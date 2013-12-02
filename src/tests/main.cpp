@@ -11,22 +11,10 @@ int main(int argc, char** argv) {
 const int N = 10000;
 
 CELERO_MAIN
-
-BASELINE(CeleroBenchTest, Baseline, 0, N)
-{
-    char buf[128];
-    sprintf(buf, "[%s]: %s", "le timestamp", "le message");
+BASELINE(CeleroBenchTest, Baseline, 100, N) {
 }
 
-blackhole::log::record_t record {{
-    { "message", "le message" },
-    { "timestamp", "le timestamp" }
-}};
-std::string pattern("[%(timestamp)s]: %(message)s");
-blackhole::formatter::string_t fmt(pattern);
-
-BENCHMARK(CeleroBenchTest, Benchmark, 0, N) {
-    celero::DoNotOptimizeAway(fmt.format(record));
+BENCHMARK(CeleroBenchTest, Benchmark, 100, N) {
 }
 
 #endif

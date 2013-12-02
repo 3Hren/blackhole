@@ -10,8 +10,9 @@ SET(HEADERS
 )
 
 SET(SOURCES
-    test_StringFormatter
     main
+    test_StringFormatter
+    test_FileSink
 )
 
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
@@ -19,6 +20,8 @@ ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 SET(Boost_USE_MULTITHREADED ON)
 
 SET(BOOST_COMPONENTS
+    system
+    filesystem
 )
 
 SET(GOOGLE_LIBRARIES
