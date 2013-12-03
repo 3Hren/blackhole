@@ -21,13 +21,23 @@ namespace blackhole {
 namespace log {
 
 typedef boost::variant<
+    std::time_t,
+    std::uint8_t,
     std::uint64_t,
     std::int64_t,
     std::double_t,
     std::string
 > attribute_value_t;
 
-typedef std::unordered_map<std::string, attribute_value_t> attributes_t;
+typedef std::pair<
+    std::string,
+    attribute_value_t
+> attribute_pair_t;
+
+typedef std::unordered_map<
+    attribute_pair_t::first_type,
+    attribute_pair_t::second_type
+> attributes_t;
 
 struct record_t {
     attributes_t attributes;

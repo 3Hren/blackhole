@@ -1,5 +1,7 @@
 #include "Mocks.hpp"
 
+#include <ctime>
+
 using namespace blackhole;
 
 enum level {
@@ -47,6 +49,22 @@ private:
 };
 
 
+struct LessEqThan {
+    template<typename L, typename R>
+    bool operator()(const L& left, const R& right) const {
+        return left <= right;
+    }
+};
+
+log::attributes_t merge(const std::initializer_list<log::attributes_t>& args) {
+    log::attributes_t summary;
+    for (auto it = args.begin(); it != args.end(); ++it) {
+        summary.insert(it->begin(), it->end());
+    }
+    return summary;
+}
+
+
 namespace keyword {
 
 } // namespace keyword
@@ -56,6 +74,7 @@ class logger_base_t {
 
 protected:
     filter_t m_filter;
+    std::unique_ptr<base_frontend_t> m_frontend;
 
 public:
     logger_base_t() :
@@ -78,22 +97,29 @@ public:
     void set_filter(filter_t&& filter) {
         m_filter = filter;
     }
-};
 
-template<typename Level>
-class verbose_logger_t : public logger_base_t {
-    std::unique_ptr<base_frontend_t> m_frontend;
-public:
-    log::record_t open_record(Level level) const {
-        //!@todo: Enabled?
-        //!@todo: Create base attributes
-        log::attributes_t attributes;
-        attributes["severity"] = static_cast<std::uint64_t>(level);
-        if (m_filter(attributes)) {
-            log::record_t record;
-            record.attributes = std::move(attributes);
-            return record;
+    void add_frontend(std::unique_ptr<base_frontend_t> frontend) {
+        m_frontend = std::move(frontend);
+    }
+
+    log::record_t open_record() const {
+        return open_record(log::attributes_t());
+    }
+
+    log::record_t open_record(log::attributes_t&& local_attributes) const {
+        if (enabled()) {
+            log::attributes_t attributes = merge({
+                std::move(get_scoped_attributes()),
+                std::move(local_attributes)
+            });
+
+            if (m_filter(attributes)) {
+                log::record_t record;
+                record.attributes = std::move(attributes);
+                return record;
+            }
         }
+
         return log::record_t();
     }
 
@@ -101,8 +127,19 @@ public:
         m_frontend->handle(std::move(record));
     }
 
-    void add_frontend(std::unique_ptr<base_frontend_t> frontend) {
-        m_frontend = std::move(frontend);
+private:
+    log::attributes_t get_scoped_attributes() const {
+        log::attributes_t attributes;
+        attributes["timestamp_id"] = std::time(nullptr);
+        return attributes;
+    }
+};
+
+template<typename Level>
+class verbose_logger_t : public logger_base_t {
+public:
+    log::record_t open_record(Level level) const {
+        return logger_base_t::open_record(severity = level);
     }
 
     template<typename Action>
@@ -119,17 +156,16 @@ public:
         }
     };
 
-    struct LessEqThan {
-        template<typename L, typename R>
-        bool operator()(const L& left, const R& right) const {
-            return left <= right;
-        }
-    };
-
     class severity_t {
     public:
         filter_t operator>=(Level level) const {
             return severity_action_t<LessEqThan>(level);
+        }
+
+        log::attributes_t operator=(Level level) const {
+            log::attributes_t attributes;
+            attributes["severity"] = static_cast<std::uint64_t>(level);
+            return attributes;
         }
     };
 
@@ -156,6 +192,17 @@ TEST(logger_base_t, CanBeDisabled) {
 TEST(logger_base_t, EnabledByDefault) {
     logger_base_t log;
     EXPECT_TRUE(log.enabled());
+}
+
+TEST(logger_base_t, OpenRecordByDefault) {
+    logger_base_t log;
+    EXPECT_TRUE(log.open_record().valid());
+}
+
+TEST(logger_base_t, DoNotOpenRecordIfDisabled) {
+    logger_base_t log;
+    log.disable();
+    EXPECT_FALSE(log.open_record().valid());
 }
 
 TEST(verbose_logger_t, Manual) {
