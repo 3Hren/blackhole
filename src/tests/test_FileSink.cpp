@@ -1,5 +1,3 @@
-// Проверить boost::fs и raw
-
 #include "Mocks.hpp"
 
 using namespace blackhole;
@@ -40,9 +38,4 @@ TEST(file_t, ThrowsExceptionIfFileCannotBeOpened) {
     EXPECT_CALL(sink.backend(), write(_))
             .Times(0);
     EXPECT_THROW(sink.consume("message"), error_t);
-}
-
-TEST(file_t, Manual) {
-    sink::file_t<sink::boost_backend_t> sink("test.log");
-    sink.consume("le message");
 }

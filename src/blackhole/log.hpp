@@ -31,6 +31,10 @@ typedef std::unordered_map<std::string, attribute_value_t> attributes_t;
 
 struct record_t {
     attributes_t attributes;
+
+    bool valid() const {
+        return !attributes.empty();
+    }
 };
 
 } // namespace log

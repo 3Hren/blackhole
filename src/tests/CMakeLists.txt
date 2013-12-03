@@ -1,6 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
-SET(CMAKE_BUILD_TYPE "Release")
+SET(CMAKE_BUILD_TYPE "Debug")
 
 SET(PROJECT blackhole-tests)
 
@@ -13,6 +13,7 @@ SET(SOURCES
     main
     test_StringFormatter
     test_FileSink
+    test_VerboseLogger
 )
 
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
