@@ -60,6 +60,50 @@ log::attributes_t merge(const std::initializer_list<log::attributes_t>& args) {
 
 namespace keyword {
 
+template<typename T>
+struct severity_t {
+    static_assert(std::is_enum<T>::value, "severity type must be enum");
+
+    typedef typename std::underlying_type<T>::type type;
+
+    static const char* name() {
+        return "severity";
+    }
+
+    filter_t operator>=(T value) const {
+        return action_t<LessEqThan>(value);
+    }
+
+    log::attributes_t operator=(T value) const {
+        log::attributes_t attributes;
+        attributes[name()] = static_cast<type>(value);
+        return attributes;
+    }
+
+    template<typename Action>
+    struct action_t {
+        Action action;
+        T value;
+
+        action_t(T value) :
+            value(value)
+        {}
+
+        bool operator()(const log::attributes_t& attributes) const {
+            //!@todo: attributes.extract<keyword::severity>();
+            return action(value, static_cast<T>(boost::get<type>(attributes.at(severity_t<T>::name()))));
+        }
+    };
+};
+
+template<typename T>
+static severity_t<T>& severity() {
+    static severity_t<T> self;
+    return self;
+}
+
+// DECLARE_KEYWORD(severity, level);
+
 } // namespace keyword
 
 class logger_base_t {
@@ -134,38 +178,8 @@ class verbose_logger_t : public logger_base_t {
 
 public:
     log::record_t open_record(Level level) const {
-        return logger_base_t::open_record(severity = level);
+        return logger_base_t::open_record(keyword::severity<Level>() = level);
     }
-
-    template<typename Action>
-    struct severity_action_t {
-
-        Action action;
-        Level level;
-
-        severity_action_t(Level level) :
-            level(level)
-        {}
-
-        bool operator()(const log::attributes_t& attributes) const {
-            return action(level, static_cast<Level>(boost::get<level_type>(attributes.at("severity"))));
-        }
-    };
-
-    class severity_t {
-    public:
-        filter_t operator>=(Level level) const {
-            return severity_action_t<LessEqThan>(level);
-        }
-
-        log::attributes_t operator=(Level level) const {
-            log::attributes_t attributes;
-            attributes["severity"] = static_cast<level_type>(level);
-            return attributes;
-        }
-    };
-
-    severity_t severity;
 };
 
 TEST(logger_base_t, CanBeEnabled) {
@@ -212,7 +226,7 @@ TEST(verbose_logger_t, OpenRecordByDefault) {
 TEST(verbose_logger_t, OpenRecordForValidVerbosityLevel) {
     enum class level : std::uint64_t { debug, info, warn, error };
     verbose_logger_t<level> log;
-    log.set_filter(log.severity >= level::info);
+    log.set_filter(keyword::severity<level>() >= level::info);
     EXPECT_FALSE(log.open_record(level::debug).valid());
     EXPECT_TRUE(log.open_record(level::info).valid());
     EXPECT_TRUE(log.open_record(level::warn).valid());
