@@ -54,17 +54,22 @@ log::attributes_t merge(const std::initializer_list<log::attributes_t>& args) {
     for (auto it = args.begin(); it != args.end(); ++it) {
         summary.insert(it->begin(), it->end());
     }
+
     return summary;
 }
 
 
 namespace keyword {
 
-template<typename T>
-struct severity_t {
-    static_assert(std::is_enum<T>::value, "severity type must be enum");
+template<typename T, class = void>
+struct keyword_base_t {
+    typedef T type;
+};
 
-    typedef typename std::underlying_type<T>::type type;
+template<typename T>
+struct keyword_base_t<T, typename std::enable_if<std::is_enum<T>::value>::type> {
+    typedef T type;
+    typedef typename std::underlying_type<T>::type underlying_type;
 
     static const char* name() {
         return "severity";
@@ -76,7 +81,7 @@ struct severity_t {
 
     log::attributes_t operator=(T value) const {
         log::attributes_t attributes;
-        attributes[name()] = static_cast<type>(value);
+        attributes[name()] = static_cast<underlying_type>(value);
         return attributes;
     }
 
@@ -91,18 +96,26 @@ struct severity_t {
 
         bool operator()(const log::attributes_t& attributes) const {
             //!@todo: attributes.extract<keyword::severity>();
-            return action(value, static_cast<T>(boost::get<type>(attributes.at(severity_t<T>::name()))));
+            return action(value, static_cast<T>(boost::get<underlying_type>(attributes.at(keyword_base_t<T>::name()))));
         }
     };
 };
 
-template<typename T>
-static severity_t<T>& severity() {
-    static severity_t<T> self;
-    return self;
-}
+#define DECLARE_SEVERITY(__name__) \
+    template<typename T> \
+    static keyword::keyword_base_t<T>& __name__() { \
+        static keyword::keyword_base_t<T> self; \
+        return self; \
+    }
 
-// DECLARE_KEYWORD(severity, level);
+#define DECLARE_KEYWORD(__name__, __type__) \
+    static keyword::keyword_base_t<__type__>& __name__() { \
+        static keyword::keyword_base_t<__type__> self; \
+        return self; \
+    }
+
+DECLARE_SEVERITY(severity)
+DECLARE_KEYWORD(timestamp_id, std::time_t)
 
 } // namespace keyword
 
