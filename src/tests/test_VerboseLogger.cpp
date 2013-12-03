@@ -4,13 +4,6 @@
 
 using namespace blackhole;
 
-enum level {
-    debug,
-    info,
-    warning,
-    error
-};
-
 class base_frontend_t {
 public:
     virtual void handle(log::record_t&& record) = 0;
@@ -137,6 +130,8 @@ private:
 
 template<typename Level>
 class verbose_logger_t : public logger_base_t {
+    typedef typename std::underlying_type<Level>::type level_type;
+
 public:
     log::record_t open_record(Level level) const {
         return logger_base_t::open_record(severity = level);
@@ -144,6 +139,7 @@ public:
 
     template<typename Action>
     struct severity_action_t {
+
         Action action;
         Level level;
 
@@ -152,7 +148,7 @@ public:
         {}
 
         bool operator()(const log::attributes_t& attributes) const {
-            return action(level, static_cast<Level>(boost::get<std::uint64_t>(attributes.at("severity"))));
+            return action(level, static_cast<Level>(boost::get<level_type>(attributes.at("severity"))));
         }
     };
 
@@ -164,18 +160,13 @@ public:
 
         log::attributes_t operator=(Level level) const {
             log::attributes_t attributes;
-            attributes["severity"] = static_cast<std::uint64_t>(level);
+            attributes["severity"] = static_cast<level_type>(level);
             return attributes;
         }
     };
 
     severity_t severity;
 };
-
-TEST(verbose_logger_t, Class) {
-    verbose_logger_t<level> log;
-    UNUSED(log);
-}
 
 TEST(logger_base_t, CanBeEnabled) {
     logger_base_t log;
@@ -205,7 +196,33 @@ TEST(logger_base_t, DoNotOpenRecordIfDisabled) {
     EXPECT_FALSE(log.open_record().valid());
 }
 
+TEST(verbose_logger_t, Class) {
+    enum level : std::uint64_t { debug, info, warn, error };
+    verbose_logger_t<level> log;
+    UNUSED(log);
+}
+
+TEST(verbose_logger_t, OpenRecordByDefault) {
+    enum level : std::uint64_t { debug, info, warn, error };
+    verbose_logger_t<level> log;
+    log::record_t record = log.open_record(level::debug);
+    EXPECT_TRUE(record.valid());
+}
+
+TEST(verbose_logger_t, OpenRecordForValidVerbosityLevel) {
+    enum class level : std::uint64_t { debug, info, warn, error };
+    verbose_logger_t<level> log;
+    log.set_filter(log.severity >= level::info);
+    EXPECT_FALSE(log.open_record(level::debug).valid());
+    EXPECT_TRUE(log.open_record(level::info).valid());
+    EXPECT_TRUE(log.open_record(level::warn).valid());
+    EXPECT_TRUE(log.open_record(level::error).valid());
+}
+
+// Allow to make custom filters. severity >= warning || has_tag(urgent) && !!urgent
+
 TEST(verbose_logger_t, Manual) {
+    enum level : std::uint64_t { debug, info, warn, error };
     verbose_logger_t<level> log;
 
     //!@note: Factory starts here...
@@ -223,22 +240,3 @@ TEST(verbose_logger_t, Manual) {
         log.push(std::move(record));
     }
 }
-
-TEST(verbose_logger_t, OpenRecordByDefault) {
-    enum level { debug, info, warn, error };
-    verbose_logger_t<level> log;
-    log::record_t record = log.open_record(level::debug);
-    EXPECT_TRUE(record.valid());
-}
-
-TEST(verbose_logger_t, OpenRecordForValidVerbosityLevel) {
-    enum class level : std::uint64_t { debug, info, warn, error };
-    verbose_logger_t<level> log;
-    log.set_filter(log.severity >= level::info);
-    EXPECT_FALSE(log.open_record(level::debug).valid());
-    EXPECT_TRUE(log.open_record(level::info).valid());
-    EXPECT_TRUE(log.open_record(level::warn).valid());
-    EXPECT_TRUE(log.open_record(level::error).valid());
-}
-
-// Allow to make custom filters. severity >= warning || has_tag(urgent) && !!urgent
