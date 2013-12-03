@@ -35,9 +35,11 @@
 // *     pattern: [%(...)s] ...
 // */
 
-//log.debug("%s", "arg1", {
-//              "key1": 123
-//          })
+//! Python
+// log.debug("message from '%s'", "Hell", { "owner": "Satan", "email": "satan@mail.hell" })
+
+
+//auto core = logging::core::instance();
 
 namespace mock {
 

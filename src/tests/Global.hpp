@@ -13,3 +13,4 @@ using namespace ::testing;
     TEST(__case__, DISABLED_##__name__)
 
 #include "blackhole/log.hpp"
+#include "blackhole/utils/unique.hpp"
