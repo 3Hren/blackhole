@@ -139,6 +139,7 @@ public:
     void write(const std::string& message) {
         m_file.write(message.data(), static_cast<std::streamsize>(message.size()));
         m_file.put('\n');
+        m_file.flush();
     }
 };
 
