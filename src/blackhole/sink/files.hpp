@@ -2,10 +2,8 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
-//#include <boost/format.hpp>
-//#include <boost/lexical_cast.hpp>
-//#include <boost/mpl/vector.hpp>
-//#include <boost/variant.hpp>
+
+#include "blackhole/error.hpp"
 
 namespace blackhole {
 
