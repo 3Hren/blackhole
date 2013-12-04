@@ -1,9 +1,11 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include "attribute.hpp"
 #include "filter.hpp"
+#include "frontend.hpp"
 #include "keyword.hpp"
 
 namespace blackhole {
@@ -13,7 +15,7 @@ class logger_base_t {
 
 protected:
     filter_t m_filter;
-    std::unique_ptr<base_frontend_t> m_frontend;
+    std::vector<std::unique_ptr<base_frontend_t>> m_frontends;
     log::attributes_t m_global_attributes;
 
 public:
@@ -43,7 +45,7 @@ public:
     }
 
     void add_frontend(std::unique_ptr<base_frontend_t> frontend) {
-        m_frontend = std::move(frontend);
+        m_frontends.push_back(std::move(frontend));
     }
 
     log::record_t open_record() const {
@@ -51,7 +53,7 @@ public:
     }
 
     log::record_t open_record(log::attributes_t&& local_attributes) const {
-        if (enabled()) {
+        if (enabled() && !m_frontends.empty()) {
             log::attributes_t attributes = merge({
                 // universe_attributes              // Program global.
                 // thread_attributes                // Thread local.
@@ -70,14 +72,17 @@ public:
         return log::record_t();
     }
 
-    void push(log::record_t&& record) {
-        //!@todo: Check frontend is not null!
-        m_frontend->handle(std::move(record));
+    void push(log::record_t&& record) const {
+        for (auto it = m_frontends.begin(); it != m_frontends.end(); ++it) {
+            const std::unique_ptr<base_frontend_t>& frontend = *it;
+            frontend->handle(record);
+        }
     }
 
 private:
     log::attributes_t get_scoped_attributes() const {
         log::attributes_t attributes;
+        //!@todo: Maybe replace explicit string by synomim keyword?
         attributes["timestamp_id"] = std::time(nullptr);
         return attributes;
     }

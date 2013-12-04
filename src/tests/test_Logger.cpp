@@ -20,12 +20,18 @@ TEST(logger_base_t, EnabledByDefault) {
 }
 
 TEST(logger_base_t, OpenRecordByDefault) {
+    std::unique_ptr<mock::frontend_t> frontend;
+
     logger_base_t log;
+    log.add_frontend(std::move(frontend));
     EXPECT_TRUE(log.open_record().valid());
 }
 
 TEST(logger_base_t, DoNotOpenRecordIfDisabled) {
+    std::unique_ptr<mock::frontend_t> frontend;
+
     logger_base_t log;
+    log.add_frontend(std::move(frontend));
     log.disable();
     EXPECT_FALSE(log.open_record().valid());
 }
@@ -33,28 +39,45 @@ TEST(logger_base_t, DoNotOpenRecordIfDisabled) {
 namespace blackhole { namespace keyword { DECLARE_KEYWORD(urgent, std::uint8_t) } }
 
 TEST(logger_base_t, OpensRecordWhenAttributeFilterSucceed) {
+    std::unique_ptr<mock::frontend_t> frontend;
+
     logger_base_t log;
+    log.add_frontend(std::move(frontend));
     log.set_filter(expr::has_attr(keyword::urgent()));
     log.add_attribute(keyword::urgent() = 1);
     EXPECT_TRUE(log.open_record().valid());
 }
 
 TEST(logger_base_t, DoNotOpenRecordWhenAttributeFilterFailed) {
+    std::unique_ptr<mock::frontend_t> frontend;
+
     logger_base_t log;
+    log.add_frontend(std::move(frontend));
     log.set_filter(expr::has_attr(keyword::urgent()));
     EXPECT_FALSE(log.open_record().valid());
 }
 
 TEST(logger_base_t, OpenRecordWhenComplexFilterSucceed) {
+    std::unique_ptr<mock::frontend_t> frontend;
+
     logger_base_t log;
+    log.add_frontend(std::move(frontend));
     log.set_filter(expr::has_attr(keyword::urgent()) && keyword::urgent() == 1);
     log.add_attribute(keyword::urgent() = 1);
     EXPECT_TRUE(log.open_record().valid());
 }
 
 TEST(logger_base_t, DoNotOpenRecordWhenComplexFilterFailed) {
+    std::unique_ptr<mock::frontend_t> frontend;
+
     logger_base_t log;
+    log.add_frontend(std::move(frontend));
     log.set_filter(expr::has_attr(keyword::urgent()) && keyword::urgent() == 1);
     log.add_attribute(keyword::urgent() = 2);
+    EXPECT_FALSE(log.open_record().valid());
+}
+
+TEST(logger_base_t, DoNotOpenRecordIfThereAreNoFrontends) {
+    logger_base_t log;
     EXPECT_FALSE(log.open_record().valid());
 }

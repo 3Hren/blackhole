@@ -10,14 +10,20 @@ TEST(verbose_logger_t, Class) {
 
 TEST(verbose_logger_t, OpenRecordByDefault) {
     enum level : std::uint64_t { debug, info, warn, error };
+    std::unique_ptr<mock::frontend_t> frontend;
+
     verbose_logger_t<level> log;
+    log.add_frontend(std::move(frontend));
     log::record_t record = log.open_record(level::debug);
     EXPECT_TRUE(record.valid());
 }
 
 TEST(verbose_logger_t, OpenRecordForValidVerbosityLevel) {
     enum class level : std::uint64_t { debug, info, warn, error };
+    std::unique_ptr<mock::frontend_t> frontend;
+
     verbose_logger_t<level> log;
+    log.add_frontend(std::move(frontend));
     log.set_filter(keyword::severity<level>() >= level::info);
     EXPECT_FALSE(log.open_record(level::debug).valid());
     EXPECT_TRUE(log.open_record(level::info).valid());

@@ -2,11 +2,13 @@
 
 #include <memory>
 
+#include "record.hpp"
+
 namespace blackhole {
 
 class base_frontend_t {
 public:
-    virtual void handle(log::record_t&& record) = 0;
+    virtual void handle(const log::record_t& record) = 0;
 };
 
 template<class Formatter, class Sink>
@@ -19,7 +21,7 @@ public:
         m_sink(std::move(sink))
     {}
 
-    void handle(log::record_t&& record) {
+    void handle(const log::record_t& record) {
         auto msg = std::move(m_formatter->format(record));
         m_sink->consume(msg);
      }

@@ -41,6 +41,8 @@
 
 //auto core = logging::core::instance();
 
+using namespace blackhole;
+
 namespace mock {
 
 class backend_t {
@@ -55,6 +57,11 @@ public:
 
     MOCK_METHOD0(open, bool());
     MOCK_METHOD1(write, void(const std::string&));
+};
+
+class frontend_t : public base_frontend_t {
+public:
+    MOCK_METHOD1(handle, void(const log::record_t&));
 };
 
 } // namespace mock
