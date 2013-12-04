@@ -1,3 +1,9 @@
+#pragma once
+
+#include <string>
+
+#include <boost/format.hpp>
+
 namespace blackhole {
 
 namespace utils {

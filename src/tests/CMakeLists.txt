@@ -13,6 +13,7 @@ SET(SOURCES
     main
     test_StringFormatter
     test_FileSink
+    test_Logger
     test_VerboseLogger
 )
 

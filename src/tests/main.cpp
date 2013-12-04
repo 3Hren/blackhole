@@ -12,7 +12,12 @@ const int N = 10000;
 
 CELERO_MAIN
 BASELINE(CeleroBenchTest, Baseline, 100, N) {
+    (boost::format("Le message: %s") % "le value").str();
 }
+
+using namespace blackhole;
+
+log::
 
 BENCHMARK(CeleroBenchTest, Benchmark, 100, N) {
 }
