@@ -70,10 +70,23 @@ log::attributes_t merge(const std::initializer_list<log::attributes_t>& args) {
 
 namespace expr {
 
+struct And {
+    filter_t first;
+    filter_t second;
+
+    bool operator ()(const log::attributes_t& attributes) const {
+        return first(attributes) && second(attributes);
+    }
+};
+
 template<typename T>
 struct has_attr_action_t {
     bool operator()(const log::attributes_t& attributes) const {
         return attributes.find(T::name()) != attributes.end();
+    }
+
+    filter_t operator &&(filter_t other) const {
+        return And { *this, other };
     }
 };
 
@@ -313,7 +326,7 @@ TEST(verbose_logger_t, OpenRecordForValidVerbosityLevel) {
 
 namespace keyword { DECLARE_KEYWORD(urgent, std::uint8_t) }
 
-TEST(logger_base_t, OpensRecordWhenAttributeFilterSucceeded) {
+TEST(logger_base_t, OpensRecordWhenAttributeFilterSucceed) {
     logger_base_t log;
     log.set_filter(expr::has_attr(keyword::urgent()));
     log.add_attribute(keyword::urgent() = 1);
@@ -326,13 +339,19 @@ TEST(logger_base_t, DoNotOpenRecordWhenAttributeFilterFailed) {
     EXPECT_FALSE(log.open_record().valid());
 }
 
+TEST(logger_base_t, OpenRecordWhenComplexFilterSucceed) {
+    logger_base_t log;
+    log.set_filter(expr::has_attr(keyword::urgent()) && keyword::urgent() == 1);
+    log.add_attribute(keyword::urgent() = 1);
+    EXPECT_TRUE(log.open_record().valid());
+}
 
-//TEST(logger_base_t, ComplexFilter) {
-//    logger_base_t log;
-//    log.set_filter(expr::has_attr(keyword::urgent()));// && keyword::urgent() == 1);
-//    log.set_attribute(keyword::urgent() = 1);
-//    EXPECT_FALSE(log.open_record());
-//}
+TEST(logger_base_t, DoNotOpenRecordWhenComplexFilterFailed) {
+    logger_base_t log;
+    log.set_filter(expr::has_attr(keyword::urgent()) && keyword::urgent() == 1);
+    log.add_attribute(keyword::urgent() = 2);
+    EXPECT_FALSE(log.open_record().valid());
+}
 
 // Allow to make custom filters. severity() >= warning || has_tag(urgent()) && urgent() == 1
 //                                         bool(attr)  ||      bool(attr)   && bool(attr)
