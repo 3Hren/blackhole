@@ -71,6 +71,7 @@ public:
     }
 
     void push(log::record_t&& record) {
+        //!@todo: Check frontend is not null!
         m_frontend->handle(std::move(record));
     }
 
