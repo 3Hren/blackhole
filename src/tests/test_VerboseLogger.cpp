@@ -41,13 +41,23 @@ private:
     default_filter_t() {}
 };
 
+namespace helper {
 
 struct LessEqThan {
     template<typename L, typename R>
-    bool operator()(const L& left, const R& right) const {
+    static bool execute(const L& left, const R& right) {
         return left <= right;
     }
 };
+
+struct Eq {
+    template<typename L, typename R>
+    static bool execute(const L& left, const R& right) {
+        return left == right;
+    }
+};
+
+} // namespace helper
 
 log::attributes_t merge(const std::initializer_list<log::attributes_t>& args) {
     log::attributes_t summary;
@@ -58,63 +68,110 @@ log::attributes_t merge(const std::initializer_list<log::attributes_t>& args) {
     return summary;
 }
 
+namespace expr {
+
+template<typename T>
+struct has_attr_action_t {
+    bool operator()(const log::attributes_t& attributes) const {
+        return attributes.find(T::name()) != attributes.end();
+    }
+};
+
+template<typename T>
+has_attr_action_t<T> has_attr(const T&) {
+    return has_attr_action_t<T>();
+}
+
+} // namespace expr
 
 namespace keyword {
 
 template<typename T, class = void>
-struct keyword_base_t {
-    typedef T type;
+struct traits {
+    static inline void pack(log::attributes_t& attributes, const std::string& name, const T& value) {
+        attributes[name] = value;
+    }
+
+    static inline T pack(const T& value) {
+        return value;
+    }
+
+    static inline T extract(const log::attributes_t& attributes, const std::string& name) {
+        return boost::get<T>(attributes.at(name));
+    }
 };
 
 template<typename T>
-struct keyword_base_t<T, typename std::enable_if<std::is_enum<T>::value>::type> {
-    typedef T type;
+struct traits<T, typename std::enable_if<std::is_enum<T>::value>::type> {
     typedef typename std::underlying_type<T>::type underlying_type;
 
+    static inline void pack(log::attributes_t& attributes, const std::string& name, const T& value) {
+        attributes[name] = static_cast<underlying_type>(value);
+    }
+
+    static inline underlying_type pack(const T& value) {
+        return static_cast<underlying_type>(value);
+    }
+
+    static inline T extract(const log::attributes_t& attributes, const std::string& name) {
+        return static_cast<T>(boost::get<underlying_type>(attributes.at(name)));
+    }
+};
+
+//!@todo: Need testing.
+template<typename T, typename NameProvider>
+struct keyword_t {
     static const char* name() {
-        return "severity";
+        return NameProvider::name();
     }
 
-    filter_t operator>=(T value) const {
-        return action_t<LessEqThan>(value);
+    log::attribute_pair_t operator =(T value) const {
+        return std::make_pair(name(), traits<T>::pack(value));
     }
 
-    log::attributes_t operator=(T value) const {
-        log::attributes_t attributes;
-        attributes[name()] = static_cast<underlying_type>(value);
-        return attributes;
+    filter_t operator >=(T value) const {
+        return action_t<helper::LessEqThan>({ value });
+    }
+
+    filter_t operator ==(T value) const {
+        return action_t<helper::Eq>({ value });
     }
 
     template<typename Action>
     struct action_t {
-        Action action;
         T value;
 
-        action_t(T value) :
-            value(value)
-        {}
-
         bool operator()(const log::attributes_t& attributes) const {
-            //!@todo: attributes.extract<keyword::severity>();
-            return action(value, static_cast<T>(boost::get<underlying_type>(attributes.at(keyword_base_t<T>::name()))));
+            return Action::execute(value, traits<T>::extract(attributes, name()));
         }
     };
 };
 
-#define DECLARE_SEVERITY(__name__) \
-    template<typename T> \
-    static keyword::keyword_base_t<T>& __name__() { \
-        static keyword::keyword_base_t<T> self; \
+namespace tag {
+
+struct severity_t {
+    static const char* name() { return "severity"; }
+};
+
+} // namespace tag
+
+template<typename T>
+static keyword_t<T, tag::severity_t>& severity() {
+    static keyword_t<T, tag::severity_t> self;
+    return self;
+}
+
+#define DECLARE_KEYWORD(Name, T) \
+    namespace tag { \
+        struct Name##_t { \
+            static const char* name() { return #Name; } \
+        }; \
+    } \
+    static keyword_t<T, tag::Name##_t>& Name() { \
+        static keyword_t<T, tag::Name##_t> self; \
         return self; \
     }
 
-#define DECLARE_KEYWORD(__name__, __type__) \
-    static keyword::keyword_base_t<__type__>& __name__() { \
-        static keyword::keyword_base_t<__type__> self; \
-        return self; \
-    }
-
-DECLARE_SEVERITY(severity)
 DECLARE_KEYWORD(timestamp_id, std::time_t)
 
 } // namespace keyword
@@ -125,6 +182,7 @@ class logger_base_t {
 protected:
     filter_t m_filter;
     std::unique_ptr<base_frontend_t> m_frontend;
+    log::attributes_t m_global_attributes;
 
 public:
     logger_base_t() :
@@ -148,6 +206,10 @@ public:
         m_filter = filter;
     }
 
+    void add_attribute(const log::attribute_pair_t& attr) {
+        m_global_attributes.insert(attr);
+    }
+
     void add_frontend(std::unique_ptr<base_frontend_t> frontend) {
         m_frontend = std::move(frontend);
     }
@@ -159,8 +221,11 @@ public:
     log::record_t open_record(log::attributes_t&& local_attributes) const {
         if (enabled()) {
             log::attributes_t attributes = merge({
-                std::move(get_scoped_attributes()),
-                std::move(local_attributes)
+                // universe_attributes              // Program global.
+                // thread_attributes                // Thread local.
+                m_global_attributes,                // Logger object specific.
+                std::move(get_scoped_attributes()), // Depending on event scope, e.g. timestamp.
+                std::move(local_attributes)         // Any user attributes.
             });
 
             if (m_filter(attributes)) {
@@ -191,7 +256,7 @@ class verbose_logger_t : public logger_base_t {
 
 public:
     log::record_t open_record(Level level) const {
-        return logger_base_t::open_record(keyword::severity<Level>() = level);
+        return logger_base_t::open_record({ keyword::severity<Level>() = level }); //!@todo: Неправильно, нужно во-первых уметь генерировать мапу аттрибутов из вариадика, а во-вторых - оставлять operator= для создания одного аттрибута!
     }
 };
 
@@ -246,7 +311,31 @@ TEST(verbose_logger_t, OpenRecordForValidVerbosityLevel) {
     EXPECT_TRUE(log.open_record(level::error).valid());
 }
 
-// Allow to make custom filters. severity >= warning || has_tag(urgent) && !!urgent
+namespace keyword { DECLARE_KEYWORD(urgent, std::uint8_t) }
+
+TEST(logger_base_t, OpensRecordWhenAttributeFilterSucceeded) {
+    logger_base_t log;
+    log.set_filter(expr::has_attr(keyword::urgent()));
+    log.add_attribute(keyword::urgent() = 1);
+    EXPECT_TRUE(log.open_record().valid());
+}
+
+TEST(logger_base_t, DoNotOpenRecordWhenAttributeFilterFailed) {
+    logger_base_t log;
+    log.set_filter(expr::has_attr(keyword::urgent()));
+    EXPECT_FALSE(log.open_record().valid());
+}
+
+
+//TEST(logger_base_t, ComplexFilter) {
+//    logger_base_t log;
+//    log.set_filter(expr::has_attr(keyword::urgent()));// && keyword::urgent() == 1);
+//    log.set_attribute(keyword::urgent() = 1);
+//    EXPECT_FALSE(log.open_record());
+//}
+
+// Allow to make custom filters. severity() >= warning || has_tag(urgent()) && urgent() == 1
+//                                         bool(attr)  ||      bool(attr)   && bool(attr)
 
 TEST(verbose_logger_t, Manual) {
     enum level : std::uint64_t { debug, info, warn, error };
