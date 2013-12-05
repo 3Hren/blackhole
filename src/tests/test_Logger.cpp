@@ -2,6 +2,8 @@
 
 using namespace blackhole;
 
+namespace expr = blackhole::expression;
+
 TEST(logger_base_t, CanBeEnabled) {
     logger_base_t log;
     log.enable();
@@ -109,4 +111,5 @@ TEST(logger_base_t, FilteringUsingDynamicAttributes) {
 //! overload inspect::has_attr(string)
 //! make || operations in filtering
 //! implement %(...A)s handling in formatter::string
+//! [L|S|G|T|U].
 //! implement %(...L)s handling for only local other attributes in format::string

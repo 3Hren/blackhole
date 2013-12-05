@@ -9,7 +9,7 @@
 
 namespace blackhole {
 
-namespace expr {
+namespace expression {
 
 template<typename T>
 struct get_attr_action_t {
@@ -31,6 +31,6 @@ get_attr_action_t<T> get_attr(const std::string& name) {
     return get_attr_action_t<T>({ name });
 }
 
-} // namespace expr
+} // namespace expression
 
 } // namespace blackhole

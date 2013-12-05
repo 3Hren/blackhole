@@ -1,5 +1,7 @@
 #include "Mocks.hpp"
 
+namespace expr = blackhole::expression;
+
 TEST(HasAttribute, ReturnsTrueIfDynamicAttributeExists) {
     auto filter = expr::has_attr<std::int32_t>("custom");
     log::attributes_t attributes = {{"custom", 42}};

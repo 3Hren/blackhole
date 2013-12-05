@@ -10,7 +10,7 @@
 
 namespace blackhole {
 
-namespace expr {
+namespace expression {
 
 template<typename T>
 class has_attribute_visitor : public boost::static_visitor<bool>{
@@ -54,6 +54,6 @@ has_attr_action_t<typename T::type> has_attr(const T&) {
     return has_attr<typename T::type>(std::string(T::name()));
 }
 
-} // namespace expr
+} // namespace expression
 
 } // namespace blackhole

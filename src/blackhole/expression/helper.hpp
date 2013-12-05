@@ -5,7 +5,7 @@
 
 namespace blackhole {
 
-namespace expr {
+namespace expression {
 
 namespace aux {
 
@@ -30,6 +30,6 @@ struct Eq {
 
 } // namespace aux
 
-} // namespace expr
+} // namespace expression
 
 } // namespace blackhole
