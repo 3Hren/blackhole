@@ -31,6 +31,11 @@ get_attr_action_t<T> get_attr(const std::string& name) {
     return get_attr_action_t<T>({ name });
 }
 
+template<typename T>
+get_attr_action_t<typename T::type> get_attr(const T&) {
+    return get_attr<typename T::type>(std::string(T::name()));
+}
+
 } // namespace expression
 
 } // namespace blackhole

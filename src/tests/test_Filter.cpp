@@ -26,7 +26,7 @@ TEST(HasAttribute, ReturnsTrueIfBothDynamicAttributeNotExistsAndTypeMismatched) 
     EXPECT_FALSE(filter(attributes));
 }
 
-TEST(GetAttribute, CanExtractAttribute) {
+TEST(GetAttribute, CanExtractDynamicAttribute) {
     auto filter = expr::get_attr<std::int32_t>("custom");
     log::attributes_t attributes = {{"custom", 42}};
     EXPECT_EQ(42, filter(attributes));
@@ -58,6 +58,12 @@ TEST(GetAttribute, FailsIfDeferredlyAttributeComparingFails) {
     auto filter = expr::get_attr<std::int32_t>("custom") == 666;
     log::attributes_t attributes = {{"custom", 42}};
     EXPECT_FALSE(filter(attributes));
+}
+
+TEST(GetAttribute, CanExtractStaticAttribute) {
+    auto filter = expr::get_attr(keyword::timestamp_id());
+    log::attributes_t attributes = {{"timestamp_id", std::time_t(100500)}};
+    EXPECT_EQ(std::time_t(100500), filter(attributes));
 }
 
 TEST(FilterAttribute, ComplexAttributeFiltering) {
