@@ -81,3 +81,11 @@ TEST(logger_base_t, DoNotOpenRecordIfThereAreNoFrontends) {
     logger_base_t log;
     EXPECT_FALSE(log.open_record().valid());
 }
+
+//!@todo: TestCustomAttributes: setting,
+//! filtering,
+//! implement inspect::getattr function(attr) and (string),
+//! overload inspect::has_attr(string)
+//! make || operations in filtering
+//! implement %(...A)s handling in formatter::string
+//! implement %(...L)s handling for only local other attributes in format::string
