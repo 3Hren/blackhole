@@ -52,6 +52,10 @@ public:
         return open_record(log::attributes_t());
     }
 
+    log::record_t open_record(log::attribute_pair_t&& local_attribute) {
+        return open_record(log::attributes_t({ std::move(local_attribute) }));
+    }
+
     log::record_t open_record(log::attributes_t&& local_attributes) const {
         if (enabled() && !m_frontends.empty()) {
             log::attributes_t attributes = merge({

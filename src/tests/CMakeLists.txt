@@ -15,6 +15,7 @@ SET(SOURCES
     test_FileSink
     test_Logger
     test_VerboseLogger
+    test_Attribute
 )
 
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)

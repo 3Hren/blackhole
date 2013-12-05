@@ -82,7 +82,18 @@ TEST(logger_base_t, DoNotOpenRecordIfThereAreNoFrontends) {
     EXPECT_FALSE(log.open_record().valid());
 }
 
-//!@todo: TestCustomAttributes: setting,
+TEST(logger_base_t, DynamicAttributes) {
+    std::unique_ptr<mock::frontend_t> frontend;
+
+    logger_base_t log;
+    log.add_frontend(std::move(frontend));
+    log::record_t record = log.open_record(attr::make<std::int32_t>("custom", 42));
+    ASSERT_TRUE(record.valid());
+    ASSERT_TRUE(record.attributes.find("custom") != record.attributes.end());
+    EXPECT_EQ(42, boost::get<std::int32_t>(record.attributes["custom"]));
+}
+
+//!@todo: TestCustomAttributes:
 //! filtering,
 //! implement inspect::getattr function(attr) and (string),
 //! overload inspect::has_attr(string)

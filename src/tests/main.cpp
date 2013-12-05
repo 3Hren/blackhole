@@ -7,7 +7,7 @@ int main(int argc, char** argv) {
     InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
-#else
+#elif 0
 #include "celero/Celero.h"
 
 using namespace blackhole;
@@ -38,5 +38,5 @@ BENCHMARK(CeleroBenchTest, Benchmark, 10, N) {
         log_.push(std::move(record));
     }
 }
-
+#else
 #endif

@@ -13,6 +13,7 @@ namespace log {
 typedef boost::variant<
     std::time_t,
     std::uint8_t,
+    std::int32_t,
     std::uint64_t,
     std::int64_t,
     std::double_t,
@@ -39,5 +40,14 @@ inline log::attributes_t merge(const std::initializer_list<log::attributes_t>& a
 
     return summary;
 }
+
+namespace attr {
+
+template<typename T>
+inline log::attribute_pair_t make(const std::string& name, const T& value) {
+    return std::make_pair(name, value);
+}
+
+} // namespace attr
 
 } // namespace blackhole
