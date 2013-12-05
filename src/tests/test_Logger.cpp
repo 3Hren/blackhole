@@ -82,7 +82,7 @@ TEST(logger_base_t, DoNotOpenRecordIfThereAreNoFrontends) {
     EXPECT_FALSE(log.open_record().valid());
 }
 
-TEST(logger_base_t, DynamicAttributes) {
+TEST(logger_base_t, SettingDynamicAttributes) {
     std::unique_ptr<mock::frontend_t> frontend;
 
     logger_base_t log;
@@ -93,8 +93,19 @@ TEST(logger_base_t, DynamicAttributes) {
     EXPECT_EQ(42, boost::get<std::int32_t>(record.attributes["custom"]));
 }
 
+TEST(logger_base_t, FilteringUsingDynamicAttributes) {
+    std::unique_ptr<mock::frontend_t> frontend;
+
+    logger_base_t log;
+    log.add_frontend(std::move(frontend));
+    log.set_filter(expr::has_attr<std::int32_t>("custom") && expr::get_attr<std::int32_t>("custom") == 42);
+    log::record_t record = log.open_record(attr::make<std::int32_t>("custom", 42));
+
+    EXPECT_TRUE(record.valid());
+}
+
 //!@todo: TestCustomAttributes:
-//! filtering,
+//! Check separately: filter, get_attr, has_attr
 //! implement inspect::getattr function(attr) and (string),
 //! overload inspect::has_attr(string)
 //! make || operations in filtering
