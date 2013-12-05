@@ -33,9 +33,7 @@ format(const std::string& format, const Args&... args) {
         return aux::substitute(boost::format(format), args...);
     } catch(const boost::io::format_error& e) {
         std::ostringstream stream;
-
         stream << "<unable to format the message - " << e.what() << ">";
-
         return stream.str();
     }
 }

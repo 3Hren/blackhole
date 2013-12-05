@@ -24,7 +24,7 @@ public:
     void handle(const log::record_t& record) {
         auto msg = std::move(m_formatter->format(record));
         m_sink->consume(msg);
-     }
+    }
 };
 
 } // namespace blackhole
