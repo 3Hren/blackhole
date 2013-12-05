@@ -42,3 +42,8 @@ TEST(string_t, ThrowsExceptionWhenAttributeNameNotProvided) {
     formatter::string_t fmt(pattern);
     EXPECT_THROW(fmt.format(record), error_t);
 }
+
+//!@todo:
+//! implement %(...A)s handling in formatter::string
+//! implement %(...L)s handling for only local attributes in format::string
+//! [L|S|G|T|U].

@@ -105,9 +105,3 @@ TEST(logger_base_t, FilteringUsingDynamicAttributes) {
 
     EXPECT_TRUE(record.valid());
 }
-
-//!@todo: TestCustomAttributes:
-//! make || operations in filtering
-//! implement %(...A)s handling in formatter::string
-//! [L|S|G|T|U].
-//! implement %(...L)s handling for only local other attributes in format::string

@@ -72,4 +72,6 @@ TEST(FilterAttribute, ComplexAttributeFiltering) {
     EXPECT_TRUE(filter(attributes));
 }
 
-//!@todo: Setting, checking and extracting enum variable.
+//!@todo: Filter.
+//! make || operations in filtering
+//! setting, checking and extracting enum variable.
