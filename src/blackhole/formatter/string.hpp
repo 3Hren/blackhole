@@ -5,6 +5,7 @@
 
 #include <boost/format.hpp>
 
+#include "blackhole/error.hpp"
 #include "blackhole/record.hpp"
 
 namespace blackhole {
