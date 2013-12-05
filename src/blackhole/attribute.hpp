@@ -43,6 +43,7 @@ inline log::attributes_t merge(const std::initializer_list<log::attributes_t>& a
 
 namespace attr {
 
+// Dynamic attribute factory function.
 template<typename T>
 inline log::attribute_pair_t make(const std::string& name, const T& value) {
     return std::make_pair(name, value);
