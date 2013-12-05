@@ -45,3 +45,23 @@ TEST(GetAttribute, ThrowsExceptionIfAttributeHasTypedMismatch) {
     log::attributes_t attributes = {{"custom", 3.1415}};
     EXPECT_THROW(filter(attributes), boost::bad_get);
 }
+
+TEST(GetAttribute, CanCompareAttributeDeferredly) {
+    auto filter = expr::get_attr<std::int32_t>("custom") == 42;
+    log::attributes_t attributes = {{"custom", 42}};
+    EXPECT_TRUE(filter(attributes));
+}
+
+TEST(GetAttribute, FailsIfDeferredlyAttributeComparingFails) {
+    auto filter = expr::get_attr<std::int32_t>("custom") == 666;
+    log::attributes_t attributes = {{"custom", 42}};
+    EXPECT_FALSE(filter(attributes));
+}
+
+TEST(FilterAttribute, ComplexAttributeFiltering) {
+    auto filter = expr::has_attr<std::int32_t>("custom") && expr::get_attr<std::int32_t>("custom") == 42;
+    log::attributes_t attributes = {{"custom", 42}};
+    EXPECT_TRUE(filter(attributes));
+}
+
+//!@todo: Setting, checking and extracting enum variable.

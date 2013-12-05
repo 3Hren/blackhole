@@ -105,7 +105,6 @@ TEST(logger_base_t, FilteringUsingDynamicAttributes) {
 }
 
 //!@todo: TestCustomAttributes:
-//! Check separately: filter, get_attr, has_attr
 //! implement inspect::getattr function(attr) and (string),
 //! overload inspect::has_attr(string)
 //! make || operations in filtering
