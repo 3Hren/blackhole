@@ -65,7 +65,7 @@ has_attr_action_t<T> has_attr(const std::string& name) {
 // For static attributes.
 template<typename T>
 has_attr_action_t<typename T::type> has_attr(const T&) {
-    return has_attr_action_t<typename T::type>({ std::string(T::name()) });
+    return has_attr<typename T::type>(std::string(T::name()));
 }
 
 template<typename T>
