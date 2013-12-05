@@ -42,9 +42,21 @@ struct traits<T, typename std::enable_if<std::is_enum<T>::value>::type> {
     }
 };
 
+template<typename T, class = void>
+struct type_extracter {
+    typedef T type;
+};
+
+template<typename T>
+struct type_extracter<T, typename std::enable_if<std::is_enum<T>::value>::type> {
+    typedef typename std::underlying_type<T>::type type;
+};
+
 //!@todo: Need testing.
 template<typename T, typename NameProvider>
 struct keyword_t {
+    typedef typename type_extracter<T>::type type;
+
     static const char* name() {
         return NameProvider::name();
     }

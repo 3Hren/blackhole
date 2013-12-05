@@ -16,6 +16,7 @@ SET(SOURCES
     test_Logger
     test_VerboseLogger
     test_Attribute
+    test_Filter
 )
 
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
