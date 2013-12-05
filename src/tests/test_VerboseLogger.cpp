@@ -42,7 +42,7 @@ TEST(verbose_logger_t, Manual) {
     //!@note ... till here.
     log.add_frontend(std::move(frontend));
 
-    //!@note: Next lines can be hided via macro: LOG(log, debug, "Message %s", "Hell", keyword::answer = 42);
+    //!@note: Next lines can be hided via macro: LOG(log, debug, "Message %s", "Hell", { keyword::answer = 42, keyword::blah = "WAT?", keyword::make("urgent", 1) });
     log::record_t record = log.open_record(level::error);
     if (record.valid()) {
         record.attributes["message"] = utils::format("Some message from: '%s'!", "Hell");
