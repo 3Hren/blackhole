@@ -30,23 +30,8 @@ public:
 
         for (auto it = names.begin(); it != names.end(); ++it) {
             const std::string& name = *it;
-            if (boost::starts_with(name, "...")) {
-                for (auto sit = name.begin() + 3; sit != name.end(); ++sit) {
-                    char ch = *sit;
-                    std::uint32_t num = ch - '0';
-                    log::attribute_t::type_t type = static_cast<log::attribute_t::type_t>(num);
-                    std::stringstream buf;
-                    for (auto ait = attributes.begin(); ait != attributes.end(); ++ait) {
-                        if (ait != attributes.begin()) {
-                            buf << ", ";
-                        }
-                        const log::attribute_t& attribute = ait->second;
-                        if (attribute.type == type) {
-                            buf << "'" << ait->first << "': '" << attribute.value << "'";
-                        }
-                    }
-                    fmt % buf.str();
-                }
+            if (boost::starts_with(name, string::VARIADIC_KEY_PREFIX)) {
+                handle_variadic(name, attributes, &fmt);
                 continue;
             }
 
@@ -58,6 +43,28 @@ public:
             fmt % attribute.value;
         }
         return fmt.str();
+    }
+
+private:
+    inline void handle_variadic(const std::string& name, const log::attributes_t& attributes, boost::format* fmt) const {
+        for (auto it = name.begin() + string::VARIADIC_KEY_PRFFIX_LENGTH; it != name.end(); ++it) {
+            const char ch = *it;
+            const std::uint32_t num = ch - '0';
+            const log::attribute_t::type_t type = static_cast<log::attribute_t::type_t>(num);
+            std::stringstream buf;
+            for (auto ait = attributes.begin(); ait != attributes.end(); ++ait) {
+                if (ait != attributes.begin()) {
+                    buf << ", ";
+                }
+
+                const log::attribute_t& attribute = ait->second;
+                if (attribute.type == type) {
+                    buf << "'" << ait->first << "': '" << attribute.value << "'";
+                }
+            }
+
+            (*fmt) % buf.str();
+        }
     }
 };
 

@@ -11,6 +11,7 @@ namespace formatter {
 namespace string {
 
 static const char VARIADIC_KEY_PREFIX[] = "...";
+static const std::size_t VARIADIC_KEY_PRFFIX_LENGTH = strlen(VARIADIC_KEY_PREFIX);
 
 struct pattern_parser_t {
     static config_t parse(const std::string& input_pattern) {
