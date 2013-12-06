@@ -37,5 +37,5 @@ TEST(file_t, ThrowsExceptionIfFileCannotBeOpened) {
             .WillOnce(Return(false));
     EXPECT_CALL(sink.backend(), write(_))
             .Times(0);
-    EXPECT_THROW(sink.consume("message"), error_t);
+    EXPECT_THROW(sink.consume("message"), blackhole::error_t);
 }
