@@ -23,26 +23,11 @@ struct pattern_parser_t {
 
         while(current != end) {
             if (begin_key(current, end)) {
-                current += 2;
                 pattern.push_back('%');
-                std::string key;
-                while (current != end) {
-                    if (end_key(current, end)) {
-                        break;
-                    } else {
-                        key.push_back(*current);
-                    }
-                    current++;
-                }
-
-                if (boost::starts_with(key, VARIADIC_KEY_PREFIX)) {
-                    handle_variadic_key(&key);
-                }
-                keys.push_back(key);
+                keys.push_back(extract_key(current, end));
             } else {
                 pattern.push_back(*current);
             }
-
             current++;
         }
 
@@ -56,6 +41,25 @@ private:
 
     static inline bool end_key(std::string::const_iterator it, std::string::const_iterator end) {
         return (*it == ')') && (it + 1 != end) && (*(it + 1) == 's');
+    }
+
+    static inline std::string extract_key(std::string::const_iterator& it, std::string::const_iterator end) {
+        it += 2;
+        std::string key;
+        while (it != end) {
+            if (end_key(it, end)) {
+                break;
+            } else {
+                key.push_back(*it);
+            }
+            it++;
+        }
+
+        if (boost::starts_with(key, VARIADIC_KEY_PREFIX)) {
+            handle_variadic_key(&key);
+        }
+
+        return key;
     }
 
     static void handle_variadic_key(std::string* key) {
