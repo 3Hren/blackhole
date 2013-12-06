@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <boost/format.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "blackhole/error.hpp"
 #include "blackhole/record.hpp"
@@ -33,18 +34,26 @@ public:
 
         for (auto it = names.begin(); it != names.end(); ++it) {
             const std::string& name = *it;
-            //if name.startswith("...")
-            //  auto sit = name.begin() + 3;
-            //  for (; sit != name.end(); ++sit)
-            //      attr_level_t level = to_int(*sit); // sit - число в строковом представлении
-            //      str = ""
-            //      for (name, (type, value) in attributes(level))
-            //          if type == attr_level
-            //              fmt = boost::format("%s = %s") % name % value;
-            //              str += fmt.str()
-            //              if !attr.last()?
-            //                  str += ", "
-            //
+            if (boost::starts_with(name, "...")) {
+                for (auto sit = name.begin() + 3; sit != name.end(); ++sit) {
+                    char ch = *sit;
+                    std::uint32_t num = ch - '0';
+                    log::attribute_t::type_t type = static_cast<log::attribute_t::type_t>(num);
+                    std::stringstream buf;
+                    for (auto ait = attributes.begin(); ait != attributes.end(); ++ait) {
+                        if (ait != attributes.begin()) {
+                            buf << ", ";
+                        }
+                        const log::attribute_t& attribute = ait->second;
+                        if (attribute.type == type) {
+                            buf << "'" << ait->first << "': '" << attribute.value << "'";
+                        }
+                    }
+                    fmt % buf.str();
+                }
+                continue;
+            }
+
             auto ait = attributes.find(name);
             if (ait == attributes.end()) {
                 throw error_t("bad format string '%s' - key '%s' was not provided", m_config.pattern, name);
@@ -79,6 +88,21 @@ private:
                     }
                     current++;
                 }
+                if (boost::starts_with(key, "...")) {
+                    for (auto it = key.begin() + 3; it != key.end(); ++it) {
+                        char ch = *it;
+                        std::cout << ch << std::endl;
+                        switch (ch) {
+                        case 'L':
+                            *it = '0';
+                            std::cout << *it << std::endl;
+                            break;
+                        default:
+                            *it = '0';
+                        }
+                    }
+                }
+                std::cout << key << std::endl;
                 attribute_names.push_back(key);
             } else {
                 fpattern.push_back(*current);

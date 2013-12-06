@@ -50,7 +50,7 @@ TEST(string_t, FormatOtherLocalAttributes) {
     record.attributes = {
         { "uuid", { "123-456" } },
     };
-    std::string pattern("[%(...L)s");
+    std::string pattern("[%(...L)s]");
     formatter::string_t formatter(pattern);
     EXPECT_EQ("['uuid': '123-456']", formatter.format(record));
 }
