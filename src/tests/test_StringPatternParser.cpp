@@ -35,6 +35,13 @@ TEST(PatternParser, ParseVariadicUniverseScopeToken) {
     EXPECT_EQ(std::vector<std::string>({ "...16" }), config.attribute_names);
 }
 
+TEST(PatternParser, ParseVariadicMixedScopeTokens) {
+    std::string pattern("%(...LE)s");
+    auto config = formatter::string::pattern_parser_t::parse(pattern);
+    EXPECT_EQ("%s", config.pattern);
+    EXPECT_EQ(std::vector<std::string>({ "...3" }), config.attribute_names);
+}
+
 TEST(PatternParser, SquishScopes) {
     std::string pattern("%(...LLLUUE)s");
     auto config = formatter::string::pattern_parser_t::parse(pattern);
