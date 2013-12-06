@@ -15,8 +15,8 @@ struct severity_t {
 } // namespace tag
 
 template<typename T>
-static keyword_t<T, tag::severity_t>& severity() {
-    static keyword_t<T, tag::severity_t> self;
+static keyword_t<T, tag::severity_t, log::attribute_t::type_t::event>& severity() {
+    static keyword_t<T, tag::severity_t, log::attribute_t::type_t::event> self;
     return self;
 }
 

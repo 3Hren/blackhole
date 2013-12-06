@@ -11,5 +11,10 @@ TEST(Attribute, TimestampIsEventAttribute) {
     EXPECT_EQ(log::attribute_t::type_t::event, pair.second.type);
 }
 
-//!@todo: Test severity is local attribute.
+TEST(Attribute, SeverityIsEventAttribute) {
+    enum class level { debug };
+    log::attribute_pair_t pair = (keyword::severity<level>() = level::debug);
+    EXPECT_EQ(log::attribute_t::type_t::event, pair.second.type);
+}
+
 //!@todo: Test message is local attribute.
