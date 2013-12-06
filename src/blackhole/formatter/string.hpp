@@ -33,11 +33,24 @@ public:
 
         for (auto it = names.begin(); it != names.end(); ++it) {
             const std::string& name = *it;
+            //if name.startswith("...")
+            //  auto sit = name.begin() + 3;
+            //  for (; sit != name.end(); ++sit)
+            //      attr_level_t level = to_int(*sit); // sit - число в строковом представлении
+            //      str = ""
+            //      for (name, (type, value) in attributes(level))
+            //          if type == attr_level
+            //              fmt = boost::format("%s = %s") % name % value;
+            //              str += fmt.str()
+            //              if !attr.last()?
+            //                  str += ", "
+            //
             auto ait = attributes.find(name);
             if (ait == attributes.end()) {
                 throw error_t("bad format string '%s' - key '%s' was not provided", m_config.pattern, name);
             }
-            fmt % ait->second;
+            const log::attribute_t& attribute = ait->second;
+            fmt % attribute.value;
         }
         return fmt.str();
     }

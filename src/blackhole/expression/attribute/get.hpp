@@ -18,7 +18,8 @@ struct get_attr_action_t {
     const std::string name;
 
     const result_type& operator()(const log::attributes_t& attributes) const {
-        return boost::get<T>(attributes.at(name));
+        return boost::get<T>(attributes.at(name).value);
+        //
     }
 
     filter_t operator ==(const T& other) const {

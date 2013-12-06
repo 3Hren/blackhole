@@ -2,6 +2,8 @@
 
 #include <functional>
 
+#include "attribute.hpp"
+
 namespace blackhole {
 
 typedef std::function<bool(const log::attributes_t& attributes)> filter_t;

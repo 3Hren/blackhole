@@ -87,7 +87,7 @@ private:
     log::attributes_t get_scoped_attributes() const {
         log::attributes_t attributes;
         //!@todo: Maybe replace explicit string by synomim keyword?
-        attributes["timestamp_id"] = std::time(nullptr);
+        attributes["timestamp_id"] = { std::time(nullptr), log::attribute_t::type_t::scope };
         return attributes;
     }
 };

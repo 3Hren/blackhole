@@ -34,7 +34,8 @@ struct has_attr_action_t {
         if (it == attributes.end()) {
             return false;
         }
-        return boost::apply_visitor(has_attribute_visitor<T>(), it->second);
+        const log::attribute_t& attribute = it->second;
+        return boost::apply_visitor(has_attribute_visitor<T>(), attribute.value);
     }
 
     filter_t operator &&(filter_t other) const {

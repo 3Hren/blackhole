@@ -25,7 +25,7 @@ struct traits {
     }
 
     static inline T extract(const log::attributes_t& attributes, const std::string& name) {
-        return boost::get<T>(attributes.at(name));
+        return boost::get<T>(attributes.at(name).value);
     }
 };
 
@@ -38,7 +38,7 @@ struct traits<T, typename std::enable_if<std::is_enum<T>::value>::type> {
     }
 
     static inline T extract(const log::attributes_t& attributes, const std::string& name) {
-        return static_cast<T>(boost::get<underlying_type>(attributes.at(name)));
+        return static_cast<T>(boost::get<underlying_type>(attributes.at(name).value));
     }
 };
 
@@ -62,7 +62,7 @@ struct keyword_t {
     }
 
     log::attribute_pair_t operator =(T value) const {
-        return std::make_pair(name(), traits<T>::pack(value));
+        return std::make_pair(name(), log::attribute_t(traits<T>::pack(value), log::attribute_t::type_t::local));
     }
 
     filter_t operator >=(T value) const {

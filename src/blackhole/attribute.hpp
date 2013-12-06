@@ -11,18 +11,41 @@ namespace blackhole {
 namespace log {
 
 typedef boost::variant<
-    std::time_t,
     std::uint8_t,
     std::int32_t,
     std::uint64_t,
     std::int64_t,
     std::double_t,
+    std::time_t,
     std::string
 > attribute_value_t;
 
+struct attribute_t {
+    enum class type_t {
+        local,      /* event specific attributes, like message itself */
+        scope,      /* temporary attributes, like timestamp */
+        global,     /* logger object attributes*/
+        thread,     /* thread attributes */
+        universe    /* singleton attributes for entire application */
+    };
+
+    attribute_value_t value;
+    type_t type;
+
+    attribute_t() :
+        value(std::uint8_t(0)),
+        type(type_t::local)
+    {}
+
+    attribute_t(const attribute_value_t& value, type_t type = type_t::local) :
+        value(value),
+        type(type)
+    {}
+};
+
 typedef std::pair<
     std::string,
-    attribute_value_t
+    attribute_t
 > attribute_pair_t;
 
 typedef std::unordered_map<
@@ -46,7 +69,7 @@ namespace attr {
 // Dynamic attribute factory function.
 template<typename T>
 inline log::attribute_pair_t make(const std::string& name, const T& value) {
-    return std::make_pair(name, value);
+    return std::make_pair(name, log::attribute_t(value, log::attribute_t::type_t::local));
 }
 
 } // namespace attr
