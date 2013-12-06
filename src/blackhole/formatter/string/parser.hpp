@@ -66,8 +66,9 @@ private:
 
     static void handle_variadic_key(std::string* key) {
         for (auto it = key->begin() + 3; it != key->end(); ++it) {
-            char ch = *it;
-            *it = static_cast<char>(static_cast<int>('0') + static_cast<int>(map_to_scope(ch)));
+            const char ch = *it;
+            const log::attribute::scope scope = map_to_scope(ch);
+            *it = static_cast<char>(static_cast<int>('0') + static_cast<int>(scope));
         }
     }
 
