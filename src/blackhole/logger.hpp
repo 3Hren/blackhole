@@ -64,7 +64,7 @@ public:
                 // universe_attributes              // Program global.
                 // thread_attributes                // Thread local.
                 m_global_attributes,                // Logger object specific.
-                std::move(get_scoped_attributes()), // Depending on event scope, e.g. timestamp.
+                std::move(get_event_attributes()),  // Event specific, e.g. timestamp.
                 std::move(local_attributes)         // Any user attributes.
             });
 
@@ -86,8 +86,7 @@ public:
     }
 
 private:
-    log::attributes_t get_scoped_attributes() const {
-        //!@todo: Declare attribute type in DECLARE_KEYWORD or explicitly.
+    log::attributes_t get_event_attributes() const {
         log::attributes_t attributes = {
             keyword::timestamp_id() = std::time(nullptr)
         };

@@ -14,8 +14,8 @@
         return self; \
     }
 
-#define DECLARE_SCOPE_KEYWORD(Name, T) \
-    DECLARE_KEYWORD_IMPL(Name, scope, T)
+#define DECLARE_EVENT_KEYWORD(Name, T) \
+    DECLARE_KEYWORD_IMPL(Name, event, T)
 
 #define DECLARE_KEYWORD(Name, T) \
     DECLARE_KEYWORD_IMPL(Name, global, T)

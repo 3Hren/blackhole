@@ -21,9 +21,10 @@ typedef boost::variant<
 > attribute_value_t;
 
 struct attribute_t {
+    //!@todo: Rename.
     enum class type_t {
-        local,      /* event specific attributes */
-        scope,      /* almost local, but user-defined attributes, like timestamp or message*/
+        local,      /* user-defined event attributes*/
+        event,      /* not user-defined event attributes, like timestamp or message */
         global,     /* logger object attributes*/
         thread,     /* thread attributes */
         universe    /* singleton attributes for entire application */
@@ -37,6 +38,7 @@ struct attribute_t {
         type(type_t::local)
     {}
 
+    //!@todo: Incapsulate default scope.
     attribute_t(const attribute_value_t& value, type_t type = type_t::local) :
         value(value),
         type(type)

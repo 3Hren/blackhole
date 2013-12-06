@@ -73,9 +73,9 @@ TEST(string_t, ComplexFormatWithOtherLocalAttributes) {
         { "uuid", { "123-456" } },
         { "answer to life the universe and everything", { 42 } }
     };
-    record.attributes["timestamp"] = { "1960-01-01 00:00:00", log::attribute_t::type_t::scope };
-    record.attributes["message"] = { "le message", log::attribute_t::type_t::scope };
-    record.attributes["level"] = { "INFO", log::attribute_t::type_t::global };
+    record.attributes["timestamp"] = { "1960-01-01 00:00:00", log::attribute_t::type_t::event };
+    record.attributes["message"] = { "le message", log::attribute_t::type_t::event };
+    record.attributes["level"] = { "INFO", log::attribute_t::type_t::event };
     std::string pattern("[%(timestamp)s] [%(level)s]: %(message)s [%(...L)s]");
     formatter::string_t formatter(pattern);
     EXPECT_EQ("[1960-01-01 00:00:00] [INFO]: le message ['answer to life the universe and everything': '42', 'uuid': '123-456']",
@@ -84,4 +84,4 @@ TEST(string_t, ComplexFormatWithOtherLocalAttributes) {
 
 //!@todo:
 //! implement %(...A)s handling in formatter::string
-//! [L|S|G|T|U].
+//! [L|E|G|T|U].

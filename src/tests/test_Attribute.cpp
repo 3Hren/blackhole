@@ -6,10 +6,10 @@ TEST(Attribute, CanMakeCustomAttribute) {
     EXPECT_EQ(42, boost::get<std::int32_t>(attribute.second.value));
 }
 
-TEST(Attribute, TimestampIsScopedAttribute) {
+TEST(Attribute, TimestampIsEventAttribute) {
     log::attribute_pair_t pair = (keyword::timestamp_id() = std::time_t(0));
-    EXPECT_EQ(log::attribute_t::type_t::scope, pair.second.type);
+    EXPECT_EQ(log::attribute_t::type_t::event, pair.second.type);
 }
 
-//!@todo: Test severity is scoped attribute.
-//!@todo: Test message is scoped attribute.
+//!@todo: Test severity is local attribute.
+//!@todo: Test message is local attribute.
