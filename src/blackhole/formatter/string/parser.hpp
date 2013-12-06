@@ -2,6 +2,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "blackhole/attribute.hpp"
 #include "config.hpp"
 
 namespace blackhole {
@@ -66,14 +67,24 @@ private:
     static void handle_variadic_key(std::string* key) {
         for (auto it = key->begin() + 3; it != key->end(); ++it) {
             char ch = *it;
-            switch (ch) {
-            case 'L':
-                *it = '0';
-                break;
-            default:
-                *it = '0';
-            }
+            *it = static_cast<char>(static_cast<int>('0') + static_cast<int>(map_to_scope(ch)));
         }
+    }
+
+    static log::attribute::scope map_to_scope(const char ch) {
+        switch (ch) {
+        case 'L':
+            return log::attribute::scope::local;
+        case 'E':
+            return log::attribute::scope::event;
+        case 'G':
+            return log::attribute::scope::global;
+        case 'T':
+            return log::attribute::scope::thread;
+        case 'U':
+            return log::attribute::scope::universe;
+        }
+        return log::attribute::scope::local;
     }
 };
 

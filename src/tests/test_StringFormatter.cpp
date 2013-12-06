@@ -84,7 +84,3 @@ TEST(string_t, ComplexFormatWithOtherLocalAttributes) {
     EXPECT_TRUE(actual.find("'answer to life the universe and everything': '42'") != std::string::npos);
     EXPECT_TRUE(actual.find("'uuid': '123-456'") != std::string::npos);
 }
-
-//!@todo:
-//! implement %(...A)s handling in formatter::string
-//! [L|E|G|T|U].
