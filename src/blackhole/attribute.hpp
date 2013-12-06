@@ -22,12 +22,12 @@ typedef boost::variant<
 
 namespace attribute {
 
-enum class scope {
-    local,      /* user-defined event attributes*/
-    event,      /* not user-defined event attributes, like timestamp or message */
-    global,     /* logger object attributes*/
-    thread,     /* thread attributes */
-    universe    /* singleton attributes for entire application */
+enum scope {
+    local = 1,      /* user-defined event attributes*/
+    event = 2,      /* not user-defined event attributes, like timestamp or message */
+    global = 4,     /* logger object attributes*/
+    thread = 8,     /* thread attributes */
+    universe = 16   /* singleton attributes for entire application */
 };
 
 static const scope DEFAULT_SCOPE = scope::local;

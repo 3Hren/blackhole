@@ -53,7 +53,7 @@ private:
             std::vector<std::string> formatted;
             for (auto attr_it = attributes.begin(); attr_it != attributes.end(); ++attr_it) {
                 const log::attribute_t& attribute = attr_it->second;
-                if (attribute.scope == scope) {
+                if (attribute.scope & scope) {
                     std::stringstream buffer;
                     buffer << "'" << attr_it->first << "': '" << attribute.value << "'";
                     formatted.push_back(buffer.str());
