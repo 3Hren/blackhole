@@ -39,7 +39,7 @@ public:
     }
 
     void set_filter(filter_t&& filter) {
-        m_filter = filter;
+        m_filter = std::move(filter);
     }
 
     void add_attribute(const log::attribute_pair_t& attr) {
