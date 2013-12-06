@@ -20,28 +20,30 @@ typedef boost::variant<
     std::string
 > attribute_value_t;
 
-struct attribute_t {
-    //!@todo: Rename.
-    enum class type_t {
-        local,      /* user-defined event attributes*/
-        event,      /* not user-defined event attributes, like timestamp or message */
-        global,     /* logger object attributes*/
-        thread,     /* thread attributes */
-        universe    /* singleton attributes for entire application */
-    };
+namespace attribute {
 
+enum class scope {
+    local,      /* user-defined event attributes*/
+    event,      /* not user-defined event attributes, like timestamp or message */
+    global,     /* logger object attributes*/
+    thread,     /* thread attributes */
+    universe    /* singleton attributes for entire application */
+};
+
+} // namespace attribute
+
+struct attribute_t {
     attribute_value_t value;
-    type_t type;
+    attribute::scope scope;
 
     attribute_t() :
         value(std::uint8_t(0)),
-        type(type_t::local)
+        scope(attribute::scope::local)
     {}
 
-    //!@todo: Incapsulate default scope.
-    attribute_t(const attribute_value_t& value, type_t type = type_t::local) :
+    attribute_t(const attribute_value_t& value, attribute::scope type = attribute::scope::local) :
         value(value),
-        type(type)
+        scope(type)
     {}
 };
 
@@ -66,12 +68,12 @@ inline log::attributes_t merge(const std::initializer_list<log::attributes_t>& a
     return summary;
 }
 
-namespace attr {
+namespace attribute {
 
 // Dynamic attribute factory function.
 template<typename T>
 inline log::attribute_pair_t make(const std::string& name, const T& value) {
-    return std::make_pair(name, log::attribute_t(value, log::attribute_t::type_t::local));
+    return std::make_pair(name, log::attribute_t(value));
 }
 
 } // namespace attr

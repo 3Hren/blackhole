@@ -49,11 +49,11 @@ private:
     inline void handle_variadic(const std::string& key, const log::attributes_t& attributes, boost::format* fmt) const {
         for (auto it = key.begin() + string::VARIADIC_KEY_PRFFIX_LENGTH; it != key.end(); ++it) {
             const std::uint32_t num = *it - '0';
-            const log::attribute_t::type_t type = static_cast<log::attribute_t::type_t>(num);
+            const log::attribute::scope scope = static_cast<log::attribute::scope>(num);
             std::vector<std::string> formatted;
             for (auto attr_it = attributes.begin(); attr_it != attributes.end(); ++attr_it) {
                 const log::attribute_t& attribute = attr_it->second;
-                if (attribute.type == type) {
+                if (attribute.scope == scope) {
                     std::stringstream buffer;
                     buffer << "'" << attr_it->first << "': '" << attribute.value << "'";
                     formatted.push_back(buffer.str());

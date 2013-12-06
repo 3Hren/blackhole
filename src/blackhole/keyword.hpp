@@ -3,14 +3,14 @@
 #include "attribute.hpp"
 #include "filter.hpp"
 
-#define DECLARE_KEYWORD_IMPL(Name, AttributeType, T) \
+#define DECLARE_KEYWORD_IMPL(Name, Scope, T) \
     namespace tag { \
         struct Name##_t { \
             static const char* name() { return #Name; } \
         }; \
     } \
-    static blackhole::keyword::keyword_t<T, tag::Name##_t, log::attribute_t::type_t::AttributeType>& Name() { \
-        static blackhole::keyword::keyword_t<T, tag::Name##_t, log::attribute_t::type_t::AttributeType> self; \
+    static blackhole::keyword::keyword_t<T, tag::Name##_t, log::attribute::scope::Scope>& Name() { \
+        static blackhole::keyword::keyword_t<T, tag::Name##_t, log::attribute::scope::Scope> self; \
         return self; \
     }
 
@@ -59,7 +59,7 @@ struct type_extracter<T, typename std::enable_if<std::is_enum<T>::value>::type> 
 };
 
 //!@todo: Need testing.
-template<typename T, typename NameProvider, log::attribute_t::type_t ScopeLevel = log::attribute_t::type_t::local>
+template<typename T, typename NameProvider, log::attribute::scope Scope = log::attribute::scope::local>
 struct keyword_t {
     typedef typename type_extracter<T>::type type;
 
@@ -68,7 +68,7 @@ struct keyword_t {
     }
 
     log::attribute_pair_t operator =(T value) const {
-        return std::make_pair(name(), log::attribute_t(traits<T>::pack(value), ScopeLevel));
+        return std::make_pair(name(), log::attribute_t(traits<T>::pack(value), Scope));
     }
 
     filter_t operator >=(T value) const {

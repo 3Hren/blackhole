@@ -89,7 +89,7 @@ TEST(logger_base_t, SettingDynamicAttributes) {
 
     logger_base_t log;
     log.add_frontend(std::move(frontend));
-    log::record_t record = log.open_record(attr::make<std::int32_t>("custom", 42));
+    log::record_t record = log.open_record(attribute::make<std::int32_t>("custom", 42));
     ASSERT_TRUE(record.valid());
     ASSERT_TRUE(record.attributes.find("custom") != record.attributes.end());
     EXPECT_EQ(42, boost::get<std::int32_t>(record.attributes["custom"].value));
@@ -101,7 +101,7 @@ TEST(logger_base_t, FilteringUsingDynamicAttributes) {
     logger_base_t log;
     log.add_frontend(std::move(frontend));
     log.set_filter(expr::has_attr<std::int32_t>("custom") && expr::get_attr<std::int32_t>("custom") == 42);
-    log::record_t record = log.open_record(attr::make<std::int32_t>("custom", 42));
+    log::record_t record = log.open_record(attribute::make<std::int32_t>("custom", 42));
 
     EXPECT_TRUE(record.valid());
 }

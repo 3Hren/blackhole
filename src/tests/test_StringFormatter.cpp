@@ -71,8 +71,8 @@ TEST(string_t, FormatOtherLocalAttributes) {
 TEST(string_t, ComplexFormatWithOtherLocalAttributes) {
     log::record_t record;
     record.attributes = {
-        { "timestamp", { "1960-01-01 00:00:00", log::attribute_t::type_t::event } },
-        { "level", { "INFO", log::attribute_t::type_t::event } },
+        { "timestamp", { "1960-01-01 00:00:00", log::attribute::scope::event } },
+        { "level", { "INFO", log::attribute::scope::event } },
         keyword::message() = "le message",
         { "uuid", { "123-456" } },
         { "answer to life the universe and everything", { 42 } }
