@@ -22,8 +22,8 @@ typedef boost::variant<
 
 struct attribute_t {
     enum class type_t {
-        local,      /* event specific attributes, like message itself */
-        scope,      /* temporary attributes, like timestamp */
+        local,      /* event specific attributes */
+        scope,      /* almost local, but user-defined attributes, like timestamp or message*/
         global,     /* logger object attributes*/
         thread,     /* thread attributes */
         universe    /* singleton attributes for entire application */
