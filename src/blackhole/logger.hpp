@@ -7,6 +7,7 @@
 #include "filter.hpp"
 #include "frontend.hpp"
 #include "keyword.hpp"
+#include "keyword/severity.hpp"
 
 namespace blackhole {
 
