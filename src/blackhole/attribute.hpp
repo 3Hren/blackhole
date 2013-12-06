@@ -30,6 +30,8 @@ enum class scope {
     universe    /* singleton attributes for entire application */
 };
 
+static const scope DEFAULT_SCOPE = scope::local;
+
 } // namespace attribute
 
 struct attribute_t {
@@ -38,10 +40,10 @@ struct attribute_t {
 
     attribute_t() :
         value(std::uint8_t(0)),
-        scope(attribute::scope::local)
+        scope(attribute::DEFAULT_SCOPE)
     {}
 
-    attribute_t(const attribute_value_t& value, attribute::scope type = attribute::scope::local) :
+    attribute_t(const attribute_value_t& value, attribute::scope type = attribute::DEFAULT_SCOPE) :
         value(value),
         scope(type)
     {}

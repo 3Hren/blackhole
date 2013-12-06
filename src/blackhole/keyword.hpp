@@ -59,7 +59,7 @@ struct type_extracter<T, typename std::enable_if<std::is_enum<T>::value>::type> 
 };
 
 //!@todo: Need testing.
-template<typename T, typename NameProvider, log::attribute::scope Scope = log::attribute::scope::local>
+template<typename T, typename NameProvider, log::attribute::scope Scope = log::attribute::DEFAULT_SCOPE>
 struct keyword_t {
     typedef typename type_extracter<T>::type type;
 
