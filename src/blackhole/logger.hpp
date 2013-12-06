@@ -8,6 +8,7 @@
 #include "frontend.hpp"
 #include "keyword.hpp"
 #include "keyword/severity.hpp"
+#include "keyword/timestamp.hpp"
 
 namespace blackhole {
 
@@ -86,9 +87,10 @@ public:
 
 private:
     log::attributes_t get_scoped_attributes() const {
-        log::attributes_t attributes;
-        //!@todo: Maybe replace explicit string by synomim keyword?
-        attributes["timestamp_id"] = { std::time(nullptr), log::attribute_t::type_t::scope };
+        //!@todo: Declare attribute type in DECLARE_KEYWORD or explicitly.
+        log::attributes_t attributes = {
+            keyword::timestamp_id() = std::time(nullptr)
+        };
         return attributes;
     }
 };

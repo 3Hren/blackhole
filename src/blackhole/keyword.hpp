@@ -86,7 +86,3 @@ struct keyword_t {
 } // namespace keyword
 
 } // namespace blackhole
-
-namespace blackhole { namespace keyword {
-DECLARE_KEYWORD(timestamp_id, std::time_t)
-} }
