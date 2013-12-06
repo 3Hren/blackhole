@@ -7,6 +7,7 @@
 #include "filter.hpp"
 #include "frontend.hpp"
 #include "keyword.hpp"
+#include "keyword/message.hpp"
 #include "keyword/severity.hpp"
 #include "keyword/timestamp.hpp"
 

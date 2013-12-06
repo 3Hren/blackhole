@@ -17,4 +17,7 @@ TEST(Attribute, SeverityIsEventAttribute) {
     EXPECT_EQ(log::attribute_t::type_t::event, pair.second.type);
 }
 
-//!@todo: Test message is local attribute.
+TEST(Attribute, MessageIsEventAttribute) {
+    log::attribute_pair_t pair = (keyword::message() = "le message");
+    EXPECT_EQ(log::attribute_t::type_t::event, pair.second.type);
+}
