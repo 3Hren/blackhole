@@ -29,15 +29,15 @@ public:
         const std::vector<std::string>& names = m_config.attribute_names;
 
         for (auto it = names.begin(); it != names.end(); ++it) {
-            const std::string& name = *it;
-            if (boost::starts_with(name, string::VARIADIC_KEY_PREFIX)) {
-                handle_variadic(name, attributes, &fmt);
+            const std::string& key = *it;
+            if (boost::starts_with(key, string::VARIADIC_KEY_PREFIX)) {
+                handle_variadic(key, attributes, &fmt);
                 continue;
             }
 
-            auto ait = attributes.find(name);
+            auto ait = attributes.find(key);
             if (ait == attributes.end()) {
-                throw error_t("bad format string '%s' - key '%s' was not provided", m_config.pattern, name);
+                throw error_t("bad format string '%s' - key '%s' was not provided", m_config.pattern, key);
             }
             const log::attribute_t& attribute = ait->second;
             fmt % attribute.value;
@@ -46,24 +46,21 @@ public:
     }
 
 private:
-    inline void handle_variadic(const std::string& name, const log::attributes_t& attributes, boost::format* fmt) const {
-        for (auto it = name.begin() + string::VARIADIC_KEY_PRFFIX_LENGTH; it != name.end(); ++it) {
-            const char ch = *it;
-            const std::uint32_t num = ch - '0';
+    inline void handle_variadic(const std::string& key, const log::attributes_t& attributes, boost::format* fmt) const {
+        for (auto it = key.begin() + string::VARIADIC_KEY_PRFFIX_LENGTH; it != key.end(); ++it) {
+            const std::uint32_t num = *it - '0';
             const log::attribute_t::type_t type = static_cast<log::attribute_t::type_t>(num);
-            std::stringstream buf;
-            for (auto ait = attributes.begin(); ait != attributes.end(); ++ait) {
-                if (ait != attributes.begin()) {
-                    buf << ", ";
-                }
-
-                const log::attribute_t& attribute = ait->second;
+            std::vector<std::string> formatted;
+            for (auto attr_it = attributes.begin(); attr_it != attributes.end(); ++attr_it) {
+                const log::attribute_t& attribute = attr_it->second;
                 if (attribute.type == type) {
-                    buf << "'" << ait->first << "': '" << attribute.value << "'";
+                    std::stringstream buffer;
+                    buffer << "'" << attr_it->first << "': '" << attribute.value << "'";
+                    formatted.push_back(buffer.str());
                 }
             }
 
-            (*fmt) % buf.str();
+            (*fmt) % boost::join(formatted, ", ");
         }
     }
 };

@@ -45,7 +45,7 @@ TEST(string_t, ThrowsExceptionWhenAttributeNameNotProvided) {
     EXPECT_THROW(fmt.format(record), error_t);
 }
 
-TEST(string_t, FormatOtherLocalAttributes) {
+TEST(string_t, FormatOtherLocalAttribute) {
     log::record_t record;
     record.attributes = {
         { "uuid", { "123-456" } },
@@ -55,7 +55,33 @@ TEST(string_t, FormatOtherLocalAttributes) {
     EXPECT_EQ("['uuid': '123-456']", formatter.format(record));
 }
 
+TEST(string_t, FormatOtherLocalAttributes) {
+    log::record_t record;
+    record.attributes = {
+        { "uuid", { "123-456" } },
+        { "answer to life the universe and everything", { 42 } }
+    };
+    std::string pattern("[%(...L)s]");
+    formatter::string_t formatter(pattern);
+    // Result may vary depending on string hash function.
+    EXPECT_EQ("['answer to life the universe and everything': '42', 'uuid': '123-456']", formatter.format(record));
+}
+
+TEST(string_t, ComplexFormatWithOtherLocalAttributes) {
+    log::record_t record;
+    record.attributes = {
+        { "uuid", { "123-456" } },
+        { "answer to life the universe and everything", { 42 } }
+    };
+    record.attributes["timestamp"] = { "1960-01-01 00:00:00", log::attribute_t::type_t::scope };
+    record.attributes["message"] = { "le message", log::attribute_t::type_t::scope };
+    record.attributes["level"] = { "INFO", log::attribute_t::type_t::global };
+    std::string pattern("[%(timestamp)s] [%(level)s]: %(message)s [%(...L)s]");
+    formatter::string_t formatter(pattern);
+    EXPECT_EQ("[1960-01-01 00:00:00] [INFO]: le message ['answer to life the universe and everything': '42', 'uuid': '123-456']",
+              formatter.format(record));
+}
+
 //!@todo:
 //! implement %(...A)s handling in formatter::string
-//! implement %(...L)s handling for only local attributes in format::string
 //! [L|S|G|T|U].
