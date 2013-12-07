@@ -33,10 +33,10 @@ TEST(GetAttribute, CanExtractDynamicAttribute) {
 }
 
 TEST(GetAttribute, ThrowsExceptionIfCannotExtractAttribute) {
-    /*! @note: It's okay that `get_attr` throws exceptions, cause there is no correct value to be
-               returned if there is no value actually or its type not equal with expected type.
-               You must check `has_attr<T>()` before extracting it.
-               If not, an exception will be thrown and caught inside log core. */
+    /*! It's okay that `get_attr` throws exceptions, cause there is no correct value to be
+        returned if there is no value actually or its type not equal with expected type.
+        You must check `has_attr<T>()` before extracting it.
+        If not, an exception will be thrown and caught inside log core. */
     auto filter = expr::get_attr<std::int32_t>("non-existing-attribute");
     log::attributes_t attributes = {{"custom", {42}}};
     EXPECT_THROW(filter(attributes), std::logic_error);
