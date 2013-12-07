@@ -47,13 +47,14 @@ public:
 
 private:
     inline void handle_variadic(const std::string& key, const log::attributes_t& attributes, boost::format* fmt) const {
+        typedef log::attribute::scope_underlying_type scope_underlying_type;
+
         for (auto it = key.begin() + string::VARIADIC_KEY_PRFFIX_LENGTH; it != key.end(); ++it) {
-            const std::uint32_t num = *it - '0';
-            const log::attribute::scope scope = static_cast<log::attribute::scope>(num);
+            const scope_underlying_type scope = *it - '0';
             std::vector<std::string> formatted;
             for (auto attr_it = attributes.begin(); attr_it != attributes.end(); ++attr_it) {
                 const log::attribute_t& attribute = attr_it->second;
-                if (attribute.scope & scope) {
+                if (static_cast<scope_underlying_type>(attribute.scope) & scope) {
                     std::stringstream buffer;
                     buffer << "'" << attr_it->first << "': '" << attribute.value << "'";
                     formatted.push_back(buffer.str());

@@ -22,13 +22,15 @@ typedef boost::variant<
 
 namespace attribute {
 
-enum scope {
+enum class scope : std::uint8_t {
     local = 1,      /* user-defined event attributes*/
     event = 2,      /* not user-defined event attributes, like timestamp or message */
     global = 4,     /* logger object attributes*/
     thread = 8,     /* thread attributes */
     universe = 16   /* singleton attributes for entire application */
 };
+
+typedef typename std::underlying_type<scope>::type scope_underlying_type;
 
 static const scope DEFAULT_SCOPE = scope::local;
 

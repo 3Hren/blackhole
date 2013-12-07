@@ -65,11 +65,13 @@ private:
     }
 
     static void handle_variadic_key(std::string* key) {
-        log::attribute::scope result = static_cast<log::attribute::scope>(0);
+        typedef typename log::attribute::scope_underlying_type scope_underlying_type;
+
+        scope_underlying_type result = 0;
         for (auto it = key->begin() + 3; it != key->end(); ++it) {
             const char ch = *it;
             const log::attribute::scope scope = map_to_scope(ch);
-            result = static_cast<log::attribute::scope>(result | scope);
+            result |= static_cast<scope_underlying_type>(scope);
         }
         *key = std::string("...") + std::to_string(result);
     }
