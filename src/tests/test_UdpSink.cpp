@@ -19,19 +19,22 @@ public:
         asio::ip::udp::resolver resolver(io_service);
         asio::ip::udp::resolver::query query(host, boost::lexical_cast<std::string>(port));
         asio::ip::udp::resolver::iterator it = resolver.resolve(query); //!@todo: May throw!
-        asio::ip::udp::resolver::iterator end;
-        std::vector<asio::ip::udp::endpoint> endpoints(it, end);
+        std::vector<asio::ip::udp::endpoint> endpoints(it, asio::ip::udp::resolver::iterator());
 
         for (auto it = endpoints.begin(); it != endpoints.end(); ++it) {
             try {
-                socket = std::make_unique<asio::ip::udp::socket>(io_service);
                 endpoint = *it;
+                socket = std::make_unique<asio::ip::udp::socket>(io_service);
                 socket->open(endpoint.protocol());
                 break;
             } catch (const boost::system::system_error& err) {
                 std::cout << err.what() << std::endl;
                 continue;
             }
+        }
+
+        if (!socket) {
+            throw error_t("can not create socket");
         }
     }
 
