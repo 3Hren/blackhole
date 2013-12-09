@@ -54,17 +54,47 @@ public:
     }
 
     void consume(const std::string& message) {
-        try {
-            m_backend.write(message);
-        } catch (const std::exception& err) {
-            std::cout << err.what() << std::endl;
-        } catch (...) {
-            std::cout << "unknown error occurred while writing message to the socket" << std::endl;
-        }
+        m_backend.write(message);
     }
 
     Backend& backend() {
         return m_backend;
+    }
+};
+
+class tcp_socket_t {
+    asio::io_service io_service;
+    asio::ip::tcp::endpoint endpoint;
+    std::unique_ptr<asio::ip::tcp::socket> socket;
+
+public:
+    tcp_socket_t() {
+        asio::ip::tcp::resolver resolver(io_service);
+        asio::ip::tcp::resolver::query query("localhost", boost::lexical_cast<std::string>(50030));
+        asio::ip::tcp::resolver::iterator it = resolver.resolve(query); //!@todo: May throw!
+        std::vector<asio::ip::tcp::endpoint> endpoints(it, asio::ip::tcp::resolver::iterator());
+
+        for (auto it = endpoints.begin(); it != endpoints.end(); ++it) {
+            try {
+                endpoint = *it;
+                socket = std::make_unique<asio::ip::tcp::socket>(io_service);
+                socket->connect(endpoint);
+                break;
+            } catch (const boost::system::system_error& err) {
+                std::cout << err.what() << std::endl;
+                continue;
+            }
+        }
+
+        if (!socket) {
+            throw error_t("can not create socket");
+        }
+        std::cout << endpoint << std::endl;
+    }
+
+    void consume(const std::string& message) {
+         auto written = socket->write_some(boost::asio::buffer(message.data(), message.size()));
+         std::cout << utils::format("written: %d, available: %d", written, socket->available()) << std::endl;
     }
 };
 
@@ -84,7 +114,14 @@ TEST(socket_t, TestCanSendMessages) {
     sink.consume("formatted message");
 }
 
-//!@todo: ThrowsExceptionIfAnyErrorOccurred.
+TEST(socket_t, ThrowsExceptionOnAnyWriteErrorOccurred) {
+    sink::socket_t<NiceMock<mock::socket::backend_t>> sink("localhost", 50030);
+    EXPECT_CALL(sink.backend(), write(_))
+            .Times(1)
+            .WillOnce(Throw(std::exception()));
+    EXPECT_THROW(sink.consume("message"), std::exception);
+}
+
 //!@todo: DoSomethingIfCannotCreateSocket
 //!@todo: DoSomethingIfCannotConnect
 //!@todo: DoSomethingOnWriteError

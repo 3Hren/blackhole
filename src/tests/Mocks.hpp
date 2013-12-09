@@ -71,7 +71,7 @@ public:
     backend_t(const std::string&, std::uint16_t) {
     }
 
-    MOCK_CONST_METHOD1(write, void(const std::string&));
+    MOCK_CONST_METHOD1(write, ssize_t(const std::string&));
 };
 
 } // namespace socket
