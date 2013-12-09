@@ -64,4 +64,16 @@ public:
     MOCK_METHOD1(handle, void(const log::record_t&));
 };
 
+namespace socket {
+
+class backend_t {
+public:
+    backend_t(const std::string&, std::uint16_t) {
+    }
+
+    MOCK_CONST_METHOD1(write, void(const std::string&));
+};
+
+} // namespace socket
+
 } // namespace mock

@@ -9,14 +9,13 @@ namespace blackhole {
 
 namespace sink {
 
-class socket_t {
+class boost_asio_backend_t {
     asio::io_service io_service;
     asio::ip::udp::endpoint endpoint;
     std::unique_ptr<asio::ip::udp::socket> socket;
 
 public:
-    socket_t(const std::string& host, std::uint16_t port)
-    {
+    boost_asio_backend_t(const std::string& host, std::uint16_t port) {
         asio::ip::udp::resolver resolver(io_service);
         asio::ip::udp::resolver::query query(host, boost::lexical_cast<std::string>(port));
         asio::ip::udp::resolver::iterator it = resolver.resolve(query); //!@todo: May throw!
@@ -36,14 +35,33 @@ public:
         }
     }
 
+    ssize_t write(const std::string& message) {
+        return socket->send_to(boost::asio::buffer(message.data(), message.size()), endpoint);
+    }
+};
+
+template<typename Backend>
+class socket_t {
+    Backend m_backend;
+
+public:
+    socket_t(const std::string& host, std::uint16_t port) :
+        m_backend(host, port)
+    {
+    }
+
     void consume(const std::string& message) {
         try {
-            socket->send_to(boost::asio::buffer(message.data(), message.size()), endpoint);
+            m_backend.write(message);
         } catch (const std::exception& err) {
-            std::cout << "!" << err.what() << std::endl;
+            std::cout << err.what() << std::endl;
         } catch (...) {
-            std::cout << "WTF?" << std::endl;
+            std::cout << "unknown error occurred while writing message to the socket" << std::endl;
         }
+    }
+
+    Backend& backend() {
+        return m_backend;
     }
 };
 
@@ -51,12 +69,13 @@ public:
 
 } // namespace blackhole
 
-TEST(socket_t, Class) {
-    sink::socket_t sink("localhost", 50030);
-    sink.consume("{\"@message\": \"le message\"}");
+TEST(socket_t, TestCanSendMessages) {
+    sink::socket_t<NiceMock<mock::socket::backend_t>> sink("localhost", 50030);
+    EXPECT_CALL(sink.backend(), write(std::string("formatted message"))).
+            Times(1);
+    sink.consume("formatted message");
 }
 
-//!@todo: TestCanSendMessages.
 //!@todo: ThrowsExceptionIfAnyErrorOccurred.
 //!@todo: DoSomethingIfCannotCreateSocket
 //!@todo: DoSomethingIfCannotConnect
