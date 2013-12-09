@@ -40,7 +40,7 @@ public:
     }
 };
 
-template<typename Backend>
+template<typename Backend = boost_asio_backend_t>
 class socket_t {
     Backend m_backend;
 
@@ -68,6 +68,11 @@ public:
 } // namespace sink
 
 } // namespace blackhole
+
+TEST(socket_t, Class) {
+    sink::socket_t<> sink("localhost", 50030);
+    UNUSED(sink);
+}
 
 TEST(socket_t, TestCanSendMessages) {
     sink::socket_t<NiceMock<mock::socket::backend_t>> sink("localhost", 50030);
