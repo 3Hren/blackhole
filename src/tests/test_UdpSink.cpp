@@ -1,136 +1,5 @@
 #include "Mocks.hpp"
 
-#include <boost/asio.hpp>
-#include <boost/lexical_cast.hpp>
-
-namespace asio = boost::asio;
-
-namespace blackhole {
-
-namespace sink {
-
-//! Resolves specified host and tries to connect to the socket.
-template<typename Protocol>
-void
-connect(asio::io_service& io_service, typename Protocol::socket& socket, const std::string& host, std::uint16_t port) {
-    try {
-        typename Protocol::resolver resolver(io_service);
-        typename Protocol::resolver::query query(host, boost::lexical_cast<std::string>(port));
-        typename Protocol::resolver::iterator it = resolver.resolve(query);
-
-        try {
-            asio::connect(socket, it);
-        } catch (const boost::system::system_error& err) {
-            throw error_t("couldn't connect to the %s:%d - %s", host, port, err.what());
-        }
-    } catch (const boost::system::system_error& err) {
-        throw error_t("couldn't resolve %s:%d - %s", host, port, err.what());
-    }
-}
-
-namespace socket {
-
-template<typename Protocol>
-class boost_backend_t;
-
-template<>
-class boost_backend_t<boost::asio::ip::udp> {
-    typedef boost::asio::ip::udp Protocol;
-
-    const std::string host;
-    const std::uint16_t port;
-
-    boost::asio::io_service io_service;
-    Protocol::socket socket;
-
-public:
-    boost_backend_t(const std::string& host, std::uint16_t port) :
-        host(host),
-        port(port),
-        socket(initialize(io_service, host, port))
-    {
-    }
-
-    ssize_t write(const std::string& message) {
-        return socket.send(boost::asio::buffer(message.data(), message.size()));
-    }
-
-private:
-    static inline
-    Protocol::socket
-    initialize(asio::io_service& io_service, const std::string& host, std::uint16_t port) {
-        Protocol::socket socket(io_service);
-        connect<Protocol>(io_service, socket, host, port);
-        return socket;
-    }
-};
-
-template<>
-class boost_backend_t<boost::asio::ip::tcp> {
-    typedef boost::asio::ip::tcp Protocol;
-
-    const std::string host;
-    const std::uint16_t port;
-
-    asio::io_service io_service;
-    std::unique_ptr<Protocol::socket> socket;
-
-public:
-    boost_backend_t(const std::string& host, std::uint16_t port) :
-        host(host),
-        port(port),
-        socket(initialize(io_service, host, port))
-    {
-    }
-
-    ssize_t write(const std::string& message) {
-        if (!socket) {
-            socket = initialize(io_service, host, port);
-        }
-
-        try {
-            return socket->write_some(boost::asio::buffer(message.data(), message.size()));
-        } catch (const boost::system::system_error& err) {
-            socket.release();
-            std::rethrow_exception(std::current_exception());
-        }
-    }
-
-private:
-    static inline
-    std::unique_ptr<Protocol::socket>
-    initialize(asio::io_service& io_service, const std::string& host, std::uint16_t port) {
-        std::unique_ptr<Protocol::socket> socket = std::make_unique<Protocol::socket>(io_service);
-        connect<Protocol>(io_service, *socket, host, port);
-        return socket;
-    }
-};
-
-} // namespace socket
-
-template<typename Protocol, typename Backend = socket::boost_backend_t<Protocol>>
-class socket_t {
-    Backend m_backend;
-
-public:
-    socket_t(const std::string& host, std::uint16_t port) :
-        m_backend(host, port)
-    {
-    }
-
-    void consume(const std::string& message) {
-        m_backend.write(message);
-    }
-
-    Backend& backend() {
-        return m_backend;
-    }
-};
-
-} // namespace sink
-
-} // namespace blackhole
-
 TEST(socket_t, Class) {
     sink::socket_t<boost::asio::ip::udp> sink("localhost", 50030);
     UNUSED(sink);
@@ -164,8 +33,8 @@ TEST(socket_t, ThrowsExceptionWhenCannotAcquireResource) {
     EXPECT_THROW(socket_t("localhost", 50030), std::exception); //!@todo: Maybe some kind of typecheck here?
 }
 
-#define UDP_MANUAL
-#define TCP_MANUAL
+//#define UDP_MANUAL
+//#define TCP_MANUAL
 
 #ifdef TCP_MANUAL
 TEST(socket_t, ManualTcp) {
