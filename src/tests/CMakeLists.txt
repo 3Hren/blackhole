@@ -19,6 +19,7 @@ SET(SOURCES
     test_Filter
     test_StringPatternParser
     test_UdpSink
+    test_Manual
 )
 
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
