@@ -100,7 +100,7 @@ private:
     static inline
     std::unique_ptr<asio::ip::tcp::socket>
     initialize(asio::io_service& io_service, const std::string& host, std::uint16_t port) {
-        auto socket = std::make_unique<asio::ip::tcp::socket>(io_service);
+        std::unique_ptr<asio::ip::tcp::socket> socket = std::make_unique<asio::ip::tcp::socket>(io_service);
         connect(io_service, *socket, host, port);
         return socket;
     }
