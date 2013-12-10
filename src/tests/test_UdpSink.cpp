@@ -10,22 +10,28 @@ namespace blackhole {
 namespace sink {
 
 class boost_asio_backend_t {
+    const std::string host;
+    const std::uint16_t port;
+
     asio::io_service io_service;
     asio::ip::udp::endpoint endpoint;
     std::unique_ptr<asio::ip::udp::socket> socket;
 
 public:
-    boost_asio_backend_t(const std::string& host, std::uint16_t port) {
+    boost_asio_backend_t(const std::string& host, std::uint16_t port) :
+        host(host),
+        port(port)
+    {
         asio::ip::udp::resolver resolver(io_service);
         asio::ip::udp::resolver::query query(host, boost::lexical_cast<std::string>(port));
-        asio::ip::udp::resolver::iterator it = resolver.resolve(query); //!@todo: May throw!
+        asio::ip::udp::resolver::iterator it = resolver.resolve(query); //!@todo: May throw! Whatever.
         std::vector<asio::ip::udp::endpoint> endpoints(it, asio::ip::udp::resolver::iterator());
 
         for (auto it = endpoints.begin(); it != endpoints.end(); ++it) {
             try {
-                endpoint = *it;
                 socket = std::make_unique<asio::ip::udp::socket>(io_service);
-                socket->open(endpoint.protocol());
+                socket->open(it->protocol());
+                endpoint = *it;
                 break;
             } catch (const boost::system::system_error& err) {
                 std::cout << err.what() << std::endl;
@@ -34,7 +40,7 @@ public:
         }
 
         if (!socket) {
-            throw error_t("can not create socket");
+            throw error_t("couldn't open UDP socket at %s:%d", host, port);
         }
     }
 
@@ -63,38 +69,58 @@ public:
 };
 
 class tcp_socket_t {
+    const std::string host;
+    const std::uint16_t port;
+
     asio::io_service io_service;
-    asio::ip::tcp::endpoint endpoint;
     std::unique_ptr<asio::ip::tcp::socket> socket;
 
 public:
-    tcp_socket_t() {
-        asio::ip::tcp::resolver resolver(io_service);
-        asio::ip::tcp::resolver::query query("localhost", boost::lexical_cast<std::string>(50030));
-        asio::ip::tcp::resolver::iterator it = resolver.resolve(query); //!@todo: May throw!
-        std::vector<asio::ip::tcp::endpoint> endpoints(it, asio::ip::tcp::resolver::iterator());
-
-        for (auto it = endpoints.begin(); it != endpoints.end(); ++it) {
-            try {
-                endpoint = *it;
-                socket = std::make_unique<asio::ip::tcp::socket>(io_service);
-                socket->connect(endpoint);
-                break;
-            } catch (const boost::system::system_error& err) {
-                std::cout << err.what() << std::endl;
-                continue;
-            }
-        }
-
-        if (!socket) {
-            throw error_t("can not create socket");
-        }
-        std::cout << endpoint << std::endl;
+    tcp_socket_t(const std::string& host, std::uint16_t port) :
+        host(host),
+        port(port),
+        socket(initialize(io_service, host, port))
+    {
     }
 
     void consume(const std::string& message) {
-         auto written = socket->write_some(boost::asio::buffer(message.data(), message.size()));
-         std::cout << utils::format("written: %d, available: %d", written, socket->available()) << std::endl;
+        if (!socket) {
+            socket = initialize(io_service, host, port);
+        }
+
+        try {
+            socket->write_some(boost::asio::buffer(message.data(), message.size()));
+        } catch (const boost::system::system_error& err) {
+            socket.release();
+            std::rethrow_exception(std::current_exception());
+        }
+    }
+
+private:
+    static inline
+    std::unique_ptr<asio::ip::tcp::socket>
+    initialize(asio::io_service& io_service, const std::string& host, std::uint16_t port) {
+        auto socket = std::make_unique<asio::ip::tcp::socket>(io_service);
+        connect(io_service, *socket, host, port);
+        return socket;
+    }
+
+    static inline
+    void
+    connect(asio::io_service& io_service, asio::ip::tcp::socket& socket, const std::string& host, std::uint16_t port) {
+        try {
+            asio::ip::tcp::resolver resolver(io_service);
+            asio::ip::tcp::resolver::query query(host, boost::lexical_cast<std::string>(port));
+            asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+
+            try {
+                asio::connect(socket, it);
+            } catch (const boost::system::system_error& err) {
+                throw error_t("couldn't connect to the %s:%d - %s", host, port, err.what());
+            }
+        } catch (const boost::system::system_error& err) {
+            throw error_t("couldn't resolve %s:%d - %s", host, port, err.what());
+        }
     }
 };
 
@@ -132,4 +158,19 @@ TEST(socket_t, ThrowsExceptionWhenCannotAcquireResource) {
     // acquire resource needed, it can't continue its work, so it's neccessary to notify upper level
     // code about it.
     EXPECT_THROW(sink::socket_t<NiceMock<mock::socket::failing_backend_t>>("localhost", 50030), std::exception); //!@todo: Maybe some kind of typecheck here?
+}
+
+TEST(socket_t, Manual) {
+    sink::tcp_socket_t sink("localhost", 50030);
+    int i = 0;
+    while (true) {
+        try {
+            sink.consume(utils::format("{\"@message\": \"value = %d\"}\n", i));
+        } catch (std::exception& e) {
+            std::cout << utils::format("I've fucked up: %s", e.what()) << std::endl;
+        }
+
+        i++;
+        usleep(1000000);
+    }
 }
