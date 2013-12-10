@@ -10,42 +10,29 @@ namespace blackhole {
 namespace sink {
 
 class boost_asio_backend_t {
+    typedef boost::asio::ip::udp protocol;
+
     const std::string host;
     const std::uint16_t port;
 
-    asio::io_service io_service;
-    asio::ip::udp::endpoint endpoint;
-    std::unique_ptr<asio::ip::udp::socket> socket;
+    boost::asio::io_service io_service;
+    protocol::socket socket;
 
 public:
     boost_asio_backend_t(const std::string& host, std::uint16_t port) :
         host(host),
-        port(port)
+        port(port),
+        socket(io_service)
     {
-        asio::ip::udp::resolver resolver(io_service);
-        asio::ip::udp::resolver::query query(host, boost::lexical_cast<std::string>(port));
-        asio::ip::udp::resolver::iterator it = resolver.resolve(query); //!@todo: May throw! Whatever.
-        std::vector<asio::ip::udp::endpoint> endpoints(it, asio::ip::udp::resolver::iterator());
+        protocol::resolver resolver(io_service);
+        protocol::resolver::query query(host, boost::lexical_cast<std::string>(port));
+        protocol::resolver::iterator it = resolver.resolve(query);
 
-        for (auto it = endpoints.begin(); it != endpoints.end(); ++it) {
-            try {
-                socket = std::make_unique<asio::ip::udp::socket>(io_service);
-                socket->open(it->protocol());
-                endpoint = *it;
-                break;
-            } catch (const boost::system::system_error& err) {
-                std::cout << err.what() << std::endl;
-                continue;
-            }
-        }
-
-        if (!socket) {
-            throw error_t("couldn't open UDP socket at %s:%d", host, port);
-        }
+        boost::asio::connect(socket, it);
     }
 
     ssize_t write(const std::string& message) {
-        return socket->send_to(boost::asio::buffer(message.data(), message.size()), endpoint);
+        return socket.send(boost::asio::buffer(message.data(), message.size()));
     }
 };
 
@@ -160,7 +147,10 @@ TEST(socket_t, ThrowsExceptionWhenCannotAcquireResource) {
     EXPECT_THROW(sink::socket_t<NiceMock<mock::socket::failing_backend_t>>("localhost", 50030), std::exception); //!@todo: Maybe some kind of typecheck here?
 }
 
-TEST(socket_t, Manual) {
+#define UDP_MANUAL
+
+#ifdef TCP_MANUAL
+TEST(socket_t, ManualTcp) {
     sink::tcp_socket_t sink("localhost", 50030);
     int i = 0;
     while (true) {
@@ -174,3 +164,21 @@ TEST(socket_t, Manual) {
         usleep(1000000);
     }
 }
+#endif
+
+#ifdef UDP_MANUAL
+TEST(socket_t, ManualUdp) {
+    sink::socket_t<> sink("localhost", 50030);
+    int i = 0;
+    while (true) {
+        try {
+            sink.consume(utils::format("{\"@message\": \"value = %d\"}\n", i));
+        } catch (std::exception& e) {
+            std::cout << utils::format("I've fucked up: %s", e.what()) << std::endl;
+        }
+
+        i++;
+        usleep(1000000);
+    }
+}
+#endif
