@@ -9,14 +9,34 @@ namespace blackhole {
 
 namespace sink {
 
+//! Resolves specified host and tries to connect to the socket.
+template<typename Protocol>
+void
+connect(asio::io_service& io_service, typename Protocol::socket& socket, const std::string& host, std::uint16_t port) {
+    try {
+        typename Protocol::resolver resolver(io_service);
+        typename Protocol::resolver::query query(host, boost::lexical_cast<std::string>(port));
+        typename Protocol::resolver::iterator it = resolver.resolve(query);
+
+        try {
+            asio::connect(socket, it);
+        } catch (const boost::system::system_error& err) {
+            throw error_t("couldn't connect to the %s:%d - %s", host, port, err.what());
+        }
+    } catch (const boost::system::system_error& err) {
+        throw error_t("couldn't resolve %s:%d - %s", host, port, err.what());
+    }
+}
+
+//template<typename Protocol>
 class boost_asio_backend_t {
-    typedef boost::asio::ip::udp protocol;
+    typedef boost::asio::ip::udp Protocol;
 
     const std::string host;
     const std::uint16_t port;
 
     boost::asio::io_service io_service;
-    protocol::socket socket;
+    Protocol::socket socket;
 
 public:
     boost_asio_backend_t(const std::string& host, std::uint16_t port) :
@@ -24,11 +44,7 @@ public:
         port(port),
         socket(io_service)
     {
-        protocol::resolver resolver(io_service);
-        protocol::resolver::query query(host, boost::lexical_cast<std::string>(port));
-        protocol::resolver::iterator it = resolver.resolve(query);
-
-        boost::asio::connect(socket, it);
+        connect<Protocol>(io_service, socket, host, port);
     }
 
     ssize_t write(const std::string& message) {
