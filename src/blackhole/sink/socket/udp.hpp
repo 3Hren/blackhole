@@ -5,7 +5,8 @@
 
 #include <boost/asio.hpp>
 
-#include "blackhole/sink/socket/connect.hpp"
+#include "backend.hpp"
+#include "connect.hpp"
 
 namespace blackhole {
 
@@ -13,29 +14,26 @@ namespace sink {
 
 namespace socket {
 
-template<typename Protocol>
-class boost_backend_t;
-
 template<>
 class boost_backend_t<boost::asio::ip::udp> {
     typedef boost::asio::ip::udp Protocol;
 
-    const std::string host;
-    const std::uint16_t port;
+    const std::string m_host;
+    const std::uint16_t m_port;
 
-    boost::asio::io_service io_service;
-    Protocol::socket socket;
+    boost::asio::io_service m_io_service;
+    Protocol::socket m_socket;
 
 public:
     boost_backend_t(const std::string& host, std::uint16_t port) :
-        host(host),
-        port(port),
-        socket(initialize(io_service, host, port))
+        m_host(host),
+        m_port(port),
+        m_socket(initialize(m_io_service, host, port))
     {
     }
 
     ssize_t write(const std::string& message) {
-        return socket.send(boost::asio::buffer(message.data(), message.size()));
+        return m_socket.send(boost::asio::buffer(message.data(), message.size()));
     }
 
 private:

@@ -5,8 +5,10 @@
 
 #include <boost/asio.hpp>
 
-#include "blackhole/sink/socket/connect.hpp"
 #include "blackhole/utils/unique.hpp"
+
+#include "backend.hpp"
+#include "connect.hpp"
 
 namespace blackhole {
 
@@ -18,29 +20,29 @@ template<>
 class boost_backend_t<boost::asio::ip::tcp> {
     typedef boost::asio::ip::tcp Protocol;
 
-    const std::string host;
-    const std::uint16_t port;
+    const std::string m_host;
+    const std::uint16_t m_port;
 
-    boost::asio::io_service io_service;
-    std::unique_ptr<Protocol::socket> socket;
+    boost::asio::io_service m_io_service;
+    std::unique_ptr<Protocol::socket> m_socket;
 
 public:
     boost_backend_t(const std::string& host, std::uint16_t port) :
-        host(host),
-        port(port),
-        socket(initialize(io_service, host, port))
+        m_host(host),
+        m_port(port),
+        m_socket(initialize(m_io_service, host, port))
     {
     }
 
     ssize_t write(const std::string& message) {
-        if (!socket) {
-            socket = initialize(io_service, host, port);
+        if (!m_socket) {
+            m_socket = initialize(m_io_service, m_host, m_port);
         }
 
         try {
-            return socket->write_some(boost::asio::buffer(message.data(), message.size()));
-        } catch (const boost::system::system_error& err) {
-            socket.release();
+            return m_socket->write_some(boost::asio::buffer(message.data(), message.size()));
+        } catch (const boost::system::system_error&) {
+            m_socket.release();
             std::rethrow_exception(std::current_exception());
         }
     }
