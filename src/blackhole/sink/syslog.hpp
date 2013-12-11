@@ -10,6 +10,20 @@ namespace blackhole {
 
 namespace sink {
 
+enum class priority_t : unsigned {
+    emerg   = LOG_EMERG,
+    alert   = LOG_ALERT,
+    crit    = LOG_CRIT,
+    err     = LOG_ERR,
+    warning = LOG_WARNING,
+    notice  = LOG_NOTICE,
+    info    = LOG_INFO,
+    debug   = LOG_DEBUG
+};
+
+template<typename Level>
+struct priority_traits;
+
 namespace backend {
 
 class native_t {
@@ -25,8 +39,8 @@ public:
         ::closelog();
     }
 
-    void write(int priority, const char* message) {
-        ::syslog(priority, "%s", message);
+    void write(priority_t priority, const std::string& message) {
+        ::syslog(static_cast<unsigned>(priority), "%s", message.c_str());
     }
 
 private:
@@ -41,21 +55,29 @@ private:
 
 } // namespace backend
 
-template<typename Backend = backend::native_t>
+template<typename Level, typename Backend = backend::native_t>
 class syslog_t {
     Backend m_backend;
 public:
     syslog_t(const std::string& identity, int option = LOG_PID, int facility = LOG_USER) :
         m_backend(identity, option, facility)
-    {}
+    {
+        static_assert(std::is_enum<Level>::value, "level type must be enum");
+    }
 
     syslog_t(const std::string& identity, int facility) :
         m_backend(identity, LOG_PID, facility)
-    {}
+    {
+        static_assert(std::is_enum<Level>::value, "level type must be enum");
+    }
 
-    void consume(int priority, const std::string& message) {
-//        priority = PriorityMapper::map(priority);
-        m_backend.write(priority, message.c_str());
+    void consume(Level level, const std::string& message) {
+        priority_t priority = priority_traits<Level>::map(level);
+        m_backend.write(priority, message);
+    }
+
+    Backend& backend() {
+        return m_backend;
     }
 };
 

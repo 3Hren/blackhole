@@ -45,4 +45,15 @@ public:
 
 } // namespace socket
 
+namespace syslog {
+
+class backend_t {
+public:
+    backend_t(const std::string&, int, int) {}
+
+    MOCK_CONST_METHOD2(write, void(sink::priority_t, const std::string&));
+};
+
+} // namespace syslog
+
 } // namespace mock
