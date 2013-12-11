@@ -42,7 +42,8 @@ struct sink_config_t {
 namespace factory {
 
 template<typename Level, typename Sink>
-std::unique_ptr<base_frontend_t> create(const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink) {
+std::unique_ptr<base_frontend_t>
+create(const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink) {
     if (formatter_config.type == "string") {
         typedef formatter::string_t formatter_type;
 
@@ -56,37 +57,28 @@ std::unique_ptr<base_frontend_t> create(const formatter_config_t& formatter_conf
 }
 
 template<typename Level>
-std::unique_ptr<base_frontend_t> create(const formatter_config_t& formatter, const sink_config_t& sink) {
-    if (sink.type == "files") {
-        typedef sink::file_t<> sink_type;
-
-        std::string path = sink.args.at("path");
-        auto s = std::make_unique<sink_type>(path);
-
-        return create<Level>(formatter, std::move(s));
-    } else if (sink.type == "syslog") {
-        typedef sink::syslog_t<Level> sink_type;
-
-        std::string identity = sink.args.at("identity");
-        auto s = std::make_unique<sink_type>(identity);
-
-        return create<Level>(formatter, std::move(s));
-    } else if (sink.type == "socket") {
-        std::string type = sink.args.at("type");
+std::unique_ptr<base_frontend_t>
+create(const formatter_config_t& formatter_config, const sink_config_t& sink_config) {
+    if (sink_config.type == "files") {
+        std::string path = sink_config.args.at("path");
+        auto sink = std::make_unique<sink::file_t<>>(path);
+        return create<Level>(formatter_config, std::move(sink));
+    } else if (sink_config.type == "syslog") {
+        std::string identity = sink_config.args.at("identity");
+        auto sink = std::make_unique<sink::syslog_t<Level>>(identity);
+        return create<Level>(formatter_config, std::move(sink));
+    } else if (sink_config.type == "socket") {
+        std::string type = sink_config.args.at("type");
         if (type == "udp") {
-            typedef sink::socket_t<boost::asio::ip::udp> sink_type;
-            std::string host = sink.args.at("host");
-            std::uint16_t port = boost::lexical_cast<std::uint16_t>(sink.args.at("port"));
-            auto s = std::make_unique<sink_type>(host, port);
-
-            return create<Level>(formatter, std::move(s));
+            std::string host = sink_config.args.at("host");
+            std::uint16_t port = boost::lexical_cast<std::uint16_t>(sink_config.args.at("port"));
+            auto sink = std::make_unique<sink::socket_t<boost::asio::ip::udp>>(host, port);
+            return create<Level>(formatter_config, std::move(sink));
         } else if (type == "tcp") {
-            typedef sink::socket_t<boost::asio::ip::tcp> sink_type;
-            std::string host = sink.args.at("host");
-            std::uint16_t port = boost::lexical_cast<std::uint16_t>(sink.args.at("port"));
-            auto s = std::make_unique<sink_type>(host, port);
-
-            return create<Level>(formatter, std::move(s));
+            std::string host = sink_config.args.at("host");
+            std::uint16_t port = boost::lexical_cast<std::uint16_t>(sink_config.args.at("port"));
+            auto sink = std::make_unique<sink::socket_t<boost::asio::ip::tcp>>(host, port);
+            return create<Level>(formatter_config, std::move(sink));
         }
     }
 
