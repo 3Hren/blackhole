@@ -7,7 +7,7 @@ namespace blackhole {
 
 namespace sink {
 
-template<typename Protocol, typename Backend = socket::boost_backend_t<Protocol>>
+template<typename Protocol, typename Backend = socket::boost_backend_t<Protocol> >
 class socket_t {
     Backend m_backend;
 
