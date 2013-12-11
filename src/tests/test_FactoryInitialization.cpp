@@ -41,16 +41,19 @@ struct sink_config_t {
 
 namespace factory {
 
+template<typename Level, typename Formatter, typename Sink>
+std::unique_ptr<base_frontend_t>
+create(std::unique_ptr<Formatter> formatter, std::unique_ptr<Sink> sink) {
+    return std::make_unique<frontend_t<Formatter, Sink, Level>>(std::move(formatter), std::move(sink));
+}
+
 template<typename Level, typename Sink>
 std::unique_ptr<base_frontend_t>
 create(const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink) {
     if (formatter_config.type == "string") {
-        typedef formatter::string_t formatter_type;
-
         std::string pattern = formatter_config.args.at("pattern");
-        auto formatter = std::make_unique<formatter_type>(pattern);
-
-        return std::make_unique<frontend_t<formatter_type, Sink, Level>>(std::move(formatter), std::move(sink));
+        auto formatter = std::make_unique<formatter::string_t>(pattern);
+        return create<Level>(std::move(formatter), std::move(sink));
     }
 
     return std::unique_ptr<base_frontend_t>();
