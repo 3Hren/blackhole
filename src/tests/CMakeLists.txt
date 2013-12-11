@@ -22,6 +22,7 @@ SET(SOURCES
     test_Manual
     test_SyslogSink
     test_Functional
+    test_FactoryInitialization
 )
 
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
