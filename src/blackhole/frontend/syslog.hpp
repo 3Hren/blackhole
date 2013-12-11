@@ -2,6 +2,7 @@
 
 #include "blackhole/frontend.hpp"
 #include "blackhole/sink/syslog.hpp"
+#include "blackhole/keyword/severity.hpp"
 
 namespace blackhole {
 
@@ -17,10 +18,11 @@ public:
 
     void handle(const log::record_t& record) {
         auto msg = std::move(m_formatter->format(record));
-        auto it = record.attributes.find("severity");
+        auto it = record.attributes.find(keyword::severity<Level>().name());
 
         if (it != record.attributes.end()) {
-            const Level level = static_cast<Level>(boost::get<typename std::underlying_type<Level>::type>((*it).second.value));
+            //!@todo: It's not compiler-independent to use std::underlying_type. Rewrite!
+            const Level level = static_cast<Level>(boost::get<typename std::underlying_type<Level>::type>(it->second.value));
             m_sink->consume(level, msg);
         }
     }

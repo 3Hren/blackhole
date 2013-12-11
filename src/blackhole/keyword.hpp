@@ -2,6 +2,7 @@
 
 #include "attribute.hpp"
 #include "filter.hpp"
+#include "helper.hpp"
 
 #define DECLARE_KEYWORD_IMPL(Name, Scope, T) \
     namespace tag { \
