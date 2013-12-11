@@ -21,6 +21,7 @@ SET(SOURCES
     test_UdpSink
     test_Manual
     test_SyslogSink
+    test_Functional
 )
 
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)

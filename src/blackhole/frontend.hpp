@@ -11,7 +11,7 @@ public:
     virtual void handle(const log::record_t& record) = 0;
 };
 
-template<class Formatter, class Sink>
+template<class Formatter, class Sink, class Level = void>
 class frontend_t : public base_frontend_t {
     const std::unique_ptr<Formatter> m_formatter;
     const std::unique_ptr<Sink> m_sink;
