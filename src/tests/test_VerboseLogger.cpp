@@ -52,4 +52,3 @@ TEST(verbose_logger_t, Manual) {
 }
 
 //!@todo: Make severity string mapper.
-//!@todo: Specialization for `syslog_t` frontend. It's needed for providing loglevel to the `syslog_t`.
