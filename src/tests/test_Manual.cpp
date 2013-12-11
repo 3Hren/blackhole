@@ -1,6 +1,6 @@
 #include "Mocks.hpp"
 
-#define UDP_MANUAL
+//#define UDP_MANUAL
 //#define TCP_MANUAL
 
 #ifdef TCP_MANUAL

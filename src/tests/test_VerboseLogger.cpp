@@ -50,3 +50,7 @@ TEST(verbose_logger_t, Manual) {
         log.push(std::move(record));
     }
 }
+
+//!@todo: Make severity string mapper.
+//!@todo: Specialization for `syslog_t` frontend. It's needed for providing loglevel to the `syslog_t`.
+//!@todo: Make severity -> SyslogLevel mapper.
