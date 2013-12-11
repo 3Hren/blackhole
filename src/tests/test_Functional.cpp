@@ -40,8 +40,7 @@ TEST(Functional, SyslogConfiguredVerboseLogger) {
 
     log::record_t record = log.open_record(level::error);
     if (record.valid()) {
-        record.attributes["message"] = { utils::format("Some message from: '%s'!", "Hell") };
-        // Add another attributes.
+        record.attributes["message"] = { utils::format("Some message from: '%s'!", "Hell"), log::attribute::scope::event };
         log.push(std::move(record));
     }
 }
