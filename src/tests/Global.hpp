@@ -22,4 +22,5 @@ using namespace ::testing;
 #include "blackhole/logger.hpp"
 #include "blackhole/sink/files.hpp"
 #include "blackhole/sink/socket.hpp"
+#include "blackhole/sink/syslog.hpp"
 #include "blackhole/utils/unique.hpp"
