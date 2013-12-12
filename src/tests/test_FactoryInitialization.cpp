@@ -27,6 +27,7 @@ struct priority_traits<testing::level> {
 
 } } // namespace blackhole::sink
 
+//!@todo: Decompose it into separate file.
 namespace blackhole {
 
 struct formatter_config_t {

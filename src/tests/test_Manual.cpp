@@ -36,3 +36,6 @@ TEST(socket_t, ManualUdp) {
     }
 }
 #endif
+
+//!@todo: Simplify logger creation.
+//!@todo: Make global logger.

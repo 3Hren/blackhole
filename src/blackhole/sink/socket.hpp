@@ -29,3 +29,5 @@ public:
 } // namespace sink
 
 } // namespace blackhole
+
+//!@todo: Make asynchronous TCP backend.
