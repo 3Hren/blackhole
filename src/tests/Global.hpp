@@ -19,6 +19,7 @@ using namespace ::testing;
 #include "blackhole/frontend.hpp"
 #include "blackhole/frontend/syslog.hpp"
 #include "blackhole/helper.hpp"
+#include "blackhole/initialization.hpp"
 #include "blackhole/keyword.hpp"
 #include "blackhole/logger.hpp"
 #include "blackhole/sink/files.hpp"
