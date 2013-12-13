@@ -106,3 +106,7 @@ public:
 };
 
 } // namespace blackhole
+
+//!@todo: Make exception trap. Make it configurable.
+//!@todo: Make fallback logger. Make it configurable.
+//!@todo: Make timestamp time_t -> string mapper.
