@@ -97,7 +97,7 @@ private:
 
 template<typename Level>
 class verbose_logger_t : public logger_base_t {
-    typedef typename std::underlying_type<Level>::type level_type;
+    typedef typename aux::underlying_type<Level>::type level_type;
 
 public:
     log::record_t open_record(Level level) const {

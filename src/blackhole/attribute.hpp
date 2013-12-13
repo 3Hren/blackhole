@@ -6,6 +6,8 @@
 
 #include <boost/variant.hpp>
 
+#include "utils/underlying.hpp"
+
 namespace blackhole {
 
 namespace log {
@@ -30,7 +32,7 @@ enum class scope : std::uint8_t {
     universe = 16   /* singleton attributes for entire application */
 };
 
-typedef typename std::underlying_type<scope>::type scope_underlying_type;
+typedef typename aux::underlying_type<scope>::type scope_underlying_type;
 
 static const scope DEFAULT_SCOPE = scope::local;
 
@@ -94,7 +96,7 @@ struct traits {
 
 template<typename T>
 struct traits<T, typename std::enable_if<std::is_enum<T>::value>::type> {
-    typedef typename std::underlying_type<T>::type underlying_type;
+    typedef typename aux::underlying_type<T>::type underlying_type;
 
     static inline underlying_type pack(const T& value) {
         return static_cast<underlying_type>(value);

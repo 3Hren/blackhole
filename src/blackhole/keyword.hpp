@@ -3,6 +3,7 @@
 #include "attribute.hpp"
 #include "filter.hpp"
 #include "helper.hpp"
+#include "utils/underlying.hpp"
 
 #define DECLARE_KEYWORD_IMPL(Name, Scope, T) \
     namespace tag { \
@@ -24,20 +25,6 @@
 namespace blackhole {
 
 namespace keyword {
-
-namespace aux {
-
-template<typename T, class = void>
-struct underlying_type {
-    typedef T type;
-};
-
-template<typename T>
-struct underlying_type<T, typename std::enable_if<std::is_enum<T>::value>::type> {
-    typedef typename std::underlying_type<T>::type type;
-};
-
-} // namespace aux
 
 template<typename T, typename NameProvider, log::attribute::scope Scope = log::attribute::DEFAULT_SCOPE>
 struct keyword_t {
