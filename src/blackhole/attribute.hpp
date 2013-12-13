@@ -25,11 +25,11 @@ typedef boost::variant<
 namespace attribute {
 
 enum class scope : std::uint8_t {
-    local = 1,      /* user-defined event attributes*/
-    event = 2,      /* not user-defined event attributes, like timestamp or message */
-    global = 4,     /* logger object attributes*/
-    thread = 8,     /* thread attributes */
-    universe = 16   /* singleton attributes for entire application */
+    local       = 1 << 0,   /* user-defined event attributes*/
+    event       = 1 << 1,   /* not user-defined event attributes, like timestamp or message */
+    global      = 1 << 2,   /* logger object attributes*/
+    thread      = 1 << 3,   /* thread attributes */
+    universe    = 1 << 4    /* singleton attributes for entire application */
 };
 
 typedef typename aux::underlying_type<scope>::type scope_underlying_type;
