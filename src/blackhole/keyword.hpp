@@ -25,19 +25,23 @@ namespace blackhole {
 
 namespace keyword {
 
+namespace aux {
+
 template<typename T, class = void>
-struct type_extracter { //!@todo: Rename to `extract_type`.
+struct underlying_type {
     typedef T type;
 };
 
 template<typename T>
-struct type_extracter<T, typename std::enable_if<std::is_enum<T>::value>::type> {
+struct underlying_type<T, typename std::enable_if<std::is_enum<T>::value>::type> {
     typedef typename std::underlying_type<T>::type type;
 };
 
+} // namespace aux
+
 template<typename T, typename NameProvider, log::attribute::scope Scope = log::attribute::DEFAULT_SCOPE>
 struct keyword_t {
-    typedef typename type_extracter<T>::type type;
+    typedef typename aux::underlying_type<T>::type type;
 
     static const char* name() {
         return NameProvider::name();
