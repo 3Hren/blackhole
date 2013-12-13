@@ -26,31 +26,7 @@ namespace blackhole {
 namespace keyword {
 
 template<typename T, class = void>
-struct traits {
-    static inline T pack(const T& value) {
-        return value;
-    }
-
-    static inline T extract(const log::attributes_t& attributes, const std::string& name) {
-        return boost::get<T>(attributes.at(name).value);
-    }
-};
-
-template<typename T>
-struct traits<T, typename std::enable_if<std::is_enum<T>::value>::type> {
-    typedef typename std::underlying_type<T>::type underlying_type;
-
-    static inline underlying_type pack(const T& value) {
-        return static_cast<underlying_type>(value);
-    }
-
-    static inline T extract(const log::attributes_t& attributes, const std::string& name) {
-        return static_cast<T>(boost::get<underlying_type>(attributes.at(name).value));
-    }
-};
-
-template<typename T, class = void>
-struct type_extracter {
+struct type_extracter { //!@todo: Rename to `extract_type`.
     typedef T type;
 };
 
@@ -68,7 +44,7 @@ struct keyword_t {
     }
 
     log::attribute_pair_t operator =(T value) const {
-        return std::make_pair(name(), log::attribute_t(traits<T>::pack(value), Scope));
+        return std::make_pair(name(), log::attribute_t(attribute::traits<T>::pack(value), Scope));
     }
 
     filter_t operator >=(T value) const {
@@ -84,7 +60,7 @@ struct keyword_t {
         T value;
 
         bool operator()(const log::attributes_t& attributes) const {
-            return Action::execute(value, traits<T>::extract(attributes, name()));
+            return Action::execute(value, attribute::traits<T>::extract(attributes, name()));
         }
     };
 };

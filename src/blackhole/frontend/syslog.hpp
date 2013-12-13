@@ -18,13 +18,8 @@ public:
 
     void handle(const log::record_t& record) {
         auto msg = std::move(m_formatter->format(record));
-        auto it = record.attributes.find(keyword::severity<Level>().name());
-
-        if (it != record.attributes.end()) {
-            //!@todo: It's not compiler-independent to use std::underlying_type. Rewrite!
-            const Level level = static_cast<Level>(boost::get<typename std::underlying_type<Level>::type>(it->second.value));
-            m_sink->consume(level, msg);
-        }
+        const Level level = record.extract<Level>(keyword::severity<Level>().name());
+        m_sink->consume(level, msg);
     }
 };
 
