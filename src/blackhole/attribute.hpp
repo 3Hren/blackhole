@@ -39,7 +39,7 @@ static const scope DEFAULT_SCOPE = scope::local;
 } // namespace attribute
 
 struct attribute_t {
-    attribute_value_t value;
+    attribute_value_t value; //!@note: Maybe create functor with map? struct keeper { value_t value; value_t operator(value_t) {} };
     attribute::scope scope;
 
     attribute_t() :
@@ -78,8 +78,9 @@ namespace attribute {
 
 // Dynamic attribute factory function.
 template<typename T>
-inline log::attribute_pair_t make(const std::string& name, const T& value) {
-    return std::make_pair(name, log::attribute_t(value));
+inline
+log::attribute_pair_t make(const std::string& name, const T& value, log::attribute::scope scope = log::attribute::DEFAULT_SCOPE) {
+    return std::make_pair(name, log::attribute_t(value, scope));
 }
 
 // Attribute packing/unpacking/extracting.

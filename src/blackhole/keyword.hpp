@@ -35,7 +35,7 @@ struct keyword_t {
     }
 
     log::attribute_pair_t operator =(T value) const {
-        return std::make_pair(name(), log::attribute_t(attribute::traits<T>::pack(value), Scope));
+        return attribute::make(name(), attribute::traits<T>::pack(value), Scope);
     }
 
     filter_t operator >=(T value) const {
