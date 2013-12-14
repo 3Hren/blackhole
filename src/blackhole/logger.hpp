@@ -110,3 +110,5 @@ public:
 //!@todo: Make exception trap. Make it configurable.
 //!@todo: Make fallback logger. Make it configurable.
 //!@todo: Make timestamp time_t -> string mapper.
+//!@todo: Make json formatter. Try to implement logstash formatter.
+//!@todo: Make msgpack formatter.
