@@ -10,6 +10,40 @@
 
 namespace blackhole {
 
+namespace aux {
+
+template<typename Protocol, typename SocketService, typename Iterator>
+Iterator connect(boost::asio::basic_socket<Protocol, SocketService>& s, Iterator begin, Iterator end, boost::system::error_code& ec) {
+    ec = boost::system::error_code();
+
+    for (Iterator iter = begin; iter != end; ++iter) {
+        if (iter != end) {
+            s.close(ec);
+            s.connect(*iter, ec);
+            if (!ec) {
+                return iter;
+            }
+        }
+    }
+
+    if (!ec) {
+        ec = boost::asio::error::not_found;
+    }
+
+    return end;
+}
+
+template <typename Protocol, typename SocketService, typename Iterator>
+Iterator connect(boost::asio::basic_socket<Protocol, SocketService>& s, Iterator begin) {
+    boost::system::error_code ec;
+    Iterator end = typename Protocol::resolver::iterator();
+    Iterator result = aux::connect(s, begin, end, ec);
+    boost::asio::detail::throw_error(ec);
+    return result;
+}
+
+} //namespace aux
+
 namespace sink {
 
 //! Resolves specified host and tries to connect to the socket.
@@ -22,7 +56,7 @@ connect(boost::asio::io_service& io_service, typename Protocol::socket& socket, 
         typename Protocol::resolver::iterator it = resolver.resolve(query);
 
         try {
-            boost::asio::connect(socket, it);
+            aux::connect(socket, it);
         } catch (const boost::system::system_error& err) {
             throw error_t("couldn't connect to the %s:%d - %s", host, port, err.what());
         }

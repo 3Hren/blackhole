@@ -4,11 +4,6 @@ SET(CMAKE_BUILD_TYPE "Debug")
 
 SET(PROJECT blackhole-tests)
 
-SET(HEADERS
-    Global.hpp
-    Mocks.hpp
-)
-
 SET(SOURCES
     main
     test_StringFormatter

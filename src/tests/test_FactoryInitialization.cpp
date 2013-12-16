@@ -31,12 +31,12 @@ struct priority_traits<testing::level> {
 TEST(Factory, FileStringsFrontend) {
     formatter_config_t formatter = {
         "string",
-        { { "pattern", "[%(timestamp)s]: %(message)s" } }
+        std::map<std::string, std::string>{ { "pattern", "[%(timestamp)s]: %(message)s" } }
     };
 
     sink_config_t sink = {
         "files",
-        { { "path", "/dev/stdout" } }
+        std::map<std::string, std::string>{ { "path", "/dev/stdout" } }
     };
 
     EXPECT_TRUE(bool(factory_t<testing::level>::create(formatter, sink)));
@@ -45,12 +45,12 @@ TEST(Factory, FileStringsFrontend) {
 TEST(Factory, SyslogStringsFrontend) {
     formatter_config_t formatter = {
         "string",
-        { { "pattern", "[%(timestamp)s]: %(message)s" } }
+        std::map<std::string, std::string>{ { "pattern", "[%(timestamp)s]: %(message)s" } }
     };
 
     sink_config_t sink = {
         "syslog",
-        { { "identity", "AppIdentity" } }
+        std::map<std::string, std::string>{ { "identity", "AppIdentity" } }
     };
 
     EXPECT_TRUE(bool(factory_t<testing::level>::create(formatter, sink)));
@@ -59,11 +59,11 @@ TEST(Factory, SyslogStringsFrontend) {
 TEST(Factory, UdpSocketStringsFrontend) {
     formatter_config_t formatter = {
         "string",
-        { { "pattern", "[%(timestamp)s]: %(message)s" } }
+        std::map<std::string, std::string>{ { "pattern", "[%(timestamp)s]: %(message)s" } }
     };
 
     sink_config_t sink = {
-        "socket", {
+        "socket", std::map<std::string, std::string>{
             { "type", "udp" },
             { "host", "localhost" },
             { "port", "50030" }
@@ -76,12 +76,12 @@ TEST(Factory, UdpSocketStringsFrontend) {
 TEST(Factory, TcpSocketStringsFrontend) {
     formatter_config_t formatter = {
         "string",
-        { { "pattern", "[%(timestamp)s]: %(message)s" } }
+        std::map<std::string, std::string>{ { "pattern", "[%(timestamp)s]: %(message)s" } }
     };
 
     // Sink will try to connect to the specified port. So if it isn't available, an exception will be thrown, it's ok.
     sink_config_t sink = {
-        "socket", {
+        "socket", std::map<std::string, std::string>{
             { "type", "tcp" },
             { "host", "localhost" },
             { "port", "22" }

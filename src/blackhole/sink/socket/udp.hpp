@@ -6,6 +6,7 @@
 #include <boost/asio.hpp>
 
 #include "backend.hpp"
+#include "blackhole/utils/unique.hpp"
 #include "connect.hpp"
 
 namespace blackhole {
@@ -22,7 +23,7 @@ class boost_backend_t<boost::asio::ip::udp> {
     const std::uint16_t m_port;
 
     boost::asio::io_service m_io_service;
-    Protocol::socket m_socket;
+    std::unique_ptr<Protocol::socket> m_socket;
 
 public:
     boost_backend_t(const std::string& host, std::uint16_t port) :
@@ -33,15 +34,15 @@ public:
     }
 
     ssize_t write(const std::string& message) {
-        return m_socket.send(boost::asio::buffer(message.data(), message.size()));
+        return m_socket->send(boost::asio::buffer(message.data(), message.size()));
     }
 
 private:
     static inline
-    Protocol::socket
+    std::unique_ptr<Protocol::socket>
     initialize(boost::asio::io_service& io_service, const std::string& host, std::uint16_t port) {
-        Protocol::socket socket(io_service);
-        connect<Protocol>(io_service, socket, host, port);
+        auto socket = std::make_unique<Protocol::socket>(io_service);
+        connect<Protocol>(io_service, *socket.get(), host, port);
         return socket;
     }
 };
