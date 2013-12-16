@@ -61,8 +61,8 @@ TEST(GetAttribute, FailsIfDeferredlyAttributeComparingFails) {
 }
 
 TEST(GetAttribute, CanExtractStaticAttribute) {
-    auto filter = expr::get_attr(keyword::timestamp_id());
-    log::attributes_t attributes = {{"timestamp_id", {std::time_t(100500)}}};
+    auto filter = expr::get_attr(keyword::timestamp());
+    log::attributes_t attributes = {{"timestamp", {std::time_t(100500)}}};
     EXPECT_EQ(std::time_t(100500), filter(attributes));
 }
 

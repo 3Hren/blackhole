@@ -15,12 +15,17 @@ namespace blackhole {
 namespace formatter {
 
 class string_t {
+    typedef std::function<std::string(const log::attribute_value_t&)> mapper_t;
     const string::config_t m_config;
-
+    std::unordered_map<std::string, mapper_t> m_mappers;
 public:
     string_t(const std::string& pattern) :
         m_config(string::pattern_parser_t::parse(pattern))
     {
+    }
+
+    void set_mapper(const std::string& key, mapper_t mapper) {
+        m_mappers[key] = mapper;
     }
 
     std::string format(const log::record_t& record) const {
@@ -40,7 +45,14 @@ public:
                 throw error_t("bad format string '%s' - key '%s' was not provided", m_config.pattern, key);
             }
             const log::attribute_t& attribute = ait->second;
-            fmt % attribute.value;
+            {
+                auto it = m_mappers.find(key);
+            if (it != m_mappers.end()) {
+                fmt % it->second(attribute.value);
+            } else {
+                fmt % attribute.value;
+            }
+            }
         }
         return fmt.str();
     }
@@ -53,10 +65,11 @@ private:
             const scope_underlying_type scope = *it - '0';
             std::vector<std::string> formatted;
             for (auto attr_it = attributes.begin(); attr_it != attributes.end(); ++attr_it) {
+                const std::string& name = attr_it->first;
                 const log::attribute_t& attribute = attr_it->second;
                 if (static_cast<scope_underlying_type>(attribute.scope) & scope) {
                     std::stringstream buffer;
-                    buffer << "'" << attr_it->first << "': '" << attribute.value << "'";
+                    buffer << "'" << name << "': '" << attribute.value << "'";
                     formatted.push_back(buffer.str());
                 }
             }

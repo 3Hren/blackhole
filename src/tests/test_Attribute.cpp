@@ -7,7 +7,7 @@ TEST(Attribute, CanMakeCustomAttribute) {
 }
 
 TEST(Attribute, TimestampIsEventAttribute) {
-    log::attribute_pair_t pair = (keyword::timestamp_id() = std::time_t(0));
+    log::attribute_pair_t pair = (keyword::timestamp() = std::time_t(0));
     EXPECT_EQ(log::attribute::scope::event, pair.second.scope);
 }
 

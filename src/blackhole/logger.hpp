@@ -89,7 +89,7 @@ public:
 private:
     log::attributes_t get_event_attributes() const {
         log::attributes_t attributes = {
-            keyword::timestamp_id() = std::time(nullptr)
+            keyword::timestamp() = std::time(nullptr)
         };
         return attributes;
     }

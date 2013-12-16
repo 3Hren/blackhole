@@ -84,3 +84,29 @@ TEST(string_t, ComplexFormatWithOtherLocalAttributes) {
     EXPECT_TRUE(actual.find("'answer to life the universe and everything': '42'") != std::string::npos);
     EXPECT_TRUE(actual.find("'uuid': '123-456'") != std::string::npos);
 }
+
+namespace testing {
+
+std::string map_timestamp(const log::attribute_value_t& value) {
+    std::time_t time = boost::get<std::time_t>(value);
+    char mbstr[128];
+    if(std::strftime(mbstr, 128, "%F %T", std::localtime(&time))) {
+        return std::string(mbstr);
+    }
+    return std::string("?");
+}
+
+} // namespace testing
+
+TEST(string_t, CustomMapping) {
+    log::record_t record;
+    record.attributes = {
+        keyword::timestamp() = std::time_t(100500),
+        keyword::message() = "le message",
+    };
+    std::string pattern("[%(timestamp)s]: %(message)s");
+    formatter::string_t formatter(pattern);
+    formatter.set_mapper("timestamp", &testing::map_timestamp);
+    std::string actual = formatter.format(record);
+    EXPECT_EQ(actual, "[1970-01-02 06:55:00]: le message");
+}
