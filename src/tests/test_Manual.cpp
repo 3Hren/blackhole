@@ -39,4 +39,3 @@ TEST(socket_t, ManualUdp) {
 
 //!@todo: Simplify logger creation.
 //!@todo: Make global logger.
-//!@todo: Make compilable on GCC4.4.

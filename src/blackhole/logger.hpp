@@ -102,7 +102,8 @@ class verbose_logger_t : public logger_base_t {
 
 public:
     log::record_t open_record(Level level) const {
-        return logger_base_t::open_record({ keyword::severity<Level>() = level });
+        log::attributes_t attributes = { keyword::severity<Level>() = level };
+        return logger_base_t::open_record(std::move(attributes));
     }
 };
 
