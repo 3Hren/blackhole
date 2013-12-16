@@ -106,7 +106,7 @@ TEST(string_t, CustomMapping) {
     };
     std::string pattern("[%(timestamp)s]: %(message)s");
     formatter::string_t formatter(pattern);
-    formatter.set_mapper("timestamp", &testing::map_timestamp);
+    formatter.add_mapper("timestamp", &testing::map_timestamp);
     std::string actual = formatter.format(record);
     EXPECT_EQ(actual, "[1970-01-02 06:55:00]: le message");
 }
