@@ -87,8 +87,7 @@ TEST(string_t, ComplexFormatWithOtherLocalAttributes) {
 
 namespace testing {
 
-std::string map_timestamp(const log::attribute_value_t& value) {
-    std::time_t time = boost::get<std::time_t>(value);
+std::string map_timestamp(const std::time_t& time) {
     char mbstr[128];
     if(std::strftime(mbstr, 128, "%F %T", std::gmtime(&time))) {
         return std::string(mbstr);
@@ -99,6 +98,9 @@ std::string map_timestamp(const log::attribute_value_t& value) {
 } // namespace testing
 
 TEST(string_t, CustomMapping) {
+    mapping::mapper_t mapper;
+    mapper.add<std::time_t>("timestamp", &testing::map_timestamp);
+
     log::record_t record;
     record.attributes = {
         keyword::timestamp() = std::time_t(100500),
@@ -106,7 +108,7 @@ TEST(string_t, CustomMapping) {
     };
     std::string pattern("[%(timestamp)s]: %(message)s");
     formatter::string_t formatter(pattern);
-    formatter.add_mapper("timestamp", &testing::map_timestamp);
+    formatter.set_mapper(std::move(mapper));
     std::string actual = formatter.format(record);
     EXPECT_EQ(actual, "[1970-01-02 03:55:00]: le message");
 }

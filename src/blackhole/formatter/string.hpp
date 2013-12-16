@@ -8,37 +8,16 @@
 
 #include "blackhole/error.hpp"
 #include "blackhole/formatter/string/parser.hpp"
+#include "blackhole/formatter/mapping.hpp"
 #include "blackhole/record.hpp"
 
 namespace blackhole {
 
 namespace formatter {
 
-class mapper_t {
-public:
-    typedef std::function<std::string(const log::attribute_value_t&)> handler_type;
-
-    void add_handler(const std::string& key, handler_type handler) {
-        m_handlers[key] = handler;
-    }
-
-    void handle(const std::string& key, const log::attribute_value_t& value, boost::format* fmt) const {
-        auto it = m_handlers.find(key);
-        if (it != m_handlers.end()) {
-            const handler_type& handler = it->second;
-            (*fmt) % handler(value);
-        } else {
-            (*fmt) % value;
-        }
-    }
-
-private:
-    std::unordered_map<std::string, handler_type> m_handlers;
-};
-
 class string_t {
     const string::config_t m_config;
-    mapper_t m_mapper;
+    mapping::mapper_t m_mapper;
 
 public:
     string_t(const std::string& pattern) :
@@ -46,8 +25,8 @@ public:
     {
     }
 
-    void add_mapper(const std::string& key, mapper_t::handler_type mapper) {
-        m_mapper.add_handler(key, mapper);
+    void set_mapper(mapping::mapper_t&& mapper) {
+        m_mapper = std::move(mapper);
     }
 
     std::string format(const log::record_t& record) const {
@@ -73,7 +52,14 @@ private:
 
     inline void format_single_key(const std::string& key, const log::attributes_t& attributes, boost::format* fmt) const {
         const log::attribute_t& attribute = get_attribute(attributes, key);
-        m_mapper.handle(key, attribute.value, fmt);
+        bool ok;
+        std::string result;
+        std::tie(result, ok) = m_mapper.execute(key, attribute.value);
+        if (ok) {
+            (*fmt) % result;
+        } else {
+            (*fmt) % attribute.value;
+        }
     }
 
     inline void format_variadic_key(const std::string& key, const log::attributes_t& attributes, boost::format* fmt) const {
