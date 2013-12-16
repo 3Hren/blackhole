@@ -66,7 +66,7 @@ public:
                 // universe_attributes              // Program global.
                 // thread_attributes                // Thread local.
                 m_global_attributes,                // Logger object specific.
-                std::move(get_event_attributes()),  // Event specific, e.g. timestamp.
+                get_event_attributes(),             // Event specific, e.g. timestamp.
                 std::move(local_attributes)         // Any user attributes.
             });
 
