@@ -4,6 +4,11 @@ SET(CMAKE_BUILD_TYPE "Debug")
 
 SET(PROJECT blackhole-tests)
 
+SET(HEADERS
+    Global.hpp
+    Mocks.hpp
+)
+
 SET(SOURCES
     main
     test_StringFormatter
@@ -18,6 +23,7 @@ SET(SOURCES
     test_SyslogSink
     test_Functional
     test_FactoryInitialization
+    test_JsonFormatter
 )
 
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)

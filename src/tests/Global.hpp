@@ -16,6 +16,7 @@ using namespace ::testing;
 #include "blackhole/expression.hpp"
 #include "blackhole/filter.hpp"
 #include "blackhole/formatter/string.hpp"
+#include "blackhole/formatter/json.hpp"
 #include "blackhole/frontend.hpp"
 #include "blackhole/frontend/syslog.hpp"
 #include "blackhole/helper.hpp"
