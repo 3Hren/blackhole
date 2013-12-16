@@ -50,5 +50,3 @@ TEST(verbose_logger_t, Manual) {
         log.push(std::move(record));
     }
 }
-
-//!@todo: Make severity string mapper.
