@@ -8,6 +8,15 @@
 
 #include "utils/underlying.hpp"
 
+#if defined(__clang__) || defined(GCC47)
+#else
+namespace std {
+
+typedef double double_t;
+
+} // namespace std
+#endif
+
 namespace blackhole {
 
 namespace log {
@@ -32,7 +41,7 @@ enum class scope : std::uint8_t {
     universe    = 1 << 4    /* singleton attributes for entire application */
 };
 
-typedef typename aux::underlying_type<scope>::type scope_underlying_type;
+typedef aux::underlying_type<scope>::type scope_underlying_type;
 
 static const scope DEFAULT_SCOPE = scope::local;
 

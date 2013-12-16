@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "attribute.hpp"
+#include "common.hpp"
 #include "filter.hpp"
 #include "frontend.hpp"
 #include "keyword.hpp"
@@ -55,7 +56,7 @@ public:
         return open_record(log::attributes_t());
     }
 
-    log::record_t open_record(log::attribute_pair_t&& local_attribute) {
+    log::record_t open_record(log::attribute_pair_t&& local_attribute) const {
         return open_record(log::attributes_t({ std::move(local_attribute) }));
     }
 

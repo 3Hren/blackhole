@@ -11,9 +11,14 @@ TEST(Attribute, TimestampIsEventAttribute) {
     EXPECT_EQ(log::attribute::scope::event, pair.second.scope);
 }
 
+namespace testing {
+
+enum class level { debug };
+
+} // namespace testing
+
 TEST(Attribute, SeverityIsEventAttribute) {
-    enum class level { debug };
-    log::attribute_pair_t pair = (keyword::severity<level>() = level::debug);
+    log::attribute_pair_t pair = (keyword::severity<testing::level>() = testing::level::debug);
     EXPECT_EQ(log::attribute::scope::event, pair.second.scope);
 }
 

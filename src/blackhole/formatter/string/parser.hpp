@@ -65,7 +65,7 @@ private:
     }
 
     static void handle_variadic_key(std::string* key) {
-        typedef typename log::attribute::scope_underlying_type scope_underlying_type;
+        typedef log::attribute::scope_underlying_type scope_underlying_type;
 
         scope_underlying_type result = 0;
         for (auto it = key->begin() + 3; it != key->end(); ++it) {
@@ -73,7 +73,8 @@ private:
             const log::attribute::scope scope = map_to_scope(ch);
             result |= static_cast<scope_underlying_type>(scope);
         }
-        *key = std::string("...") + std::to_string(result);
+        // Explicit cast to long long resolves GCC 4.4 ambiguity bug.
+        *key = std::string("...") + std::to_string(static_cast<long long>(result));
     }
 
     static log::attribute::scope map_to_scope(const char ch) {

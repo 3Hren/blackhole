@@ -42,7 +42,7 @@ SET(GOOGLE_LIBRARIES
 PROJECT(${PROJECT})
 
 INCLUDE_DIRECTORIES(../
-    /Users/esafronov/sandbox/Celero/include
+#    /Users/esafronov/sandbox/Celero/include
 )
 
 FIND_PACKAGE(Boost COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
@@ -54,7 +54,7 @@ TARGET_LINK_LIBRARIES(${PROJECT}
     ${Boost_LIBRARIES}
     ${GOOGLE_LIBRARIES}
     blackhole
-    /Users/esafronov/sandbox/Celero/build/libcelero.dylib
+#    /Users/esafronov/sandbox/Celero/build/libcelero.dylib
 )
 
-ADD_DEFINITIONS(-std=c++11)
+ADD_DEFINITIONS(-std=c++0x)
