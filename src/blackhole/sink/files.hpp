@@ -2,6 +2,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <boost/version.hpp>
 
 #include "blackhole/error.hpp"
 
@@ -28,7 +29,11 @@ public:
     }
 
     std::string path() const {
+#if BOOST_VERSION >= 104600
         return m_path.filename().string();
+#else
+        return m_path.filename();
+#endif
     }
 
     void write(const std::string& message) {
