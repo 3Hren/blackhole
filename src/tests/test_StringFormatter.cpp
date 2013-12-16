@@ -90,7 +90,7 @@ namespace testing {
 std::string map_timestamp(const log::attribute_value_t& value) {
     std::time_t time = boost::get<std::time_t>(value);
     char mbstr[128];
-    if(std::strftime(mbstr, 128, "%F %T", std::localtime(&time))) {
+    if(std::strftime(mbstr, 128, "%F %T", std::gmtime(&time))) {
         return std::string(mbstr);
     }
     return std::string("?");
@@ -108,5 +108,5 @@ TEST(string_t, CustomMapping) {
     formatter::string_t formatter(pattern);
     formatter.add_mapper("timestamp", &testing::map_timestamp);
     std::string actual = formatter.format(record);
-    EXPECT_EQ(actual, "[1970-01-02 06:55:00]: le message");
+    EXPECT_EQ(actual, "[1970-01-02 03:55:00]: le message");
 }
