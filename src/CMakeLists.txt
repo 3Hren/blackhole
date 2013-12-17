@@ -3,3 +3,4 @@ PROJECT(src)
 
 ADD_SUBDIRECTORY(blackhole)
 ADD_SUBDIRECTORY(tests)
+ADD_SUBDIRECTORY(benchmark)
