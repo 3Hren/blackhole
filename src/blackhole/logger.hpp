@@ -14,12 +14,24 @@
 
 namespace blackhole {
 
+namespace log {
+
+class exception_handler_t {
+public:
+    virtual ~exception_handler_t() {}
+    virtual void execute() const = 0;
+};
+
+} // namespace log
+
 class logger_base_t {
     bool m_enabled;
 
 protected:
     filter_t m_filter;
+    std::unique_ptr<log::exception_handler_t> m_exception_handler;
     std::vector<std::unique_ptr<base_frontend_t>> m_frontends;
+
     log::attributes_t m_global_attributes;
 
 public:
@@ -52,6 +64,10 @@ public:
         m_frontends.push_back(std::move(frontend));
     }
 
+    void set_exception_handler(std::unique_ptr<log::exception_handler_t> handler) {
+        m_exception_handler = std::move(handler);
+    }
+
     log::record_t open_record() const {
         return open_record(log::attributes_t());
     }
@@ -63,11 +79,11 @@ public:
     log::record_t open_record(log::attributes_t&& local_attributes) const {
         if (enabled() && !m_frontends.empty()) {
             log::attributes_t attributes = merge({
-                // universe_attributes              // Program global.
-                // thread_attributes                // Thread local.
-                m_global_attributes,                // Logger object specific.
-                get_event_attributes(),             // Event specific, e.g. timestamp.
-                std::move(local_attributes)         // Any user attributes.
+                // universe_attributes          // Program global.
+                // thread_attributes            // Thread local.
+                m_global_attributes,            // Logger object specific.
+                get_event_attributes(),         // Event specific, e.g. timestamp.
+                std::move(local_attributes)     // Any user attributes.
             });
 
             if (m_filter(attributes)) {
@@ -82,8 +98,12 @@ public:
 
     void push(log::record_t&& record) const {
         for (auto it = m_frontends.begin(); it != m_frontends.end(); ++it) {
-            const std::unique_ptr<base_frontend_t>& frontend = *it;
-            frontend->handle(record);
+            try {
+                const std::unique_ptr<base_frontend_t>& frontend = *it;
+                frontend->handle(record);
+            } catch (...) {
+                m_exception_handler->execute();
+            }
         }
     }
 
@@ -109,7 +129,6 @@ public:
 
 } // namespace blackhole
 
-//!@todo: Make exception trap. Make it configurable.
 //!@todo: Make fallback logger. Make it configurable.
 //!@todo: Make json formatter. Try to implement logstash formatter.
 //!@todo: Make msgpack formatter.

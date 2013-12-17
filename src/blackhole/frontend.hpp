@@ -8,6 +8,7 @@ namespace blackhole {
 
 class base_frontend_t {
 public:
+    virtual ~base_frontend_t() {}
     virtual void handle(const log::record_t& record) = 0;
 };
 

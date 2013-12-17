@@ -6,6 +6,16 @@ using namespace blackhole;
 
 namespace mock {
 
+class formatter_t {
+public:
+    MOCK_CONST_METHOD1(format, std::string(const log::record_t&));
+};
+
+class sink_t {
+public:
+    MOCK_METHOD1(consume, void(const std::string&));
+};
+
 class frontend_t : public base_frontend_t {
 public:
     MOCK_METHOD1(handle, void(const log::record_t&));
