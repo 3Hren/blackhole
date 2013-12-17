@@ -39,6 +39,7 @@ public:
     void write(const std::string& message) {
         m_file.write(message.data(), static_cast<std::streamsize>(message.size()));
         m_file.put('\n');
+        //!@todo: Make auto_flush flag.
         m_file.flush();
     }
 };
