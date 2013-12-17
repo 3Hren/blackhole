@@ -2,19 +2,40 @@
 
 namespace testing {
 
-struct handler_t {
-    void operator()(const std::runtime_error&) {}
+struct simple_handler_t {
+    void operator()() {}
 };
 
 } // namespace testing
 
-TEST(exception_trap_t, DoNotCrashWhenRaisedExceptionFromFrontend) {
+TEST(exception_trap_t, SimpleExceptionHandler) {
     auto frontend = std::make_unique<NiceMock<mock::frontend_t>>();
     EXPECT_CALL(*frontend.get(), handle(_))
             .Times(1)
             .WillOnce(Throw(std::runtime_error("error")));
 
-    auto handler = log::exception::handler_factory_t<testing::handler_t>::make<
+    logger_base_t log;
+    log.add_frontend(std::move(frontend));
+    log.set_exception_handler(testing::simple_handler_t());
+    log::record_t record;
+    log.push(std::move(record));
+}
+
+namespace testing {
+
+struct typed_handler_t {
+    void operator()(const std::runtime_error&) {}
+};
+
+} // namespace testing
+
+TEST(exception_trap_t, TypedExceptionHandler) {
+    auto frontend = std::make_unique<NiceMock<mock::frontend_t>>();
+    EXPECT_CALL(*frontend.get(), handle(_))
+            .Times(1)
+            .WillOnce(Throw(std::runtime_error("error")));
+
+    auto handler = log::exception::handler_factory_t<testing::typed_handler_t>::make<
         std::runtime_error
     >();
 
