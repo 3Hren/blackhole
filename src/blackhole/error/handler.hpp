@@ -35,6 +35,8 @@ template<typename Handler>
 class launcher {
 protected:
     typedef Handler handler_type;
+    typedef void exception_type;
+
     handler_type handler;
 
 public:
@@ -51,11 +53,15 @@ template<typename Exception, typename Base>
 class intermediate : public Base {
 protected:
     typedef typename Base::handler_type handler_type;
+    typedef Exception exception_type;
 
 public:
     intermediate(const handler_type& handler) :
         Base(handler)
-    {}
+    {
+        typedef std::is_base_of<typename Base::exception_type, exception_type> correct_hierarchy;
+        static_assert(!correct_hierarchy::value, "can't build correct exception handling hierarchy");
+    }
 
     void operator()() {
         try {
