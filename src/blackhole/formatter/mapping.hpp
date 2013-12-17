@@ -5,6 +5,7 @@
 
 #include "blackhole/attribute.hpp"
 #include "blackhole/utils/unique.hpp"
+#include "blackhole/utils/underlying.hpp"
 
 namespace blackhole {
 
@@ -23,7 +24,8 @@ struct actor_impl_t : public actor_t {
     {}
 
     std::string execute(const log::attribute_value_t& value) const {
-        return func(boost::get<T>(value));
+        typedef typename aux::underlying_type<T>::type underlying_type;
+        return func(static_cast<T>(boost::get<underlying_type>(value)));
     }
 };
 
