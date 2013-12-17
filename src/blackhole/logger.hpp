@@ -5,6 +5,7 @@
 
 #include "attribute.hpp"
 #include "common.hpp"
+#include "error/handler.hpp"
 #include "filter.hpp"
 #include "frontend.hpp"
 #include "keyword.hpp"
@@ -14,29 +15,6 @@
 #include "utils/unique.hpp"
 
 namespace blackhole {
-
-namespace log {
-
-typedef std::function<void()> exception_handler_t;
-
-class default_exception_handler_t {
-public:
-    void operator()() const {
-#ifdef BLACKHOLE_DEBUG
-        throw;
-#else
-        try {
-            throw;
-        } catch (const std::exception& err) {
-            std::cout << "logging core error occurred: " << err.what() << std::endl;
-        } catch (...) {
-            std::cout << "logging core error occurred: unknown" << std::endl;
-        }
-#endif
-    }
-};
-
-} // namespace log
 
 class logger_base_t {
     bool m_enabled;
