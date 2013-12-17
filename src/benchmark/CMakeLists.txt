@@ -18,6 +18,10 @@ SET(Boost_USE_MULTITHREADED ON)
 SET(BOOST_COMPONENTS
     system
     filesystem
+    thread
+    date_time
+    log
+    log_setup
 )
 
 SET(GOOGLE_LIBRARIES
