@@ -6,6 +6,13 @@ using namespace blackhole;
 
 namespace mock {
 
+class frontend_t : public base_frontend_t {
+public:
+    MOCK_METHOD1(handle, void(const log::record_t&));
+};
+
+namespace files {
+
 class backend_t {
 public:
     backend_t(const std::string&) {
@@ -20,10 +27,7 @@ public:
     MOCK_METHOD1(write, void(const std::string&));
 };
 
-class frontend_t : public base_frontend_t {
-public:
-    MOCK_METHOD1(handle, void(const log::record_t&));
-};
+} // namespace files
 
 namespace socket {
 

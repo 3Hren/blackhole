@@ -8,14 +8,14 @@ TEST(file_t, Class) {
 }
 
 TEST(file_t, WritesToTheFile) {
-    sink::file_t<NiceMock<mock::backend_t>> sink("test.log");
+    sink::file_t<NiceMock<mock::files::backend_t>> sink("test.log");
     EXPECT_CALL(sink.backend(), write(std::string("formatted message"))).
             Times(1);
     sink.consume("formatted message");
 }
 
 TEST(file_t, OpensFileIfItClosedWhenWriting) {
-    sink::file_t<mock::backend_t> sink("test.log");
+    sink::file_t<mock::files::backend_t> sink("test.log");
     EXPECT_CALL(sink.backend(), opened()).
             Times(1).
             WillOnce(Return(false));
@@ -28,7 +28,7 @@ TEST(file_t, OpensFileIfItClosedWhenWriting) {
 }
 
 TEST(file_t, ThrowsExceptionIfFileCannotBeOpened) {
-    sink::file_t<NiceMock<mock::backend_t>> sink("test.log");
+    sink::file_t<NiceMock<mock::files::backend_t>> sink("test.log");
     EXPECT_CALL(sink.backend(), opened())
             .Times(1)
             .WillOnce(Return(false));
