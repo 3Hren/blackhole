@@ -60,12 +60,12 @@
  *
  */
 
-#if 0
+#if 1
 int main(int argc, char** argv) {
     InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
-#elif 1
+#elif 0
 #include "celero/Celero.h"
 
 using namespace blackhole;
@@ -93,7 +93,8 @@ int main(int argc, char** argv) {
     auto s = std::make_unique<sink::file_t<>>("test.log");
     auto frontend = std::make_unique<frontend_t<formatter::string_t, sink::file_t<>>>(std::move(f), std::move(s));
     log_.add_frontend(std::move(frontend));
-    celero::Run(argc, argv); return 0;
+    celero::Run(argc, argv);
+    return 0;
 }
 
 
