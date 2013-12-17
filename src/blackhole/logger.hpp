@@ -11,15 +11,29 @@
 #include "keyword/message.hpp"
 #include "keyword/severity.hpp"
 #include "keyword/timestamp.hpp"
+#include "utils/unique.hpp"
 
 namespace blackhole {
 
 namespace log {
 
-class exception_handler_t {
+typedef std::function<void()> exception_handler_t;
+
+class default_exception_handler_t {
 public:
-    virtual ~exception_handler_t() {}
-    virtual void execute() const = 0;
+    void operator()() const {
+#ifdef BLACKHOLE_DEBUG
+        throw;
+#else
+        try {
+            throw;
+        } catch (const std::exception& err) {
+            std::cout << "logging core error occurred: " << err.what() << std::endl;
+        } catch (...) {
+            std::cout << "logging core error occurred: unknown" << std::endl;
+        }
+#endif
+    }
 };
 
 } // namespace log
@@ -29,7 +43,8 @@ class logger_base_t {
 
 protected:
     filter_t m_filter;
-    std::unique_ptr<log::exception_handler_t> m_exception_handler;
+    log::exception_handler_t m_exception_handler;
+
     std::vector<std::unique_ptr<base_frontend_t>> m_frontends;
 
     log::attributes_t m_global_attributes;
@@ -37,7 +52,8 @@ protected:
 public:
     logger_base_t() :
         m_enabled(true),
-        m_filter(default_filter_t::instance())
+        m_filter(default_filter_t::instance()),
+        m_exception_handler(log::default_exception_handler_t())
     {}
 
     bool enabled() const {
@@ -64,7 +80,7 @@ public:
         m_frontends.push_back(std::move(frontend));
     }
 
-    void set_exception_handler(std::unique_ptr<log::exception_handler_t> handler) {
+    void set_exception_handler(log::exception_handler_t&& handler) {
         m_exception_handler = std::move(handler);
     }
 
@@ -102,7 +118,7 @@ public:
                 const std::unique_ptr<base_frontend_t>& frontend = *it;
                 frontend->handle(record);
             } catch (...) {
-                m_exception_handler->execute();
+                m_exception_handler();
             }
         }
     }
