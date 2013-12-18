@@ -11,39 +11,35 @@ namespace blackhole {
 
 namespace mapping {
 
-struct actor_t {
-    virtual std::string execute(const log::attribute_value_t& value) const = 0;
-};
-
 template<typename T>
-struct actor_impl_t : public actor_t {
+struct extracter {
     std::function<std::string(const T&)> func;
 
-    actor_impl_t(std::function<std::string(const T&)> func) :
+    extracter(std::function<std::string(const T&)> func) :
         func(func)
     {}
 
-    std::string execute(const log::attribute_value_t& value) const {
+    std::string operator()(const log::attribute_value_t& value) const {
         typedef typename aux::underlying_type<T>::type underlying_type;
         return func(static_cast<T>(boost::get<underlying_type>(value)));
     }
 };
 
 class mapper_t {
-    std::unordered_map<std::string, std::unique_ptr<actor_t>> actors;
+    typedef std::function<std::string(const log::attribute_value_t&)> mapping_t;
+    std::unordered_map<std::string, mapping_t> m_mappings;
 
 public:
     template<typename T>
     void add(const std::string& key, std::function<std::string(const T&)> handler) {
-        std::unique_ptr<actor_t> actor = std::make_unique<actor_impl_t<T>>(handler);
-        actors[key] = std::move(actor);
+        m_mappings[key] = extracter<T>(handler);
     }
 
     std::tuple<std::string, bool> execute(const std::string& key, const log::attribute_value_t& value) const {
-        auto it = actors.find(key);
-        if (it != actors.end()) {
-            actor_t* actor = it->second.get();
-            return std::make_tuple(actor->execute(value), true);
+        auto it = m_mappings.find(key);
+        if (it != m_mappings.end()) {
+            const mapping_t& action = it->second;
+            return std::make_tuple(action(value), true);
         }
         return std::make_tuple("", false);
     }

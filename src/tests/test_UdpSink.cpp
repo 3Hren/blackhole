@@ -30,6 +30,6 @@ TEST(socket_t, ThrowsExceptionWhenCannotAcquireResource) {
     // acquire resource needed, it can't continue its work, so it's neccessary to notify upper level
     // code about it.
     typedef sink::socket_t<boost::asio::ip::udp, NiceMock<mock::socket::failing_backend_t>> socket_t;
-    EXPECT_THROW(socket_t("localhost", 50030), std::exception); //!@todo: Maybe some kind of typecheck here?
+    EXPECT_THROW(socket_t("localhost", 50030), std::exception);
 }
 
