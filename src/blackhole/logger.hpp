@@ -124,5 +124,5 @@ public:
 } // namespace blackhole
 
 //!@todo: Make fallback logger. Make it configurable.
-//!@todo: Make json formatter. Try to implement logstash formatter.
+//!@todo: Try to implement logstash formatter.
 //!@todo: Make msgpack formatter.

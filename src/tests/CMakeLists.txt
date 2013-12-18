@@ -57,6 +57,7 @@ TARGET_LINK_LIBRARIES(${PROJECT}
     ${Boost_LIBRARIES}
     ${GOOGLE_LIBRARIES}
     blackhole
+    json
 )
 
 ADD_DEFINITIONS(-std=c++0x)
