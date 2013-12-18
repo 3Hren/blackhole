@@ -53,3 +53,5 @@ public:
 } // namespace formatter
 
 } // namespace blackhole
+
+//!@todo: Try to implement logstash formatter.
