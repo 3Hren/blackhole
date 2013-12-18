@@ -41,7 +41,7 @@ public:
             const mapping_t& action = it->second;
             return std::make_tuple(action(value), true);
         }
-        return std::make_tuple("", false);
+        return std::make_tuple(std::string(""), false);
     }
 };
 
