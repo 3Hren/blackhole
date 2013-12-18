@@ -72,7 +72,7 @@ private:
                 const std::string& name = attr_it->first;
                 const log::attribute_t& attribute = attr_it->second;
                 if (static_cast<scope_underlying_type>(attribute.scope) & scope) {
-                    std::stringstream buffer;
+                    std::ostringstream buffer;
                     buffer << "'" << name << "': '" << attribute.value << "'";
                     formatted.push_back(buffer.str());
                 }
