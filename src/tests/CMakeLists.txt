@@ -4,6 +4,8 @@ SET(CMAKE_BUILD_TYPE "Debug")
 
 SET(PROJECT blackhole-tests)
 
+ENABLE_TESTING()
+
 SET(HEADERS
     Global.hpp
     Mocks.hpp

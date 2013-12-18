@@ -30,6 +30,7 @@ public:
     }
 
     std::string format(const log::record_t& record) const {
+        //!@todo: std::ostringstream formatting gives large performance boost.
         boost::format fmt(m_config.pattern);
         const log::attributes_t& attributes = record.attributes;
         const std::vector<std::string>& names = m_config.attribute_names;
