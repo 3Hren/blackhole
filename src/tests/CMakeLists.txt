@@ -45,7 +45,8 @@ SET(GOOGLE_LIBRARIES
 
 PROJECT(${PROJECT})
 
-INCLUDE_DIRECTORIES(../
+INCLUDE_DIRECTORIES(
+    ../
 )
 
 FIND_PACKAGE(Boost COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
@@ -60,6 +61,6 @@ TARGET_LINK_LIBRARIES(${PROJECT}
     json
 )
 
-add_test(NAME tblackhole-tests COMMAND blackhole-tests --verbose)
+ADD_TEST(NAME blackhole-tests COMMAND blackhole-tests)
 
 ADD_DEFINITIONS(-std=c++0x)
