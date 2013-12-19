@@ -81,10 +81,15 @@ enum weak_enum {
 
 } // namespace testing
 
-TEST(FilterAttribute, ExtractingWeaklyTypedEnumAttribute) {
-    auto filter = expr::has_attr<testing::weak_enum>("pressure_level")
-            && expr::get_attr<testing::weak_enum>("pressure_level") == testing::high;
-    log::attributes_t attributes = {{ "pressure_level", log::attribute_t(testing::high) }};
+TEST(FilterAttribute, HasWeaklyTypedEnumAttribute) {
+    auto filter = expr::has_attr<testing::weak_enum>("weak_enum");
+    log::attributes_t attributes = {{ "weak_enum", log::attribute_t(testing::high) }};
+    EXPECT_TRUE(filter(attributes));
+}
+
+TEST(FilterAttribute, GetWeaklyTypedEnumAttribute) {
+    auto filter = expr::get_attr<testing::weak_enum>("weak_enum") == testing::high;
+    log::attributes_t attributes = {{ "weak_enum", log::attribute_t(testing::high) }};
     EXPECT_TRUE(filter(attributes));
 }
 
@@ -97,15 +102,18 @@ enum class strong_enum {
 
 } // namespace testing
 
-TEST(FilterAttribute, ExtractingStronglyTypedEnumAttribute) {
-    auto filter = expr::has_attr<testing::strong_enum>("strong_enum")
-            && expr::get_attr<testing::strong_enum>("strong_enum") == testing::strong_enum::high;
+TEST(FilterAttribute, HasStronglyTypedEnumAttribute) {
+    auto filter = expr::has_attr<testing::strong_enum>("strong_enum");
+    log::attributes_t attributes = {{ "strong_enum", log::attribute_t(testing::strong_enum::high) }};
+    EXPECT_TRUE(filter(attributes));
+}
+
+TEST(FilterAttribute, GetStronglyTypedEnumAttribute) {
+    auto filter = expr::get_attr<testing::strong_enum>("strong_enum") == testing::strong_enum::high;
     log::attributes_t attributes = {{ "strong_enum", log::attribute_t(testing::strong_enum::high) }};
     EXPECT_TRUE(filter(attributes));
 }
 
 //!@todo: Filter by severity keyword.
 //!@todo: Enable >=, >, <, <= operators.
-
 //!@todo: Make || operations in filtering
-//!@todo: Setting, checking and extracting enum variable.
