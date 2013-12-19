@@ -11,7 +11,7 @@ notifications:
    - "it's %{author}'s turn to pay the next round of drinks for the massacre he caused in %{repository}: %{build_url}"
 
 env:
- - CMAKE_OPTIONS="-DGOOGLE_MOCK_SOURCE_DIR=`pwd`/3hren/blackhole/gmock-1.6.0"
+ - CMAKE_OPTIONS="-DGOOGLE_MOCK_SOURCE_DIR=`pwd`/3Hren/blackhole/gmock-1.6.0"
 
 before_install:
  - sudo apt-get update -qq
