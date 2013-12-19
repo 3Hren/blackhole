@@ -60,4 +60,6 @@ TARGET_LINK_LIBRARIES(${PROJECT}
     json
 )
 
+add_test(NAME tblackhole-tests COMMAND blackhole-tests --verbose)
+
 ADD_DEFINITIONS(-std=c++0x)

@@ -4,7 +4,6 @@ PROJECT(src)
 ADD_SUBDIRECTORY(blackhole)
 
 IF(ENABLE_TESTING)
-    ENABLE_TESTING()
     IF ("${GOOGLE_MOCK_SOURCE_DIR}" STREQUAL "" OR NOT EXISTS "${GOOGLE_MOCK_SOURCE_DIR}/CMakeLists.txt")
         MESSAGE("Unit testing is disabled")
     ELSE()
