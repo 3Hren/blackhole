@@ -1,11 +1,11 @@
 #include "Mocks.hpp"
 
-TEST(json_t, Class) {
+TEST_OFF(json_t, Class) {
     formatter::json_t fmt;
     UNUSED(fmt);
 }
 
-TEST(json_t, FormatSingleAttribute) {
+TEST_OFF(json_t, FormatSingleAttribute) {
     log::record_t record;
     record.attributes = {
         keyword::message() = "le message"
@@ -16,7 +16,7 @@ TEST(json_t, FormatSingleAttribute) {
     EXPECT_EQ(expected, fmt.format(record));
 }
 
-TEST(json_t, FormatMultipleAttributes) {
+TEST_OFF(json_t, FormatMultipleAttributes) {
     log::record_t record;
     record.attributes = {
         keyword::message() = "le message",
