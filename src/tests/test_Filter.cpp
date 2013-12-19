@@ -74,18 +74,33 @@ TEST(FilterAttribute, ComplexAttributeFiltering) {
 
 namespace testing {
 
-enum pressure_level {
+enum weak_enum {
     low,
-    high,
-    critical
+    high
 };
 
 } // namespace testing
 
 TEST(FilterAttribute, ExtractingWeaklyTypedEnumAttribute) {
-    auto filter = expr::has_attr<testing::pressure_level>("pressure_level")
-            && expr::get_attr<testing::pressure_level>("pressure_level") == testing::high;
+    auto filter = expr::has_attr<testing::weak_enum>("pressure_level")
+            && expr::get_attr<testing::weak_enum>("pressure_level") == testing::high;
     log::attributes_t attributes = {{ "pressure_level", log::attribute_t(testing::high) }};
+    EXPECT_TRUE(filter(attributes));
+}
+
+namespace testing {
+
+enum class strong_enum {
+    low,
+    high
+};
+
+} // namespace testing
+
+TEST(FilterAttribute, ExtractingStronglyTypedEnumAttribute) {
+    auto filter = expr::has_attr<testing::strong_enum>("strong_enum")
+            && expr::get_attr<testing::strong_enum>("strong_enum") == testing::strong_enum::high;
+    log::attributes_t attributes = {{ "strong_enum", log::attribute_t(testing::strong_enum::high) }};
     EXPECT_TRUE(filter(attributes));
 }
 
