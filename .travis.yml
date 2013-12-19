@@ -18,7 +18,7 @@ before_install:
  - wget http://googlemock.googlecode.com/files/gmock-1.6.0.zip && unzip gmock-1.6.0.zip
 
 install:
- - sudo apt-get install -qq cdbs cmake libjsoncpp-dev libboost-dev
+ - sudo apt-get install -qq cdbs cmake libjsoncpp-dev libboost-dev libboost-filesystem-dev
 
 before_script:
  - mkdir build && cd build
