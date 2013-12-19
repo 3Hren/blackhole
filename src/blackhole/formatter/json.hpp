@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -8,6 +9,7 @@
 #include <json/json.h>
 
 #include "blackhole/record.hpp"
+#include "blackhole/platform.hpp"
 
 namespace blackhole {
 
@@ -22,14 +24,35 @@ public:
         root(root)
     {}
 
-    template<typename T>
-    void operator ()(const std::string& name, const T& attribute) {
+    void operator()(const std::string& name, const std::uint32_t attribute) {
+        root[name] = Json::UInt(attribute);
+    }
+
+    void operator()(const std::string& name, const std::uint64_t attribute) {
+        root[name] = Json::UInt64(attribute);
+    }
+
+    void operator()(const std::string& name, const std::int32_t attribute) {
+        root[name] = Json::Int(attribute);
+    }
+
+    void operator()(const std::string& name, const std::int64_t attribute) {
+        root[name] = Json::Int64(attribute);
+    }
+
+    void operator()(const std::string& name, const std::string& attribute) {
         root[name] = attribute;
     }
 
-    void operator ()(const std::string& name, long attribute) {
-        root[name] = static_cast<int>(attribute);
+    void operator()(const std::string& name, const std::double_t attribute) {
+        root[name] = attribute;
     }
+
+#if defined(__clang__)
+    void operator()(const std::string& name, const std::time_t attribute) {
+        root[name] = Json::UInt64(attribute);
+    }
+#endif
 };
 
 }
