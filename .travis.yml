@@ -30,4 +30,5 @@ before_script:
  - mkdir build && cd build
 
 script:
- - cmake -DENABLE_TESTING=ON $CMAKE_OPTIONS .. && make && sudo make install && make test && ctest --verbose
+ - cmake -DENABLE_TESTING=ON $CMAKE_OPTIONS .. && make && make test 
+ - ctest --verbose
