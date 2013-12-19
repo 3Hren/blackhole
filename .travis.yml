@@ -1,0 +1,27 @@
+language: cpp
+
+compiler: 
+ - clang
+ - gcc
+
+notifications:
+  on_success: change
+  on_failure: always
+  template:
+   - "it's %{author}'s turn to pay the next round of drinks for the massacre he caused in %{repository}: %{build_url}"
+
+env:
+ - CMAKE_OPTIONS="-DGOOGLE_MOCK_SOURCE_DIR=`pwd`/3hren/blackhole/gmock-1.6.0"
+
+before_install:
+ - sudo apt-get update -qq
+ - wget http://googlemock.googlecode.com/files/gmock-1.6.0.zip && unzip gmock-1.6.0.zip
+
+install:
+ - sudo apt-get install -qq cdbs cmake libjsoncpp-dev libboost-dev
+
+before_script:
+ - mkdir build && cd build
+
+script:
+ - cmake -DENABLE_TESTING=ON $CMAKE_OPTIONS .. && make -j4 && sudo make install && make test && ctest --verbose
