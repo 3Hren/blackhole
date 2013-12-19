@@ -72,5 +72,25 @@ TEST(FilterAttribute, ComplexAttributeFiltering) {
     EXPECT_TRUE(filter(attributes));
 }
 
+namespace testing {
+
+enum pressure_level {
+    low,
+    high,
+    critical
+};
+
+} // namespace testing
+
+TEST(FilterAttribute, ExtractingWeaklyTypedEnumAttribute) {
+    auto filter = expr::has_attr<testing::pressure_level>("pressure_level")
+            && expr::get_attr<testing::pressure_level>("pressure_level") == testing::high;
+    log::attributes_t attributes = {{ "pressure_level", log::attribute_t(testing::high) }};
+    EXPECT_TRUE(filter(attributes));
+}
+
+//!@todo: Filter by severity keyword.
+//!@todo: Enable >=, >, <, <= operators.
+
 //!@todo: Make || operations in filtering
 //!@todo: Setting, checking and extracting enum variable.

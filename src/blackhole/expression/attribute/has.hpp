@@ -7,6 +7,7 @@
 #include "blackhole/attribute.hpp"
 #include "blackhole/expression/helper.hpp"
 #include "blackhole/filter.hpp"
+#include "blackhole/utils/underlying.hpp"
 
 namespace blackhole {
 
@@ -35,7 +36,8 @@ struct has_attr_action_t {
             return false;
         }
         const log::attribute_t& attribute = it->second;
-        return boost::apply_visitor(has_attribute_visitor<T>(), attribute.value);
+        typedef typename blackhole::aux::underlying_type<T>::type underlying_type;
+        return boost::apply_visitor(has_attribute_visitor<underlying_type>(), attribute.value);
     }
 
     filter_t operator &&(filter_t other) const {

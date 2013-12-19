@@ -5,13 +5,13 @@
 #include "blackhole/attribute.hpp"
 #include "blackhole/expression/helper.hpp"
 #include "blackhole/filter.hpp"
-
+#include "blackhole/utils/underlying.hpp"
 
 namespace blackhole {
 
 namespace expression {
 
-template<typename T>
+template<typename T, class = void>
 struct get_attr_action_t {
     typedef T result_type;
 
@@ -19,6 +19,22 @@ struct get_attr_action_t {
 
     const result_type& operator()(const log::attributes_t& attributes) const {
         return boost::get<T>(attributes.at(name).value);
+    }
+
+    filter_t operator ==(const T& other) const {
+        return aux::Eq<get_attr_action_t<T>>({ *this, other });
+    }
+};
+
+template<typename T>
+struct get_attr_action_t<T, typename std::enable_if<std::is_enum<T>::value>::type> {
+    typedef T result_type;
+
+    const std::string name;
+
+    result_type operator()(const log::attributes_t& attributes) const {
+        typedef typename blackhole::aux::underlying_type<T>::type underlying_type;
+        return static_cast<result_type>(boost::get<underlying_type>(attributes.at(name).value));
     }
 
     filter_t operator ==(const T& other) const {

@@ -49,7 +49,7 @@ static const scope DEFAULT_SCOPE = scope::local;
 } // namespace attribute
 
 struct attribute_t {
-    attribute_value_t value; //!@note: Maybe create functor with map? struct keeper { value_t value; value_t operator(value_t) {} };
+    attribute_value_t value;
     attribute::scope scope;
 
     attribute_t() :
@@ -59,6 +59,15 @@ struct attribute_t {
 
     attribute_t(const attribute_value_t& value, attribute::scope type = attribute::DEFAULT_SCOPE) :
         value(value),
+        scope(type)
+    {}
+
+    // Force compiler to keep enum values according to its underlying type.
+    // It is needed, cause for weakly-typed enums its underlying type and its values underlying
+    // types may vary, which leads to exception while extracting from variant.
+    template<typename T, class = typename std::enable_if<std::is_enum<T>::value>::type>
+    attribute_t(T value, attribute::scope type = attribute::DEFAULT_SCOPE) :
+        value(static_cast<typename aux::underlying_type<T>::type>(value)),
         scope(type)
     {}
 };
