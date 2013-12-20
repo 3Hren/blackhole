@@ -3,7 +3,6 @@
 #include "attribute.hpp"
 #include "filter.hpp"
 #include "helper.hpp"
-#include "utils/underlying.hpp"
 
 #define DECLARE_KEYWORD_IMPL(Name, Scope, T) \
     namespace tag { \
@@ -28,7 +27,7 @@ namespace keyword {
 
 template<typename T, typename NameProvider, log::attribute::scope Scope = log::attribute::DEFAULT_SCOPE>
 struct keyword_t {
-    typedef typename aux::underlying_type<T>::type type;
+    typedef T type;
 
     static const char* name() {
         return NameProvider::name();

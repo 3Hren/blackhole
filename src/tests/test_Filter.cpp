@@ -114,6 +114,29 @@ TEST(FilterAttribute, GetStronglyTypedEnumAttribute) {
     EXPECT_TRUE(filter(attributes));
 }
 
+namespace ts {
+
+enum class severity {
+    debug,
+    info,
+    warning,
+    error
+};
+
+} // namespace ts
+
+TEST(FilterSeverity, Has) {
+    auto filter = expr::has_attr(keyword::severity<ts::severity>());
+    log::attributes_t attributes = { keyword::severity<ts::severity>() = ts::severity::info };
+    EXPECT_TRUE(filter(attributes));
+}
+
+TEST(FilterSeverity, GetEq) {
+    auto filter = expr::get_attr(keyword::severity<ts::severity>()) == ts::severity::info;
+    log::attributes_t attributes = { keyword::severity<ts::severity>() = ts::severity::info };
+    EXPECT_TRUE(filter(attributes));
+}
+
 //!@todo: Filter by severity keyword.
 //!@todo: Enable >=, >, <, <= operators.
 //!@todo: Make || operations in filtering
