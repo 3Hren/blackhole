@@ -48,6 +48,16 @@ struct LessEq {
     }
 };
 
+template<typename T>
+struct Gt {
+    T extracter;
+    typename T::result_type other;
+
+    bool operator ()(const log::attributes_t& attributes) const {
+        return extracter(attributes) > other;
+    }
+};
+
 } // namespace aux
 
 } // namespace expression
