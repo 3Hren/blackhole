@@ -137,6 +137,16 @@ TEST(FilterSeverity, GetEq) {
     EXPECT_TRUE(filter(attributes));
 }
 
+TEST(FilterSeverity, HasAndGetLess) {
+    auto filter = expr::has_attr(keyword::severity<ts::severity>())
+            && expr::get_attr(keyword::severity<ts::severity>()) < ts::severity::info;
+    log::attributes_t attributes = { keyword::severity<ts::severity>() = ts::severity::info };
+    EXPECT_FALSE(filter(attributes));
+
+    attributes = { keyword::severity<ts::severity>() = ts::severity::debug };
+    EXPECT_TRUE(filter(attributes));
+}
+
 //!@todo: Filter by severity keyword.
 //!@todo: Enable >=, >, <, <= operators.
 //!@todo: Make || operations in filtering

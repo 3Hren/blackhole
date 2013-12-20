@@ -17,7 +17,7 @@ struct get_attr_action_t {
 
     const std::string name;
 
-    const result_type& operator()(const log::attributes_t& attributes) const {
+    const result_type& operator ()(const log::attributes_t& attributes) const {
         return boost::get<T>(attributes.at(name).value);
     }
 
@@ -33,12 +33,16 @@ struct get_attr_action_t<T, typename std::enable_if<std::is_enum<T>::value>::typ
 
     const std::string name;
 
-    result_type operator()(const log::attributes_t& attributes) const {
+    result_type operator ()(const log::attributes_t& attributes) const {
         return static_cast<result_type>(boost::get<underlying_type>(attributes.at(name).value));
     }
 
     filter_t operator ==(const T& other) const {
         return aux::Eq<get_attr_action_t<T>>({ *this, other });
+    }
+
+    filter_t operator <(const T& other) const {
+        return aux::Less<get_attr_action_t<T>>({ *this, other });
     }
 };
 
