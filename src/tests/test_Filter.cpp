@@ -72,6 +72,16 @@ TEST(FilterAttribute, ComplexAttributeFiltering) {
     EXPECT_TRUE(filter(attributes));
 }
 
+TEST(FilterCustomAttribute, HasAndGetLess) {
+    auto filter = expr::has_attr<std::int32_t>("custom")
+            && expr::get_attr<std::int32_t>("custom") < 42;
+    log::attributes_t attributes = {{"custom", log::attribute_t(42)}};
+    EXPECT_FALSE(filter(attributes));
+
+    attributes = {{"custom", log::attribute_t(41)}};
+    EXPECT_TRUE(filter(attributes));
+}
+
 namespace testing {
 
 enum weak_enum {
