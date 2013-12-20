@@ -81,15 +81,25 @@ enum weak_enum {
 
 } // namespace testing
 
-TEST(FilterAttribute, HasWeaklyTypedEnumAttribute) {
+TEST(FilterWeaklyTypedEnumAttribute, Has) {
     auto filter = expr::has_attr<testing::weak_enum>("weak_enum");
     log::attributes_t attributes = {{ "weak_enum", log::attribute_t(testing::high) }};
     EXPECT_TRUE(filter(attributes));
 }
 
-TEST(FilterAttribute, GetWeaklyTypedEnumAttribute) {
+TEST(FilterWeaklyTypedEnumAttribute, Get) {
     auto filter = expr::get_attr<testing::weak_enum>("weak_enum") == testing::high;
     log::attributes_t attributes = {{ "weak_enum", log::attribute_t(testing::high) }};
+    EXPECT_TRUE(filter(attributes));
+}
+
+TEST(FilterWeaklyTypedEnumAttribute, HasAndGetLess) {
+    auto filter = expr::has_attr<testing::weak_enum>("weak_enum")
+            && expr::get_attr<testing::weak_enum>("weak_enum") < testing::high;
+    log::attributes_t attributes = {{ "weak_enum", log::attribute_t(testing::high) }};
+    EXPECT_FALSE(filter(attributes));
+
+    attributes = {{ "weak_enum", log::attribute_t(testing::low) }};
     EXPECT_TRUE(filter(attributes));
 }
 
@@ -102,15 +112,25 @@ enum class strong_enum {
 
 } // namespace testing
 
-TEST(FilterAttribute, HasStronglyTypedEnumAttribute) {
+TEST(FilterStronglyTypedEnumAttribute, Has) {
     auto filter = expr::has_attr<testing::strong_enum>("strong_enum");
     log::attributes_t attributes = {{ "strong_enum", log::attribute_t(testing::strong_enum::high) }};
     EXPECT_TRUE(filter(attributes));
 }
 
-TEST(FilterAttribute, GetStronglyTypedEnumAttribute) {
+TEST(FilterStronglyTypedEnumAttribute, Get) {
     auto filter = expr::get_attr<testing::strong_enum>("strong_enum") == testing::strong_enum::high;
     log::attributes_t attributes = {{ "strong_enum", log::attribute_t(testing::strong_enum::high) }};
+    EXPECT_TRUE(filter(attributes));
+}
+
+TEST(FilterStronglyTypedEnumAttribute, HasAndGetLess) {
+    auto filter = expr::has_attr<testing::strong_enum>("strong_enum")
+            && expr::get_attr<testing::strong_enum>("strong_enum") < testing::strong_enum::high;
+    log::attributes_t attributes = {{ "strong_enum", log::attribute_t(testing::strong_enum::high) }};
+    EXPECT_FALSE(filter(attributes));
+
+    attributes = {{ "strong_enum", log::attribute_t(testing::strong_enum::low) }};
     EXPECT_TRUE(filter(attributes));
 }
 
