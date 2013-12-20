@@ -11,29 +11,9 @@ namespace blackhole {
 
 namespace expression {
 
-template<typename T, class = void>
+template<typename T>
 struct get_attr_action_t {
     typedef T result_type;
-
-    const std::string name;
-
-    result_type operator ()(const log::attributes_t& attributes) const {
-        return attribute::traits<T>::extract(attributes, name);
-    }
-
-    filter_t operator ==(const T& other) const {
-        return aux::Eq<get_attr_action_t<T>>({ *this, other });
-    }
-
-    filter_t operator <(const T& other) const {
-        return aux::Less<get_attr_action_t<T>>({ *this, other });
-    }
-};
-
-template<typename T>
-struct get_attr_action_t<T, typename std::enable_if<std::is_enum<T>::value>::type> {
-    typedef T result_type;
-    typedef typename blackhole::aux::underlying_type<T>::type underlying_type;
 
     const std::string name;
 
