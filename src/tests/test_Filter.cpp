@@ -60,7 +60,7 @@ TEST(FilterCustomAttribute, FailsIfDeferredlyAttributeComparingFails) {
     EXPECT_FALSE(filter(attributes));
 }
 
-TEST(FilterCustomAttribute, HasAngGetEq) {
+TEST(FilterCustomAttribute, HasAndGetEq) {
     auto filter = expr::has_attr<std::int32_t>("custom") && expr::get_attr<std::int32_t>("custom") == 42;
     log::attributes_t attributes = {{"custom", log::attribute_t(42)}};
     EXPECT_TRUE(filter(attributes));
@@ -74,6 +74,19 @@ TEST(FilterCustomAttribute, HasAndGetLess) {
 
     attributes = {{"custom", log::attribute_t(41)}};
     EXPECT_TRUE(filter(attributes));
+}
+
+TEST(FilterCustomAttribute, HasAndGetLessEq) {
+    auto filter = expr::has_attr<std::int32_t>("custom")
+            && expr::get_attr<std::int32_t>("custom") <= 42;
+    log::attributes_t attributes = {{"custom", log::attribute_t(42)}};
+    EXPECT_TRUE(filter(attributes));
+
+    attributes = {{"custom", log::attribute_t(41)}};
+    EXPECT_TRUE(filter(attributes));
+
+    attributes = {{"custom", log::attribute_t(43)}};
+    EXPECT_FALSE(filter(attributes));
 }
 
 TEST(FilterKeywordAttribute, Get) {
@@ -113,6 +126,16 @@ TEST(FilterWeaklyTypedEnumAttribute, HasAndGetLess) {
     EXPECT_TRUE(filter(attributes));
 }
 
+TEST(FilterWeaklyTypedEnumAttribute, HasAndGetLessEq) {
+    auto filter = expr::has_attr<testing::weak_enum>("weak_enum")
+            && expr::get_attr<testing::weak_enum>("weak_enum") <= testing::high;
+    log::attributes_t attributes = {{ "weak_enum", log::attribute_t(testing::high) }};
+    EXPECT_TRUE(filter(attributes));
+
+    attributes = {{ "weak_enum", log::attribute_t(testing::low) }};
+    EXPECT_TRUE(filter(attributes));
+}
+
 namespace testing {
 
 enum class strong_enum {
@@ -139,6 +162,16 @@ TEST(FilterStronglyTypedEnumAttribute, HasAndGetLess) {
             && expr::get_attr<testing::strong_enum>("strong_enum") < testing::strong_enum::high;
     log::attributes_t attributes = {{ "strong_enum", log::attribute_t(testing::strong_enum::high) }};
     EXPECT_FALSE(filter(attributes));
+
+    attributes = {{ "strong_enum", log::attribute_t(testing::strong_enum::low) }};
+    EXPECT_TRUE(filter(attributes));
+}
+
+TEST(FilterStronglyTypedEnumAttribute, HasAndGetLessEq) {
+    auto filter = expr::has_attr<testing::strong_enum>("strong_enum")
+            && expr::get_attr<testing::strong_enum>("strong_enum") <= testing::strong_enum::high;
+    log::attributes_t attributes = {{ "strong_enum", log::attribute_t(testing::strong_enum::high) }};
+    EXPECT_TRUE(filter(attributes));
 
     attributes = {{ "strong_enum", log::attribute_t(testing::strong_enum::low) }};
     EXPECT_TRUE(filter(attributes));
@@ -177,6 +210,18 @@ TEST(FilterSeverity, HasAndGetLess) {
     EXPECT_TRUE(filter(attributes));
 }
 
-//!@todo: Filter by severity keyword.
-//!@todo: Enable >=, >, <, <= operators.
+TEST(FilterSeverity, HasAndGetLessEq) {
+    auto filter = expr::has_attr(keyword::severity<ts::severity>())
+            && expr::get_attr(keyword::severity<ts::severity>()) <= ts::severity::info;
+    log::attributes_t attributes = { keyword::severity<ts::severity>() = ts::severity::info };
+    EXPECT_TRUE(filter(attributes));
+
+    attributes = { keyword::severity<ts::severity>() = ts::severity::debug };
+    EXPECT_TRUE(filter(attributes));
+
+    attributes = { keyword::severity<ts::severity>() = ts::severity::warning };
+    EXPECT_FALSE(filter(attributes));
+}
+
+//!@todo: Enable >=, >, <= operators.
 //!@todo: Make || operations in filtering

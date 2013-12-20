@@ -21,20 +21,30 @@ struct And {
 template<typename T>
 struct Eq {
     T extracter;
-    typename T::result_type second;
+    typename T::result_type other;
 
     bool operator ()(const log::attributes_t& attributes) const {
-        return extracter(attributes) == second;
+        return extracter(attributes) == other;
     }
 };
 
 template<typename T>
 struct Less {
     T extracter;
-    typename T::result_type second;
+    typename T::result_type other;
 
     bool operator ()(const log::attributes_t& attributes) const {
-        return extracter(attributes) < second;
+        return extracter(attributes) < other;
+    }
+};
+
+template<typename T>
+struct LessEq {
+    T extracter;
+    typename T::result_type other;
+
+    bool operator ()(const log::attributes_t& attributes) const {
+        return extracter(attributes) <= other;
     }
 };
 
