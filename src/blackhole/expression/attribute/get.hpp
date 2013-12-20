@@ -36,6 +36,10 @@ struct get_attr_action_t {
     filter_t operator >(const T& other) const {
         return aux::Gt<get_attr_action_t<T>>({ *this, other });
     }
+
+    filter_t operator >=(const T& other) const {
+        return aux::GtEq<get_attr_action_t<T>>({ *this, other });
+    }
 };
 
 template<typename T>
