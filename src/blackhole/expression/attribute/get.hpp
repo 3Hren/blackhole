@@ -28,12 +28,12 @@ struct get_attr_action_t {
 
 template<typename T>
 struct get_attr_action_t<T, typename std::enable_if<std::is_enum<T>::value>::type> {
+    typedef typename blackhole::aux::underlying_type<T>::type underlying_type;
     typedef T result_type;
 
     const std::string name;
 
     result_type operator()(const log::attributes_t& attributes) const {
-        typedef typename blackhole::aux::underlying_type<T>::type underlying_type;
         return static_cast<result_type>(boost::get<underlying_type>(attributes.at(name).value));
     }
 
