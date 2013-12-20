@@ -1,7 +1,6 @@
 language: cpp
 
 compiler: 
- - clang
  - gcc
 
 notifications:
@@ -31,4 +30,4 @@ before_script:
 
 script:
  - cmake -DENABLE_TESTING=ON $CMAKE_OPTIONS .. && make && make test 
- - ctest --verbose
+ - src/tests/blackhole-tests
