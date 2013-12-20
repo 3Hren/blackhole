@@ -17,8 +17,8 @@ struct get_attr_action_t {
 
     const std::string name;
 
-    const result_type& operator ()(const log::attributes_t& attributes) const {
-        return boost::get<T>(attributes.at(name).value);
+    result_type operator ()(const log::attributes_t& attributes) const {
+        return attribute::traits<T>::extract(attributes, name);
     }
 
     filter_t operator ==(const T& other) const {
@@ -32,13 +32,13 @@ struct get_attr_action_t {
 
 template<typename T>
 struct get_attr_action_t<T, typename std::enable_if<std::is_enum<T>::value>::type> {
-    typedef typename blackhole::aux::underlying_type<T>::type underlying_type;
     typedef T result_type;
+    typedef typename blackhole::aux::underlying_type<T>::type underlying_type;
 
     const std::string name;
 
     result_type operator ()(const log::attributes_t& attributes) const {
-        return static_cast<result_type>(boost::get<underlying_type>(attributes.at(name).value));
+        return attribute::traits<T>::extract(attributes, name);
     }
 
     filter_t operator ==(const T& other) const {
