@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <mutex>
 #include <string>
 
 #include "formatter/string.hpp"
