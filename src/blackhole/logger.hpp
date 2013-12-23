@@ -34,6 +34,16 @@ public:
         m_exception_handler(log::default_exception_handler_t())
     {}
 
+    // Blaming GCC 4.4 - it needs explicit move constructor definition,
+    // cause it cannot define default move constructor for derived class.
+    logger_base_t(logger_base_t&& other) {
+        m_enabled = other.m_enabled;
+        m_filter = std::move(other.m_filter);
+        m_exception_handler = std::move(other.m_exception_handler);
+        m_frontends = std::move(other.m_frontends);
+        m_global_attributes = std::move(other.m_global_attributes);
+    }
+
     bool enabled() const {
         return m_enabled;
     }
@@ -116,6 +126,15 @@ class verbose_logger_t : public logger_base_t {
     typedef typename aux::underlying_type<Level>::type level_type;
 
 public:
+    verbose_logger_t() :
+        logger_base_t()
+    {}
+
+    // GCC4.4 doesn't create default copy/move constructor for derived classes. It's a bug.
+    verbose_logger_t(verbose_logger_t&& other) :
+        logger_base_t(std::move(other))
+    {}
+
     log::record_t open_record(Level level) const {
         log::attributes_t attributes = { keyword::severity<Level>() = level };
         return logger_base_t::open_record(std::move(attributes));
