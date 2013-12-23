@@ -6,6 +6,8 @@
 
 namespace blackhole {
 
+namespace aux {
+
 template<typename Log>
 class pusher_t {
     Log* log;
@@ -38,6 +40,8 @@ inline pusher_t<Log> log_with_attributes(Log& log, Level level, const std::strin
     return pusher_t<Log>();
 }
 
+} // namespace aux
+
 } // namespace blackhole
 
 #define BH_LOG(log, level, ...) \
@@ -49,4 +53,4 @@ inline pusher_t<Log> log_with_attributes(Log& log, Level level, const std::strin
         } \
     } while (0)
 
-#define BH_LOG_WA log_with_attributes
+#define BH_LOG_WA blackhole::aux::log_with_attributes
