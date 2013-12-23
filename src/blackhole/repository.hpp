@@ -5,6 +5,7 @@
 
 #include "formatter/string.hpp"
 #include "frontend.hpp"
+#include "logger.hpp"
 #include "sink/files.hpp"
 #include "sink/socket.hpp"
 #include "sink/syslog.hpp"
@@ -20,6 +21,16 @@ struct formatter_config_t {
 struct sink_config_t {
     std::string type;
     std::map<std::string, std::string> args;
+};
+
+struct frontend_config_t {
+    formatter_config_t formatter;
+    sink_config_t sink;
+};
+
+struct log_config_t {
+    std::string name;
+    std::vector<frontend_config_t> frontends;
 };
 
 template<typename Level>
@@ -76,6 +87,39 @@ struct factory_t {
 
         return std::unique_ptr<base_frontend_t>();
     }
+};
+
+template<typename Level>
+struct repository_t {
+    static repository_t& instance() {
+        static repository_t self;
+        return self;
+    }
+
+    void init(log_config_t config) {
+        std::lock_guard<std::mutex> lock(mutex);
+        configs[config.name] = config;
+    }
+
+    verbose_logger_t<Level> create(const std::string& name) const {
+        std::lock_guard<std::mutex> lock(mutex);
+        log_config_t config = configs.at(name);
+        verbose_logger_t<Level> logger;
+        for (auto it = config.frontends.begin(); it != config.frontends.end(); ++it) {
+            const frontend_config_t& frontend_config = *it;
+            auto frontend = factory_t<Level>::create(frontend_config.formatter, frontend_config.sink);
+            logger.add_frontend(std::move(frontend));
+        }
+        return logger;
+    }
+
+    verbose_logger_t<Level> root() const {
+        return create("root");
+    }
+
+private:
+    mutable std::mutex mutex;
+    std::unordered_map<std::string, log_config_t> configs;
 };
 
 } // namespace blackhole

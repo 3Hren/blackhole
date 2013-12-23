@@ -1,6 +1,6 @@
 #include "Mocks.hpp"
 
-TEST_OFF(json_t, Class) {
+TEST(json_t, Class) {
     formatter::json_t fmt;
     UNUSED(fmt);
 }

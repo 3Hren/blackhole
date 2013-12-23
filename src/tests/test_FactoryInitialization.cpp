@@ -90,3 +90,37 @@ TEST(Factory, TcpSocketStringsFrontend) {
 
     EXPECT_TRUE(bool(factory_t<testing::level>::create(formatter, sink)));
 }
+
+log_config_t create_valid_config() {
+    formatter_config_t formatter = {
+        "string",
+        std::map<std::string, std::string>{ { "pattern", "[%(timestamp)s]: %(message)s" } }
+    };
+
+    sink_config_t sink = {
+        "files",
+        std::map<std::string, std::string>{ { "path", "/dev/stdout" } }
+    };
+
+    frontend_config_t frontend = { formatter, sink };
+    return log_config_t{ "root", { frontend } };
+}
+
+TEST(Repository, InitializationFromSettings) {
+    log_config_t config = create_valid_config();
+    repository_t<testing::level>::instance().init(config);
+    const bool condition = std::is_same<verbose_logger_t<testing::level>, decltype(repository_t<testing::level>::instance().create("root"))>::value;
+    static_assert(condition, "repository should return `verbose_logger_t` object");
+}
+
+TEST(Repository, ThrowsExceptionIfLoggerWithSpecifiedNameNotFound) {
+    log_config_t config = create_valid_config();
+    repository_t<testing::level>::instance().init(config);
+    EXPECT_THROW(repository_t<testing::level>::instance().create("log"), std::out_of_range);
+}
+
+TEST(Repository, CreatesDuplicateOfRootLoggerByDefault) {
+    log_config_t config = create_valid_config();
+    repository_t<testing::level>::instance().init(config);
+    repository_t<testing::level>::instance().root();
+}
