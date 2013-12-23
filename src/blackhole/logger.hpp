@@ -123,7 +123,7 @@ private:
 
 template<typename Level>
 class verbose_logger_t : public logger_base_t {
-    typedef typename aux::underlying_type<Level>::type level_type;
+    typedef Level level_type;
 
 public:
     verbose_logger_t() :

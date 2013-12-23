@@ -73,6 +73,8 @@ public:
 template<typename Level>
 class verbose_log_t {
 public:
+    typedef Level level_type;
+
     MOCK_CONST_METHOD1_T(open_record, log::record_t(Level));
     MOCK_CONST_METHOD1_T(push, void(log::record_t));
 };
