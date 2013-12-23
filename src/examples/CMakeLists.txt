@@ -1,0 +1,5 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+PROJECT(blackhole-examples)
+
+ADD_SUBDIRECTORY(simple)
+
