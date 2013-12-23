@@ -13,32 +13,39 @@ namespace expression {
 
 template<typename T>
 struct get_attr_action_t {
-    typedef T result_type;
+    typedef typename blackhole::aux::underlying_type<T>::type result_type;
 
     const std::string name;
 
+    template<template<typename> class Operator>
+    static inline
+    Operator<get_attr_action_t<T> > operation(const get_attr_action_t<T>& extractor, const T& other) {
+        return Operator<get_attr_action_t<T>>({ extractor, static_cast<result_type>(other) });
+    }
+
     result_type operator ()(const log::attributes_t& attributes) const {
-        return attribute::traits<T>::extract(attributes, name);
+        // GCC 4.4. can't compare strongly-typed enums.
+        return static_cast<result_type>(attribute::traits<T>::extract(attributes, name));
     }
 
     filter_t operator ==(const T& other) const {
-        return aux::Eq<get_attr_action_t<T>>({ *this, other });
+        return operation<aux::Eq>(*this, other);
     }
 
     filter_t operator <(const T& other) const {
-        return aux::Less<get_attr_action_t<T>>({ *this, other });
+        return operation<aux::Less>(*this, other);
     }
 
     filter_t operator <=(const T& other) const {
-        return aux::LessEq<get_attr_action_t<T>>({ *this, other });
+        return operation<aux::LessEq>(*this, other);
     }
 
     filter_t operator >(const T& other) const {
-        return aux::Gt<get_attr_action_t<T>>({ *this, other });
+        return operation<aux::Gt>(*this, other);
     }
 
     filter_t operator >=(const T& other) const {
-        return aux::GtEq<get_attr_action_t<T>>({ *this, other });
+        return operation<aux::GtEq>(*this, other);
     }
 };
 
