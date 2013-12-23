@@ -26,7 +26,8 @@ SET(SOURCES
     test_Functional
     test_FactoryInitialization
     test_JsonFormatter
-    test_ExceptionTrap.cpp
+    test_ExceptionTrap
+    test_Macro
 )
 
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
