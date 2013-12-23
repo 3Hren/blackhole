@@ -38,6 +38,5 @@ TEST(socket_t, ManualUdp) {
 #endif
 
 //!@todo: Make global logger.
-//!@todo: Create logging macro with printf-like api.
 //!@todo: Create logging macro with stream-like api.
 
