@@ -5,6 +5,7 @@
 
 #include "formatter/string.hpp"
 #include "frontend.hpp"
+#include "frontend/syslog.hpp"
 #include "logger.hpp"
 #include "sink/files.hpp"
 #include "sink/socket.hpp"
