@@ -54,10 +54,11 @@ public:
     }
 
     void consume(const std::string& message) {
-        //!@todo: if (m_backend.need_rotate(message.size()) m_backend.rotate();
+        //!@todo: Make file rotation.
+        //!@todo: Make file naming by pattern.
 
         if (!m_backend.opened()) {
-            //!@todo: create directory if not exists
+            //!@todo: Create directory if not exists.
             if (!m_backend.open()) {
                 throw error_t("failed to open file '%s' for writing", m_backend.path());
             }
