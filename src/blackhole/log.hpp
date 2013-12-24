@@ -18,7 +18,7 @@ public:
         log(log),
         record(record)
     {
-        record.attributes.insert(keyword::message() = blackhole::utils::format(std::forward<Args>(args)...));
+        record.attributes.insert(keyword::message() = utils::format(std::forward<Args>(args)...));
     }
 
     ~scoped_pump() {
