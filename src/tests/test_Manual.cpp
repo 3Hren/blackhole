@@ -37,6 +37,6 @@ TEST(socket_t, ManualUdp) {
 }
 #endif
 
-//!@todo: Make global logger.
+//!@todo: Make global logger for simple usage. Like `repository_t::instance().root()` but with predefined frontend.
 //!@todo: Create logging macro with stream-like api.
 
