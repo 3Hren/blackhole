@@ -2,42 +2,38 @@
 
 #include "logger.hpp"
 #include "utils/format.hpp"
-#include "utils/nullptr.hpp"
 
 namespace blackhole {
 
 namespace aux {
 
 template<typename Log>
-class pusher_t {
-    Log* log;
-    blackhole::log::record_t record;
+class scoped_pump {
+    const Log& log;
+    log::record_t& record;
 
 public:
-    pusher_t(Log* log = nullptr, blackhole::log::record_t&& record = blackhole::log::record_t()) :
+    template<typename... Args>
+    scoped_pump(const Log& log, log::record_t& record, Args&&... args) :
         log(log),
         record(record)
-    {}
+    {
+        record.attributes["message"] = { blackhole::utils::format(std::forward<Args>(args)...) };
+    }
+
+    ~scoped_pump() {
+        log.push(std::move(record));
+    }
 
     template<typename... Args>
-    inline void operator ()(Args&&... args) {
-        if (log) {
-            record.fill(std::forward<Args>(args)...);
-            log->push(std::move(record));
-            log = nullptr;
-        }
+    void operator ()(Args&&... args) {
+        record.fill(std::forward<Args>(args)...);
     }
 };
 
-template<typename Log, typename Level, typename... Args>
-inline pusher_t<Log> log_with_attributes(Log& log, Level level, const std::string& message, Args&&... args) {
-    blackhole::log::record_t record = log.open_record(level);
-    if (record.valid()) {
-        record.attributes["message"] = { blackhole::utils::format(message, std::forward<Args>(args)...) };
-        return pusher_t<Log>(&log, std::move(record));
-    }
-
-    return pusher_t<Log>();
+template<typename Log, typename... Args>
+scoped_pump<Log> make_scoped_pump(Log& log, log::record_t& record, Args&&... args) {
+    return scoped_pump<Log>(log, record, std::forward<Args>(args)...);
 }
 
 } // namespace aux
@@ -45,12 +41,5 @@ inline pusher_t<Log> log_with_attributes(Log& log, Level level, const std::strin
 } // namespace blackhole
 
 #define BH_LOG(log, level, ...) \
-    do { \
-        blackhole::log::record_t record = log.open_record(level); \
-        if (record.valid()) { \
-            record.attributes["message"] = { blackhole::utils::format(__VA_ARGS__) }; \
-            log.push(std::move(record)); \
-        } \
-    } while (0)
-
-#define BH_LOG_WA blackhole::aux::log_with_attributes
+    for (blackhole::log::record_t record = log.open_record(level); record.valid(); record.attributes.clear()) \
+        blackhole::aux::make_scoped_pump(log, record, __VA_ARGS__)

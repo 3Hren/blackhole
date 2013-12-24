@@ -102,7 +102,7 @@ TEST(Macro, FormatMessageWithAttributes) {
             .Times(1)
             .WillOnce(WithArg<0>(Invoke(action)));
 
-    BH_LOG_WA(log, level::debug, "message")(
+    BH_LOG(log, level::debug, "message")(
         attribute::make("value", 42),
         attribute::make("reason", "42"),
         keyword::timestamp() = 100500
@@ -129,7 +129,7 @@ TEST(Macro, FormatMessageWithPrintfStyleWithAttributes) {
             .Times(1)
             .WillOnce(WithArg<0>(Invoke(action)));
 
-    BH_LOG_WA(log, level::debug, "value [%d]: %s - okay", 100500, "blah")(
+    BH_LOG(log, level::debug, "value [%d]: %s - okay", 100500, "blah")(
         attribute::make("value", 42),
         attribute::make("reason", "42"),
         keyword::timestamp() = 100500
