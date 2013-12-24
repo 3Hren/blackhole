@@ -10,7 +10,7 @@ namespace formatter {
 
 class json_t {
 public:
-    std::string format(const log::record_t& record) const {
+    std::string format(const log::record_t&) const {
         return std::string();
     }
 };

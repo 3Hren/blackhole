@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#define UNUSED(T...) \
-    (void)T;
+#define UNUSED(...) \
+    (void)__VA_ARGS__;
 
 using namespace ::testing;
 

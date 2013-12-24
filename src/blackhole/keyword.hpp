@@ -10,7 +10,7 @@
             static const char* name() { return #Name; } \
         }; \
     } \
-    static blackhole::keyword::keyword_t<T, tag::Name##_t, log::attribute::scope::Scope>& Name() { \
+    static inline blackhole::keyword::keyword_t<T, tag::Name##_t, log::attribute::scope::Scope>& Name() { \
         static blackhole::keyword::keyword_t<T, tag::Name##_t, log::attribute::scope::Scope> self; \
         return self; \
     }

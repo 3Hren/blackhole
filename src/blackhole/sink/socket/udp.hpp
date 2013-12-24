@@ -20,7 +20,6 @@ class boost_backend_t<boost::asio::ip::udp> {
     typedef boost::asio::ip::udp Protocol;
 
     const std::string m_host;
-    const std::uint16_t m_port;
 
     boost::asio::io_service m_io_service;
     std::unique_ptr<Protocol::socket> m_socket;
@@ -28,7 +27,6 @@ class boost_backend_t<boost::asio::ip::udp> {
 public:
     boost_backend_t(const std::string& host, std::uint16_t port) :
         m_host(host),
-        m_port(port),
         m_socket(initialize(m_io_service, host, port))
     {
     }
