@@ -29,6 +29,7 @@ SET(SOURCES
     test_JsonFormatter
     test_ExceptionTrap
     test_Macro
+    test_MsgpackFormatter
 )
 
 SET(Boost_USE_MULTITHREADED ON)
