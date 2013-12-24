@@ -33,8 +33,9 @@ struct priority_traits<level> {
 
 } } // namespace blackhole::sink
 
+//! Initialization stage.
+//! \brief Manually or from file - whatever. The main aim - is to get initialized `log_config_t` object.
 void init() {
-    // Initialization stage. Manually or from file - anyway. Main aim - is to get initialozed `log_config_t` object.
     formatter_config_t formatter = {
         "string",
         std::map<std::string, std::string>{ { "pattern", "[%(timestamp)s] [%(severity)s]: %(message)s" } }
