@@ -26,6 +26,8 @@ struct priority_traits<level> {
         case level::error:
             return priority_t::err;
         }
+
+        return priority_t::debug;
     }
 };
 
