@@ -92,7 +92,11 @@ struct factory_t {
 };
 
 template<typename Level>
-struct repository_t {
+class repository_t {
+    mutable std::mutex mutex;
+    std::unordered_map<std::string, log_config_t> configs;
+
+public:
     static repository_t& instance() {
         static repository_t self;
         return self;
@@ -119,9 +123,29 @@ struct repository_t {
         return create("root");
     }
 
+    verbose_logger_t<Level> trivial() const {
+        return create("trivial");
+    }
+
 private:
-    mutable std::mutex mutex;
-    std::unordered_map<std::string, log_config_t> configs;
+    repository_t() {
+        init(make_trivial_config());
+    }
+
+    static log_config_t make_trivial_config() {
+        formatter_config_t formatter = {
+            "string",
+            std::map<std::string, std::string>{ { "pattern", "[%(timestamp)s] [%(severity)s]: %(message)s" } }
+        };
+
+        sink_config_t sink = {
+            "files",
+            std::map<std::string, std::string>{ { "path", "/dev/stdout" } }
+        };
+
+        frontend_config_t frontend = { formatter, sink };
+        return log_config_t{ "trivial", { frontend } };
+    }
 };
 
 } // namespace blackhole
