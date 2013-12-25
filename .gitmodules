@@ -1,0 +1,3 @@
+[submodule "foreign/rapidjson"]
+	path = foreign/rapidjson
+	url = https://github.com/andrusha97/rapidjson.git
