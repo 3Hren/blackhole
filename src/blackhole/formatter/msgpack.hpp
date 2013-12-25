@@ -40,7 +40,7 @@ public:
             boost::apply_visitor(visitor, attribute.value);
         }
 
-        return std::string(buffer.data());
+        return std::string(buffer.data(), buffer.size());
     }
 };
 
