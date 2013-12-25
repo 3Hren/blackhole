@@ -51,8 +51,6 @@ TEST(json_t, FormatMultipleComplexAttributes) {
     EXPECT_STREQ("le message", doc["message"].GetString());
     EXPECT_EQ(100500, doc["timestamp"].GetInt());
     EXPECT_STREQ("udp://127.0.0.1", doc["@source"].GetString());
-
-    EXPECT_STREQ("udp://127.0.0.1", doc["@source"].GetString());
     EXPECT_STREQ("dhcp-218-248-wifi.yandex", doc["@source_host"].GetString());
     EXPECT_STREQ("service/storage", doc["@source_path"].GetString());
     EXPECT_STREQ("550e8400-e29b-41d4-a716-446655440000", doc["@uuid"].GetString());
