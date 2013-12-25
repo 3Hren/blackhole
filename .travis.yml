@@ -23,7 +23,7 @@ before_install:
  - cd ../..
 
 install:
- - sudo apt-get install -qq cdbs cmake libboost-dev libboost-filesystem-dev
+ - sudo apt-get install -qq cdbs cmake libboost-dev libboost-filesystem-dev libmsgpack-dev
 
 before_script:
  - mkdir build && cd build
