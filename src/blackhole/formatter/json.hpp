@@ -15,10 +15,10 @@ namespace formatter {
 
 class json_visitor_t : public boost::static_visitor<> {
     const char* name;
-    rapidjson::Document& root;
+    rapidjson::Document* root;
 public:
 
-    json_visitor_t(rapidjson::Document& root) :
+    json_visitor_t(rapidjson::Document* root) :
         root(root)
     {}
 
@@ -27,16 +27,16 @@ public:
     }
 
     template<typename T, class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
-    void operator ()(T value) {
-        root.AddMember(name, value, root.GetAllocator());
+    void operator ()(T value) const {
+        root->AddMember(name, value, root->GetAllocator());
     }
 
-    void operator ()(std::time_t value) {
-        root.AddMember(name, static_cast<int64_t>(value), root.GetAllocator());
+    void operator ()(std::time_t value) const {
+        root->AddMember(name, static_cast<int64_t>(value), root->GetAllocator());
     }
 
-    void operator ()(const std::string& value) {
-        root.AddMember(name, value.c_str(), root.GetAllocator());
+    void operator ()(const std::string& value) const {
+        root->AddMember(name, value.c_str(), root->GetAllocator());
     }
 };
 
@@ -56,7 +56,7 @@ public:
         rapidjson::Document root;
         root.SetObject();
 
-        json_visitor_t visitor(root);
+        json_visitor_t visitor(&root);
         for (auto it = record.attributes.begin(); it != record.attributes.end(); ++it) {
             const std::string& name = it->first;
             const log::attribute_t& attribute = it->second;
