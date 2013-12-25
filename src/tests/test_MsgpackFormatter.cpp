@@ -14,9 +14,14 @@ TEST(msgpack_t, FormatSingleAttribute) {
     };
 
     formatter::msgpack_t fmt;
-    fmt.format(record);
+    std::string actual = fmt.format(record);
 
-    EXPECT_EQ("\x81\xa7message\xaale message", fmt.format(record));
+    msgpack::unpacked unpacked;
+    msgpack::unpack(&unpacked, actual.data(), actual.size());
+    std::map<std::string, msgpack::object> root;
+    unpacked.get().convert<std::map<std::string, msgpack::object>>(&root);
+
+    EXPECT_EQ("le message", root["message"].as<std::string>());
 }
 
 TEST(msgpack_t, FormatMultipleAttributes) {
@@ -27,9 +32,15 @@ TEST(msgpack_t, FormatMultipleAttributes) {
     };
 
     formatter::msgpack_t fmt;
-    fmt.format(record);
+    std::string actual = fmt.format(record);
 
-    EXPECT_EQ("\x82\xa9timestamp\xce\x00\x01\x88\x94\xa7message\xaale message", fmt.format(record));
+    msgpack::unpacked unpacked;
+    msgpack::unpack(&unpacked, actual.data(), actual.size());
+    std::map<std::string, msgpack::object> root;
+    unpacked.get().convert<std::map<std::string, msgpack::object>>(&root);
+
+    EXPECT_EQ("le message", root["message"].as<std::string>());
+    EXPECT_EQ(100500, root["timestamp"].as<std::time_t>());
 }
 
 //!@todo: Nested attribute objects. It is needed for logstash.

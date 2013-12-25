@@ -59,6 +59,7 @@ TARGET_LINK_LIBRARIES(${PROJECT}
     ${Boost_LIBRARIES}
     ${GOOGLE_LIBRARIES}
     blackhole
+    msgpack
 )
 
 ADD_TEST(NAME blackhole-tests COMMAND blackhole-tests)
