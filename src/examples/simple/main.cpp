@@ -60,4 +60,6 @@ int main(int, char**) {
     BH_LOG(log, level::info,    "[%d] %s - done", 1, "info");
     BH_LOG(log, level::warning, "[%d] %s - done", 2, "warning");
     BH_LOG(log, level::error,   "[%d] %s - done", 3, "error");
+
+    return 0;
 }
