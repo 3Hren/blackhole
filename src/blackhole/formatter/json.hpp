@@ -53,7 +53,7 @@ public:
         rapidjson::Writer<rapidjson::GenericStringBuffer<rapidjson::UTF8<>>> writer(buffer);
 
         root.Accept(writer);
-        return std::string(buffer.GetString(), buffer.GetSize());
+        return std::string(buffer.GetString(), buffer.Size());
     }
 };
 
