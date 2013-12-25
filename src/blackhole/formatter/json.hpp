@@ -74,6 +74,3 @@ public:
 } // namespace formatter
 
 } // namespace blackhole
-
-//!@todo: Find normal json builder.
-//!@todo: Try to implement logstash formatter.
