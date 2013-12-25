@@ -14,7 +14,7 @@ namespace blackhole {
 namespace formatter {
 
 class json_visitor_t : public boost::static_visitor<> {
-    rapidjson::Document &root;
+    rapidjson::Document& root;
 public:
     const char* name;
 
@@ -22,7 +22,7 @@ public:
         root(root)
     {}
 
-    template<typename T>
+    template<typename T, class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
     void operator ()(T value) {
         root.AddMember(name, value, root.GetAllocator());
     }
@@ -44,8 +44,8 @@ public:
 
         json_visitor_t visitor(root);
         for (auto it = record.attributes.begin(); it != record.attributes.end(); ++it) {
-            const log::attribute_t& attribute = it->second;
             visitor.name = it->first.c_str();
+            const log::attribute_t& attribute = it->second;
             boost::apply_visitor(visitor, attribute.value);
         }
 
