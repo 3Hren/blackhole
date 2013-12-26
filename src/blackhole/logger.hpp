@@ -113,7 +113,6 @@ public:
 
 private:
     log::attributes_t get_event_attributes() const {
-        //!@todo: Current naive implementation of timestamp formatter is suck and have large performance troubles. Fix it.
         log::attributes_t attributes = {
             keyword::timestamp() = std::time(nullptr)
         };
@@ -142,7 +141,3 @@ public:
 };
 
 } // namespace blackhole
-
-//!@todo: Make fallback logger. Make it configurable.
-//!@todo: Try to implement logstash formatter.
-//!@todo: Make example with logstash.

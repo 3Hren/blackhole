@@ -36,6 +36,3 @@ TEST(socket_t, ManualUdp) {
     }
 }
 #endif
-
-//!@todo: Create logging macro with stream-like api.
-

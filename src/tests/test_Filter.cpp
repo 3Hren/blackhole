@@ -248,5 +248,3 @@ TEST(FilterSeverity, HasAndGetGtEq) {
     attributes = { keyword::severity<ts::severity>() = ts::severity::warning };
     EXPECT_TRUE(filter(attributes));
 }
-
-//!@todo: Make || operations in filtering

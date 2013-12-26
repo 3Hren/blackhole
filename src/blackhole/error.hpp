@@ -15,5 +15,3 @@ public:
 };
 
 } // namespace blackhole
-
-//!@todo: Make internal exception class with attribute keeping, e.g. line, file or path.

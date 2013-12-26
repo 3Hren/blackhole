@@ -39,7 +39,6 @@ public:
     void write(const std::string& message) {
         m_file.write(message.data(), static_cast<std::streamsize>(message.size()));
         m_file.put('\n');
-        //!@todo: Make auto_flush flag.
         m_file.flush();
     }
 };
@@ -54,11 +53,7 @@ public:
     }
 
     void consume(const std::string& message) {
-        //!@todo: Make file rotation.
-        //!@todo: Make file naming by pattern.
-
         if (!m_backend.opened()) {
-            //!@todo: Create directory if not exists.
             if (!m_backend.open()) {
                 throw error_t("failed to open file '%s' for writing", m_backend.path());
             }

@@ -42,5 +42,3 @@ TEST(msgpack_t, FormatMultipleAttributes) {
     EXPECT_EQ("le message", root["message"].as<std::string>());
     EXPECT_EQ(100500, root["timestamp"].as<std::time_t>());
 }
-
-//!@todo: Nested attribute objects. It is needed for logstash.
