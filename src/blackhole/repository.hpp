@@ -5,6 +5,7 @@
 #include <string>
 
 #include "formatter/string.hpp"
+#include "formatter/json.hpp"
 #include "frontend.hpp"
 #include "frontend/syslog.hpp"
 #include "logger.hpp"
