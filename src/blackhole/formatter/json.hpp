@@ -88,7 +88,11 @@ public:
         rapidjson::Writer<rapidjson::GenericStringBuffer<rapidjson::UTF8<>>> writer(buffer);
 
         root.Accept(writer);
-        return std::string(buffer.GetString(), buffer.Size());
+        std::string message = std::string(buffer.GetString(), buffer.Size());
+        if (config.newline) {
+            message.push_back('\n');
+        }
+        return message;
     }
 
 private:

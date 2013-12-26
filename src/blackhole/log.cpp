@@ -1,9 +1,9 @@
-//!@todo: json_t/msgpack_t: Attribute mappings.
 //!@todo: json_t/msgpack_t: Attribute tree building.
 //!@todo: aux: More typed configs.
 //!@todo: Incapsulate attribute mapping (timestamp, severity etc).
 //!@todo: example: Make example with logstash.
 
+//!@todo: msgpack_t: Attribute mappings.
 //!@todo: api: Make fallback logger. Make it configurable.
 //!@todo: aux: Make internal exception class with attribute keeping, e.g. line, file or path.
 //!@todo: performance: Current naive implementation of timestamp formatter is suck and have large performance troubles. Fix it.

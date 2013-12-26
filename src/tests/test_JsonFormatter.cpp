@@ -101,3 +101,19 @@ TEST(json_t, MultipleAttributeMapping) {
     EXPECT_EQ(100500, doc["@timestamp"].GetInt());
 }
 
+TEST(json_t, AddsNewlineIfSpecified) {
+    log::record_t record;
+    record.attributes = {
+        keyword::message() = "le message",
+    };
+
+    formatter::json_t::config_type config;
+    config.newline = true;
+
+    formatter::json_t fmt(config);
+    std::string actual = fmt.format(record);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(actual.c_str());
+    EXPECT_TRUE(boost::ends_with(actual, "\n"));
+}
