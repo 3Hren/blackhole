@@ -55,3 +55,25 @@ TEST(json_t, FormatMultipleComplexAttributes) {
     EXPECT_STREQ("service/storage", doc["@source_path"].GetString());
     EXPECT_STREQ("550e8400-e29b-41d4-a716-446655440000", doc["@uuid"].GetString());
 }
+
+TEST(json_t, SingleAttributeMapping) {
+    log::record_t record;
+    record.attributes = {
+        keyword::message() = "le message",
+        keyword::timestamp() = 100500
+    };
+
+    formatter::json_t::config_type config;
+    config.mapping["message"] = "@message";
+
+    formatter::json_t fmt(config);
+    std::string actual = fmt.format(record);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(actual.c_str());
+    ASSERT_TRUE(doc.HasMember("@message"));
+    EXPECT_STREQ("le message", doc["@message"].GetString());
+
+    ASSERT_TRUE(doc.HasMember("timestamp"));
+    EXPECT_EQ(100500, doc["timestamp"].GetInt());
+}

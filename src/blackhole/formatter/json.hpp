@@ -50,8 +50,29 @@ void apply_visitor(Visitor& visitor, const char* name, const T& value) {
 
 }
 
+namespace json {
+
+struct config_t {
+    bool newline;
+    std::unordered_map<std::string, std::string> mapping;
+    std::unordered_map<std::string, std::vector<std::string>> tree;
+
+    config_t() :
+        newline(false)
+    {}
+};
+
+} // namespace json
+
 class json_t {
+    const json::config_t config;
 public:
+    typedef json::config_t config_type;
+
+    json_t(const json::config_t& config = json::config_t()) :
+        config(config)
+    {}
+
     std::string format(const log::record_t& record) const {
         rapidjson::Document root;
         root.SetObject();
@@ -60,7 +81,7 @@ public:
         for (auto it = record.attributes.begin(); it != record.attributes.end(); ++it) {
             const std::string& name = it->first;
             const log::attribute_t& attribute = it->second;
-            aux::apply_visitor(visitor, name.c_str(), attribute.value);
+            apply_visitor(visitor, name, attribute.value);
         }
 
         rapidjson::GenericStringBuffer<rapidjson::UTF8<>> buffer;
@@ -68,6 +89,16 @@ public:
 
         root.Accept(writer);
         return std::string(buffer.GetString(), buffer.Size());
+    }
+
+private:
+    void apply_visitor(json_visitor_t& visitor, const std::string& name, const log::attribute_value_t& value) const {
+        auto it = config.mapping.find(name);
+        if (it != config.mapping.end()) {
+            aux::apply_visitor(visitor, it->second.c_str(), value);
+        } else {
+            aux::apply_visitor(visitor, name.c_str(), value);
+        }
     }
 };
 
