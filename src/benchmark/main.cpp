@@ -6,7 +6,7 @@
 
 using namespace blackhole;
 
-#define VS_BOOST
+//#define VS_BOOST
 #ifdef VS_BOOST
 #include <boost/log/utility/setup.hpp>
 #include <boost/log/sources/logger.hpp>
@@ -141,4 +141,61 @@ BASELINE(CeleroBenchTest, BoostLog, 0, N) {
 BENCHMARK(CeleroBenchTest, BlackholeLog, 0, N) {
     BH_LOG(warning, "Something bad is going on but I can handle it");
 }
+#endif
+
+#if 1
+using namespace blackhole;
+
+class json_t_old {
+public:
+    std::string format(const log::record_t& record) const {
+        rapidjson::Document root;
+        root.SetObject();
+
+        formatter::json_visitor_t visitor(&root);
+        for (auto it = record.attributes.begin(); it != record.attributes.end(); ++it) {
+            const std::string& name = it->first;
+            const log::attribute_t& attribute = it->second;
+            formatter::aux::apply_visitor(visitor, name.c_str(), attribute.value);
+        }
+
+        rapidjson::GenericStringBuffer<rapidjson::UTF8<>> buffer;
+        rapidjson::Writer<rapidjson::GenericStringBuffer<rapidjson::UTF8<>>> writer(buffer);
+
+        root.Accept(writer);
+        return std::string(buffer.GetString(), buffer.Size());
+    }
+};
+
+const int N = 10000;
+
+log::record_t record = {
+    log::attributes_t{
+        keyword::message() = "le message",
+        keyword::timestamp() = 100500,
+        attribute::make("@source", "udp://127.0.0.1"),
+        attribute::make("@source_host", "dhcp-218-248-wifi.yandex"),
+        attribute::make("@source_path", "service/storage"),
+        attribute::make("@uuid", "550e8400-e29b-41d4-a716-446655440000")
+    }
+};
+
+json_t_old fmt1;
+formatter::json_t::config_type config;
+formatter::json_t fmt2(config);
+
+int main(int argc, char** argv) {
+    config.mapping["message"] = "@message";
+    celero::Run(argc, argv);
+    return 0;
+}
+
+BASELINE(JsonFormatterBenchmark, Baseline, 0, N) {
+    celero::DoNotOptimizeAway(fmt1.format(record));
+}
+
+BASELINE(JsonFormatterBenchmark, Mapping, 0, N) {
+    celero::DoNotOptimizeAway(fmt2.format(record));
+}
+
 #endif

@@ -30,6 +30,7 @@ SET(GOOGLE_LIBRARIES
 PROJECT(${PROJECT})
 
 INCLUDE_DIRECTORIES(../
+    ../../foreign/rapidjson/include
     /Users/esafronov/sandbox/Celero/include
 )
 
