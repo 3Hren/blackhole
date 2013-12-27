@@ -1,4 +1,3 @@
-//!@todo: json_t/msgpack_t: Attribute tree building.
 //!@todo: aux: More typed configs.
 //!@todo: Incapsulate attribute mapping (timestamp, severity etc).
 //!@todo: example: Make example with logstash.

@@ -82,7 +82,6 @@ private:
         } else {
             root->AddMember(name, value, root->GetAllocator());
         }
-
     }
 };
 
