@@ -117,3 +117,52 @@ TEST(json_t, AddsNewlineIfSpecified) {
     doc.Parse<0>(actual.c_str());
     EXPECT_TRUE(boost::ends_with(actual, "\n"));
 }
+
+TEST(json_t, FieldMapping) {
+    log::record_t record;
+    record.attributes = {
+        keyword::message() = "le message",
+        keyword::timestamp() = 100500
+    };
+
+    formatter::json_t::config_type config;
+    config.fields["timestamp"] = { "fields" };
+
+    formatter::json_t fmt(config);
+    std::string actual = fmt.format(record);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(actual.c_str());
+
+    ASSERT_TRUE(doc.HasMember("message"));
+
+    ASSERT_TRUE(doc.HasMember("fields"));
+    ASSERT_TRUE(doc["fields"].HasMember("timestamp"));
+    EXPECT_EQ(100500, doc["fields"]["timestamp"].GetInt());
+}
+
+TEST(json_t, ComplexFieldMapping) {
+    log::record_t record;
+    record.attributes = {
+        keyword::message() = "le message",
+        keyword::timestamp() = 100500
+    };
+
+    formatter::json_t::config_type config;
+    config.fields["message"] = { "fields" };
+    config.fields["timestamp"] = { "fields", "aux" };
+
+    formatter::json_t fmt(config);
+    std::string actual = fmt.format(record);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(actual.c_str());
+
+    ASSERT_TRUE(doc.HasMember("fields"));
+    ASSERT_TRUE(doc["fields"].HasMember("message"));
+    EXPECT_STREQ("le message", doc["fields"]["message"].GetString());
+
+    ASSERT_TRUE(doc["fields"].HasMember("aux"));
+    ASSERT_TRUE(doc["fields"]["aux"].HasMember("timestamp"));
+    EXPECT_EQ(100500, doc["fields"]["aux"]["timestamp"].GetInt());
+}

@@ -167,7 +167,8 @@ public:
     }
 };
 
-const int N = 10000;
+const int S = 0;
+const int N = 100000;
 
 log::record_t record = {
     log::attributes_t{
@@ -180,22 +181,59 @@ log::record_t record = {
     }
 };
 
-json_t_old fmt1;
-formatter::json_t::config_type config;
-formatter::json_t fmt2(config);
+json_t_old* fmt1 = 0;
+formatter::json_t* fmt2 = 0;
+formatter::json_t* fmt3 = 0;
+formatter::json_t* fmt4 = 0;
+formatter::json_t* fmt5 = 0;
 
 int main(int argc, char** argv) {
-    config.mapping["message"] = "@message";
+    fmt1 = new json_t_old;
+
+    formatter::json::config_t config2;
+    config2.newline = true;
+    fmt2 = new formatter::json_t(config2);
+
+    formatter::json::config_t config3;
+    config3.mapping["message"] = "@message";
+    fmt3 = new formatter::json_t(config3);
+
+    formatter::json::config_t config4;
+    config4.fields["@source"] = { "fields" };
+    config4.fields["@source_host"] = { "fields" };
+    config4.fields["@uuid"] = { "fields" };
+    fmt4 = new formatter::json_t(config4);
+
+    formatter::json::config_t config5;
+    config5.newline = true;
+    config5.mapping["message"] = "@message";
+    config5.fields["@source"] = { "fields" };
+    config5.fields["@source_host"] = { "fields" };
+    config5.fields["@uuid"] = { "fields" };
+    fmt5 = new formatter::json_t(config5);
+
     celero::Run(argc, argv);
     return 0;
 }
 
-BASELINE(JsonFormatterBenchmark, Baseline, 0, N) {
-    celero::DoNotOptimizeAway(fmt1.format(record));
+BASELINE(JsonFormatterBenchmark, Baseline, S, N) {
+    celero::DoNotOptimizeAway(fmt1->format(record));
 }
 
-BASELINE(JsonFormatterBenchmark, Mapping, 0, N) {
-    celero::DoNotOptimizeAway(fmt2.format(record));
+BASELINE(JsonFormatterBenchmark, NewLine, S, N) {
+    celero::DoNotOptimizeAway(fmt2->format(record));
+}
+
+BASELINE(JsonFormatterBenchmark, Mapping, S, N) {
+    celero::DoNotOptimizeAway(fmt3->format(record));
+}
+
+BASELINE(JsonFormatterBenchmark, BuildingTree, S, N) {
+    celero::DoNotOptimizeAway(fmt4->format(record));
+}
+
+BASELINE(JsonFormatterBenchmark, Complex, S, N) {
+    celero::DoNotOptimizeAway(fmt5->format(record));
 }
 
 #endif
