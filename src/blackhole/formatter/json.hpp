@@ -39,8 +39,8 @@ public:
 
     json_visitor_t(rapidjson::Document* root) :
         root(root),
-        name(0),
-        nodes(0)
+        name(nullptr),
+        nodes(nullptr)
     {}
 
     void bind_name(const char* name) {
@@ -68,17 +68,17 @@ private:
     template<typename T>
     void add_member(const T& value) const {
         if (nodes && nodes->size()) {
-            rapidjson::Value* tmp = root;
+            rapidjson::Value* current_node = root;
             for (auto it = nodes->begin(); it != nodes->end(); ++it) {
-                const std::string& n = *it;
-                if (!tmp->HasMember(n.c_str())) {
+                const std::string& name = *it;
+                if (!current_node->HasMember(name.c_str())) {
                     rapidjson::Value node;
                     node.SetObject();
-                    tmp->AddMember(n.c_str(), node, root->GetAllocator());
+                    current_node->AddMember(name.c_str(), node, root->GetAllocator());
                 }
-                tmp = &tmp->operator [](n.c_str());
+                current_node = &current_node->operator [](name.c_str());
             }
-            tmp->AddMember(name, value, root->GetAllocator());
+            current_node->AddMember(name, value, root->GetAllocator());
         } else {
             root->AddMember(name, value, root->GetAllocator());
         }
