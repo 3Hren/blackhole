@@ -220,19 +220,19 @@ BASELINE(JsonFormatterBenchmark, Baseline, S, N) {
     celero::DoNotOptimizeAway(fmt1->format(record));
 }
 
-BASELINE(JsonFormatterBenchmark, NewLine, S, N) {
+BENCHMARK(JsonFormatterBenchmark, NewLine, S, N) {
     celero::DoNotOptimizeAway(fmt2->format(record));
 }
 
-BASELINE(JsonFormatterBenchmark, Mapping, S, N) {
+BENCHMARK(JsonFormatterBenchmark, Mapping, S, N) {
     celero::DoNotOptimizeAway(fmt3->format(record));
 }
 
-BASELINE(JsonFormatterBenchmark, BuildingTree, S, N) {
+BENCHMARK(JsonFormatterBenchmark, BuildingTree, S, N) {
     celero::DoNotOptimizeAway(fmt4->format(record));
 }
 
-BASELINE(JsonFormatterBenchmark, Complex, S, N) {
+BENCHMARK(JsonFormatterBenchmark, Complex, S, N) {
     celero::DoNotOptimizeAway(fmt5->format(record));
 }
 
