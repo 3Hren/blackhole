@@ -64,7 +64,7 @@ TEST(json_t, SingleAttributeMapping) {
     };
 
     formatter::json_t::config_type config;
-    config.mapping["message"] = "@message";
+    config.name_mapping["message"] = "@message";
 
     formatter::json_t fmt(config);
     std::string actual = fmt.format(record);
@@ -86,8 +86,8 @@ TEST(json_t, MultipleAttributeMapping) {
     };
 
     formatter::json_t::config_type config;
-    config.mapping["message"] = "@message";
-    config.mapping["timestamp"] = "@timestamp";
+    config.name_mapping["message"] = "@message";
+    config.name_mapping["timestamp"] = "@timestamp";
 
     formatter::json_t fmt(config);
     std::string actual = fmt.format(record);
@@ -126,7 +126,7 @@ TEST(json_t, FieldMapping) {
     };
 
     formatter::json_t::config_type config;
-    config.fields["timestamp"] = { "fields" };
+    config.field_mapping["timestamp"] = { "fields" };
 
     formatter::json_t fmt(config);
     std::string actual = fmt.format(record);
@@ -149,8 +149,8 @@ TEST(json_t, ComplexFieldMapping) {
     };
 
     formatter::json_t::config_type config;
-    config.fields["message"] = { "fields" };
-    config.fields["timestamp"] = { "fields", "aux" };
+    config.field_mapping["message"] = { "fields" };
+    config.field_mapping["timestamp"] = { "fields", "aux" };
 
     formatter::json_t fmt(config);
     std::string actual = fmt.format(record);

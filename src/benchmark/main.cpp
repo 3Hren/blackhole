@@ -146,17 +146,62 @@ BENCHMARK(CeleroBenchTest, BlackholeLog, 0, N) {
 #if 1
 using namespace blackhole;
 
-class json_t_old {
+namespace old {
+
+class json_visitor_t : public boost::static_visitor<> {
+    rapidjson::Document* root;
+    const char* name;
+public:
+    json_visitor_t(rapidjson::Document* root) :
+        root(root),
+        name(nullptr)
+    {}
+
+    void bind_name(const char* name) {
+        this->name = name;
+    }
+
+    template<typename T, class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+    void operator ()(T value) const {
+        add_member(value);
+    }
+
+    void operator ()(std::time_t value) const {
+        add_member(static_cast<int64_t>(value));
+    }
+
+    void operator ()(const std::string& value) const {
+        add_member(value.c_str());
+    }
+
+private:
+    template<typename T>
+    void add_member(const T& value) const {
+        root->AddMember(name, value, root->GetAllocator());
+    }
+};
+
+namespace aux {
+
+template<typename Visitor, typename T>
+void apply_visitor_old(Visitor& visitor, const char* name, const T& value) {
+    visitor.bind_name(name);
+    boost::apply_visitor(visitor, value);
+}
+
+} // namespace aux
+
+class json_t {
 public:
     std::string format(const log::record_t& record) const {
         rapidjson::Document root;
         root.SetObject();
 
-        formatter::json_visitor_t visitor(&root);
+        json_visitor_t visitor(&root);
         for (auto it = record.attributes.begin(); it != record.attributes.end(); ++it) {
             const std::string& name = it->first;
             const log::attribute_t& attribute = it->second;
-            formatter::aux::apply_visitor(visitor, name.c_str(), attribute.value);
+            aux::apply_visitor_old(visitor, name.c_str(), attribute.value);
         }
 
         rapidjson::GenericStringBuffer<rapidjson::UTF8<>> buffer;
@@ -167,8 +212,10 @@ public:
     }
 };
 
+} // namespace old
+
 const int S = 0;
-const int N = 100000;
+const int N = 500000;
 
 log::record_t record = {
     log::attributes_t{
@@ -181,35 +228,35 @@ log::record_t record = {
     }
 };
 
-json_t_old* fmt1 = 0;
+old::json_t* fmt1 = 0;
 formatter::json_t* fmt2 = 0;
 formatter::json_t* fmt3 = 0;
 formatter::json_t* fmt4 = 0;
 formatter::json_t* fmt5 = 0;
 
 int main(int argc, char** argv) {
-    fmt1 = new json_t_old;
+    fmt1 = new old::json_t;
 
     formatter::json::config_t config2;
     config2.newline = true;
     fmt2 = new formatter::json_t(config2);
 
     formatter::json::config_t config3;
-    config3.mapping["message"] = "@message";
+    config3.name_mapping["message"] = "@message";
     fmt3 = new formatter::json_t(config3);
 
     formatter::json::config_t config4;
-    config4.fields["@source"] = { "fields" };
-    config4.fields["@source_host"] = { "fields" };
-    config4.fields["@uuid"] = { "fields" };
+    config4.field_mapping["@source"] = { "fields" };
+    config4.field_mapping["@source_host"] = { "fields" };
+    config4.field_mapping["@uuid"] = { "fields" };
     fmt4 = new formatter::json_t(config4);
 
     formatter::json::config_t config5;
     config5.newline = true;
-    config5.mapping["message"] = "@message";
-    config5.fields["@source"] = { "fields" };
-    config5.fields["@source_host"] = { "fields" };
-    config5.fields["@uuid"] = { "fields" };
+    config5.name_mapping["message"] = "@message";
+    config5.field_mapping["@source"] = { "fields" };
+    config5.field_mapping["@source_host"] = { "fields" };
+    config5.field_mapping["@uuid"] = { "fields" };
     fmt5 = new formatter::json_t(config5);
 
     celero::Run(argc, argv);

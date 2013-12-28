@@ -19,10 +19,12 @@ namespace json {
 
 struct config_t {
     typedef std::vector<std::string> fields_t;
+    typedef std::unordered_map<std::string, std::string> name_mapping_t;
+    typedef std::unordered_map<std::string, fields_t> field_mapping_t;
 
     bool newline;
-    std::unordered_map<std::string, std::string> mapping;
-    std::unordered_map<std::string, fields_t> fields;
+    name_mapping_t name_mapping;
+    field_mapping_t field_mapping;
 
     config_t() :
         newline(false)
@@ -33,22 +35,18 @@ struct config_t {
 
 class json_visitor_t : public boost::static_visitor<> {
     rapidjson::Document* root;
-    const char* name;
-    const json::config_t::fields_t* nodes;
-public:
+    const json::config_t::field_mapping_t& field_mapping;
 
-    json_visitor_t(rapidjson::Document* root) :
+    const std::string* name;
+public:
+    json_visitor_t(rapidjson::Document* root, const json::config_t::field_mapping_t& field_mapping) :
         root(root),
-        name(nullptr),
-        nodes(nullptr)
+        field_mapping(field_mapping),
+        name(nullptr)
     {}
 
-    void bind_name(const char* name) {
+    void set_name(const std::string* name) {
         this->name = name;
-    }
-
-    void bind_nodes(const json::config_t::fields_t* nodes = nullptr) {
-        this->nodes = nodes;
     }
 
     template<typename T, class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
@@ -67,38 +65,46 @@ public:
 private:
     template<typename T>
     void add_member(const T& value) const {
-        if (nodes && nodes->size()) {
-            rapidjson::Value* current_node = root;
-            for (auto it = nodes->begin(); it != nodes->end(); ++it) {
-                const std::string& name = *it;
-                if (!current_node->HasMember(name.c_str())) {
-                    rapidjson::Value node;
-                    node.SetObject();
-                    current_node->AddMember(name.c_str(), node, root->GetAllocator());
+        auto it = field_mapping.find(*name);
+        if (it != field_mapping.end()) {
+            const json::config_t::fields_t& fields = it->second;
+            if (fields.size() > 0) {
+                rapidjson::Value* node = root;
+                for (auto it = fields.begin(); it != fields.end(); ++it) {
+                    const std::string& field = *it;
+                    if (!node->HasMember(field.c_str())) {
+                        rapidjson::Value child;
+                        child.SetObject();
+                        add_member(node, field, std::move(child));
+                    }
+                    node = &(*node)[field.c_str()];
                 }
-                current_node = &current_node->operator [](name.c_str());
+                add_member(node, value);
+            } else {
+                add_member(root, value);
             }
-            current_node->AddMember(name, value, root->GetAllocator());
         } else {
-            root->AddMember(name, value, root->GetAllocator());
+            add_member(root, value);
         }
+    }
+
+    template<typename T>
+    void add_member(rapidjson::Value* node, const T& value) const {
+        node->AddMember(name->c_str(), value, root->GetAllocator());
+    }
+
+    template<typename T>
+    void add_member(rapidjson::Value* node, const std::string& name, T&& value) const {
+        node->AddMember(name.c_str(), value, root->GetAllocator());
     }
 };
 
 namespace aux {
 
 template<typename Visitor, typename T>
-void apply_visitor(Visitor& visitor, const char* name, const T& value) {
-    visitor.bind_name(name);
+void apply_visitor(Visitor& visitor, const std::string* name, const T& value) {
+    visitor.set_name(name);
     boost::apply_visitor(visitor, value);
-}
-
-template<typename Visitor, typename T>
-void apply_visitor(Visitor& visitor, const json::config_t::fields_t* nodes, const char* name, const T& value) {
-    visitor.bind_name(name);
-    visitor.bind_nodes(nodes);
-    boost::apply_visitor(visitor, value);
-    visitor.bind_nodes();
 }
 
 }
@@ -116,11 +122,11 @@ public:
         rapidjson::Document root;
         root.SetObject();
 
-        json_visitor_t visitor(&root);
+        json_visitor_t visitor(&root, config.field_mapping);
         for (auto it = record.attributes.begin(); it != record.attributes.end(); ++it) {
             const std::string& name = mapped(it->first);
             const log::attribute_t& attribute = it->second;
-            apply_visitor(visitor, name, attribute.value);
+            aux::apply_visitor(visitor, &name, attribute.value);
         }
 
         rapidjson::GenericStringBuffer<rapidjson::UTF8<>> buffer;
@@ -135,19 +141,9 @@ public:
     }
 
 private:
-    void apply_visitor(json_visitor_t& visitor, const std::string& name, const log::attribute_value_t& value) const {
-        auto it = config.fields.find(name);
-        if (it != config.fields.end()) {
-            const json::config_t::fields_t* nodes = &it->second;
-            aux::apply_visitor(visitor, nodes, name.c_str(), value);
-        } else {
-            aux::apply_visitor(visitor, name.c_str(), value);
-        }
-    }
-
     const std::string& mapped(const std::string& name) const {
-        auto it = config.mapping.find(name);
-        if (it != config.mapping.end()) {
+        auto it = config.name_mapping.find(name);
+        if (it != config.name_mapping.end()) {
             return it->second;
         }
         return name;
