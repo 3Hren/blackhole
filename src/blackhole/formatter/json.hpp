@@ -31,10 +31,6 @@ struct config_t {
     {}
 };
 
-namespace aux {
-
-}
-
 } // namespace json
 
 //! This class looks creppy, because of inconvenient rapidjson interface.
