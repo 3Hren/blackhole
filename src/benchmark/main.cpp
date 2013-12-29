@@ -246,17 +246,17 @@ int main(int argc, char** argv) {
     fmt3 = new formatter::json_t(config3);
 
     formatter::json::config_t config4;
-    config4.field_mapping["@source"] = { "fields" };
-    config4.field_mapping["@source_host"] = { "fields" };
-    config4.field_mapping["@uuid"] = { "fields" };
+    config4.field_hierarchy["@source"] = { "fields" };
+    config4.field_hierarchy["@source_host"] = { "fields" };
+    config4.field_hierarchy["@uuid"] = { "fields" };
     fmt4 = new formatter::json_t(config4);
 
     formatter::json::config_t config5;
     config5.newline = true;
     config5.name_mapping["message"] = "@message";
-    config5.field_mapping["@source"] = { "fields" };
-    config5.field_mapping["@source_host"] = { "fields" };
-    config5.field_mapping["@uuid"] = { "fields" };
+    config5.field_hierarchy["@source"] = { "fields" };
+    config5.field_hierarchy["@source_host"] = { "fields" };
+    config5.field_hierarchy["@uuid"] = { "fields" };
     fmt5 = new formatter::json_t(config5);
 
     celero::Run(argc, argv);
