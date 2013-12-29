@@ -20,11 +20,11 @@ namespace json {
 struct config_t {
     typedef std::vector<std::string> hierarchy_t;
     typedef std::unordered_map<std::string, std::string> name_mapping_t;
-    typedef std::unordered_map<std::string, hierarchy_t> field_hierarchy_t;
+    typedef std::unordered_map<std::string, hierarchy_t> fields_hierarchy_t;
 
     bool newline;
     name_mapping_t name_mapping;
-    field_hierarchy_t field_hierarchy;
+    fields_hierarchy_t fields_hierarchy;
 
     config_t() :
         newline(false)
@@ -36,13 +36,13 @@ struct config_t {
 //! This class looks creppy, because of inconvenient rapidjson interface.
 class json_visitor_t : public boost::static_visitor<> {
     rapidjson::Document* root;
-    const json::config_t::field_hierarchy_t& field_hierarchy;
+    const json::config_t::fields_hierarchy_t& fields_hierarchy;
 
     const std::string* name;
 public:
-    json_visitor_t(rapidjson::Document* root, const json::config_t::field_hierarchy_t& field_hierarchy) :
+    json_visitor_t(rapidjson::Document* root, const json::config_t::fields_hierarchy_t& fields_hierarchy) :
         root(root),
-        field_hierarchy(field_hierarchy),
+        fields_hierarchy(fields_hierarchy),
         name(nullptr)
     {}
 
@@ -66,11 +66,11 @@ public:
 private:
     template<typename T>
     void apply(const T& value) const {
-        auto it = field_hierarchy.find(*name);
-        if (it != field_hierarchy.end()) {
+        auto it = fields_hierarchy.find(*name);
+        if (it != fields_hierarchy.end()) {
             const json::config_t::hierarchy_t& hierarchy = it->second;
             if (hierarchy.size() > 0) {
-                build_hierarchy(hierarchy, value);
+                build_hierarchy(hierarchy, *name, value);
             } else {
                 add_member(root, *name, value);
             }
@@ -80,17 +80,18 @@ private:
     }
 
     template<typename T>
-    void build_hierarchy(const json::config_t::hierarchy_t& hierarchy, const T& value) const {
+    void build_hierarchy(const json::config_t::hierarchy_t& hierarchy, const std::string& name, const T& value) const {
         rapidjson::Value* node = root;
         for (auto it = hierarchy.begin(); it != hierarchy.end(); ++it) {
-            const std::string& name = *it;
-            if (!node->HasMember(name.c_str())) {
-                node = add_child(node, name);
+            const std::string& current_name = *it;
+            if (!node->HasMember(current_name.c_str())) {
+                node = add_child(node, current_name);
             } else {
-                node = get_child(node, name);
+                node = get_child(node, current_name);
             }
         }
-        add_member(node, *name, value);
+
+        add_member(node, name, value);
     }
 
     rapidjson::Value* add_child(rapidjson::Value* node, const std::string& name) const {
@@ -117,8 +118,8 @@ private:
 namespace aux {
 
 template<typename Visitor, typename T>
-void apply_visitor(Visitor& visitor, const std::string* name, const T& value) {
-    visitor.set_name(name);
+void apply_visitor(Visitor& visitor, const std::string& name, const T& value) {
+    visitor.set_name(&name);
     boost::apply_visitor(visitor, value);
 }
 
@@ -137,11 +138,11 @@ public:
         rapidjson::Document root;
         root.SetObject();
 
-        json_visitor_t visitor(&root, config.field_hierarchy);
+        json_visitor_t visitor(&root, config.fields_hierarchy);
         for (auto it = record.attributes.begin(); it != record.attributes.end(); ++it) {
             const std::string& name = mapped(it->first);
             const log::attribute_t& attribute = it->second;
-            aux::apply_visitor(visitor, &name, attribute.value);
+            aux::apply_visitor(visitor, name, attribute.value);
         }
 
         rapidjson::GenericStringBuffer<rapidjson::UTF8<>> buffer;

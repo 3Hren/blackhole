@@ -126,7 +126,7 @@ TEST(json_t, FieldMapping) {
     };
 
     formatter::json_t::config_type config;
-    config.field_hierarchy["timestamp"] = { "fields" };
+    config.fields_hierarchy["timestamp"] = { "fields" };
 
     formatter::json_t fmt(config);
     std::string actual = fmt.format(record);
@@ -149,8 +149,8 @@ TEST(json_t, ComplexFieldMapping) {
     };
 
     formatter::json_t::config_type config;
-    config.field_hierarchy["message"] = { "fields" };
-    config.field_hierarchy["timestamp"] = { "fields", "aux" };
+    config.fields_hierarchy["message"] = { "fields" };
+    config.fields_hierarchy["timestamp"] = { "fields", "aux" };
 
     formatter::json_t fmt(config);
     std::string actual = fmt.format(record);
