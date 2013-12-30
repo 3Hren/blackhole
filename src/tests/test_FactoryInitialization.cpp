@@ -158,9 +158,11 @@ TEST(FactoryTraits, JsonFormatterConfig) {
 
     using namespace formatter::json::map;
     EXPECT_TRUE(actual.newline);
-    EXPECT_EQ(naming_t({ { "message", "@message" } }), actual.naming);
+    ASSERT_TRUE(actual.naming.find("message") != actual.naming.end());
+    EXPECT_EQ("@message", actual.naming["message"]);
 
     typedef std::unordered_map<std::string, positioning_t::positions_t> specified_positioning_t;
-    EXPECT_EQ(specified_positioning_t({ { "message", {} } }), actual.positioning.specified);
+    ASSERT_TRUE(actual.positioning.specified.find("message") != actual.positioning.specified.end());
+    EXPECT_EQ(std::vector<std::string>({}), actual.positioning.specified["message"]);
     EXPECT_EQ(std::vector<std::string>({ "fields" }), actual.positioning.unspecified);
 }
