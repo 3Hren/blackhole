@@ -4,6 +4,8 @@
 #include <mutex>
 #include <string>
 
+#include <boost/any.hpp>
+
 #include "formatter/string.hpp"
 #include "formatter/json.hpp"
 #include "frontend.hpp"
@@ -18,7 +20,7 @@ namespace blackhole {
 
 struct formatter_config_t {
     std::string type;
-    std::map<std::string, std::string> args;
+    boost::any config;
 };
 
 struct sink_config_t {
@@ -36,6 +38,20 @@ struct log_config_t {
     std::vector<frontend_config_t> frontends;
 };
 
+template<typename T>
+struct factory_traits {
+    static typename T::config_type map_config(const boost::any& config);
+};
+
+template<>
+struct factory_traits<formatter::string_t> {
+    typedef typename formatter::string_t::config_type config_type;
+    static config_type map_config(const boost::any& config) {
+        const std::string& pattern = boost::any_cast<std::string>(config);
+        return formatter::string::pattern_parser_t::parse(pattern);
+    }
+};
+
 template<typename Level>
 struct factory_t {
     template<typename Formatter, typename Sink>
@@ -50,8 +66,8 @@ struct factory_t {
     std::unique_ptr<base_frontend_t>
     create(const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink) {
         if (formatter_config.type == "string") {
-            std::string pattern = formatter_config.args.at("pattern");
-            auto formatter = std::make_unique<formatter::string_t>(pattern);
+            formatter::string_t::config_type config = factory_traits<formatter::string_t>::map_config(formatter_config.config);
+            auto formatter = std::make_unique<formatter::string_t>(config);
             return create(std::move(formatter), std::move(sink));
         }
 

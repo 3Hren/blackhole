@@ -20,10 +20,15 @@ class string_t {
     mapping::mapper_t m_mapper;
 
 public:
+    typedef string::config_t config_type;
+
     string_t(const std::string& pattern) :
         m_config(string::pattern_parser_t::parse(pattern))
-    {
-    }
+    {}
+
+    string_t(const config_type& config) :
+        m_config(config)
+    {}
 
     void set_mapper(mapping::mapper_t&& mapper) {
         m_mapper = std::move(mapper);

@@ -33,7 +33,7 @@ struct priority_traits<testing::level> {
 TEST(Factory, FileStringsFrontend) {
     formatter_config_t formatter = {
         "string",
-        std::map<std::string, std::string>{ { "pattern", "[%(timestamp)s]: %(message)s" } }
+        std::string("[%(timestamp)s]: %(message)s")
     };
 
     sink_config_t sink = {
@@ -47,7 +47,7 @@ TEST(Factory, FileStringsFrontend) {
 TEST(Factory, SyslogStringsFrontend) {
     formatter_config_t formatter = {
         "string",
-        std::map<std::string, std::string>{ { "pattern", "[%(timestamp)s]: %(message)s" } }
+        std::string("[%(timestamp)s]: %(message)s")
     };
 
     sink_config_t sink = {
@@ -61,7 +61,7 @@ TEST(Factory, SyslogStringsFrontend) {
 TEST(Factory, UdpSocketStringsFrontend) {
     formatter_config_t formatter = {
         "string",
-        std::map<std::string, std::string>{ { "pattern", "[%(timestamp)s]: %(message)s" } }
+        std::string("[%(timestamp)s]: %(message)s")
     };
 
     sink_config_t sink = {
@@ -78,7 +78,7 @@ TEST(Factory, UdpSocketStringsFrontend) {
 TEST(Factory, TcpSocketStringsFrontend) {
     formatter_config_t formatter = {
         "string",
-        std::map<std::string, std::string>{ { "pattern", "[%(timestamp)s]: %(message)s" } }
+        std::string("[%(timestamp)s]: %(message)s")
     };
 
     // Sink will try to connect to the specified port. So if it isn't available, an exception will be thrown, it's ok.
@@ -96,7 +96,7 @@ TEST(Factory, TcpSocketStringsFrontend) {
 log_config_t create_valid_config() {
     formatter_config_t formatter = {
         "string",
-        std::map<std::string, std::string>{ { "pattern", "[%(timestamp)s]: %(message)s" } }
+        std::string("[%(timestamp)s]: %(message)s")
     };
 
     sink_config_t sink = {
@@ -125,4 +125,17 @@ TEST(Repository, CreatesDuplicateOfRootLoggerByDefault) {
     log_config_t config = create_valid_config();
     repository_t<testing::level>::instance().init(config);
     repository_t<testing::level>::instance().root();
+}
+
+TEST(Repository, StringFormatterFactoryTraits) {
+    formatter_config_t config = {
+        "string",
+        std::string("[%(timestamp)s]: %(message)s")
+    };
+
+    boost::any expected = std::string("[%s]: %s");
+    auto actual = factory_traits<formatter::string_t>::map_config(config.config);
+
+    EXPECT_EQ(boost::any_cast<std::string>(expected), actual.pattern);
+    EXPECT_EQ(std::vector<std::string>({ "timestamp", "message" }), actual.attribute_names);
 }
