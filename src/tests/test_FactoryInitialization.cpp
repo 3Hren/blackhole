@@ -127,15 +127,40 @@ TEST(Repository, CreatesDuplicateOfRootLoggerByDefault) {
     repository_t<testing::level>::instance().root();
 }
 
-TEST(Repository, StringFormatterFactoryTraits) {
+TEST(FactoryTraits, StringFormatterConfig) {
     formatter_config_t config = {
         "string",
         std::string("[%(timestamp)s]: %(message)s")
     };
 
-    boost::any expected = std::string("[%s]: %s");
     auto actual = factory_traits<formatter::string_t>::map_config(config.config);
 
-    EXPECT_EQ(boost::any_cast<std::string>(expected), actual.pattern);
+    EXPECT_EQ("[%s]: %s", actual.pattern);
     EXPECT_EQ(std::vector<std::string>({ "timestamp", "message" }), actual.attribute_names);
+}
+
+TEST(FactoryTraits, JsonFormatterConfig) {
+    formatter_config_t config = {
+        "json",
+        boost::any {
+            std::vector<boost::any> {
+                true,
+                std::unordered_map<std::string, std::string> { { "message", "@message" } },
+                std::vector<boost::any> {
+                    std::unordered_map<std::string, std::vector<std::string>> { { "message", {} } },
+                    std::vector<std::string> { "fields" }
+                }
+            }
+        }
+    };
+
+    formatter::json::config_t actual = factory_traits<formatter::json_t>::map_config(config.config);
+
+    using namespace formatter::json::map;
+    EXPECT_TRUE(actual.newline);
+    EXPECT_EQ(naming_t({ { "message", "@message" } }), actual.naming);
+
+    typedef std::unordered_map<std::string, positioning_t::positions_t> specified_positioning_t;
+    EXPECT_EQ(specified_positioning_t({ { "message", {} } }), actual.positioning.specified);
+    EXPECT_EQ(std::vector<std::string>({ "fields" }), actual.positioning.unspecified);
 }
