@@ -45,7 +45,7 @@ struct factory_traits {
 
 template<>
 struct factory_traits<formatter::string_t> {
-    typedef typename formatter::string_t::config_type config_type;
+    typedef formatter::string_t::config_type config_type;
     static config_type map_config(const boost::any& config) {
         const std::string& pattern = boost::any_cast<std::string>(config);
         return formatter::string::pattern_parser_t::parse(pattern);
@@ -152,12 +152,13 @@ private:
     static log_config_t make_trivial_config() {
         formatter_config_t formatter = {
             "string",
-            std::map<std::string, std::string>{ { "pattern", "[%(timestamp)s] [%(severity)s]: %(message)s" } }
+            std::string("[%(timestamp)s] [%(severity)s]: %(message)s")
         };
 
+        std::map<std::string, std::string> sink_args = { { "path", "/dev/stdout" } };
         sink_config_t sink = {
             "files",
-            std::map<std::string, std::string>{ { "path", "/dev/stdout" } }
+            sink_args
         };
 
         frontend_config_t frontend = { formatter, sink };

@@ -38,7 +38,7 @@ struct priority_traits<level> {
 void init() {
     formatter_config_t formatter = {
         "string",
-        std::map<std::string, std::string>{ { "pattern", "[%(timestamp)s] [%(severity)s]: %(message)s" } }
+        std::string("[%(timestamp)s] [%(severity)s]: %(message)s")
     };
 
     sink_config_t sink = {

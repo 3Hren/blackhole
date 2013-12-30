@@ -11,6 +11,7 @@
 
 #include "blackhole/formatter/json/config.hpp"
 #include "blackhole/record.hpp"
+#include "blackhole/utils/nullptr.hpp"
 
 namespace blackhole {
 
