@@ -9,38 +9,12 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
+#include "blackhole/formatter/json/config.hpp"
 #include "blackhole/record.hpp"
 
 namespace blackhole {
 
 namespace formatter {
-
-namespace json {
-
-namespace map {
-
-typedef std::unordered_map<std::string, std::string> naming_t;
-
-struct positioning_t {
-    typedef std::vector<std::string> positions_t;
-
-    std::unordered_map<std::string, positions_t> specified;
-    positions_t unspecified;
-};
-
-} // namespace map
-
-struct config_t {
-    bool newline;
-    map::naming_t naming;
-    map::positioning_t positioning;
-
-    config_t() :
-        newline(false)
-    {}
-};
-
-} // namespace json
 
 //! This class looks creppy, because of inconvenient rapidjson interface.
 class json_visitor_t : public boost::static_visitor<> {
