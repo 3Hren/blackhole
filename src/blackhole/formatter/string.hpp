@@ -7,6 +7,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "blackhole/error.hpp"
+#include "blackhole/formatter/config.hpp"
 #include "blackhole/formatter/string/parser.hpp"
 #include "blackhole/formatter/mapping.hpp"
 #include "blackhole/record.hpp"
@@ -97,5 +98,15 @@ private:
 };
 
 } // namespace formatter
+
+template<>
+struct factory_traits<formatter::string_t> {
+    typedef formatter::string_t::config_type config_type;
+
+    static config_type map_config(const boost::any& config) {
+        const std::string& pattern = boost::any_cast<std::string>(config);
+        return formatter::string::pattern_parser_t::parse(pattern);
+    }
+};
 
 } // namespace blackhole

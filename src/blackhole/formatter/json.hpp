@@ -9,6 +9,7 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
+#include "blackhole/formatter/config.hpp"
 #include "blackhole/formatter/json/config.hpp"
 #include "blackhole/record.hpp"
 #include "blackhole/utils/nullptr.hpp"
@@ -155,5 +156,23 @@ private:
 };
 
 } // namespace formatter
+
+template<>
+struct factory_traits<formatter::json_t> {
+    typedef formatter::json_t::config_type config_type;
+    static config_type map_config(const boost::any& config) {
+        using namespace formatter::json::map;
+
+        std::vector<boost::any> options = boost::any_cast<std::vector<boost::any>>(config);
+        config_type cfg;
+        cfg.newline = boost::any_cast<bool>(options.at(0));
+        cfg.naming = boost::any_cast<naming_t>(options.at(1));
+        std::vector<boost::any> positioning = boost::any_cast<std::vector<boost::any>>(options.at(2));
+
+        cfg.positioning.specified = boost::any_cast<std::unordered_map<std::string, positioning_t::positions_t>>(positioning.at(0));
+        cfg.positioning.unspecified = boost::any_cast<positioning_t::positions_t>(positioning.at(1));
+        return cfg;
+    }
+};
 
 } // namespace blackhole

@@ -4,10 +4,8 @@
 #include <mutex>
 #include <string>
 
-#include <boost/any.hpp>
-
-#include "formatter/string.hpp"
 #include "formatter/json.hpp"
+#include "formatter/string.hpp"
 #include "frontend.hpp"
 #include "frontend/syslog.hpp"
 #include "logger.hpp"
@@ -36,38 +34,6 @@ struct frontend_config_t {
 struct log_config_t {
     std::string name;
     std::vector<frontend_config_t> frontends;
-};
-
-template<typename T>
-struct factory_traits {
-    static typename T::config_type map_config(const boost::any& config);
-};
-
-template<>
-struct factory_traits<formatter::string_t> {
-    typedef formatter::string_t::config_type config_type;
-    static config_type map_config(const boost::any& config) {
-        const std::string& pattern = boost::any_cast<std::string>(config);
-        return formatter::string::pattern_parser_t::parse(pattern);
-    }
-};
-
-template<>
-struct factory_traits<formatter::json_t> {
-    typedef formatter::json_t::config_type config_type;
-    static config_type map_config(const boost::any& config) {
-        using namespace formatter::json::map;
-
-        std::vector<boost::any> options = boost::any_cast<std::vector<boost::any>>(config);
-        config_type cfg;
-        cfg.newline = boost::any_cast<bool>(options.at(0));
-        cfg.naming = boost::any_cast<naming_t>(options.at(1));
-        std::vector<boost::any> positioning = boost::any_cast<std::vector<boost::any>>(options.at(2));
-
-        cfg.positioning.specified = boost::any_cast<std::unordered_map<std::string, positioning_t::positions_t>>(positioning.at(0));
-        cfg.positioning.unspecified = boost::any_cast<positioning_t::positions_t>(positioning.at(1));
-        return cfg;
-    }
 };
 
 template<typename Level>
