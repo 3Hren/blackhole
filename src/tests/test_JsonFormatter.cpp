@@ -64,7 +64,7 @@ TEST(json_t, SingleAttributeMapping) {
     };
 
     formatter::json_t::config_type config;
-    config.name_mapping["message"] = "@message";
+    config.naming["message"] = "@message";
 
     formatter::json_t fmt(config);
     std::string actual = fmt.format(record);
@@ -86,8 +86,8 @@ TEST(json_t, MultipleAttributeMapping) {
     };
 
     formatter::json_t::config_type config;
-    config.name_mapping["message"] = "@message";
-    config.name_mapping["timestamp"] = "@timestamp";
+    config.naming["message"] = "@message";
+    config.naming["timestamp"] = "@timestamp";
 
     formatter::json_t fmt(config);
     std::string actual = fmt.format(record);
@@ -126,7 +126,7 @@ TEST(json_t, FieldMapping) {
     };
 
     formatter::json_t::config_type config;
-    config.fields_hierarchy["timestamp"] = { "fields" };
+    config.positioning.specified["timestamp"] = { "fields" };
 
     formatter::json_t fmt(config);
     std::string actual = fmt.format(record);
@@ -149,8 +149,8 @@ TEST(json_t, ComplexFieldMapping) {
     };
 
     formatter::json_t::config_type config;
-    config.fields_hierarchy["message"] = { "fields" };
-    config.fields_hierarchy["timestamp"] = { "fields", "aux" };
+    config.positioning.specified["message"] = { "fields" };
+    config.positioning.specified["timestamp"] = { "fields", "aux" };
 
     formatter::json_t fmt(config);
     std::string actual = fmt.format(record);
@@ -165,4 +165,29 @@ TEST(json_t, ComplexFieldMapping) {
     ASSERT_TRUE(doc["fields"].HasMember("aux"));
     ASSERT_TRUE(doc["fields"]["aux"].HasMember("timestamp"));
     EXPECT_EQ(100500, doc["fields"]["aux"]["timestamp"].GetInt());
+}
+
+TEST(json_t, UnspecifiedPositionalMapping) {
+    log::record_t record;
+    record.attributes = {
+        keyword::message() = "le message",
+        keyword::timestamp() = 100500
+    };
+
+    formatter::json_t::config_type config;
+    config.positioning.unspecified = { "fields" };
+
+    formatter::json_t fmt(config);
+    std::string actual = fmt.format(record);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(actual.c_str());
+
+    ASSERT_TRUE(doc.HasMember("fields"));
+
+    ASSERT_TRUE(doc["fields"].HasMember("message"));
+    EXPECT_STREQ("le message", doc["fields"]["message"].GetString());
+
+    ASSERT_TRUE(doc["fields"].HasMember("timestamp"));
+    EXPECT_EQ(100500, doc["fields"]["timestamp"].GetInt());
 }

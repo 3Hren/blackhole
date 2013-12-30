@@ -242,21 +242,21 @@ int main(int argc, char** argv) {
     fmt2 = new formatter::json_t(config2);
 
     formatter::json::config_t config3;
-    config3.name_mapping["message"] = "@message";
+    config3.naming["message"] = "@message";
     fmt3 = new formatter::json_t(config3);
 
     formatter::json::config_t config4;
-    config4.fields_hierarchy["@source"] = { "fields" };
-    config4.fields_hierarchy["@source_host"] = { "fields" };
-    config4.fields_hierarchy["@uuid"] = { "fields" };
+    config4.positioning.specified["@source"] = { "fields" };
+    config4.positioning.specified["@source_host"] = { "fields" };
+    config4.positioning.specified["@uuid"] = { "fields" };
     fmt4 = new formatter::json_t(config4);
 
     formatter::json::config_t config5;
     config5.newline = true;
-    config5.name_mapping["message"] = "@message";
-    config5.fields_hierarchy["@source"] = { "fields" };
-    config5.fields_hierarchy["@source_host"] = { "fields" };
-    config5.fields_hierarchy["@uuid"] = { "fields" };
+    config5.naming["message"] = "@message";
+    config5.positioning.specified["@source"] = { "fields" };
+    config5.positioning.specified["@source_host"] = { "fields" };
+    config5.positioning.specified["@uuid"] = { "fields" };
     fmt5 = new formatter::json_t(config5);
 
     celero::Run(argc, argv);
