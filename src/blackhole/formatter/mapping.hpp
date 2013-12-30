@@ -45,6 +45,17 @@ public:
     }
 };
 
+inline void apply(const mapper_t& mapper, const std::string& key, const log::attribute_t& attribute, boost::format* format) {
+    bool ok;
+    std::string result;
+    std::tie(result, ok) = mapper.execute(key, attribute.value);
+    if (ok) {
+        (*format) % result;
+    } else {
+        (*format) % attribute.value;
+    }
+}
+
 } // namespace mapping
 
 } // namespace blackhole

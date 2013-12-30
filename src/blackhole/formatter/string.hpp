@@ -58,14 +58,7 @@ private:
 
     inline void format_single_key(const std::string& key, const log::attributes_t& attributes, boost::format* fmt) const {
         const log::attribute_t& attribute = get_attribute(attributes, key);
-        bool ok;
-        std::string result;
-        std::tie(result, ok) = m_mapper.execute(key, attribute.value);
-        if (ok) {
-            (*fmt) % result;
-        } else {
-            (*fmt) % attribute.value;
-        }
+        mapping::apply(m_mapper, key, attribute, fmt);
     }
 
     inline void format_variadic_key(const std::string& key, const log::attributes_t& attributes, boost::format* fmt) const {
