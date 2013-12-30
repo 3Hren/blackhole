@@ -47,6 +47,8 @@ class json_visitor_t : public boost::static_visitor<> {
     rapidjson::Document* root;
     const json::map::positioning_t& positioning;
 
+    // There is no other way to pass additional argument when invoking `apply_visitor` except
+    // explicit setting it every iteration.
     const std::string* name;
 public:
     json_visitor_t(rapidjson::Document* root, const json::map::positioning_t& positioning) :
@@ -79,26 +81,26 @@ private:
         if (it != positioning.specified.end()) {
             const json::map::positioning_t::positions_t& positions = it->second;
             if (positions.size() > 0) {
-                build_hierarchy(positions, *name, value);
+                add_positional(positions, *name, value);
             } else {
                 add_member(root, *name, value);
             }
         } else if (positioning.unspecified.size() > 0) {
-            build_hierarchy(positioning.unspecified, *name, value);
+            add_positional(positioning.unspecified, *name, value);
         } else {
             add_member(root, *name, value);
         }
     }
 
     template<typename T>
-    void build_hierarchy(const json::map::positioning_t::positions_t& positions, const std::string& name, const T& value) const {
+    void add_positional(const json::map::positioning_t::positions_t& positions, const std::string& name, const T& value) const {
         rapidjson::Value* node = root;
         for (auto it = positions.begin(); it != positions.end(); ++it) {
-            const std::string& current_name = *it;
-            if (!node->HasMember(current_name.c_str())) {
-                node = add_child(node, current_name);
+            const std::string& position = *it;
+            if (!node->HasMember(position.c_str())) {
+                node = add_child(node, position);
             } else {
-                node = get_child(node, current_name);
+                node = get_child(node, position);
             }
         }
 
