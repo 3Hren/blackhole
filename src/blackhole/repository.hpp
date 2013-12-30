@@ -45,14 +45,21 @@ struct factory_t {
         return std::make_unique<frontend_t<Formatter, Sink, Level>>(std::move(formatter), std::move(sink));
     }
 
+    template<typename Formatter, typename Sink>
+    static
+    std::unique_ptr<base_frontend_t>
+    create(const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink) {
+        auto config = factory_traits<Formatter>::map_config(formatter_config.config);
+        auto formatter = std::make_unique<Formatter>(config);
+        return create(std::move(formatter), std::move(sink));
+    }
+
     template<typename Sink>
     static
     std::unique_ptr<base_frontend_t>
     create(const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink) {
         if (formatter_config.type == "string") {
-            formatter::string_t::config_type config = factory_traits<formatter::string_t>::map_config(formatter_config.config);
-            auto formatter = std::make_unique<formatter::string_t>(config);
-            return create(std::move(formatter), std::move(sink));
+            return create<formatter::string_t>(formatter_config, std::move(sink));
         }
 
         return std::unique_ptr<base_frontend_t>();
