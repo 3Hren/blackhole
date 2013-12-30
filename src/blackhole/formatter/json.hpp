@@ -9,7 +9,7 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
-#include "blackhole/formatter/config.hpp"
+#include "blackhole/formatter/base.hpp"
 #include "blackhole/formatter/json/config.hpp"
 #include "blackhole/record.hpp"
 #include "blackhole/utils/nullptr.hpp"
@@ -160,17 +160,25 @@ private:
 template<>
 struct factory_traits<formatter::json_t> {
     typedef formatter::json_t::config_type config_type;
+
+    static const int NEWLINE_ID = 0;
+    static const int NAMING_ID = 1;
+    static const int POSITIONING_ID = 2;
+
+    static const int SPECIFIED_ID = 0;
+    static const int UNSPECIFIED_ID = 1;
+
     static config_type map_config(const boost::any& config) {
         using namespace formatter::json::map;
 
         std::vector<boost::any> options = boost::any_cast<std::vector<boost::any>>(config);
         config_type cfg;
-        cfg.newline = boost::any_cast<bool>(options.at(0));
-        cfg.naming = boost::any_cast<naming_t>(options.at(1));
-        std::vector<boost::any> positioning = boost::any_cast<std::vector<boost::any>>(options.at(2));
+        cfg.newline = boost::any_cast<bool>(options.at(NEWLINE_ID));
+        cfg.naming = boost::any_cast<naming_t>(options.at(NAMING_ID));
+        std::vector<boost::any> positioning = boost::any_cast<std::vector<boost::any>>(options.at(POSITIONING_ID));
 
-        cfg.positioning.specified = boost::any_cast<std::unordered_map<std::string, positioning_t::positions_t>>(positioning.at(0));
-        cfg.positioning.unspecified = boost::any_cast<positioning_t::positions_t>(positioning.at(1));
+        cfg.positioning.specified = boost::any_cast<decltype(cfg.positioning.specified)>(positioning.at(SPECIFIED_ID));
+        cfg.positioning.unspecified = boost::any_cast<decltype(cfg.positioning.unspecified)>(positioning.at(UNSPECIFIED_ID));
         return cfg;
     }
 };

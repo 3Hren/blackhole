@@ -7,7 +7,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "blackhole/error.hpp"
-#include "blackhole/formatter/config.hpp"
+#include "blackhole/formatter/base.hpp"
 #include "blackhole/formatter/string/parser.hpp"
 #include "blackhole/formatter/mapping.hpp"
 #include "blackhole/record.hpp"
