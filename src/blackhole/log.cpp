@@ -1,4 +1,4 @@
-//!@todo: aux: More typed configs.
+//!@todo: aux: More typed configs for sinks.
 //!@todo: Incapsulate attribute mapping (timestamp, severity etc).
 //!@todo: example: Make example with logstash.
 
