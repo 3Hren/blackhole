@@ -98,8 +98,7 @@ namespace attribute {
 
 // Dynamic attribute factory function.
 template<typename T>
-inline
-log::attribute_pair_t make(const std::string& name, const T& value, log::attribute::scope scope = log::attribute::DEFAULT_SCOPE) {
+inline log::attribute_pair_t make(const std::string& name, const T& value, log::attribute::scope scope = log::attribute::DEFAULT_SCOPE) {
     return std::make_pair(name, log::attribute_t(value, scope));
 }
 
