@@ -4,8 +4,6 @@
 #include <vector>
 #include <unordered_map>
 
-#include <boost/algorithm/string.hpp>
-
 #include <rapidjson/document.h>
 #include <rapidjson/rapidjson.h>
 #include <rapidjson/stringbuffer.h>
@@ -15,7 +13,9 @@
 #include "blackhole/formatter/base.hpp"
 #include "blackhole/formatter/json/config.hpp"
 #include "blackhole/record.hpp"
+#include "blackhole/utils/actions/empty.hpp"
 #include "blackhole/utils/nullptr.hpp"
+#include "blackhole/utils/split.hpp"
 
 namespace blackhole {
 
@@ -161,14 +161,6 @@ private:
 
 } // namespace formatter
 
-//!@todo: move to utils/actions
-struct empty_action {
-    template<typename T>
-    bool operator ()(const T& value) const {
-        return value.empty();
-    }
-};
-
 template<>
 struct factory_traits<formatter::json_t> {
     typedef formatter::json_t::config_type config_type;
@@ -202,35 +194,33 @@ struct factory_traits<formatter::json_t> {
             const boost::any& value = it->second;
 
             if (value.type() == typeid(std::string)) {
-                if (boost::any_cast<std::string>(value) == "*") {
-                    boost::split(cfg.positioning.unspecified, name, boost::is_any_of("/"));
-                    cfg.positioning.unspecified.erase(std::remove_if(cfg.positioning.unspecified.begin(),
-                                                                     cfg.positioning.unspecified.end(),
-                                                                     empty_action()),
-                                                      cfg.positioning.unspecified.end());
-                } else {
-                    throw blackhole::error_t("wrong configuration");
-                }
+                handle_unspecified(name, value, cfg);
             } else if (value.type() == typeid(std::vector<std::string>)) {
-                std::vector<std::string> positions;
-                boost::split(positions, name, boost::is_any_of("/"));
-                positions.erase(std::remove_if(positions.begin(),
-                                               positions.end(),
-                                               empty_action()),
-                                positions.end());
-
-                std::vector<std::string> keys;
-                aux::any_to(value, keys);
-                for (auto key_it = keys.begin(); key_it != keys.end(); ++key_it) {
-                    const std::string& key = *key_it;
-                    cfg.positioning.specified[key] = positions;
-                }
+                handle_specified(name, value, cfg);
             } else {
                 throw blackhole::error_t("wrong configuration");
             }
         }
 
         return cfg;
+    }
+
+    static void handle_specified(const std::string& name, const boost::any& value, config_type& cfg) {
+        std::vector<std::string> positions = aux::split(name, "/");
+        std::vector<std::string> keys;
+        aux::any_to(value, keys);
+        for (auto it = keys.begin(); it != keys.end(); ++it) {
+            const std::string& key = *it;
+            cfg.positioning.specified[key] = positions;
+        }
+    }
+
+    static void handle_unspecified(const std::string& name, const boost::any& value, config_type& cfg) {
+        if (boost::any_cast<std::string>(value) == "*") {
+            cfg.positioning.unspecified = aux::split(name, "/");
+        } else {
+            throw blackhole::error_t("wrong configuration");
+        }
     }
 };
 
