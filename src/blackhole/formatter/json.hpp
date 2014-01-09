@@ -12,6 +12,7 @@
 #include "blackhole/error.hpp"
 #include "blackhole/formatter/base.hpp"
 #include "blackhole/formatter/json/config.hpp"
+#include "blackhole/formatter/map/value.hpp"
 #include "blackhole/record.hpp"
 #include "blackhole/utils/actions/empty.hpp"
 #include "blackhole/utils/nullptr.hpp"
@@ -25,14 +26,18 @@ namespace formatter {
 class json_visitor_t : public boost::static_visitor<> {
     rapidjson::Document* root;
     const json::map::positioning_t& positioning;
+    const mapping::mapper_t& mapper;
+
+    std::vector<std::string> cache;
 
     // There is no other way to pass additional argument when invoking `apply_visitor` except
     // explicit setting it every iteration.
     const std::string* name;
 public:
-    json_visitor_t(rapidjson::Document* root, const json::map::positioning_t& positioning) :
+    json_visitor_t(rapidjson::Document* root, const json::map::positioning_t& positioning, const mapping::mapper_t& mapper) :
         root(root),
         positioning(positioning),
+        mapper(mapper),
         name(nullptr)
     {}
 
@@ -40,57 +45,44 @@ public:
         this->name = name;
     }
 
-    template<typename T, class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
-    void operator ()(T value) const {
-        apply(value);
-    }
-
-    void operator ()(std::time_t value) const {
-        apply(static_cast<int64_t>(value));
-    }
-
-    void operator ()(const std::string& value) const {
-        apply(value.c_str());
-    }
-
-private:
     template<typename T>
-    void apply(const T& value) const {
+    void operator ()(const T& value) {
         auto it = positioning.specified.find(*name);
         if (it != positioning.specified.end()) {
             const json::map::positioning_t::positions_t& positions = it->second;
             if (positions.size() > 0) {
                 add_positional(positions, *name, value);
             } else {
-                add_member(root, *name, value);
+                map_and_add_member(root, *name, value);
             }
         } else if (positioning.unspecified.size() > 0) {
             add_positional(positioning.unspecified, *name, value);
         } else {
-            add_member(root, *name, value);
+            map_and_add_member(root, *name, value);
         }
     }
 
+private:
     template<typename T>
-    void add_positional(const json::map::positioning_t::positions_t& positions, const std::string& name, const T& value) const {
-        rapidjson::Value* node = root;
+    void add_positional(const json::map::positioning_t::positions_t& positions, const std::string& name, const T& value) {
+        rapidjson::Value* current = root;
         for (auto it = positions.begin(); it != positions.end(); ++it) {
             const std::string& position = *it;
-            if (!node->HasMember(position.c_str())) {
-                node = add_child(node, position);
+            if (!current->HasMember(position.c_str())) {
+                current = add_node(current, position);
             } else {
-                node = get_child(node, position);
+                current = get_child(current, position);
             }
         }
 
-        add_member(node, name, value);
+        map_and_add_member(current, name, value);
     }
 
-    rapidjson::Value* add_child(rapidjson::Value* node, const std::string& name) const {
-        rapidjson::Value child;
-        child.SetObject();
-        add_member(node, name, std::move(child));
-        return get_child(node, name);
+    rapidjson::Value* add_node(rapidjson::Value* parent, const std::string& name) {
+        rapidjson::Value current;
+        current.SetObject();
+        parent->AddMember(name.c_str(), current, root->GetAllocator());
+        return get_child(parent, name);
     }
 
     rapidjson::Value* get_child(rapidjson::Value* node, const std::string& name) const {
@@ -98,12 +90,34 @@ private:
     }
 
     template<typename T>
-    void add_member(rapidjson::Value* node, const std::string& name, const T& value) const {
-        node->AddMember(name.c_str(), value, root->GetAllocator());
+    void map_and_add_member(rapidjson::Value* node, const std::string& name, const T& value) {
+        bool ok = false;
+        std::string result;
+        std::tie(result, ok) = mapper.execute(name, value);
+        if (ok) {
+            cache.push_back(result);
+            add_member(node, name, cache.back());
+        } else {
+            add_member(node, name, value);
+        }
     }
 
-    void add_member(rapidjson::Value* node, const std::string& name, rapidjson::Value&& value) const {
-        node->AddMember(name.c_str(), value, root->GetAllocator());
+    template<typename T, class = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+    void add_member(rapidjson::Value* node, const std::string& name, T value) {
+        add_member_impl(node, name, value);
+    }
+
+    void add_member(rapidjson::Value* node, const std::string& name, std::time_t value) {
+        add_member_impl(node, name, static_cast<int64_t>(value));
+    }
+
+    void add_member(rapidjson::Value* node, const std::string& name, const std::string& value) {
+        add_member_impl(node, name, value.c_str());
+    }
+
+    template<typename T>
+    void add_member_impl(rapidjson::Value* node, const std::string& name, T&& value) {
+        node->AddMember(name.c_str(), std::forward<T>(value), root->GetAllocator());
     }
 };
 
@@ -119,6 +133,8 @@ void apply_visitor(Visitor& visitor, const std::string& name, const T& value) {
 
 class json_t {
     const json::config_t config;
+    mapping::mapper_t mapper;
+
 public:
     typedef json::config_t config_type;
 
@@ -126,11 +142,15 @@ public:
         config(config)
     {}
 
+    void set_mapper(mapping::mapper_t&& mapper) {
+        this->mapper = std::move(mapper);
+    }
+
     std::string format(const log::record_t& record) const {
         rapidjson::Document root;
         root.SetObject();
 
-        json_visitor_t visitor(&root, config.positioning);
+        json_visitor_t visitor(&root, config.positioning, mapper);
         for (auto it = record.attributes.begin(); it != record.attributes.end(); ++it) {
             const std::string& name = mapped(it->first);
             const log::attribute_t& attribute = it->second;
@@ -168,14 +188,6 @@ struct factory_traits<formatter::json_t> {
     static const int NAMING_ID = 1;
     static const int POSITIONING_ID = 2;
 
-    /*!
-     * \brief map_config
-     *        "/" -> ["message"]
-     *        "/fields" -> "*"
-     *        =>
-     *        "specified" { "message" -> [] }
-     *        "unspecified" -> ["fields"]
-     */
     static config_type map_config(const boost::any& config) {
         using namespace formatter::json::map;
 

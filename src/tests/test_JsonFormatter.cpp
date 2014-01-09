@@ -191,3 +191,40 @@ TEST(json_t, UnspecifiedPositionalMapping) {
     ASSERT_TRUE(doc["fields"].HasMember("timestamp"));
     EXPECT_EQ(100500, doc["fields"]["timestamp"].GetInt());
 }
+
+namespace testing {
+
+std::string map_secret_value(std::uint32_t value) {
+    std::ostringstream stream;
+    stream << "(" << value << ")";
+    return stream.str();
+}
+
+} // namespace testing
+
+TEST(json_t, CustomMapping) {
+    mapping::mapper_t mapper;
+    mapper.add<std::uint32_t>("secret", &testing::map_secret_value);
+
+    log::record_t record;
+    record.attributes = {
+        keyword::message() = "le message",
+        attribute::make<std::uint32_t>("secret", 42)
+    };
+
+    formatter::json_t::config_type config;
+    formatter::json_t fmt(config);
+    fmt.set_mapper(std::move(mapper));
+    std::string actual = fmt.format(record);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(actual.c_str());
+
+    ASSERT_TRUE(doc.HasMember("message"));
+    ASSERT_TRUE(doc["message"].IsString());
+    EXPECT_STREQ("le message", doc["message"].GetString());
+
+    ASSERT_TRUE(doc.HasMember("secret"));
+    ASSERT_TRUE(doc["secret"].IsString());
+    EXPECT_STREQ("(42)", doc["secret"].GetString());
+}
