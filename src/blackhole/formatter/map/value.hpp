@@ -3,6 +3,8 @@
 #include <functional>
 #include <string>
 
+#include <boost/format.hpp>
+
 #include "blackhole/attribute.hpp"
 #include "blackhole/utils/unique.hpp"
 #include "blackhole/utils/underlying.hpp"
