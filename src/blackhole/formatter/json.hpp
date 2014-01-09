@@ -71,7 +71,6 @@ private:
         }
     }
 
-    //!@todo: Maybe replace pointer by its reference? This can make code a bit cleaner.
     template<typename T>
     void add_positional(const json::map::positioning_t::positions_t& positions, const std::string& name, const T& value) const {
         rapidjson::Value* node = root;
