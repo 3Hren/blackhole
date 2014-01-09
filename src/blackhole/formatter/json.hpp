@@ -4,11 +4,14 @@
 #include <vector>
 #include <unordered_map>
 
+#include <boost/algorithm/string.hpp>
+
 #include <rapidjson/document.h>
 #include <rapidjson/rapidjson.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
+#include "blackhole/error.hpp"
 #include "blackhole/formatter/base.hpp"
 #include "blackhole/formatter/json/config.hpp"
 #include "blackhole/record.hpp"
@@ -18,7 +21,7 @@ namespace blackhole {
 
 namespace formatter {
 
-//! This class looks creppy, because of inconvenient rapidjson interface.
+//! This class looks creppy, because of inconvenient rapidjson interface. Hope someout could refactor it.
 class json_visitor_t : public boost::static_visitor<> {
     rapidjson::Document* root;
     const json::map::positioning_t& positioning;
@@ -68,6 +71,7 @@ private:
         }
     }
 
+    //!@todo: Maybe replace pointer by its reference? This can make code a bit cleaner.
     template<typename T>
     void add_positional(const json::map::positioning_t::positions_t& positions, const std::string& name, const T& value) const {
         rapidjson::Value* node = root;
@@ -157,6 +161,14 @@ private:
 
 } // namespace formatter
 
+//!@todo: move to utils/actions
+struct empty_action {
+    template<typename T>
+    bool operator ()(const T& value) const {
+        return value.empty();
+    }
+};
+
 template<>
 struct factory_traits<formatter::json_t> {
     typedef formatter::json_t::config_type config_type;
@@ -165,9 +177,14 @@ struct factory_traits<formatter::json_t> {
     static const int NAMING_ID = 1;
     static const int POSITIONING_ID = 2;
 
-    static const int SPECIFIED_ID = 0;
-    static const int UNSPECIFIED_ID = 1;
-
+    /*!
+     * \brief map_config
+     *        "/" -> ["message"]
+     *        "/fields" -> "*"
+     *        =>
+     *        "specified" { "message" -> [] }
+     *        "unspecified" -> ["fields"]
+     */
     static config_type map_config(const boost::any& config) {
         using namespace formatter::json::map;
 
@@ -178,10 +195,41 @@ struct factory_traits<formatter::json_t> {
         aux::any_to(options.at(NEWLINE_ID), cfg.newline);
         aux::any_to(options.at(NAMING_ID), cfg.naming);
 
-        std::vector<boost::any> positioning;
+        std::unordered_map<std::string, boost::any> positioning;
         aux::any_to(options.at(POSITIONING_ID), positioning);
-        aux::any_to(positioning.at(SPECIFIED_ID), cfg.positioning.specified);
-        aux::any_to(positioning.at(UNSPECIFIED_ID), cfg.positioning.unspecified);
+        for (auto it = positioning.begin(); it != positioning.end(); ++it) {
+            const std::string& name = it->first;
+            const boost::any& value = it->second;
+
+            if (value.type() == typeid(std::string)) {
+                if (boost::any_cast<std::string>(value) == "*") {
+                    boost::split(cfg.positioning.unspecified, name, boost::is_any_of("/"));
+                    cfg.positioning.unspecified.erase(std::remove_if(cfg.positioning.unspecified.begin(),
+                                                                     cfg.positioning.unspecified.end(),
+                                                                     empty_action()),
+                                                      cfg.positioning.unspecified.end());
+                } else {
+                    throw blackhole::error_t("wrong configuration");
+                }
+            } else if (value.type() == typeid(std::vector<std::string>)) {
+                std::vector<std::string> positions;
+                boost::split(positions, name, boost::is_any_of("/"));
+                positions.erase(std::remove_if(positions.begin(),
+                                               positions.end(),
+                                               empty_action()),
+                                positions.end());
+
+                std::vector<std::string> keys;
+                aux::any_to(value, keys);
+                for (auto key_it = keys.begin(); key_it != keys.end(); ++key_it) {
+                    const std::string& key = *key_it;
+                    cfg.positioning.specified[key] = positions;
+                }
+            } else {
+                throw blackhole::error_t("wrong configuration");
+            }
+        }
+
         return cfg;
     }
 };

@@ -146,9 +146,9 @@ TEST(FactoryTraits, JsonFormatterConfig) {
             std::vector<boost::any> {
                 true,
                 std::unordered_map<std::string, std::string> { { "message", "@message" } },
-                std::vector<boost::any> {
-                    std::unordered_map<std::string, std::vector<std::string>> { { "message", {} } },
-                    std::vector<std::string> { "fields" }
+                std::unordered_map<std::string, boost::any> {
+                    { "/", std::vector<std::string> { "message" } },
+                    { "/fields", std::string("*") }
                 }
             }
         }
