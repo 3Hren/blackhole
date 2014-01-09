@@ -3,6 +3,7 @@
 
 using namespace blackhole;
 
+//! Our logger severity enumeration.
 enum class level {
     debug,
     info,
@@ -12,6 +13,7 @@ enum class level {
 
 namespace blackhole { namespace sink {
 
+//! Priority mapping function overload for proper syslog mapping.
 template<>
 struct priority_traits<level> {
     static inline
@@ -36,19 +38,30 @@ struct priority_traits<level> {
 
 //! Initialization stage.
 //! \brief Manually or from file - whatever. The main aim - is to get initialized `log_config_t` object.
+//! For logstash we need log object which sends json-packed messages through tcp socket.
 /*! Formatter config looks like:
- *  {
+ *  "formatter": {
  *      "json": {
  *          "newline": true,
  *          "mapping": {
  *              "naming": {
- *                  "message": "@message"
+ *                  "message": "@message",
+ *                  "timestamp": "@timestamp"
  *              },
  *              "positioning": {
- *                  "/": ["message"],
+ *                  "/": ["@message", "@timestamp"],
  *                  "/fields": "*"
  *              }
  *          }
+ *      }
+ *  }
+ *
+ *  Sink config can be:
+ *  "sink": {
+ *      "socket": {
+ *          "type": "tcp",
+ *          "host": "localhost",
+ *          "port": 50030
  *      }
  *  }
  */
@@ -58,9 +71,12 @@ void init() {
         boost::any {
             std::vector<boost::any> {
                 true,
-                std::unordered_map<std::string, std::string> { { "message", "@message" } },
+                std::unordered_map<std::string, std::string> {
+                    { "message", "@message" },
+                    { "timestamp", "@timestamp" }
+                },
                 std::unordered_map<std::string, boost::any> {
-                    { "/", std::vector<std::string> { "message" } },
+                    { "/", std::vector<std::string> { "@message", "@timestamp" } },
                     { "/fields", std::string("*") }
                 }
             }
