@@ -60,6 +60,8 @@ struct factory_t {
     create(const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink) {
         if (formatter_config.type == "string") {
             return create<formatter::string_t>(formatter_config, std::move(sink));
+        } else if (formatter_config.type == "json") {
+            return create<formatter::json_t>(formatter_config, std::move(sink));
         }
 
         return std::unique_ptr<base_frontend_t>();
