@@ -25,6 +25,10 @@ struct extracter {
         typedef typename aux::underlying_type<T>::type underlying_type;
         return func(static_cast<T>(boost::get<underlying_type>(value)));
     }
+
+    std::string operator()(const T& value) const {
+        return func(value);
+    }
 };
 
 class mapper_t {
@@ -37,7 +41,8 @@ public:
         m_mappings[key] = extracter<T>(handler);
     }
 
-    std::tuple<std::string, bool> execute(const std::string& key, const log::attribute_value_t& value) const {
+    template<typename T>
+    std::tuple<std::string, bool> execute(const std::string& key, const T& value) const {
         auto it = m_mappings.find(key);
         if (it != m_mappings.end()) {
             const mapping_t& action = it->second;
