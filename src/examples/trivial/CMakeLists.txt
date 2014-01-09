@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 SET(CMAKE_BUILD_TYPE "Debug")
 
-SET(PROJECT blackhole-example-default)
+SET(PROJECT blackhole-example-trivial)
 
 ENABLE_TESTING()
 
