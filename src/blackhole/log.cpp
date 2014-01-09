@@ -1,6 +1,5 @@
 //!@todo: aux: More typed configs for sinks.
 //!@todo: Incapsulate attribute mapping (timestamp, severity etc).
-//!@todo: example: Make example with logstash.
 
 //!@todo: msgpack_t: Attribute mappings.
 //!@todo: api: Make fallback logger. Make it configurable.
