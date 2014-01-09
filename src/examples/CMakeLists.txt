@@ -3,3 +3,4 @@ PROJECT(blackhole-examples)
 
 ADD_SUBDIRECTORY(simple)
 ADD_SUBDIRECTORY(default)
+ADD_SUBDIRECTORY(logstash)
