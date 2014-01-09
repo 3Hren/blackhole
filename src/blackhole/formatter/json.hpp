@@ -172,16 +172,16 @@ struct factory_traits<formatter::json_t> {
         using namespace formatter::json::map;
 
         std::vector<boost::any> options;
-        aux::any_cast(config, options);
+        aux::any_to(config, options);
 
         config_type cfg;
-        aux::any_cast(options.at(NEWLINE_ID), cfg.newline);
-        aux::any_cast(options.at(NAMING_ID), cfg.naming);
+        aux::any_to(options.at(NEWLINE_ID), cfg.newline);
+        aux::any_to(options.at(NAMING_ID), cfg.naming);
 
         std::vector<boost::any> positioning;
-        aux::any_cast(options.at(POSITIONING_ID), positioning);
-        aux::any_cast(positioning.at(SPECIFIED_ID), cfg.positioning.specified);
-        aux::any_cast(positioning.at(UNSPECIFIED_ID), cfg.positioning.unspecified);
+        aux::any_to(options.at(POSITIONING_ID), positioning);
+        aux::any_to(positioning.at(SPECIFIED_ID), cfg.positioning.specified);
+        aux::any_to(positioning.at(UNSPECIFIED_ID), cfg.positioning.unspecified);
         return cfg;
     }
 };

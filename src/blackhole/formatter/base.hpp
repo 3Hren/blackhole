@@ -12,7 +12,7 @@ struct factory_traits {
 namespace aux {
 
 template<typename T>
-static void any_cast(const boost::any& from, T& to) {
+static void any_to(const boost::any& from, T& to) {
     to = boost::any_cast<T>(from);
 }
 
