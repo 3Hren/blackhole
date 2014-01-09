@@ -9,7 +9,7 @@
 #include "blackhole/error.hpp"
 #include "blackhole/formatter/base.hpp"
 #include "blackhole/formatter/string/parser.hpp"
-#include "blackhole/formatter/mapping.hpp"
+#include "blackhole/formatter/map/value.hpp"
 #include "blackhole/record.hpp"
 
 namespace blackhole {
