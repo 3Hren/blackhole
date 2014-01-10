@@ -1,5 +1,6 @@
 #pragma once
 
+#include <list>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -28,7 +29,8 @@ class json_visitor_t : public boost::static_visitor<> {
     const json::map::positioning_t& positioning;
     const mapping::mapper_t& mapper;
 
-    std::vector<std::string> cache;
+    // Mapped values cache to keep them alive.
+    std::list<std::string> cache;
 
     // There is no other way to pass additional argument when invoking `apply_visitor` except
     // explicit setting it every iteration.
