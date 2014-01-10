@@ -1,4 +1,3 @@
-//!@todo: aux: Config unpacking - aux::vector_to(config, cfg.host, cfg.port);
 //!@todo: api: Using direct keyword stringify substitution in log macro, i.e. LOG("level=%s", keyword::severity<level>);
 //!@todo: api: Mapper.add<T>(keyword, function) - use keyword or string.
 

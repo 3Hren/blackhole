@@ -48,10 +48,7 @@ struct factory_traits<sink::socket_t<Protocol>> {
 
     static config_type map_config(const boost::any& config) {
         config_type cfg;
-        std::vector<boost::any> args;
-        aux::any_to(config, args);
-        aux::any_to(args.at(0), cfg.host);
-        aux::any_to(args.at(1), cfg.port);
+        aux::vector_to(config, cfg.host, cfg.port);
         return cfg;
     }
 };
