@@ -23,17 +23,26 @@ namespace blackhole {
 
 namespace formatter {
 
+namespace aux {
+template<typename Visitor, typename T>
+void apply_visitor(Visitor&, const std::string&, const T&);
+} // namespace aux
+
 //! This class looks creppy, because of inconvenient rapidjson interface. Hope someone could refactor it.
 class json_visitor_t : public boost::static_visitor<> {
     rapidjson::Document* root;
     const json::map::positioning_t& positioning;
     const mapping::value_t& mapper;
 
-    // Mapped values cache to keep them alive.
+    // Mapped attribute values cache helps to keep them alive.
     std::list<std::string> cache;
 
     // There is no other way to pass additional argument when invoking `apply_visitor` except
-    // explicit setting it every iteration.
+    // explicit setting it every iteration. To do this we grant `name` member access to setter
+    // function.
+    template<typename Visitor, typename T>
+    friend void aux::apply_visitor(Visitor&, const std::string&, const T&);
+
     const std::string* name;
 public:
     json_visitor_t(rapidjson::Document* root, const json::map::positioning_t& positioning, const mapping::value_t& mapper) :
@@ -42,10 +51,6 @@ public:
         mapper(mapper),
         name(nullptr)
     {}
-
-    void set_name(const std::string* name) {
-        this->name = name;
-    }
 
     template<typename T>
     void operator ()(const T& value) {
@@ -125,7 +130,7 @@ namespace aux {
 
 template<typename Visitor, typename T>
 void apply_visitor(Visitor& visitor, const std::string& name, const T& value) {
-    visitor.set_name(&name);
+    visitor.name = &name;
     boost::apply_visitor(visitor, value);
 }
 
