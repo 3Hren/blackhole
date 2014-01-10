@@ -202,7 +202,7 @@ std::string map_secret_value(std::uint32_t value) {
 
 } // namespace testing
 
-TEST(json_t, CustomMapping) {
+TEST(json_t, AttributeMappingIsDeterminedByItsBaseNames) {
     mapping::value_t mapper;
     mapper.add<std::uint32_t>("secret", &testing::map_secret_value);
 
@@ -213,6 +213,9 @@ TEST(json_t, CustomMapping) {
     };
 
     formatter::json_t::config_type config;
+    config.naming["message"] = "@message";
+    config.naming["secret"] = "@secret";
+
     formatter::json_t fmt(config);
     fmt.set_mapper(std::move(mapper));
     std::string actual = fmt.format(record);
@@ -220,11 +223,11 @@ TEST(json_t, CustomMapping) {
     rapidjson::Document doc;
     doc.Parse<0>(actual.c_str());
 
-    ASSERT_TRUE(doc.HasMember("message"));
-    ASSERT_TRUE(doc["message"].IsString());
-    EXPECT_STREQ("le message", doc["message"].GetString());
+    ASSERT_TRUE(doc.HasMember("@message"));
+    ASSERT_TRUE(doc["@message"].IsString());
+    EXPECT_STREQ("le message", doc["@message"].GetString());
 
-    ASSERT_TRUE(doc.HasMember("secret"));
-    ASSERT_TRUE(doc["secret"].IsString());
-    EXPECT_STREQ("(42)", doc["secret"].GetString());
+    ASSERT_TRUE(doc.HasMember("@secret"));
+    ASSERT_TRUE(doc["@secret"].IsString());
+    EXPECT_STREQ("(42)", doc["@secret"].GetString());
 }
