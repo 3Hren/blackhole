@@ -55,10 +55,43 @@ private:
 
 } // namespace backend
 
+namespace syslog {
+
+struct config_t {
+    std::string identity;
+    int option;
+    int facility;
+
+    config_t() {}
+
+    config_t(const std::string& identity, int option = LOG_PID, int facility = LOG_USER) :
+        identity(identity),
+        option(option),
+        facility(facility)
+    {}
+
+    config_t(const std::string& identity, int facility) :
+        identity(identity),
+        option(LOG_PID),
+        facility(facility)
+    {}
+};
+
+} // namespace syslog
+
 template<typename Level, typename Backend = backend::native_t>
 class syslog_t {
     Backend m_backend;
+
 public:
+    typedef syslog::config_t config_type;
+
+    syslog_t(const config_type& config) :
+        m_backend(config.identity, config.option, config.facility)
+    {
+        static_assert(std::is_enum<Level>::value, "level type must be enum");
+    }
+
     syslog_t(const std::string& identity, int option = LOG_PID, int facility = LOG_USER) :
         m_backend(identity, option, facility)
     {
@@ -82,5 +115,16 @@ public:
 };
 
 } // namespace sink
+
+template<typename Level>
+struct factory_traits<sink::syslog_t<Level>> {
+    typedef typename sink::syslog_t<Level>::config_type config_type;
+
+    static config_type map_config(const boost::any& config) {
+        config_type cfg;
+        aux::any_to(config, cfg.identity);
+        return cfg;
+    }
+};
 
 } // namespace blackhole

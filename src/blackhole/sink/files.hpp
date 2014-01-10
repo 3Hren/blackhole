@@ -44,14 +44,27 @@ public:
     }
 };
 
+namespace file {
+
+struct config_t {
+    std::string path;
+};
+
+} // namespace file
+
 template<class Backend = boost_backend_t>
 class file_t {
     Backend m_backend;
 public:
+    typedef file::config_t config_type;
+
     file_t(const std::string& path) :
         m_backend(path)
-    {
-    }
+    {}
+
+    file_t(const config_type& config) :
+        m_backend(config.path)
+    {}
 
     void consume(const std::string& message) {
         if (!m_backend.opened()) {
@@ -68,5 +81,16 @@ public:
 };
 
 } // namespace sink
+
+template<>
+struct factory_traits<sink::file_t<>> {
+    typedef sink::file_t<>::config_type config_type;
+
+    static config_type map_config(const boost::any& config) {
+        config_type cfg;
+        aux::any_to(config, cfg.path);
+        return cfg;
+    }
+};
 
 } // namespace blackhole

@@ -38,7 +38,7 @@ TEST(Factory, FileStringsFrontend) {
 
     sink_config_t sink = {
         "files",
-        std::map<std::string, std::string>{ { "path", "/dev/stdout" } }
+        std::string("/dev/stdout")
     };
 
     EXPECT_TRUE(bool(factory_t<testing::level>::create(formatter, sink)));
@@ -52,7 +52,7 @@ TEST(Factory, SyslogStringsFrontend) {
 
     sink_config_t sink = {
         "syslog",
-        std::map<std::string, std::string>{ { "identity", "AppIdentity" } }
+        std::string("AppIdentity")
     };
 
     EXPECT_TRUE(bool(factory_t<testing::level>::create(formatter, sink)));
@@ -65,10 +65,10 @@ TEST(Factory, UdpSocketStringsFrontend) {
     };
 
     sink_config_t sink = {
-        "socket", std::map<std::string, std::string>{
-            { "type", "udp" },
-            { "host", "localhost" },
-            { "port", "50030" }
+        "udp",
+        std::vector<boost::any> {
+            std::string("localhost"),
+            std::uint16_t(50030)
         }
     };
 
@@ -83,10 +83,10 @@ TEST(Factory, TcpSocketStringsFrontend) {
 
     // Sink will try to connect to the specified port. So if it isn't available, an exception will be thrown, it's ok.
     sink_config_t sink = {
-        "socket", std::map<std::string, std::string>{
-            { "type", "tcp" },
-            { "host", "localhost" },
-            { "port", "22" }
+        "tcp",
+        std::vector<boost::any> {
+            std::string("localhost"),
+            std::uint16_t(22)
         }
     };
 
@@ -101,7 +101,7 @@ log_config_t create_valid_config() {
 
     sink_config_t sink = {
         "files",
-        std::map<std::string, std::string>{ { "path", "/dev/stdout" } }
+        std::string("/dev/stdout")
     };
 
     frontend_config_t frontend = { formatter, sink };
