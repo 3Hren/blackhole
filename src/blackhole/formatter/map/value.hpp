@@ -45,6 +45,11 @@ public:
         m_mappings[key] = extracter<T>(handler);
     }
 
+    template<typename Keyword>
+    void add(std::function<std::string(const typename Keyword::type&)> handler) {
+        add(Keyword::name(), handler);
+    }
+
     template<typename T>
     boost::optional<std::string> execute(const std::string& key, T&& value) const {
         boost::optional<std::string> result;

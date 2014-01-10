@@ -7,6 +7,7 @@
 #define DECLARE_KEYWORD_IMPL(Name, Scope, T) \
     namespace tag { \
         struct Name##_t { \
+            typedef T type; \
             static const char* name() { return #Name; } \
         }; \
     } \

@@ -112,3 +112,19 @@ TEST(string_t, CustomMapping) {
     std::string actual = formatter.format(record);
     EXPECT_EQ(actual, "[1970-01-02 03:55:00]: le message");
 }
+
+TEST(string_t, CustomMappingWithKeyword) {
+    mapping::value_t mapper;
+    mapper.add<keyword::tag::timestamp_t>(&testing::map_timestamp);
+
+    log::record_t record;
+    record.attributes = {
+        keyword::timestamp() = std::time_t(100500),
+        keyword::message() = "le message",
+    };
+    std::string pattern("[%(timestamp)s]: %(message)s");
+    formatter::string_t formatter(pattern);
+    formatter.set_mapper(std::move(mapper));
+    std::string actual = formatter.format(record);
+    EXPECT_EQ(actual, "[1970-01-02 03:55:00]: le message");
+}

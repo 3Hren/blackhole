@@ -1,5 +1,5 @@
+//!@todo: api: Mapper.add<T>(name, function) - use initial names, not mapped.
 //!@todo: api: Using direct keyword stringify substitution in log macro, i.e. LOG("level=%s", keyword::severity<level>);
-//!@todo: api: Mapper.add<T>(keyword, function) - use keyword or string.
 
 //!@todo: msgpack_t: Attribute mappings.
 //!@todo: api: Make fallback logger. Make it configurable.
