@@ -22,7 +22,6 @@ SET(SOURCES
     test_Filter
     test_StringPatternParser
     test_UdpSink
-    test_Manual
     test_SyslogSink
     test_Functional
     test_FactoryInitialization
@@ -30,6 +29,7 @@ SET(SOURCES
     test_ExceptionTrap
     test_Macro
     test_MsgpackFormatter
+    test_Manual
 )
 
 SET(Boost_USE_MULTITHREADED ON)
