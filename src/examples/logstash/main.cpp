@@ -92,7 +92,7 @@ std::string map_timestamp(const std::time_t& time) {
 void init() {
     mapping::value_t mapper;
     mapper.add<keyword::tag::severity_t<level>>(&map_severity);
-    mapper.add<std::time_t>("timestamp", &map_timestamp);
+    mapper.add<keyword::tag::timestamp_t>(&map_timestamp);
 
     formatter_config_t formatter = {
         "json",
