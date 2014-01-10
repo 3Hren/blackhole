@@ -92,7 +92,7 @@ std::string map_timestamp(const std::time_t& time) {
 void init() {
     mapping::value_t mapper;
     mapper.add<keyword::tag::severity_t<level>>(&map_severity);
-    mapper.add<std::time_t>("@timestamp", &map_timestamp);
+    mapper.add<std::time_t>("timestamp", &map_timestamp);
 
     formatter_config_t formatter = {
         "json",
@@ -104,7 +104,7 @@ void init() {
                     { "timestamp", "@timestamp" }
                 },
                 std::unordered_map<std::string, boost::any> {
-                    { "/", std::vector<std::string> { "@message", "@timestamp" } },
+                    { "/", std::vector<std::string> { "message", "timestamp" } },
                     { "/fields", std::string("*") }
                 }
             }

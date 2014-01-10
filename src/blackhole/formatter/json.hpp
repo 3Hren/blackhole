@@ -32,7 +32,7 @@ void apply_visitor(Visitor&, const std::string&, const T&);
 //! This class looks creppy, because of inconvenient rapidjson interface. Hope someone could refactor it.
 class json_visitor_t : public boost::static_visitor<> {
     rapidjson::Document* root;
-    const json::map::positioning_t& positioning;
+    const json::config_t& config;
     const mapping::value_t& mapper;
 
     // Mapped attribute values cache helps to keep them alive.
@@ -46,25 +46,25 @@ class json_visitor_t : public boost::static_visitor<> {
 
     const std::string* name;
 public:
-    json_visitor_t(rapidjson::Document* root, const json::map::positioning_t& positioning, const mapping::value_t& mapper) :
+    json_visitor_t(rapidjson::Document* root, const json::config_t& config, const mapping::value_t& mapper) :
         root(root),
-        positioning(positioning),
+        config(config),
         mapper(mapper),
         name(nullptr)
     {}
 
     template<typename T>
     void operator ()(const T& value) {
-        auto it = positioning.specified.find(*name);
-        if (it != positioning.specified.end()) {
+        auto it = config.positioning.specified.find(*name);
+        if (it != config.positioning.specified.end()) {
             const json::map::positioning_t::positions_t& positions = it->second;
             if (positions.size() > 0) {
                 add_positional(positions, *name, value);
             } else {
                 map_and_add_member(root, *name, value);
             }
-        } else if (!positioning.unspecified.empty()) {
-            add_positional(positioning.unspecified, *name, value);
+        } else if (!config.positioning.unspecified.empty()) {
+            add_positional(config.positioning.unspecified, *name, value);
         } else {
             map_and_add_member(root, *name, value);
         }
@@ -123,7 +123,15 @@ private:
 
     template<typename T>
     void add_member_impl(rapidjson::Value* node, const std::string& name, T&& value) {
-        node->AddMember(name.c_str(), std::forward<T>(value), root->GetAllocator());
+        node->AddMember(mapped(name).c_str(), std::forward<T>(value), root->GetAllocator());
+    }
+
+    const std::string& mapped(const std::string& name) const {
+        auto it = config.naming.find(name);
+        if (it != config.naming.end()) {
+            return it->second;
+        }
+        return name;
     }
 };
 
@@ -151,9 +159,9 @@ public:
         rapidjson::Document root;
         root.SetObject();
 
-        json_visitor_t visitor(&root, config.positioning, mapper);
+        json_visitor_t visitor(&root, config, mapper);
         for (auto it = record.attributes.begin(); it != record.attributes.end(); ++it) {
-            const std::string& name = mapped(it->first);
+            const std::string& name = it->first;
             const log::attribute_t& attribute = it->second;
             aux::apply_visitor(visitor, name, attribute.value);
         }
@@ -167,15 +175,6 @@ public:
             message.push_back('\n');
         }
         return message;
-    }
-
-private:
-    const std::string& mapped(const std::string& name) const {
-        auto it = config.naming.find(name);
-        if (it != config.naming.end()) {
-            return it->second;
-        }
-        return name;
     }
 };
 
