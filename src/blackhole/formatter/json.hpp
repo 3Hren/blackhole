@@ -81,7 +81,7 @@ private:
     rapidjson::Value* add_node(rapidjson::Value* parent, const std::string& name) {
         rapidjson::Value current;
         current.SetObject();
-        parent->AddMember(name.c_str(), current, root->GetAllocator());
+        add_member_impl(parent, name, current);
         return get_child(parent, name);
     }
 
