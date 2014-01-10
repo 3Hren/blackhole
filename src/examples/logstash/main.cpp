@@ -35,6 +35,29 @@ struct priority_traits<level> {
 
 } } // namespace blackhole::sink
 
+std::string map_severity(level lvl) {
+    static std::string LEVEL[] = {
+        "DEBUG",
+        "INFO",
+        "WARNING",
+        "ERROR"
+    };
+
+    auto value = static_cast<aux::underlying_type<level>::type>(lvl);
+    if (value >= 0 && value < sizeof(LEVEL) / sizeof(LEVEL[0])) {
+        return LEVEL[value];
+    }
+
+    return "UNKNOWN";
+}
+
+std::string map_timestamp(const std::time_t& time) {
+    char mbstr[128];
+    if(std::strftime(mbstr, 128, "%F %T", std::gmtime(&time))) {
+        return std::string(mbstr);
+    }
+    return std::string("?");
+}
 
 //! Initialization stage.
 //! \brief Manually or from file - whatever. The main aim - is to get initialized `log_config_t` object.
@@ -66,6 +89,10 @@ struct priority_traits<level> {
  *  }
  */
 void init() {
+    mapping::mapper_t mapper;
+    mapper.add<level>("severity", &map_severity);
+    mapper.add<std::time_t>("@timestamp", &map_timestamp);
+
     formatter_config_t formatter = {
         "json",
         boost::any {
@@ -80,7 +107,8 @@ void init() {
                     { "/fields", std::string("*") }
                 }
             }
-        }
+        },
+        mapper
     };
 
     sink_config_t sink = {
