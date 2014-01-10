@@ -19,6 +19,20 @@ namespace blackhole {
 struct formatter_config_t {
     std::string type;
     boost::any config;
+    mapping::mapper_t mapper;
+
+    formatter_config_t() {}
+
+    formatter_config_t(const std::string& type, const boost::any& config) :
+        type(type),
+        config(config)
+    {}
+
+    formatter_config_t(const std::string& type, const boost::any& config, const mapping::mapper_t& mapper) :
+        type(type),
+        config(config),
+        mapper(mapper)
+    {}
 };
 
 struct sink_config_t {
@@ -51,6 +65,7 @@ struct factory_t {
     create(const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink) {
         auto config = factory_traits<Formatter>::map_config(formatter_config.config);
         auto formatter = std::make_unique<Formatter>(config);
+        formatter->set_mapper(formatter_config.mapper);
         return create(std::move(formatter), std::move(sink));
     }
 

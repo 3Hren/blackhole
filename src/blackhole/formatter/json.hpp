@@ -148,6 +148,10 @@ public:
         this->mapper = std::move(mapper);
     }
 
+    void set_mapper(const mapping::mapper_t& mapper) {
+        this->mapper = mapper;
+    }
+
     std::string format(const log::record_t& record) const {
         rapidjson::Document root;
         root.SetObject();

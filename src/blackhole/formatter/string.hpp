@@ -35,6 +35,10 @@ public:
         m_mapper = std::move(mapper);
     }
 
+    void set_mapper(const mapping::mapper_t& mapper) {
+        m_mapper = mapper;
+    }
+
     std::string format(const log::record_t& record) const {
         boost::format fmt(m_config.pattern);
         const log::attributes_t& attributes = record.attributes;

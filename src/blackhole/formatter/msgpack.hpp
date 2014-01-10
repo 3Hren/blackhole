@@ -27,6 +27,9 @@ public:
 
 class msgpack_t {
 public:
+    void set_mapper(const mapping::mapper_t&) {
+    }
+
     std::string format(const log::record_t& record) const {
         msgpack::sbuffer buffer;
         msgpack::packer<msgpack::sbuffer> packer(&buffer);
