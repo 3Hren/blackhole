@@ -5,6 +5,7 @@
 #include <boost/version.hpp>
 
 #include "blackhole/error.hpp"
+#include "blackhole/factory.hpp"
 
 namespace blackhole {
 
