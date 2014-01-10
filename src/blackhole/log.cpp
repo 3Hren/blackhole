@@ -1,4 +1,3 @@
-//!@todo: Incapsulate attribute mapping (timestamp, severity etc).
 //!@todo: aux: More typed configs for sinks.
 
 //!@todo: msgpack_t: Attribute mappings.
