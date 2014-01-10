@@ -46,22 +46,22 @@ public:
     }
 
     template<typename T>
-    std::tuple<std::string, bool> execute(const std::string& key, T&& value) const {
+    boost::optional<std::string> execute(const std::string& key, T&& value) const {
+        boost::optional<std::string> result;
         auto it = m_mappings.find(key);
         if (it != m_mappings.end()) {
             const mapping_t& action = it->second;
-            return std::make_tuple(action(std::forward<T>(value)), true);
+            result = std::move(action(std::forward<T>(value)));
         }
-        return std::make_tuple(std::string(""), false);
+
+        return result;
     }
 };
 
 inline void apply(const mapper_t& mapper, const std::string& key, const log::attribute_t& attribute, boost::format* format) {
-    bool ok;
-    std::string result;
-    std::tie(result, ok) = mapper.execute(key, attribute.value);
-    if (ok) {
-        (*format) % result;
+    auto result = mapper.execute(key, attribute.value);
+    if (result.is_initialized()) {
+        (*format) % result.get();
     } else {
         (*format) % attribute.value;
     }

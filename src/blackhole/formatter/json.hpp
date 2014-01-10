@@ -93,11 +93,9 @@ private:
 
     template<typename T>
     void map_and_add_member(rapidjson::Value* node, const std::string& name, const T& value) {
-        bool ok = false;
-        std::string result;
-        std::tie(result, ok) = mapper.execute(name, value);
-        if (ok) {
-            cache.push_back(result);
+        auto result = mapper.execute(name, value);
+        if (result.is_initialized()) {
+            cache.push_back(std::move(result.get()));
             add_member(node, name, cache.back());
         } else {
             add_member(node, name, value);
