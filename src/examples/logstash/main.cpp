@@ -91,7 +91,7 @@ std::string map_timestamp(const std::time_t& time) {
  */
 void init() {
     mapping::value_t mapper;
-    mapper.add<level>("severity", &map_severity);
+    mapper.add<keyword::tag::severity_t<level>>(&map_severity);
     mapper.add<std::time_t>("@timestamp", &map_timestamp);
 
     formatter_config_t formatter = {
@@ -113,11 +113,10 @@ void init() {
     };
 
     sink_config_t sink = {
-        "socket",
-        std::map<std::string, std::string>{
-            { "type", "tcp" },
-            { "host", "localhost" },
-            { "port", "50030" }
+        "tcp",
+        std::vector<boost::any> {
+            std::string("localhost"),
+            std::uint16_t(50030)
         }
     };
 
