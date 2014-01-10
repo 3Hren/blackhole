@@ -6,6 +6,7 @@
 //!@todo: performance: Current naive implementation of timestamp formatter is suck and have large performance troubles. Fix it.
 //!@todo: performance: Experiment with std::ostringstream or format library for performance check.
 //!@todo: filter_t: Make || operations in filtering.
+//!@todo: api: mapper.add<T>(keyword, function) - use keyword or string.
 //!@todo: files_t: Make auto_flush flag.
 //!@todo: files_t: Make file rotation.
 //!@todo: files_t: Make file naming by pattern.

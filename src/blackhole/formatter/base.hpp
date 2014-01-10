@@ -24,14 +24,14 @@ namespace formatter {
 
 class base_t {
 protected:
-    mapping::mapper_t mapper;
+    mapping::value_t mapper;
 
 public:
-    void set_mapper(const mapping::mapper_t& mapper) {
+    void set_mapper(const mapping::value_t& mapper) {
         this->mapper = mapper;
     }
 
-    void set_mapper(mapping::mapper_t&& mapper) {
+    void set_mapper(mapping::value_t&& mapper) {
         this->mapper = std::move(mapper);
     }
 };

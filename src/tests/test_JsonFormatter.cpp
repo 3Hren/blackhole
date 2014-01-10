@@ -203,7 +203,7 @@ std::string map_secret_value(std::uint32_t value) {
 } // namespace testing
 
 TEST(json_t, CustomMapping) {
-    mapping::mapper_t mapper;
+    mapping::value_t mapper;
     mapper.add<std::uint32_t>("secret", &testing::map_secret_value);
 
     log::record_t record;

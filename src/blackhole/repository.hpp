@@ -19,7 +19,7 @@ namespace blackhole {
 struct formatter_config_t {
     std::string type;
     boost::any config;
-    mapping::mapper_t mapper;
+    mapping::value_t mapper;
 
     formatter_config_t() {}
 
@@ -28,7 +28,7 @@ struct formatter_config_t {
         config(config)
     {}
 
-    formatter_config_t(const std::string& type, const boost::any& config, const mapping::mapper_t& mapper) :
+    formatter_config_t(const std::string& type, const boost::any& config, const mapping::value_t& mapper) :
         type(type),
         config(config),
         mapper(mapper)

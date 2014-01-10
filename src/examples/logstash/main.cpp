@@ -90,7 +90,7 @@ std::string map_timestamp(const std::time_t& time) {
  *  }
  */
 void init() {
-    mapping::mapper_t mapper;
+    mapping::value_t mapper;
     mapper.add<level>("severity", &map_severity);
     mapper.add<std::time_t>("@timestamp", &map_timestamp);
 

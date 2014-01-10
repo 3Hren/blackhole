@@ -35,7 +35,7 @@ struct extracter {
     }
 };
 
-class mapper_t {
+class value_t {
     typedef std::function<std::string(const log::attribute_value_t&)> mapping_t;
     std::unordered_map<std::string, mapping_t> m_mappings;
 
@@ -58,7 +58,7 @@ public:
     }
 };
 
-inline void apply(const mapper_t& mapper, const std::string& key, const log::attribute_t& attribute, boost::format* format) {
+inline void apply(const value_t& mapper, const std::string& key, const log::attribute_t& attribute, boost::format* format) {
     auto result = mapper.execute(key, attribute.value);
     if (result.is_initialized()) {
         (*format) % result.get();

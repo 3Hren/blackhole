@@ -98,7 +98,7 @@ std::string map_timestamp(const std::time_t& time) {
 } // namespace testing
 
 TEST(string_t, CustomMapping) {
-    mapping::mapper_t mapper;
+    mapping::value_t mapper;
     mapper.add<std::time_t>("timestamp", &testing::map_timestamp);
 
     log::record_t record;

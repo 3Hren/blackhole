@@ -23,11 +23,11 @@ namespace blackhole {
 
 namespace formatter {
 
-//! This class looks creppy, because of inconvenient rapidjson interface. Hope someout could refactor it.
+//! This class looks creppy, because of inconvenient rapidjson interface. Hope someone could refactor it.
 class json_visitor_t : public boost::static_visitor<> {
     rapidjson::Document* root;
     const json::map::positioning_t& positioning;
-    const mapping::mapper_t& mapper;
+    const mapping::value_t& mapper;
 
     // Mapped values cache to keep them alive.
     std::list<std::string> cache;
@@ -36,7 +36,7 @@ class json_visitor_t : public boost::static_visitor<> {
     // explicit setting it every iteration.
     const std::string* name;
 public:
-    json_visitor_t(rapidjson::Document* root, const json::map::positioning_t& positioning, const mapping::mapper_t& mapper) :
+    json_visitor_t(rapidjson::Document* root, const json::map::positioning_t& positioning, const mapping::value_t& mapper) :
         root(root),
         positioning(positioning),
         mapper(mapper),
@@ -57,7 +57,7 @@ public:
             } else {
                 map_and_add_member(root, *name, value);
             }
-        } else if (positioning.unspecified.size() > 0) {
+        } else if (!positioning.unspecified.empty()) {
             add_positional(positioning.unspecified, *name, value);
         } else {
             map_and_add_member(root, *name, value);
