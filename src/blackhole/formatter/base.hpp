@@ -2,6 +2,8 @@
 
 #include <boost/any.hpp>
 
+#include <blackhole/formatter/map/value.hpp>
+
 namespace blackhole {
 
 template<typename T>
@@ -17,5 +19,23 @@ static void any_to(const boost::any& from, T& to) {
 }
 
 } // namespace aux
+
+namespace formatter {
+
+class base_t {
+protected:
+    mapping::mapper_t mapper;
+
+public:
+    void set_mapper(const mapping::mapper_t& mapper) {
+        this->mapper = mapper;
+    }
+
+    void set_mapper(mapping::mapper_t&& mapper) {
+        this->mapper = std::move(mapper);
+    }
+};
+
+} // namespace formatter
 
 } // namespace blackhole

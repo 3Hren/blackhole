@@ -131,9 +131,8 @@ void apply_visitor(Visitor& visitor, const std::string& name, const T& value) {
 
 } // namespace aux
 
-class json_t {
+class json_t : public base_t {
     const json::config_t config;
-    mapping::mapper_t mapper;
 
 public:
     typedef json::config_t config_type;
@@ -141,14 +140,6 @@ public:
     json_t(const json::config_t& config = json::config_t()) :
         config(config)
     {}
-
-    void set_mapper(mapping::mapper_t&& mapper) {
-        this->mapper = std::move(mapper);
-    }
-
-    void set_mapper(const mapping::mapper_t& mapper) {
-        this->mapper = mapper;
-    }
 
     std::string format(const log::record_t& record) const {
         rapidjson::Document root;

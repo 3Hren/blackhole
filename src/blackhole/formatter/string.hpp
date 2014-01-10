@@ -16,9 +16,8 @@ namespace blackhole {
 
 namespace formatter {
 
-class string_t {
+class string_t : public base_t {
     const string::config_t m_config;
-    mapping::mapper_t m_mapper;
 
 public:
     typedef string::config_t config_type;
@@ -30,14 +29,6 @@ public:
     string_t(const config_type& config) :
         m_config(config)
     {}
-
-    void set_mapper(mapping::mapper_t&& mapper) {
-        m_mapper = std::move(mapper);
-    }
-
-    void set_mapper(const mapping::mapper_t& mapper) {
-        m_mapper = mapper;
-    }
 
     std::string format(const log::record_t& record) const {
         boost::format fmt(m_config.pattern);
@@ -62,7 +53,7 @@ private:
 
     inline void format_single_key(const std::string& key, const log::attributes_t& attributes, boost::format* fmt) const {
         const log::attribute_t& attribute = get_attribute(attributes, key);
-        mapping::apply(m_mapper, key, attribute, fmt);
+        mapping::apply(mapper, key, attribute, fmt);
     }
 
     inline void format_variadic_key(const std::string& key, const log::attributes_t& attributes, boost::format* fmt) const {
