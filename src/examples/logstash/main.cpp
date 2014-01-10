@@ -35,6 +35,7 @@ struct priority_traits<level> {
 
 } } // namespace blackhole::sink
 
+//! Attribute mapping from its real values to human-readabl string representation.
 std::string map_severity(level lvl) {
     static std::string LEVEL[] = {
         "DEBUG",
