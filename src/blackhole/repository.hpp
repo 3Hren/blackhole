@@ -51,6 +51,9 @@ struct log_config_t {
 };
 
 template<typename Level>
+class sink_factory_t;
+
+template<typename Level>
 struct factory_t {
     template<typename Formatter, typename Sink>
     static
@@ -94,17 +97,48 @@ struct factory_t {
     static
     std::unique_ptr<base_frontend_t>
     create(const formatter_config_t& formatter_config, const sink_config_t& sink_config) {
-        if (sink_config.type == "files") {
-            return create<sink::file_t<>>(formatter_config, sink_config);
-        } else if (sink_config.type == "syslog") {
-            return create<sink::syslog_t<Level>>(formatter_config, sink_config);
-        } else if (sink_config.type == "udp") {
-            return create<sink::socket_t<boost::asio::ip::udp>>(formatter_config, sink_config);
-        } else if (sink_config.type == "tcp") {
-            return create<sink::socket_t<boost::asio::ip::tcp>>(formatter_config, sink_config);
+        return sink_factory_t<Level>::instance().create(sink_config.type, formatter_config, sink_config);
+    }
+};
+
+template<typename Level>
+class sink_factory_t {
+    typedef std::unique_ptr<base_frontend_t> return_type;
+    typedef std::function<return_type(const formatter_config_t&, const sink_config_t&)> factory_type;
+    typedef return_type(*raw_factory_type)(const formatter_config_t&, const sink_config_t&);
+
+    mutable std::mutex mutex;
+    std::unordered_map<std::string, factory_type> sinks;
+public:
+    static sink_factory_t<Level>& instance() {
+        static sink_factory_t<Level> self;
+        return self;
+    }
+
+    template<typename T>
+    void add(const std::string& name) {
+        std::lock_guard<std::mutex> lock(mutex);
+        sinks[name] = static_cast<raw_factory_type>(&factory_t<Level>::template create<T>);
+    }
+
+    return_type create(const std::string& name,
+                       const formatter_config_t& formatter_config,
+                       const sink_config_t& sink_config) const {
+        std::lock_guard<std::mutex> lock(mutex);
+        auto it = sinks.find(name);
+        if (it != sinks.end()) {
+            return it->second(formatter_config, sink_config);
         }
 
-        return std::unique_ptr<base_frontend_t>();
+        return return_type();
+    }
+
+private:
+    sink_factory_t() {
+        add<sink::file_t<>>("files");
+        add<sink::syslog_t<Level>>("syslog");
+        add<sink::socket_t<boost::asio::ip::udp>>("udp");
+        add<sink::socket_t<boost::asio::ip::udp>>("tcp");
     }
 };
 
