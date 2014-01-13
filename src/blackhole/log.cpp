@@ -1,4 +1,4 @@
-//!@todo: api: Sink and formatter registration.
+//!@todo: api: Formatter registration.
 //!@todo: api: Using direct keyword stringify substitution in log macro, i.e. LOG("level=%s", keyword::severity<level>);
 //!@todo: performance: Experiment with std::ostringstream or format library for performance check.
 //!@todo: performance & api: Maybe write own json-writer?
