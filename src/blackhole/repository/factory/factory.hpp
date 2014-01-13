@@ -13,6 +13,8 @@ class sink_factory_t;
 template<typename Level>
 class formatter_factory_t;
 
+class base_frontend_t;
+
 template<typename Level>
 struct factory_t {
     template<typename Formatter, typename Sink>

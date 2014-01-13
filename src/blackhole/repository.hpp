@@ -73,7 +73,8 @@ private:
     template<typename Sink, typename Formatters>
     void add() {
         sink_factory_t<Level>::instance().template add<Sink>();
-        boost::mpl::for_each<Formatters, aux::mpl::id<boost::mpl::_>>(aux::formatter_registrator<Level, Sink>());
+        aux::formatter_registrator<Level, Sink> registrator;
+        boost::mpl::for_each<Formatters, aux::mpl::id<boost::mpl::_>>(registrator);
     }
 
     static log_config_t make_trivial_config() {
