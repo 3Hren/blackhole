@@ -9,46 +9,13 @@
 #include "frontend.hpp"
 #include "frontend/syslog.hpp"
 #include "logger.hpp"
+#include "repository/config/log.hpp"
 #include "sink/files.hpp"
 #include "sink/socket.hpp"
 #include "sink/syslog.hpp"
 #include "utils/unique.hpp"
 
 namespace blackhole {
-
-struct formatter_config_t {
-    std::string type;
-    boost::any config;
-    mapping::value_t mapper;
-
-    formatter_config_t() {}
-
-    formatter_config_t(const std::string& type, const boost::any& config) :
-        type(type),
-        config(config)
-    {}
-
-    formatter_config_t(const std::string& type, const boost::any& config, const mapping::value_t& mapper) :
-        type(type),
-        config(config),
-        mapper(mapper)
-    {}
-};
-
-struct sink_config_t {
-    std::string type;
-    boost::any config;
-};
-
-struct frontend_config_t {
-    formatter_config_t formatter;
-    sink_config_t sink;
-};
-
-struct log_config_t {
-    std::string name;
-    std::vector<frontend_config_t> frontends;
-};
 
 template<typename Level>
 class sink_factory_t;
