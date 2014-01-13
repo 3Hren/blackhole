@@ -98,12 +98,6 @@ public:
         static_assert(std::is_enum<Level>::value, "level type must be enum");
     }
 
-    syslog_t(const std::string& identity, int facility) :
-        m_backend(identity, LOG_PID, facility)
-    {
-        static_assert(std::is_enum<Level>::value, "level type must be enum");
-    }
-
     void consume(Level level, const std::string& message) {
         priority_t priority = priority_traits<Level>::map(level);
         m_backend.write(priority, message);
