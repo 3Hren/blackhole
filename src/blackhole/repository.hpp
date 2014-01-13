@@ -105,7 +105,7 @@ private:
         add<sink::file_t<>>("files");
         add<sink::syslog_t<Level>>("syslog");
         add<sink::socket_t<boost::asio::ip::udp>>("udp");
-        add<sink::socket_t<boost::asio::ip::udp>>("tcp");
+        add<sink::socket_t<boost::asio::ip::tcp>>("tcp");
     }
 };
 
