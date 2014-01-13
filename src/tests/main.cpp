@@ -1,7 +1,5 @@
 #include "Global.hpp"
 
-#include <memory>
-
 /*! @brief Log library specification.
  *
  *  === TYPICAL USAGE VIA MACRO ===
