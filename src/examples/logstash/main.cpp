@@ -35,7 +35,7 @@ struct priority_traits<level> {
 
 } } // namespace blackhole::sink
 
-//! Attribute mapping from its real values to human-readabl string representation.
+//! Attribute mapping from its real values to human-readable string representation.
 std::string map_severity(level lvl) {
     static std::string LEVEL[] = {
         "DEBUG",
@@ -61,7 +61,8 @@ std::string map_timestamp(const std::time_t& time) {
 }
 
 //! Initialization stage.
-//! \brief Manually or from file - whatever. The main aim - is to get initialized `log_config_t` object.
+//! \brief Manually or from file - whatever.
+//! The main aim - is to get initialized `log_config_t` object.
 //! For logstash we need log object which sends json-packed messages through tcp socket.
 /*! Formatter config looks like:
  *  "formatter": {
@@ -82,8 +83,7 @@ std::string map_timestamp(const std::time_t& time) {
  *
  *  Sink config can be:
  *  "sink": {
- *      "socket": {
- *          "type": "tcp",
+ *      "tcp": {
  *          "host": "localhost",
  *          "port": 50030
  *      }
