@@ -156,10 +156,9 @@ private:
             std::string("[%(timestamp)s] [%(severity)s]: %(message)s")
         };
 
-        std::map<std::string, std::string> sink_args = { { "path", "/dev/stdout" } };
         sink_config_t sink = {
             "files",
-            sink_args
+            std::string("/dev/stdout")
         };
 
         frontend_config_t frontend = { formatter, sink };

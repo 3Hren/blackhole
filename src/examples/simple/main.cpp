@@ -43,7 +43,7 @@ void init() {
 
     sink_config_t sink = {
         "files",
-        std::map<std::string, std::string>{ { "path", "/dev/stdout" } }
+        std::string("/dev/stdout")
     };
 
     frontend_config_t frontend = { formatter, sink };
