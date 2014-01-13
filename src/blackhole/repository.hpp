@@ -64,7 +64,7 @@ struct factory_t {
     static
     std::unique_ptr<base_frontend_t>
     create(const formatter_config_t& formatter_config, const sink_config_t& sink_config) {
-        return sink_factory_t<Level>::instance().create(sink_config.type, formatter_config, sink_config);
+        return sink_factory_t<Level>::instance().create(formatter_config, sink_config);
     }
 };
 
@@ -88,11 +88,9 @@ public:
         sinks[T::name()] = static_cast<raw_factory_type>(&factory_t<Level>::template create<T>);
     }
 
-    return_type create(const std::string& name,
-                       const formatter_config_t& formatter_config,
-                       const sink_config_t& sink_config) const {
+    return_type create(const formatter_config_t& formatter_config, const sink_config_t& sink_config) const {
         std::lock_guard<std::mutex> lock(mutex);
-        auto it = sinks.find(name);
+        auto it = sinks.find(sink_config.type);
         if (it != sinks.end()) {
             return it->second(formatter_config, sink_config);
         }
