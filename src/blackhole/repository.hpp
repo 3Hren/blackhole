@@ -83,9 +83,9 @@ public:
     }
 
     template<typename T>
-    void add(const std::string& name) {
+    void add() {
         std::lock_guard<std::mutex> lock(mutex);
-        sinks[name] = static_cast<raw_factory_type>(&factory_t<Level>::template create<T>);
+        sinks[T::name()] = static_cast<raw_factory_type>(&factory_t<Level>::template create<T>);
     }
 
     return_type create(const std::string& name,
@@ -102,10 +102,10 @@ public:
 
 private:
     sink_factory_t() {
-        add<sink::file_t<>>("files");
-        add<sink::syslog_t<Level>>("syslog");
-        add<sink::socket_t<boost::asio::ip::udp>>("udp");
-        add<sink::socket_t<boost::asio::ip::tcp>>("tcp");
+        add<sink::file_t<>>();
+        add<sink::syslog_t<Level>>();
+        add<sink::socket_t<boost::asio::ip::udp>>();
+        add<sink::socket_t<boost::asio::ip::tcp>>();
     }
 };
 

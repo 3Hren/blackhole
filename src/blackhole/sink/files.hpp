@@ -58,6 +58,10 @@ class file_t {
 public:
     typedef file::config_t config_type;
 
+    static const char* name() {
+        return "files";
+    }
+
     file_t(const std::string& path) :
         m_backend(path)
     {}

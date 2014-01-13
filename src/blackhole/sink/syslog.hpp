@@ -86,6 +86,10 @@ class syslog_t {
 public:
     typedef syslog::config_t config_type;
 
+    static const char* name() {
+        return "syslog";
+    }
+
     syslog_t(const config_type& config) :
         m_backend(config.identity, config.option, config.facility)
     {

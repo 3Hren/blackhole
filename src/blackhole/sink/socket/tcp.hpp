@@ -27,6 +27,10 @@ class boost_backend_t<boost::asio::ip::tcp> {
     std::unique_ptr<Protocol::socket> m_socket;
 
 public:
+    static const char* name() {
+        return "tcp";
+    }
+
     boost_backend_t(const std::string& host, std::uint16_t port) :
         m_host(host),
         m_port(port),
