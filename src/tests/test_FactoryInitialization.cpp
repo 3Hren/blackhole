@@ -31,6 +31,8 @@ struct priority_traits<testing::level> {
 
 
 TEST(Factory, FileStringsFrontend) {
+    repository_t<testing::level>::instance();
+
     formatter_config_t formatter = {
         "string",
         std::string("[%(timestamp)s]: %(message)s")
@@ -45,6 +47,8 @@ TEST(Factory, FileStringsFrontend) {
 }
 
 TEST(Factory, SyslogStringsFrontend) {
+    repository_t<testing::level>::instance();
+
     formatter_config_t formatter = {
         "string",
         std::string("[%(timestamp)s]: %(message)s")
@@ -59,6 +63,8 @@ TEST(Factory, SyslogStringsFrontend) {
 }
 
 TEST(Factory, UdpSocketStringsFrontend) {
+    repository_t<testing::level>::instance();
+
     formatter_config_t formatter = {
         "string",
         std::string("[%(timestamp)s]: %(message)s")
@@ -76,6 +82,8 @@ TEST(Factory, UdpSocketStringsFrontend) {
 }
 
 TEST(Factory, TcpSocketStringsFrontend) {
+    repository_t<testing::level>::instance();
+
     formatter_config_t formatter = {
         "string",
         std::string("[%(timestamp)s]: %(message)s")

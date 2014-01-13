@@ -22,6 +22,10 @@ class string_t : public base_t {
 public:
     typedef string::config_t config_type;
 
+    static const char* name() {
+        return "string";
+    }
+
     string_t(const std::string& pattern) :
         m_config(string::pattern_parser_t::parse(pattern))
     {}

@@ -151,6 +151,10 @@ class json_t : public base_t {
 public:
     typedef json::config_t config_type;
 
+    static const char* name() {
+        return "json";
+    }
+
     json_t(const json::config_t& config = json::config_t()) :
         config(config)
     {}
