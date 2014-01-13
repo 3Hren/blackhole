@@ -65,30 +65,30 @@ std::string map_timestamp(const std::time_t& time) {
 //! The main aim - is to get initialized `log_config_t` object.
 //! For logstash we need log object which sends json-packed messages through tcp socket.
 /*! Formatter config looks like:
- *  "formatter": {
- *      "json": {
- *          "newline": true,
- *          "mapping": {
- *              "naming": {
- *                  "message": "@message",
- *                  "timestamp": "@timestamp"
- *              },
- *              "positioning": {
- *                  "/": ["@message", "@timestamp"],
- *                  "/fields": "*"
- *              }
- *          }
- *      }
- *  }
- *
- *  Sink config can be:
- *  "sink": {
- *      "tcp": {
- *          "host": "localhost",
- *          "port": 50030
- *      }
- *  }
- */
+    "formatter": {
+        "json": {
+            "newline": true,
+            "mapping": {
+                "naming": {
+                    "message": "@message",
+                    "timestamp": "@timestamp"
+                },
+                "positioning": {
+                    "/": ["@message", "@timestamp"],
+                    "/fields": "*"
+                }
+            }
+        }
+    }
+
+    Sink config can be:
+    "sink": {
+        "tcp": {
+            "host": "localhost",
+            "port": 50030
+        }
+    }
+*/
 void init() {
     mapping::value_t mapper;
     mapper.add<keyword::tag::severity_t<level>>(&map_severity);
