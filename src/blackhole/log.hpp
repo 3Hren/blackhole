@@ -1,5 +1,7 @@
 #pragma once
 
+#include "format/message/extraction.hpp"
+#include "format/message/insitu.hpp"
 #include "logger.hpp"
 #include "utils/format.hpp"
 
@@ -18,7 +20,7 @@ public:
         log(log),
         record(record)
     {
-        record.attributes.insert(keyword::message() = utils::format(std::forward<Args>(args)...));
+        record.attributes.insert(keyword::message() = aux::format(record.attributes, std::forward<Args>(args)...));
     }
 
     ~scoped_pump() {

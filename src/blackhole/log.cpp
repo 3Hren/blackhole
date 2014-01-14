@@ -1,4 +1,3 @@
-//!@todo: api: Using direct keyword stringify substitution in log macro, i.e. LOG("level=%s", keyword::severity<level>);
 //!@todo: files_t: Make auto_flush flag.
 //!@todo: files_t: Make file rotation.
 //!@todo: files_t: Make file naming by pattern.

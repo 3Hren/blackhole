@@ -140,3 +140,56 @@ TEST(Macro, FormatMessageWithPrintfStyleWithAttributes) {
     EXPECT_EQ("42", actual.reason);
     EXPECT_EQ(100500, actual.timestamp);
 }
+
+namespace blackhole {
+
+namespace format {
+
+namespace message {
+
+template<>
+struct insitu<keyword::tag::severity_t<level>> {
+    static inline std::ostream& execute(std::ostream& stream, level lvl) {
+        static std::string DESCRIPTIONS[] = {
+            "DEBUG",
+            "INFO ",
+            "WARN ",
+            "ERROR"
+        };
+
+        if (static_cast<std::size_t>(lvl) < sizeof(DESCRIPTIONS) / sizeof(DESCRIPTIONS[0])) {
+            stream << DESCRIPTIONS[lvl];
+        } else {
+            stream << static_cast<int>(lvl);
+        }
+
+        return stream;
+    }
+};
+
+} // namespace message
+
+} // namespace format
+
+} // namespace blackhole
+
+TEST(Macro, SpecificKeywordMessageFormatting) {
+    log::record_t record;
+    record.attributes = {
+        keyword::severity<level>() = level::debug
+    };
+
+    mock::verbose_log_t<testing::level> log;
+    EXPECT_CALL(log, open_record(level::debug))
+            .Times(1)
+            .WillOnce(Return(record));
+
+    std::string actual;
+    ExtractMessageAttributeAction action { actual };
+    EXPECT_CALL(log, push(_))
+            .Times(1)
+            .WillOnce(WithArg<0>(Invoke(action)));
+    BH_LOG(log, level::debug, "value: %s", keyword::severity<level>());
+
+    EXPECT_EQ("value: DEBUG", actual);
+}
