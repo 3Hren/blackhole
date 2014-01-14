@@ -39,3 +39,13 @@ TEST(file_t, ThrowsExceptionIfFileCannotBeOpened) {
             .Times(0);
     EXPECT_THROW(sink.consume("message"), blackhole::error_t);
 }
+
+TEST(file_t, AutoFlushIfSpecified) {
+    sink::file::config_t config("test.log", true);
+    sink::file_t<NiceMock<mock::files::backend_t>> sink(config);
+    EXPECT_CALL(sink.backend(), flush())
+            .Times(1);
+
+    sink.consume("message");
+}
+

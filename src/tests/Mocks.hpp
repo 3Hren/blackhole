@@ -35,6 +35,7 @@ public:
 
     MOCK_METHOD0(open, bool());
     MOCK_METHOD1(write, void(const std::string&));
+    MOCK_METHOD0(flush, void());
 };
 
 } // namespace files

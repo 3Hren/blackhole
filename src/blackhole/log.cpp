@@ -1,4 +1,3 @@
-//!@todo: files_t: Make auto_flush flag.
 //!@todo: files_t: Make file rotation.
 //!@todo: files_t: Make file naming by pattern.
 //!@todo: files_t: Create directory if not exists.

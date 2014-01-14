@@ -40,6 +40,9 @@ public:
     void write(const std::string& message) {
         m_file.write(message.data(), static_cast<std::streamsize>(message.size()));
         m_file.put('\n');
+    }
+
+    void flush() {
         m_file.flush();
     }
 };
@@ -48,12 +51,29 @@ namespace file {
 
 struct config_t {
     std::string path;
+    bool autoflush;
+
+    config_t(const std::string& path, bool autoflush) :
+        path(path),
+        autoflush(autoflush)
+    {}
+
+    config_t(const std::string& path) :
+        path(path),
+        autoflush(true)
+    {}
+
+    config_t() :
+        path("/dev/stdout"),
+        autoflush(true)
+    {}
 };
 
 } // namespace file
 
 template<class Backend = boost_backend_t>
 class file_t {
+    file::config_t config;
     Backend m_backend;
 public:
     typedef file::config_t config_type;
@@ -63,10 +83,12 @@ public:
     }
 
     file_t(const std::string& path) :
+        config(path),
         m_backend(path)
     {}
 
     file_t(const config_type& config) :
+        config(config),
         m_backend(config.path)
     {}
 
@@ -77,6 +99,10 @@ public:
             }
         }
         m_backend.write(message);
+
+        if (config.autoflush) {
+            m_backend.flush();
+        }
     }
 
     Backend& backend() {
