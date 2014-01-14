@@ -32,7 +32,7 @@ struct priority_traits<testing::level> {
 
 TEST(Factory, FileStringsFrontend) {
     group_factory_t<level> factory;
-    factory.template add<sink::file_t<>, formatter::string_t>();
+    factory.add<sink::file_t<>, formatter::string_t>();
 
     formatter_config_t formatter = {
         "string",
@@ -49,7 +49,7 @@ TEST(Factory, FileStringsFrontend) {
 
 TEST(Factory, SyslogStringsFrontend) {
     group_factory_t<level> factory;
-    factory.template add<sink::syslog_t<level>, formatter::string_t>();
+    factory.add<sink::syslog_t<level>, formatter::string_t>();
 
     formatter_config_t formatter = {
         "string",
@@ -66,7 +66,7 @@ TEST(Factory, SyslogStringsFrontend) {
 
 TEST(Factory, UdpSocketStringsFrontend) {
     group_factory_t<level> factory;
-    factory.template add<sink::socket_t<boost::asio::ip::udp>, formatter::string_t>();
+    factory.add<sink::socket_t<boost::asio::ip::udp>, formatter::string_t>();
 
     formatter_config_t formatter = {
         "string",
@@ -86,7 +86,7 @@ TEST(Factory, UdpSocketStringsFrontend) {
 
 TEST(Factory, TcpSocketStringsFrontend) {
     group_factory_t<level> factory;
-    factory.template add<sink::socket_t<boost::asio::ip::tcp>, formatter::string_t>();
+    factory.add<sink::socket_t<boost::asio::ip::tcp>, formatter::string_t>();
 
     formatter_config_t formatter = {
         "string",
@@ -198,7 +198,7 @@ TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredSink) {
 
 TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredFormatter) {
     group_factory_t<level> factory;
-    factory.template add<sink::socket_t<boost::asio::ip::udp>, boost::mpl::list<>>();
+    factory.add<sink::socket_t<boost::asio::ip::udp>, boost::mpl::list<>>();
 
     formatter_config_t formatter = {
         "string",
