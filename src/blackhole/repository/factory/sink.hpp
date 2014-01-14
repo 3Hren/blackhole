@@ -14,8 +14,7 @@ namespace blackhole {
 template<typename Level>
 class sink_factory_t {
     typedef std::unique_ptr<base_frontend_t> return_type;
-    typedef std::function<return_type(const formatter_config_t&, const sink_config_t&)> factory_type;
-    typedef return_type(*raw_factory_type)(const formatter_config_t&, const sink_config_t&);
+    typedef return_type(*factory_type)(const formatter_config_t&, const sink_config_t&);
 
     mutable std::mutex mutex;
     std::unordered_map<std::string, factory_type> sinks;
@@ -28,7 +27,7 @@ public:
     template<typename T>
     void add() {
         std::lock_guard<std::mutex> lock(mutex);
-        sinks[T::name()] = static_cast<raw_factory_type>(&factory_t<Level>::template create<T>);
+        sinks[T::name()] = static_cast<factory_type>(&factory_t<Level>::template create<T>);
     }
 
     return_type create(const formatter_config_t& formatter_config, const sink_config_t& sink_config) const {

@@ -17,24 +17,17 @@ class formatter_factory_t {
     template<typename T>
     struct traits {
         typedef std::unique_ptr<base_frontend_t> return_type;
-        typedef std::function<return_type(const formatter_config_t&, std::unique_ptr<T>)> function_type;
-        typedef return_type(*raw_function_type)(const formatter_config_t&, std::unique_ptr<T>);
+        typedef return_type(*function_type)(const formatter_config_t&, std::unique_ptr<T>);
     };
 
     struct factory_keeper_t {
         std::unordered_map<std::string, boost::any> factories;
 
-        template<typename T>
-        void add(typename traits<T>::function_type fn) {
-            factories[T::name()] = fn;
-        }
-
-        template<typename T, typename Formatter>
+        template<typename Sink, typename Formatter>
         void add() {
-            typedef typename traits<T>::raw_function_type raw_function_type;
-            typedef typename traits<T>::function_type function_type;
-            raw_function_type overloaded = static_cast<raw_function_type>(&factory_t<Level>::template create<Formatter>);
-            factories[T::name()] = static_cast<function_type>(overloaded);
+            typedef typename traits<Sink>::function_type function_type;
+            function_type overloaded = static_cast<function_type>(&factory_t<Level>::template create<Formatter>);
+            factories[Sink::name()] = overloaded;
         }
 
         template<typename T>
