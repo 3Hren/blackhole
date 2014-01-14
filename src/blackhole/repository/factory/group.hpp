@@ -50,11 +50,11 @@ public:
     return_type create(const formatter_config_t& formatter_config, const sink_config_t& sink_config) const {
         std::lock_guard<std::mutex> lock(mutex);
         auto it = sinks.find(sink_config.type);
-        if (it != sinks.end()) {
-            return it->second(frontend_factory, formatter_config, sink_config);
+        if (it == sinks.end()) {
+            throw error_t("sink '%s' is not registered");
         }
 
-        return return_type();
+        return it->second(frontend_factory, formatter_config, sink_config);
     }
 };
 

@@ -179,3 +179,19 @@ TEST(FactoryTraits, JsonFormatterConfig) {
     EXPECT_EQ(std::vector<std::string>({}), actual.positioning.specified["message"]);
     EXPECT_EQ(std::vector<std::string>({ "fields" }), actual.positioning.unspecified);
 }
+
+TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredFormatter) {
+    group_factory_t<level> factory;
+
+    formatter_config_t formatter = {
+        "string",
+        std::string("[%(timestamp)s]: %(message)s")
+    };
+
+    sink_config_t sink = {
+        "files",
+        std::string("/dev/stdout")
+    };
+
+    EXPECT_THROW(factory.create(formatter, sink), error_t);
+}
