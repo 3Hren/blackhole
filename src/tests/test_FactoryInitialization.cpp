@@ -193,7 +193,7 @@ TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredSink) {
         std::string("/dev/stdout")
     };
 
-    EXPECT_THROW(factory.create(formatter, sink), error_t);
+    EXPECT_THROW(factory.create(formatter, sink), blackhole::error_t);
 }
 
 TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredFormatter) {
@@ -210,5 +210,5 @@ TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredFormatter) {
         std::string("/dev/stdout")
     };
 
-    EXPECT_THROW(factory.create(formatter, sink), error_t);
+    EXPECT_THROW(factory.create(formatter, sink), blackhole::error_t);
 }
