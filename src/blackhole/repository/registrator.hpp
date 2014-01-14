@@ -1,8 +1,8 @@
 #pragma once
 
-#include "blackhole/repository/factory/formatter.hpp"
-
 namespace blackhole {
+
+template<typename Level> class frontend_factory_t;
 
 namespace aux {
 
@@ -14,9 +14,11 @@ template<class T> struct id {};
 
 template<typename Level, typename Sink>
 struct formatter_registrator {
+    frontend_factory_t<Level>& factory;
+
     template<typename Formatter>
     void operator ()(aux::mpl::id<Formatter>) const {
-        formatter_factory_t<Level>::instance().template add<Sink, Formatter>();
+        factory.template add<Sink, Formatter>();
     }
 };
 

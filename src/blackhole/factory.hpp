@@ -4,12 +4,9 @@
 
 #include <boost/any.hpp>
 
-namespace blackhole {
+#include "blackhole/repository/factory/traits.hpp"
 
-template<typename T>
-struct factory_traits {
-    static typename T::config_type map_config(const boost::any& config);
-};
+namespace blackhole {
 
 namespace aux {
 

@@ -12,8 +12,7 @@
 #include "frontend/syslog.hpp"
 #include "logger.hpp"
 #include "repository/config/log.hpp"
-#include "repository/factory/formatter.hpp"
-#include "repository/factory/sink.hpp"
+#include "repository/factory/group.hpp"
 #include "repository/registrator.hpp"
 #include "sink/files.hpp"
 #include "sink/socket.hpp"
@@ -25,6 +24,7 @@ namespace blackhole {
 template<typename Level>
 class repository_t {
     mutable std::mutex mutex;
+    group_factory_t<Level> factory;
     std::unordered_map<std::string, log_config_t> configs;
 
 public:
@@ -44,7 +44,7 @@ public:
         verbose_logger_t<Level> logger;
         for (auto it = config.frontends.begin(); it != config.frontends.end(); ++it) {
             const frontend_config_t& frontend_config = *it;
-            auto frontend = factory_t<Level>::create(frontend_config.formatter, frontend_config.sink);
+            auto frontend = factory.create(frontend_config.formatter, frontend_config.sink);
             logger.add_frontend(std::move(frontend));
         }
         return logger;
@@ -60,21 +60,24 @@ public:
 
 private:
     repository_t() {
-        typedef boost::mpl::list<formatter::string_t, formatter::json_t> formatters_t;
+        typedef boost::mpl::vector<
+            sink::file_t<>,
+            sink::syslog_t<Level>,
+            sink::socket_t<boost::asio::ip::udp>,
+            sink::socket_t<boost::asio::ip::tcp>
+        > sinks_t;
 
-        add<sink::file_t<>, formatters_t>();
-        add<sink::syslog_t<Level>, formatters_t>();
-        add<sink::socket_t<boost::asio::ip::udp>, formatters_t>();
-        add<sink::socket_t<boost::asio::ip::tcp>, formatters_t>();
+        typedef boost::mpl::list<
+            formatter::string_t,
+            formatter::json_t
+        > formatters_t;
+
+        factory.template add<sink::file_t<>, formatters_t>();
+        factory.template add<sink::syslog_t<Level>, formatters_t>();
+        factory.template add<sink::socket_t<boost::asio::ip::udp>, formatters_t>();
+        factory.template add<sink::socket_t<boost::asio::ip::tcp>, formatters_t>();
 
         init(make_trivial_config());
-    }
-
-    template<typename Sink, typename Formatters>
-    void add() {
-        sink_factory_t<Level>::instance().template add<Sink>();
-        aux::formatter_registrator<Level, Sink> registrator;
-        boost::mpl::for_each<Formatters, aux::mpl::id<boost::mpl::_>>(registrator);
     }
 
     static log_config_t make_trivial_config() {

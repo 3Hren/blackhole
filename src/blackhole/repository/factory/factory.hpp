@@ -2,16 +2,14 @@
 
 #include <memory>
 
+#include "blackhole/repository/factory/traits.hpp"
 #include "blackhole/repository/config/formatter.hpp"
 #include "blackhole/repository/config/sink.hpp"
 
 namespace blackhole {
 
 template<typename Level>
-class sink_factory_t;
-
-template<typename Level>
-class formatter_factory_t;
+class frontend_factory_t;
 
 class base_frontend_t;
 
@@ -37,23 +35,17 @@ struct factory_t {
     template<typename Sink>
     static
     std::unique_ptr<base_frontend_t>
-    create(const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink) {
-        return formatter_factory_t<Level>::instance().create(formatter_config, std::move(sink));
+    create(const frontend_factory_t<Level>& factory, const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink) {
+        return factory.create(formatter_config, std::move(sink));
     }
 
     template<class Sink>
     static
     std::unique_ptr<base_frontend_t>
-    create(const formatter_config_t& formatter_config, const sink_config_t& sink_config) {
+    create(const frontend_factory_t<Level>& factory, const formatter_config_t& formatter_config, const sink_config_t& sink_config) {
         auto config = factory_traits<Sink>::map_config(sink_config.config);
         auto sink = std::make_unique<Sink>(config);
-        return create(formatter_config, std::move(sink));
-    }
-
-    static
-    std::unique_ptr<base_frontend_t>
-    create(const formatter_config_t& formatter_config, const sink_config_t& sink_config) {
-        return sink_factory_t<Level>::instance().create(formatter_config, sink_config);
+        return create(factory, formatter_config, std::move(sink));
     }
 };
 

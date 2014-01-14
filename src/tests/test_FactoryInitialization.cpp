@@ -31,7 +31,8 @@ struct priority_traits<testing::level> {
 
 
 TEST(Factory, FileStringsFrontend) {
-    repository_t<testing::level>::instance();
+    group_factory_t<level> factory;
+    factory.template add<sink::file_t<>, formatter::string_t>();
 
     formatter_config_t formatter = {
         "string",
@@ -43,11 +44,12 @@ TEST(Factory, FileStringsFrontend) {
         std::string("/dev/stdout")
     };
 
-    EXPECT_TRUE(bool(factory_t<testing::level>::create(formatter, sink)));
+    EXPECT_TRUE(bool(factory.create(formatter, sink)));
 }
 
 TEST(Factory, SyslogStringsFrontend) {
-    repository_t<testing::level>::instance();
+    group_factory_t<level> factory;
+    factory.template add<sink::syslog_t<level>, formatter::string_t>();
 
     formatter_config_t formatter = {
         "string",
@@ -59,11 +61,12 @@ TEST(Factory, SyslogStringsFrontend) {
         std::string("AppIdentity")
     };
 
-    EXPECT_TRUE(bool(factory_t<testing::level>::create(formatter, sink)));
+    EXPECT_TRUE(bool(factory.create(formatter, sink)));
 }
 
 TEST(Factory, UdpSocketStringsFrontend) {
-    repository_t<testing::level>::instance();
+    group_factory_t<level> factory;
+    factory.template add<sink::socket_t<boost::asio::ip::udp>, formatter::string_t>();
 
     formatter_config_t formatter = {
         "string",
@@ -78,18 +81,20 @@ TEST(Factory, UdpSocketStringsFrontend) {
         }
     };
 
-    EXPECT_TRUE(bool(factory_t<testing::level>::create(formatter, sink)));
+    EXPECT_TRUE(bool(factory.create(formatter, sink)));
 }
 
 TEST(Factory, TcpSocketStringsFrontend) {
-    repository_t<testing::level>::instance();
+    group_factory_t<level> factory;
+    factory.template add<sink::socket_t<boost::asio::ip::tcp>, formatter::string_t>();
 
     formatter_config_t formatter = {
         "string",
         std::string("[%(timestamp)s]: %(message)s")
     };
 
-    // Sink will try to connect to the specified port. So if it isn't available, an exception will be thrown, it's ok.
+    // Sink will try to connect to the specified port. So if it isn't available,
+    // an exception will be thrown, it's ok.
     sink_config_t sink = {
         "tcp",
         std::vector<boost::any> {
@@ -98,7 +103,7 @@ TEST(Factory, TcpSocketStringsFrontend) {
         }
     };
 
-    EXPECT_TRUE(bool(factory_t<testing::level>::create(formatter, sink)));
+    EXPECT_TRUE(bool(factory.create(formatter, sink)));
 }
 
 log_config_t create_valid_config() {
