@@ -180,8 +180,25 @@ TEST(FactoryTraits, JsonFormatterConfig) {
     EXPECT_EQ(std::vector<std::string>({ "fields" }), actual.positioning.unspecified);
 }
 
+TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredSink) {
+    group_factory_t<level> factory;
+
+    formatter_config_t formatter = {
+        "string",
+        std::string("[%(timestamp)s]: %(message)s")
+    };
+
+    sink_config_t sink = {
+        "files",
+        std::string("/dev/stdout")
+    };
+
+    EXPECT_THROW(factory.create(formatter, sink), error_t);
+}
+
 TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredFormatter) {
     group_factory_t<level> factory;
+    factory.template add<sink::socket_t<boost::asio::ip::udp>, boost::mpl::list<>>();
 
     formatter_config_t formatter = {
         "string",
