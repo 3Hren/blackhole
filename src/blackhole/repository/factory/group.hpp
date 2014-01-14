@@ -51,7 +51,7 @@ public:
         std::lock_guard<std::mutex> lock(mutex);
         auto it = sinks.find(sink_config.type);
         if (it == sinks.end()) {
-            throw error_t("sink '%s' is not registered");
+            throw error_t("sink '%s' is not registered", sink_config.type);
         }
 
         return it->second(frontend_factory, formatter_config, sink_config);
