@@ -1,5 +1,7 @@
 #pragma once
 
+#include "blackhole/repository/factory/formatter.hpp"
+
 namespace blackhole {
 
 namespace aux {
