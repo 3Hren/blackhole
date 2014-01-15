@@ -217,18 +217,21 @@ TEST(Repository, FileSinkWithStringFormatterIsAvailableByDefault) {
     auto& repository = repository_t<level>::instance();
     bool available = repository.available<sink::file_t<>, formatter::string_t>();
     EXPECT_TRUE(available);
+    repository.clear();
 }
 
 TEST(Repository, PairConfiguring) {
+    bool available = false;
     auto& repository = repository_t<level>::instance();
 
-    bool available = repository.available<sink::syslog_t<level>, formatter::string_t>();
+    available = repository.available<sink::syslog_t<level>, formatter::string_t>();
     EXPECT_FALSE(available);
 
     repository.configure<sink::syslog_t<level>, formatter::string_t>();
 
     available = repository.available<sink::syslog_t<level>, formatter::string_t>();
     EXPECT_TRUE(available);
+    repository.clear();
 }
 
 TEST(Repository, GroupConfiguring) {
@@ -237,14 +240,47 @@ TEST(Repository, GroupConfiguring) {
         formatter::json_t
     > formatters_t;
 
+    bool available = false;
     auto& repository = repository_t<level>::instance();
 
-    bool available = repository.available<sink::file_t<>, formatter::json_t>();
+    available = repository.available<sink::file_t<>, formatter::json_t>();
     EXPECT_FALSE(available);
 
     repository.configure<sink::file_t<>, formatters_t>();
 
     available = repository.available<sink::file_t<>, formatter::json_t>();
     EXPECT_TRUE(available);
+    repository.clear();
 }
 
+TEST(Repository, CombinationConfiguring) {
+    typedef boost::mpl::vector<
+        sink::file_t<>,
+        sink::syslog_t<level>
+    > sinks_t;
+
+    typedef boost::mpl::list<
+        formatter::string_t,
+        formatter::json_t
+    > formatters_t;
+
+    bool available = false;
+    auto& repository = repository_t<level>::instance();
+
+    available = repository.available<sink::file_t<>, formatter::json_t>();
+    ASSERT_FALSE(available);
+    available = repository.available<sink::syslog_t<level>, formatter::string_t>();
+    ASSERT_FALSE(available);
+    available = repository.available<sink::syslog_t<level>, formatter::json_t>();
+    ASSERT_FALSE(available);
+
+    repository.configure<sinks_t, formatters_t>();
+
+    available = repository.available<sink::file_t<>, formatter::json_t>();
+    EXPECT_TRUE(available);
+    available = repository.available<sink::syslog_t<level>, formatter::string_t>();
+    EXPECT_TRUE(available);
+    available = repository.available<sink::syslog_t<level>, formatter::json_t>();
+    EXPECT_TRUE(available);
+    repository.clear();
+}

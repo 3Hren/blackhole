@@ -16,6 +16,26 @@
 
 namespace blackhole {
 
+template<typename Sink, typename Formatter, class = void>
+struct frontend_repository {
+    template<typename Level>
+    static void push(frontend_factory_t<Level>& factory) {
+        factory.template add<Sink, Formatter>();
+    }
+};
+
+template<typename Sink, typename Formatters>
+struct frontend_repository<Sink, Formatters, typename std::enable_if<boost::mpl::is_sequence<Formatters>::type::value>::type> {
+    template<typename Level>
+    static void push(frontend_factory_t<Level>& factory) {
+        aux::registrator::frontend<Level> action { factory };
+        boost::mpl::for_each<
+            Formatters,
+            aux::mpl::id<Sink, boost::mpl::_>
+        >(action);
+    }
+};
+
 template<typename Level>
 class group_factory_t {
     typedef std::unique_ptr<base_frontend_t> return_type;
@@ -25,24 +45,6 @@ class group_factory_t {
     std::unordered_map<std::string, factory_type> sinks;
 
     frontend_factory_t<Level> factory;
-
-    template<typename Sink, typename Formatter, class = void>
-    struct frontend_repository {
-        static void push(frontend_factory_t<Level>& factory) {
-            factory.template add<Sink, Formatter>();
-        }
-    };
-
-    template<typename Sink, typename Formatters>
-    struct frontend_repository<Sink, Formatters, typename std::enable_if<boost::mpl::is_sequence<Formatters>::type::value>::type> {
-        static void push(frontend_factory_t<Level>& factory) {
-            aux::registrator::frontend<Level> action { factory };
-            boost::mpl::for_each<
-                Formatters,
-                aux::mpl::id<Sink, boost::mpl::_>
-            >(action);
-        }
-    };
 public:
     template<typename Sink, typename Formatter>
     void add() {
@@ -53,6 +55,7 @@ public:
 
     template<typename Sink, typename Formatter>
     bool has() const {
+        std::lock_guard<std::mutex> lock(mutex);
         return sinks.find(Sink::name()) != sinks.end() && factory.template has<Sink, Formatter>();
     }
 
@@ -64,6 +67,12 @@ public:
         }
 
         return it->second(factory, formatter_config, sink_config);
+    }
+
+    void clear() {
+        std::lock_guard<std::mutex> lock(mutex);
+        sinks.clear();
+        factory.clear();
     }
 };
 

@@ -27,6 +27,31 @@ struct configurator {
 };
 
 template<typename Level>
+struct wrapper {
+    group_factory_t<Level>& factory;
+
+    template<typename Sink, typename Formatters>
+    void operator ()(aux::mpl::id<Sink, Formatters>) const {
+        configurator<Sink, Formatters>::execute(factory);
+    }
+};
+
+template<typename Sinks, typename Formatters>
+struct configurator<
+    Sinks,
+    Formatters,
+    typename std::enable_if<
+        boost::mpl::is_sequence<Sinks>::type::value && boost::mpl::is_sequence<Formatters>::type::value
+    >::type
+> {
+    template<typename Level>
+    static void execute(group_factory_t<Level>& factory) {
+        wrapper<Level> wrap {factory};
+        boost::mpl::for_each<Sinks, aux::mpl::id<boost::mpl::_, Formatters>>(wrap);
+    }
+};
+
+template<typename Level>
 class repository_t {
     mutable std::mutex mutex;
     group_factory_t<Level> factory;
@@ -36,6 +61,24 @@ public:
     static repository_t& instance() {
         static repository_t self;
         return self;
+    }
+
+    template<typename Sink, typename Formatter>
+    bool available() {
+        std::lock_guard<std::mutex> lock(mutex);
+        return factory.template has<Sink, Formatter>();
+    }
+
+    template<typename Sink, typename Formatter>
+    void configure() {
+        std::lock_guard<std::mutex> lock(mutex);
+        configurator<Sink, Formatter>::execute(factory);
+    }
+
+    void clear() {
+        std::lock_guard<std::mutex> lock(mutex);
+        factory.clear();
+        configs.clear();
     }
 
     void init(log_config_t config) {
@@ -63,35 +106,9 @@ public:
         return create("trivial");
     }
 
-    template<typename Sink, typename Formatter>
-    void configure() {
-        configurator<Sink, Formatter>::execute(factory);
-    }
-
-    template<typename Sink, typename Formatter>
-    bool available() {
-        return factory.template has<Sink, Formatter>();
-    }
-
 private:
     repository_t() {
-        typedef boost::mpl::vector<
-            sink::file_t<>,
-            sink::syslog_t<Level>,
-            sink::socket_t<boost::asio::ip::udp>,
-            sink::socket_t<boost::asio::ip::tcp>
-        > sinks_t;
-
-        typedef boost::mpl::list<
-            formatter::string_t,
-            formatter::json_t
-        > formatters_t;
-
-        factory.template add<sink::file_t<>, formatters_t>();
-        factory.template add<sink::syslog_t<Level>, formatters_t>();
-        factory.template add<sink::socket_t<boost::asio::ip::udp>, formatters_t>();
-        factory.template add<sink::socket_t<boost::asio::ip::tcp>, formatters_t>();
-
+        configure<sink::file_t<>, formatter::string_t>();
         init(make_trivial_config());
     }
 
