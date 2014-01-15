@@ -81,7 +81,7 @@ public:
             const function_keeper_t<Level>& keeper = factories.at(formatter_config.type);
             auto factory = keeper.template get<Sink>();
             return factory(formatter_config, std::move(sink));
-        } catch (const std::exception& err) {
+        } catch (const std::exception&) {
             throw error_t("there are no registered formatter '%s' for sink '%s", formatter_config.type, Sink::name());
         }
 
