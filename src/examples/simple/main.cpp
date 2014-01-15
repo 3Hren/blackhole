@@ -10,29 +10,6 @@ enum class level {
     error
 };
 
-namespace blackhole { namespace sink {
-
-template<>
-struct priority_traits<level> {
-    static inline
-    priority_t map(level lvl) {
-        switch (lvl) {
-        case level::debug:
-            return priority_t::debug;
-        case level::info:
-            return priority_t::info;
-        case level::warning:
-            return priority_t::warning;
-        case level::error:
-            return priority_t::err;
-        }
-
-        return priority_t::debug;
-    }
-};
-
-} } // namespace blackhole::sink
-
 //! Initialization stage.
 //! \brief Manually or from file - whatever. The main aim - is to get initialized `log_config_t` object.
 void init() {

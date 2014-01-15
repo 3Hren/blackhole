@@ -1,7 +1,6 @@
 //!@todo: files_t: Make file rotation.
 //!@todo: files_t: Make file naming by pattern.
 //!@todo: files_t: Create directory if not exists.
-//!@todo: api: It is now possible not to pay for unused sinks/formatters. Use it.
 
 //!@todo: performance: Experiment with std::ostringstream or format library for performance check.
 //!@todo: performance & api: Maybe write own json-writer?

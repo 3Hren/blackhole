@@ -10,9 +10,9 @@
 
 #include "blackhole/repository/config/formatter.hpp"
 #include "blackhole/repository/config/sink.hpp"
+#include "blackhole/repository/factory/configurator.hpp"
 #include "blackhole/repository/factory/factory.hpp"
 #include "blackhole/repository/factory/frontend.hpp"
-#include "blackhole/repository/registrator.hpp"
 
 namespace blackhole {
 

@@ -11,30 +11,6 @@ enum class level {
     error
 };
 
-namespace blackhole { namespace sink {
-
-//! Priority mapping function overload for proper syslog mapping.
-template<>
-struct priority_traits<level> {
-    static inline
-    priority_t map(level lvl) {
-        switch (lvl) {
-        case level::debug:
-            return priority_t::debug;
-        case level::info:
-            return priority_t::info;
-        case level::warning:
-            return priority_t::warning;
-        case level::error:
-            return priority_t::err;
-        }
-
-        return priority_t::debug;
-    }
-};
-
-} } // namespace blackhole::sink
-
 //! Attribute mapping from its real values to human-readable string representation.
 std::string map_severity(level lvl) {
     static std::string LEVEL[] = {
