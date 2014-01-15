@@ -34,6 +34,11 @@ class frontend_factory_t {
         }
 
         template<typename Sink>
+        bool has() const {
+            return functions.find(Sink::name()) != functions.end();
+        }
+
+        template<typename Sink>
         typename traits<Sink>::function_type get() const {
             boost::any any = functions.at(Sink::name());
             return boost::any_cast<typename traits<Sink>::function_type>(any);
@@ -56,6 +61,12 @@ public:
             keeper.template add<Sink, Formatter>();
             factories[Formatter::name()] = keeper;
         }
+    }
+
+    template<typename Sink, typename Formatter>
+    bool has() const {
+        auto it = factories.find(Formatter::name());
+        return it != factories.end() && it->second.template has<Sink>();
     }
 
     template<typename Sink>

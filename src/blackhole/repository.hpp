@@ -18,6 +18,14 @@
 
 namespace blackhole {
 
+template<typename Sink, typename Formatter, class = void>
+struct configurator {
+    template<typename Level>
+    static void execute(group_factory_t<Level>& factory) {
+        factory.template add<Sink, Formatter>();
+    }
+};
+
 template<typename Level>
 class repository_t {
     mutable std::mutex mutex;
@@ -53,6 +61,16 @@ public:
 
     verbose_logger_t<Level> trivial() const {
         return create("trivial");
+    }
+
+    template<typename Sink, typename Formatter>
+    void configure() {
+        configurator<Sink, Formatter>::execute(factory);
+    }
+
+    template<typename Sink, typename Formatter>
+    bool available() {
+        return factory.template has<Sink, Formatter>();
     }
 
 private:

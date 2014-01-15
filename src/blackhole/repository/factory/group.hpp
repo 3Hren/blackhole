@@ -51,6 +51,11 @@ public:
         frontend_repository<Sink, Formatter>::push(factory);
     }
 
+    template<typename Sink, typename Formatter>
+    bool has() const {
+        return sinks.find(Sink::name()) != sinks.end() && factory.template has<Sink, Formatter>();
+    }
+
     return_type create(const formatter_config_t& formatter_config, const sink_config_t& sink_config) const {
         std::lock_guard<std::mutex> lock(mutex);
         auto it = sinks.find(sink_config.type);

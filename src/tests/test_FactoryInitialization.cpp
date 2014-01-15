@@ -212,3 +212,18 @@ TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredFormatter) {
 
     EXPECT_THROW(factory.create(formatter, sink), blackhole::error_t);
 }
+
+TEST(Repository, FileSinkWithStringFormatterIsAvailableByDefault) {
+    auto& repository = repository_t<level>::instance();
+    bool available = repository.available<sink::file_t<>, formatter::string_t>();
+    EXPECT_TRUE(available);
+}
+
+TEST(Repository, PairConfiguring) {
+    auto& repository = repository_t<level>::instance();
+    repository.configure<sink::syslog_t<level>, formatter::string_t>();
+
+    bool available = repository.available<sink::syslog_t<level>, formatter::string_t>();
+    EXPECT_TRUE(available);
+}
+
