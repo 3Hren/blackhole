@@ -24,7 +24,7 @@ class group_factory_t {
     mutable std::mutex mutex;
     std::unordered_map<std::string, factory_type> sinks;
 
-    frontend_factory_t<Level> frontend_factory;
+    frontend_factory_t<Level> factory;
 
     template<typename Sink, typename Formatter, class = void>
     struct frontend_repository {
@@ -33,12 +33,12 @@ class group_factory_t {
         }
     };
 
-    template<typename Sink, typename Formatter>
-    struct frontend_repository<Sink, Formatter, typename std::enable_if<boost::mpl::is_sequence<Formatter>::type::value>::type> {
+    template<typename Sink, typename Formatters>
+    struct frontend_repository<Sink, Formatters, typename std::enable_if<boost::mpl::is_sequence<Formatters>::type::value>::type> {
         static void push(frontend_factory_t<Level>& factory) {
             aux::registrator::frontend<Level> action { factory };
             boost::mpl::for_each<
-                Formatter,
+                Formatters,
                 aux::mpl::id<Sink, boost::mpl::_>
             >(action);
         }
@@ -48,7 +48,7 @@ public:
     void add() {
         std::lock_guard<std::mutex> lock(mutex);
         sinks[Sink::name()] = static_cast<factory_type>(&factory_t<Level>::template create<Sink>);
-        frontend_repository<Sink, Formatter>::push(frontend_factory);
+        frontend_repository<Sink, Formatter>::push(factory);
     }
 
     return_type create(const formatter_config_t& formatter_config, const sink_config_t& sink_config) const {
@@ -58,7 +58,7 @@ public:
             throw error_t("sink '%s' is not registered", sink_config.type);
         }
 
-        return it->second(frontend_factory, formatter_config, sink_config);
+        return it->second(factory, formatter_config, sink_config);
     }
 };
 
