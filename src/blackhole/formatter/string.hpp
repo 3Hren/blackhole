@@ -11,6 +11,7 @@
 #include "blackhole/formatter/string/parser.hpp"
 #include "blackhole/formatter/map/value.hpp"
 #include "blackhole/record.hpp"
+#include "blackhole/repository/factory/traits.hpp"
 
 namespace blackhole {
 
