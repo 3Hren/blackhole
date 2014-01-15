@@ -221,9 +221,30 @@ TEST(Repository, FileSinkWithStringFormatterIsAvailableByDefault) {
 
 TEST(Repository, PairConfiguring) {
     auto& repository = repository_t<level>::instance();
-    repository.configure<sink::syslog_t<level>, formatter::string_t>();
 
     bool available = repository.available<sink::syslog_t<level>, formatter::string_t>();
+    EXPECT_FALSE(available);
+
+    repository.configure<sink::syslog_t<level>, formatter::string_t>();
+
+    available = repository.available<sink::syslog_t<level>, formatter::string_t>();
+    EXPECT_TRUE(available);
+}
+
+TEST(Repository, GroupConfiguring) {
+    typedef boost::mpl::list<
+        formatter::string_t,
+        formatter::json_t
+    > formatters_t;
+
+    auto& repository = repository_t<level>::instance();
+
+    bool available = repository.available<sink::file_t<>, formatter::json_t>();
+    EXPECT_FALSE(available);
+
+    repository.configure<sink::file_t<>, formatters_t>();
+
+    available = repository.available<sink::file_t<>, formatter::json_t>();
     EXPECT_TRUE(available);
 }
 
