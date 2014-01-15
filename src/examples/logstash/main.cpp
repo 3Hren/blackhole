@@ -1,6 +1,9 @@
 #include <blackhole/log.hpp>
 #include <blackhole/repository.hpp>
 
+#include <blackhole/formatter/json.hpp>
+#include <blackhole/sink/socket.hpp>
+
 using namespace blackhole;
 
 //! Our logger severity enumeration.
@@ -66,6 +69,11 @@ std::string map_timestamp(const std::time_t& time) {
     }
 */
 void init() {
+    //! Register required frontend.
+    repository_t<level>::instance().configure<
+        sink::socket_t<boost::asio::ip::tcp>, formatter::json_t
+    >();
+
     mapping::value_t mapper;
     mapper.add<keyword::tag::severity_t<level>>(&map_severity);
     mapper.add<keyword::tag::timestamp_t>(&map_timestamp);
