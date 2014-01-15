@@ -4,8 +4,6 @@
 #include <mutex>
 #include <string>
 
-#include <boost/mpl/for_each.hpp>
-
 #include "formatter/json.hpp"
 #include "formatter/string.hpp"
 #include "frontend.hpp"
@@ -17,7 +15,6 @@
 #include "sink/files.hpp"
 #include "sink/socket.hpp"
 #include "sink/syslog.hpp"
-#include "utils/unique.hpp"
 
 namespace blackhole {
 

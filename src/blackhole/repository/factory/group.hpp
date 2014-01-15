@@ -5,6 +5,7 @@
 #include <mutex>
 #include <unordered_map>
 
+#include <boost/mpl/for_each.hpp>
 #include <boost/mpl/is_sequence.hpp>
 
 #include "blackhole/repository/config/formatter.hpp"
