@@ -36,8 +36,11 @@ class group_factory_t {
     template<typename Sink, typename Formatter>
     struct frontend_repository<Sink, Formatter, typename std::enable_if<boost::mpl::is_sequence<Formatter>::type::value>::type> {
         static void push(frontend_factory_t<Level>& factory) {
-            aux::formatter_registrator<Level, Sink> registrator { factory };
-            boost::mpl::for_each<Formatter, aux::mpl::id<boost::mpl::_>>(registrator);
+            aux::registrator::frontend<Level> action { factory };
+            boost::mpl::for_each<
+                Formatter,
+                aux::mpl::id<Sink, boost::mpl::_>
+            >(action);
         }
     };
 public:

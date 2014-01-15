@@ -8,19 +8,23 @@ namespace aux {
 
 namespace mpl {
 
-template<class T> struct id {};
+template<class Sink, class Formatter> struct id {};
 
 } // namespace mpl
 
-template<typename Level, typename Sink>
-struct formatter_registrator {
+namespace registrator {
+
+template<typename Level>
+struct frontend {
     frontend_factory_t<Level>& factory;
 
-    template<typename Formatter>
-    void operator ()(aux::mpl::id<Formatter>) const {
+    template<typename Sink, typename Formatter>
+    void operator ()(aux::mpl::id<Sink, Formatter>) const {
         factory.template add<Sink, Formatter>();
     }
 };
+
+} // namespace registrator
 
 } // namespace aux
 
