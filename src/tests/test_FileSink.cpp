@@ -15,7 +15,7 @@ TEST(file_t, WritesToTheFile) {
 }
 
 TEST(file_t, OpensFileIfItClosedWhenWriting) {
-    sink::file_t<mock::files::backend_t> sink("test.log");
+    sink::file_t<NiceMock<mock::files::backend_t>> sink("test.log");
     EXPECT_CALL(sink.backend(), opened()).
             Times(1).
             WillOnce(Return(false));
