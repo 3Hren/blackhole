@@ -248,3 +248,24 @@ TEST(FilterSeverity, HasAndGetGtEq) {
     attributes = { keyword::severity<ts::severity>() = ts::severity::warning };
     EXPECT_TRUE(filter(attributes));
 }
+
+TEST(FilterCustomAttribute, HasOrHas) {
+    auto filter = expr::has_attr<std::int32_t>("custom-1") || expr::has_attr<std::int32_t>("custom-2");
+    log::attributes_t attributes = {
+        {"custom-1", log::attribute_t(41)},
+        {"custom-2", log::attribute_t(100501)}
+    };
+    EXPECT_TRUE(filter(attributes));
+
+    attributes = {
+        {"custom-0", log::attribute_t(42)},
+        {"custom-1", log::attribute_t(100501)}
+    };
+    EXPECT_TRUE(filter(attributes));
+
+    attributes = {
+        {"custom-0", log::attribute_t(41)},
+        {"custom-3", log::attribute_t(100500)}
+    };
+    EXPECT_FALSE(filter(attributes));
+}

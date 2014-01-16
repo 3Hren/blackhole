@@ -43,6 +43,10 @@ struct has_attr_action_t {
     filter_t operator &&(filter_t other) const {
         return aux::And { *this, other };
     }
+
+    filter_t operator ||(filter_t other) const {
+        return aux::Or { *this, other };
+    }
 };
 
 // For dynamic attributes.

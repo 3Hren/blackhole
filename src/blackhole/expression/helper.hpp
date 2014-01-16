@@ -18,6 +18,15 @@ struct And {
     }
 };
 
+struct Or {
+    filter_t first;
+    filter_t second;
+
+    bool operator ()(const log::attributes_t& attributes) const {
+        return first(attributes) || second(attributes);
+    }
+};
+
 template<typename T>
 struct Eq {
     T extracter;
