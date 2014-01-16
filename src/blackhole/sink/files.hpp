@@ -25,9 +25,7 @@ public:
     }
 
     bool open() {
-        try {
-            boost::filesystem::create_directories(m_path.parent_path());
-        } catch (const boost::filesystem::filesystem_error&) {
+        if (!create_directories(m_path.parent_path())) {
             return false;
         }
 
@@ -46,6 +44,18 @@ public:
 
     void flush() {
         m_file.flush();
+    }
+
+private:
+    template<typename Path>
+    bool create_directories(const Path& path) {
+        try {
+            boost::filesystem::create_directories(path);
+        } catch (const boost::filesystem::filesystem_error&) {
+            return false;
+        }
+
+        return true;
     }
 };
 
