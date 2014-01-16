@@ -2,7 +2,6 @@
 //!@todo: files_t: Make file naming by pattern.
 //!@todo: files_t: Create directory if not exists.
 
-//!@todo: example: Make syslog example with demonstration of severity mapping.
 //!@todo: example: Make stdout/string example with demonstration of formatting other attribute.
 
 //!@todo: performance: Experiment with std::ostringstream or format library for performance check.
