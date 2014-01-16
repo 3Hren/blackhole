@@ -14,3 +14,4 @@
 //!@todo: filter_t: Make || operations in filtering.
 //!@todo: socket_t: Make asynchronous TCP backend.
 //!@todo: msgpack_t: Attribute mappings.
+//!@todo: api: Maybe squish repository_t::init and ::configure methods?
