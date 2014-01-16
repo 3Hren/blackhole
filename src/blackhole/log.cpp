@@ -1,6 +1,5 @@
 //!@todo: files_t: Make file rotation.
 //!@todo: files_t: Make file naming by pattern.
-//!@todo: files_t: Create directory if not exists.
 
 //!@todo: example: Make stdout/string example with demonstration of formatting other attribute.
 

@@ -25,6 +25,12 @@ public:
     }
 
     bool open() {
+        try {
+            boost::filesystem::create_directories(m_path.parent_path());
+        } catch (const boost::filesystem::filesystem_error&) {
+            return false;
+        }
+
         m_file.open(m_path, std::ios_base::out | std::ios_base::app);
         return m_file.is_open();
     }
