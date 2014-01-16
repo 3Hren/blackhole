@@ -41,11 +41,17 @@ struct has_attr_action_t {
     }
 
     filter_t operator &&(filter_t other) const {
-        return aux::And { *this, other };
+        return operation<aux::And>(other);
     }
 
     filter_t operator ||(filter_t other) const {
-        return aux::Or { *this, other };
+        return operation<aux::Or>(other);
+    }
+
+private:
+    template<typename Action>
+    filter_t operation(filter_t other) const {
+        return Action { *this, other };
     }
 };
 
