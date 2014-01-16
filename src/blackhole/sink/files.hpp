@@ -30,11 +30,7 @@ public:
     }
 
     std::string path() const {
-#if BOOST_VERSION >= 104600
-        return m_path.filename().string();
-#else
-        return m_path.filename();
-#endif
+        return m_path.string();
     }
 
     void write(const std::string& message) {
