@@ -35,7 +35,14 @@ struct AndMixin {
 };
 
 template<typename T>
-struct Eq : public AndMixin<Eq<T>>{
+struct OrMixin {
+    filter_t operator ||(filter_t other) const {
+        return Or { static_cast<const T&>(*this), other };
+    }
+};
+
+template<typename T>
+struct Eq : public AndMixin<Eq<T>>, public OrMixin<Eq<T>> {
     T extracter;
     typename T::result_type other;
 
