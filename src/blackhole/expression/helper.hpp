@@ -28,16 +28,21 @@ struct Or {
 };
 
 template<typename T>
-struct Eq {
+struct AndMixin {
+    filter_t operator &&(filter_t other) const {
+        return And { static_cast<const T&>(*this), other };
+    }
+};
+
+template<typename T>
+struct Eq : public AndMixin<Eq<T>>{
     T extracter;
     typename T::result_type other;
 
+    Eq(T extracter, typename T::result_type other) : extracter(extracter), other(other) {}
+
     bool operator ()(const log::attributes_t& attributes) const {
         return extracter(attributes) == other;
-    }
-
-    filter_t operator &&(filter_t other) const {
-        return And { *this, other };
     }
 };
 
