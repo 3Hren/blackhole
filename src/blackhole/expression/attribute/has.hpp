@@ -41,12 +41,6 @@ struct has_attr_action_t : public aux::LogicMixin<has_attr_action_t<T>> {
         typedef typename blackhole::aux::underlying_type<T>::type underlying_type;
         return boost::apply_visitor(has_attribute_visitor<underlying_type>(), attribute.value);
     }
-
-private:
-    template<typename Action>
-    filter_t operation(filter_t other) const {
-        return Action { *this, other };
-    }
 };
 
 // For dynamic attributes.
