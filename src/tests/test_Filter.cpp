@@ -271,9 +271,8 @@ TEST(FilterCustomAttribute, HasOrHas) {
 }
 
 TEST(FilterCustomAttribute, GetEqAndGetEq) {
-    expression::aux::Eq<expr::get_attr_action_t<std::int32_t>> filter =
-            expr::get_attr<std::int32_t>("custom-1") == 42;// && [](const log::attributes_t&){ return true; };
-            //expr::get_attr<std::int32_t>("custom-2") == 100500;
+    auto filter = expr::get_attr<std::int32_t>("custom-1") == 42 &&
+            expr::get_attr<std::int32_t>("custom-2") == 100500;
     log::attributes_t attributes = {
         {"custom-1", log::attribute_t(42)},
         {"custom-2", log::attribute_t(100500)}
