@@ -37,7 +37,7 @@ struct get_attr_action_t {
         return operation<aux::Eq>(other);
     }
 
-    filter_t operator <(const T& other) const {
+    typename filtered<aux::Less>::type operator <(const T& other) const {
         return operation<aux::Less>(other);
     }
 
