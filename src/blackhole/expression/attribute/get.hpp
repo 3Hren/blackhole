@@ -28,7 +28,7 @@ struct get_attr_action_t {
         return static_cast<result_type>(attribute::traits<T>::extract(attributes, name));
     }
 
-    filter_t operator ==(const T& other) const {
+    aux::Eq<get_attr_action_t<T>> operator ==(const T& other) const {
         return operation<aux::Eq>(other);
     }
 

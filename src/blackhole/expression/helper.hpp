@@ -35,6 +35,10 @@ struct Eq {
     bool operator ()(const log::attributes_t& attributes) const {
         return extracter(attributes) == other;
     }
+
+    filter_t operator &&(filter_t other) const {
+        return And { *this, other };
+    }
 };
 
 template<typename T>
