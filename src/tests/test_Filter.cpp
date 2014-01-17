@@ -278,4 +278,16 @@ TEST(FilterCustomAttribute, GetEqAndGetEq) {
         {"custom-2", log::attribute_t(100500)}
     };
     EXPECT_TRUE(filter(attributes));
+
+    attributes = {
+        {"custom-1", log::attribute_t(41)},
+        {"custom-2", log::attribute_t(100500)}
+    };
+    EXPECT_FALSE(filter(attributes));
+
+    attributes = {
+        {"custom-1", log::attribute_t(42)},
+        {"custom-2", log::attribute_t(100501)}
+    };
+    EXPECT_FALSE(filter(attributes));
 }
