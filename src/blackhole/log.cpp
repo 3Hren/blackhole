@@ -1,3 +1,5 @@
+//!@todo: filter_t: Make || operations in filtering.
+
 //!@todo: files_t: Make file rotation.
 //!@todo: files_t: Make file naming by pattern.
 
@@ -9,7 +11,6 @@
 //!@todo: api: Make fallback logger. Make it configurable.
 //!@todo: aux: Make internal exception class with attribute keeping, e.g. line, file or path.
 //!@todo: performance: Current naive implementation of timestamp formatter is suck and have large performance troubles. Fix it.
-//!@todo: filter_t: Make || operations in filtering.
 //!@todo: socket_t: Make asynchronous TCP backend.
 //!@todo: msgpack_t: Attribute mappings.
 //!@todo: api: Maybe squish repository_t::init and ::configure methods?
