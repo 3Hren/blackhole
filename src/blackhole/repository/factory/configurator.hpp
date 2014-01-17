@@ -30,8 +30,8 @@ struct configurator<
 > {
     template<typename Level>
     static void execute(group_factory_t<Level>& factory) {
-        aux::registrator::group<Level> wrap {factory};
-        boost::mpl::for_each<Sinks, aux::mpl::id<boost::mpl::_, Formatters>>(wrap);
+        aux::registrator::group<Level> action {factory};
+        boost::mpl::for_each<Sinks, aux::mpl::id<boost::mpl::_, Formatters>>(action);
     }
 };
 
