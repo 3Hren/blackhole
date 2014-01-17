@@ -15,6 +15,11 @@ template<typename T>
 struct get_attr_action_t {
     typedef typename blackhole::aux::underlying_type<T>::type result_type;
 
+    template<template<typename = T> class Operator>
+    struct filtered {
+        typedef Operator<get_attr_action_t<T>> type;
+    };
+
     const std::string name;
 
     template<template<typename = T> class Operator>
@@ -28,7 +33,7 @@ struct get_attr_action_t {
         return static_cast<result_type>(attribute::traits<T>::extract(attributes, name));
     }
 
-    aux::Eq<get_attr_action_t<T>> operator ==(const T& other) const {
+    typename filtered<aux::Eq>::type operator ==(const T& other) const {
         return operation<aux::Eq>(other);
     }
 
