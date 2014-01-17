@@ -27,8 +27,10 @@ public:
 };
 
 template<typename T>
-struct has_attr_action_t {
+struct has_attr_action_t : public aux::LogicMixin<has_attr_action_t<T>> {
     const std::string name;
+
+    has_attr_action_t(const std::string& name) : name(name) {}
 
     bool operator()(const log::attributes_t& attributes) const {
         auto it = attributes.find(name);
@@ -38,14 +40,6 @@ struct has_attr_action_t {
         const log::attribute_t& attribute = it->second;
         typedef typename blackhole::aux::underlying_type<T>::type underlying_type;
         return boost::apply_visitor(has_attribute_visitor<underlying_type>(), attribute.value);
-    }
-
-    filter_t operator &&(filter_t other) const {
-        return operation<aux::And>(other);
-    }
-
-    filter_t operator ||(filter_t other) const {
-        return operation<aux::Or>(other);
     }
 
 private:
