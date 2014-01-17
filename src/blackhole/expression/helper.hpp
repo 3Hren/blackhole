@@ -42,7 +42,10 @@ struct OrMixin {
 };
 
 template<typename T>
-struct Eq : public AndMixin<Eq<T>>, public OrMixin<Eq<T>> {
+struct LogicMixin : public AndMixin<T>, public OrMixin<T> {};
+
+template<typename T>
+struct Eq : public LogicMixin<Eq<T>> {
     T extracter;
     typename T::result_type other;
 
