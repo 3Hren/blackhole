@@ -376,3 +376,38 @@ TEST(FilterCustomAttribute, GetLessEqAndGetLessEq) {
     EXPECT_TRUE(filter(attributes));
 }
 
+TEST(FilterCustomAttribute, GetGtAndGetGt) {
+    auto filter = expr::get_attr<std::int32_t>("custom-1") > 42 &&
+            expr::get_attr<std::int32_t>("custom-2") > 100500;
+    log::attributes_t attributes = {
+        {"custom-1", log::attribute_t(42)},
+        {"custom-2", log::attribute_t(100500)}
+    };
+    EXPECT_FALSE(filter(attributes));
+
+    attributes = {
+        {"custom-1", log::attribute_t(41)},
+        {"custom-2", log::attribute_t(100500)}
+    };
+    EXPECT_FALSE(filter(attributes));
+
+    attributes = {
+        {"custom-1", log::attribute_t(42)},
+        {"custom-2", log::attribute_t(100501)}
+    };
+    EXPECT_FALSE(filter(attributes));
+
+    attributes = {
+        {"custom-1", log::attribute_t(41)},
+        {"custom-2", log::attribute_t(100499)}
+    };
+    EXPECT_FALSE(filter(attributes));
+
+    attributes = {
+        {"custom-1", log::attribute_t(43)},
+        {"custom-2", log::attribute_t(100501)}
+    };
+    EXPECT_TRUE(filter(attributes));
+}
+
+

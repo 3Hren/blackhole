@@ -81,9 +81,11 @@ struct LessEq : public LogicMixin<LessEq<T>> {
 };
 
 template<typename T>
-struct Gt {
+struct Gt : public LogicMixin<Gt<T>> {
     T extracter;
     typename T::result_type other;
+
+    Gt(T extracter, typename T::result_type other) : extracter(extracter), other(other) {}
 
     bool operator ()(const log::attributes_t& attributes) const {
         return extracter(attributes) > other;
