@@ -93,9 +93,11 @@ struct Gt : public LogicMixin<Gt<T>> {
 };
 
 template<typename T>
-struct GtEq {
+struct GtEq : public LogicMixin<GtEq<T>> {
     T extracter;
     typename T::result_type other;
+
+    GtEq(T extracter, typename T::result_type other) : extracter(extracter), other(other) {}
 
     bool operator ()(const log::attributes_t& attributes) const {
         return extracter(attributes) >= other;

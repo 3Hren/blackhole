@@ -49,7 +49,7 @@ struct get_attr_action_t {
         return operation<aux::Gt>(other);
     }
 
-    filter_t operator >=(const T& other) const {
+    typename filtered<aux::GtEq>::type operator >=(const T& other) const {
         return operation<aux::GtEq>(other);
     }
 };
