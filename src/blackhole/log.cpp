@@ -1,5 +1,3 @@
-//!@todo: filter_t: Make || operations in filtering.
-
 //!@todo: files_t: Make file rotation.
 //!@todo: files_t: Make file naming by pattern.
 
