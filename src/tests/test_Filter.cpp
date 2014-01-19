@@ -505,3 +505,44 @@ TEST(FilterCustomAttribute, TripleAndOperatorWithEqFilter) {
     };
     EXPECT_FALSE(filter(attributes));
 }
+
+TEST(FilterCustomAttribute, TripleOrOperatorWithEqFilter) {
+    auto filter = expr::get_attr<std::int32_t>("custom-1") == 42 ||
+            expr::get_attr<std::int32_t>("custom-2") == 100500 ||
+            expr::get_attr<std::int32_t>("custom-3") == 666;
+
+    log::attributes_t attributes = {
+        {"custom-1", log::attribute_t(42)},
+        {"custom-2", log::attribute_t(100500)},
+        {"custom-3", log::attribute_t(666)},
+    };
+    EXPECT_TRUE(filter(attributes));
+
+    attributes = {
+        {"custom-1", log::attribute_t(41)},
+        {"custom-2", log::attribute_t(100500)},
+        {"custom-3", log::attribute_t(667)},
+    };
+    EXPECT_TRUE(filter(attributes));
+
+    attributes = {
+        {"custom-1", log::attribute_t(41)},
+        {"custom-2", log::attribute_t(100501)},
+        {"custom-3", log::attribute_t(666)},
+    };
+    EXPECT_TRUE(filter(attributes));
+
+    attributes = {
+        {"custom-1", log::attribute_t(42)},
+        {"custom-2", log::attribute_t(100501)},
+        {"custom-3", log::attribute_t(667)},
+    };
+    EXPECT_TRUE(filter(attributes));
+
+    attributes = {
+        {"custom-1", log::attribute_t(41)},
+        {"custom-2", log::attribute_t(100501)},
+        {"custom-3", log::attribute_t(667)},
+    };
+    EXPECT_FALSE(filter(attributes));
+}

@@ -9,22 +9,38 @@ namespace expression {
 
 namespace aux {
 
-struct And {
+struct And;
+struct Or;
+
+template<typename T>
+struct AndMixin {
+    And operator &&(filter_t other) const;
+};
+
+template<typename T>
+struct OrMixin {
+    Or operator ||(filter_t other) const;
+};
+
+template<typename T>
+struct LogicMixin : public AndMixin<T>, public OrMixin<T> {};
+
+struct And : public AndMixin<And> {
     filter_t first;
     filter_t second;
+
+    And(filter_t first, filter_t second) : first(first), second(second) {}
 
     bool operator ()(const log::attributes_t& attributes) const {
         return first(attributes) && second(attributes);
     }
-
-    And operator &&(filter_t other) const {
-        return And { *this, other };
-    }
 };
 
-struct Or {
+struct Or : public OrMixin<Or> {
     filter_t first;
     filter_t second;
+
+    Or(filter_t first, filter_t second) : first(first), second(second) {}
 
     bool operator ()(const log::attributes_t& attributes) const {
         return first(attributes) || second(attributes);
@@ -32,21 +48,14 @@ struct Or {
 };
 
 template<typename T>
-struct AndMixin {
-    And operator &&(filter_t other) const {
-        return And { static_cast<const T&>(*this), other };
-    }
-};
+And AndMixin<T>::operator &&(filter_t other) const  {
+    return And { static_cast<const T&>(*this), other };
+}
 
 template<typename T>
-struct OrMixin {
-    Or operator ||(filter_t other) const {
-        return Or { static_cast<const T&>(*this), other };
-    }
-};
-
-template<typename T>
-struct LogicMixin : public AndMixin<T>, public OrMixin<T> {};
+Or OrMixin<T>::operator ||(filter_t other) const {
+    return Or { static_cast<const T&>(*this), other };
+}
 
 template<typename T>
 struct Eq : public LogicMixin<Eq<T>> {
