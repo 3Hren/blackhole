@@ -16,6 +16,10 @@ struct And {
     bool operator ()(const log::attributes_t& attributes) const {
         return first(attributes) && second(attributes);
     }
+
+    And operator &&(filter_t other) const {
+        return And { *this, other };
+    }
 };
 
 struct Or {
@@ -29,14 +33,14 @@ struct Or {
 
 template<typename T>
 struct AndMixin {
-    filter_t operator &&(filter_t other) const {
+    And operator &&(filter_t other) const {
         return And { static_cast<const T&>(*this), other };
     }
 };
 
 template<typename T>
 struct OrMixin {
-    filter_t operator ||(filter_t other) const {
+    Or operator ||(filter_t other) const {
         return Or { static_cast<const T&>(*this), other };
     }
 };
