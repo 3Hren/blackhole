@@ -548,8 +548,8 @@ TEST(FilterCustomAttribute, TripleOrOperatorWithEqFilter) {
 }
 
 TEST(FilterCustomAttribute, CombinationOfLogicOperatorsWithEqFilter) {
-    auto filter = expr::get_attr<std::int32_t>("custom-1") == 42 &&
-            expr::get_attr<std::int32_t>("custom-2") == 100500 ||
+    auto filter = (expr::get_attr<std::int32_t>("custom-1") == 42 &&
+                   expr::get_attr<std::int32_t>("custom-2") == 100500) ||
             expr::get_attr<std::int32_t>("custom-3") == 666;
 
     log::attributes_t attributes = {
@@ -597,8 +597,8 @@ TEST(FilterCustomAttribute, CombinationOfLogicOperatorsWithEqFilter) {
 
 TEST(FilterCustomAttribute, ReversedCombinationOfLogicOperatorsWithEqFilter) {
     auto filter = expr::get_attr<std::int32_t>("custom-1") == 42 ||
-            expr::get_attr<std::int32_t>("custom-2") == 100500 &&
-            expr::get_attr<std::int32_t>("custom-3") == 666;
+            (expr::get_attr<std::int32_t>("custom-2") == 100500 &&
+             expr::get_attr<std::int32_t>("custom-3") == 666);
 
     log::attributes_t attributes = {
         {"custom-1", log::attribute_t(42)},
