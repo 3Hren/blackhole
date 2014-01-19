@@ -25,7 +25,7 @@ struct OrMixin {
 template<typename T>
 struct LogicMixin : public AndMixin<T>, public OrMixin<T> {};
 
-struct And : public AndMixin<And> {
+struct And : public LogicMixin<And> {
     filter_t first;
     filter_t second;
 
@@ -36,7 +36,7 @@ struct And : public AndMixin<And> {
     }
 };
 
-struct Or : public OrMixin<Or> {
+struct Or : public LogicMixin<Or> {
     filter_t first;
     filter_t second;
 
