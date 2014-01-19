@@ -472,7 +472,7 @@ TEST(FilterCustomAttribute, GetGtEqAndGetGtEq) {
     EXPECT_TRUE(filter(attributes));
 }
 
-TEST(FilterCustomAttribute, TripleMotherfucking) {
+TEST(FilterCustomAttribute, TripleAndOperatorWithEqFilter) {
     auto filter = expr::get_attr<std::int32_t>("custom-1") == 42 &&
             expr::get_attr<std::int32_t>("custom-2") == 100500 &&
             expr::get_attr<std::int32_t>("custom-3") == 666;
