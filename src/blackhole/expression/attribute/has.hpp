@@ -46,7 +46,7 @@ struct has_attr_action_t : public aux::LogicMixin<has_attr_action_t<T>> {
 // For dynamic attributes.
 template<typename T>
 has_attr_action_t<T> has_attr(const std::string& name) {
-    return has_attr_action_t<T>({ name });
+    return has_attr_action_t<T>(name);
 }
 
 // For static attributes.
