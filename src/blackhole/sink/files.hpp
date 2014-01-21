@@ -130,7 +130,7 @@ struct factory_traits<sink::file_t<>> {
 
     static config_type map_config(const boost::any& config) {
         config_type cfg;
-        aux::any_to(config, cfg.path);
+        aux::vector_to(config, cfg.path, cfg.autoflush);
         return cfg;
     }
 };

@@ -20,7 +20,10 @@ void init() {
 
     sink_config_t sink = {
         "files",
-        std::string("/dev/stdout")
+        std::vector<boost::any> {
+            std::string("/dev/stdout"),
+            true
+        }
     };
 
     frontend_config_t frontend = { formatter, sink };

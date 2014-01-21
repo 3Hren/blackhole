@@ -29,6 +29,7 @@ SET(SOURCES
     test_ExceptionTrap
     test_Macro
     test_MsgpackFormatter
+    test_Config
     test_Manual
 )
 

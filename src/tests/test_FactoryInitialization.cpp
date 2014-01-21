@@ -41,7 +41,10 @@ TEST(Factory, FileStringsFrontend) {
 
     sink_config_t sink = {
         "files",
-        std::string("/dev/stdout")
+        std::vector<boost::any> {
+            std::string("/dev/stdout"),
+            true
+        }
     };
 
     EXPECT_TRUE(bool(factory.create(formatter, sink)));
@@ -114,7 +117,10 @@ log_config_t create_valid_config() {
 
     sink_config_t sink = {
         "files",
-        std::string("/dev/stdout")
+        std::vector<boost::any> {
+            std::string("/dev/stdout"),
+            true
+        }
     };
 
     frontend_config_t frontend = { formatter, sink };
@@ -138,46 +144,6 @@ TEST(Repository, CreatesDuplicateOfRootLoggerByDefault) {
     log_config_t config = create_valid_config();
     repository_t<testing::level>::instance().init(config);
     repository_t<testing::level>::instance().root();
-}
-
-TEST(FactoryTraits, StringFormatterConfig) {
-    formatter_config_t config = {
-        "string",
-        std::string("[%(timestamp)s]: %(message)s")
-    };
-
-    auto actual = factory_traits<formatter::string_t>::map_config(config.config);
-
-    EXPECT_EQ("[%s]: %s", actual.pattern);
-    EXPECT_EQ(std::vector<std::string>({ "timestamp", "message" }), actual.attribute_names);
-}
-
-TEST(FactoryTraits, JsonFormatterConfig) {
-    formatter_config_t config = {
-        "json",
-        boost::any {
-            std::vector<boost::any> {
-                true,
-                std::unordered_map<std::string, std::string> { { "message", "@message" } },
-                std::unordered_map<std::string, boost::any> {
-                    { "/", std::vector<std::string> { "message" } },
-                    { "/fields", std::string("*") }
-                }
-            }
-        }
-    };
-
-    formatter::json::config_t actual = factory_traits<formatter::json_t>::map_config(config.config);
-
-    using namespace formatter::json::map;
-    EXPECT_TRUE(actual.newline);
-    ASSERT_TRUE(actual.naming.find("message") != actual.naming.end());
-    EXPECT_EQ("@message", actual.naming["message"]);
-
-    typedef std::unordered_map<std::string, positioning_t::positions_t> specified_positioning_t;
-    ASSERT_TRUE(actual.positioning.specified.find("message") != actual.positioning.specified.end());
-    EXPECT_EQ(std::vector<std::string>({}), actual.positioning.specified["message"]);
-    EXPECT_EQ(std::vector<std::string>({ "fields" }), actual.positioning.unspecified);
 }
 
 TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredSink) {
