@@ -83,10 +83,10 @@ private:
 
         sink_config_t sink = {
             "files",
-            std::vector<boost::any> {
+            std::vector<boost::any>({
                 std::string("/dev/stdout"),
                 true
-            }
+            })
         };
 
         frontend_config_t frontend = { formatter, sink };
