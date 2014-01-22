@@ -50,6 +50,30 @@ TEST(Factory, FileStringsFrontend) {
     EXPECT_TRUE(bool(factory.create(formatter, sink)));
 }
 
+TEST(Repository, RotationFileStringsFrontend) {
+    group_factory_t<level> factory;
+    factory.add<sink::file_t<sink::boost_backend_t, sink::rotator_t>, formatter::string_t>();
+
+    formatter_config_t formatter = {
+        "string",
+        std::string("[%(timestamp)s]: %(message)s")
+    };
+
+    sink_config_t sink = {
+        "files",
+        std::vector<boost::any> {
+            std::string("/dev/stdout"),
+            true,
+            std::vector<boost::any> {
+                std::uint64_t(1024),   // Size.
+                std::uint16_t(3)       // Count.
+            }
+        }
+    };
+
+    EXPECT_TRUE(bool(factory.create(formatter, sink)));
+}
+
 TEST(Factory, SyslogStringsFrontend) {
     group_factory_t<level> factory;
     factory.add<sink::syslog_t<level>, formatter::string_t>();
@@ -249,28 +273,4 @@ TEST(Repository, CombinationConfiguring) {
     available = repository.available<sink::syslog_t<level>, formatter::json_t>();
     EXPECT_TRUE(available);
     repository.clear();
-}
-
-TEST(Repository, _) {
-    group_factory_t<level> factory;
-    factory.add<sink::file_t<sink::boost_backend_t, sink::rotator_t>, formatter::string_t>();
-
-    formatter_config_t formatter = {
-        "string",
-        std::string("[%(timestamp)s]: %(message)s")
-    };
-
-    sink_config_t sink = {
-        "files",
-        std::vector<boost::any> {
-            std::string("/dev/stdout"),
-            true,
-            std::vector<boost::any> {
-                std::uint64_t(1024),   // Size.
-                std::uint16_t(3)       // Count.
-            }
-        }
-    };
-
-    EXPECT_TRUE(bool(factory.create(formatter, sink)));
 }
