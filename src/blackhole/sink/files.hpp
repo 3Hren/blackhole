@@ -6,6 +6,7 @@
 
 #include "blackhole/error.hpp"
 #include "blackhole/factory.hpp"
+#include "blackhole/sink/files/rotator.hpp"
 
 namespace blackhole {
 
@@ -59,24 +60,7 @@ private:
     }
 };
 
-struct null_rotator_t {
-    static const char* name() {
-        return "";
-    }
-};
-
-struct rotator_t {
-    static const char* name() {
-        return "/rotate";
-    }
-};
-
 namespace file {
-
-struct rotator_config_t {
-    std::uint64_t size;
-    std::uint16_t count;
-};
 
 template<typename Rotator = null_rotator_t>
 struct config_t {
