@@ -11,6 +11,17 @@ namespace blackhole {
 namespace aux {
 
 template<typename T>
+static bool is(const boost::any& any) {
+    try {
+        boost::any_cast<T>(any);
+    } catch (const boost::bad_any_cast&) {
+        return false;
+    }
+
+    return true;
+}
+
+template<typename T>
 static void any_to(const boost::any& from, T& to) {
     to = boost::any_cast<T>(from);
 }

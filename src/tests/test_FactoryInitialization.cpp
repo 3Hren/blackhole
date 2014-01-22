@@ -265,9 +265,9 @@ TEST(Repository, _) {
         std::vector<boost::any> {
             std::string("/dev/stdout"),
             true,
-            std::unordered_map<std::string, boost::any> {
-                { "size", 1024 },
-                { "count", 3 }
+            std::vector<boost::any> {
+                1024,   // Size.
+                3       // Count.
             }
         }
     };

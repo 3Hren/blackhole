@@ -31,6 +31,7 @@ SET(SOURCES
     test_MsgpackFormatter
     test_Config
     test_Manual
+    test_Utils
 )
 
 SET(Boost_USE_MULTITHREADED ON)

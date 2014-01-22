@@ -145,15 +145,10 @@ public:
         std::vector<boost::any> cfg;
         aux::any_to(config, cfg);
         std::string rotator;
-        if (cfg.size() > 2) {
-            //!@todo: aux::is<std::unordered_map<std::string, boost::any>>(cfg.at(2));
-            std::unordered_map<std::string, boost::any> rotator_cfg;
-            try {
-                aux::any_to(cfg.at(2), rotator_cfg);
-                rotator = "/rotate";
-            } catch (...) {
-            }
+        if (cfg.size() > 2 && aux::is<std::vector<boost::any>>(cfg.at(2))) {
+            rotator = "/rotate";
         }
+
         return utils::format("files%s", rotator);
     }
 
@@ -194,7 +189,6 @@ struct factory_traits<sink::file_t<>> {
     static config_type map_config(const boost::any& config) {
         config_type cfg;
         aux::vector_to(config, cfg.path, cfg.autoflush);
-        std::cout << 0 << std::endl;
         return cfg;
     }
 };
@@ -205,9 +199,8 @@ struct factory_traits<sink::file_t<sink::boost_backend_t, sink::rotator_t>> {
 
     static config_type map_config(const boost::any& config) {
         config_type cfg;
-        std::unordered_map<std::string, boost::any> rotator;
+        std::vector<boost::any> rotator;
         aux::vector_to(config, cfg.path, cfg.autoflush, rotator);
-        std::cout << 1 << std::endl;
         return cfg;
     }
 };
