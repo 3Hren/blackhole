@@ -175,8 +175,10 @@ struct config_traits<sink::file_t<Backend, Rotator>> {
         std::vector<boost::any> cfg;
         aux::any_to(config, cfg);
         std::string rotator;
-        if (cfg.size() > 2 && aux::is<std::vector<boost::any>>(cfg.at(2))) {
-            rotator = "/rotate";
+
+        const uint ROTATOR_POS = 2;
+        if (cfg.size() > ROTATOR_POS && aux::is<std::vector<boost::any>>(cfg.at(ROTATOR_POS))) {
+            rotator = sink::rotator_t::name();
         }
 
         return utils::format("files%s", rotator);
