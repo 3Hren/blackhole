@@ -41,15 +41,22 @@ class group_factory_t {
     typedef std::unique_ptr<base_frontend_t> return_type;
     typedef return_type(*factory_type)(const frontend_factory_t<Level>&, const formatter_config_t&, const sink_config_t&);
 
+    typedef std::string(*config_mapper)(const boost::any&);
+
     mutable std::mutex mutex;
     std::unordered_map<std::string, factory_type> sinks;
+    std::unordered_map<std::string, config_mapper> config_mappers;
 
     frontend_factory_t<Level> factory;
 public:
     template<typename Sink, typename Formatter>
     void add() {
         std::lock_guard<std::mutex> lock(mutex);
-        sinks[Sink::name()] = static_cast<factory_type>(&factory_t<Level>::template create<Sink>);
+
+        config_mappers[Sink::name()] = &Sink::parse;
+        sinks[Sink::cfgname()] = static_cast<factory_type>(&factory_t<Level>::template create<Sink>);
+        //! files: { rotate {...} } -> files/rotate
+        //! files: {}               -> files
         frontend_repository<Sink, Formatter>::push(factory);
     }
 
@@ -61,12 +68,18 @@ public:
 
     return_type create(const formatter_config_t& formatter_config, const sink_config_t& sink_config) const {
         std::lock_guard<std::mutex> lock(mutex);
-        auto it = sinks.find(sink_config.type);
-        if (it == sinks.end()) {
+        auto cit = config_mappers.find(sink_config.type);
+        if (cit == config_mappers.end()) {
             throw error_t("sink '%s' is not registered", sink_config.type);
         }
 
-        return it->second(factory, formatter_config, sink_config);
+        std::string cfgname = cit->second(sink_config.config);
+        auto sit = sinks.find(cfgname);
+        if (sit == sinks.end()) {
+            throw error_t("sink '%s' is not registered", cfgname);
+        }
+
+        return sit->second(factory, formatter_config, sink_config);
     }
 
     void clear() {

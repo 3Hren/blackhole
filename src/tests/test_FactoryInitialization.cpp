@@ -250,3 +250,27 @@ TEST(Repository, CombinationConfiguring) {
     EXPECT_TRUE(available);
     repository.clear();
 }
+
+TEST(Repository, _) {
+    group_factory_t<level> factory;
+    factory.add<sink::file_t<sink::boost_backend_t, sink::rotator_t>, formatter::string_t>();
+
+    formatter_config_t formatter = {
+        "string",
+        std::string("[%(timestamp)s]: %(message)s")
+    };
+
+    sink_config_t sink = {
+        "files",
+        std::vector<boost::any> {
+            std::string("/dev/stdout"),
+            true,
+            std::unordered_map<std::string, boost::any> {
+                { "size", 1024 },
+                { "count", 3 }
+            }
+        }
+    };
+
+    EXPECT_TRUE(bool(factory.create(formatter, sink)));
+}

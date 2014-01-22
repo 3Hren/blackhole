@@ -59,8 +59,26 @@ private:
     }
 };
 
+struct null_rotator_t {
+    static const char* name() {
+        return "";
+    }
+};
+
+struct rotator_t {
+    static const char* name() {
+        return "/rotate";
+    }
+};
+
 namespace file {
 
+struct rotator_config_t {
+    std::uint16_t active;
+    std::uint64_t size;
+};
+
+template<typename Rotator = null_rotator_t>
 struct config_t {
     std::string path;
     bool autoflush;
@@ -81,17 +99,62 @@ struct config_t {
     {}
 };
 
+template<>
+struct config_t<rotator_t> {
+    std::string path;
+    bool autoflush;
+    rotator_config_t rotator;
+
+    config_t(const std::string& path, bool autoflush) :
+        path(path),
+        autoflush(autoflush)
+    {}
+
+    config_t(const std::string& path) :
+        path(path),
+        autoflush(true)
+    {}
+
+    config_t() :
+        path("/dev/stdout"),
+        autoflush(true)
+    {}
+};
+
 } // namespace file
 
-template<class Backend = boost_backend_t>
+template<class Backend = boost_backend_t, class Rotator = null_rotator_t>
 class file_t {
-    file::config_t config;
+    file::config_t<Rotator> config;
     Backend m_backend;
+    Rotator m_rotator;
 public:
-    typedef file::config_t config_type;
+    typedef file::config_t<Rotator> config_type;
 
     static const char* name() {
         return "files";
+    }
+
+    //!@todo: move out
+    static std::string cfgname() {
+        return utils::format("files%s", Rotator::name());
+    }
+
+    //!@todo: move out
+    static std::string parse(const boost::any& config) {
+        std::vector<boost::any> cfg;
+        aux::any_to(config, cfg);
+        std::string rotator;
+        if (cfg.size() > 2) {
+            //!@todo: aux::is<std::unordered_map<std::string, boost::any>>(cfg.at(2));
+            std::unordered_map<std::string, boost::any> rotator_cfg;
+            try {
+                aux::any_to(cfg.at(2), rotator_cfg);
+                rotator = "/rotate";
+            } catch (...) {
+            }
+        }
+        return utils::format("files%s", rotator);
     }
 
     file_t(const std::string& path) :
@@ -131,6 +194,20 @@ struct factory_traits<sink::file_t<>> {
     static config_type map_config(const boost::any& config) {
         config_type cfg;
         aux::vector_to(config, cfg.path, cfg.autoflush);
+        std::cout << 0 << std::endl;
+        return cfg;
+    }
+};
+
+template<>
+struct factory_traits<sink::file_t<sink::boost_backend_t, sink::rotator_t>> {
+    typedef sink::file_t<sink::boost_backend_t, sink::rotator_t>::config_type config_type;
+
+    static config_type map_config(const boost::any& config) {
+        config_type cfg;
+        std::unordered_map<std::string, boost::any> rotator;
+        aux::vector_to(config, cfg.path, cfg.autoflush, rotator);
+        std::cout << 1 << std::endl;
         return cfg;
     }
 };

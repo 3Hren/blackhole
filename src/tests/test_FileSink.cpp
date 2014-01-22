@@ -41,7 +41,7 @@ TEST(file_t, ThrowsExceptionIfFileCannotBeOpened) {
 }
 
 TEST(file_t, AutoFlushIfSpecified) {
-    sink::file::config_t config("test.log", true);
+    sink::file::config_t<> config("test.log", true);
     sink::file_t<NiceMock<mock::files::backend_t>> sink(config);
     EXPECT_CALL(sink.backend(), flush())
             .Times(1);
@@ -50,7 +50,7 @@ TEST(file_t, AutoFlushIfSpecified) {
 }
 
 TEST(file_t, AutoFlushIsDisabledIfSpecified) {
-    sink::file::config_t config("test.log", false);
+    sink::file::config_t<> config("test.log", false);
     sink::file_t<NiceMock<mock::files::backend_t>> sink(config);
     EXPECT_CALL(sink.backend(), flush())
             .Times(0);

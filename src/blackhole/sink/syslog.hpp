@@ -90,6 +90,14 @@ public:
         return "syslog";
     }
 
+    static std::string cfgname() {
+        return name();
+    }
+
+    static std::string parse(const boost::any&) {
+        return name();
+    }
+
     syslog_t(const config_type& config) :
         m_backend(config.identity, config.option, config.facility)
     {
