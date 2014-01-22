@@ -182,9 +182,9 @@ public:
 
 } // namespace sink
 
-template<>
-struct factory_traits<sink::file_t<>> {
-    typedef sink::file_t<>::config_type config_type;
+template<class Backend>
+struct factory_traits<sink::file_t<Backend>> {
+    typedef typename sink::file_t<Backend>::config_type config_type;
 
     static config_type map_config(const boost::any& config) {
         config_type cfg;
@@ -193,9 +193,9 @@ struct factory_traits<sink::file_t<>> {
     }
 };
 
-template<>
-struct factory_traits<sink::file_t<sink::boost_backend_t, sink::rotator_t>> {
-    typedef sink::file_t<sink::boost_backend_t, sink::rotator_t>::config_type config_type;
+template<class Backend>
+struct factory_traits<sink::file_t<Backend, sink::rotator_t>> {
+    typedef typename sink::file_t<Backend, sink::rotator_t>::config_type config_type;
 
     static config_type map_config(const boost::any& config) {
         config_type cfg;
