@@ -266,8 +266,8 @@ TEST(Repository, _) {
             std::string("/dev/stdout"),
             true,
             std::vector<boost::any> {
-                1024,   // Size.
-                3       // Count.
+                std::uint64_t(1024),   // Size.
+                std::uint16_t(3)       // Count.
             }
         }
     };
