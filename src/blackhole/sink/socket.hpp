@@ -27,14 +27,6 @@ public:
         return Backend::name();
     }
 
-    static std::string cfgname() {
-        return name();
-    }
-
-    static std::string parse(const boost::any&) {
-        return name();
-    }
-
     socket_t(const config_type& config) :
         m_backend(config.host, config.port)
     {}

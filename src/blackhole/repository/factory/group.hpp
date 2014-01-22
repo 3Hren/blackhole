@@ -52,11 +52,8 @@ public:
     template<typename Sink, typename Formatter>
     void add() {
         std::lock_guard<std::mutex> lock(mutex);
-
-        config_mappers[Sink::name()] = &Sink::parse;
-        sinks[Sink::cfgname()] = static_cast<factory_type>(&factory_t<Level>::template create<Sink>);
-        //! files: { rotate {...} } -> files/rotate
-        //! files: {}               -> files
+        config_mappers[Sink::name()] = &config_traits<Sink>::parse;
+        sinks[config_traits<Sink>::name()] = static_cast<factory_type>(&factory_t<Level>::template create<Sink>);
         frontend_repository<Sink, Formatter>::push(factory);
     }
 
@@ -73,10 +70,10 @@ public:
             throw error_t("sink '%s' is not registered", sink_config.type);
         }
 
-        std::string cfgname = cit->second(sink_config.config);
-        auto sit = sinks.find(cfgname);
+        const std::string& config_name = cit->second(sink_config.config);
+        auto sit = sinks.find(config_name);
         if (sit == sinks.end()) {
-            throw error_t("sink '%s' is not registered", cfgname);
+            throw error_t("sink '%s' is not registered", config_name);
         }
 
         return sit->second(factory, formatter_config, sink_config);

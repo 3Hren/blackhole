@@ -74,8 +74,8 @@ struct rotator_t {
 namespace file {
 
 struct rotator_config_t {
-    std::uint16_t active;
     std::uint64_t size;
+    std::uint16_t count;
 };
 
 template<typename Rotator = null_rotator_t>
@@ -135,23 +135,6 @@ public:
         return "files";
     }
 
-    //!@todo: move out
-    static std::string cfgname() {
-        return utils::format("files%s", Rotator::name());
-    }
-
-    //!@todo: move out
-    static std::string parse(const boost::any& config) {
-        std::vector<boost::any> cfg;
-        aux::any_to(config, cfg);
-        std::string rotator;
-        if (cfg.size() > 2 && aux::is<std::vector<boost::any>>(cfg.at(2))) {
-            rotator = "/rotate";
-        }
-
-        return utils::format("files%s", rotator);
-    }
-
     file_t(const std::string& path) :
         config(path),
         m_backend(path)
@@ -182,6 +165,24 @@ public:
 
 } // namespace sink
 
+template<class Backend, class Rotator>
+struct config_traits<sink::file_t<Backend, Rotator>> {
+    static std::string name() {
+        return utils::format("files%s", Rotator::name());
+    }
+
+    static std::string parse(const boost::any& config) {
+        std::vector<boost::any> cfg;
+        aux::any_to(config, cfg);
+        std::string rotator;
+        if (cfg.size() > 2 && aux::is<std::vector<boost::any>>(cfg.at(2))) {
+            rotator = "/rotate";
+        }
+
+        return utils::format("files%s", rotator);
+    }
+};
+
 template<class Backend>
 struct factory_traits<sink::file_t<Backend>> {
     typedef typename sink::file_t<Backend>::config_type config_type;
@@ -201,8 +202,10 @@ struct factory_traits<sink::file_t<Backend, sink::rotator_t>> {
         config_type cfg;
         std::vector<boost::any> rotator;
         aux::vector_to(config, cfg.path, cfg.autoflush, rotator);
+//        aux::vector_to(rotator, cfg.rotator.size, cfg.rotator.count);
         return cfg;
     }
 };
 
 } // namespace blackhole
+
