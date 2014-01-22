@@ -64,3 +64,8 @@ TEST(file_t, AutoFlushIsEnabledByDefault) {
             .Times(1);
     sink.consume("message");
 }
+
+//!@todo:
+//! Given: size=1024, count=2, pattern='test.log.%N'
+//! Condition: `backend.size()`=1025
+//! Action: `rotator.rotate()`.
