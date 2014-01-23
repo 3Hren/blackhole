@@ -62,24 +62,14 @@ private:
 
 namespace file {
 
-template<typename Rotator = null_rotator_t>
+template<class Rotator = void>
 struct config_t {
     std::string path;
     bool autoflush;
 
-    config_t(const std::string& path, bool autoflush) :
+    config_t(const std::string& path = "/dev/stdout", bool autoflush = true) :
         path(path),
         autoflush(autoflush)
-    {}
-
-    config_t(const std::string& path) :
-        path(path),
-        autoflush(true)
-    {}
-
-    config_t() :
-        path("/dev/stdout"),
-        autoflush(true)
     {}
 };
 
@@ -89,29 +79,54 @@ struct config_t<rotator_t> {
     bool autoflush;
     rotator::config_t rotator;
 
-    config_t(const std::string& path, bool autoflush) :
+    config_t(const std::string& path = "/dev/stdout", bool autoflush = true) :
         path(path),
         autoflush(autoflush)
-    {}
-
-    config_t(const std::string& path) :
-        path(path),
-        autoflush(true)
-    {}
-
-    config_t() :
-        path("/dev/stdout"),
-        autoflush(true)
     {}
 };
 
 } // namespace file
 
-template<class Backend = boost_backend_t, class Rotator = null_rotator_t>
+template<typename Backend>
+class writer_t {
+    Backend& backend;
+public:
+    writer_t(Backend& backend) :
+        backend(backend)
+    {}
+
+    void write(const std::string& message) {
+        if (!backend.opened()) {
+            if (!backend.open()) {
+                throw error_t("failed to open file '%s' for writing", backend.path());
+            }
+        }
+        backend.write(message);
+    }
+};
+
+template<typename Backend>
+class flusher_t {
+    bool autoflush;
+    Backend& backend;
+public:
+    flusher_t(bool autoflush, Backend& backend) :
+        autoflush(autoflush),
+        backend(backend)
+    {}
+
+    void flush() {
+        if (autoflush) {
+            backend.flush();
+        }
+    }
+};
+
+template<class Backend = boost_backend_t, class Rotator = void>
 class file_t {
-    file::config_t<Rotator> config;
     Backend m_backend;
-    Rotator m_rotator;
+    writer_t<Backend> m_writer;
+    flusher_t<Backend> m_flusher;
 public:
     typedef file::config_t<Rotator> config_type;
 
@@ -120,26 +135,22 @@ public:
     }
 
     file_t(const std::string& path) :
-        config(path),
-        m_backend(path)
+        m_backend(path),
+        m_writer(m_backend),
+        m_flusher(true, m_backend)
     {}
 
     file_t(const config_type& config) :
-        config(config),
-        m_backend(config.path)
+        m_backend(config.path),
+        m_writer(m_backend),
+        m_flusher(config.autoflush, m_backend)
     {}
 
     void consume(const std::string& message) {
-        if (!m_backend.opened()) {
-            if (!m_backend.open()) {
-                throw error_t("failed to open file '%s' for writing", m_backend.path());
-            }
-        }
-        m_backend.write(message);
-
-        if (config.autoflush) {
-            m_backend.flush();
-        }
+        m_writer.write(message);
+        m_flusher.flush();
+        // if (rotator.necessary())
+        //    rotator.rotate();
     }
 
     Backend& backend() {
@@ -149,6 +160,31 @@ public:
 
 } // namespace sink
 
+
+static inline std::string aparse(const boost::any& config) {
+    std::vector<boost::any> cfg;
+    aux::any_to(config, cfg);
+    std::string rotator;
+
+    const uint ROTATOR_POS = 2;
+    if (cfg.size() > ROTATOR_POS && aux::is<std::vector<boost::any>>(cfg.at(ROTATOR_POS))) {
+        rotator = sink::rotator_t::name();
+    }
+
+    return utils::format("files%s", rotator);
+}
+
+template<class Backend>
+struct config_traits<sink::file_t<Backend, void>> {
+    static std::string name() {
+        return "files";
+    }
+
+    static std::string parse(const boost::any& config) {
+        return aparse(config);
+    }
+};
+
 template<class Backend, class Rotator>
 struct config_traits<sink::file_t<Backend, Rotator>> {
     static std::string name() {
@@ -156,16 +192,7 @@ struct config_traits<sink::file_t<Backend, Rotator>> {
     }
 
     static std::string parse(const boost::any& config) {
-        std::vector<boost::any> cfg;
-        aux::any_to(config, cfg);
-        std::string rotator;
-
-        const uint ROTATOR_POS = 2;
-        if (cfg.size() > ROTATOR_POS && aux::is<std::vector<boost::any>>(cfg.at(ROTATOR_POS))) {
-            rotator = sink::rotator_t::name();
-        }
-
-        return utils::format("files%s", rotator);
+        return aparse(config);
     }
 };
 
