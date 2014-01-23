@@ -66,6 +66,17 @@ TEST(file_t, AutoFlushIsEnabledByDefault) {
 }
 
 //!@todo:
-//! Given: size=1024, count=2, pattern='test.log.%N'
+//! Given: size=1024, backup=1, suffix='.%N'
 //! Condition: `backend.size()`=1025
 //! Action: `rotator.rotate()`.
+
+//!@todo:
+//! Given: backup=1, suffix='.%N'
+//! Condition: `rotator.rotate()`
+//! Action: close current file, rename it, open new file.
+
+TEST(rotator_t, Class) {
+    sink::rotator_t rotator;
+    UNUSED(rotator);
+}
+

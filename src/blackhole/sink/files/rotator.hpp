@@ -1,21 +1,31 @@
 #pragma once
 
+#include <cstdint>
+#include <string>
+
 namespace blackhole {
 
 namespace sink {
 
-struct rotator_config_t {
+namespace rotator {
+
+struct config_t {
     std::uint64_t size;
     std::uint16_t count;
+    std::string suffix;
 };
 
-struct null_rotator_t {
+}
+
+class null_rotator_t {
+public:
     static const char* name() {
         return "";
     }
 };
 
-struct rotator_t {
+class rotator_t {
+public:
     static const char* name() {
         return "/rotate";
     }
