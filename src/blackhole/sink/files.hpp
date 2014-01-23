@@ -160,28 +160,30 @@ public:
 
 } // namespace sink
 
+namespace generator {
 
-static inline std::string aparse(const boost::any& config) {
-    std::vector<boost::any> cfg;
-    aux::any_to(config, cfg);
-    std::string rotator;
+template<class Backend, class Rotator>
+struct id<sink::file_t<Backend, Rotator>> {
+    static std::string extract(const boost::any& config) {
+        std::vector<boost::any> cfg;
+        aux::any_to(config, cfg);
+        std::string rotator;
 
-    const uint ROTATOR_POS = 2;
-    if (cfg.size() > ROTATOR_POS && aux::is<std::vector<boost::any>>(cfg.at(ROTATOR_POS))) {
-        rotator = sink::rotator_t::name();
+        const uint ROTATOR_POS = 2;
+        if (cfg.size() > ROTATOR_POS && aux::is<std::vector<boost::any>>(cfg.at(ROTATOR_POS))) {
+            rotator = sink::rotator_t::name();
+        }
+
+        return utils::format("files%s", rotator);
     }
+};
 
-    return utils::format("files%s", rotator);
-}
+} // namespace generator
 
 template<class Backend>
 struct config_traits<sink::file_t<Backend, void>> {
     static std::string name() {
         return "files";
-    }
-
-    static std::string parse(const boost::any& config) {
-        return aparse(config);
     }
 };
 
@@ -189,10 +191,6 @@ template<class Backend, class Rotator>
 struct config_traits<sink::file_t<Backend, Rotator>> {
     static std::string name() {
         return utils::format("files%s", Rotator::name());
-    }
-
-    static std::string parse(const boost::any& config) {
-        return aparse(config);
     }
 };
 

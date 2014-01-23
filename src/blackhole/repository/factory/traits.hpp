@@ -4,6 +4,18 @@
 
 namespace blackhole {
 
+namespace generator {
+
+template<typename T>
+struct id {
+    //! \brief Extract sink or formatter unique key from its config.
+    static std::string extract(const boost::any&) {
+        return T::name();
+    }
+};
+
+} // namespace generator
+
 template<typename T>
 struct config_traits {
     //! \brief Statically maps sink or formatter type into unique key.
@@ -13,11 +25,6 @@ struct config_traits {
      */
     static std::string name() {
         return T::name();
-    }
-
-    //! \brief Extract sink of formatter unique key from its config.
-    static std::string parse(const boost::any&) {
-        return name();
     }
 };
 
