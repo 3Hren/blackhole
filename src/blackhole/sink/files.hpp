@@ -134,12 +134,6 @@ public:
         return "files";
     }
 
-    file_t(const std::string& path) :
-        m_backend(path),
-        m_writer(m_backend),
-        m_flusher(true, m_backend)
-    {}
-
     file_t(const config_type& config) :
         m_backend(config.path),
         m_writer(m_backend),

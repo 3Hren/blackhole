@@ -3,19 +3,22 @@
 using namespace blackhole;
 
 TEST(file_t, Class) {
-    sink::file_t<> sink("test.log");
+    sink::file_t<>::config_type config("test.log");
+    sink::file_t<> sink(config);
     UNUSED(sink);
 }
 
 TEST(file_t, WritesToTheFile) {
-    sink::file_t<NiceMock<mock::files::backend_t>> sink("test.log");
+    sink::file_t<NiceMock<mock::files::backend_t>>::config_type config("test.log");
+    sink::file_t<NiceMock<mock::files::backend_t>> sink(config);
     EXPECT_CALL(sink.backend(), write(std::string("formatted message"))).
             Times(1);
     sink.consume("formatted message");
 }
 
 TEST(file_t, OpensFileIfItClosedWhenWriting) {
-    sink::file_t<NiceMock<mock::files::backend_t>> sink("test.log");
+    sink::file_t<NiceMock<mock::files::backend_t>>::config_type config("test.log");
+    sink::file_t<NiceMock<mock::files::backend_t>> sink(config);
     EXPECT_CALL(sink.backend(), opened()).
             Times(1).
             WillOnce(Return(false));
@@ -28,7 +31,8 @@ TEST(file_t, OpensFileIfItClosedWhenWriting) {
 }
 
 TEST(file_t, ThrowsExceptionIfFileCannotBeOpened) {
-    sink::file_t<NiceMock<mock::files::backend_t>> sink("test.log");
+    sink::file_t<NiceMock<mock::files::backend_t>>::config_type config("test.log");
+    sink::file_t<NiceMock<mock::files::backend_t>> sink(config);
     EXPECT_CALL(sink.backend(), opened())
             .Times(1)
             .WillOnce(Return(false));
@@ -41,7 +45,7 @@ TEST(file_t, ThrowsExceptionIfFileCannotBeOpened) {
 }
 
 TEST(file_t, AutoFlushIfSpecified) {
-    sink::file::config_t<> config("test.log", true);
+    sink::file_t<NiceMock<mock::files::backend_t>>::config_type config("test.log", true);
     sink::file_t<NiceMock<mock::files::backend_t>> sink(config);
     EXPECT_CALL(sink.backend(), flush())
             .Times(1);
@@ -50,7 +54,7 @@ TEST(file_t, AutoFlushIfSpecified) {
 }
 
 TEST(file_t, AutoFlushIsDisabledIfSpecified) {
-    sink::file::config_t<> config("test.log", false);
+    sink::file_t<NiceMock<mock::files::backend_t>>::config_type config("test.log", false);
     sink::file_t<NiceMock<mock::files::backend_t>> sink(config);
     EXPECT_CALL(sink.backend(), flush())
             .Times(0);
@@ -59,7 +63,8 @@ TEST(file_t, AutoFlushIsDisabledIfSpecified) {
 }
 
 TEST(file_t, AutoFlushIsEnabledByDefault) {
-    sink::file_t<NiceMock<mock::files::backend_t>> sink("test.log");
+    sink::file_t<NiceMock<mock::files::backend_t>>::config_type config("test.log");
+    sink::file_t<NiceMock<mock::files::backend_t>> sink(config);
     EXPECT_CALL(sink.backend(), flush())
             .Times(1);
     sink.consume("message");
@@ -80,3 +85,21 @@ TEST(rotator_t, Class) {
     UNUSED(rotator);
 }
 
+//TEST(rotator_t, RotateFiles) {
+//    sink::rotator::config_t config = { 1024, 1, ".%N" };
+//    mock::files::backend_t backend("test.log");
+//    sink::rotator_t rotator(config, backend);
+
+//    EXPECT_CALL(backend, flush())
+//            .Times(1);
+//    EXPECT_CALL(backend, close())
+//            .Times(1);
+//    EXPECT_CALL(backend, filename())
+//            .Times(1)
+//            .WillOnce(Return("test.log"));
+//    EXPECT_CALL(backend, rename("test.log", "test.log.1"))
+//            .Times(1);
+//    EXPECT_CALL(backend, open("test.log"))
+//            .Times(1);
+//    rotator.rotate(backend);
+//}
