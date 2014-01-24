@@ -122,11 +122,15 @@ public:
     }
 };
 
-template<class Backend = boost_backend_t, class Rotator = void>
-class file_t {
+template<class Backend = boost_backend_t, class Rotator = void, typename = void>
+class file_t;
+
+template<class Backend, class Rotator>
+class file_t<Backend, Rotator, typename std::enable_if<!std::is_void<Rotator>::value>::type> {
     Backend m_backend;
     writer_t<Backend> m_writer;
     flusher_t<Backend> m_flusher;
+    Rotator m_rotator;
 public:
     typedef file::config_t<Rotator> config_type;
 
@@ -137,14 +141,16 @@ public:
     file_t(const config_type& config) :
         m_backend(config.path),
         m_writer(m_backend),
-        m_flusher(config.autoflush, m_backend)
+        m_flusher(config.autoflush, m_backend),
+        m_rotator(config.rotator, m_backend)
     {}
 
     void consume(const std::string& message) {
         m_writer.write(message);
         m_flusher.flush();
-        // if (rotator.necessary())
-        //    rotator.rotate();
+        if (m_rotator.necessary()) {
+            m_rotator.rotate();
+        }
     }
 
     Backend& backend() {
@@ -153,7 +159,7 @@ public:
 };
 
 template<class Backend>
-class file_t<Backend, void> {
+class file_t<Backend, void, void> {
     Backend m_backend;
     writer_t<Backend> m_writer;
     flusher_t<Backend> m_flusher;
