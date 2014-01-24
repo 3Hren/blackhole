@@ -34,6 +34,22 @@ public:
         return m_file.is_open();
     }
 
+    void close() {
+        m_file.close();
+    }
+
+    void rename(const std::string& oldname, const std::string& newname) {
+        boost::filesystem::rename(m_path.parent_path() / oldname, m_path.parent_path() / newname);
+    }
+
+    std::string filename() const {
+#if BOOST_VERSION >= 104600
+        return m_path.filename().string();
+#else
+        return m_path.filename();
+#endif
+    }
+
     std::string path() const {
         return m_path.string();
     }
@@ -125,6 +141,34 @@ public:
 template<class Backend = boost_backend_t, template<typename> class Rotator = NoRotation, typename = void>
 class file_t;
 
+template<class Backend>
+class file_t<Backend, NoRotation, void> {
+    Backend m_backend;
+    writer_t<Backend> m_writer;
+    flusher_t<Backend> m_flusher;
+public:
+    typedef file::config_t<NoRotation> config_type;
+
+    static const char* name() {
+        return "files";
+    }
+
+    file_t(const config_type& config) :
+        m_backend(config.path),
+        m_writer(m_backend),
+        m_flusher(config.autoflush, m_backend)
+    {}
+
+    void consume(const std::string& message) {
+        m_writer.write(message);
+        m_flusher.flush();
+    }
+
+    Backend& backend() {
+        return m_backend;
+    }
+};
+
 template<class Backend, template<typename> class Rotator>
 class file_t<
     Backend,
@@ -157,34 +201,6 @@ public:
         if (m_rotator.necessary()) {
             m_rotator.rotate();
         }
-    }
-
-    Backend& backend() {
-        return m_backend;
-    }
-};
-
-template<class Backend>
-class file_t<Backend, NoRotation, void> {
-    Backend m_backend;
-    writer_t<Backend> m_writer;
-    flusher_t<Backend> m_flusher;
-public:
-    typedef file::config_t<NoRotation> config_type;
-
-    static const char* name() {
-        return "files";
-    }
-
-    file_t(const config_type& config) :
-        m_backend(config.path),
-        m_writer(m_backend),
-        m_flusher(config.autoflush, m_backend)
-    {}
-
-    void consume(const std::string& message) {
-        m_writer.write(message);
-        m_flusher.flush();
     }
 
     Backend& backend() {

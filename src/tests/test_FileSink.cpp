@@ -75,32 +75,27 @@ TEST(file_t, AutoFlushIsEnabledByDefault) {
 //! Condition: `backend.size()`=1025
 //! Action: `rotator.rotate()`.
 
-//!@todo:
-//! Given: backup=1, suffix='.%N'
-//! Condition: `rotator.rotate()`
-//! Action: close current file, rename it, open new file.
-
 TEST(rotator_t, Class) {
     mock::files::backend_t backend("test.log");
     sink::rotator_t<mock::files::backend_t> rotator(backend);
     UNUSED(rotator);
 }
 
-//TEST(rotator_t, RotateFiles) {
-//    sink::rotator::config_t config = { 1024, 1, ".%N" };
-//    mock::files::backend_t backend("test.log");
-//    sink::rotator_t rotator(config, backend);
+TEST(rotator_t, RotateFiles) {
+    sink::rotator::config_t config = { 1024, 1, ".%N" };
+    mock::files::backend_t backend("test.log");
+    sink::rotator_t<mock::files::backend_t> rotator(config, backend);
 
-//    EXPECT_CALL(backend, flush())
-//            .Times(1);
-//    EXPECT_CALL(backend, close())
-//            .Times(1);
-//    EXPECT_CALL(backend, filename())
-//            .Times(1)
-//            .WillOnce(Return("test.log"));
-//    EXPECT_CALL(backend, rename("test.log", "test.log.1"))
-//            .Times(1);
-//    EXPECT_CALL(backend, open("test.log"))
-//            .Times(1);
-//    rotator.rotate(backend);
-//}
+    EXPECT_CALL(backend, flush())
+            .Times(1);
+    EXPECT_CALL(backend, close())
+            .Times(1);
+    EXPECT_CALL(backend, filename())
+            .Times(1)
+            .WillOnce(Return("test.log"));
+    EXPECT_CALL(backend, rename("test.log", "test.log.1"))
+            .Times(1);
+    EXPECT_CALL(backend, open())
+            .Times(1);
+    rotator.rotate();
+}

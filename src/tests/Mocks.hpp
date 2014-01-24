@@ -32,9 +32,12 @@ public:
 
     MOCK_CONST_METHOD0(opened, bool());
     MOCK_CONST_METHOD0(path, std::string());
+    MOCK_CONST_METHOD0(filename, std::string());
 
     MOCK_METHOD0(open, bool());
+    MOCK_METHOD2(rename, void(const std::string&, const std::string&));
     MOCK_METHOD1(write, void(const std::string&));
+    MOCK_METHOD0(close, void());
     MOCK_METHOD0(flush, void());
 };
 
