@@ -54,19 +54,26 @@ public:
 
     void rotate() const {
         const std::string& filename = backend.filename();
-        std::string suffix = config.suffix;
-        boost::algorithm::replace_all(suffix, "%N", "%s");
+
         backend.flush();
         backend.close();
-        for (std::uint16_t i = config.count - 1; i > 0; --i) {
-            std::string oldname = filename + utils::format(suffix, i);
-            if (backend.exists(oldname)) {
-                std::string newname = filename + utils::format(suffix, i + 1);
-                backend.rename(oldname, newname);
+        //!@todo: Implement rotation naming strategy, because N and DateTime naming is mutual exclusive.
+        if (config.suffix.find("%N") != std::string::npos) {
+            std::string suffix = config.suffix;
+            boost::algorithm::replace_all(suffix, "%N", "%s");
+            for (std::uint16_t i = config.count - 1; i > 0; --i) {
+                std::string oldname = filename + utils::format(suffix, i);
+                if (backend.exists(oldname)) {
+                    std::string newname = filename + utils::format(suffix, i + 1);
+                    backend.rename(oldname, newname);
+                }
+            }
+
+            if (backend.exists(filename)) {
+                backend.rename(filename, filename + utils::format(suffix, 1));
             }
         }
 
-        backend.rename(filename, filename + utils::format(suffix, 1));
         backend.open();
     }
 };
