@@ -14,10 +14,10 @@ struct config_t {
     std::uint16_t count;
     std::string suffix;
 
-    config_t() :
-        size(10 * 1024 * 1024),
-        count(5),
-        suffix(".%N")
+    config_t(std::uint64_t size = 10 * 1024 * 1024, std::uint16_t count = 5, const std::string& suffix = ".%N") :
+        size(size),
+        count(count),
+        suffix(suffix)
     {}
 };
 
@@ -35,7 +35,14 @@ public:
     {}
 
     template<typename Backend>
-    void rotate(Backend&) const {}
+    bool necessary(Backend&) const {
+        return false;
+    }
+
+    template<typename Backend>
+    void rotate(Backend&) const {
+        //!@todo: Implement me.
+    }
 };
 
 }
