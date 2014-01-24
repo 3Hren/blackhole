@@ -156,6 +156,8 @@ public:
 
 namespace generator {
 
+const uint ROTATOR_POS = 2;
+
 template<class Backend, class Rotator>
 struct id<sink::file_t<Backend, Rotator>> {
     static std::string extract(const boost::any& config) {
@@ -163,7 +165,6 @@ struct id<sink::file_t<Backend, Rotator>> {
         aux::any_to(config, cfg);
         std::string rotator;
 
-        const uint ROTATOR_POS = 2;
         if (cfg.size() > ROTATOR_POS && aux::is<std::vector<boost::any>>(cfg.at(ROTATOR_POS))) {
             rotator = sink::rotator_t::name();
         }
