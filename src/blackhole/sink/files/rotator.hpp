@@ -57,7 +57,7 @@ public:
 
         backend.flush();
         backend.close();
-        //!@todo: Implement rotation naming strategy, because N and DateTime naming is mutual exclusive.
+        //!@todo: Implement rotation naming strategy, because N and DateTime naming are mutual exclusive.
         if (config.suffix.find("%N") != std::string::npos) {
             std::string suffix = config.suffix;
             boost::algorithm::replace_all(suffix, "%N", "%s");
