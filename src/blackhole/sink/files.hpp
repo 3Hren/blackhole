@@ -13,7 +13,7 @@ namespace blackhole {
 namespace sink {
 
 class boost_backend_t {
-    boost::filesystem::path m_path;
+    const boost::filesystem::path m_path;
     boost::filesystem::ofstream m_file;
 public:
     boost_backend_t(const std::string& path) :
