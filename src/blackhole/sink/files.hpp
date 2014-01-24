@@ -62,7 +62,7 @@ private:
 
 namespace file {
 
-template<class Rotator = void>
+template<template<typename> class Rotator = NoRotation>
 struct config_t {
     std::string path;
     bool autoflush;
@@ -73,8 +73,8 @@ struct config_t {
     {}
 };
 
-template<class Backend>
-struct config_t<rotator_t<Backend>> {
+template<>
+struct config_t<rotator_t> {
     std::string path;
     bool autoflush;
     rotator::config_t rotator;
@@ -122,15 +122,21 @@ public:
     }
 };
 
-template<class Backend = boost_backend_t, class Rotator = void, typename = void>
+template<class Backend = boost_backend_t, template<typename> class Rotator = NoRotation, typename = void>
 class file_t;
 
-template<class Backend, class Rotator>
-class file_t<Backend, Rotator, typename std::enable_if<!std::is_void<Rotator>::value>::type> {
+template<class Backend, template<typename> class Rotator>
+class file_t<
+    Backend,
+    Rotator,
+    typename std::enable_if<
+        !std::is_same<Rotator<Backend>, NoRotation<Backend>>::value
+    >::type>
+{
     Backend m_backend;
     writer_t<Backend> m_writer;
     flusher_t<Backend> m_flusher;
-    Rotator m_rotator;
+    Rotator<Backend> m_rotator;
 public:
     typedef file::config_t<Rotator> config_type;
 
@@ -159,12 +165,12 @@ public:
 };
 
 template<class Backend>
-class file_t<Backend, void, void> {
+class file_t<Backend, NoRotation, void> {
     Backend m_backend;
     writer_t<Backend> m_writer;
     flusher_t<Backend> m_flusher;
 public:
-    typedef file::config_t<void> config_type;
+    typedef file::config_t<NoRotation> config_type;
 
     static const char* name() {
         return "files";
@@ -179,8 +185,6 @@ public:
     void consume(const std::string& message) {
         m_writer.write(message);
         m_flusher.flush();
-        // if (rotator.necessary())
-        //    rotator.rotate();
     }
 
     Backend& backend() {
@@ -195,7 +199,7 @@ namespace generator {
 const uint ROTATOR_POS = 2;
 
 template<class Backend, template<typename> class Rotator>
-struct id<sink::file_t<Backend, Rotator<Backend>>> {
+struct id<sink::file_t<Backend, Rotator>> {
     static std::string extract(const boost::any& config) {
         std::vector<boost::any> cfg;
         aux::any_to(config, cfg);
@@ -212,16 +216,16 @@ struct id<sink::file_t<Backend, Rotator<Backend>>> {
 } // namespace generator
 
 template<class Backend>
-struct config_traits<sink::file_t<Backend, void>> {
+struct config_traits<sink::file_t<Backend, sink::NoRotation>> {
     static std::string name() {
         return "files";
     }
 };
 
-template<class Backend, class Rotator>
+template<class Backend, template<typename> class Rotator>
 struct config_traits<sink::file_t<Backend, Rotator>> {
     static std::string name() {
-        return utils::format("files%s", Rotator::name());
+        return utils::format("files%s", Rotator<Backend>::name());
     }
 };
 
@@ -237,8 +241,8 @@ struct factory_traits<sink::file_t<Backend>> {
 };
 
 template<class Backend>
-struct factory_traits<sink::file_t<Backend, sink::rotator_t<Backend>>> {
-    typedef typename sink::file_t<Backend, sink::rotator_t<Backend>>::config_type config_type;
+struct factory_traits<sink::file_t<Backend, sink::rotator_t>> {
+    typedef typename sink::file_t<Backend, sink::rotator_t>::config_type config_type;
 
     static config_type map_config(const boost::any& config) {
         config_type cfg;

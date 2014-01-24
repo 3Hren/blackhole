@@ -7,6 +7,9 @@ namespace blackhole {
 
 namespace sink {
 
+//! Tag for file sinks with no rotation.
+template<typename Backend> class NoRotation;
+
 namespace rotator {
 
 struct config_t {
