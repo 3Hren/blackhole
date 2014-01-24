@@ -81,7 +81,8 @@ TEST(file_t, AutoFlushIsEnabledByDefault) {
 //! Action: close current file, rename it, open new file.
 
 TEST(rotator_t, Class) {
-    sink::rotator_t rotator;
+    mock::files::backend_t backend("test.log");
+    sink::rotator_t<mock::files::backend_t> rotator(backend);
     UNUSED(rotator);
 }
 

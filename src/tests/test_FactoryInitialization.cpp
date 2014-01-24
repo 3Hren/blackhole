@@ -52,7 +52,7 @@ TEST(Factory, FileStringsFrontend) {
 
 TEST(Repository, RotationFileStringsFrontend) {
     group_factory_t<level> factory;
-    factory.add<sink::file_t<sink::boost_backend_t, sink::rotator_t>, formatter::string_t>();
+    factory.add<sink::file_t<sink::boost_backend_t, sink::rotator_t<sink::boost_backend_t>>, formatter::string_t>();
 
     formatter_config_t formatter = {
         "string",

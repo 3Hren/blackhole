@@ -23,24 +23,29 @@ struct config_t {
 
 }
 
+template<typename Backend>
 class rotator_t {
     rotator::config_t config;
+    Backend& backend;
 public:
     static const char* name() {
         return "/rotate";
     }
 
-    rotator_t(const rotator::config_t& config = rotator::config_t()) :
-        config(config)
+    rotator_t(Backend& backend) :
+        backend(backend)
     {}
 
-    template<typename Backend>
-    bool necessary(Backend&) const {
+    rotator_t(const rotator::config_t& config, Backend& backend) :
+        config(config),
+        backend(backend)
+    {}
+
+    bool necessary() const {
         return false;
     }
 
-    template<typename Backend>
-    void rotate(Backend&) const {
+    void rotate() const {
         //!@todo: Implement me.
     }
 };
