@@ -39,7 +39,8 @@ public:
     }
 
     void rename(const std::string& oldname, const std::string& newname) {
-        boost::filesystem::rename(m_path.parent_path() / oldname, m_path.parent_path() / newname);
+        const boost::filesystem::path& path = m_path.parent_path();
+        boost::filesystem::rename(path / oldname, path / newname);
     }
 
     std::string filename() const {
