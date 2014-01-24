@@ -60,8 +60,10 @@ public:
         backend.close();
         for (std::uint16_t i = config.count - 1; i > 0; --i) {
             std::string oldname = filename + utils::format(suffix, i);
-            std::string newname = filename + utils::format(suffix, i + 1);
-            backend.rename(oldname, newname);
+            if (backend.exists(oldname)) {
+                std::string newname = filename + utils::format(suffix, i + 1);
+                backend.rename(oldname, newname);
+            }
         }
 
         backend.rename(filename, filename + utils::format(suffix, 1));

@@ -25,6 +25,10 @@ public:
         return m_file.is_open();
     }
 
+    bool exists(const std::string& filename) const {
+        return boost::filesystem::exists(m_path.parent_path() / filename);
+    }
+
     bool open() {
         if (!create_directories(m_path.parent_path())) {
             return false;

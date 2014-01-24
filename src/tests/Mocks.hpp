@@ -30,6 +30,7 @@ public:
                 WillByDefault(Return(true));
     }
 
+    MOCK_CONST_METHOD1(exists, bool(const std::string&));
     MOCK_CONST_METHOD0(opened, bool());
     MOCK_CONST_METHOD0(path, std::string());
     MOCK_CONST_METHOD0(filename, std::string());
