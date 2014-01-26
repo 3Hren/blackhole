@@ -227,10 +227,10 @@ struct id<sink::file_t<Backend, Rotator>> {
         std::string rotator;
 
         if (cfg.size() > ROTATOR_POS && aux::is<std::vector<boost::any>>(cfg.at(ROTATOR_POS))) {
-            rotator = sink::rotator_t<Backend>::name();
+            rotator = utils::format("/%s", sink::rotator_t<Backend>::name());
         }
 
-        return utils::format("files%s", rotator);
+        return utils::format("%s%s", sink::file_t<Backend, Rotator>::name(), rotator);
     }
 };
 
@@ -239,14 +239,14 @@ struct id<sink::file_t<Backend, Rotator>> {
 template<class Backend>
 struct config_traits<sink::file_t<Backend, sink::NoRotation>> {
     static std::string name() {
-        return "files";
+        return sink::file_t<Backend, sink::NoRotation>::name();
     }
 };
 
 template<class Backend, template<typename> class Rotator>
 struct config_traits<sink::file_t<Backend, Rotator>> {
     static std::string name() {
-        return utils::format("files%s", Rotator<Backend>::name());
+        return utils::format("%s/%s", sink::file_t<Backend, Rotator>::name(), Rotator<Backend>::name());
     }
 };
 

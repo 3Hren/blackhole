@@ -36,7 +36,7 @@ class rotator_t {
     Backend& backend;
 public:
     static const char* name() {
-        return "/rotate";
+        return "rotate";
     }
 
     rotator_t(Backend& backend) :
