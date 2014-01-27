@@ -269,7 +269,7 @@ struct factory_traits<sink::file_t<Backend, sink::rotator_t>> {
         config_type cfg;
         std::vector<boost::any> rotator;
         aux::vector_to(config, cfg.path, cfg.autoflush, rotator);
-        aux::vector_to(rotator, cfg.rotator.size, cfg.rotator.count);
+        aux::vector_to(rotator, cfg.rotator.size, cfg.rotator.backups);
         return cfg;
     }
 };

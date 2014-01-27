@@ -26,6 +26,7 @@ Rotate both:
 
 //!@todo: example: Make stdout/string example with demonstration of formatting other attribute.
 //!@todo: example: File rotating.
+//!@todo: aux: aux::map_to. Also replace most std::vectors in boost::any to std::map.
 
 //!@todo: benchmark: File logging comparing with boost::log.
 //!@todo: benchmark: Socket logging with json.

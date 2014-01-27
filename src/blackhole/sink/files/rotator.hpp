@@ -17,14 +17,14 @@ template<typename Backend> class NoRotation;
 namespace rotator {
 
 struct config_t {
+    std::string pattern;
+    std::uint16_t backups;
     std::uint64_t size;
-    std::uint16_t count;
-    std::string suffix;
 
-    config_t(std::uint64_t size = 10 * 1024 * 1024, std::uint16_t count = 5, const std::string& suffix = ".%N") :
-        size(size),
-        count(count),
-        suffix(suffix)
+    config_t(const std::string& pattern = ".%N", std::uint16_t backups = 5, std::uint64_t size = 10 * 1024 * 1024) :
+        pattern(pattern),
+        backups(backups),
+        size(size)
     {}
 };
 
@@ -58,10 +58,10 @@ public:
         backend.flush();
         backend.close();
         //!@todo: Implement rotation naming strategy, because N and DateTime naming are mutual exclusive.
-        if (config.suffix.find("%N") != std::string::npos) {
-            std::string suffix = config.suffix;
+        if (config.pattern.find("%N") != std::string::npos) {
+            std::string suffix = config.pattern;
             boost::algorithm::replace_all(suffix, "%N", "%s");
-            for (std::uint16_t i = config.count - 1; i > 0; --i) {
+            for (std::uint16_t i = config.backups - 1; i > 0; --i) {
                 std::string oldname = filename + utils::format(suffix, i);
                 if (backend.exists(oldname)) {
                     std::string newname = filename + utils::format(suffix, i + 1);

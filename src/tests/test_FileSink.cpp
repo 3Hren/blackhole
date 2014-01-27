@@ -82,7 +82,7 @@ TEST(rotator_t, Class) {
 }
 
 TEST(rotator_t, RotateFiles) {
-    sink::rotator::config_t config = { 1024, 1, ".%N" };
+    sink::rotator::config_t config = { ".%N", 1, 1024 };
     mock::files::backend_t backend("test.log");
     sink::rotator_t<mock::files::backend_t> rotator(config, backend);
 
@@ -104,7 +104,7 @@ TEST(rotator_t, RotateFiles) {
 }
 
 TEST(rotator_t, RotateMultipleFiles) {
-    sink::rotator::config_t config = { 1024, 2, ".%N" };
+    sink::rotator::config_t config = { ".%N", 2, 1024 };
     mock::files::backend_t backend("test.log");
     sink::rotator_t<mock::files::backend_t> rotator(config, backend);
 
@@ -127,7 +127,7 @@ TEST(rotator_t, RotateMultipleFiles) {
 }
 
 TEST(rotator_t, NotRenameIfFileNotExists) {
-    sink::rotator::config_t config = { 1024, 2, ".%N" };
+    sink::rotator::config_t config = { ".%N", 2, 1024 };
     mock::files::backend_t backend("test.log");
     sink::rotator_t<mock::files::backend_t> rotator(config, backend);
 
