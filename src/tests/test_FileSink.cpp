@@ -150,3 +150,19 @@ TEST(rotator_t, NotRenameIfFileNotExists) {
             .Times(1);
     rotator.rotate();
 }
+
+TEST(rotator_t, SubstitutesFilenamePlaceholder) {
+    sink::rotator::config_t config = { "%(filename)s.%N", 1, 1024 };
+    NiceMock<mock::files::backend_t> backend("test.log");
+    sink::rotator_t<mock::files::backend_t> rotator(config, backend);
+
+    EXPECT_CALL(backend, filename())
+            .Times(1)
+            .WillOnce(Return("test.log"));
+    EXPECT_CALL(backend, exists("test.log"))
+            .Times(1)
+            .WillOnce(Return(true));
+    EXPECT_CALL(backend, rename("test.log", "test.log.1"))
+            .Times(1);
+    rotator.rotate();
+}

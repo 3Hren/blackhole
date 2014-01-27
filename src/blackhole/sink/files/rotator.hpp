@@ -57,20 +57,26 @@ public:
 
         backend.flush();
         backend.close();
-        //!@todo: Implement rotation naming strategy, because N and DateTime naming are mutual exclusive.
+
+        std::string pattern = config.pattern;
+        if (config.pattern.find("%(filename)s") != std::string::npos) {
+            boost::algorithm::replace_all(pattern, "%(filename)s", filename);
+        } else {
+            pattern = utils::format("%s%s", filename, pattern);
+        }
+
         if (config.pattern.find("%N") != std::string::npos) {
-            std::string suffix = config.pattern;
-            boost::algorithm::replace_all(suffix, "%N", "%s");
+            boost::algorithm::replace_all(pattern, "%N", "%s");
             for (std::uint16_t i = config.backups - 1; i > 0; --i) {
-                std::string oldname = filename + utils::format(suffix, i);
+                std::string oldname = utils::format(pattern, i);
                 if (backend.exists(oldname)) {
-                    std::string newname = filename + utils::format(suffix, i + 1);
+                    std::string newname = utils::format(pattern, i + 1);
                     backend.rename(oldname, newname);
                 }
             }
 
             if (backend.exists(filename)) {
-                backend.rename(filename, filename + utils::format(suffix, 1));
+                backend.rename(filename, utils::format(pattern, 1));
             }
         }
 
@@ -78,6 +84,6 @@ public:
     }
 };
 
-}
+} // namespace sink
 
-}
+} // namespace blackhole
