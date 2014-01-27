@@ -29,6 +29,16 @@ public:
         return boost::filesystem::exists(m_path.parent_path() / filename);
     }
 
+    std::vector<std::string> listdir() const {
+        //!@todo: Implement me!
+        return std::vector<std::string>();
+    }
+
+    std::time_t changed(const std::string&) const {
+        //!@todo: Implement me!
+        return std::time(nullptr);
+    }
+
     bool open() {
         if (!create_directories(m_path.parent_path())) {
             return false;
