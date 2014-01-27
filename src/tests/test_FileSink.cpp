@@ -86,20 +86,14 @@ TEST(rotator_t, RotateFiles) {
     mock::files::backend_t backend("test.log");
     sink::rotator_t<mock::files::backend_t> rotator(config, backend);
 
-    EXPECT_CALL(backend, flush())
-            .Times(1);
-    EXPECT_CALL(backend, close())
-            .Times(1);
+    EXPECT_CALL(backend, flush());
+    EXPECT_CALL(backend, close());
     EXPECT_CALL(backend, filename())
-            .Times(1)
             .WillOnce(Return("test.log"));
     EXPECT_CALL(backend, exists("test.log"))
-            .Times(1)
             .WillOnce(Return(true));
-    EXPECT_CALL(backend, rename("test.log", "test.log.1"))
-            .Times(1);
-    EXPECT_CALL(backend, open())
-            .Times(1);
+    EXPECT_CALL(backend, rename("test.log", "test.log.1"));
+    EXPECT_CALL(backend, open());
     rotator.rotate();
 }
 
@@ -108,21 +102,15 @@ TEST(rotator_t, RotateMultipleFiles) {
     mock::files::backend_t backend("test.log");
     sink::rotator_t<mock::files::backend_t> rotator(config, backend);
 
-    EXPECT_CALL(backend, flush())
-            .Times(1);
-    EXPECT_CALL(backend, close())
-            .Times(1);
+    EXPECT_CALL(backend, flush());
+    EXPECT_CALL(backend, close());
     EXPECT_CALL(backend, filename())
-            .Times(1)
             .WillOnce(Return("test.log"));
     EXPECT_CALL(backend, exists(_))
             .WillRepeatedly(Return(true));
-    EXPECT_CALL(backend, rename("test.log.1", "test.log.2"))
-            .Times(1);
-    EXPECT_CALL(backend, rename("test.log", "test.log.1"))
-            .Times(1);
-    EXPECT_CALL(backend, open())
-            .Times(1);
+    EXPECT_CALL(backend, rename("test.log.1", "test.log.2"));
+    EXPECT_CALL(backend, rename("test.log", "test.log.1"));
+    EXPECT_CALL(backend, open());
     rotator.rotate();
 }
 
@@ -131,23 +119,16 @@ TEST(rotator_t, NotRenameIfFileNotExists) {
     mock::files::backend_t backend("test.log");
     sink::rotator_t<mock::files::backend_t> rotator(config, backend);
 
-    EXPECT_CALL(backend, flush())
-            .Times(1);
-    EXPECT_CALL(backend, close())
-            .Times(1);
+    EXPECT_CALL(backend, flush());
+    EXPECT_CALL(backend, close());
     EXPECT_CALL(backend, filename())
-            .Times(1)
             .WillOnce(Return("test.log"));
     EXPECT_CALL(backend, exists("test.log.1"))
-            .Times(1)
             .WillOnce(Return(false));
     EXPECT_CALL(backend, exists("test.log"))
-            .Times(1)
             .WillOnce(Return(true));
-    EXPECT_CALL(backend, rename("test.log", "test.log.1"))
-            .Times(1);
-    EXPECT_CALL(backend, open())
-            .Times(1);
+    EXPECT_CALL(backend, rename("test.log", "test.log.1"));
+    EXPECT_CALL(backend, open());
     rotator.rotate();
 }
 
@@ -157,12 +138,7 @@ TEST(rotator_t, SubstitutesFilenamePlaceholder) {
     sink::rotator_t<mock::files::backend_t> rotator(config, backend);
 
     EXPECT_CALL(backend, filename())
-            .Times(1)
             .WillOnce(Return("test.log"));
-    EXPECT_CALL(backend, exists("test.log"))
-            .Times(1)
-            .WillOnce(Return(true));
-    EXPECT_CALL(backend, rename("test.log", "test.log.1"))
-            .Times(1);
+    EXPECT_CALL(backend, rename("test.log", "test.log.1"));
     rotator.rotate();
 }

@@ -26,8 +26,10 @@ namespace files {
 class backend_t {
 public:
     backend_t(const std::string&) {
-        ON_CALL(*this, opened()).
-                WillByDefault(Return(true));
+        ON_CALL(*this, opened())
+                .WillByDefault(Return(true));
+        ON_CALL(*this, exists(_))
+                .WillByDefault(Return(true));
     }
 
     MOCK_CONST_METHOD1(exists, bool(const std::string&));
