@@ -61,8 +61,6 @@ public:
         std::string pattern = config.pattern;
         if (config.pattern.find("%(filename)s") != std::string::npos) {
             boost::algorithm::replace_all(pattern, "%(filename)s", filename);
-        } else {
-            pattern = utils::format("%s%s", filename, pattern);
         }
 
         if (config.pattern.find("%N") != std::string::npos) {
