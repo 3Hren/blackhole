@@ -294,19 +294,15 @@ private:
         }
 
         int counter = 0;
-        for (auto it = filenames.begin(); it != filenames.end(); ++it) {
-            const std::string& filename = *it;
-            if (counter >= backups) {
-                break;
-            }
+        for (auto it = filenames.begin(); it != filenames.end() && counter < backups; ++it, ++counter) {
+            const std::string& oldname = *it;
 
-            std::string fn = filename;
-            std::string current = std::string(fn.begin() + pos, fn.begin() + pos + 1);
-            int i = boost::lexical_cast<int>(current);
-            i++;
-            fn.replace(pos, 1, boost::lexical_cast<std::string>(i));
-            result.push_back(std::make_pair(filename, fn));
-            counter++;
+            std::string current = std::string(oldname.begin() + pos, oldname.begin() + pos + 1);
+            int id = boost::lexical_cast<int>(current);
+            id++;
+            std::string newname = oldname;
+            newname.replace(pos, 1, boost::lexical_cast<std::string>(id));
+            result.push_back(std::make_pair(oldname, newname));
         }
 
         return result;
