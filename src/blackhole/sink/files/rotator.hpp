@@ -252,7 +252,7 @@ private:
         rollover(backend.listdir(), pattern);
 
         if (backend.exists(filename)) {
-            backend.rename(filename, format(pattern));
+            backend.rename(filename, backup_filename(pattern));
         }
     }
 
@@ -308,7 +308,7 @@ private:
         return result;
     }
 
-    std::string format(const std::string& pattern) const {
+    std::string backup_filename(const std::string& pattern) const {
         std::string filename = pattern;
         boost::algorithm::replace_all(filename, "%N", "1");
         std::time_t time = m_timer.current();
