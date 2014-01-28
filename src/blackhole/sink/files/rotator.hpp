@@ -176,7 +176,7 @@ inline int pos(const std::string& pattern) {
 
     bool placeholder_expected = false;
     for (auto it = pattern.begin(); it != pattern.end() && it != pattern.begin() + pos; ++it) {
-        char c = *it;
+        const char c = *it;
 
         if (!placeholder_expected) {
             if (c == '%') {
