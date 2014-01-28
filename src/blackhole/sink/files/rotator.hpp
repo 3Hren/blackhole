@@ -58,6 +58,11 @@ struct datetime_t {
     const std::string& pattern;
     const std::uint16_t backups;
 
+    datetime_t(const std::string& pattern, std::uint16_t backups) :
+        pattern(pattern),
+        backups(backups)
+    {}
+
     bool operator ()(const std::string& filename) const {
         return !match(filename);
     }
@@ -202,18 +207,7 @@ public:
             boost::algorithm::replace_all(pattern, "%(filename)s", filename);
         }
 
-        std::vector<std::string> files = backend.listdir();
-        filter(&files, pattern);
-        std::sort(files.begin(), files.end(), time::ascending<Backend>(backend));
-
-        std::vector<std::pair<std::string, std::string>> pairs = cumilative(files, pattern, config.backups);
-
-        for (auto it = pairs.begin(); it != pairs.end(); ++it) {
-            const std::pair<std::string, std::string>& pair = *it;
-            if (backend.exists(pair.first)) {
-                backend.rename(pair.first, pair.second);
-            }
-        }
+        rotate(backend.listdir(), pattern);
 
         if (backend.exists(filename)) {
             backend.rename(filename, format(pattern));
@@ -222,10 +216,24 @@ public:
         backend.open();
     }
 
-    void filter(std::vector<std::string>* filenames, const std::string& pattern) const {
-        matcher::datetime_t matcher { pattern, config.backups };
-        auto it = std::remove_if(filenames->begin(), filenames->end(), matcher);
-        filenames->erase(it, filenames->end());
+private:
+    void rotate(std::vector<std::string> filenames, const std::string& pattern) const {
+        filter(&filenames, matcher::datetime_t(pattern, config.backups));
+        std::sort(filenames.begin(), filenames.end(), time::ascending<Backend>(backend));
+
+        std::vector<std::pair<std::string, std::string>> pairs = cumilative(filenames, pattern, config.backups);
+
+        for (auto it = pairs.begin(); it != pairs.end(); ++it) {
+            const std::pair<std::string, std::string>& pair = *it;
+            if (backend.exists(pair.first)) {
+                backend.rename(pair.first, pair.second);
+            }
+        }
+    }
+
+    template<typename Filter>
+    void filter(std::vector<std::string>* filenames, Filter filter) const {
+        filenames->erase(std::remove_if(filenames->begin(), filenames->end(), filter), filenames->end());
     }
 
     std::vector<std::pair<std::string, std::string> >
