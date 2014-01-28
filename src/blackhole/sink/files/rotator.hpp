@@ -199,25 +199,23 @@ public:
     void rotate() const {
         backend.flush();
         backend.close();
-
-        const std::string& filename = backend.filename();
-
-        std::string pattern = config.pattern;
-        if (config.pattern.find("%(filename)s") != std::string::npos) {
-            boost::algorithm::replace_all(pattern, "%(filename)s", filename);
-        }
-
-        rotate(backend.listdir(), pattern);
-
-        if (backend.exists(filename)) {
-            backend.rename(filename, format(pattern));
-        }
-
+        rollover();
         backend.open();
     }
 
 private:
-    void rotate(std::vector<std::string> filenames, const std::string& pattern) const {
+    void rollover() const {
+        const std::string& filename = backend.filename();
+        const std::string& pattern = make_pattern(filename);
+
+        rollover(backend.listdir(), pattern);
+
+        if (backend.exists(filename)) {
+            backend.rename(filename, format(pattern));
+        }
+    }
+
+    void rollover(std::vector<std::string> filenames, const std::string& pattern) const {
         filter(&filenames, matcher::datetime_t(pattern, config.backups));
         std::sort(filenames.begin(), filenames.end(), time::ascending<Backend>(backend));
 
@@ -229,6 +227,15 @@ private:
                 backend.rename(pair.first, pair.second);
             }
         }
+    }
+
+    std::string make_pattern(const std::string& filename) const {
+        std::string pattern = config.pattern;
+        if (config.pattern.find("%(filename)s") != std::string::npos) {
+            boost::algorithm::replace_all(pattern, "%(filename)s", filename);
+        }
+
+        return pattern;
     }
 
     template<typename Filter>
