@@ -157,10 +157,10 @@ TEST(rotator_t, SubstitutesFilenamePlaceholder) {
 namespace {
 
 std::time_t to_time_t(const std::string& message, const std::string& format = "%Y%m%d") {
-    std::tm tm = {};
+    std::tm tm;
+    std::memset(&tm, 0, sizeof(tm));
     strptime(message.c_str(), format.c_str(), &tm);
     std::time_t time = timegm(&tm);
-    std::cout << time << " - " << std::put_time(std::gmtime(&time), format.c_str()) << std::endl;
     return time;
 }
 

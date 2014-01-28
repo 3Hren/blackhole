@@ -1,10 +1,13 @@
 #pragma once
 
 #include <cstdint>
+#include <ctime>
 #include <iomanip>
+#include <iostream>
 #include <string>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "blackhole/utils/format.hpp"
 
@@ -33,6 +36,21 @@ struct config_t {
         backups(backups),
         size(size)
     {}
+};
+
+} // namespace rotator
+
+namespace time {
+
+template<typename Backend>
+struct ascending {
+    Backend& backend;
+
+    ascending(Backend& backend) : backend(backend) {}
+
+    bool operator ()(const std::string& lhs, const std::string& rhs) const {
+        return backend.changed(lhs) < backend.changed(rhs);
+    }
 };
 
 }
@@ -88,20 +106,15 @@ public:
         std::cout << utils::format("Filtered: [%s]", boost::join(files, ", ")) << std::endl;
 
         // Files are sorted by timestamp.
-        sort(files);
+        std::sort(files.begin(), files.end(), time::ascending<Backend>(backend));
         std::cout << utils::format("Sorted: [%s]", boost::join(files, ", ")) << std::endl;
 
         // Maximum `backups` pairs are collected.
         std::vector<std::pair<std::string, std::string>> pairs = cumilative(files, pattern, config.backups);
-        if (pairs.empty()) {
-            std::cout << "No pairs." << std::endl;
-        } else {
-            std::cout << "Pairs:" << std::endl;
-            for (auto pair : pairs) std::cout << pair.first << " -> " << pair.second << std::endl;
-        }
 
         // Rotating pairs. Counter (if present) is increasing.
-        for (auto pair : pairs) {
+        for (auto it = pairs.begin(); it != pairs.end(); ++it) {
+            const std::pair<std::string, std::string>& pair = *it;
             if (backend.exists(pair.first)) {
                 backend.rename(pair.first, pair.second);
             }
@@ -116,8 +129,8 @@ public:
 
     std::vector<std::string> filter(const std::vector<std::string>& filenames, const std::string& pattern) const {
         std::vector<std::string> result;
-        for (auto filename : filenames) {
-//            std::cout << utils::format("%s: %s", filename, match(filename, pattern)) << std::endl;
+        for (auto it = filenames.begin(); it != filenames.end(); ++it) {
+            const std::string& filename = *it;
             if (match(filename, pattern)) {
                 result.push_back(filename);
             }
@@ -188,8 +201,6 @@ public:
 
         if (p_it == p_end) {
             if (f_it != f_end) {
-                // The actual file name may end with an additional counter
-                // that is added by the collector in case if file name clash
                 return scan_digits(f_it, f_end, std::distance(f_it, f_end));
             } else {
                 return true;
@@ -205,8 +216,7 @@ public:
                 return false;
             }
 
-            char c = *it++;
-//            std::cout << "[" << c << "]" << std::boolalpha << (it == end) << std::endl;
+            const char c = *it++;
             if (!std::isdigit(c)) {
                 return false;
             }
@@ -215,27 +225,14 @@ public:
         return true;
     }
 
-    template<typename T>
-    static int digits(T number) {
-        int digits = 0;
-        if (number < 0) {
-            digits = 1;
-        }
-
+    static uint digits(uint number) {
+        uint digits = 0;
         while (number) {
             number /= 10;
             digits++;
         }
 
         return digits;
-    }
-
-    std::vector<std::string> sort(const std::vector<std::string>& filenames) const {
-        std::vector<std::string> result = filenames;
-        std::sort(result.begin(), result.end(), [this](const std::string& lhs, const std::string& rhs) {
-            return backend.changed(lhs) < backend.changed(rhs);
-        });
-        return result;
     }
 
     std::vector<std::pair<std::string, std::string> >
@@ -276,7 +273,8 @@ public:
 
         std::cout << pos << std::endl;
         int counter = 0;
-        for (const std::string& filename : filenames) {
+        for (auto it = filenames.begin(); it != filenames.end(); ++it) {
+            const std::string& filename = *it;
             std::cout << filename << std::endl;
             if (counter >= backups) {
                 break;
@@ -286,7 +284,7 @@ public:
             std::string current = std::string(fn.begin() + pos, fn.begin() + pos + 1);
             int i = atoi(current.data());
             i++;
-            fn.replace(pos, 1, std::to_string(i));
+            fn.replace(pos, 1, boost::lexical_cast<std::string>(i));
             result.push_back(std::make_pair(filename, fn));
             counter++;
         }
@@ -296,10 +294,10 @@ public:
     std::string format(const std::string& pattern) const {
         std::string filename = pattern;
         boost::algorithm::replace_all(filename, "%N", "1");
-        std::ostringstream stream;
         std::time_t time = m_timer.current();
-        stream << std::put_time(std::gmtime(&time), filename.data());
-        return stream.str();
+        char buf[128];
+        strftime(buf, 128, filename.data(), std::gmtime(&time));
+        return buf;
     }
 };
 
