@@ -245,6 +245,11 @@ public:
     }
 
 private:
+    struct rollover_pair_t {
+        const std::string current;
+        const std::string newname;
+    };
+
     void rollover() const {
         const std::string& filename = backend.filename();
         const std::string& pattern = make_pattern(filename);
@@ -260,12 +265,11 @@ private:
         filter(&filenames, matcher::datetime_t(pattern, config.backups));
         std::sort(filenames.begin(), filenames.end(), time::ascending<Backend>(backend));
 
-        std::vector<std::pair<std::string, std::string>> pairs = cumulative(filenames, pattern, config.backups);
-
+        std::vector<rollover_pair_t> pairs = make_rollover_pairs(filenames, pattern, config.backups);
         for (auto it = pairs.begin(); it != pairs.end(); ++it) {
-            const std::pair<std::string, std::string>& pair = *it;
-            if (backend.exists(pair.first)) {
-                backend.rename(pair.first, pair.second);
+            const rollover_pair_t& pair = *it;
+            if (backend.exists(pair.current)) {
+                backend.rename(pair.current, pair.newname);
             }
         }
     }
@@ -284,9 +288,9 @@ private:
         filenames->erase(std::remove_if(filenames->begin(), filenames->end(), filter), filenames->end());
     }
 
-    std::vector<std::pair<std::string, std::string> >
-    cumulative(const std::vector<std::string>& filenames, const std::string& pattern, int backups) const {
-        std::vector<std::pair<std::string, std::string>> result;
+    std::vector<rollover_pair_t>
+    make_rollover_pairs(const std::vector<std::string>& filenames, const std::string& pattern, int backups) const {
+        std::vector<rollover_pair_t> result;
 
         int pos = matcher::counter::pos(pattern);
         if (pos == -1) {
@@ -302,7 +306,7 @@ private:
             id++;
             std::string newname = oldname;
             newname.replace(pos, 1, boost::lexical_cast<std::string>(id));
-            result.push_back(std::make_pair(oldname, newname));
+            result.push_back({ oldname, newname });
         }
 
         return result;
