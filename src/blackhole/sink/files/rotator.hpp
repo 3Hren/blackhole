@@ -219,7 +219,7 @@ private:
         filter(&filenames, matcher::datetime_t(pattern, config.backups));
         std::sort(filenames.begin(), filenames.end(), time::ascending<Backend>(backend));
 
-        std::vector<std::pair<std::string, std::string>> pairs = cumilative(filenames, pattern, config.backups);
+        std::vector<std::pair<std::string, std::string>> pairs = cumulative(filenames, pattern, config.backups);
 
         for (auto it = pairs.begin(); it != pairs.end(); ++it) {
             const std::pair<std::string, std::string>& pair = *it;
@@ -244,7 +244,7 @@ private:
     }
 
     std::vector<std::pair<std::string, std::string> >
-    cumilative(const std::vector<std::string>& filenames, const std::string& pattern, int backups) const {
+    cumulative(const std::vector<std::string>& filenames, const std::string& pattern, int backups) const {
         std::vector<std::pair<std::string, std::string>> result;
         int pos = pattern.find("%N");
         if (pos == -1) {
