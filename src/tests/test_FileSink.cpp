@@ -229,7 +229,7 @@ TEST(rotator_t, RotateWithDateTimeAndCountPlaceholders) {
     rotator.rotate();
 }
 
-TEST(rotator_t, RotateWithDateTimeAndCountPlaceholders2) {
+TEST(rotator_t, RotateWithDateTimeAndCountPlaceholdersInTheMiddleOfPattern) {
     sink::rotator::config_t config = { "test.log.%Y%m%d.%N.wow!", 2, 1024 };
     NiceMock<mock::files::backend_t> backend("test.log");
     sink::rotator_t<mock::files::backend_t, mock::timer_t> rotator(config, backend);
