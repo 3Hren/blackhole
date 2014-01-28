@@ -50,7 +50,7 @@ struct ascending {
     }
 };
 
-}
+} // namespace time
 
 namespace matcher {
 
