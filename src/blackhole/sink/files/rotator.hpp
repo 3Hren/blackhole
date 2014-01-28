@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <iostream>
 #include <string>
 
 #include <boost/algorithm/string.hpp>
@@ -93,24 +92,12 @@ public:
             boost::algorithm::replace_all(pattern, "%(filename)s", filename);
         }
 
-        std::cout << utils::format("Pattern: %s", pattern) << std::endl;
-
-        // Get list of files in the directory
         std::vector<std::string> files = backend.listdir();
-        std::cout << utils::format("List: [%s]", boost::join(files, ", ")) << std::endl;
-
-        // Files are filtered by pattern. Only matched files left.
         files = filter(files, pattern);
-        std::cout << utils::format("Filtered: [%s]", boost::join(files, ", ")) << std::endl;
-
-        // Files are sorted by timestamp.
         std::sort(files.begin(), files.end(), time::ascending<Backend>(backend));
-        std::cout << utils::format("Sorted: [%s]", boost::join(files, ", ")) << std::endl;
 
-        // Maximum `backups` pairs are collected.
         std::vector<std::pair<std::string, std::string>> pairs = cumilative(files, pattern, config.backups);
 
-        // Rotating pairs. Counter (if present) is increasing.
         for (auto it = pairs.begin(); it != pairs.end(); ++it) {
             const std::pair<std::string, std::string>& pair = *it;
             if (backend.exists(pair.first)) {
@@ -241,7 +228,6 @@ public:
             return result;
         }
 
-        std::cout << pos << std::endl;
         bool placeholder_expected = false;
         for (auto it = pattern.begin(); it != pattern.end() && it != pattern.begin() + pos; ++it) {
             char c = *it;
@@ -269,11 +255,9 @@ public:
             }
         }
 
-        std::cout << pos << std::endl;
         int counter = 0;
         for (auto it = filenames.begin(); it != filenames.end(); ++it) {
             const std::string& filename = *it;
-            std::cout << filename << std::endl;
             if (counter >= backups) {
                 break;
             }
