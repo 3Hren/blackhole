@@ -165,6 +165,47 @@ private:
     }
 };
 
+namespace counter {
+
+//! Locate real counter position in any matched filename using given pattern.
+inline int pos(const std::string& pattern) {
+    int pos = pattern.find("%N");
+    if (pos == -1) {
+        return -1;
+    }
+
+    bool placeholder_expected = false;
+    for (auto it = pattern.begin(); it != pattern.end() && it != pattern.begin() + pos; ++it) {
+        char c = *it;
+
+        if (!placeholder_expected) {
+            if (c == '%') {
+                placeholder_expected = true;
+            }
+        } else {
+            switch (c) {
+            case 'M':
+            case 'H':
+            case 'd':
+            case 'm':
+            case 'N':
+                break;
+            case 'Y':
+                pos += 2;
+                break;
+            default:
+                throw std::invalid_argument(utils::format("Unsupported placeholder used in pattern for file scanning: %s", c));
+            }
+
+            placeholder_expected = false;
+        }
+    }
+
+    return pos;
+}
+
+} // namespace offset
+
 } // namespace match
 
 template<class Backend, class Timer = timer_t>
@@ -246,12 +287,11 @@ private:
     std::vector<std::pair<std::string, std::string> >
     cumulative(const std::vector<std::string>& filenames, const std::string& pattern, int backups) const {
         std::vector<std::pair<std::string, std::string>> result;
-        int pos = pattern.find("%N");
+
+        int pos = matcher::counter::pos(pattern);
         if (pos == -1) {
             return result;
         }
-
-        pos += calculate_offset(pattern, pos);
 
         int counter = 0;
         for (auto it = filenames.begin(); it != filenames.end(); ++it) {
@@ -270,38 +310,6 @@ private:
         }
 
         return result;
-    }
-
-    int calculate_offset(const std::string& pattern, int pos) const {
-        int offset = 0;
-        bool placeholder_expected = false;
-        for (auto it = pattern.begin(); it != pattern.end() && it != pattern.begin() + pos; ++it) {
-            char c = *it;
-
-            if (!placeholder_expected) {
-                if (c == '%') {
-                    placeholder_expected = true;
-                }
-            } else {
-                switch (c) {
-                case 'M':
-                case 'H':
-                case 'd':
-                case 'm':
-                case 'N':
-                    break;
-                case 'Y':
-                    offset += 2;
-                    break;
-                default:
-                    throw std::invalid_argument(utils::format("Unsupported placeholder used in pattern for file scanning: %s", c));
-                }
-
-                placeholder_expected = false;
-            }
-        }
-
-        return offset;
     }
 
     std::string format(const std::string& pattern) const {
