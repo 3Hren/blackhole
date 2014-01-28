@@ -154,10 +154,26 @@ TEST(rotator_t, SubstitutesFilenamePlaceholder) {
     rotator.rotate();
 }
 
+namespace {
+
+std::time_t to_time_t(const std::string& message, const std::string& format = "%Y%m%d") {
+    std::tm tm = {};
+    strptime(message.c_str(), format.c_str(), &tm);
+    std::time_t time = timegm(&tm);
+    std::cout << time << " - " << std::put_time(std::gmtime(&time), format.c_str()) << std::endl;
+    return time;
+}
+
+}
+
 TEST(rotator_t, SubstitutesDateTimePlaceholders) {
     sink::rotator::config_t config = { "test.log.%Y%m%d", 1, 1024 };
     NiceMock<mock::files::backend_t> backend("test.log");
-    sink::rotator_t<mock::files::backend_t> rotator(config, backend);
+    sink::rotator_t<mock::files::backend_t, mock::timer_t> rotator(config, backend);
+
+    EXPECT_CALL(rotator.timer(), current())
+            .Times(1)
+            .WillOnce(Return(to_time_t("20140127")));
 
     EXPECT_CALL(backend, filename())
             .WillOnce(Return("test.log"));
@@ -173,7 +189,11 @@ TEST(rotator_t, SubstitutesDateTimePlaceholders) {
 TEST(rotator_t, RotateWithDateTimePlaceholders) {
     sink::rotator::config_t config = { "test.log.%Y%m%d", 2, 1024 };
     NiceMock<mock::files::backend_t> backend("test.log");
-    sink::rotator_t<mock::files::backend_t> rotator(config, backend);
+    sink::rotator_t<mock::files::backend_t, mock::timer_t> rotator(config, backend);
+
+    EXPECT_CALL(rotator.timer(), current())
+            .Times(1)
+            .WillOnce(Return(to_time_t("20140127")));
 
     EXPECT_CALL(backend, filename())
             .WillOnce(Return("test.log"));
@@ -189,7 +209,11 @@ TEST(rotator_t, RotateWithDateTimePlaceholders) {
 TEST(rotator_t, RotateWithDateTimeAndCountPlaceholders) {
     sink::rotator::config_t config = { "test.log.%Y%m%d.%N", 2, 1024 };
     NiceMock<mock::files::backend_t> backend("test.log");
-    sink::rotator_t<mock::files::backend_t> rotator(config, backend);
+    sink::rotator_t<mock::files::backend_t, mock::timer_t> rotator(config, backend);
+
+    EXPECT_CALL(rotator.timer(), current())
+            .Times(1)
+            .WillOnce(Return(to_time_t("20140127")));
 
     EXPECT_CALL(backend, filename())
             .WillOnce(Return("test.log"));
@@ -201,13 +225,18 @@ TEST(rotator_t, RotateWithDateTimeAndCountPlaceholders) {
             .WillOnce(Return(true));
     EXPECT_CALL(backend, rename("test.log.20140126.1", "test.log.20140126.2"));
     EXPECT_CALL(backend, rename("test.log", "test.log.20140127.1"));
+
     rotator.rotate();
 }
 
 TEST(rotator_t, RotateWithDateTimeAndCountPlaceholders2) {
     sink::rotator::config_t config = { "test.log.%Y%m%d.%N.wow!", 2, 1024 };
     NiceMock<mock::files::backend_t> backend("test.log");
-    sink::rotator_t<mock::files::backend_t> rotator(config, backend);
+    sink::rotator_t<mock::files::backend_t, mock::timer_t> rotator(config, backend);
+
+    EXPECT_CALL(rotator.timer(), current())
+            .Times(1)
+            .WillOnce(Return(to_time_t("20140127")));
 
     EXPECT_CALL(backend, filename())
             .WillOnce(Return("test.log"));
@@ -219,5 +248,6 @@ TEST(rotator_t, RotateWithDateTimeAndCountPlaceholders2) {
             .WillOnce(Return(true));
     EXPECT_CALL(backend, rename("test.log.20140126.1.wow!", "test.log.20140126.2.wow!"));
     EXPECT_CALL(backend, rename("test.log", "test.log.20140127.1.wow!"));
+
     rotator.rotate();
 }

@@ -93,7 +93,7 @@ private:
 
 namespace file {
 
-template<template<typename> class Rotator = NoRotation>
+template<template<typename...> class Rotator = NoRotation>
 struct config_t {
     std::string path;
     bool autoflush;
@@ -153,7 +153,7 @@ public:
     }
 };
 
-template<class Backend = boost_backend_t, template<typename> class Rotator = NoRotation, typename = void>
+template<class Backend = boost_backend_t, template<typename...> class Rotator = NoRotation, typename = void>
 class file_t;
 
 template<class Backend>
@@ -184,7 +184,7 @@ public:
     }
 };
 
-template<class Backend, template<typename> class Rotator>
+template<class Backend, template<typename...> class Rotator>
 class file_t<
     Backend,
     Rotator,
@@ -229,7 +229,7 @@ namespace generator {
 
 const uint ROTATOR_POS = 2;
 
-template<class Backend, template<typename> class Rotator>
+template<class Backend, template<typename, typename> class Rotator>
 struct id<sink::file_t<Backend, Rotator>> {
     static std::string extract(const boost::any& config) {
         std::vector<boost::any> cfg;
@@ -253,7 +253,7 @@ struct config_traits<sink::file_t<Backend, sink::NoRotation>> {
     }
 };
 
-template<class Backend, template<typename> class Rotator>
+template<class Backend, template<typename...> class Rotator>
 struct config_traits<sink::file_t<Backend, Rotator>> {
     static std::string name() {
         return utils::format("%s/%s", sink::file_t<Backend, Rotator>::name(), Rotator<Backend>::name());

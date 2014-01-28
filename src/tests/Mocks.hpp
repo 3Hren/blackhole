@@ -92,4 +92,9 @@ public:
     MOCK_CONST_METHOD1_T(push, void(log::record_t));
 };
 
+class timer_t {
+public:
+    MOCK_CONST_METHOD0(current, std::time_t());
+};
+
 } // namespace mock

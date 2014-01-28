@@ -12,8 +12,14 @@ namespace blackhole {
 
 namespace sink {
 
+struct timer_t {
+    std::time_t current() const {
+        return std::time(nullptr);
+    }
+};
+
 //! Tag for file sinks with no rotation.
-template<typename Backend> class NoRotation;
+template<class Backend, class Timer = timer_t> class NoRotation;
 
 namespace rotator {
 
@@ -31,10 +37,11 @@ struct config_t {
 
 }
 
-template<typename Backend>
+template<class Backend, class Timer = timer_t>
 class rotator_t {
     rotator::config_t config;
     Backend& backend;
+    Timer m_timer;
 public:
     static const char* name() {
         return "rotate";
@@ -48,6 +55,10 @@ public:
         config(config),
         backend(backend)
     {}
+
+    Timer& timer() {
+        return m_timer;
+    }
 
     bool necessary() const {
         // In case of size based rotation everything is simple: file.size() + message.size() >= size;
@@ -97,7 +108,6 @@ public:
         }
 
         if (backend.exists(filename)) {
-            std::cout << utils::format("%s -> %s", filename, format(pattern)) << std::endl;
             backend.rename(filename, format(pattern));
         }
 
@@ -287,7 +297,7 @@ public:
         std::string filename = pattern;
         boost::algorithm::replace_all(filename, "%N", "1");
         std::ostringstream stream;
-        std::time_t time = std::time(nullptr);
+        std::time_t time = m_timer.current();
         stream << std::put_time(std::gmtime(&time), filename.data());
         return stream.str();
     }
