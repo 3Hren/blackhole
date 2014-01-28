@@ -251,6 +251,29 @@ private:
             return result;
         }
 
+        pos += calculate_offset(pattern, pos);
+
+        int counter = 0;
+        for (auto it = filenames.begin(); it != filenames.end(); ++it) {
+            const std::string& filename = *it;
+            if (counter >= backups) {
+                break;
+            }
+
+            std::string fn = filename;
+            std::string current = std::string(fn.begin() + pos, fn.begin() + pos + 1);
+            int i = boost::lexical_cast<int>(current);
+            i++;
+            fn.replace(pos, 1, boost::lexical_cast<std::string>(i));
+            result.push_back(std::make_pair(filename, fn));
+            counter++;
+        }
+
+        return result;
+    }
+
+    int calculate_offset(const std::string& pattern, int pos) const {
+        int offset = 0;
         bool placeholder_expected = false;
         for (auto it = pattern.begin(); it != pattern.end() && it != pattern.begin() + pos; ++it) {
             char c = *it;
@@ -268,7 +291,7 @@ private:
                 case 'N':
                     break;
                 case 'Y':
-                    pos += 2;
+                    offset += 2;
                     break;
                 default:
                     throw std::invalid_argument(utils::format("Unsupported placeholder used in pattern for file scanning: %s", c));
@@ -278,22 +301,7 @@ private:
             }
         }
 
-        int counter = 0;
-        for (auto it = filenames.begin(); it != filenames.end(); ++it) {
-            const std::string& filename = *it;
-            if (counter >= backups) {
-                break;
-            }
-
-            std::string fn = filename;
-            std::string current = std::string(fn.begin() + pos, fn.begin() + pos + 1);
-            int i = atoi(current.data());
-            i++;
-            fn.replace(pos, 1, boost::lexical_cast<std::string>(i));
-            result.push_back(std::make_pair(filename, fn));
-            counter++;
-        }
-        return result;
+        return offset;
     }
 
     std::string format(const std::string& pattern) const {
