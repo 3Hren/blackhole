@@ -52,79 +52,17 @@ struct ascending {
 
 }
 
-template<class Backend, class Timer = timer_t>
-class rotator_t {
-    rotator::config_t config;
-    Backend& backend;
-    Timer m_timer;
-public:
-    static const char* name() {
-        return "rotate";
+namespace matcher {
+
+struct datetime_t {
+    const std::string& pattern;
+    const std::uint16_t backups;
+
+    bool operator ()(const std::string& filename) const {
+        return !match(filename);
     }
 
-    rotator_t(Backend& backend) :
-        backend(backend)
-    {}
-
-    rotator_t(const rotator::config_t& config, Backend& backend) :
-        config(config),
-        backend(backend)
-    {}
-
-    Timer& timer() {
-        return m_timer;
-    }
-
-    bool necessary() const {
-        // In case of size based rotation everything is simple: file.size() + message.size() >= size;
-        // In case of datetime based rotation that's seems to be a bit difficult: get_current_time() >= current_fence().
-        return false;
-    }
-
-    void rotate() const {
-        backend.flush();
-        backend.close();
-
-        const std::string& filename = backend.filename();
-
-        std::string pattern = config.pattern;
-        if (config.pattern.find("%(filename)s") != std::string::npos) {
-            boost::algorithm::replace_all(pattern, "%(filename)s", filename);
-        }
-
-        std::vector<std::string> files = backend.listdir();
-        files = filter(files, pattern);
-        std::sort(files.begin(), files.end(), time::ascending<Backend>(backend));
-
-        std::vector<std::pair<std::string, std::string>> pairs = cumilative(files, pattern, config.backups);
-
-        for (auto it = pairs.begin(); it != pairs.end(); ++it) {
-            const std::pair<std::string, std::string>& pair = *it;
-            if (backend.exists(pair.first)) {
-                backend.rename(pair.first, pair.second);
-            }
-        }
-
-        if (backend.exists(filename)) {
-            backend.rename(filename, format(pattern));
-        }
-
-        backend.open();
-    }
-
-    std::vector<std::string> filter(const std::vector<std::string>& filenames, const std::string& pattern) const {
-        std::vector<std::string> result;
-        for (auto it = filenames.begin(); it != filenames.end(); ++it) {
-            const std::string& filename = *it;
-            if (match(filename, pattern)) {
-                result.push_back(filename);
-            }
-        }
-
-        return result;
-    }
-
-    bool match(const std::string& filename, const std::string& pattern) const {
+    bool match(const std::string& filename) const {
         auto f_it = filename.begin();
         auto f_end = filename.end();
         auto p_it = pattern.begin();
@@ -171,7 +109,7 @@ public:
                     ++p_it;
                     break;
                 case 'N':
-                    if (!scan_digits(f_it, f_end, digits(config.backups))) {
+                    if (!scan_digits(f_it, f_end, digits(backups))) {
                         return false;
                     }
                     ++p_it;
@@ -195,6 +133,7 @@ public:
         }
     }
 
+private:
     static bool scan_digits(std::string::const_iterator& it, std::string::const_iterator end, int n) {
         for (; n > 0; --n) {
             if (it == end) {
@@ -218,6 +157,75 @@ public:
         }
 
         return digits;
+    }
+};
+
+} // namespace match
+
+template<class Backend, class Timer = timer_t>
+class rotator_t {
+    rotator::config_t config;
+    Backend& backend;
+    Timer m_timer;
+public:
+    static const char* name() {
+        return "rotate";
+    }
+
+    rotator_t(Backend& backend) :
+        backend(backend)
+    {}
+
+    rotator_t(const rotator::config_t& config, Backend& backend) :
+        config(config),
+        backend(backend)
+    {}
+
+    Timer& timer() {
+        return m_timer;
+    }
+
+    bool necessary() const {
+        // In case of size based rotation everything is simple: file.size() + message.size() >= size;
+        // In case of datetime based rotation that's seems to be a bit difficult: get_current_time() >= current_fence().
+        return false;
+    }
+
+    void rotate() const {
+        backend.flush();
+        backend.close();
+
+        const std::string& filename = backend.filename();
+
+        std::string pattern = config.pattern;
+        if (config.pattern.find("%(filename)s") != std::string::npos) {
+            boost::algorithm::replace_all(pattern, "%(filename)s", filename);
+        }
+
+        std::vector<std::string> files = backend.listdir();
+        filter(&files, pattern);
+        std::sort(files.begin(), files.end(), time::ascending<Backend>(backend));
+
+        std::vector<std::pair<std::string, std::string>> pairs = cumilative(files, pattern, config.backups);
+
+        for (auto it = pairs.begin(); it != pairs.end(); ++it) {
+            const std::pair<std::string, std::string>& pair = *it;
+            if (backend.exists(pair.first)) {
+                backend.rename(pair.first, pair.second);
+            }
+        }
+
+        if (backend.exists(filename)) {
+            backend.rename(filename, format(pattern));
+        }
+
+        backend.open();
+    }
+
+    void filter(std::vector<std::string>* filenames, const std::string& pattern) const {
+        matcher::datetime_t matcher { pattern, config.backups };
+        auto it = std::remove_if(filenames->begin(), filenames->end(), matcher);
+        filenames->erase(it, filenames->end());
     }
 
     std::vector<std::pair<std::string, std::string> >
