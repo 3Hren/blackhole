@@ -317,8 +317,11 @@ private:
         boost::algorithm::replace_all(filename, "%N", "1");
         std::time_t time = m_timer.current();
         char buf[128];
-        strftime(buf, 128, filename.data(), std::gmtime(&time));
-        return buf;
+        if (strftime(buf, 128, filename.data(), std::gmtime(&time)) == 0) {
+            // Do nothing.
+        }
+
+        return std::string(buf);
     }
 };
 
