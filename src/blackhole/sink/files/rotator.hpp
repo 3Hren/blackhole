@@ -67,6 +67,7 @@ struct datetime_t {
         return !match(filename);
     }
 
+private:
     bool match(const std::string& filename) const {
         auto f_it = filename.begin();
         auto f_end = filename.end();
@@ -138,7 +139,6 @@ struct datetime_t {
         }
     }
 
-private:
     static bool scan_digits(std::string::const_iterator& it, std::string::const_iterator end, int n) {
         for (; n > 0; --n) {
             if (it == end) {
