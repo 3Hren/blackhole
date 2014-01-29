@@ -32,6 +32,7 @@ SET(SOURCES
     test_Config
     test_Manual
     test_Utils
+    test_FileRotation
 )
 
 SET(Boost_USE_MULTITHREADED ON)
