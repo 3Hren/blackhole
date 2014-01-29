@@ -247,7 +247,7 @@ public:
 private:
     struct rollover_pair_t {
         const std::string current;
-        const std::string newname;
+        const std::string renamed;
     };
 
     void rollover() const {
@@ -269,7 +269,7 @@ private:
         for (auto it = pairs.begin(); it != pairs.end(); ++it) {
             const rollover_pair_t& pair = *it;
             if (backend.exists(pair.current)) {
-                backend.rename(pair.current, pair.newname);
+                backend.rename(pair.current, pair.renamed);
             }
         }
     }
@@ -299,14 +299,14 @@ private:
 
         int counter = 0;
         for (auto it = filenames.begin(); it != filenames.end() && counter < backups; ++it, ++counter) {
-            const std::string& oldname = *it;
+            const std::string& current = *it;
 
-            std::string current = std::string(oldname.begin() + pos, oldname.begin() + pos + 1);
-            int id = boost::lexical_cast<int>(current);
+            std::string current_id = std::string(current.begin() + pos, current.begin() + pos + 1);
+            int id = boost::lexical_cast<int>(current_id);
             id++;
-            std::string newname = oldname;
-            newname.replace(pos, 1, boost::lexical_cast<std::string>(id));
-            result.push_back({ oldname, newname });
+            std::string renamed = current;
+            renamed.replace(pos, 1, boost::lexical_cast<std::string>(id));
+            result.push_back({ current, renamed });
         }
 
         return result;
