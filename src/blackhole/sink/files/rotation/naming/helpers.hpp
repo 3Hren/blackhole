@@ -10,7 +10,7 @@ namespace sink {
 
 namespace matching {
 
-static inline bool all_digits(std::string::const_iterator& it, std::string::const_iterator end, int n) {
+inline bool all_digits(std::string::const_iterator& it, std::string::const_iterator end, int n) {
     for (; n > 0; --n) {
         if (it == end) {
             return false;
@@ -25,7 +25,7 @@ static inline bool all_digits(std::string::const_iterator& it, std::string::cons
     return true;
 }
 
-static inline uint digits(uint number) {
+inline uint digits(uint number) {
     uint digits = 0;
     while (number) {
         number /= 10;
