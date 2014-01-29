@@ -8,16 +8,11 @@
 
 #include "blackhole/utils/format.hpp"
 #include "blackhole/sink/files/rotation/config.hpp"
+#include "blackhole/sink/files/rotation/timer.hpp"
 
 namespace blackhole {
 
 namespace sink {
-
-struct timer_t {
-    std::time_t current() const {
-        return std::time(nullptr);
-    }
-};
 
 //! Tag for file sinks with no rotation.
 template<class Backend, class Timer = timer_t> class NoRotation;
