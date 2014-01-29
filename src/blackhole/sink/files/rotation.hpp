@@ -58,8 +58,8 @@ public:
 
 private:
     struct rollover_pair_t {
-        const std::string current;
-        const std::string renamed;
+        std::string current;
+        std::string renamed;
     };
 
     void rollover() const {
@@ -109,7 +109,8 @@ private:
             id++;
             std::string renamed = current;
             renamed.replace(pos, 1, boost::lexical_cast<std::string>(id));
-            result.push_back({ current, renamed });
+            rollover_pair_t pair { current, renamed };
+            result.push_back(std::move(pair));
         }
 
         return result;
