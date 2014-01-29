@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include "blackhole/sink/files/rotation/naming/comparator.hpp"
+#include "blackhole/sink/files/rotation/naming/helpers.hpp"
 
 namespace blackhole {
 
@@ -59,19 +60,19 @@ private:
                 case 'H':
                 case 'd':
                 case 'm':
-                    if (!scan_digits(f_it, f_end, 2)) {
+                    if (!all_digits(f_it, f_end, 2)) {
                         return false;
                     }
                     ++p_it;
                     break;
                 case 'Y':
-                    if (!scan_digits(f_it, f_end, 4)) {
+                    if (!all_digits(f_it, f_end, 4)) {
                         return false;
                     }
                     ++p_it;
                     break;
                 case 'N':
-                    if (!scan_digits(f_it, f_end, digits(backups))) {
+                    if (!all_digits(f_it, f_end, digits(backups))) {
                         return false;
                     }
                     ++p_it;
@@ -86,38 +87,13 @@ private:
 
         if (p_it == p_end) {
             if (f_it != f_end) {
-                return scan_digits(f_it, f_end, std::distance(f_it, f_end));
+                return all_digits(f_it, f_end, std::distance(f_it, f_end));
             } else {
                 return true;
             }
         } else {
             return false;
         }
-    }
-
-    static bool scan_digits(std::string::const_iterator& it, std::string::const_iterator end, int n) {
-        for (; n > 0; --n) {
-            if (it == end) {
-                return false;
-            }
-
-            const char c = *it++;
-            if (!std::isdigit(c)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    static uint digits(uint number) {
-        uint digits = 0;
-        while (number) {
-            number /= 10;
-            digits++;
-        }
-
-        return digits;
     }
 };
 
