@@ -29,10 +29,6 @@ public:
         return "rotate";
     }
 
-    rotator_t(Backend& backend) :
-        backend(backend)
-    {}
-
     rotator_t(const rotation::config_t& config, Backend& backend) :
         config(config),
         backend(backend),

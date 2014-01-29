@@ -8,8 +8,9 @@ using namespace blackhole;
 //! Action: `rotator.rotate()`.
 
 TEST(rotator_t, Class) {
+    sink::rotation::config_t config = { "test.log.%N", 1, 1024 };
     mock::files::backend_t backend("test.log");
-    sink::rotator_t<mock::files::backend_t> rotator(backend);
+    sink::rotator_t<mock::files::backend_t> rotator(config, backend);
     UNUSED(rotator);
 }
 
