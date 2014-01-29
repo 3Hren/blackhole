@@ -6,10 +6,10 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "blackhole/utils/format.hpp"
 #include "blackhole/sink/files/rotation/config.hpp"
 #include "blackhole/sink/files/rotation/timer.hpp"
 #include "blackhole/sink/files/rotation/naming.hpp"
+#include "blackhole/utils/format.hpp"
 
 namespace blackhole {
 
