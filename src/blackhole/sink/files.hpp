@@ -6,7 +6,7 @@
 
 #include "blackhole/error.hpp"
 #include "blackhole/factory.hpp"
-#include "blackhole/sink/files/rotator.hpp"
+#include "blackhole/sink/files/rotation.hpp"
 
 namespace blackhole {
 

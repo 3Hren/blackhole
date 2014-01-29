@@ -7,6 +7,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "blackhole/utils/format.hpp"
+#include "blackhole/sink/files/rotation/config.hpp"
 
 namespace blackhole {
 
