@@ -9,6 +9,27 @@ namespace blackhole {
 
 namespace sink {
 
+namespace basename {
+
+class generator_t {
+    const std::string pattern;
+
+public:
+    generator_t(const std::string& pattern = std::string()) :
+        pattern(pattern)
+    {}
+
+    std::string basename(const std::string& filename) const {
+        if (pattern.find("%(filename)s") != std::string::npos) {
+            return boost::algorithm::replace_all_copy(pattern, "%(filename)s", filename);
+        }
+
+        return pattern;
+    }
+};
+
+} // namespace basename
+
 namespace matching {
 
 struct datetime_t {

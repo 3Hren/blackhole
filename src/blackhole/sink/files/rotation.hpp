@@ -23,6 +23,7 @@ class rotator_t {
     rotation::config_t config;
     Backend& backend;
     Timer m_timer;
+    basename::generator_t generator;
 public:
     static const char* name() {
         return "rotate";
@@ -34,7 +35,8 @@ public:
 
     rotator_t(const rotation::config_t& config, Backend& backend) :
         config(config),
-        backend(backend)
+        backend(backend),
+        generator(config.pattern)
     {}
 
     Timer& timer() {
@@ -62,12 +64,12 @@ private:
 
     void rollover() const {
         const std::string& filename = backend.filename();
-        const std::string& pattern = make_pattern(filename);
+        const std::string& basename = generator.basename(filename);
 
-        rollover(backend.listdir(), pattern);
+        rollover(backend.listdir(), basename);
 
         if (backend.exists(filename)) {
-            backend.rename(filename, backup_filename(pattern));
+            backend.rename(filename, backup_filename(basename));
         }
     }
 
@@ -82,15 +84,6 @@ private:
                 backend.rename(pair.current, pair.renamed);
             }
         }
-    }
-
-    std::string make_pattern(const std::string& filename) const {
-        std::string pattern = config.pattern;
-        if (config.pattern.find("%(filename)s") != std::string::npos) {
-            boost::algorithm::replace_all(pattern, "%(filename)s", filename);
-        }
-
-        return pattern;
     }
 
     template<typename Filter>
