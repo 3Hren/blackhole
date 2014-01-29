@@ -52,6 +52,25 @@ TEST(rotator_t, RotateMultipleFiles) {
     rotator.rotate();
 }
 
+TEST(rotator_t, ProperRolloverWithAbsentFiles) {
+    sink::rotation::config_t config = { "test.log.%N", 10, 1024 };
+    NiceMock<mock::files::backend_t> backend("test.log");
+    sink::rotator_t<mock::files::backend_t> rotator(config, backend);
+
+    EXPECT_CALL(backend, filename())
+            .WillOnce(Return("test.log"));
+    EXPECT_CALL(backend, listdir())
+            .WillOnce(Return(std::vector<std::string>({ "test.log", "test.log.9" })));
+    EXPECT_CALL(backend, exists(_))
+            .WillRepeatedly(Return(true));
+
+    InSequence s;
+    EXPECT_CALL(backend, rename("test.log.9", "test.log.10"));
+    EXPECT_CALL(backend, rename("test.log", "test.log.1"));
+
+    rotator.rotate();
+}
+
 TEST(rotator_t, NotRenameIfFileNotExists) {
     sink::rotation::config_t config = { "test.log.%N", 2, 1024 };
     NiceMock<mock::files::backend_t> backend("test.log");

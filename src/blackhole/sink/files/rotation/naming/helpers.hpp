@@ -13,7 +13,7 @@ namespace matching {
 inline bool all_digits(std::string::const_iterator& it, std::string::const_iterator end, int n) {
     for (; n > 0; --n) {
         if (it == end) {
-            return false;
+            return true;
         }
 
         const char c = *it++;

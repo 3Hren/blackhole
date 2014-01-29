@@ -1,5 +1,4 @@
 //!@todo: files_t: Make file rotation.
-//!@todo: today: Finish refactoring (1hr)
 //!@todo: today: Support for %N placeholders more than 1 digit (1.5hr)
 //!@todo: today: Refactoring (0.5hr)
 //!@todo: today: Conditions for %N and datetime (2hr)
