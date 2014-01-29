@@ -82,7 +82,7 @@ TEST(rotator_t, Class) {
 }
 
 TEST(rotator_t, RotatingSequence) {
-    sink::rotator::config_t config = { "test.log.%N", 1, 1024 };
+    sink::rotation::config_t config = { "test.log.%N", 1, 1024 };
     mock::files::backend_t backend("test.log");
     sink::rotator_t<mock::files::backend_t> rotator(config, backend);
 
@@ -102,7 +102,7 @@ TEST(rotator_t, RotatingSequence) {
 }
 
 TEST(rotator_t, RotateMultipleFiles) {
-    sink::rotator::config_t config = { "test.log.%N", 2, 1024 };
+    sink::rotation::config_t config = { "test.log.%N", 2, 1024 };
     NiceMock<mock::files::backend_t> backend("test.log");
     sink::rotator_t<mock::files::backend_t> rotator(config, backend);
 
@@ -121,7 +121,7 @@ TEST(rotator_t, RotateMultipleFiles) {
 }
 
 TEST(rotator_t, NotRenameIfFileNotExists) {
-    sink::rotator::config_t config = { "test.log.%N", 2, 1024 };
+    sink::rotation::config_t config = { "test.log.%N", 2, 1024 };
     NiceMock<mock::files::backend_t> backend("test.log");
     sink::rotator_t<mock::files::backend_t> rotator(config, backend);
 
@@ -139,7 +139,7 @@ TEST(rotator_t, NotRenameIfFileNotExists) {
 }
 
 TEST(rotator_t, SubstitutesFilenamePlaceholder) {
-    sink::rotator::config_t config = { "%(filename)s.%N", 1, 1024 };
+    sink::rotation::config_t config = { "%(filename)s.%N", 1, 1024 };
     NiceMock<mock::files::backend_t> backend("test.log");
     sink::rotator_t<mock::files::backend_t> rotator(config, backend);
 
@@ -167,7 +167,7 @@ std::time_t to_time_t(const std::string& message, const std::string& format = "%
 }
 
 TEST(rotator_t, SubstitutesDateTimePlaceholders) {
-    sink::rotator::config_t config = { "test.log.%Y%m%d", 1, 1024 };
+    sink::rotation::config_t config = { "test.log.%Y%m%d", 1, 1024 };
     NiceMock<mock::files::backend_t> backend("test.log");
     sink::rotator_t<mock::files::backend_t, mock::timer_t> rotator(config, backend);
 
@@ -187,7 +187,7 @@ TEST(rotator_t, SubstitutesDateTimePlaceholders) {
 }
 
 TEST(rotator_t, RotateWithDateTimePlaceholders) {
-    sink::rotator::config_t config = { "test.log.%Y%m%d", 2, 1024 };
+    sink::rotation::config_t config = { "test.log.%Y%m%d", 2, 1024 };
     NiceMock<mock::files::backend_t> backend("test.log");
     sink::rotator_t<mock::files::backend_t, mock::timer_t> rotator(config, backend);
 
@@ -207,7 +207,7 @@ TEST(rotator_t, RotateWithDateTimePlaceholders) {
 }
 
 TEST(rotator_t, RotateWithDateTimeAndCountPlaceholders) {
-    sink::rotator::config_t config = { "test.log.%Y%m%d.%N", 2, 1024 };
+    sink::rotation::config_t config = { "test.log.%Y%m%d.%N", 2, 1024 };
     NiceMock<mock::files::backend_t> backend("test.log");
     sink::rotator_t<mock::files::backend_t, mock::timer_t> rotator(config, backend);
 
@@ -230,7 +230,7 @@ TEST(rotator_t, RotateWithDateTimeAndCountPlaceholders) {
 }
 
 TEST(rotator_t, RotateWithDateTimeAndCountPlaceholdersInTheMiddleOfPattern) {
-    sink::rotator::config_t config = { "test.log.%Y%m%d.%N.wow!", 2, 1024 };
+    sink::rotation::config_t config = { "test.log.%Y%m%d.%N.wow!", 2, 1024 };
     NiceMock<mock::files::backend_t> backend("test.log");
     sink::rotator_t<mock::files::backend_t, mock::timer_t> rotator(config, backend);
 

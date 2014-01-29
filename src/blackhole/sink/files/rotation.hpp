@@ -22,22 +22,6 @@ struct timer_t {
 //! Tag for file sinks with no rotation.
 template<class Backend, class Timer = timer_t> class NoRotation;
 
-namespace rotator {
-
-struct config_t {
-    std::string pattern;
-    std::uint16_t backups;
-    std::uint64_t size;
-
-    config_t(const std::string& pattern = ".%N", std::uint16_t backups = 5, std::uint64_t size = 10 * 1024 * 1024) :
-        pattern(pattern),
-        backups(backups),
-        size(size)
-    {}
-};
-
-} // namespace rotator
-
 namespace time {
 
 template<typename Backend>
@@ -211,7 +195,7 @@ inline int pos(const std::string& pattern) {
 
 template<class Backend, class Timer = timer_t>
 class rotator_t {
-    rotator::config_t config;
+    rotation::config_t config;
     Backend& backend;
     Timer m_timer;
 public:
@@ -223,7 +207,7 @@ public:
         backend(backend)
     {}
 
-    rotator_t(const rotator::config_t& config, Backend& backend) :
+    rotator_t(const rotation::config_t& config, Backend& backend) :
         config(config),
         backend(backend)
     {}

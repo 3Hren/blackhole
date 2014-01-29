@@ -108,7 +108,7 @@ template<>
 struct config_t<rotator_t> {
     std::string path;
     bool autoflush;
-    rotator::config_t rotator;
+    rotation::config_t rotator;
 
     config_t(const std::string& path = "/dev/stdout", bool autoflush = true) :
         path(path),
