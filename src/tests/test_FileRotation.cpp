@@ -294,6 +294,19 @@ TEST(match, PositiveMatchCounterWithWidth) {
     EXPECT_TRUE(matching::matched("test.log.%5N.log", "test.log.10000.log"));
 }
 
+TEST(match, NegativeMatchCounterWithDatetime) {
+    using namespace sink::rotation;
+    EXPECT_FALSE(matching::matched("test.log.%N.%Y%m%d.log", "test.log...log"));
+
+    EXPECT_FALSE(matching::matched("test.log.%N.%Y%m%d.log", "test.log..20140101.log"));
+
+    EXPECT_FALSE(matching::matched("test.log.%N.%Y%m%d.log", "test.log.01.20140101.log"));
+    EXPECT_FALSE(matching::matched("test.log.%N.%Y%m%d.log", "test.log.10.20140101.log"));
+
+    EXPECT_FALSE(matching::matched("test.log.%N.%Y%m%d.log", "test.log.1.201401--.log"));
+    EXPECT_FALSE(matching::matched("test.log.%N.%Y%m%d.log", "test.log.1.120140101.log"));
+}
+
 TEST(match, PositiveMatchCounterWithDatetime) {
     using namespace sink::rotation;
     EXPECT_TRUE(matching::matched("test.log.%N.%Y%m%d.log", "test.log.1.20140101.log"));
