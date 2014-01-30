@@ -14,9 +14,9 @@ namespace blackhole {
 namespace sink {
 
 //! Tag for file sinks with no rotation.
-template<class Backend, class Timer = timer_t> class NoRotation;
+template<class Backend, class Timer = rotation::timer_t> class NoRotation;
 
-template<class Backend, class Timer = timer_t>
+template<class Backend, class Timer = rotation::timer_t>
 class rotator_t {
     rotation::config_t config;
     Backend& backend;
