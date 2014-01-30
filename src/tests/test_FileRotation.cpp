@@ -243,10 +243,12 @@ TEST(rotator_t, RotateWithDateTimePlaceholderAfterCounter) {
 }
 
 TEST(counter_t, ParserWithoutPlaceholders) {
+    using namespace sink::rotation;
     EXPECT_EQ(counter_t({ "test.log", "", 0 }), counter_t::from_string("test.log"));
 }
 
 TEST(couter_t, ParseOnlyCounterPlaceholder) {
+    using namespace sink::rotation;
     EXPECT_EQ(counter_t({ "test.log.", "", 1 }), counter_t::from_string("test.log.%N"));
     EXPECT_EQ(counter_t({ "test.log.", "", 1 }), counter_t::from_string("test.log.%1N"));
     EXPECT_EQ(counter_t({ "test.log.", "", 2 }), counter_t::from_string("test.log.%2N"));
@@ -256,6 +258,7 @@ TEST(couter_t, ParseOnlyCounterPlaceholder) {
 }
 
 TEST(couter_t, ParseCounterPlaceholderWithDatetime) {
+    using namespace sink::rotation;
     EXPECT_EQ(counter_t({ "test.log.", ".YYYYmmdd", 1 }), counter_t::from_string("test.log.%N.%Y%m%d"));
     EXPECT_EQ(counter_t({ "test.log.YYYYmmdd.", "", 1 }), counter_t::from_string("test.log.%Y%m%d.%N"));
 }
