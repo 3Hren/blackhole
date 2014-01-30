@@ -55,7 +55,10 @@ struct counter_t {
      * next:        test.log.20140130.2     test.log.2          test.log.20140130.2
      */
     std::string next(const std::string& filename) const {
-        BOOST_ASSERT(filename.size() - prefix.size() - suffix.size() >= 0);
+        BOOST_ASSERT(static_cast<int>(filename.size()) -
+                     static_cast<int>(prefix.size()) -
+                     static_cast<int>(suffix.size()) >= 0);
+
         const std::string& counter =
                 filename.substr(prefix.size(), filename.size() - prefix.size() - suffix.size());
         const uint value = cast(counter);
