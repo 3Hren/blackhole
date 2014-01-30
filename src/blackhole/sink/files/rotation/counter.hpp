@@ -18,9 +18,9 @@ namespace sink {
 namespace rotation {
 
 struct counter_t {
-    std::string prefix;
-    std::string suffix;
-    uint width;
+    const std::string prefix;
+    const std::string suffix;
+    const uint width;
 
     counter_t(const std::string& prefix, const std::string& suffix, uint width) :
         prefix(std::move(prefix)),
@@ -51,24 +51,19 @@ struct counter_t {
     /*!
      * pattern:     test.log.%Y%m%d.%N      %(filename)s.%N     %(filename)s.%Y%m%d.%N
      * basename:    test.log.%Y%m%d.%N      test.log.%N         test.log.%Y%m%d.%N
-     * current:     test.log.20140130.1     test.log.1          test.log.20140130.1
-     * newname:     test.log.20140130.2     test.log.2          test.log.20140130.2
+     * filename:    test.log.20140130.1     test.log.1          test.log.20140130.1
+     * next:        test.log.20140130.2     test.log.2          test.log.20140130.2
      */
     std::string next(const std::string& filename) const {
         BOOST_ASSERT(filename.size() - prefix.size() - suffix.size() >= 0);
-        const std::string& counter = filename.substr(prefix.size(),
-                                                     filename.size() - prefix.size() - suffix.size());
-        uint value = 0;
-        try {
-            value = boost::lexical_cast<uint>(counter);
-        } catch (const boost::bad_lexical_cast&) {
-            // Eat this.
-        }
-
+        const std::string& counter =
+                filename.substr(prefix.size(), filename.size() - prefix.size() - suffix.size());
+        const uint value = cast(counter);
         std::ostringstream stream;
         stream << std::string(filename.begin(), filename.begin() + prefix.size())
                << std::setfill('0') << std::setw(width) << (value + 1)
-               << std::string(filename.begin() + prefix.size() + std::max(width, matching::digits(value)), filename.end());
+               << std::string(filename.begin() + prefix.size() + std::max(width, matching::digits(value)),
+                              filename.end());
         return stream.str();
     }
 
@@ -114,6 +109,15 @@ struct counter_t {
         }
 
         return counter_t(std::move(prefix), std::move(suffix), width);
+    }
+
+private:
+    static uint cast(const std::string& str, uint default_value = 0) {
+        try {
+            return boost::lexical_cast<uint>(str);
+        } catch (const boost::bad_lexical_cast&) {
+            return default_value;
+        }
     }
 
     static const std::map<std::string, std::string>& available_placeholders() {
