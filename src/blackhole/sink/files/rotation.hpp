@@ -8,6 +8,7 @@
 #include "blackhole/sink/files/rotation/config.hpp"
 #include "blackhole/sink/files/rotation/counter.hpp"
 #include "blackhole/sink/files/rotation/timer.hpp"
+#include "blackhole/sink/files/rotation/matching/counter.hpp"
 
 namespace blackhole {
 
@@ -21,7 +22,7 @@ class rotator_t {
     rotation::config_t config;
     Backend& backend;
     Timer m_timer;
-    basename::generator_t generator;
+    rotation::naming::basename_t generator;
     rotation::counter_t counter;
 public:
     static const char* name() {
@@ -53,14 +54,9 @@ public:
     }
 
 private:
-    struct rollover_pair_t {
-        std::string current;
-        std::string renamed;
-    };
-
     void rollover() const {
         const std::string& filename = backend.filename();
-        const std::string& basename = generator.basename(filename);
+        const std::string& basename = generator.transform(filename);
 
         if (counter.valid()) {
             rollover(backend.listdir(), basename);
@@ -72,7 +68,10 @@ private:
     }
 
     void rollover(std::vector<std::string> filenames, const std::string& pattern) const {
-        filenames.erase(std::remove_if(filenames.begin(), filenames.end(), matching::datetime_t(pattern)), filenames.end());
+        filenames.erase(std::remove_if(filenames.begin(),
+                                       filenames.end(),
+                                       rotation::matching::both_t(pattern)),
+                        filenames.end());
         std::sort(filenames.begin(), filenames.end(), comparator::time::ascending<Backend>(backend));
         for (auto it = filenames.begin(); it != filenames.end(); ++it) {
             const std::string& filename = *it;

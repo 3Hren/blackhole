@@ -8,7 +8,9 @@ namespace blackhole {
 
 namespace sink {
 
-namespace matching {
+namespace rotation {
+
+namespace naming {
 
 inline bool all_digits(std::string::const_iterator& it, std::string::const_iterator end, int n) {
     for (; n > 0; --n) {
@@ -30,7 +32,9 @@ inline uint digits(uint number) {
     return digits;
 }
 
-} // namespace matching
+} // namespace naming
+
+} // namespace rotation
 
 } // namespace sink
 

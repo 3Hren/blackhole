@@ -263,33 +263,38 @@ TEST(couter_t, ParseCounterPlaceholderWithDatetime) {
     EXPECT_EQ(counter_t({ "test.log.YYYYmmdd.", "", 1 }), counter_t::from_string("test.log.%Y%m%d.%N"));
 }
 
-TEST(matching, MatchCounter) {
-    EXPECT_TRUE(sink::matching::match("test.log.%N", "test.log.1"));
+TEST(match, MatchCounter) {
+    using namespace sink::rotation;
+    EXPECT_TRUE(matching::matched("test.log.%N", "test.log.1"));
 }
 
-TEST(matching, MatchCounterInMiddle) {
-    EXPECT_TRUE(sink::matching::match("test.log.%N.log", "test.log.1.log"));
+TEST(match, MatchCounterInMiddle) {
+    using namespace sink::rotation;
+    EXPECT_TRUE(matching::matched("test.log.%N.log", "test.log.1.log"));
 }
 
-TEST(matching, NegativeMatchCounterWithWidth) {
-    EXPECT_FALSE(sink::matching::match("test.log.%0N.log", "test.log..log"));
-    EXPECT_FALSE(sink::matching::match("test.log.%0N.log", "test.log.1.log"));
+TEST(match, NegativeMatchCounterWithWidth) {
+    using namespace sink::rotation;
+    EXPECT_FALSE(matching::matched("test.log.%0N.log", "test.log..log"));
+    EXPECT_FALSE(matching::matched("test.log.%0N.log", "test.log.1.log"));
 
-    EXPECT_FALSE(sink::matching::match("test.log.%1N.log", "test.log.01.log"));
-    EXPECT_FALSE(sink::matching::match("test.log.%1N.log", "test.log.10.log"));
-    EXPECT_FALSE(sink::matching::match("test.log.%2N.log", "test.log.1.log"));
-    EXPECT_FALSE(sink::matching::match("test.log.%2N.log", "test.log.2.log"));
-    EXPECT_FALSE(sink::matching::match("test.log.%2N.log", "test.log.100.log"));
+    EXPECT_FALSE(matching::matched("test.log.%1N.log", "test.log.01.log"));
+    EXPECT_FALSE(matching::matched("test.log.%1N.log", "test.log.10.log"));
+    EXPECT_FALSE(matching::matched("test.log.%2N.log", "test.log.1.log"));
+    EXPECT_FALSE(matching::matched("test.log.%2N.log", "test.log.2.log"));
+    EXPECT_FALSE(matching::matched("test.log.%2N.log", "test.log.100.log"));
 }
 
-TEST(matching, PositiveMatchCounterWithWidth) {
-    EXPECT_TRUE(sink::matching::match("test.log.%1N.log", "test.log.1.log"));
-    EXPECT_TRUE(sink::matching::match("test.log.%2N.log", "test.log.01.log"));
-    EXPECT_TRUE(sink::matching::match("test.log.%2N.log", "test.log.10.log"));
-    EXPECT_TRUE(sink::matching::match("test.log.%5N.log", "test.log.00001.log"));
-    EXPECT_TRUE(sink::matching::match("test.log.%5N.log", "test.log.10000.log"));
+TEST(match, PositiveMatchCounterWithWidth) {
+    using namespace sink::rotation;
+    EXPECT_TRUE(matching::matched("test.log.%1N.log", "test.log.1.log"));
+    EXPECT_TRUE(matching::matched("test.log.%2N.log", "test.log.01.log"));
+    EXPECT_TRUE(matching::matched("test.log.%2N.log", "test.log.10.log"));
+    EXPECT_TRUE(matching::matched("test.log.%5N.log", "test.log.00001.log"));
+    EXPECT_TRUE(matching::matched("test.log.%5N.log", "test.log.10000.log"));
 }
 
-TEST(matching, PositiveMatchCounterWithDatetime) {
-    EXPECT_TRUE(sink::matching::match("test.log.%N.%Y%m%d.log", "test.log.1.20140101.log"));
+TEST(match, PositiveMatchCounterWithDatetime) {
+    using namespace sink::rotation;
+    EXPECT_TRUE(matching::matched("test.log.%N.%Y%m%d.log", "test.log.1.20140101.log"));
 }

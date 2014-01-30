@@ -9,13 +9,33 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "blackhole/sink/files/rotation/naming.hpp"
+#include "blackhole/sink/files/rotation/naming/basename.hpp"
+#include "blackhole/sink/files/rotation/naming/comparator.hpp"
+#include "blackhole/sink/files/rotation/naming/helpers.hpp"
 
 namespace blackhole {
 
 namespace sink {
 
 namespace rotation {
+
+namespace placeholder {
+
+inline char symbol() {
+    return '%';
+}
+
+struct counter;
+
+template<typename T>
+struct traits;
+
+template<>
+struct traits<counter> {
+    static char symbol() { return 'N'; }
+};
+
+}
 
 struct counter_t {
     const std::string prefix;
@@ -65,7 +85,7 @@ struct counter_t {
         std::ostringstream stream;
         stream << std::string(filename.begin(), filename.begin() + prefix.size())
                << std::setfill('0') << std::setw(width) << (value + 1)
-               << std::string(filename.begin() + prefix.size() + std::max(width, matching::digits(value)),
+               << std::string(filename.begin() + prefix.size() + std::max(width, naming::digits(value)),
                               filename.end());
         return stream.str();
     }
