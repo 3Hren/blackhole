@@ -1,4 +1,4 @@
-//!@todo: files_r: Rotation condition.
+//!@todo: files_t: Rotation condition.
 //! Sample config:
 /*!
 Rotate by size:
