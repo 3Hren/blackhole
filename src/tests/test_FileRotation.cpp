@@ -2,11 +2,6 @@
 
 using namespace blackhole;
 
-//!@todo:
-//! Given: size=1024, backup=1, suffix='.%N'
-//! Condition: `backend.size()`=1025
-//! Action: `rotator.rotate()`.
-
 TEST(rotator_t, Class) {
     sink::rotation::config_t config = { "test.log.%N", 1, 1024 };
     mock::files::backend_t backend("test.log");

@@ -110,9 +110,10 @@ struct config_t<rotator_t> {
     bool autoflush;
     rotation::config_t rotator;
 
-    config_t(const std::string& path = "/dev/stdout", bool autoflush = true) :
+    config_t(const std::string& path = "/dev/stdout", bool autoflush = true, const rotation::config_t& rotator = rotation::config_t()) :
         path(path),
-        autoflush(autoflush)
+        autoflush(autoflush),
+        rotator(rotator)
     {}
 };
 
