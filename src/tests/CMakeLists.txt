@@ -14,24 +14,24 @@ SET(HEADERS
 
 SET(SOURCES
     main
-#    test_StringFormatter
-#    test_FileSink
-#    test_Logger
-#    test_VerboseLogger
-#    test_Attribute
-#    test_Filter
-#    test_StringPatternParser
-#    test_UdpSink
-#    test_SyslogSink
-#    test_Functional
-#    test_FactoryInitialization
-#    test_JsonFormatter
-#    test_ExceptionTrap
-#    test_Macro
-#    test_MsgpackFormatter
-#    test_Config
-#    test_Manual
-#    test_Utils
+    test_StringFormatter
+    test_FileSink
+    test_Logger
+    test_VerboseLogger
+    test_Attribute
+    test_Filter
+    test_StringPatternParser
+    test_UdpSink
+    test_SyslogSink
+    test_Functional
+    test_FactoryInitialization
+    test_JsonFormatter
+    test_ExceptionTrap
+    test_Macro
+    test_MsgpackFormatter
+    test_Config
+    test_Manual
+    test_Utils
     test_FileRotation
 )
 

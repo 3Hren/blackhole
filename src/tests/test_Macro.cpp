@@ -157,10 +157,11 @@ struct insitu<keyword::tag::severity_t<level>> {
             "ERROR"
         };
 
-        if (static_cast<std::size_t>(lvl) < sizeof(DESCRIPTIONS) / sizeof(DESCRIPTIONS[0])) {
-            stream << DESCRIPTIONS[lvl];
+        std::size_t lvl_ = static_cast<std::size_t>(lvl);
+        if (lvl_ < sizeof(DESCRIPTIONS) / sizeof(DESCRIPTIONS[0])) {
+            stream << DESCRIPTIONS[lvl_];
         } else {
-            stream << static_cast<int>(lvl);
+            stream << lvl_;
         }
 
         return stream;
