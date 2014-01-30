@@ -1,12 +1,9 @@
 #pragma once
 
-#include <cctype>
 #include <cstdint>
-#include <iomanip>
 #include <string>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include "blackhole/sink/files/rotation/config.hpp"
 #include "blackhole/sink/files/rotation/counter.hpp"
