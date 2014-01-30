@@ -75,7 +75,7 @@ private:
     }
 
     void rollover(std::vector<std::string> filenames, const std::string& pattern) const {
-        filter(&filenames, matching::datetime_t(pattern));
+        filenames.erase(std::remove_if(filenames.begin(), filenames.end(), matching::datetime_t(pattern)), filenames.end());
         std::sort(filenames.begin(), filenames.end(), comparator::time::ascending<Backend>(backend));
         for (auto it = filenames.begin(); it != filenames.end(); ++it) {
             const std::string& filename = *it;
@@ -83,11 +83,6 @@ private:
                 backend.rename(filename, counter.next(filename));
             }
         }
-    }
-
-    template<typename Filter>
-    void filter(std::vector<std::string>* filenames, Filter filter) const {
-        filenames->erase(std::remove_if(filenames->begin(), filenames->end(), filter), filenames->end());
     }
 
     std::string backup_filename(const std::string& pattern) const {
