@@ -25,8 +25,8 @@ struct counter_t {
     const uint width;
 
     counter_t(const std::string& prefix, const std::string& suffix, uint width) :
-        prefix(std::move(prefix)),
-        suffix(std::move(suffix)),
+        prefix(prefix),
+        suffix(suffix),
         width(width)
     {}
 
