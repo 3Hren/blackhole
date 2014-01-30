@@ -46,10 +46,12 @@ struct counter_t {
     }
 
     //! I just leave these examples as mini documentation.
-    //! pattern:     test.log.%Y%m%d.%N      %(filename).%N      %(filename).%Y%m%d.%N
-    //! basename:    test.log.%Y%m%d.%N      test.log.%N         test.log.%Y%m%d.%N
-    //! current:     test.log.20140130.1     test.log.1          test.log.20140130.1
-    //! newname:     test.log.20140130.2     test.log.2          test.log.20140130.2
+    /*!
+     * pattern:     test.log.%Y%m%d.%N      %(filename)s.%N     %(filename)s.%Y%m%d.%N
+     * basename:    test.log.%Y%m%d.%N      test.log.%N         test.log.%Y%m%d.%N
+     * current:     test.log.20140130.1     test.log.1          test.log.20140130.1
+     * newname:     test.log.20140130.2     test.log.2          test.log.20140130.2
+     */
     std::string next(const std::string& filename) const {
         BOOST_ASSERT(filename.size() - prefix.size() - suffix.size() >= 0);
         const std::string& counter = filename.substr(prefix.size(),
