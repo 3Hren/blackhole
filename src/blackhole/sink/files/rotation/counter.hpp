@@ -2,9 +2,11 @@
 
 #include <cstdint>
 #include <iomanip>
+#include <map>
 #include <sstream>
 #include <string>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "blackhole/sink/files/rotation/naming.hpp"
@@ -105,32 +107,25 @@ struct counter_t {
             }
         }
 
-        boost::replace_all(prefix, "%Y", "YYYY");
-        boost::replace_all(prefix, "%m", "mm");
-        boost::replace_all(prefix, "%d", "dd");
-        boost::replace_all(prefix, "%H", "HH");
-        boost::replace_all(prefix, "%M", "MM");
-        boost::replace_all(prefix, "%s", "ss");
-
-        boost::replace_all(suffix, "%Y", "YYYY");
-        boost::replace_all(suffix, "%m", "mm");
-        boost::replace_all(suffix, "%d", "dd");
-        boost::replace_all(suffix, "%H", "HH");
-        boost::replace_all(suffix, "%M", "MM");
-        boost::replace_all(suffix, "%s", "ss");
+        const auto& placeholders = available_placeholders();
+        for (auto it = placeholders.begin(); it != placeholders.end(); ++it) {
+            boost::replace_all(prefix, it->first, it->second);
+            boost::replace_all(suffix, it->first, it->second);
+        }
 
         return counter_t(std::move(prefix), std::move(suffix), width);
     }
 
-    int count(const std::string& str, const std::string& obj ) {
-        int n = 0;
-        std::string::size_type pos = 0;
-        while ((pos = obj.find(str, pos)) != std::string::npos) {
-            n++;
-            pos += str.size();
-        }
-
-        return n;
+    static const std::map<std::string, std::string>& available_placeholders() {
+        static std::map<std::string, std::string> PLACEHOLDERS = {
+            { "%Y", "YYYY" },
+            { "%m", "mm" },
+            { "%d", "dd" },
+            { "%H", "HH" },
+            { "%M", "MM" },
+            { "%s", "ss" }
+        };
+        return PLACEHOLDERS;
     }
 };
 
