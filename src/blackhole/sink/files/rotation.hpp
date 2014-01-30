@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cctype>
 #include <cstdint>
+#include <iomanip>
 #include <string>
 
 #include <boost/algorithm/string.hpp>
@@ -13,6 +15,123 @@
 
 namespace blackhole {
 
+struct counter_t {
+    std::string prefix;
+    std::string suffix;
+    uint width;
+
+    counter_t(const std::string& prefix, const std::string& suffix, uint width) :
+        prefix(std::move(prefix)),
+        suffix(std::move(suffix)),
+        width(width)
+    {}
+
+    counter_t(std::string&& prefix, std::string&& suffix, uint width) :
+        prefix(std::move(prefix)),
+        suffix(std::move(suffix)),
+        width(width)
+    {}
+
+    bool operator ==(const counter_t& other) const {
+        return prefix == other.prefix && suffix == other.suffix && width == other.width;
+    }
+
+    friend std::ostream& operator <<(std::ostream& stream, const counter_t& counter) {
+        stream << "counter_t('" << counter.prefix << "', '" << counter.suffix << "', " << counter.width << ")";
+        return stream;
+    }
+
+    bool valid() const {
+        return width != 0;
+    }
+
+    //! I just leave these examples as mini documentation.
+    //! pattern:     test.log.%Y%m%d.%N      %(filename).%N      %(filename).%Y%m%d.%N
+    //! basename:    test.log.%Y%m%d.%N      test.log.%N         test.log.%Y%m%d.%N
+    //! current:     test.log.20140130.1     test.log.1          test.log.20140130.1
+    //! newname:     test.log.20140130.2     test.log.2          test.log.20140130.2
+    std::string next(const std::string& filename) const {
+        BOOST_ASSERT(filename.size() - prefix.size() - suffix.size() >= 0);
+        const std::string& counter = filename.substr(prefix.size(),
+                                                     filename.size() - prefix.size() - suffix.size());
+        uint value = 0;
+        try {
+            value = boost::lexical_cast<uint>(counter);
+        } catch (const boost::bad_lexical_cast&) {
+            // Eat this.
+        }
+
+        std::ostringstream stream;
+        stream << std::string(filename.begin(), filename.begin() + prefix.size())
+               << std::setfill('0') << std::setw(width) << (value + 1)
+               << std::string(filename.begin() + prefix.size() + std::max(width, sink::matching::digits(value)), filename.end());
+        return stream.str();
+    }
+
+    static counter_t from_string(const std::string& pattern) {
+        std::string prefix;
+        std::string suffix;
+        int width = 0;
+        bool found = false;
+        for (auto it = pattern.begin(); it != pattern.end(); ++it) {
+            if (found) {
+                suffix.push_back(*it);
+            } else if (*it == '%') {
+                it++;
+                std::string value;
+
+                for (; it != pattern.end(); ++it) {
+                    if (*it == 'N') {
+                        found = true;
+                        break;
+                    }
+
+                    value.push_back(*it);
+                    if (!std::isdigit(*it)) {
+                        break;
+                    }
+                }
+
+                if (found) {
+                    width = value.empty() ? 1 : boost::lexical_cast<uint>(value);
+                } else {
+                    prefix.push_back('%');
+                    prefix.append(value);
+                }
+            } else {
+                prefix.push_back(*it);
+            }
+        }
+
+        boost::replace_all(prefix, "%Y", "YYYY");
+        boost::replace_all(prefix, "%m", "mm");
+        boost::replace_all(prefix, "%d", "dd");
+        boost::replace_all(prefix, "%H", "HH");
+        boost::replace_all(prefix, "%M", "MM");
+        boost::replace_all(prefix, "%s", "ss");
+
+        boost::replace_all(suffix, "%Y", "YYYY");
+        boost::replace_all(suffix, "%m", "mm");
+        boost::replace_all(suffix, "%d", "dd");
+        boost::replace_all(suffix, "%H", "HH");
+        boost::replace_all(suffix, "%M", "MM");
+        boost::replace_all(suffix, "%s", "ss");
+
+        return counter_t(std::move(prefix), std::move(suffix), width);
+    }
+
+    int count(const std::string& str, const std::string& obj ) {
+        int n = 0;
+        std::string::size_type pos = 0;
+        while ((pos = obj.find(str, pos)) != std::string::npos) {
+            n++;
+            pos += str.size();
+        }
+
+        return n;
+    }
+};
+
 namespace sink {
 
 //! Tag for file sinks with no rotation.
@@ -24,6 +143,8 @@ class rotator_t {
     Backend& backend;
     Timer m_timer;
     basename::generator_t generator;
+
+    counter_t counter;
 public:
     static const char* name() {
         return "rotate";
@@ -32,7 +153,8 @@ public:
     rotator_t(const rotation::config_t& config, Backend& backend) :
         config(config),
         backend(backend),
-        generator(config.pattern)
+        generator(config.pattern),
+        counter(counter_t::from_string(config.pattern))
     {}
 
     Timer& timer() {
@@ -62,7 +184,9 @@ private:
         const std::string& filename = backend.filename();
         const std::string& basename = generator.basename(filename);
 
-        rollover(backend.listdir(), basename);
+        if (counter.valid()) {
+            rollover(backend.listdir(), basename);
+        }
 
         if (backend.exists(filename)) {
             backend.rename(filename, backup_filename(basename));
@@ -70,14 +194,12 @@ private:
     }
 
     void rollover(std::vector<std::string> filenames, const std::string& pattern) const {
-        filter(&filenames, matching::datetime_t(pattern, config.backups));
+        filter(&filenames, matching::datetime_t(pattern));
         std::sort(filenames.begin(), filenames.end(), comparator::time::ascending<Backend>(backend));
-
-        std::vector<rollover_pair_t> pairs = make_rollover_pairs(filenames, pattern, config.backups);
-        for (auto it = pairs.begin(); it != pairs.end(); ++it) {
-            const rollover_pair_t& pair = *it;
-            if (backend.exists(pair.current)) {
-                backend.rename(pair.current, pair.renamed);
+        for (auto it = filenames.begin(); it != filenames.end(); ++it) {
+            const std::string& filename = *it;
+            if (backend.exists(filename)) {
+                backend.rename(filename, counter.next(filename));
             }
         }
     }
@@ -85,31 +207,6 @@ private:
     template<typename Filter>
     void filter(std::vector<std::string>* filenames, Filter filter) const {
         filenames->erase(std::remove_if(filenames->begin(), filenames->end(), filter), filenames->end());
-    }
-
-    std::vector<rollover_pair_t>
-    make_rollover_pairs(const std::vector<std::string>& filenames, const std::string& pattern, int backups) const {
-        std::vector<rollover_pair_t> result;
-
-        int pos = matching::counting::pos(pattern);
-        if (pos == -1) {
-            return result;
-        }
-
-        int counter = 0;
-        for (auto it = filenames.begin(); it != filenames.end() && counter < backups; ++it, ++counter) {
-            const std::string& current = *it;
-
-            std::string current_id = std::string(current.begin() + pos, current.begin() + pos + 1);
-            int id = boost::lexical_cast<int>(current_id);
-            id++;
-            std::string renamed = current;
-            renamed.replace(pos, 1, boost::lexical_cast<std::string>(id));
-            rollover_pair_t pair { current, renamed };
-            result.push_back(std::move(pair));
-        }
-
-        return result;
     }
 
     std::string backup_filename(const std::string& pattern) const {

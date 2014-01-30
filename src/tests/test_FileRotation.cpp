@@ -72,6 +72,25 @@ TEST(rotator_t, ProperRolloverWithAbsentFiles) {
     rotator.rotate();
 }
 
+TEST(rotator_t, IncreaseDigitsInTheMiddle) {
+    sink::rotation::config_t config = { "test.log.%N.123", 10, 1024 };
+    NiceMock<mock::files::backend_t> backend("test.log");
+    sink::rotator_t<mock::files::backend_t> rotator(config, backend);
+
+    EXPECT_CALL(backend, filename())
+            .WillOnce(Return("test.log"));
+    EXPECT_CALL(backend, listdir())
+            .WillOnce(Return(std::vector<std::string>({ "test.log", "test.log.9.123" })));
+    EXPECT_CALL(backend, exists(_))
+            .WillRepeatedly(Return(true));
+
+    InSequence s;
+    EXPECT_CALL(backend, rename("test.log.9.123", "test.log.10.123"));
+    EXPECT_CALL(backend, rename("test.log", "test.log.1.123"));
+
+    rotator.rotate();
+}
+
 TEST(rotator_t, NotRenameIfFileNotExists) {
     sink::rotation::config_t config = { "test.log.%N", 2, 1024 };
     NiceMock<mock::files::backend_t> backend("test.log");
@@ -129,8 +148,6 @@ TEST(rotator_t, SubstitutesDateTimePlaceholders) {
 
     EXPECT_CALL(backend, filename())
             .WillOnce(Return("test.log"));
-    EXPECT_CALL(backend, listdir())
-            .WillOnce(Return(std::vector<std::string>({ "test.log" })));
     EXPECT_CALL(backend, exists("test.log"))
             .WillOnce(Return(true));
     EXPECT_CALL(backend, rename("test.log", "test.log.20140127"));
@@ -149,8 +166,6 @@ TEST(rotator_t, RotateWithDateTimePlaceholders) {
 
     EXPECT_CALL(backend, filename())
             .WillOnce(Return("test.log"));
-    EXPECT_CALL(backend, listdir())
-            .WillOnce(Return(std::vector<std::string>({ "test.log", "test.log.20140126" })));
     EXPECT_CALL(backend, exists("test.log"))
             .WillOnce(Return(true));
     EXPECT_CALL(backend, rename("test.log", "test.log.20140127"));
@@ -181,7 +196,7 @@ TEST(rotator_t, RotateWithDateTimeAndCountPlaceholders) {
     rotator.rotate();
 }
 
-TEST(rotator_t, RotateWithDateTimeAndCountPlaceholdersInTheMiddleOfPattern) {
+TEST(rotator_t, RotateWithDateTimePlaceholderBeforeCounter) {
     sink::rotation::config_t config = { "test.log.%Y%m%d.%N.wow!", 2, 1024 };
     NiceMock<mock::files::backend_t> backend("test.log");
     sink::rotator_t<mock::files::backend_t, mock::timer_t> rotator(config, backend);
@@ -202,4 +217,76 @@ TEST(rotator_t, RotateWithDateTimeAndCountPlaceholdersInTheMiddleOfPattern) {
     EXPECT_CALL(backend, rename("test.log", "test.log.20140127.1.wow!"));
 
     rotator.rotate();
+}
+
+TEST(rotator_t, RotateWithDateTimePlaceholderAfterCounter) {
+    sink::rotation::config_t config = { "test.log.%N.%Y%m%d.wow!", 2, 1024 };
+    NiceMock<mock::files::backend_t> backend("test.log");
+    sink::rotator_t<mock::files::backend_t, mock::timer_t> rotator(config, backend);
+
+    EXPECT_CALL(rotator.timer(), current())
+            .Times(1)
+            .WillOnce(Return(to_time_t("20140127")));
+
+    EXPECT_CALL(backend, filename())
+            .WillOnce(Return("test.log"));
+    EXPECT_CALL(backend, listdir())
+            .WillOnce(Return(std::vector<std::string>({ "test.log", "test.log.1.20140126.wow!" })));
+    EXPECT_CALL(backend, exists("test.log.1.20140126.wow!"))
+            .WillOnce(Return(true));
+    EXPECT_CALL(backend, exists("test.log"))
+            .WillOnce(Return(true));
+    EXPECT_CALL(backend, rename("test.log.1.20140126.wow!", "test.log.2.20140126.wow!"));
+    EXPECT_CALL(backend, rename("test.log", "test.log.1.20140127.wow!"));
+
+    rotator.rotate();
+}
+
+TEST(counter_t, ParserWithoutPlaceholders) {
+    EXPECT_EQ(counter_t({ "test.log", "", 0 }), counter_t::from_string("test.log"));
+}
+
+TEST(couter_t, ParseOnlyCounterPlaceholder) {
+    EXPECT_EQ(counter_t({ "test.log.", "", 1 }), counter_t::from_string("test.log.%N"));
+    EXPECT_EQ(counter_t({ "test.log.", "", 1 }), counter_t::from_string("test.log.%1N"));
+    EXPECT_EQ(counter_t({ "test.log.", "", 2 }), counter_t::from_string("test.log.%2N"));
+    EXPECT_EQ(counter_t({ "test.log.", "", 9 }), counter_t::from_string("test.log.%9N"));
+    EXPECT_EQ(counter_t({ "test.log.", "", 10 }), counter_t::from_string("test.log.%10N"));
+    EXPECT_EQ(counter_t({ "test.log.", "", 100 }), counter_t::from_string("test.log.%100N"));
+}
+
+TEST(couter_t, ParseCounterPlaceholderWithDatetime) {
+    EXPECT_EQ(counter_t({ "test.log.", ".YYYYmmdd", 1 }), counter_t::from_string("test.log.%N.%Y%m%d"));
+    EXPECT_EQ(counter_t({ "test.log.YYYYmmdd.", "", 1 }), counter_t::from_string("test.log.%Y%m%d.%N"));
+}
+
+TEST(matching, MatchCounter) {
+    EXPECT_TRUE(sink::matching::match("test.log.%N", "test.log.1"));
+}
+
+TEST(matching, MatchCounterInMiddle) {
+    EXPECT_TRUE(sink::matching::match("test.log.%N.log", "test.log.1.log"));
+}
+
+TEST(matching, NegativeMatchCounterWithWidth) {
+    EXPECT_FALSE(sink::matching::match("test.log.%0N.log", "test.log..log"));
+    EXPECT_FALSE(sink::matching::match("test.log.%0N.log", "test.log.1.log"));
+
+    EXPECT_FALSE(sink::matching::match("test.log.%1N.log", "test.log.01.log"));
+    EXPECT_FALSE(sink::matching::match("test.log.%1N.log", "test.log.10.log"));
+    EXPECT_FALSE(sink::matching::match("test.log.%2N.log", "test.log.1.log"));
+    EXPECT_FALSE(sink::matching::match("test.log.%2N.log", "test.log.2.log"));
+    EXPECT_FALSE(sink::matching::match("test.log.%2N.log", "test.log.100.log"));
+}
+
+TEST(matching, PositiveMatchCounterWithWidth) {
+    EXPECT_TRUE(sink::matching::match("test.log.%1N.log", "test.log.1.log"));
+    EXPECT_TRUE(sink::matching::match("test.log.%2N.log", "test.log.01.log"));
+    EXPECT_TRUE(sink::matching::match("test.log.%2N.log", "test.log.10.log"));
+    EXPECT_TRUE(sink::matching::match("test.log.%5N.log", "test.log.00001.log"));
+    EXPECT_TRUE(sink::matching::match("test.log.%5N.log", "test.log.10000.log"));
+}
+
+TEST(matching, PositiveMatchCounterWithDatetime) {
+    EXPECT_TRUE(sink::matching::match("test.log.%N.%Y%m%d.log", "test.log.1.20140101.log"));
 }
