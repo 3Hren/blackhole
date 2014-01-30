@@ -19,24 +19,6 @@ namespace sink {
 
 namespace rotation {
 
-namespace placeholder {
-
-inline char symbol() {
-    return '%';
-}
-
-struct counter;
-
-template<typename T>
-struct traits;
-
-template<>
-struct traits<counter> {
-    static char symbol() { return 'N'; }
-};
-
-}
-
 struct counter_t {
     const std::string prefix;
     const std::string suffix;
