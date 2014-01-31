@@ -6,6 +6,10 @@ namespace blackhole {
 
 namespace sink {
 
+namespace rotation {
+
+namespace naming {
+
 namespace comparator {
 
 namespace time {
@@ -24,6 +28,10 @@ struct ascending {
 } // namespace time
 
 } // namespace comparator
+
+} // namespace naming
+
+} // namespace rotation
 
 } // namespace sink
 

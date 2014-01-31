@@ -75,7 +75,8 @@ private:
                                        filenames.end(),
                                        rotation::naming::filter_t(pattern)),
                         filenames.end());
-        std::sort(filenames.begin(), filenames.end(), comparator::time::ascending<Backend>(backend));
+        std::sort(filenames.begin(), filenames.end(),
+                  rotation::naming::comparator::time::ascending<Backend>(backend));
         for (auto it = filenames.begin(); it != filenames.end(); ++it) {
             const std::string& filename = *it;
             if (backend.exists(filename)) {
