@@ -233,22 +233,6 @@ namespace generator {
 
 const uint ROTATOR_POS = 2;
 
-//template<class Backend, class Rotator>
-//struct id<sink::file_t<Backend, Rotator>> {
-//    static std::string extract(const boost::any& config) {
-//        std::vector<boost::any> cfg;
-//        aux::any_to(config, cfg);
-//        std::string rotator;
-
-//        if (cfg.size() > ROTATOR_POS && aux::is<std::vector<boost::any>>(cfg.at(ROTATOR_POS))) {
-//            rotator += "/";
-//            rotator += Rotator::name();
-//        }
-
-//        return utils::format("%s%s", sink::file_t<Backend, Rotator>::name(), rotator);
-//    }
-//};
-
 template<class Backend, class Watcher>
 struct id<sink::file_t<Backend, sink::rotator_t<Backend, Watcher>>> {
     static std::string extract(const boost::any& config) {
