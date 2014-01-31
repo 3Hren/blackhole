@@ -50,6 +50,14 @@ public:
     MOCK_METHOD0(flush, void());
 };
 
+namespace rotation {
+
+class watcher_t {
+
+};
+
+} // namespace rotation
+
 } // namespace files
 
 namespace socket {

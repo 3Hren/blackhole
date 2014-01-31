@@ -93,7 +93,7 @@ private:
 
 namespace file {
 
-template<template<typename...> class Rotator = NoRotation>
+template<class Rotator = NoRotation>
 struct config_t {
     std::string path;
     bool autoflush;
@@ -104,8 +104,8 @@ struct config_t {
     {}
 };
 
-template<>
-struct config_t<rotator_t> {
+template<class Backend, class Watcher, class Timer>
+struct config_t<rotator_t<Backend, Watcher, Timer>> {
     std::string path;
     bool autoflush;
     rotation::config_t rotator;
@@ -154,7 +154,7 @@ public:
     }
 };
 
-template<class Backend = boost_backend_t, template<typename...> class Rotator = NoRotation, typename = void>
+template<class Backend = boost_backend_t, class Rotator = NoRotation, typename = void>
 class file_t;
 
 template<class Backend>
@@ -185,18 +185,21 @@ public:
     }
 };
 
-template<class Backend, template<typename...> class Rotator>
+//template<template<typename...> class T, template<typename...> class U> struct is_same : public std::false_type {};
+//template<template<typename...> class T> struct is_same<T, T> : public std::true_type {};
+
+template<class Backend, class Rotator>
 class file_t<
     Backend,
     Rotator,
     typename std::enable_if<
-        !std::is_same<Rotator<Backend>, NoRotation<Backend>>::value
+        !std::is_same<Rotator, NoRotation>::value
     >::type>
 {
     Backend m_backend;
     writer_t<Backend> m_writer;
     flusher_t<Backend> m_flusher;
-    Rotator<Backend> m_rotator;
+    Rotator m_rotator;
 public:
     typedef file::config_t<Rotator> config_type;
 
@@ -230,18 +233,37 @@ namespace generator {
 
 const uint ROTATOR_POS = 2;
 
-template<class Backend, template<typename, typename> class Rotator>
-struct id<sink::file_t<Backend, Rotator>> {
+//template<class Backend, class Rotator>
+//struct id<sink::file_t<Backend, Rotator>> {
+//    static std::string extract(const boost::any& config) {
+//        std::vector<boost::any> cfg;
+//        aux::any_to(config, cfg);
+//        std::string rotator;
+
+//        if (cfg.size() > ROTATOR_POS && aux::is<std::vector<boost::any>>(cfg.at(ROTATOR_POS))) {
+//            rotator += "/";
+//            rotator += Rotator::name();
+//        }
+
+//        return utils::format("%s%s", sink::file_t<Backend, Rotator>::name(), rotator);
+//    }
+//};
+
+template<class Backend, class Watcher>
+struct id<sink::file_t<Backend, sink::rotator_t<Backend, Watcher>>> {
     static std::string extract(const boost::any& config) {
+        typedef sink::rotator_t<Backend, Watcher> rotator_type;
+
         std::vector<boost::any> cfg;
         aux::any_to(config, cfg);
         std::string rotator;
 
         if (cfg.size() > ROTATOR_POS && aux::is<std::vector<boost::any>>(cfg.at(ROTATOR_POS))) {
-            rotator = utils::format("/%s", sink::rotator_t<Backend>::name());
+            rotator += "/";
+            rotator += rotator_type::name();
         }
 
-        return utils::format("%s%s", sink::file_t<Backend, Rotator>::name(), rotator);
+        return utils::format("%s%s", sink::file_t<Backend, rotator_type>::name(), rotator);
     }
 };
 
@@ -254,10 +276,10 @@ struct config_traits<sink::file_t<Backend, sink::NoRotation>> {
     }
 };
 
-template<class Backend, template<typename...> class Rotator>
+template<class Backend, class Rotator>
 struct config_traits<sink::file_t<Backend, Rotator>> {
     static std::string name() {
-        return utils::format("%s/%s", sink::file_t<Backend, Rotator>::name(), Rotator<Backend>::name());
+        return utils::format("%s/%s", sink::file_t<Backend, Rotator>::name(), Rotator::name());
     }
 };
 
@@ -272,9 +294,9 @@ struct factory_traits<sink::file_t<Backend>> {
     }
 };
 
-template<class Backend>
-struct factory_traits<sink::file_t<Backend, sink::rotator_t>> {
-    typedef typename sink::file_t<Backend, sink::rotator_t>::config_type config_type;
+template<class Backend, class Watcher>
+struct factory_traits<sink::file_t<Backend, sink::rotator_t<Backend, Watcher>>> {
+    typedef typename sink::file_t<Backend, sink::rotator_t<Backend, Watcher>>::config_type config_type;
 
     static config_type map_config(const boost::any& config) {
         config_type cfg;

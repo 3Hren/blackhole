@@ -14,10 +14,23 @@ namespace blackhole {
 
 namespace sink {
 
-//! Tag for file sinks with no rotation.
-template<class Backend, class Timer = rotation::timer_t> class NoRotation;
+namespace watcher {
 
-template<class Backend, class Timer = rotation::timer_t>
+struct size_t {
+    std::uint64_t size;
+
+    template<typename Backend>
+    bool operator ()(Backend& backend, const std::string& message) const {
+        return backend.size(backend.filename()) + message.size() >= size;
+    }
+};
+
+} // namespace watcher
+
+//! Tag for file sinks with no rotation.
+class NoRotation;
+
+template<class Backend, class Watcher, class Timer = rotation::timer_t>
 class rotator_t {
     rotation::config_t config;
     Backend& backend;
@@ -25,6 +38,8 @@ class rotator_t {
     rotation::naming::basename_t generator;
     rotation::counter_t counter;
 public:
+    typedef Watcher watcher_type;
+
     static const char* name() {
         return "rotate";
     }
