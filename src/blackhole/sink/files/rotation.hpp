@@ -42,8 +42,6 @@ class rotator_t {
     rotation::naming::basename_t generator;
     rotation::counter_t counter;
 public:
-    typedef Watcher watcher_type;
-
     static const char* name() {
         return "rotate";
     }
