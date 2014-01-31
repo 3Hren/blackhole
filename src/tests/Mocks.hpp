@@ -25,7 +25,11 @@ namespace files {
 
 class backend_t {
 public:
-    backend_t(const std::string&) {
+    backend_t(const std::string& = std::string()) {
+        init();
+    }
+
+    void init() {
         ON_CALL(*this, opened())
                 .WillByDefault(Return(true));
         ON_CALL(*this, exists(_))

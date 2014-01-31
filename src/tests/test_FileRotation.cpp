@@ -320,10 +320,7 @@ TEST(match, PositiveMatchCounterWithDatetime) {
 //! Condition: `backend.size()`=1025
 //! Action: `rotator.rotate()`.
 
-//TEST(file_t, NecessaryRotate) {
-//    sink::rotation::config_t config = { "test.log.%N", 5, 1024 };
-//    NiceMock<mock::files::backend_t> backend("test.log");
-//    sink::rotator_t<mock::files::backend_t, mock::timer_t> rotator(config, backend);
-
-//    EXPECT_TRUE(rotator.necessary("message"));
-//}
+TEST(size_t, Class) {
+    sink::watcher::size_t watcher(1024);
+    UNUSED(watcher);
+}

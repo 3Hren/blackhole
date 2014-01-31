@@ -19,6 +19,10 @@ namespace watcher {
 struct size_t {
     std::uint64_t size;
 
+    size_t(std::uint64_t size) :
+        size(size)
+    {}
+
     template<typename Backend>
     bool operator ()(Backend& backend, const std::string& message) const {
         return backend.size(backend.filename()) + message.size() >= size;
