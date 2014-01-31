@@ -293,4 +293,17 @@ struct factory_traits<sink::file_t<Backend, sink::rotator_t<Backend, Watcher>>> 
     }
 };
 
+template<class Backend>
+struct factory_traits<sink::file_t<Backend, sink::rotator_t<Backend, sink::rotation::watcher::size_t>>> {
+    typedef typename sink::file_t<Backend, sink::rotator_t<Backend, sink::rotation::watcher::size_t>>::config_type config_type;
+
+    static config_type map_config(const boost::any& config) {
+        config_type cfg;
+        std::vector<boost::any> rotator;
+        aux::vector_to(config, cfg.path, cfg.autoflush, rotator);
+        aux::vector_to(rotator, cfg.rotator.pattern, cfg.rotator.backups, cfg.rotator.watcher.size);
+        return cfg;
+    }
+};
+
 } // namespace blackhole

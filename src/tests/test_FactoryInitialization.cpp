@@ -50,7 +50,7 @@ TEST(Factory, FileStringsFrontend) {
     EXPECT_TRUE(bool(factory.create(formatter, sink)));
 }
 
-TEST(Repository, RotationFileStringsFrontend) {
+TEST(Repository, RotationFileStringsFrontendWithSizeWatcher) {
     group_factory_t<level> factory;
     factory.add<
         sink::file_t<
@@ -76,6 +76,7 @@ TEST(Repository, RotationFileStringsFrontend) {
             std::vector<boost::any> {
                 std::string("%(filename)s.log.%N"), // Pattern.
                 std::uint16_t(5),                   // Backups.
+                std::uint64_t(10 * 1024 * 1024)     // Size.
             }
         }
     };
