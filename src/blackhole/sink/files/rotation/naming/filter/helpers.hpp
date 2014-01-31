@@ -39,6 +39,27 @@ inline bool parse_counter(const std::string& pattern, uint& width) {
     return parse_counter(it, pattern.end(), width);
 }
 
+//!
+//! \brief matched - Parse input string and determine if it is matched by specified pattern.
+//!
+//! \param pattern - pattern:
+//!     %N      - match any non-negative number
+//!     %nN     - match any non-negative number with `n` width, for example: 01, 10, 99
+//!     %Y      - match any 4 digits (year)
+//!     %M      - match any 2 digits (month)
+//!     %d      - match any 2 digits (day)
+//!     %H      - match any 2 digits (hour)
+//!     %m      - match any 2 digits (minute)
+//!
+//! Next examples are matched:
+//!     pattern:    "test.log.%Y%m%d.%N"
+//!     filename:   "test.log.20140101.1"
+//!
+//!     pattern:    "test.%Y%m%d.%2N.log"
+//!     filename:   "test.20140101.01.log"
+//! \param filename - string.
+//! \return true if matched, otherwise false.
+//!
 inline bool matched(const std::string& pattern, const std::string& filename) {
     auto f_it = filename.begin();
     auto f_end = filename.end();
