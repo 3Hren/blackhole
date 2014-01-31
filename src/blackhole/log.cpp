@@ -1,13 +1,6 @@
 //!@todo: files_t: Rotation condition.
 //! Sample config:
 /*!
-Rotate by size:
-"rotate": {
-    "pattern": "%(filename)s.log.%N",
-    "backups" 5,
-    "size": 1000000
-}
-
 Rotate by datetime:
 "rotate": {
     "backups" 5,
