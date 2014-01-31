@@ -314,13 +314,3 @@ TEST(match, PositiveMatchCounterWithDatetime) {
     using namespace sink::rotation;
     EXPECT_TRUE(matching::matched("test.log.%N.%Y%m%d.log", "test.log.1.20140101.log"));
 }
-
-//!@todo:
-//! Given: size=1024, backup=1, suffix='.%N'
-//! Condition: `backend.size()`=1025
-//! Action: `rotator.rotate()`.
-
-TEST(size_t, Class) {
-    sink::watcher::size_t watcher(1024);
-    UNUSED(watcher);
-}

@@ -33,6 +33,7 @@ SET(SOURCES
     test_Manual
     test_Utils
     test_FileRotation
+    test_FileRotationWatcher.cpp
 )
 
 SET(Boost_USE_MULTITHREADED ON)

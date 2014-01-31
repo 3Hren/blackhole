@@ -46,6 +46,7 @@ public:
     MOCK_CONST_METHOD0(filename, std::string());
     MOCK_CONST_METHOD0(listdir, std::vector<std::string>());
     MOCK_CONST_METHOD1(changed, std::time_t(const std::string&));
+    MOCK_CONST_METHOD1(size, std::uint64_t(const std::string&));
 
     MOCK_METHOD0(open, bool());
     MOCK_METHOD2(rename, void(const std::string&, const std::string&));
