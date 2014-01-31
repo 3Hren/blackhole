@@ -1,12 +1,18 @@
 #include "Mocks.hpp"
 
 TEST(size_t, Class) {
-    sink::watcher::size_t watcher(1024);
+    sink::rotation::watcher::size_t watcher(1024);
+    UNUSED(watcher);
+}
+
+TEST(size_t, InitializationThroughConfig) {
+    sink::rotation::watcher::config_t<sink::rotation::watcher::size_t> config = { 1024 };
+    sink::rotation::watcher::size_t watcher(config);
     UNUSED(watcher);
 }
 
 TEST(size_t, TriggerIfIncomingSizeGreaterOrEqualThanMaximum) {
-    sink::watcher::size_t watcher(1024);
+    sink::rotation::watcher::size_t watcher(1024);
 
     NiceMock<mock::files::backend_t> backend;
 
@@ -19,7 +25,7 @@ TEST(size_t, TriggerIfIncomingSizeGreaterOrEqualThanMaximum) {
 }
 
 TEST(size_t, NotTriggerIfIncomingSizeLessThanMaximum) {
-    sink::watcher::size_t watcher(1024);
+    sink::rotation::watcher::size_t watcher(1024);
 
     NiceMock<mock::files::backend_t> backend;
 

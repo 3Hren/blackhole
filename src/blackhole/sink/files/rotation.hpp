@@ -7,50 +7,36 @@
 
 #include "blackhole/sink/files/rotation/config.hpp"
 #include "blackhole/sink/files/rotation/counter.hpp"
-#include "blackhole/sink/files/rotation/timer.hpp"
 #include "blackhole/sink/files/rotation/matching/counter.hpp"
+#include "blackhole/sink/files/rotation/timer.hpp"
+#include "blackhole/sink/files/rotation/watcher.hpp"
 
 namespace blackhole {
 
 namespace sink {
-
-namespace watcher {
-
-struct size_t {
-    std::uint64_t size;
-
-    size_t(std::uint64_t size) :
-        size(size)
-    {}
-
-    template<typename Backend>
-    bool operator ()(Backend& backend, const std::string& message) const {
-        return backend.size(backend.filename()) + message.size() >= size;
-    }
-};
-
-} // namespace watcher
 
 //! Tag for file sinks with no rotation.
 class NoRotation;
 
 template<class Backend, class Watcher, class Timer = rotation::timer_t>
 class rotator_t {
-    rotation::config_t config;
+    rotation::config_t<Watcher> config;
     Backend& backend;
     Timer m_timer;
     rotation::naming::basename_t generator;
     rotation::counter_t counter;
+    Watcher watcher;
 public:
     static const char* name() {
         return "rotate";
     }
 
-    rotator_t(const rotation::config_t& config, Backend& backend) :
+    rotator_t(const rotation::config_t<Watcher>& config, Backend& backend) :
         config(config),
         backend(backend),
         generator(config.pattern),
-        counter(rotation::counter_t::from_string(config.pattern))
+        counter(rotation::counter_t::from_string(config.pattern)),
+        watcher(config.watcher)
     {}
 
     Timer& timer() {

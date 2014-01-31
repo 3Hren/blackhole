@@ -3,21 +3,26 @@
 #include <cstdint>
 #include <string>
 
+#include "blackhole/sink/files/rotation/watcher/config.hpp"
+
 namespace blackhole {
 
 namespace sink {
 
 namespace rotation {
 
+template<typename Watcher>
 struct config_t {
     std::string pattern;
     std::uint16_t backups;
-    std::uint64_t size;
+    watcher::config_t<Watcher> watcher;
 
-    config_t(const std::string& pattern = ".%N", std::uint16_t backups = 5, std::uint64_t size = 10 * 1024 * 1024) :
+    config_t(const std::string& pattern = "%(filename)s.%N",
+             std::uint16_t backups = 5,
+             watcher::config_t<Watcher> watcher = watcher::config_t<Watcher>()) :
         pattern(pattern),
         backups(backups),
-        size(size)
+        watcher(watcher)
     {}
 };
 

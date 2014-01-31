@@ -57,7 +57,7 @@ TEST(Repository, RotationFileStringsFrontend) {
             sink::boost_backend_t,
             sink::rotator_t<
                 sink::boost_backend_t,
-                sink::watcher::size_t
+                sink::rotation::watcher::size_t
             >
         >,
         formatter::string_t
@@ -74,8 +74,8 @@ TEST(Repository, RotationFileStringsFrontend) {
             std::string("/dev/stdout"),
             true,
             std::vector<boost::any> {
-                std::uint64_t(1024),   // Size.
-                std::uint16_t(3)       // Count.
+                std::string("%(filename)s.log.%N"), // Pattern.
+                std::uint16_t(5),                   // Backups.
             }
         }
     };

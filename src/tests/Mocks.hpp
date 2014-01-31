@@ -58,7 +58,8 @@ public:
 namespace rotation {
 
 class watcher_t {
-
+public:
+    watcher_t(const sink::rotation::watcher::config_t<watcher_t>&) {}
 };
 
 } // namespace rotation

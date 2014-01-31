@@ -108,9 +108,11 @@ template<class Backend, class Watcher, class Timer>
 struct config_t<rotator_t<Backend, Watcher, Timer>> {
     std::string path;
     bool autoflush;
-    rotation::config_t rotator;
+    rotation::config_t<Watcher> rotator;
 
-    config_t(const std::string& path = "/dev/stdout", bool autoflush = true, const rotation::config_t& rotator = rotation::config_t()) :
+    config_t(const std::string& path = "/dev/stdout",
+             bool autoflush = true,
+             const rotation::config_t<Watcher>& rotator = rotation::config_t<Watcher>()) :
         path(path),
         autoflush(autoflush),
         rotator(rotator)
@@ -286,7 +288,7 @@ struct factory_traits<sink::file_t<Backend, sink::rotator_t<Backend, Watcher>>> 
         config_type cfg;
         std::vector<boost::any> rotator;
         aux::vector_to(config, cfg.path, cfg.autoflush, rotator);
-        aux::vector_to(rotator, cfg.rotator.size, cfg.rotator.backups);
+        aux::vector_to(rotator, cfg.rotator.pattern, cfg.rotator.backups);
         return cfg;
     }
 };
