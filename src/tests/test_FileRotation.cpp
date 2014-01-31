@@ -12,14 +12,14 @@ typedef sink::rotator_t<mock::files::backend_t, mock::files::rotation::watcher_t
 
 TEST(rotator_t, Class) {
     sink::rotation::config_t config = { "test.log.%N", 1, 1024 };
-    mock::files::backend_t backend("test.log");
+    mock::files::backend_t backend;
     mocked::rotator_t rotator(config, backend);
     UNUSED(rotator);
 }
 
 TEST(rotator_t, RotatingSequence) {
     sink::rotation::config_t config = { "test.log.%N", 1, 1024 };
-    mock::files::backend_t backend("test.log");
+    mock::files::backend_t backend;
     mocked::rotator_t rotator(config, backend);
 
     InSequence s;
@@ -39,7 +39,7 @@ TEST(rotator_t, RotatingSequence) {
 
 TEST(rotator_t, RotateMultipleFiles) {
     sink::rotation::config_t config = { "test.log.%N", 2, 1024 };
-    NiceMock<mock::files::backend_t> backend("test.log");
+    NiceMock<mock::files::backend_t> backend;
     mocked::rotator_t rotator(config, backend);
 
     EXPECT_CALL(backend, filename())
@@ -58,7 +58,7 @@ TEST(rotator_t, RotateMultipleFiles) {
 
 TEST(rotator_t, ProperRolloverWithAbsentFiles) {
     sink::rotation::config_t config = { "test.log.%N", 10, 1024 };
-    NiceMock<mock::files::backend_t> backend("test.log");
+    NiceMock<mock::files::backend_t> backend;
     mocked::rotator_t rotator(config, backend);
 
     EXPECT_CALL(backend, filename())
@@ -77,7 +77,7 @@ TEST(rotator_t, ProperRolloverWithAbsentFiles) {
 
 TEST(rotator_t, IncreaseDigitsInTheMiddle) {
     sink::rotation::config_t config = { "test.log.%N.123", 10, 1024 };
-    NiceMock<mock::files::backend_t> backend("test.log");
+    NiceMock<mock::files::backend_t> backend;
     mocked::rotator_t rotator(config, backend);
 
     EXPECT_CALL(backend, filename())
@@ -96,7 +96,7 @@ TEST(rotator_t, IncreaseDigitsInTheMiddle) {
 
 TEST(rotator_t, NotRenameIfFileNotExists) {
     sink::rotation::config_t config = { "test.log.%N", 2, 1024 };
-    NiceMock<mock::files::backend_t> backend("test.log");
+    NiceMock<mock::files::backend_t> backend;
     mocked::rotator_t rotator(config, backend);
 
     EXPECT_CALL(backend, filename())
@@ -114,7 +114,7 @@ TEST(rotator_t, NotRenameIfFileNotExists) {
 
 TEST(rotator_t, SubstitutesFilenamePlaceholder) {
     sink::rotation::config_t config = { "%(filename)s.%N", 1, 1024 };
-    NiceMock<mock::files::backend_t> backend("test.log");
+    NiceMock<mock::files::backend_t> backend;
     mocked::rotator_t rotator(config, backend);
 
     EXPECT_CALL(backend, filename())
@@ -142,7 +142,7 @@ std::time_t to_time_t(const std::string& message, const std::string& format = "%
 
 TEST(rotator_t, SubstitutesDateTimePlaceholders) {
     sink::rotation::config_t config = { "test.log.%Y%m%d", 1, 1024 };
-    NiceMock<mock::files::backend_t> backend("test.log");
+    NiceMock<mock::files::backend_t> backend;
     mocked::rotator_with_timer_t rotator(config, backend);
 
     EXPECT_CALL(rotator.timer(), current())
@@ -160,7 +160,7 @@ TEST(rotator_t, SubstitutesDateTimePlaceholders) {
 
 TEST(rotator_t, RotateWithDateTimePlaceholders) {
     sink::rotation::config_t config = { "test.log.%Y%m%d", 2, 1024 };
-    NiceMock<mock::files::backend_t> backend("test.log");
+    NiceMock<mock::files::backend_t> backend;
     mocked::rotator_with_timer_t rotator(config, backend);
 
     EXPECT_CALL(rotator.timer(), current())
@@ -178,7 +178,7 @@ TEST(rotator_t, RotateWithDateTimePlaceholders) {
 
 TEST(rotator_t, RotateWithDateTimeAndCountPlaceholders) {
     sink::rotation::config_t config = { "test.log.%Y%m%d.%N", 2, 1024 };
-    NiceMock<mock::files::backend_t> backend("test.log");
+    NiceMock<mock::files::backend_t> backend;
     mocked::rotator_with_timer_t rotator(config, backend);
 
     EXPECT_CALL(rotator.timer(), current())
@@ -201,7 +201,7 @@ TEST(rotator_t, RotateWithDateTimeAndCountPlaceholders) {
 
 TEST(rotator_t, RotateWithDateTimePlaceholderBeforeCounter) {
     sink::rotation::config_t config = { "test.log.%Y%m%d.%N.wow!", 2, 1024 };
-    NiceMock<mock::files::backend_t> backend("test.log");
+    NiceMock<mock::files::backend_t> backend;
     mocked::rotator_with_timer_t rotator(config, backend);
 
     EXPECT_CALL(rotator.timer(), current())
@@ -224,7 +224,7 @@ TEST(rotator_t, RotateWithDateTimePlaceholderBeforeCounter) {
 
 TEST(rotator_t, RotateWithDateTimePlaceholderAfterCounter) {
     sink::rotation::config_t config = { "test.log.%N.%Y%m%d.wow!", 2, 1024 };
-    NiceMock<mock::files::backend_t> backend("test.log");
+    NiceMock<mock::files::backend_t> backend;
     mocked::rotator_with_timer_t rotator(config, backend);
 
     EXPECT_CALL(rotator.timer(), current())
