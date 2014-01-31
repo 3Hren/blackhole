@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cctype>
 #include <string>
 
 #include <boost/lexical_cast.hpp>
@@ -11,7 +10,9 @@ namespace sink {
 
 namespace rotation {
 
-namespace matching {
+namespace naming {
+
+namespace aux {
 
 template<typename Iterator>
 inline bool parse_counter(Iterator& it, Iterator end, uint& width) {
@@ -130,19 +131,9 @@ inline bool matched(const std::string& pattern, const std::string& filename) {
     }
 }
 
-struct both_t {
-    const std::string& pattern;
+} // namespace aux
 
-    both_t(const std::string& pattern) :
-        pattern(pattern)
-    {}
-
-    bool operator ()(const std::string& filename) const {
-        return !matched(pattern, filename);
-    }
-};
-
-} // namespace match
+} // namespace naming
 
 } // namespace rotation
 

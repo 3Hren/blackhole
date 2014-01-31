@@ -7,7 +7,7 @@
 
 #include "blackhole/sink/files/rotation/config.hpp"
 #include "blackhole/sink/files/rotation/counter.hpp"
-#include "blackhole/sink/files/rotation/matching/counter.hpp"
+#include "blackhole/sink/files/rotation/naming/filter.hpp"
 #include "blackhole/sink/files/rotation/timer.hpp"
 #include "blackhole/sink/files/rotation/watcher.hpp"
 
@@ -73,7 +73,7 @@ private:
     void rollover(std::vector<std::string> filenames, const std::string& pattern) const {
         filenames.erase(std::remove_if(filenames.begin(),
                                        filenames.end(),
-                                       rotation::matching::both_t(pattern)),
+                                       rotation::naming::filter_t(pattern)),
                         filenames.end());
         std::sort(filenames.begin(), filenames.end(), comparator::time::ascending<Backend>(backend));
         for (auto it = filenames.begin(); it != filenames.end(); ++it) {
