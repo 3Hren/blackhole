@@ -53,7 +53,9 @@ void init() {
 
     sink_config_t sink = {
         "syslog",
-        std::string("test-application")
+        std::map<std::string, boost::any> {
+            { "identity", std::string("test-application") }
+        }
     };
 
     frontend_config_t frontend = { formatter, sink };

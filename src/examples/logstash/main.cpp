@@ -98,9 +98,9 @@ void init() {
 
     sink_config_t sink = {
         "tcp",
-        std::vector<boost::any> {
-            std::string("localhost"),
-            std::uint16_t(50030)
+        std::map<std::string, boost::any> {
+            { "host", std::string("localhost") },
+            { "port", std::uint16_t(50030) }
         }
     };
 
