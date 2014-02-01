@@ -3,10 +3,11 @@
 #include "celero/Celero.h"
 
 #include "../tests/Mocks.hpp"
+#include "blackhole/record.hpp"
 
 using namespace blackhole;
 
-//#define VS_BOOST
+#define VS_BOOST
 #ifdef VS_BOOST
 #include <boost/log/utility/setup.hpp>
 #include <boost/log/sources/logger.hpp>
@@ -82,7 +83,7 @@ void init_boost_log() {
 const int N = 10000;
 
 boost::log::sources::severity_logger<severity_level> slg;
-verbose_logger_t<severity_level> log_;
+verbose_logger_t<severity_level> *log_;
 
 std::string map_timestamp(const std::time_t& time) {
     char mbstr[128];
@@ -106,28 +107,31 @@ std::string map_severity(const severity_level& level) {
     return std::to_string(static_cast<int>(level));
 }
 
-#define BH_LOG(level, msg) \
-    auto record = log_.open_record(level); \
-    if (record.valid()) { \
-        record.attributes["message"] = { msg }; \
-        log_.push(std::move(record)); \
-    }
-
 void init_blackhole_log() {
-    mapping::mapper_t mapper;
+    repository_t<severity_level>::instance().configure<sink::file_t<>, formatter::string_t>();
+
+    mapping::value_t mapper;
     mapper.add<std::time_t>("timestamp", &map_timestamp);
     mapper.add<severity_level>("severity", &map_severity);
 
-    auto f = std::make_unique<formatter::string_t>("[%(timestamp)s] [%(severity)s]: %(message)s");
-    f->set_mapper(std::move(mapper));
-    auto s = std::make_unique<sink::file_t<>>("blackhole.log");
-    auto frontend = std::make_unique<frontend_t<formatter::string_t, sink::file_t<>>>(std::move(f), std::move(s));
-    log_.add_frontend(std::move(frontend));
+    formatter_config_t formatter("string", mapper);
+    formatter["pattern"] = "[%(timestamp)s] [%(severity)s]: %(message)s";
+
+    sink_config_t sink("files");
+    sink["path"] = "blackhole.log";
+    sink["autoflush"] = true;
+
+    frontend_config_t frontend = { formatter, sink };
+    log_config_t config{ "root", { frontend } };
+
+    repository_t<severity_level>::instance().init(config);
 }
 
 int main(int argc, char** argv) {
     init_boost_log();
     init_blackhole_log();
+    auto log = repository_t<severity_level>::instance().root();
+    log_ = &log;
 
     celero::Run(argc, argv);
     return 0;
@@ -139,11 +143,11 @@ BASELINE(CeleroBenchTest, BoostLog, 0, N) {
 }
 
 BENCHMARK(CeleroBenchTest, BlackholeLog, 0, N) {
-    BH_LOG(warning, "Something bad is going on but I can handle it");
+    BH_LOG((*log_), warning, "Something bad is going on but I can handle it");
 }
 #endif
 
-#if 1
+#if 0
 using namespace blackhole;
 
 namespace old {
