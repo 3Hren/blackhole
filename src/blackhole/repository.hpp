@@ -8,6 +8,7 @@
 #include "formatter/string.hpp"
 #include "frontend.hpp"
 #include "logger.hpp"
+#include "repository/config/defaults.hpp"
 #include "repository/config/log.hpp"
 #include "repository/factory/group.hpp"
 #include "sink/files.hpp"
@@ -72,20 +73,7 @@ public:
 private:
     repository_t() {
         configure<sink::file_t<>, formatter::string_t>();
-        init(make_trivial_config());
-    }
-
-    //!@todo: Decompose
-    static log_config_t make_trivial_config() {
-        formatter_config_t formatter("string");
-        formatter["pattern"] = "[%(timestamp)s] [%(severity)s]: %(message)s";
-
-        sink_config_t sink("files");
-        sink["path"] = "/dev/stdout";
-        sink["autoflush"] = true;
-
-        frontend_config_t frontend = { formatter, sink };
-        return log_config_t{ "trivial", { frontend } };
+        init(repository::config::trivial());
     }
 };
 
