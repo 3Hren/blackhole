@@ -85,24 +85,6 @@ void init() {
     formatter["routing"]["/"] = std::vector<std::string> { "message", "timestamp" };
     formatter["routing"]["/fields"] = "*";
 
-//    formatter_config_t formatter = {
-//        "json",
-//        boost::any {
-//            std::vector<boost::any> {
-//                true,
-//                std::unordered_map<std::string, std::string> {
-//                    { "message", "@message" },
-//                    { "timestamp", "@timestamp" }
-//                },
-//                std::unordered_map<std::string, boost::any> {
-//                    { "/", std::vector<std::string> { "message", "timestamp" } },
-//                    { "/fields", std::string("*") }
-//                }
-//            }
-//        },
-//        mapper
-//    };
-
     sink_config_t sink("tcp");
     sink["host"] = "localhost";
     sink["port"] = std::uint16_t(50030);
