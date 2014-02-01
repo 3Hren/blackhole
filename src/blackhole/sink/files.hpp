@@ -233,8 +233,6 @@ public:
 
 namespace generator {
 
-const uint ROTATOR_POS = 2;
-
 template<class Backend, class Watcher>
 struct id<sink::file_t<Backend, sink::rotator_t<Backend, Watcher>>> {
     static std::string extract(const boost::any& config) {
