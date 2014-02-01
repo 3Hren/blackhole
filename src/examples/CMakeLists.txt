@@ -3,5 +3,6 @@ PROJECT(blackhole-examples)
 
 ADD_SUBDIRECTORY(trivial)
 ADD_SUBDIRECTORY(simple)
+ADD_SUBDIRECTORY(files)
 ADD_SUBDIRECTORY(syslog)
 ADD_SUBDIRECTORY(logstash)
