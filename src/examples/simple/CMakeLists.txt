@@ -24,7 +24,6 @@ PROJECT(${PROJECT})
 
 INCLUDE_DIRECTORIES(
     ../..
-    ../../../foreign/rapidjson/include
 )
 
 FIND_PACKAGE(Boost COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
