@@ -48,14 +48,12 @@ std::string map_timestamp(const std::time_t& time) {
         "json": {
             "newline": true,
             "mapping": {
-                "naming": {
-                    "message": "@message",
-                    "timestamp": "@timestamp"
-                },
-                "positioning": {
-                    "/": ["@message", "@timestamp"],
-                    "/fields": "*"
-                }
+                "message": "@message",
+                "timestamp": "@timestamp"
+            },
+            "routing": {
+                "/": ["@message", "@timestamp"],
+                "/fields": "*"
             }
         }
     }
