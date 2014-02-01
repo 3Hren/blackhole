@@ -5,6 +5,7 @@
 #include <string>
 
 #include "blackhole/error.hpp"
+#include "blackhole/factory.hpp"
 
 namespace blackhole {
 
@@ -116,11 +117,13 @@ public:
 
 template<typename Level>
 struct factory_traits<sink::syslog_t<Level>> {
-    typedef typename sink::syslog_t<Level>::config_type config_type;
+    typedef sink::syslog_t<Level> sink_type;
+    typedef typename sink_type::config_type config_type;
 
     static config_type map_config(const boost::any& config) {
         config_type cfg;
-        aux::any_to(config, cfg.identity);
+        aux::extractor<sink_type> ex(config);
+        ex["identity"].to(cfg.identity);
         return cfg;
     }
 };

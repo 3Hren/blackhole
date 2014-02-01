@@ -41,9 +41,9 @@ TEST(Factory, FileStringsFrontend) {
 
     sink_config_t sink = {
         "files",
-        std::vector<boost::any> {
-            std::string("/dev/stdout"),
-            true
+        std::map<std::string, boost::any> {
+            { "path", std::string("/dev/stdout") },
+            { "autoflush", true }
         }
     };
 
@@ -70,13 +70,13 @@ TEST(Repository, RotationFileStringsFrontendWithSizeWatcher) {
 
     sink_config_t sink = {
         "files",
-        std::vector<boost::any> {
-            std::string("/dev/stdout"),
-            true,
-            std::vector<boost::any> {
-                std::string("%(filename)s.log.%N"), // Pattern.
-                std::uint16_t(5),                   // Backups.
-                std::uint64_t(10 * 1024 * 1024)     // Size.
+        std::map<std::string, boost::any> {
+            { "path", std::string("/dev/stdout") },
+            { "autoflush", true },
+            { "rotation", std::map<std::string, boost::any> {
+                  { "pattern", std::string("%(filename)s.log.%N") },
+                  { "backups", std::uint16_t(5) },
+                  { "size", std::uint64_t(10 * 1024 * 1024) } }
             }
         }
     };
@@ -95,7 +95,9 @@ TEST(Factory, SyslogStringsFrontend) {
 
     sink_config_t sink = {
         "syslog",
-        std::string("AppIdentity")
+        std::map<std::string, boost::any> {
+            { "identity", std::string("AppIdentity") }
+        }
     };
 
     EXPECT_TRUE(bool(factory.create(formatter, sink)));
@@ -112,9 +114,9 @@ TEST(Factory, UdpSocketStringsFrontend) {
 
     sink_config_t sink = {
         "udp",
-        std::vector<boost::any> {
-            std::string("localhost"),
-            std::uint16_t(50030)
+        std::map<std::string, boost::any> {
+            { "host", std::string("localhost") },
+            { "port", std::uint16_t(50030) }
         }
     };
 
@@ -134,9 +136,9 @@ TEST(Factory, TcpSocketStringsFrontend) {
     // an exception will be thrown, it's ok.
     sink_config_t sink = {
         "tcp",
-        std::vector<boost::any> {
-            std::string("localhost"),
-            std::uint16_t(22)
+        std::map<std::string, boost::any> {
+            { "host", std::string("localhost") },
+            { "port", std::uint16_t(22) }
         }
     };
 
@@ -151,9 +153,9 @@ log_config_t create_valid_config() {
 
     sink_config_t sink = {
         "files",
-        std::vector<boost::any> {
-            std::string("/dev/stdout"),
-            true
+        std::map<std::string, boost::any> {
+            { "path", std::string("/dev/stdout") },
+            { "autoflush", true }
         }
     };
 
@@ -190,7 +192,10 @@ TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredSink) {
 
     sink_config_t sink = {
         "files",
-        std::string("/dev/stdout")
+        std::map<std::string, boost::any> {
+            { "path", std::string("/dev/stdout") },
+            { "autoflush", false }
+        }
     };
 
     EXPECT_THROW(factory.create(formatter, sink), blackhole::error_t);
@@ -207,7 +212,10 @@ TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredFormatter) {
 
     sink_config_t sink = {
         "files",
-        std::string("/dev/stdout")
+        std::map<std::string, boost::any> {
+            { "path", std::string("/dev/stdout") },
+            { "autoflush", false }
+        }
     };
 
     EXPECT_THROW(factory.create(formatter, sink), blackhole::error_t);

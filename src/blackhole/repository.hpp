@@ -75,6 +75,7 @@ private:
         init(make_trivial_config());
     }
 
+    //!@todo: Decompose
     static log_config_t make_trivial_config() {
         formatter_config_t formatter = {
             "string",
@@ -83,9 +84,9 @@ private:
 
         sink_config_t sink = {
             "files",
-            std::vector<boost::any>({
-                std::string("/dev/stdout"),
-                true
+            std::map<std::string, boost::any>({
+                { "path", std::string("/dev/stdout") },
+                { "autoflush", true }
             })
         };
 

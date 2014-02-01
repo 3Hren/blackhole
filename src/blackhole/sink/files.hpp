@@ -108,14 +108,14 @@ template<class Backend, class Watcher, class Timer>
 struct config_t<rotator_t<Backend, Watcher, Timer>> {
     std::string path;
     bool autoflush;
-    rotation::config_t<Watcher> rotator;
+    rotation::config_t<Watcher> rotation;
 
     config_t(const std::string& path = "/dev/stdout",
              bool autoflush = true,
-             const rotation::config_t<Watcher>& rotator = rotation::config_t<Watcher>()) :
+             const rotation::config_t<Watcher>& rotation = rotation::config_t<Watcher>()) :
         path(path),
         autoflush(autoflush),
-        rotator(rotator)
+        rotation(rotation)
     {}
 };
 
@@ -213,7 +213,7 @@ public:
         m_backend(config.path),
         m_writer(m_backend),
         m_flusher(config.autoflush, m_backend),
-        m_rotator(config.rotator, m_backend)
+        m_rotator(config.rotation, m_backend)
     {}
 
     void consume(const std::string& message) {
@@ -239,17 +239,16 @@ template<class Backend, class Watcher>
 struct id<sink::file_t<Backend, sink::rotator_t<Backend, Watcher>>> {
     static std::string extract(const boost::any& config) {
         typedef sink::rotator_t<Backend, Watcher> rotator_type;
+        typedef sink::file_t<Backend, rotator_type> sink_type;
 
-        std::vector<boost::any> cfg;
+        std::map<std::string, boost::any> cfg;
         aux::any_to(config, cfg);
-        std::string rotator;
 
-        if (cfg.size() > ROTATOR_POS && aux::is<std::vector<boost::any>>(cfg.at(ROTATOR_POS))) {
-            rotator += "/";
-            rotator += rotator_type::name();
+        if (cfg.find("rotation") != cfg.end()) {
+            return utils::format("%s/%s", sink_type::name(), rotator_type::name());
         }
 
-        return utils::format("%s%s", sink::file_t<Backend, rotator_type>::name(), rotator);
+        return sink_type::name();
     }
 };
 
@@ -271,37 +270,31 @@ struct config_traits<sink::file_t<Backend, Rotator>> {
 
 template<class Backend>
 struct factory_traits<sink::file_t<Backend>> {
-    typedef typename sink::file_t<Backend>::config_type config_type;
+    typedef sink::file_t<Backend> sink_type;
+    typedef typename sink_type::config_type config_type;
 
     static config_type map_config(const boost::any& config) {
         config_type cfg;
-        aux::vector_to(config, cfg.path, cfg.autoflush);
-        return cfg;
-    }
-};
-
-template<class Backend, class Watcher>
-struct factory_traits<sink::file_t<Backend, sink::rotator_t<Backend, Watcher>>> {
-    typedef typename sink::file_t<Backend, sink::rotator_t<Backend, Watcher>>::config_type config_type;
-
-    static config_type map_config(const boost::any& config) {
-        config_type cfg;
-        std::vector<boost::any> rotator;
-        aux::vector_to(config, cfg.path, cfg.autoflush, rotator);
-        aux::vector_to(rotator, cfg.rotator.pattern, cfg.rotator.backups);
+        aux::extractor<sink::file_t<Backend>> ex(config);
+        ex["path"].to(cfg.path);
+        ex["autoflush"].to(cfg.autoflush);
         return cfg;
     }
 };
 
 template<class Backend>
 struct factory_traits<sink::file_t<Backend, sink::rotator_t<Backend, sink::rotation::watcher::size_t>>> {
-    typedef typename sink::file_t<Backend, sink::rotator_t<Backend, sink::rotation::watcher::size_t>>::config_type config_type;
+    typedef typename sink::file_t<Backend, sink::rotator_t<Backend, sink::rotation::watcher::size_t>> sink_type;
+    typedef typename sink_type::config_type config_type;
 
     static config_type map_config(const boost::any& config) {
         config_type cfg;
-        std::vector<boost::any> rotator;
-        aux::vector_to(config, cfg.path, cfg.autoflush, rotator);
-        aux::vector_to(rotator, cfg.rotator.pattern, cfg.rotator.backups, cfg.rotator.watcher.size);
+        aux::extractor<sink_type> ex(config);
+        ex["path"].to(cfg.path);
+        ex["autoflush"].to(cfg.autoflush);
+        ex["rotation"]["pattern"].to(cfg.rotation.pattern);
+        ex["rotation"]["backups"].to(cfg.rotation.backups);
+        ex["rotation"]["size"].to(cfg.rotation.watcher.size);
         return cfg;
     }
 };

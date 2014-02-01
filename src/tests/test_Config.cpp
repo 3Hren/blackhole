@@ -43,9 +43,9 @@ TEST(FactoryTraits, JsonFormatterConfig) {
 TEST(FactoryTraits, FileSinkConfig) {
     sink_config_t config = {
         "files",
-        std::vector<boost::any> {
-            std::string("/dev/null"),
-            false
+        std::map<std::string, boost::any> {
+            { "path", std::string("/dev/null") },
+            { "autoflush", false }
         }
     };
 

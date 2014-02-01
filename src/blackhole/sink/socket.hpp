@@ -48,11 +48,14 @@ public:
 
 template<typename Protocol>
 struct factory_traits<sink::socket_t<Protocol>> {
-    typedef typename sink::socket_t<Protocol>::config_type config_type;
+    typedef sink::socket_t<Protocol> sink_type;
+    typedef typename sink_type::config_type config_type;
 
     static config_type map_config(const boost::any& config) {
         config_type cfg;
-        aux::vector_to(config, cfg.host, cfg.port);
+        aux::extractor<sink_type> ex(config);
+        ex["host"].to(cfg.host);
+        ex["port"].to(cfg.port);
         return cfg;
     }
 };
