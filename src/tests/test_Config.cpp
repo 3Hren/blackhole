@@ -24,10 +24,10 @@ TEST(FactoryTraits, JsonFormatterConfig) {
     ASSERT_TRUE(actual.naming.find("message") != actual.naming.end());
     EXPECT_EQ("@message", actual.naming["message"]);
 
-    typedef std::unordered_map<std::string, positioning_t::positions_t> specified_positioning_t;
-    ASSERT_TRUE(actual.positioning.specified.find("message") != actual.positioning.specified.end());
-    EXPECT_EQ(std::vector<std::string>({}), actual.positioning.specified["message"]);
-    EXPECT_EQ(std::vector<std::string>({ "fields" }), actual.positioning.unspecified);
+    typedef std::unordered_map<std::string, routing_t::routes_t> specified_positioning_t;
+    ASSERT_TRUE(actual.routing.specified.find("message") != actual.routing.specified.end());
+    EXPECT_EQ(std::vector<std::string>({}), actual.routing.specified["message"]);
+    EXPECT_EQ(std::vector<std::string>({ "fields" }), actual.routing.unspecified);
 }
 
 TEST(FactoryTraits, FileSinkConfig) {

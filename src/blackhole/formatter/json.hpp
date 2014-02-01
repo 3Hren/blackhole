@@ -55,16 +55,16 @@ public:
 
     template<typename T>
     void operator ()(const T& value) {
-        auto it = config.positioning.specified.find(*name);
-        if (it != config.positioning.specified.end()) {
-            const json::map::positioning_t::positions_t& positions = it->second;
+        auto it = config.routing.specified.find(*name);
+        if (it != config.routing.specified.end()) {
+            const json::map::routing_t::routes_t& positions = it->second;
             if (positions.size() > 0) {
                 add_positional(positions, *name, value);
             } else {
                 map_and_add_member(root, *name, value);
             }
-        } else if (!config.positioning.unspecified.empty()) {
-            add_positional(config.positioning.unspecified, *name, value);
+        } else if (!config.routing.unspecified.empty()) {
+            add_positional(config.routing.unspecified, *name, value);
         } else {
             map_and_add_member(root, *name, value);
         }
@@ -72,7 +72,7 @@ public:
 
 private:
     template<typename T>
-    void add_positional(const json::map::positioning_t::positions_t& positions, const std::string& name, const T& value) {
+    void add_positional(const json::map::routing_t::routes_t& positions, const std::string& name, const T& value) {
         rapidjson::Value* current = root;
         for (auto it = positions.begin(); it != positions.end(); ++it) {
             const std::string& position = *it;
@@ -224,13 +224,13 @@ struct factory_traits<formatter::json_t> {
         aux::any_to(value, keys);
         for (auto it = keys.begin(); it != keys.end(); ++it) {
             const std::string& key = *it;
-            cfg.positioning.specified[key] = positions;
+            cfg.routing.specified[key] = positions;
         }
     }
 
     static void handle_unspecified(const std::string& name, const boost::any& value, config_type& cfg) {
         if (boost::any_cast<std::string>(value) == "*") {
-            cfg.positioning.unspecified = aux::split(name, "/");
+            cfg.routing.unspecified = aux::split(name, "/");
         } else {
             throw blackhole::error_t("wrong configuration");
         }

@@ -126,7 +126,7 @@ TEST(json_t, FieldMapping) {
     };
 
     formatter::json_t::config_type config;
-    config.positioning.specified["timestamp"] = { "fields" };
+    config.routing.specified["timestamp"] = { "fields" };
 
     formatter::json_t fmt(config);
     std::string actual = fmt.format(record);
@@ -149,8 +149,8 @@ TEST(json_t, ComplexFieldMapping) {
     };
 
     formatter::json_t::config_type config;
-    config.positioning.specified["message"] = { "fields" };
-    config.positioning.specified["timestamp"] = { "fields", "aux" };
+    config.routing.specified["message"] = { "fields" };
+    config.routing.specified["timestamp"] = { "fields", "aux" };
 
     formatter::json_t fmt(config);
     std::string actual = fmt.format(record);
@@ -175,7 +175,7 @@ TEST(json_t, UnspecifiedPositionalMapping) {
     };
 
     formatter::json_t::config_type config;
-    config.positioning.unspecified = { "fields" };
+    config.routing.unspecified = { "fields" };
 
     formatter::json_t fmt(config);
     std::string actual = fmt.format(record);
