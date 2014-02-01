@@ -29,23 +29,16 @@ struct priority_traits<testing::level> {
 
 } } // namespace blackhole::sink
 
-
 TEST(Factory, FileStringsFrontend) {
     group_factory_t<level> factory;
     factory.add<sink::file_t<>, formatter::string_t>();
 
-    formatter_config_t formatter = {
-        "string",
-        std::string("[%(timestamp)s]: %(message)s")
-    };
+    formatter_config_t formatter("string");
+    formatter["pattern"] = "[%(timestamp)s]: %(message)s";
 
-    sink_config_t sink = {
-        "files",
-        std::map<std::string, boost::any> {
-            { "path", std::string("/dev/stdout") },
-            { "autoflush", true }
-        }
-    };
+    sink_config_t sink("files");
+    sink["path"] = "/dev/stdout";
+    sink["autoflush"] = true;
 
     EXPECT_TRUE(bool(factory.create(formatter, sink)));
 }
@@ -63,23 +56,15 @@ TEST(Repository, RotationFileStringsFrontendWithSizeWatcher) {
         formatter::string_t
     >();
 
-    formatter_config_t formatter = {
-        "string",
-        std::string("[%(timestamp)s]: %(message)s")
-    };
+    formatter_config_t formatter("string");
+    formatter["pattern"] = "[%(timestamp)s]: %(message)s";
 
-    sink_config_t sink = {
-        "files",
-        std::map<std::string, boost::any> {
-            { "path", std::string("/dev/stdout") },
-            { "autoflush", true },
-            { "rotation", std::map<std::string, boost::any> {
-                  { "pattern", std::string("%(filename)s.log.%N") },
-                  { "backups", std::uint16_t(5) },
-                  { "size", std::uint64_t(10 * 1024 * 1024) } }
-            }
-        }
-    };
+    sink_config_t sink("files");
+    sink["path"] = "/dev/stdout";
+    sink["autoflush"] = true;
+    sink["rotation"]["pattern"] = "%(filename)s.log.%N";
+    sink["rotation"]["backups"] = std::uint16_t(5);
+    sink["rotation"]["size"] = std::uint64_t(10 * 1024 * 1024);
 
     EXPECT_TRUE(bool(factory.create(formatter, sink)));
 }
@@ -88,17 +73,11 @@ TEST(Factory, SyslogStringsFrontend) {
     group_factory_t<level> factory;
     factory.add<sink::syslog_t<level>, formatter::string_t>();
 
-    formatter_config_t formatter = {
-        "string",
-        std::string("[%(timestamp)s]: %(message)s")
-    };
+    formatter_config_t formatter("string");
+    formatter["pattern"] = "[%(timestamp)s]: %(message)s";
 
-    sink_config_t sink = {
-        "syslog",
-        std::map<std::string, boost::any> {
-            { "identity", std::string("AppIdentity") }
-        }
-    };
+    sink_config_t sink("syslog");
+    sink["identity"] = "AppIdentity";
 
     EXPECT_TRUE(bool(factory.create(formatter, sink)));
 }
@@ -107,18 +86,12 @@ TEST(Factory, UdpSocketStringsFrontend) {
     group_factory_t<level> factory;
     factory.add<sink::socket_t<boost::asio::ip::udp>, formatter::string_t>();
 
-    formatter_config_t formatter = {
-        "string",
-        std::string("[%(timestamp)s]: %(message)s")
-    };
+    formatter_config_t formatter("string");
+    formatter["pattern"] = "[%(timestamp)s]: %(message)s";
 
-    sink_config_t sink = {
-        "udp",
-        std::map<std::string, boost::any> {
-            { "host", std::string("localhost") },
-            { "port", std::uint16_t(50030) }
-        }
-    };
+    sink_config_t sink("udp");
+    sink["host"] = "localhost";
+    sink["port"] = std::uint16_t(50030);
 
     EXPECT_TRUE(bool(factory.create(formatter, sink)));
 }
@@ -127,37 +100,25 @@ TEST(Factory, TcpSocketStringsFrontend) {
     group_factory_t<level> factory;
     factory.add<sink::socket_t<boost::asio::ip::tcp>, formatter::string_t>();
 
-    formatter_config_t formatter = {
-        "string",
-        std::string("[%(timestamp)s]: %(message)s")
-    };
+    formatter_config_t formatter("string");
+    formatter["pattern"] = "[%(timestamp)s]: %(message)s";
 
     // Sink will try to connect to the specified port. So if it isn't available,
     // an exception will be thrown, it's ok.
-    sink_config_t sink = {
-        "tcp",
-        std::map<std::string, boost::any> {
-            { "host", std::string("localhost") },
-            { "port", std::uint16_t(22) }
-        }
-    };
+    sink_config_t sink("tcp");
+    sink["host"] = "localhost";
+    sink["port"] = std::uint16_t(22);
 
     EXPECT_TRUE(bool(factory.create(formatter, sink)));
 }
 
 log_config_t create_valid_config() {
-    formatter_config_t formatter = {
-        "string",
-        std::string("[%(timestamp)s]: %(message)s")
-    };
+    formatter_config_t formatter("string");
+    formatter["pattern"] = "[%(timestamp)s]: %(message)s";
 
-    sink_config_t sink = {
-        "files",
-        std::map<std::string, boost::any> {
-            { "path", std::string("/dev/stdout") },
-            { "autoflush", true }
-        }
-    };
+    sink_config_t sink("files");
+    sink["path"] = "/dev/stdout";
+    sink["autoflush"] = true;
 
     frontend_config_t frontend = { formatter, sink };
     return log_config_t{ "root", { frontend } };
@@ -185,18 +146,12 @@ TEST(Repository, CreatesDuplicateOfRootLoggerByDefault) {
 TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredSink) {
     group_factory_t<level> factory;
 
-    formatter_config_t formatter = {
-        "string",
-        std::string("[%(timestamp)s]: %(message)s")
-    };
+    formatter_config_t formatter("string");
+    formatter["pattern"] = "[%(timestamp)s]: %(message)s";
 
-    sink_config_t sink = {
-        "files",
-        std::map<std::string, boost::any> {
-            { "path", std::string("/dev/stdout") },
-            { "autoflush", false }
-        }
-    };
+    sink_config_t sink("files");
+    sink["path"] = "/dev/stdout";
+    sink["autoflush"] = true;
 
     EXPECT_THROW(factory.create(formatter, sink), blackhole::error_t);
 }
@@ -205,18 +160,12 @@ TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredFormatter) {
     group_factory_t<level> factory;
     factory.add<sink::socket_t<boost::asio::ip::udp>, boost::mpl::list<>>();
 
-    formatter_config_t formatter = {
-        "string",
-        std::string("[%(timestamp)s]: %(message)s")
-    };
+    formatter_config_t formatter("string");
+    formatter["pattern"] = "[%(timestamp)s]: %(message)s";
 
-    sink_config_t sink = {
-        "files",
-        std::map<std::string, boost::any> {
-            { "path", std::string("/dev/stdout") },
-            { "autoflush", false }
-        }
-    };
+    sink_config_t sink("files");
+    sink["path"] = "/dev/stdout";
+    sink["autoflush"] = true;
 
     EXPECT_THROW(factory.create(formatter, sink), blackhole::error_t);
 }

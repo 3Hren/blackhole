@@ -45,16 +45,23 @@ struct extractor {
         } catch (boost::bad_any_cast&) {
             throw error_t("can not extract '%s': '%s' is not map", name, this->name);
         }
-        return extractor<Sink>({ map[name], name });
+        return extractor<Sink>(map[name], name);
     }
 
     template<typename T>
-    void to(T& value) {
+    void to(T& value) const {
         try {
             any_to(source, value);
         } catch (boost::bad_any_cast&) {
             throw error_t("conversion error for member '%s'", name);
         }
+    }
+
+    template<typename T>
+    T get() const {
+        T value;
+        to(value);
+        return value;
     }
 };
 

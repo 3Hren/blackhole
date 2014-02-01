@@ -77,18 +77,12 @@ private:
 
     //!@todo: Decompose
     static log_config_t make_trivial_config() {
-        formatter_config_t formatter = {
-            "string",
-            std::string("[%(timestamp)s] [%(severity)s]: %(message)s")
-        };
+        formatter_config_t formatter("string");
+        formatter["pattern"] = "[%(timestamp)s] [%(severity)s]: %(message)s";
 
-        sink_config_t sink = {
-            "files",
-            std::map<std::string, boost::any>({
-                { "path", std::string("/dev/stdout") },
-                { "autoflush", true }
-            })
-        };
+        sink_config_t sink("files");
+        sink["path"] = "/dev/stdout";
+        sink["autoflush"] = true;
 
         frontend_config_t frontend = { formatter, sink };
         return log_config_t{ "trivial", { frontend } };

@@ -1,28 +1,19 @@
 #pragma once
 
-#include <string>
-
-#include <boost/any.hpp>
-
 #include "blackhole/formatter/map/value.hpp"
+#include "blackhole/repository/config/base.hpp"
 
 namespace blackhole {
 
-struct formatter_config_t {
-    std::string type;
-    boost::any config;
+struct formatter_config_t : public repository::config::base_t {
     mapping::value_t mapper;
 
-    formatter_config_t() {}
-
-    formatter_config_t(const std::string& type, const boost::any& config) :
-        type(type),
-        config(config)
+    formatter_config_t(const std::string& type) :
+        base_t(type)
     {}
 
-    formatter_config_t(const std::string& type, const boost::any& config, const mapping::value_t& mapper) :
-        type(type),
-        config(config),
+    formatter_config_t(const std::string& type, const mapping::value_t& mapper) :
+        base_t(type),
         mapper(mapper)
     {}
 };

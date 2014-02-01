@@ -188,23 +188,21 @@ template<>
 struct factory_traits<formatter::json_t> {
     typedef formatter::json_t::config_type config_type;
 
-    static const int NEWLINE_ID = 0;
-    static const int NAMING_ID = 1;
-    static const int POSITIONING_ID = 2;
-
     static config_type map_config(const boost::any& config) {
         using namespace formatter::json::map;
 
-        std::vector<boost::any> options;
-        aux::any_to(config, options);
-
         config_type cfg;
-        aux::any_to(options.at(NEWLINE_ID), cfg.newline);
-        aux::any_to(options.at(NAMING_ID), cfg.naming);
 
-        std::unordered_map<std::string, boost::any> positioning;
-        aux::any_to(options.at(POSITIONING_ID), positioning);
-        for (auto it = positioning.begin(); it != positioning.end(); ++it) {
+        aux::extractor<formatter::json_t> ex(config);
+        ex["newline"].to(cfg.newline);
+
+        auto mapping = ex["mapping"].get<std::map<std::string, boost::any>>();
+        for (auto it = mapping.begin(); it != mapping.end(); ++it) {
+            cfg.naming[it->first] = boost::any_cast<std::string>(it->second);
+        }
+
+        auto routing = ex["routing"].get<std::map<std::string, boost::any>>();
+        for (auto it = routing.begin(); it != routing.end(); ++it) {
             const std::string& name = it->first;
             const boost::any& value = it->second;
 

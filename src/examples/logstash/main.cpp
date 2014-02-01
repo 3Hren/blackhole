@@ -78,31 +78,34 @@ void init() {
     mapper.add<keyword::tag::severity_t<level>>(&map_severity);
     mapper.add<keyword::tag::timestamp_t>(&map_timestamp);
 
-    formatter_config_t formatter = {
-        "json",
-        boost::any {
-            std::vector<boost::any> {
-                true,
-                std::unordered_map<std::string, std::string> {
-                    { "message", "@message" },
-                    { "timestamp", "@timestamp" }
-                },
-                std::unordered_map<std::string, boost::any> {
-                    { "/", std::vector<std::string> { "message", "timestamp" } },
-                    { "/fields", std::string("*") }
-                }
-            }
-        },
-        mapper
-    };
+    formatter_config_t formatter("json", mapper);
+    formatter["newline"] = true;
+    formatter["mapping"]["message"] = "@message";
+    formatter["mapping"]["timestamp"] = "@timestamp";
+    formatter["routing"]["/"] = std::vector<std::string> { "message", "timestamp" };
+    formatter["routing"]["/fields"] = "*";
 
-    sink_config_t sink = {
-        "tcp",
-        std::map<std::string, boost::any> {
-            { "host", std::string("localhost") },
-            { "port", std::uint16_t(50030) }
-        }
-    };
+//    formatter_config_t formatter = {
+//        "json",
+//        boost::any {
+//            std::vector<boost::any> {
+//                true,
+//                std::unordered_map<std::string, std::string> {
+//                    { "message", "@message" },
+//                    { "timestamp", "@timestamp" }
+//                },
+//                std::unordered_map<std::string, boost::any> {
+//                    { "/", std::vector<std::string> { "message", "timestamp" } },
+//                    { "/fields", std::string("*") }
+//                }
+//            }
+//        },
+//        mapper
+//    };
+
+    sink_config_t sink("tcp");
+    sink["host"] = "localhost";
+    sink["port"] = std::uint16_t(50030);
 
     frontend_config_t frontend = { formatter, sink };
     log_config_t config{ "root", { frontend } };

@@ -1,33 +1,23 @@
 #include "Mocks.hpp"
 
 TEST(FactoryTraits, StringFormatterConfig) {
-    formatter_config_t config = {
-        "string",
-        std::string("[%(timestamp)s]: %(message)s")
-    };
+    formatter_config_t formatter("string");
+    formatter["pattern"] = "[%(timestamp)s]: %(message)s";
 
-    auto actual = factory_traits<formatter::string_t>::map_config(config.config);
+    auto actual = factory_traits<formatter::string_t>::map_config(formatter.config);
 
     EXPECT_EQ("[%s]: %s", actual.pattern);
     EXPECT_EQ(std::vector<std::string>({ "timestamp", "message" }), actual.attribute_names);
 }
 
 TEST(FactoryTraits, JsonFormatterConfig) {
-    formatter_config_t config = {
-        "json",
-        boost::any {
-            std::vector<boost::any> {
-                true,
-                std::unordered_map<std::string, std::string> { { "message", "@message" } },
-                std::unordered_map<std::string, boost::any> {
-                    { "/", std::vector<std::string> { "message" } },
-                    { "/fields", std::string("*") }
-                }
-            }
-        }
-    };
+    formatter_config_t formatter("json");
+    formatter["newline"] = true;
+    formatter["mapping"]["message"] = "@message";
+    formatter["routing"]["/"] = std::vector<std::string> { "message" };
+    formatter["routing"]["/fields"] = "*";
 
-    formatter::json::config_t actual = factory_traits<formatter::json_t>::map_config(config.config);
+    formatter::json::config_t actual = factory_traits<formatter::json_t>::map_config(formatter.config);
 
     using namespace formatter::json::map;
     EXPECT_TRUE(actual.newline);
@@ -41,15 +31,11 @@ TEST(FactoryTraits, JsonFormatterConfig) {
 }
 
 TEST(FactoryTraits, FileSinkConfig) {
-    sink_config_t config = {
-        "files",
-        std::map<std::string, boost::any> {
-            { "path", std::string("/dev/null") },
-            { "autoflush", false }
-        }
-    };
+    sink_config_t sink("files");
+    sink["path"] = "/dev/null";
+    sink["autoflush"] = false;
 
-    auto actual = factory_traits<sink::file_t<>>::map_config(config.config);
+    auto actual = factory_traits<sink::file_t<>>::map_config(sink.config);
 
     EXPECT_EQ("/dev/null", actual.path);
     EXPECT_FALSE(actual.autoflush);

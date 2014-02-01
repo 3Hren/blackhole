@@ -7,6 +7,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "blackhole/error.hpp"
+#include "blackhole/factory.hpp"
 #include "blackhole/formatter/base.hpp"
 #include "blackhole/formatter/string/parser.hpp"
 #include "blackhole/formatter/map/value.hpp"
@@ -97,8 +98,8 @@ struct factory_traits<formatter::string_t> {
     typedef formatter::string_t::config_type config_type;
 
     static config_type map_config(const boost::any& config) {
-        const std::string& pattern = boost::any_cast<std::string>(config);
-        return formatter::string::pattern_parser_t::parse(pattern);
+        aux::extractor<formatter::string_t> ex(config);
+        return formatter::string::pattern_parser_t::parse(ex["pattern"].get<std::string>());
     }
 };
 

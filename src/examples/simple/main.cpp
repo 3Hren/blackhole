@@ -13,18 +13,12 @@ enum class level {
 //! Initialization stage.
 //! \brief Manually or from file - whatever. The main aim - is to get initialized `log_config_t` object.
 void init() {
-    formatter_config_t formatter = {
-        "string",
-        std::string("[%(timestamp)s] [%(severity)s]: %(message)s")
-    };
+    formatter_config_t formatter("string");
+    formatter["pattern"] = "[%(timestamp)s] [%(severity)s]: %(message)s";
 
-    sink_config_t sink = {
-        "files",
-        std::map<std::string, boost::any> {
-            { "path", std::string("/dev/stdout") },
-            { "autoflush", true }
-        }
-    };
+    sink_config_t sink("files");
+    sink["path"] = "/dev/stdout";
+    sink["autoflush"] = true;
 
     frontend_config_t frontend = { formatter, sink };
     log_config_t config{ "root", { frontend } };

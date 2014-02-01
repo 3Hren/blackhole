@@ -46,17 +46,11 @@ struct priority_traits<level> {
 void init() {
     repository_t<level>::instance().configure<sink::syslog_t<level>, formatter::string_t>();
 
-    formatter_config_t formatter = {
-        "string",
-        std::string("[%(timestamp)s] [%(severity)s]: %(message)s")
-    };
+    formatter_config_t formatter("string");
+    formatter["pattern"] = "[%(timestamp)s] [%(severity)s]: %(message)s";
 
-    sink_config_t sink = {
-        "syslog",
-        std::map<std::string, boost::any> {
-            { "identity", std::string("test-application") }
-        }
-    };
+    sink_config_t sink("syslog");
+    sink["identity"] = "test-application";
 
     frontend_config_t frontend = { formatter, sink };
     log_config_t config{ "root", { frontend } };
