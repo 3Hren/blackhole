@@ -40,6 +40,7 @@ public:
     }
 
     bool open() {
+        //!@todo: Here the bug hides.
         if (!create_directories(m_path.parent_path())) {
             return false;
         }
@@ -186,9 +187,6 @@ public:
         return m_backend;
     }
 };
-
-//template<template<typename...> class T, template<typename...> class U> struct is_same : public std::false_type {};
-//template<template<typename...> class T> struct is_same<T, T> : public std::true_type {};
 
 template<class Backend, class Rotator>
 class file_t<
