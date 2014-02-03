@@ -76,14 +76,14 @@ private:
                         filenames.end());
         std::sort(filenames.begin(), filenames.end(),
                   rotation::naming::comparator::time::descending<Backend>(backend));
-        if (filenames.size() > config.backups - 1) {
+        if (filenames.size() > static_cast<std::size_t>(config.backups - 1)) {
             filenames.erase(filenames.begin() + config.backups - 1, filenames.end());
         }
 
-        for (int i = filenames.size() - 1; i >= 0; --i) {
-            const std::string& filename = filenames.at(i);
+        for (int n = filenames.size() - 1; n >= 0; --n) {
+            const std::string& filename = filenames.at(n);
             if (backend.exists(filename)) {
-                backend.rename(filename, counter.next(filename, i + 1));
+                backend.rename(filename, counter.next(filename, n + 1));
             }
         }
     }

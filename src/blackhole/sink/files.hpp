@@ -17,7 +17,7 @@ class boost_backend_t {
     boost::filesystem::ofstream m_file;
 public:
     boost_backend_t(const std::string& path) :
-        m_path(boost::filesystem::absolute(path))
+        m_path(absolute(path))
     {
     }
 
@@ -35,11 +35,7 @@ public:
         for (boost::filesystem::directory_iterator it(m_path.parent_path());
              it != boost::filesystem::directory_iterator();
              ++it) {
-#if BOOST_VERSION >= 104600
-            result.push_back(it->path().filename().string());
-#else
-            result.push_back(it->path().filename());
-#endif
+            result.push_back(filename(it->path()));
         }
 
         return result;
@@ -70,11 +66,7 @@ public:
     }
 
     std::string filename() const {
-#if BOOST_VERSION >= 104600
-        return m_path.filename().string();
-#else
-        return m_path.filename();
-#endif
+        return filename(m_path);
     }
 
     std::string path() const {
@@ -88,6 +80,27 @@ public:
 
     void flush() {
         m_file.flush();
+    }
+
+private:
+    static inline boost::filesystem::path initial_path() {
+        return boost::filesystem::initial_path();
+    }
+
+    static inline std::string filename(const boost::filesystem::path& path) {
+#if BOOST_VERSION >= 104600 && BOOST_FILESYSTEM_VERSION >= 3
+        return path.filename().string();
+#else
+        return path.filename();
+#endif
+    }
+
+    static inline boost::filesystem::path absolute(const boost::filesystem::path& path) {
+#if BOOST_VERSION >= 104600 && BOOST_FILESYSTEM_VERSION >= 3
+        return boost::filesystem::absolute(path, initial_path());
+#else
+        return boost::filesystem::complete(path, initial_path());
+#endif
     }
 };
 
