@@ -15,13 +15,13 @@ namespace comparator {
 namespace time {
 
 template<typename Backend>
-struct ascending {
+struct descending {
     Backend& backend;
 
-    ascending(Backend& backend) : backend(backend) {}
+    descending(Backend& backend) : backend(backend) {}
 
     bool operator ()(const std::string& lhs, const std::string& rhs) const {
-        return backend.changed(lhs) < backend.changed(rhs);
+        return backend.changed(lhs) > backend.changed(rhs);
     }
 };
 

@@ -56,14 +56,11 @@ struct counter_t {
      * filename:    test.log.20140130.1     test.log.1          test.log.20140130.1
      * next:        test.log.20140130.2     test.log.2          test.log.20140130.2
      */
-    std::string next(const std::string& filename) const {
+    std::string next(const std::string& filename, uint value) const {
         BOOST_ASSERT(static_cast<int>(filename.size()) -
                      static_cast<int>(prefix.size()) -
                      static_cast<int>(suffix.size()) >= 0);
 
-        const std::string& counter =
-                filename.substr(prefix.size(), filename.size() - prefix.size() - suffix.size());
-        const uint value = cast(counter);
         std::ostringstream stream;
         stream << std::string(filename.begin(), filename.begin() + prefix.size())
                << std::setfill('0') << std::setw(width) << (value + 1)

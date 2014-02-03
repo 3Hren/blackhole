@@ -17,7 +17,7 @@ class boost_backend_t {
     boost::filesystem::ofstream m_file;
 public:
     boost_backend_t(const std::string& path) :
-        m_path(path)
+        m_path(boost::filesystem::absolute(path))
     {
     }
 
@@ -30,13 +30,29 @@ public:
     }
 
     std::vector<std::string> listdir() const {
-        //!@todo: Implement me!
-        return std::vector<std::string>();
+        //!@todo: Test me!
+        std::vector<std::string> result;
+        for (boost::filesystem::directory_iterator it(m_path.parent_path());
+             it != boost::filesystem::directory_iterator();
+             ++it) {
+#if BOOST_VERSION >= 104600
+            result.push_back(it->path().filename().string());
+#else
+            result.push_back(it->path().filename());
+#endif
+        }
+
+        return result;
     }
 
-    std::time_t changed(const std::string&) const {
-        //!@todo: Implement me!
-        return std::time(nullptr);
+    std::time_t changed(const std::string& filename) const {
+        //!@todo: Write tests!
+        return boost::filesystem::last_write_time(m_path.parent_path() / filename);
+    }
+
+    std::uint64_t size(const std::string& filename) const {
+        //!@todo: Write tests!
+        return boost::filesystem::file_size(m_path.parent_path() / filename);
     }
 
     bool open() {
@@ -200,7 +216,7 @@ public:
     void consume(const std::string& message) {
         m_writer.write(message);
         m_flusher.flush();
-        if (m_rotator.necessary()) {
+        if (m_rotator.necessary(message)) {
             m_rotator.rotate();
         }
     }

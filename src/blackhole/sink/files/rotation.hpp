@@ -43,10 +43,9 @@ public:
         return m_timer;
     }
 
-    bool necessary() const {
-        // In case of size based rotation everything is simple: file.size() + message.size() >= size;
-        // In case of datetime based rotation that's seems to be a bit difficult: get_current_time() >= current_fence().
-        return false;
+    bool necessary(const std::string& message) const {
+        //!@todo: In case of datetime based rotation that's seems to be a bit difficult: get_current_time() >= current_fence().
+        return watcher(backend, message);
     }
 
     void rotate() const {
@@ -76,11 +75,15 @@ private:
                                        rotation::naming::filter_t(pattern)),
                         filenames.end());
         std::sort(filenames.begin(), filenames.end(),
-                  rotation::naming::comparator::time::ascending<Backend>(backend));
-        for (auto it = filenames.begin(); it != filenames.end(); ++it) {
-            const std::string& filename = *it;
+                  rotation::naming::comparator::time::descending<Backend>(backend));
+        if (filenames.size() > config.backups - 1) {
+            filenames.erase(filenames.begin() + config.backups - 1, filenames.end());
+        }
+
+        for (int i = filenames.size() - 1; i >= 0; --i) {
+            const std::string& filename = filenames.at(i);
             if (backend.exists(filename)) {
-                backend.rename(filename, counter.next(filename));
+                backend.rename(filename, counter.next(filename, i + 1));
             }
         }
     }
