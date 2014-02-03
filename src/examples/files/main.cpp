@@ -1,5 +1,7 @@
+#include <blackhole/formatter/string.hpp>
 #include <blackhole/log.hpp>
 #include <blackhole/repository.hpp>
+#include <blackhole/sink/files.hpp>
 
 using namespace blackhole;
 
@@ -11,12 +13,23 @@ enum class level {
 };
 
 void init() {
+    repository_t<level>::instance().configure<
+        sink::file_t<
+            sink::boost_backend_t,
+            sink::rotator_t<sink::boost_backend_t, sink::rotation::watcher::size_t>
+        >,
+        formatter::string_t
+    >();
+
     formatter_config_t formatter("string");
     formatter["pattern"] = "[%(timestamp)s] [%(severity)s]: %(message)s";
 
     sink_config_t sink("files");
     sink["path"] = "blackhole.log";
     sink["autoflush"] = true;
+    sink["rotation"]["pattern"] = "blackhole.log.%N";
+    sink["rotation"]["backups"] = std::uint16_t(5);
+    sink["rotation"]["size"] = std::uint64_t(1024);
 
     frontend_config_t frontend = { formatter, sink };
     log_config_t config{ "root", { frontend } };
@@ -28,10 +41,12 @@ int main(int, char**) {
     init();
     verbose_logger_t<level> log = repository_t<level>::instance().root();
 
+    for (int i = 0; i < 10; ++i) {
     BH_LOG(log, level::debug,   "[%d] %s - done", 0, "debug");
     BH_LOG(log, level::info,    "[%d] %s - done", 1, "info");
     BH_LOG(log, level::warning, "[%d] %s - done", 2, "warning");
     BH_LOG(log, level::error,   "[%d] %s - done", 3, "error");
+    }
 
     return 0;
 }
