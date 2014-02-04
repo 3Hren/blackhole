@@ -30,7 +30,6 @@ public:
     }
 
     std::vector<std::string> listdir() const {
-        //!@todo: Test me!
         std::vector<std::string> result;
         for (boost::filesystem::directory_iterator it(m_path.parent_path());
              it != boost::filesystem::directory_iterator();
@@ -42,12 +41,10 @@ public:
     }
 
     std::time_t changed(const std::string& filename) const {
-        //!@todo: Write tests!
         return boost::filesystem::last_write_time(m_path.parent_path() / filename);
     }
 
     std::uint64_t size(const std::string& filename) const {
-        //!@todo: Write tests!
         return boost::filesystem::file_size(m_path.parent_path() / filename);
     }
 
