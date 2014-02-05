@@ -16,12 +16,12 @@ protected:
 } // namespace testing
 
 TEST_F(boost_backend_t, Class) {
-    sink::boost_backend_t backend(".testing/test.log");
+    sink::files::boost_backend_t backend(".testing/test.log");
     UNUSED(backend);
 }
 
 TEST_F(boost_backend_t, Opening) {
-    sink::boost_backend_t backend(".testing/test.log");
+    sink::files::boost_backend_t backend(".testing/test.log");
     EXPECT_FALSE(backend.opened());
     EXPECT_FALSE(backend.exists("test.log"));
 
@@ -32,7 +32,7 @@ TEST_F(boost_backend_t, Opening) {
 }
 
 TEST_F(boost_backend_t, Listdir) {
-    sink::boost_backend_t backend(".testing/test.log");
+    sink::files::boost_backend_t backend(".testing/test.log");
     EXPECT_TRUE(backend.listdir().empty());
 
     backend.open();

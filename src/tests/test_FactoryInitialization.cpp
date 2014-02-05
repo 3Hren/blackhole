@@ -47,9 +47,9 @@ TEST(Repository, RotationFileStringsFrontendWithSizeWatcher) {
     group_factory_t<level> factory;
     factory.add<
         sink::file_t<
-            sink::boost_backend_t,
+            sink::files::boost_backend_t,
             sink::rotator_t<
-                sink::boost_backend_t,
+                sink::files::boost_backend_t,
                 sink::rotation::watcher::size_t
             >
         >,

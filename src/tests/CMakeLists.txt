@@ -35,6 +35,7 @@ SET(SOURCES
     test_FileRotation
     test_FileRotationWatcher
     test_FileRotationNaming
+    test_FileBackend
 )
 
 SET(Boost_USE_MULTITHREADED ON)

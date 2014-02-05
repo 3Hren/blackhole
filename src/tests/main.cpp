@@ -41,7 +41,7 @@
  *  === CONFIGURING FROM FILE ===
  *
  * verbosity: info
- * sink: file
+ * sink: files
  *   path: [/]
  *   format: string
  *     pattern: [%(...)s] ...

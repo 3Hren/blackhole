@@ -1,107 +1,15 @@
 #pragma once
 
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <boost/version.hpp>
-
 #include "blackhole/error.hpp"
 #include "blackhole/factory.hpp"
+#include "blackhole/sink/files/backend.hpp"
 #include "blackhole/sink/files/rotation.hpp"
 
 namespace blackhole {
 
 namespace sink {
 
-class boost_backend_t {
-    const boost::filesystem::path m_path;
-    boost::filesystem::ofstream m_file;
-public:
-    boost_backend_t(const std::string& path) :
-        m_path(absolute(path))
-    {
-    }
-
-    bool opened() const {
-        return m_file.is_open();
-    }
-
-    bool exists(const std::string& filename) const {
-        return boost::filesystem::exists(m_path.parent_path() / filename);
-    }
-
-    std::vector<std::string> listdir() const {
-        std::vector<std::string> result;
-        for (boost::filesystem::directory_iterator it(m_path.parent_path());
-             it != boost::filesystem::directory_iterator();
-             ++it) {
-            result.push_back(filename(it->path()));
-        }
-
-        return result;
-    }
-
-    std::time_t changed(const std::string& filename) const {
-        return boost::filesystem::last_write_time(m_path.parent_path() / filename);
-    }
-
-    std::uint64_t size(const std::string& filename) const {
-        return boost::filesystem::file_size(m_path.parent_path() / filename);
-    }
-
-    bool open() {
-        m_file.open(m_path, std::ios_base::out | std::ios_base::app);
-        return m_file.is_open();
-    }
-
-    void close() {
-        m_file.close();
-    }
-
-    void rename(const std::string& oldname, const std::string& newname) {
-        const boost::filesystem::path& path = m_path.parent_path();
-        boost::filesystem::rename(path / oldname, path / newname);
-    }
-
-    std::string filename() const {
-        return filename(m_path);
-    }
-
-    std::string path() const {
-        return m_path.string();
-    }
-
-    void write(const std::string& message) {
-        m_file.write(message.data(), static_cast<std::streamsize>(message.size()));
-        m_file.put('\n');
-    }
-
-    void flush() {
-        m_file.flush();
-    }
-
-private:
-    static inline boost::filesystem::path initial_path() {
-        return boost::filesystem::initial_path();
-    }
-
-    static inline std::string filename(const boost::filesystem::path& path) {
-#if BOOST_VERSION >= 104600 && BOOST_FILESYSTEM_VERSION >= 3
-        return path.filename().string();
-#else
-        return path.filename();
-#endif
-    }
-
-    static inline boost::filesystem::path absolute(const boost::filesystem::path& path) {
-#if BOOST_VERSION >= 104600 && BOOST_FILESYSTEM_VERSION >= 3
-        return boost::filesystem::absolute(path, initial_path());
-#else
-        return boost::filesystem::complete(path, initial_path());
-#endif
-    }
-};
-
-namespace file {
+namespace files {
 
 template<class Rotator = NoRotation>
 struct config_t {
@@ -129,7 +37,7 @@ struct config_t<rotator_t<Backend, Watcher, Timer>> {
     {}
 };
 
-} // namespace file
+} // namespace files
 
 template<class Backend>
 class writer_t {
@@ -166,7 +74,7 @@ public:
     }
 };
 
-template<class Backend = boost_backend_t, class Rotator = NoRotation, typename = void>
+template<class Backend = files::boost_backend_t, class Rotator = NoRotation, typename = void>
 class file_t;
 
 template<class Backend>
@@ -175,7 +83,7 @@ class file_t<Backend, NoRotation, void> {
     writer_t<Backend> m_writer;
     flusher_t<Backend> m_flusher;
 public:
-    typedef file::config_t<NoRotation> config_type;
+    typedef files::config_t<NoRotation> config_type;
 
     static const char* name() {
         return "files";
@@ -210,7 +118,7 @@ class file_t<
     flusher_t<Backend> m_flusher;
     Rotator m_rotator;
 public:
-    typedef file::config_t<Rotator> config_type;
+    typedef files::config_t<Rotator> config_type;
 
     static const char* name() {
         return "files";
