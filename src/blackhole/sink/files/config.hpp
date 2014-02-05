@@ -22,16 +22,13 @@ struct config_t {
 };
 
 template<class Backend, class Watcher, class Timer>
-struct config_t<rotator_t<Backend, Watcher, Timer>> {
-    std::string path;
-    bool autoflush;
+struct config_t<rotator_t<Backend, Watcher, Timer>> : public config_t<> {
     rotation::config_t<Watcher> rotation;
 
     config_t(const std::string& path = "/dev/stdout",
              bool autoflush = true,
              const rotation::config_t<Watcher>& rotation = rotation::config_t<Watcher>()) :
-        path(path),
-        autoflush(autoflush),
+        config_t<>(path, autoflush),
         rotation(rotation)
     {}
 };
