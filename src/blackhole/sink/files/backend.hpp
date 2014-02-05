@@ -58,8 +58,21 @@ public:
     }
 
     void rename(const std::string& oldname, const std::string& newname) {
+        if (oldname == newname) {
+            return;
+        }
+
         const boost::filesystem::path& path = m_path.parent_path();
-        boost::filesystem::rename(path / oldname, path / newname);
+        const boost::filesystem::path& oldpath = path / oldname;
+        const boost::filesystem::path& newpath = path / newname;
+
+        //! `boost::filesystem::rename` in boost < 1.46.00 throws exception if target path exists.
+#if BOOST_VERSION < 104600 || BOOST_FILESYSTEM_VERSION < 3
+        if (boost::filesystem::exists(newpath)) {
+            boost::filesystem::remove(newpath);
+        }
+#endif
+        boost::filesystem::rename(oldpath, newpath);
     }
 
     std::string filename() const {
