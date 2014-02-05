@@ -11,7 +11,7 @@ enum class level {
 };
 
 //! Initialization stage.
-//! \brief Manually or from file - whatever. The main aim - is to get initialized `log_config_t` object.
+//! Manually or from file - whatever. The main aim - is to get initialized `log_config_t` object.
 void init() {
     formatter_config_t formatter("string");
     formatter["pattern"] = "[%(timestamp)s] [%(severity)s]: %(message)s";

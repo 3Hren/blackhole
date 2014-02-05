@@ -1,6 +1,14 @@
 #include <blackhole/log.hpp>
 #include <blackhole/repository.hpp>
 
+//! This example demonstrates the simpliest blackhole logging library usage.
+
+/*! All that we need - is to define severity enum with preferred log levels.
+ *
+ *  Logger object `verbose_logger_t` is provided by `repository_t` class, which
+ *  requires severity enumeration as template parameter.
+ */
+
 using namespace blackhole;
 
 enum class level {
