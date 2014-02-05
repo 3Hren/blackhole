@@ -1,6 +1,5 @@
 #pragma once
 
-#include "blackhole/error.hpp"
 #include "blackhole/factory.hpp"
 #include "blackhole/sink/files/backend.hpp"
 #include "blackhole/sink/files/config.hpp"
