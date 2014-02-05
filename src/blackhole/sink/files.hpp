@@ -4,46 +4,13 @@
 #include "blackhole/factory.hpp"
 #include "blackhole/sink/files/backend.hpp"
 #include "blackhole/sink/files/config.hpp"
+#include "blackhole/sink/files/flusher.hpp"
 #include "blackhole/sink/files/rotation.hpp"
+#include "blackhole/sink/files/writer.hpp"
 
 namespace blackhole {
 
 namespace sink {
-
-template<class Backend>
-class writer_t {
-    Backend& backend;
-public:
-    writer_t(Backend& backend) :
-        backend(backend)
-    {}
-
-    void write(const std::string& message) {
-        if (!backend.opened()) {
-            if (!backend.open()) {
-                throw error_t("failed to open file '%s' for writing", backend.path());
-            }
-        }
-        backend.write(message);
-    }
-};
-
-template<class Backend>
-class flusher_t {
-    bool autoflush;
-    Backend& backend;
-public:
-    flusher_t(bool autoflush, Backend& backend) :
-        autoflush(autoflush),
-        backend(backend)
-    {}
-
-    void flush() {
-        if (autoflush) {
-            backend.flush();
-        }
-    }
-};
 
 template<class Backend = files::boost_backend_t, class Rotator = NoRotation, typename = void>
 class files_t;
@@ -51,8 +18,8 @@ class files_t;
 template<class Backend>
 class files_t<Backend, NoRotation, void> {
     Backend m_backend;
-    writer_t<Backend> m_writer;
-    flusher_t<Backend> m_flusher;
+    files::writer_t<Backend> m_writer;
+    files::flusher_t<Backend> m_flusher;
 public:
     typedef files::config_t<NoRotation> config_type;
 
@@ -85,8 +52,8 @@ class files_t<
     >::type>
 {
     Backend m_backend;
-    writer_t<Backend> m_writer;
-    flusher_t<Backend> m_flusher;
+    files::writer_t<Backend> m_writer;
+    files::flusher_t<Backend> m_flusher;
     Rotator m_rotator;
 public:
     typedef files::config_t<Rotator> config_type;
