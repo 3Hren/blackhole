@@ -75,10 +75,10 @@ public:
 };
 
 template<class Backend = files::boost_backend_t, class Rotator = NoRotation, typename = void>
-class file_t;
+class files_t;
 
 template<class Backend>
-class file_t<Backend, NoRotation, void> {
+class files_t<Backend, NoRotation, void> {
     Backend m_backend;
     writer_t<Backend> m_writer;
     flusher_t<Backend> m_flusher;
@@ -89,7 +89,7 @@ public:
         return "files";
     }
 
-    file_t(const config_type& config) :
+    files_t(const config_type& config) :
         m_backend(config.path),
         m_writer(m_backend),
         m_flusher(config.autoflush, m_backend)
@@ -106,7 +106,7 @@ public:
 };
 
 template<class Backend, class Rotator>
-class file_t<
+class files_t<
     Backend,
     Rotator,
     typename std::enable_if<
@@ -124,7 +124,7 @@ public:
         return "files";
     }
 
-    file_t(const config_type& config) :
+    files_t(const config_type& config) :
         m_backend(config.path),
         m_writer(m_backend),
         m_flusher(config.autoflush, m_backend),
@@ -149,10 +149,10 @@ public:
 namespace generator {
 
 template<class Backend, class Watcher>
-struct id<sink::file_t<Backend, sink::rotator_t<Backend, Watcher>>> {
+struct id<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
     static std::string extract(const boost::any& config) {
         typedef sink::rotator_t<Backend, Watcher> rotator_type;
-        typedef sink::file_t<Backend, rotator_type> sink_type;
+        typedef sink::files_t<Backend, rotator_type> sink_type;
 
         std::map<std::string, boost::any> cfg;
         aux::any_to(config, cfg);
@@ -168,27 +168,27 @@ struct id<sink::file_t<Backend, sink::rotator_t<Backend, Watcher>>> {
 } // namespace generator
 
 template<class Backend>
-struct config_traits<sink::file_t<Backend, sink::NoRotation>> {
+struct config_traits<sink::files_t<Backend, sink::NoRotation>> {
     static std::string name() {
-        return sink::file_t<Backend, sink::NoRotation>::name();
+        return sink::files_t<Backend, sink::NoRotation>::name();
     }
 };
 
 template<class Backend, class Rotator>
-struct config_traits<sink::file_t<Backend, Rotator>> {
+struct config_traits<sink::files_t<Backend, Rotator>> {
     static std::string name() {
-        return utils::format("%s/%s", sink::file_t<Backend, Rotator>::name(), Rotator::name());
+        return utils::format("%s/%s", sink::files_t<Backend, Rotator>::name(), Rotator::name());
     }
 };
 
 template<class Backend>
-struct factory_traits<sink::file_t<Backend>> {
-    typedef sink::file_t<Backend> sink_type;
+struct factory_traits<sink::files_t<Backend>> {
+    typedef sink::files_t<Backend> sink_type;
     typedef typename sink_type::config_type config_type;
 
     static config_type map_config(const boost::any& config) {
         config_type cfg;
-        aux::extractor<sink::file_t<Backend>> ex(config);
+        aux::extractor<sink::files_t<Backend>> ex(config);
         ex["path"].to(cfg.path);
         ex["autoflush"].to(cfg.autoflush);
         return cfg;
@@ -196,8 +196,8 @@ struct factory_traits<sink::file_t<Backend>> {
 };
 
 template<class Backend>
-struct factory_traits<sink::file_t<Backend, sink::rotator_t<Backend, sink::rotation::watcher::size_t>>> {
-    typedef typename sink::file_t<Backend, sink::rotator_t<Backend, sink::rotation::watcher::size_t>> sink_type;
+struct factory_traits<sink::files_t<Backend, sink::rotator_t<Backend, sink::rotation::watcher::size_t>>> {
+    typedef typename sink::files_t<Backend, sink::rotator_t<Backend, sink::rotation::watcher::size_t>> sink_type;
     typedef typename sink_type::config_type config_type;
 
     static config_type map_config(const boost::any& config) {

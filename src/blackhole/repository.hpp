@@ -72,7 +72,7 @@ public:
 
 private:
     repository_t() {
-        configure<sink::file_t<>, formatter::string_t>();
+        configure<sink::files_t<>, formatter::string_t>();
         init(repository::config::trivial());
     }
 };

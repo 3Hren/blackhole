@@ -35,7 +35,7 @@ TEST(FactoryTraits, FileSinkConfig) {
     sink["path"] = "/dev/null";
     sink["autoflush"] = false;
 
-    auto actual = factory_traits<sink::file_t<>>::map_config(sink.config);
+    auto actual = factory_traits<sink::files_t<>>::map_config(sink.config);
 
     EXPECT_EQ("/dev/null", actual.path);
     EXPECT_FALSE(actual.autoflush);

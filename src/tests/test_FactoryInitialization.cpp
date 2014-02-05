@@ -31,7 +31,7 @@ struct priority_traits<testing::level> {
 
 TEST(Factory, FileStringsFrontend) {
     group_factory_t<level> factory;
-    factory.add<sink::file_t<>, formatter::string_t>();
+    factory.add<sink::files_t<>, formatter::string_t>();
 
     formatter_config_t formatter("string");
     formatter["pattern"] = "[%(timestamp)s]: %(message)s";
@@ -46,7 +46,7 @@ TEST(Factory, FileStringsFrontend) {
 TEST(Repository, RotationFileStringsFrontendWithSizeWatcher) {
     group_factory_t<level> factory;
     factory.add<
-        sink::file_t<
+        sink::files_t<
             sink::files::boost_backend_t,
             sink::rotator_t<
                 sink::files::boost_backend_t,
@@ -172,7 +172,7 @@ TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredFormatter) {
 
 TEST(Repository, FileSinkWithStringFormatterIsAvailableByDefault) {
     auto& repository = repository_t<level>::instance();
-    bool available = repository.available<sink::file_t<>, formatter::string_t>();
+    bool available = repository.available<sink::files_t<>, formatter::string_t>();
     EXPECT_TRUE(available);
     repository.clear();
 }
@@ -200,19 +200,19 @@ TEST(Repository, GroupConfiguring) {
     bool available = false;
     auto& repository = repository_t<level>::instance();
 
-    available = repository.available<sink::file_t<>, formatter::json_t>();
+    available = repository.available<sink::files_t<>, formatter::json_t>();
     EXPECT_FALSE(available);
 
-    repository.configure<sink::file_t<>, formatters_t>();
+    repository.configure<sink::files_t<>, formatters_t>();
 
-    available = repository.available<sink::file_t<>, formatter::json_t>();
+    available = repository.available<sink::files_t<>, formatter::json_t>();
     EXPECT_TRUE(available);
     repository.clear();
 }
 
 TEST(Repository, CombinationConfiguring) {
     typedef boost::mpl::vector<
-        sink::file_t<>,
+        sink::files_t<>,
         sink::syslog_t<level>
     > sinks_t;
 
@@ -224,7 +224,7 @@ TEST(Repository, CombinationConfiguring) {
     bool available = false;
     auto& repository = repository_t<level>::instance();
 
-    available = repository.available<sink::file_t<>, formatter::json_t>();
+    available = repository.available<sink::files_t<>, formatter::json_t>();
     ASSERT_FALSE(available);
     available = repository.available<sink::syslog_t<level>, formatter::string_t>();
     ASSERT_FALSE(available);
@@ -233,7 +233,7 @@ TEST(Repository, CombinationConfiguring) {
 
     repository.configure<sinks_t, formatters_t>();
 
-    available = repository.available<sink::file_t<>, formatter::json_t>();
+    available = repository.available<sink::files_t<>, formatter::json_t>();
     EXPECT_TRUE(available);
     available = repository.available<sink::syslog_t<level>, formatter::string_t>();
     EXPECT_TRUE(available);
