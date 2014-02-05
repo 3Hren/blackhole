@@ -14,9 +14,12 @@ enum class level {
 
 void init() {
     repository_t<level>::instance().configure<
-        sink::file_t<
-            sink::boost_backend_t,
-            sink::rotator_t<sink::boost_backend_t, sink::rotation::watcher::size_t>
+        sink::files_t<
+            sink::files::boost_backend_t,
+            sink::rotator_t<
+                sink::files::boost_backend_t,
+                sink::rotation::watcher::size_t
+            >
         >,
         formatter::string_t
     >();
