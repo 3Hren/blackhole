@@ -17,13 +17,13 @@ Rotate both:
 }
 */
 
-//!@todo: example: File rotating.
 //!@todo: example: Make stdout/string example with demonstration of formatting other attribute.
 
 //!@todo: benchmark: File logging comparing with boost::log.
 //!@todo: benchmark: Socket logging with json.
 
 //!@todo: files_t: Make file naming by pattern.
+//!@todo: files_t: logrotate support - ability to handle signals to reopen current file (SIGHUP).
 
 //!@todo: performance: Experiment with std::ostringstream or format library for performance check.
 //!@todo: performance: Current naive implementation of timestamp formatter is suck and have large performance troubles. Fix it.
