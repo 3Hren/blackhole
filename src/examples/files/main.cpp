@@ -31,8 +31,8 @@ void init() {
     sink["path"] = "blackhole.log";
     sink["autoflush"] = true;
     sink["rotation"]["pattern"] = "blackhole.log.%N";
-    sink["rotation"]["backups"] = std::uint16_t(5);
-    sink["rotation"]["size"] = std::uint64_t(1024);
+    sink["rotation"]["backups"] = std::uint16_t(10);
+    sink["rotation"]["size"] = std::uint64_t(100 * 1024);
 
     frontend_config_t frontend = { formatter, sink };
     log_config_t config{ "root", { frontend } };
@@ -44,7 +44,7 @@ int main(int, char**) {
     init();
     verbose_logger_t<level> log = repository_t<level>::instance().root();
 
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 32; ++i) {
     BH_LOG(log, level::debug,   "[%d] %s - done", 0, "debug");
     BH_LOG(log, level::info,    "[%d] %s - done", 1, "info");
     BH_LOG(log, level::warning, "[%d] %s - done", 2, "warning");
