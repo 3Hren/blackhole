@@ -1,3 +1,5 @@
+//!@todo: swarm: implement logger_interface
+//!@todo: thevoid: redirect json config.
 //!@todo: files_t: Rotation condition.
 //! Sample config:
 /*!
