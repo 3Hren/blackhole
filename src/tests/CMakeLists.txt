@@ -33,9 +33,10 @@ SET(SOURCES
     test_Manual
     test_Utils
     test_FileRotation
-    test_FileRotationWatcher
     test_FileRotationNaming
     test_FileBackend
+    test_FileRotationSizeWatcher
+    test_FileRotationDateTimeWatcher
 )
 
 SET(Boost_USE_MULTITHREADED ON)
