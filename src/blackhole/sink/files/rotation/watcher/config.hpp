@@ -30,6 +30,13 @@ struct config_t<watcher::size_t> {
 
 template<>
 struct config_t<watcher::datetime_t> {
+    enum class period_t {
+        hourly,
+        daily,
+        weekly,
+        monthly
+    };
+
     std::string marker;
 };
 
