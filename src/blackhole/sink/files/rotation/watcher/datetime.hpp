@@ -11,8 +11,7 @@ namespace rotation {
 namespace watcher {
 
 struct datetime_t {
-    datetime_t(config_t<datetime_t>::period_t period = config_t<datetime_t>::period_t::daily) {
-
+    datetime_t(config_t<datetime_t>::period_t = config_t<datetime_t>::period_t::daily) {
     }
 };
 
