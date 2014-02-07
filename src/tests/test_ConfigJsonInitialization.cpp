@@ -37,27 +37,26 @@ T to(const boost::any& source) {
     return value;
 }
 
-std::string valid_cfg = R"(
-{
-    "root": [
-        {
-            "formatter": {
-                "type": "string",
-                "pattern": "[%(level)s]: %(message)s"
-            },
-            "sink": {
-                "type": "files",
-                "path": "test.log",
-                "rotation": {
-                    "pattern": "test.log.%N",
-                    "backups": 5,
-                    "size": 1000000
-                }
-            }
-        }
-    ]
-}
-)";
+std::string valid_cfg = ""
+"{"
+"   \"root\": ["
+"       {"
+"           \"formatter\": {"
+"               \"type\": \"string\","
+"               \"pattern\": \"[%(level)s]: %(message)s\""
+"            },"
+"           \"sink\": {"
+"               \"type\": \"files\","
+"               \"path\": \"test.log\","
+"               \"rotation\": {"
+"                   \"pattern\": \"test.log.%N\","
+"                   \"backups\": 5,"
+"                   \"size\": 1000000"
+"               }"
+"           }"
+"       }"
+"   ]"
+"}";
 
 TEST(parser_t, NameParsing) {
     rapidjson::Document doc;
