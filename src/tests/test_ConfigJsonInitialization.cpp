@@ -110,28 +110,24 @@ public:
 
 class parser_test_case_t : public Test {
 protected:
-    rapidjson::Document doc;
-public:
-    parser_test_case_t() {}
+    std::vector<log_config_t> configs;
 
-protected:
     void SetUp() {
         std::ifstream stream("config/valid.json");
         std::string valid((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+        rapidjson::Document doc;
         doc.Parse<0>(valid.c_str());
         ASSERT_FALSE(doc.HasParseError());
+        configs = parser_t::parse(doc);
     }
 };
 
 TEST_F(parser_test_case_t, NameParsing) {
-    const std::vector<log_config_t>& configs = parser_t::parse(doc);
     ASSERT_EQ(1, configs.size());
     EXPECT_EQ("root", configs.at(0).name);
 }
 
 TEST_F(parser_test_case_t, CheckFormatterConfigAfterParsing) {
-    const std::vector<log_config_t>& configs = parser_t::parse(doc);
-
     ASSERT_EQ(1, configs.size());
     ASSERT_EQ(1, configs.at(0).frontends.size());
 
@@ -141,8 +137,6 @@ TEST_F(parser_test_case_t, CheckFormatterConfigAfterParsing) {
 }
 
 TEST_F(parser_test_case_t, CheckSinkConfigAfterParsing) {
-    const std::vector<log_config_t>& configs = parser_t::parse(doc);
-
     ASSERT_EQ(1, configs.size());
     ASSERT_EQ(1, configs.at(0).frontends.size());
 
