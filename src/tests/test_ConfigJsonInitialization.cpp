@@ -2,9 +2,13 @@
 
 namespace blackhole {
 
-namespace aux {
+namespace repository {
+
+namespace config {
 
 namespace conversion {
+
+namespace aux {
 
 enum class integral {
     uint16,
@@ -15,59 +19,111 @@ enum class integral {
     int64
 };
 
-} // namespace conversion
-
 } // namespace aux
 
-static std::map<std::string, aux::conversion::integral> convertion = {
-    { "sink/files/rotation/backups", aux::conversion::integral::uint16 },
-    { "sink/files/rotation/size", aux::conversion::integral::uint64 }
+} // namespace conversion
+
+} // namespace config
+
+} // namespace repository
+
+} // namespace blackhole
+
+namespace blackhole {
+
+namespace repository {
+
+namespace config {
+
+namespace conversion {
+
+static std::map<std::string, aux::integral> convertion = {
+    { "sink/files/rotation/backups", aux::integral::uint16 },
+    { "sink/files/rotation/size", aux::integral::uint64 }
 };
 
-template<class Builder, typename IntegralType>
-inline void convert(Builder& builder, const std::string& n, const std::string& full_name, IntegralType value) {
-    using namespace aux::conversion;
+} // namespace conversion
 
-    auto it = convertion.find(full_name + "/" + n);
+} // namespace config
+
+} // namespace repository
+
+} // namespace blackhole
+
+namespace blackhole {
+
+namespace repository {
+
+namespace config {
+
+namespace conversion {
+
+namespace aux {
+
+template<class Builder, typename IntegralType>
+inline void convert(Builder& builder, const std::string& name, const std::string& path, IntegralType value) {
+    using namespace conversion;
+
+    auto it = convertion.find(path + "/" + name);
     if (it == convertion.end()) {
-        builder[n] = static_cast<int>(value);
+        builder[name] = static_cast<int>(value);
         return;
     }
 
     const integral ic = it->second;
     switch (ic) {
     case integral::uint16:
-        builder[n] = static_cast<std::uint16_t>(value);
+        builder[name] = static_cast<std::uint16_t>(value);
         break;
     case integral::uint32:
-        builder[n] = static_cast<std::uint32_t>(value);
+        builder[name] = static_cast<std::uint32_t>(value);
         break;
     case integral::uint64:
-        builder[n] = static_cast<std::uint64_t>(value);
+        builder[name] = static_cast<std::uint64_t>(value);
         break;
     case integral::int16:
-        builder[n] = static_cast<std::int16_t>(value);
+        builder[name] = static_cast<std::int16_t>(value);
         break;
     case integral::int32:
-        builder[n] = static_cast<std::int32_t>(value);
+        builder[name] = static_cast<std::int32_t>(value);
         break;
     case integral::int64:
-        builder[n] = static_cast<std::int64_t>(value);
+        builder[name] = static_cast<std::int64_t>(value);
         break;
     default:
         BOOST_ASSERT(false);
     }
 }
 
+} // namespace aux
+
+} // namespace conversion
+
+} // namespace config
+
+} // namespace repository
+
+} // namespace blackhole
+
+namespace blackhole {
+
+namespace repository {
+
+namespace config {
+
+namespace aux {
+
 template<typename T>
-static void fill(T& builder, const rapidjson::Value& node, const std::string& full_name) {
+static void fill(T& builder, const rapidjson::Value& node, const std::string& path) {
     for (auto it = node.MemberBegin(); it != node.MemberEnd(); ++it) {
         const std::string& name = it->name.GetString();
         const rapidjson::Value& value = it->value;
 
         if (value.IsObject()) {
             auto nested_builder = builder[name];
-            fill(nested_builder, value, full_name + "/" + name);
+            fill(nested_builder, value, path + "/" + name);
+        } else if (value.IsArray() || value.IsNull()) {
+            throw blackhole::error_t("array and null parsing is not implemented yet");
         } else {
             if (name == "type") {
                 continue;
@@ -75,22 +131,24 @@ static void fill(T& builder, const rapidjson::Value& node, const std::string& fu
 
             if (value.IsBool()) {
                 builder[name] = value.GetBool();
-            } else if (value.IsInt()) {
-                convert(builder, name, full_name, value.GetInt());
-            } else if (value.IsUint()) {
-                convert(builder, name, full_name, value.GetUint());
-            } else if (value.IsInt64()) {
-                convert(builder, name, full_name, value.GetInt64());
-            } else if (value.IsUint64()) {
-                convert(builder, name, full_name, value.GetUint64());
             } else if (value.IsDouble()) {
                 builder[name] = value.GetDouble();
+            } else if (value.IsInt()) {
+                conversion::aux::convert(builder, name, path, value.GetInt());
+            } else if (value.IsUint()) {
+                conversion::aux::convert(builder, name, path, value.GetUint());
+            } else if (value.IsInt64()) {
+                conversion::aux::convert(builder, name, path, value.GetInt64());
+            } else if (value.IsUint64()) {
+                conversion::aux::convert(builder, name, path, value.GetUint64());
             } else if (value.IsString()) {
                 builder[name] = std::string(value.GetString());
             }
         }
     }
 }
+
+} // namespace aux
 
 template<class T>
 class parser_t;
@@ -99,10 +157,10 @@ template<>
 class parser_t<repository::config::base_t> {
 public:
     template<typename T>
-    static T parse(const std::string& name, const rapidjson::Value& value) {
+    static T parse(const std::string& path, const rapidjson::Value& value) {
         const std::string& type = value["type"].GetString();
         T config(type);
-        fill(config, value, name + "/" + type);
+        aux::fill(config, value, path + "/" + type);
         return config;
     }
 };
@@ -166,7 +224,11 @@ public:
     }
 };
 
-}
+} // namespace config
+
+} // namespace repository
+
+} // namespace blackhole
 
 class parser_test_case_t : public Test {
 protected:
@@ -178,7 +240,7 @@ protected:
         rapidjson::Document doc;
         doc.Parse<0>(valid.c_str());
         ASSERT_FALSE(doc.HasParseError());
-        configs = parser_t<std::vector<log_config_t>>::parse(doc);
+        configs = repository::config::parser_t<std::vector<log_config_t>>::parse(doc);
     }
 };
 
@@ -214,7 +276,7 @@ TEST(parser_t, ThrowsExceptionIfFormatterSectionIsAbsent) {
     rapidjson::Document doc;
     doc.Parse<0>(nonvalid.c_str());
     ASSERT_FALSE(doc.HasParseError());
-    EXPECT_THROW(parser_t<std::vector<log_config_t>>::parse(doc), blackhole::error_t);
+    EXPECT_THROW(repository::config::parser_t<std::vector<log_config_t>>::parse(doc), blackhole::error_t);
 }
 
 TEST(parser_t, ThrowsExceptionIfSinkSectionIsAbsent) {
@@ -223,7 +285,7 @@ TEST(parser_t, ThrowsExceptionIfSinkSectionIsAbsent) {
     rapidjson::Document doc;
     doc.Parse<0>(nonvalid.c_str());
     ASSERT_FALSE(doc.HasParseError());
-    EXPECT_THROW(parser_t<std::vector<log_config_t>>::parse(doc), blackhole::error_t);
+    EXPECT_THROW(repository::config::parser_t<std::vector<log_config_t>>::parse(doc), blackhole::error_t);
 }
 
 TEST(parser_t, MultipleFrontends) {
@@ -233,7 +295,7 @@ TEST(parser_t, MultipleFrontends) {
     doc.Parse<0>(valid.c_str());
     ASSERT_FALSE(doc.HasParseError());
 
-    const std::vector<log_config_t>& configs = parser_t<std::vector<log_config_t>>::parse(doc);
+    const std::vector<log_config_t>& configs = repository::config::parser_t<std::vector<log_config_t>>::parse(doc);
     ASSERT_EQ(1, configs.size());
     EXPECT_EQ("root", configs.at(0).name);
     ASSERT_EQ(2, configs.at(0).frontends.size());
