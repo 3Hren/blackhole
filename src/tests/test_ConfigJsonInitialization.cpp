@@ -7,6 +7,48 @@
 // opt: test throw exception when frontend type not registered
 // opt: test -//-                 sink -//-
 
+enum class int_convertion {
+    u16, u32, u64, i16, i32, i64
+};
+
+static std::map<std::string, int_convertion> convertion = {
+    { "sink/files/rotation/backups", int_convertion::u16 },
+    { "sink/files/rotation/size", int_convertion::u64 }
+};
+
+template<class Builder, typename IntegralType>
+inline void convert(Builder& builder, const std::string& n, const std::string& full_name, IntegralType value) {
+    auto it = convertion.find(full_name + "/" + n);
+    if (it == convertion.end()) {
+        builder[n] = static_cast<int>(value);
+        return;
+    }
+
+    int_convertion ic = it->second;
+    switch (ic) {
+    case int_convertion::u16:
+        builder[n] = static_cast<std::uint16_t>(value);
+        break;
+    case int_convertion::u32:
+        builder[n] = static_cast<std::uint32_t>(value);
+        break;
+    case int_convertion::u64:
+        builder[n] = static_cast<std::uint64_t>(value);
+        break;
+    case int_convertion::i16:
+        builder[n] = static_cast<std::int16_t>(value);
+        break;
+    case int_convertion::i32:
+        builder[n] = static_cast<std::int32_t>(value);
+        break;
+    case int_convertion::i64:
+        builder[n] = static_cast<std::int64_t>(value);
+        break;
+    default:
+        BOOST_ASSERT(false);
+    }
+}
+
 class parser_t {
 public:
     static std::vector<log_config_t> parse(const rapidjson::Value& root) {
@@ -26,11 +68,11 @@ public:
                 // Extract formatter and sink.
                 const rapidjson::Value& formatter_node = frontend_node["formatter"];
                 formatter_config_t formatter_config(formatter_node["type"].GetString());
-                fill(formatter_config, formatter_node);
+                fill(formatter_config, formatter_node, std::string("formatter/") + formatter_config.type);
 
                 const rapidjson::Value& sink_node = frontend_node["sink"];
                 sink_config_t sink_config(sink_node["type"].GetString());
-                fill(sink_config, sink_node);
+                fill(sink_config, sink_node, std::string("sink/") + sink_config.type);
 
                 frontend_config_t frontend_config = { formatter_config, sink_config };
                 config.frontends.push_back(frontend_config);
@@ -42,26 +84,26 @@ public:
     }
 
     template<typename T>
-    static void fill(T& builder, const rapidjson::Value& node) {
+    static void fill(T& builder, const rapidjson::Value& node, const std::string& full_name) {
         for (auto it = node.MemberBegin(); it != node.MemberEnd(); ++it) {
             std::string n(it->name.GetString());
             const rapidjson::Value& v = it->value;
 
             if (v.IsObject()) {
                 auto b = builder[n];
-                fill(b, v);
+                fill(b, v, full_name + "/" + n);
             } else {
                 if (n != "type") {
                     if (v.IsBool()) {
                         builder[n] = v.GetBool();
                     } else if (v.IsInt()) {
-                        builder[n] = v.GetInt();
+                        convert(builder, n, full_name, v.GetInt());
                     } else if (v.IsInt64()) {
-                        builder[n] = v.GetInt64();
+                        convert(builder, n, full_name, v.GetInt64());
                     } else if (v.IsUint()) {
-                        builder[n] = v.GetUint();
+                        convert(builder, n, full_name, v.GetUint());
                     } else if (v.IsUint64()) {
-                        builder[n] = v.GetUint64();
+                        convert(builder, n, full_name, v.GetUint64());
                     } else if (v.IsDouble()) {
                         builder[n] = v.GetDouble();
                     } else if (v.IsString()) {
@@ -115,8 +157,8 @@ TEST_F(parser_test_case_t, CheckSinkConfigAfterParsing) {
     EXPECT_EQ("files", sink.type);
     EXPECT_EQ("test.log", sink["path"].to<std::string>());
     EXPECT_EQ("test.log.%N", sink["rotation"]["pattern"].to<std::string>());
-    EXPECT_EQ(5, sink["rotation"]["backups"].to<int>());
-    EXPECT_EQ(1000000, sink["rotation"]["size"].to<int>()); //!@todo: We have a problem here.
+    EXPECT_EQ(5, sink["rotation"]["backups"].to<std::uint16_t>());
+    EXPECT_EQ(1000000, sink["rotation"]["size"].to<std::uint64_t>());
 }
 
 TEST(parser_t, ThrowsExceptionIfFormatterSectionIsAbsent) {
