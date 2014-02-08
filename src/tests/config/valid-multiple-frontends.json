@@ -1,0 +1,24 @@
+{
+    "root": [
+        {
+            "formatter": {
+                "type": "string",
+                "pattern": "[%(level)s]: %(message)s"
+            },
+            "sink": {
+                "type": "files",
+                "path": "test.log"
+            }
+        },
+        {
+            "formatter": {
+                "type": "json"
+            },
+            "sink": {
+                "type": "tcp",
+                "host": "localhost",
+                "port": 50030
+            }
+        }
+    ]
+}

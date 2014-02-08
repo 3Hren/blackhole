@@ -1,11 +1,4 @@
 #include "Mocks.hpp"
-// test json is valid
-// test parse formatter config into formatter_config_t
-// test parse sink config -//-
-// test parse entire config including log name.
-// test parse multiple frontends
-// opt: test throw exception when frontend type not registered
-// opt: test -//-                 sink -//-
 
 enum class int_convertion {
     u16, u32, u64, i16, i32, i64
@@ -177,4 +170,26 @@ TEST(parser_t, ThrowsExceptionIfSinkSectionIsAbsent) {
     doc.Parse<0>(nonvalid.c_str());
     ASSERT_FALSE(doc.HasParseError());
     EXPECT_THROW(parser_t::parse(doc), blackhole::error_t);
+}
+
+TEST(parser_t, MultipleFrontends) {
+    std::ifstream stream("config/valid-multiple-frontends.json");
+    std::string valid((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    rapidjson::Document doc;
+    doc.Parse<0>(valid.c_str());
+    ASSERT_FALSE(doc.HasParseError());
+
+    const std::vector<log_config_t>& configs = parser_t::parse(doc);
+    ASSERT_EQ(1, configs.size());
+    EXPECT_EQ("root", configs.at(0).name);
+    ASSERT_EQ(2, configs.at(0).frontends.size());
+
+    const frontend_config_t& front1 = configs.at(0).frontends.at(0);
+    ASSERT_EQ("string", front1.formatter.type);
+    ASSERT_EQ("files", front1.sink.type);
+
+    const frontend_config_t& front2 = configs.at(0).frontends.at(1);
+    ASSERT_EQ("json", front2.formatter.type);
+    ASSERT_EQ("tcp", front2.sink.type);
+
 }
