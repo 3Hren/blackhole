@@ -1,7 +1,10 @@
 #pragma once
 
 #include <map>
+#include <mutex>
 #include <string>
+
+#include <boost/optional.hpp>
 
 namespace blackhole {
 
@@ -13,7 +16,7 @@ namespace conversion {
 
 namespace aux {
 
-enum class integral {
+enum class integral_t {
     uint16,
     uint32,
     uint64,
@@ -23,11 +26,6 @@ enum class integral {
 };
 
 } // namespace aux
-
-static std::map<std::string, aux::integral> convertion = {
-    { "sink/files/rotation/backups", aux::integral::uint16 },
-    { "sink/files/rotation/size", aux::integral::uint64 }
-};
 
 } // namespace conversion
 

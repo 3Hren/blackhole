@@ -5,7 +5,7 @@
 #include "blackhole/repository/config/base.hpp"
 #include "blackhole/repository/config/log.hpp"
 #include "blackhole/repository/config/parser.hpp"
-#include "blackhole/repository/config/conversion/convert.hpp"
+#include "blackhole/repository/config/conversion/integral.hpp"
 
 namespace blackhole {
 
@@ -14,6 +14,47 @@ namespace repository {
 namespace config {
 
 namespace aux {
+
+static std::map<std::string, conversion::aux::integral_t> convertion = {
+    { "sink/files/rotation/backups", conversion::aux::integral_t::uint16 },
+    { "sink/files/rotation/size", conversion::aux::integral_t::uint64 },
+    { "sink/tcp/port", conversion::aux::integral_t::uint16 }
+};
+
+template<class Builder, typename IntegralType>
+inline void convert(Builder& builder, const std::string& name, const std::string& path, IntegralType value) {
+    using namespace conversion::aux;
+
+    auto it = convertion.find(path + "/" + name);
+    if (it == convertion.end()) {
+        builder[name] = static_cast<int>(value);
+        return;
+    }
+
+    const integral_t ic = it->second;
+    switch (ic) {
+    case integral_t::uint16:
+        builder[name] = static_cast<std::uint16_t>(value);
+        break;
+    case integral_t::uint32:
+        builder[name] = static_cast<std::uint32_t>(value);
+        break;
+    case integral_t::uint64:
+        builder[name] = static_cast<std::uint64_t>(value);
+        break;
+    case integral_t::int16:
+        builder[name] = static_cast<std::int16_t>(value);
+        break;
+    case integral_t::int32:
+        builder[name] = static_cast<std::int32_t>(value);
+        break;
+    case integral_t::int64:
+        builder[name] = static_cast<std::int64_t>(value);
+        break;
+    default:
+        BOOST_ASSERT(false);
+    }
+}
 
 template<typename T>
 static void fill(T& builder, const rapidjson::Value& node, const std::string& path) {
@@ -36,13 +77,13 @@ static void fill(T& builder, const rapidjson::Value& node, const std::string& pa
             } else if (value.IsDouble()) {
                 builder[name] = value.GetDouble();
             } else if (value.IsInt()) {
-                conversion::aux::convert(builder, name, path, value.GetInt());
+                aux::convert(builder, name, path, value.GetInt());
             } else if (value.IsUint()) {
-                conversion::aux::convert(builder, name, path, value.GetUint());
+                aux::convert(builder, name, path, value.GetUint());
             } else if (value.IsInt64()) {
-                conversion::aux::convert(builder, name, path, value.GetInt64());
+                aux::convert(builder, name, path, value.GetInt64());
             } else if (value.IsUint64()) {
-                conversion::aux::convert(builder, name, path, value.GetUint64());
+                aux::convert(builder, name, path, value.GetUint64());
             } else if (value.IsString()) {
                 builder[name] = std::string(value.GetString());
             }
