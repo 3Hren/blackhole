@@ -38,8 +38,8 @@ TEST_F(parser_test_case_t, CheckSinkConfigAfterParsing) {
     EXPECT_EQ("files", sink.type);
     EXPECT_EQ("test.log", sink["path"].to<std::string>());
     EXPECT_EQ("test.log.%N", sink["rotation"]["pattern"].to<std::string>());
-    EXPECT_EQ(5, sink["rotation"]["backups"].to<std::uint16_t>());
-    EXPECT_EQ(1000000, sink["rotation"]["size"].to<std::uint64_t>());
+    EXPECT_EQ(5, sink["rotation"]["backups"].to<int>());
+    EXPECT_EQ(1000000, sink["rotation"]["size"].to<int>());
 }
 
 TEST(parser_t, ThrowsExceptionIfFormatterSectionIsAbsent) {
