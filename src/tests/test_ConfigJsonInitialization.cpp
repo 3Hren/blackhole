@@ -84,6 +84,7 @@ protected:
         std::ifstream stream("config/valid.json");
         std::string valid((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
         doc.Parse<0>(valid.c_str());
+        ASSERT_FALSE(doc.HasParseError());
     }
 };
 
@@ -123,6 +124,7 @@ TEST(parser_t, ThrowsExceptionIfFormatterSectionIsAbsent) {
     std::string nonvalid((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     rapidjson::Document doc;
     doc.Parse<0>(nonvalid.c_str());
+    ASSERT_FALSE(doc.HasParseError());
     EXPECT_THROW(parser_t::parse(doc), blackhole::error_t);
 }
 
@@ -131,5 +133,6 @@ TEST(parser_t, ThrowsExceptionIfSinkSectionIsAbsent) {
     std::string nonvalid((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     rapidjson::Document doc;
     doc.Parse<0>(nonvalid.c_str());
+    ASSERT_FALSE(doc.HasParseError());
     EXPECT_THROW(parser_t::parse(doc), blackhole::error_t);
 }
