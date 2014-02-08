@@ -37,6 +37,7 @@ SET(SOURCES
     test_FileBackend
     test_FileRotationSizeWatcher
     test_FileRotationDateTimeWatcher
+    test_ConfigJsonInitialization
 )
 
 SET(Boost_USE_MULTITHREADED ON)
@@ -73,3 +74,5 @@ TARGET_LINK_LIBRARIES(${PROJECT}
 ADD_TEST(NAME blackhole-tests COMMAND blackhole-tests)
 
 ADD_DEFINITIONS(-std=c++0x)
+
+FILE(COPY config DESTINATION .)

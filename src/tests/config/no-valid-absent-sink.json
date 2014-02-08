@@ -1,0 +1,10 @@
+{
+    "root": [
+        {
+            "formatter": {
+                "type": "string",
+                "pattern": "[%(level)s]: %(message)s"
+            }
+        }
+    ]
+}

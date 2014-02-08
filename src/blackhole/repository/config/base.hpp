@@ -4,6 +4,8 @@
 
 #include <boost/any.hpp>
 
+#include "blackhole/factory.hpp"
+
 namespace blackhole {
 
 namespace repository {
@@ -15,9 +17,9 @@ struct base_t {
     boost::any config;
 
     base_t(const std::string& type) :
-        type(type)
+        type(type),
+        config(std::map<std::string, boost::any>())
     {
-        config = std::map<std::string, boost::any>();
     }
 
     struct builder_t {
@@ -40,13 +42,47 @@ struct base_t {
                 map = boost::any_cast<std::map<std::string, boost::any>>(&any);
             }
 
-            return builder_t { map->operator[](name) };
+            return builder_t { map->operator [](name) };
+        }
+    };
+
+    struct extractor_t {
+        const boost::any& any;
+
+        extractor_t operator [](const std::string& name) const {
+            auto* map = boost::any_cast<std::map<std::string, boost::any>>(&any);
+            if (!map) {
+                throw blackhole::error_t("not map");
+            }
+
+            return extractor_t { map->at(name) };
+        }
+
+        template<typename T>
+        void to(T& value) const {
+            try {
+                aux::any_to(any, value);
+            } catch (boost::bad_any_cast&) {
+                throw error_t("conversion error");
+            }
+        }
+
+        template<typename T>
+        T to() const {
+            T value;
+            to(value);
+            return value;
         }
     };
 
     builder_t operator [](const std::string& name) {
         auto& map = *boost::any_cast<std::map<std::string, boost::any>>(&config);
         return builder_t { map[name] };
+    }
+
+    extractor_t operator [](const std::string& name) const {
+        const auto& map = *boost::any_cast<std::map<std::string, boost::any>>(&config);
+        return extractor_t { map.at(name) };
     }
 };
 

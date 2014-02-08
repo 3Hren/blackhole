@@ -1,0 +1,19 @@
+{
+    "root": [
+        {
+            "formatter": {
+                "type": "string",
+                "pattern": "[%(level)s]: %(message)s"
+            },
+            "sink": {
+                "type": "files",
+                "path": "test.log",
+                "rotation": {
+                    "pattern": "test.log.%N",
+                    "backups": 5,
+                    "size": 1000000
+                }
+            }
+        }
+    ]
+}
