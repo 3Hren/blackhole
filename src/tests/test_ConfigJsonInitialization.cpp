@@ -1,40 +1,57 @@
 #include "Mocks.hpp"
 
-enum class int_convertion {
-    u16, u32, u64, i16, i32, i64
+namespace blackhole {
+
+namespace aux {
+
+namespace conversion {
+
+enum class integral {
+    uint16,
+    uint32,
+    uint64,
+    int16,
+    int32,
+    int64
 };
 
-static std::map<std::string, int_convertion> convertion = {
-    { "sink/files/rotation/backups", int_convertion::u16 },
-    { "sink/files/rotation/size", int_convertion::u64 }
+} // namespace conversion
+
+} // namespace aux
+
+static std::map<std::string, aux::conversion::integral> convertion = {
+    { "sink/files/rotation/backups", aux::conversion::integral::uint16 },
+    { "sink/files/rotation/size", aux::conversion::integral::uint64 }
 };
 
 template<class Builder, typename IntegralType>
 inline void convert(Builder& builder, const std::string& n, const std::string& full_name, IntegralType value) {
+    using namespace aux::conversion;
+
     auto it = convertion.find(full_name + "/" + n);
     if (it == convertion.end()) {
         builder[n] = static_cast<int>(value);
         return;
     }
 
-    int_convertion ic = it->second;
+    const integral ic = it->second;
     switch (ic) {
-    case int_convertion::u16:
+    case integral::uint16:
         builder[n] = static_cast<std::uint16_t>(value);
         break;
-    case int_convertion::u32:
+    case integral::uint32:
         builder[n] = static_cast<std::uint32_t>(value);
         break;
-    case int_convertion::u64:
+    case integral::uint64:
         builder[n] = static_cast<std::uint64_t>(value);
         break;
-    case int_convertion::i16:
+    case integral::int16:
         builder[n] = static_cast<std::int16_t>(value);
         break;
-    case int_convertion::i32:
+    case integral::int32:
         builder[n] = static_cast<std::int32_t>(value);
         break;
-    case int_convertion::i64:
+    case integral::int64:
         builder[n] = static_cast<std::int64_t>(value);
         break;
     default:
@@ -42,71 +59,114 @@ inline void convert(Builder& builder, const std::string& n, const std::string& f
     }
 }
 
-class parser_t {
+template<typename T>
+static void fill(T& builder, const rapidjson::Value& node, const std::string& full_name) {
+    for (auto it = node.MemberBegin(); it != node.MemberEnd(); ++it) {
+        const std::string& name = it->name.GetString();
+        const rapidjson::Value& value = it->value;
+
+        if (value.IsObject()) {
+            auto nested_builder = builder[name];
+            fill(nested_builder, value, full_name + "/" + name);
+        } else {
+            if (name == "type") {
+                continue;
+            }
+
+            if (value.IsBool()) {
+                builder[name] = value.GetBool();
+            } else if (value.IsInt()) {
+                convert(builder, name, full_name, value.GetInt());
+            } else if (value.IsUint()) {
+                convert(builder, name, full_name, value.GetUint());
+            } else if (value.IsInt64()) {
+                convert(builder, name, full_name, value.GetInt64());
+            } else if (value.IsUint64()) {
+                convert(builder, name, full_name, value.GetUint64());
+            } else if (value.IsDouble()) {
+                builder[name] = value.GetDouble();
+            } else if (value.IsString()) {
+                builder[name] = std::string(value.GetString());
+            }
+        }
+    }
+}
+
+template<class T>
+class parser_t;
+
+template<>
+class parser_t<repository::config::base_t> {
+public:
+    template<typename T>
+    static T parse(const std::string& name, const rapidjson::Value& value) {
+        const std::string& type = value["type"].GetString();
+        T config(type);
+        fill(config, value, name + "/" + type);
+        return config;
+    }
+};
+
+template<>
+class parser_t<formatter_config_t> {
+public:
+    static formatter_config_t parse(const rapidjson::Value& value) {
+        return parser_t<repository::config::base_t>::parse<formatter_config_t>("formatter", value);
+    }
+};
+
+template<>
+class parser_t<sink_config_t> {
+public:
+    static sink_config_t parse(const rapidjson::Value& value) {
+        return parser_t<repository::config::base_t>::parse<sink_config_t>("sink", value);
+    }
+};
+
+template<>
+class parser_t<frontend_config_t> {
+public:
+    static frontend_config_t parse(const rapidjson::Value& value) {
+        if (!(value.HasMember("formatter") && value.HasMember("sink"))) {
+            throw blackhole::error_t("both 'formatter' and 'sink' section must be specified");
+        }
+
+        const formatter_config_t& formatter = parser_t<formatter_config_t>::parse(value["formatter"]);
+        const sink_config_t& sink = parser_t<sink_config_t>::parse(value["sink"]);
+        return frontend_config_t { formatter, sink };
+    }
+};
+
+template<>
+class parser_t<log_config_t> {
+public:
+    static log_config_t parse(const std::string& name, const rapidjson::Value& value) {
+        log_config_t config;
+        config.name = name;
+        for (auto it = value.Begin(); it != value.End(); ++it) {
+            const frontend_config_t& frontend = parser_t<frontend_config_t>::parse(*it);
+            config.frontends.push_back(frontend);
+        }
+
+        return config;
+    }
+};
+
+template<>
+class parser_t<std::vector<log_config_t>> {
 public:
     static std::vector<log_config_t> parse(const rapidjson::Value& root) {
         std::vector<log_config_t> configs;
         for (auto it = root.MemberBegin(); it != root.MemberEnd(); ++it) {
-            log_config_t config;
-            config.name = it->name.GetString();
-
-            // Every frontend.
-            for (auto it2 = it->value.Begin(); it2 != it->value.End(); ++it2) {
-                const rapidjson::Value& frontend_node = *it2;
-
-                if (!(it2->HasMember("formatter") && it2->HasMember("sink"))) {
-                    throw blackhole::error_t("absent 'formatter' or 'sink' section");
-                }
-
-                // Extract formatter and sink.
-                const rapidjson::Value& formatter_node = frontend_node["formatter"];
-                formatter_config_t formatter_config(formatter_node["type"].GetString());
-                fill(formatter_config, formatter_node, std::string("formatter/") + formatter_config.type);
-
-                const rapidjson::Value& sink_node = frontend_node["sink"];
-                sink_config_t sink_config(sink_node["type"].GetString());
-                fill(sink_config, sink_node, std::string("sink/") + sink_config.type);
-
-                frontend_config_t frontend_config = { formatter_config, sink_config };
-                config.frontends.push_back(frontend_config);
-            }
+            const log_config_t& config = parser_t<log_config_t>::parse(it->name.GetString(), it->value);
             configs.push_back(config);
         }
 
         return configs;
     }
-
-    template<typename T>
-    static void fill(T& builder, const rapidjson::Value& node, const std::string& full_name) {
-        for (auto it = node.MemberBegin(); it != node.MemberEnd(); ++it) {
-            std::string n(it->name.GetString());
-            const rapidjson::Value& v = it->value;
-
-            if (v.IsObject()) {
-                auto b = builder[n];
-                fill(b, v, full_name + "/" + n);
-            } else {
-                if (n != "type") {
-                    if (v.IsBool()) {
-                        builder[n] = v.GetBool();
-                    } else if (v.IsInt()) {
-                        convert(builder, n, full_name, v.GetInt());
-                    } else if (v.IsInt64()) {
-                        convert(builder, n, full_name, v.GetInt64());
-                    } else if (v.IsUint()) {
-                        convert(builder, n, full_name, v.GetUint());
-                    } else if (v.IsUint64()) {
-                        convert(builder, n, full_name, v.GetUint64());
-                    } else if (v.IsDouble()) {
-                        builder[n] = v.GetDouble();
-                    } else if (v.IsString()) {
-                        builder[n] = std::string(v.GetString());
-                    }
-                }
-            }
-        }
-    }
 };
+
+}
 
 class parser_test_case_t : public Test {
 protected:
@@ -118,7 +178,7 @@ protected:
         rapidjson::Document doc;
         doc.Parse<0>(valid.c_str());
         ASSERT_FALSE(doc.HasParseError());
-        configs = parser_t::parse(doc);
+        configs = parser_t<std::vector<log_config_t>>::parse(doc);
     }
 };
 
@@ -154,7 +214,7 @@ TEST(parser_t, ThrowsExceptionIfFormatterSectionIsAbsent) {
     rapidjson::Document doc;
     doc.Parse<0>(nonvalid.c_str());
     ASSERT_FALSE(doc.HasParseError());
-    EXPECT_THROW(parser_t::parse(doc), blackhole::error_t);
+    EXPECT_THROW(parser_t<std::vector<log_config_t>>::parse(doc), blackhole::error_t);
 }
 
 TEST(parser_t, ThrowsExceptionIfSinkSectionIsAbsent) {
@@ -163,7 +223,7 @@ TEST(parser_t, ThrowsExceptionIfSinkSectionIsAbsent) {
     rapidjson::Document doc;
     doc.Parse<0>(nonvalid.c_str());
     ASSERT_FALSE(doc.HasParseError());
-    EXPECT_THROW(parser_t::parse(doc), blackhole::error_t);
+    EXPECT_THROW(parser_t<std::vector<log_config_t>>::parse(doc), blackhole::error_t);
 }
 
 TEST(parser_t, MultipleFrontends) {
@@ -173,7 +233,7 @@ TEST(parser_t, MultipleFrontends) {
     doc.Parse<0>(valid.c_str());
     ASSERT_FALSE(doc.HasParseError());
 
-    const std::vector<log_config_t>& configs = parser_t::parse(doc);
+    const std::vector<log_config_t>& configs = parser_t<std::vector<log_config_t>>::parse(doc);
     ASSERT_EQ(1, configs.size());
     EXPECT_EQ("root", configs.at(0).name);
     ASSERT_EQ(2, configs.at(0).frontends.size());
