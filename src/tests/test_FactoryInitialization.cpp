@@ -63,8 +63,8 @@ TEST(Repository, RotationFileStringsFrontendWithSizeWatcher) {
     sink["path"] = "/dev/stdout";
     sink["autoflush"] = true;
     sink["rotation"]["pattern"] = "%(filename)s.log.%N";
-    sink["rotation"]["backups"] = std::uint16_t(5);
-    sink["rotation"]["size"] = std::uint64_t(10 * 1024 * 1024);
+    sink["rotation"]["backups"] = 5;
+    sink["rotation"]["size"] = 10 * 1024 * 1024;
 
     EXPECT_TRUE(bool(factory.create(formatter, sink)));
 }
@@ -91,7 +91,7 @@ TEST(Factory, UdpSocketStringsFrontend) {
 
     sink_config_t sink("udp");
     sink["host"] = "localhost";
-    sink["port"] = std::uint16_t(50030);
+    sink["port"] = 50030;
 
     EXPECT_TRUE(bool(factory.create(formatter, sink)));
 }
@@ -107,7 +107,7 @@ TEST(Factory, TcpSocketStringsFrontend) {
     // an exception will be thrown, it's ok.
     sink_config_t sink("tcp");
     sink["host"] = "localhost";
-    sink["port"] = std::uint16_t(22);
+    sink["port"] = 22;
 
     EXPECT_TRUE(bool(factory.create(formatter, sink)));
 }
