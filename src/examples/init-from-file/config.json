@@ -1,0 +1,15 @@
+{
+    "root": [
+        {
+            "formatter": {
+                "type": "string",
+                "pattern": "[%(timestamp)s]: %(message)s (%(...L)s)"
+            },
+            "sink": {
+                "type": "files",
+                "path": "/dev/stdout",
+                "autoflush": true
+            }
+        }
+    ]
+}
