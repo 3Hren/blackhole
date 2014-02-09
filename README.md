@@ -8,8 +8,7 @@ Yet another logging library.
  - **Extremely fast.**
 
    Blackhole is designed to be the fastest logger in C++.
-   Dark template magic inside.
-   You are not paying for things you don't use.
+   This includes dark template magic inside, but you are not paying for things you don't use.
    
  - **Highly configurable.**
    
