@@ -20,6 +20,7 @@ Rotate both:
 //!@todo: api: Renaming repository methods.
 //!@todo: stream_t: Implement stream sink.
 //!@todo: example: Make stdout/string example with demonstration of formatting other attribute.
+//!@todo: api: More verbose error messages.
 
 //!@todo: feature: Verbosity filter from file.
 //!@todo: api: Ability to set global attribute mapper (?)
