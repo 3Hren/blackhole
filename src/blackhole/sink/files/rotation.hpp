@@ -45,7 +45,6 @@ public:
     }
 
     bool necessary(const std::string& message) const {
-        //!@todo: In case of datetime based rotation that's seems to be a bit difficult: get_current_time() >= current_fence().
         return watcher(backend, message);
     }
 
