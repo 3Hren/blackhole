@@ -29,7 +29,7 @@ struct datetime_t {
 
     datetime_t(period_t period = period_t::daily) :
         period(period),
-        previous(criteria())
+        previous(watch())
     {
     }
 
@@ -37,7 +37,7 @@ struct datetime_t {
 
     template<typename Backend>
     bool operator ()(Backend&, const std::string&) {
-        int current = criteria();
+        int current = watch();
         if (current != previous) {
             previous = current;
             return true;
@@ -47,7 +47,7 @@ struct datetime_t {
     }
 
 private:
-    int criteria() const {
+    int watch() const {
         const std::tm& timeinfo = picker.now();
 
         switch (period) {
