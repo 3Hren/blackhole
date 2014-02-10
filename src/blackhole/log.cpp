@@ -1,14 +1,4 @@
-//!@todo: files_t: Rotation condition.
-//! Sample config:
-/*!
-Rotate both:
-"rotate": {
-    "backups" 5,
-    "pattern": "%(filename)s.log.%N.%Y%M%d",
-    "size": 1000000,
-    "every": "d" [m, H, a, d, w, M, y]
-}
-*/
+//!@todo: files_t: Rotation condition. Rotate both.
 
 //!@todo: api: Renaming repository methods.
 //!@todo: stream_t: Implement stream sink.

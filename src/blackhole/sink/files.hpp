@@ -149,4 +149,21 @@ struct factory_traits<sink::files_t<Backend, sink::rotator_t<Backend, sink::rota
     }
 };
 
+template<class Backend>
+struct factory_traits<sink::files_t<Backend, sink::rotator_t<Backend, sink::rotation::watcher::datetime_t<>>>> {
+    typedef typename sink::files_t<Backend, sink::rotator_t<Backend, sink::rotation::watcher::datetime_t<>>> sink_type;
+    typedef typename sink_type::config_type config_type;
+
+    static config_type map_config(const boost::any& config) {
+        config_type cfg;
+        aux::extractor<sink_type> ex(config);
+        ex["path"].to(cfg.path);
+        ex["autoflush"].to(cfg.autoflush);
+        ex["rotation"]["pattern"].to(cfg.rotation.pattern);
+        ex["rotation"]["backups"].to(cfg.rotation.backups);
+        ex["rotation"]["period"].to(cfg.rotation.watcher.period);
+        return cfg;
+    }
+};
+
 } // namespace blackhole
