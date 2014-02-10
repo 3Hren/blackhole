@@ -30,10 +30,12 @@ struct datetime_t {
     datetime_t(period_t period = period_t::daily) :
         period(period),
         previous(watch())
-    {
-    }
+    {}
 
-    // "d" -> period_t. Create mapper.
+    datetime_t(const std::string& period) :
+        period(make_period(period)),
+        previous(watch())
+    {}
 
     template<typename Backend>
     bool operator ()(Backend&, const std::string&) {
@@ -64,6 +66,20 @@ private:
         }
 
         return timeinfo.tm_mday;
+    }
+
+    static period_t make_period(const std::string& period) {
+        if (period == "H") {
+            return period_t::hourly;
+        } else if (period == "d") {
+            return period_t::daily;
+        } else if (period == "w") {
+            return period_t::weekly;
+        } else if (period == "M") {
+            return period_t::monthly;
+        }
+
+        return period_t::daily;
     }
 };
 

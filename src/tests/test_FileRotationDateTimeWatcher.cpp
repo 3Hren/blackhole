@@ -51,3 +51,31 @@ TEST(datetime_t, TriggerWhenDailyCounterIncreases) {
 
     EXPECT_TRUE(watcher(backend, "message"));
 }
+
+TEST(datetime_t, NotTriggerIfDailyCounterTheSame) {
+    using namespace sink::rotation::watcher;
+
+    auto period = config_t<datetime_t<NiceMock<mock::time_picker_t>>>::period_t::daily;
+    datetime_t<NiceMock<mock::time_picker_t>> watcher(period);
+
+    NiceMock<mock::files::backend_t> backend;
+
+    std::tm timeinfo;
+    std::memset(&timeinfo, 0, sizeof(timeinfo));
+    timeinfo.tm_mday = 0;
+
+    EXPECT_CALL(watcher.picker, now())
+            .Times(1)
+            .WillOnce(Return(timeinfo));
+
+    EXPECT_FALSE(watcher(backend, "message"));
+}
+
+TEST(datetime_t, InitializationFromString) {
+    using namespace sink::rotation::watcher;
+
+    EXPECT_EQ(config_t<datetime_t<>>::period_t::hourly, datetime_t<>("H").period);
+    EXPECT_EQ(config_t<datetime_t<>>::period_t::daily, datetime_t<>("d").period);
+    EXPECT_EQ(config_t<datetime_t<>>::period_t::weekly, datetime_t<>("w").period);
+    EXPECT_EQ(config_t<datetime_t<>>::period_t::monthly, datetime_t<>("M").period);
+}
