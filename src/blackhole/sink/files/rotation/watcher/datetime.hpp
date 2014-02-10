@@ -20,22 +20,31 @@ struct time_picker_t {
 };
 
 template<class TimePicker = time_picker_t>
-struct datetime_t {
+class datetime_t {
     typedef typename config_t<datetime_t<TimePicker>>::period_t period_t;
 
-    TimePicker picker;
-    const period_t period;
+    TimePicker m_picker;
+    const period_t m_period;
     int previous;
 
+public:
     datetime_t(period_t period = period_t::daily) :
-        period(period),
+        m_period(period),
         previous(watch())
     {}
 
     datetime_t(const std::string& period) :
-        period(make_period(period)),
+        m_period(make_period(period)),
         previous(watch())
     {}
+
+    const TimePicker& picker() const {
+        return m_picker;
+    }
+
+    period_t period() const {
+        return m_period;
+    }
 
     template<typename Backend>
     bool operator ()(Backend&, const std::string&) {
@@ -50,9 +59,9 @@ struct datetime_t {
 
 private:
     int watch() const {
-        const std::tm& timeinfo = picker.now();
+        const std::tm& timeinfo = m_picker.now();
 
-        switch (period) {
+        switch (m_period) {
         case period_t::hourly:
             return timeinfo.tm_hour;
         case period_t::daily:

@@ -45,7 +45,7 @@ TEST(datetime_t, TriggerWhenDailyCounterIncreases) {
     std::memset(&timeinfo, 0, sizeof(timeinfo));
     timeinfo.tm_mday = 1;
 
-    EXPECT_CALL(watcher.picker, now())
+    EXPECT_CALL(watcher.picker(), now())
             .Times(1)
             .WillOnce(Return(timeinfo));
 
@@ -64,7 +64,7 @@ TEST(datetime_t, NotTriggerIfDailyCounterTheSame) {
     std::memset(&timeinfo, 0, sizeof(timeinfo));
     timeinfo.tm_mday = 0;
 
-    EXPECT_CALL(watcher.picker, now())
+    EXPECT_CALL(watcher.picker(), now())
             .Times(1)
             .WillOnce(Return(timeinfo));
 
@@ -74,8 +74,8 @@ TEST(datetime_t, NotTriggerIfDailyCounterTheSame) {
 TEST(datetime_t, InitializationFromString) {
     using namespace sink::rotation::watcher;
 
-    EXPECT_EQ(config_t<datetime_t<>>::period_t::hourly, datetime_t<>("H").period);
-    EXPECT_EQ(config_t<datetime_t<>>::period_t::daily, datetime_t<>("d").period);
-    EXPECT_EQ(config_t<datetime_t<>>::period_t::weekly, datetime_t<>("w").period);
-    EXPECT_EQ(config_t<datetime_t<>>::period_t::monthly, datetime_t<>("M").period);
+    EXPECT_EQ(config_t<datetime_t<>>::period_t::hourly, datetime_t<>("H").period());
+    EXPECT_EQ(config_t<datetime_t<>>::period_t::daily, datetime_t<>("d").period());
+    EXPECT_EQ(config_t<datetime_t<>>::period_t::weekly, datetime_t<>("w").period());
+    EXPECT_EQ(config_t<datetime_t<>>::period_t::monthly, datetime_t<>("M").period());
 }

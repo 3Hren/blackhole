@@ -13,8 +13,8 @@ namespace rotation {
 
 namespace watcher {
 
-struct size_t;
-template<class> struct datetime_t;
+class size_t;
+template<class> class datetime_t;
 
 template<class Watcher>
 struct config_t;
