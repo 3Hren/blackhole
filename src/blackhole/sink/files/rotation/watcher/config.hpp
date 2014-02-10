@@ -14,7 +14,7 @@ namespace rotation {
 namespace watcher {
 
 struct size_t;
-struct datetime_t;
+template<class> struct datetime_t;
 
 template<class Watcher>
 struct config_t;
@@ -28,8 +28,8 @@ struct config_t<watcher::size_t> {
     {}
 };
 
-template<>
-struct config_t<watcher::datetime_t> {
+template<class TimePicker>
+struct config_t<watcher::datetime_t<TimePicker>> {
     enum class period_t {
         hourly,
         daily,
@@ -40,8 +40,8 @@ struct config_t<watcher::datetime_t> {
     std::string marker;
 };
 
-template<>
-struct config_t<boost::mpl::set<watcher::size_t, watcher::datetime_t>> {
+template<class TimePicker>
+struct config_t<boost::mpl::set<watcher::size_t, watcher::datetime_t<TimePicker>>> {
     std::uint64_t size;
     std::string marker;
 
