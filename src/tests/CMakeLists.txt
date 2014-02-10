@@ -74,5 +74,3 @@ TARGET_LINK_LIBRARIES(${PROJECT}
 ADD_TEST(NAME blackhole-tests COMMAND blackhole-tests)
 
 ADD_DEFINITIONS(-std=c++0x)
-
-FILE(COPY config DESTINATION .)
