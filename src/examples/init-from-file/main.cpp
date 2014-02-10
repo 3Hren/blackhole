@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <blackhole/log.hpp>
 #include <blackhole/repository.hpp>
 #include <blackhole/repository/config/parser/rapidjson.hpp>
@@ -22,7 +24,7 @@ void init(const rapidjson::Document& root) {
 
 int main(int argc, char** argv) {
     if (argc != 2) {
-        std::cout << "Usage: blackhole-example-init-from-file PATH" << std::endl;
+        std::cerr << "Usage: blackhole-example-init-from-file PATH" << std::endl;
         return 1;
     }
 
