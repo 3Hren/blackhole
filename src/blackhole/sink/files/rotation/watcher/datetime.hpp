@@ -24,7 +24,7 @@ struct datetime_t {
     typedef typename config_t<datetime_t<TimePicker>>::period_t period_t;
 
     TimePicker picker;
-    period_t period;
+    const period_t period;
     int previous;
 
     datetime_t(period_t period = period_t::daily) :
