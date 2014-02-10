@@ -45,7 +45,7 @@ struct config_t<boost::mpl::set<watcher::size_t, watcher::datetime_t<TimePicker>
     std::uint64_t size;
     std::string marker;
 
-    config_t(std::uint64_t size = 1 * 1024 * 1024, const std::string& marker = std::string()) :
+    config_t(std::uint64_t size = 1 * 1024 * 1024, const std::string& marker = "d") :
         size(size),
         marker(marker)
     {}
