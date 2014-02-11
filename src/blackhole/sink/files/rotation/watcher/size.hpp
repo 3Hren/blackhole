@@ -13,10 +13,9 @@ namespace rotation {
 
 namespace watcher {
 
-class size_t {
+struct size_t {
     const std::uint64_t size;
 
-public:
     size_t(std::uint64_t size) :
         size(size)
     {}
