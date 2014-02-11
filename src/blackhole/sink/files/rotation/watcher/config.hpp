@@ -29,14 +29,22 @@ struct config_t<watcher::size_t> {
     {}
 };
 
+namespace datetime {
+
+//!@todo: Maybe pull out the class in separate namespace 'datetime'.
+enum class period_t {
+    hourly,
+    daily,
+    weekly,
+    monthly
+};
+
+} // namespace datetime
+
 template<class TimePicker>
 struct config_t<watcher::datetime_t<TimePicker>> {
-    enum class period_t {
-        hourly,
-        daily,
-        weekly,
-        monthly
-    };
+    std::string period;
+};
 
     std::string period;
 };

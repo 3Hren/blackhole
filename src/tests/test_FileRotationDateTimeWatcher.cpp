@@ -8,10 +8,10 @@ TEST(datetime_t, Class) {
 TEST(datetime_t, EnumInitialization) {
     using namespace sink::rotation::watcher;
 
-    datetime_t<> watcher1(config_t<datetime_t<>>::period_t::hourly);
-    datetime_t<> watcher2(config_t<datetime_t<>>::period_t::daily);
-    datetime_t<> watcher3(config_t<datetime_t<>>::period_t::weekly);
-    datetime_t<> watcher4(config_t<datetime_t<>>::period_t::monthly);
+    datetime_t<> watcher1(datetime::period_t::hourly);
+    datetime_t<> watcher2(datetime::period_t::daily);
+    datetime_t<> watcher3(datetime::period_t::weekly);
+    datetime_t<> watcher4(datetime::period_t::monthly);
 
     UNUSED(watcher1);
     UNUSED(watcher2);
@@ -36,7 +36,7 @@ public:
 TEST(datetime_t, TriggerWhenDailyCounterIncreases) {
     using namespace sink::rotation::watcher;
 
-    auto period = config_t<datetime_t<NiceMock<mock::time_picker_t>>>::period_t::daily;
+    auto period = datetime::period_t::daily;
     datetime_t<NiceMock<mock::time_picker_t>> watcher(period);
 
     NiceMock<mock::files::backend_t> backend;
@@ -55,7 +55,7 @@ TEST(datetime_t, TriggerWhenDailyCounterIncreases) {
 TEST(datetime_t, NotTriggerIfDailyCounterTheSame) {
     using namespace sink::rotation::watcher;
 
-    auto period = config_t<datetime_t<NiceMock<mock::time_picker_t>>>::period_t::daily;
+    auto period = datetime::period_t::daily;
     datetime_t<NiceMock<mock::time_picker_t>> watcher(period);
 
     NiceMock<mock::files::backend_t> backend;
@@ -74,8 +74,10 @@ TEST(datetime_t, NotTriggerIfDailyCounterTheSame) {
 TEST(datetime_t, InitializationFromString) {
     using namespace sink::rotation::watcher;
 
-    EXPECT_EQ(config_t<datetime_t<>>::period_t::hourly, datetime_t<>("H").period);
-    EXPECT_EQ(config_t<datetime_t<>>::period_t::daily, datetime_t<>("d").period);
-    EXPECT_EQ(config_t<datetime_t<>>::period_t::weekly, datetime_t<>("w").period);
-    EXPECT_EQ(config_t<datetime_t<>>::period_t::monthly, datetime_t<>("M").period);
+    EXPECT_EQ(datetime::period_t::hourly, datetime_t<>("H").period);
+    EXPECT_EQ(datetime::period_t::daily, datetime_t<>("d").period);
+    EXPECT_EQ(datetime::period_t::weekly, datetime_t<>("w").period);
+    EXPECT_EQ(datetime::period_t::monthly, datetime_t<>("M").period);
+}
+
 }

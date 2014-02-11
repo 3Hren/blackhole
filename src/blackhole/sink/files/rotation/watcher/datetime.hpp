@@ -21,12 +21,11 @@ struct time_picker_t {
 
 template<class TimePicker = time_picker_t>
 struct datetime_t {
-    typedef typename config_t<datetime_t<TimePicker>>::period_t period_t;
 
     TimePicker picker;
-    const period_t period;
+    const datetime::period_t period;
 
-    datetime_t(period_t period = period_t::daily) :
+    datetime_t(datetime::period_t period = datetime::period_t::daily) :
         period(period),
         previous(watch())
     {}
@@ -59,13 +58,13 @@ private:
         const std::tm& timeinfo = picker.now();
 
         switch (period) {
-        case period_t::hourly:
+        case datetime::period_t::hourly:
             return timeinfo.tm_hour;
-        case period_t::daily:
+        case datetime::period_t::daily:
             return timeinfo.tm_mday;
-        case period_t::weekly:
+        case datetime::period_t::weekly:
             return timeinfo.tm_wday;
-        case period_t::monthly:
+        case datetime::period_t::monthly:
             return timeinfo.tm_mon;
         default:
             break;
@@ -76,18 +75,18 @@ private:
 
     class period_factory_t {
     public:
-        static period_t get(const std::string& period) {
+        static datetime::period_t get(const std::string& period) {
             if (period == "H") {
-                return period_t::hourly;
+                return datetime::period_t::hourly;
             } else if (period == "d") {
-                return period_t::daily;
+                return datetime::period_t::daily;
             } else if (period == "w") {
-                return period_t::weekly;
+                return datetime::period_t::weekly;
             } else if (period == "M") {
-                return period_t::monthly;
+                return datetime::period_t::monthly;
             }
 
-            return period_t::daily;
+            return datetime::period_t::daily;
         }
     };
 };
