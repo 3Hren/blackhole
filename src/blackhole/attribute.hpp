@@ -36,9 +36,9 @@ typedef boost::variant<
 namespace attribute {
 
 enum class scope : std::uint8_t {
-    local       = 1 << 0,   /* user-defined event attributes*/
+    local       = 1 << 0,   /* user-defined event attributes */
     event       = 1 << 1,   /* not user-defined event attributes, like timestamp or message */
-    global      = 1 << 2,   /* logger object attributes*/
+    global      = 1 << 2,   /* logger object attributes */
     thread      = 1 << 3,   /* thread attributes */
     universe    = 1 << 4    /* singleton attributes for entire application */
 };
