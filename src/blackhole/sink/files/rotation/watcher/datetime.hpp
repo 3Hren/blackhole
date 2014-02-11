@@ -34,12 +34,12 @@ public:
     {}
 
     datetime_t(const std::string& period) :
-        m_period(make_period(period)),
+        m_period(period_factory_t::get(period)),
         previous(watch())
     {}
 
     datetime_t(const config_t<datetime_t<TimePicker>>& config) :
-        m_period(make_period(config.period)),
+        m_period(period_factory_t::get(config.period)),
         previous(watch())
     {}
 
@@ -82,20 +82,22 @@ private:
         return timeinfo.tm_mday;
     }
 
-    //!@todo: rename?
-    static period_t make_period(const std::string& period) {
-        if (period == "H") {
-            return period_t::hourly;
-        } else if (period == "d") {
-            return period_t::daily;
-        } else if (period == "w") {
-            return period_t::weekly;
-        } else if (period == "M") {
-            return period_t::monthly;
-        }
+    class period_factory_t {
+    public:
+        static period_t get(const std::string& period) {
+            if (period == "H") {
+                return period_t::hourly;
+            } else if (period == "d") {
+                return period_t::daily;
+            } else if (period == "w") {
+                return period_t::weekly;
+            } else if (period == "M") {
+                return period_t::monthly;
+            }
 
-        return period_t::daily;
-    }
+            return period_t::daily;
+        }
+    };
 };
 
 } // namespace watcher
