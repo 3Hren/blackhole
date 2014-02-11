@@ -108,4 +108,53 @@ TEST(watcher_set, TriggerIfDailyCounterIncreasesButSizeNot) {
 
     EXPECT_TRUE(w(backend, "message"));
 }
+
+TEST(watcher_set, TriggerIfDailyCounterNotIncreasesButSizeIs) {
+    using namespace sink::rotation;
+    typedef watcher::watcher_set<
+        watcher::size_t,
+        watcher::datetime_t<NiceMock<mock::time_picker_t>>
+    > watcher_type;
+
+    watcher::config_t<watcher_type> config;
+    config.size = 1024;
+    config.period = "d";
+
+    watcher_type w(config);
+
+    NiceMock<mock::files::backend_t> backend;
+    EXPECT_CALL(backend, filename())
+            .WillOnce(Return("test.log"));
+    EXPECT_CALL(backend, size(std::string("test.log")))
+            .WillOnce(Return(1024 - std::string("message").size()));
+    // Datetime watcher won't be called, because size watcher succeed.
+    EXPECT_CALL(w.picker, now())
+            .Times(0);
+
+    EXPECT_TRUE(w(backend, "message"));
 }
+
+TEST(watcher_set, NotTriggerIfBothWatchersNotTriggers) {
+    using namespace sink::rotation;
+    typedef watcher::watcher_set<
+        watcher::size_t,
+        watcher::datetime_t<NiceMock<mock::time_picker_t>>
+    > watcher_type;
+
+    watcher::config_t<watcher_type> config;
+    config.size = 1024;
+    config.period = "d";
+
+    watcher_type w(config);
+
+    NiceMock<mock::files::backend_t> backend;
+    EXPECT_CALL(backend, filename())
+            .WillOnce(Return("test.log"));
+    EXPECT_CALL(backend, size(std::string("test.log")))
+            .WillOnce(Return(1024 - std::string("message").size() - 1));
+    EXPECT_CALL(w.picker, now())
+            .Times(1);
+
+    EXPECT_FALSE(w(backend, "message"));
+}
+
