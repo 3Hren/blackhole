@@ -20,7 +20,8 @@ struct size_t {
         size(size)
     {}
 
-    size_t(const config_t<size_t>& config) :
+    template<typename T>
+    size_t(const config_t<T>& config) :
         size(config.size)
     {}
 

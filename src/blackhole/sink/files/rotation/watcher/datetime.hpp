@@ -35,7 +35,8 @@ struct datetime_t {
         previous(watch())
     {}
 
-    datetime_t(const config_t<datetime_t<TimePicker>>& config) :
+    template<class T>
+    datetime_t(const config_t<T>& config) :
         period(period_factory_t::get(config.period)),
         previous(watch())
     {}
@@ -89,6 +90,29 @@ private:
             return datetime::period_t::daily;
         }
     };
+};
+
+template<class... Watchers>
+struct watcher_set : public Watchers... {
+    watcher_set(const config_t<watcher_set<Watchers...>>& config) :
+        Watchers(config)...
+    {}
+
+    template<class Backend>
+    bool operator()(Backend& backend, const std::string& message) const {
+        return invoke<Backend, Watchers...>(backend, message);
+    }
+
+private:
+    template<class Backend, class T, class... Args>
+    bool invoke(Backend& backend, const std::string& message) const {
+        return T::operator()(backend, message) || invoke<Backend, Args...>(backend, message);
+    }
+
+    template<class Backend>
+    bool invoke(Backend&, const std::string&) const {
+        return false;
+    }
 };
 
 } // namespace watcher

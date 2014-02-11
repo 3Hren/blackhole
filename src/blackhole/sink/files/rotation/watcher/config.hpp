@@ -46,6 +46,9 @@ struct config_t<watcher::datetime_t<TimePicker>> {
     std::string period;
 };
 
+template<class... Args>
+struct config_t<watcher_set<Args...>> {
+    std::uint64_t size;
     std::string period;
 };
 
