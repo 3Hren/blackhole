@@ -108,6 +108,31 @@ TEST(Repository, RotationFileStringsFrontendWithDatetimeWatcher) {
     EXPECT_TRUE(bool(factory.create(formatter, sink)));
 }
 
+TEST(Repository, ThrowsExceptionIfRotationWatcherNotSpecified) {
+    group_factory_t<level> factory;
+    factory.add<
+        sink::files_t<
+            sink::files::boost_backend_t,
+            sink::rotator_t<
+                sink::files::boost_backend_t,
+                sink::rotation::watcher::datetime_t<>
+            >
+        >,
+        formatter::string_t
+    >();
+
+    formatter_config_t formatter("string");
+    formatter["pattern"] = "[%(timestamp)s]: %(message)s";
+
+    sink_config_t sink("files");
+    sink["path"] = "/dev/stdout";
+    sink["autoflush"] = true;
+    sink["rotation"]["pattern"] = "%(filename)s.log.%N";
+    sink["rotation"]["backups"] = 5;
+
+    EXPECT_THROW(factory.create(formatter, sink), blackhole::error_t);
+}
+
 TEST(Factory, SyslogStringsFrontend) {
     group_factory_t<level> factory;
     factory.add<sink::syslog_t<level>, formatter::string_t>();

@@ -109,6 +109,8 @@ struct id<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
             } else if (has_datetime_watcher) {
                 return utils::format("%s/%s/%s", sink_type::name(), rotator_type::name(), "datetime");
             }
+
+            throw blackhole::error_t("rotation section not properly configures: no watcher settings found");
         }
 
         return sink_type::name();
