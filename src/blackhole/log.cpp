@@ -1,11 +1,11 @@
-//!@todo: api: Renaming repository methods.
-//!@todo: stream_t: Implement stream sink.
-//!@todo: example: Make stdout/string example with demonstration of formatting other attribute.
-//!@todo: api: More verbose error messages.
+//!@todo: stream_t: Implement stream sink.(!)
+//!@todo: example: Make stdout/string example with demonstration of formatting other attribute.(!)
+//!@todo: api: More verbose error messages.(!)
+//!@todo: api: Renaming repository methods.(!)
 
-//!@todo: feature: Verbosity filter from file.
+//!@todo: feature: Verbosity filter from file.(2d)
 //!@todo: api: Ability to set global attribute mapper (?)
-//!@todo: api: Microseconds support in timestamps.
+//!@todo: api: Microseconds support in timestamps.(1-2h)
 
 //!@todo: benchmark: File logging comparing with boost::log.
 //!@todo: benchmark: Socket logging with json.

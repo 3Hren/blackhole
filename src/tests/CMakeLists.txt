@@ -35,9 +35,10 @@ SET(SOURCES
     test_FileRotation
     test_FileRotationNaming
     test_FileBackend
+    test_ConfigJsonInitialization
     test_FileRotationSizeWatcher
     test_FileRotationDateTimeWatcher
-    test_ConfigJsonInitialization
+    test_StreamSink
 )
 
 SET(Boost_USE_MULTITHREADED ON)
