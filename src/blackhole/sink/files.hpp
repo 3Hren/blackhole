@@ -90,14 +90,14 @@ struct id<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
     typedef sink::rotator_t<Backend, Watcher> rotator_type;
     typedef sink::files_t<Backend, rotator_type> sink_type;
 
+    typedef std::map<std::string, boost::any> variant_map_t;
+
     static std::string extract(const boost::any& config) {
-        const std::map<std::string, boost::any>& cfg =
-                boost::any_cast<std::map<std::string, boost::any>>(config);
+        const variant_map_t& cfg = boost::any_cast<variant_map_t>(config);
 
         auto rotation_it = cfg.find("rotation");
         if (rotation_it != cfg.end()) {
-            const std::map<std::string, boost::any>& rotation =
-                    boost::any_cast<std::map<std::string, boost::any>>(rotation_it->second);
+            const variant_map_t& rotation = boost::any_cast<variant_map_t>(rotation_it->second);
 
             const bool has_size_watcher = rotation.find("size") != rotation.end();
             const bool has_datetime_watcher = rotation.find("period") != rotation.end();
