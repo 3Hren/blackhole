@@ -47,9 +47,7 @@ struct config_traits {
     }
 };
 
-template<typename T>
-struct factory_traits {
-    static typename T::config_type map_config(const boost::any& config);
-};
+template<class T>
+struct factory_traits;
 
 } // namespace blackhole
