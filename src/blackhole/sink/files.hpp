@@ -91,20 +91,22 @@ struct id<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
     typedef sink::files_t<Backend, rotator_type> sink_type;
 
     static std::string extract(const boost::any& config) {
-        std::map<std::string, boost::any> cfg;
-        aux::any_to(config, cfg);
+        const std::map<std::string, boost::any>& cfg =
+                boost::any_cast<std::map<std::string, boost::any>>(config);
 
-        if (cfg.find("rotation") != cfg.end()) {
-            std::map<std::string, boost::any> rotation;
-            aux::any_to(cfg["rotation"], rotation);
-            auto size_it = rotation.find("size");
-            auto period_it = rotation.find("period");
+        auto rotation_it = cfg.find("rotation");
+        if (rotation_it != cfg.end()) {
+            const std::map<std::string, boost::any>& rotation =
+                    boost::any_cast<std::map<std::string, boost::any>>(rotation_it->second);
 
-            if (size_it != rotation.end() && period_it != rotation.end()) {
+            const bool has_size_watcher = rotation.find("size") != rotation.end();
+            const bool has_datetime_watcher = rotation.find("period") != rotation.end();
+
+            if (has_size_watcher && has_datetime_watcher) {
                 throw blackhole::error_t("set watcher is not implemented yet");
-            } else if (size_it != rotation.end()) {
+            } else if (has_size_watcher) {
                 return utils::format("%s/%s/%s", sink_type::name(), rotator_type::name(), "size");
-            } else if (period_it != rotation.end()) {
+            } else if (has_datetime_watcher) {
                 return utils::format("%s/%s/%s", sink_type::name(), rotator_type::name(), "datetime");
             }
         }
