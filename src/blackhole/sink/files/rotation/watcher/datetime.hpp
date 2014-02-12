@@ -21,6 +21,9 @@ struct time_picker_t {
 
 template<class TimePicker = time_picker_t>
 struct datetime_t {
+    static const char* name() {
+        return "datetime";
+    }
 
     TimePicker picker;
     const datetime::period_t period;
@@ -92,8 +95,13 @@ private:
     };
 };
 
+//!@todo: Move to the separate file.
 template<class... Watchers>
 struct watcher_set : public Watchers... {
+    static const char* name() {
+        return "set";
+    }
+
     watcher_set(const config_t<watcher_set<Watchers...>>& config) :
         Watchers(config)...
     {}

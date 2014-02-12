@@ -87,15 +87,26 @@ namespace generator {
 
 template<class Backend, class Watcher>
 struct id<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
-    static std::string extract(const boost::any& config) {
-        typedef sink::rotator_t<Backend, Watcher> rotator_type;
-        typedef sink::files_t<Backend, rotator_type> sink_type;
+    typedef sink::rotator_t<Backend, Watcher> rotator_type;
+    typedef sink::files_t<Backend, rotator_type> sink_type;
 
+    static std::string extract(const boost::any& config) {
         std::map<std::string, boost::any> cfg;
         aux::any_to(config, cfg);
 
         if (cfg.find("rotation") != cfg.end()) {
-            return utils::format("%s/%s", sink_type::name(), rotator_type::name());
+            std::map<std::string, boost::any> rotation;
+            aux::any_to(cfg["rotation"], rotation);
+            auto size_it = rotation.find("size");
+            auto period_it = rotation.find("period");
+
+            if (size_it != rotation.end() && period_it != rotation.end()) {
+                throw blackhole::error_t("set watcher is not implemented yet");
+            } else if (size_it != rotation.end()) {
+                return utils::format("%s/%s/%s", sink_type::name(), rotator_type::name(), "size");
+            } else if (period_it != rotation.end()) {
+                return utils::format("%s/%s/%s", sink_type::name(), rotator_type::name(), "datetime");
+            }
         }
 
         return sink_type::name();
@@ -111,10 +122,13 @@ struct config_traits<sink::files_t<Backend, sink::NoRotation>> {
     }
 };
 
-template<class Backend, class Rotator>
-struct config_traits<sink::files_t<Backend, Rotator>> {
+template<class Backend, class Watcher>
+struct config_traits<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
+    typedef sink::rotator_t<Backend, Watcher> rotator_type;
+    typedef sink::files_t<Backend, rotator_type> sink_type;
+
     static std::string name() {
-        return utils::format("%s/%s", sink::files_t<Backend, Rotator>::name(), Rotator::name());
+        return utils::format("%s/%s/%s", sink_type::name(), rotator_type::name(), Watcher::name());
     }
 };
 

@@ -14,6 +14,10 @@ namespace rotation {
 namespace watcher {
 
 struct size_t {
+    static const char* name() {
+        return "size";
+    }
+
     const std::uint64_t size;
 
     size_t(std::uint64_t size) :
