@@ -29,6 +29,19 @@ struct priority_traits<testing::level> {
 
 } } // namespace blackhole::sink
 
+TEST(Factory, StreamStringsFrontend) {
+    group_factory_t<level> factory;
+    factory.add<sink::stream_t, formatter::string_t>();
+
+    formatter_config_t formatter("string");
+    formatter["pattern"] = "[%(timestamp)s]: %(message)s";
+
+    sink_config_t sink("stream");
+    sink["output"] = "stdout";
+
+    EXPECT_TRUE(bool(factory.create(formatter, sink)));
+}
+
 TEST(Factory, FileStringsFrontend) {
     group_factory_t<level> factory;
     factory.add<sink::files_t<>, formatter::string_t>();
