@@ -5,6 +5,8 @@
 
 #include <boost/assert.hpp>
 
+#include <blackhole/factory.hpp>
+
 namespace blackhole {
 
 namespace sink {
