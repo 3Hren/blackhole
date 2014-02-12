@@ -101,6 +101,9 @@ struct cast_traits<T, typename std::enable_if<is_supported_integer<T>::value>::t
     }
 };
 
+template<class T>
+struct filler;
+
 template<typename Sink>
 struct extractor {
     boost::any source;

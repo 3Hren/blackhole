@@ -136,6 +136,28 @@ struct config_traits<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> 
     }
 };
 
+namespace aux {
+
+template<class Backend, class Rotator>
+struct filler<sink::files_t<Backend, Rotator>> {
+    template<class Extractor, class Config>
+    static void fill(const Extractor& ex, Config& config) {
+        ex["path"].to(config.path);
+        ex["autoflush"].to(config.autoflush);
+    }
+};
+
+template<class Backend, class Watcher>
+struct filler<sink::rotator_t<Backend, Watcher>> {
+    template<class Extractor, class Config>
+    static void fill(const Extractor& ex, Config& config) {
+        ex["rotation"]["pattern"].to(config.rotation.pattern);
+        ex["rotation"]["backups"].to(config.rotation.backups);
+    }
+};
+
+} // namespace aux
+
 template<class Backend>
 struct factory_traits<sink::files_t<Backend>> {
     typedef sink::files_t<Backend> sink_type;
@@ -144,24 +166,23 @@ struct factory_traits<sink::files_t<Backend>> {
     static config_type map_config(const boost::any& config) {
         config_type cfg;
         aux::extractor<sink::files_t<Backend>> ex(config);
-        ex["path"].to(cfg.path);
-        ex["autoflush"].to(cfg.autoflush);
+        aux::filler<sink_type>::fill(ex, cfg);
         return cfg;
     }
 };
 
 template<class Backend>
 struct factory_traits<sink::files_t<Backend, sink::rotator_t<Backend, sink::rotation::watcher::size_t>>> {
-    typedef typename sink::files_t<Backend, sink::rotator_t<Backend, sink::rotation::watcher::size_t>> sink_type;
+    typedef sink::rotation::watcher::size_t watcher_type;
+    typedef sink::rotator_t<Backend, watcher_type> rotator_type;
+    typedef sink::files_t<Backend, rotator_type> sink_type;
     typedef typename sink_type::config_type config_type;
 
     static config_type map_config(const boost::any& config) {
         config_type cfg;
         aux::extractor<sink_type> ex(config);
-        ex["path"].to(cfg.path);
-        ex["autoflush"].to(cfg.autoflush);
-        ex["rotation"]["pattern"].to(cfg.rotation.pattern);
-        ex["rotation"]["backups"].to(cfg.rotation.backups);
+        aux::filler<sink_type>::fill(ex, cfg);
+        aux::filler<rotator_type>::fill(ex, cfg);
         ex["rotation"]["size"].to(cfg.rotation.watcher.size);
         return cfg;
     }
@@ -169,16 +190,16 @@ struct factory_traits<sink::files_t<Backend, sink::rotator_t<Backend, sink::rota
 
 template<class Backend>
 struct factory_traits<sink::files_t<Backend, sink::rotator_t<Backend, sink::rotation::watcher::datetime_t<>>>> {
-    typedef typename sink::files_t<Backend, sink::rotator_t<Backend, sink::rotation::watcher::datetime_t<>>> sink_type;
+    typedef sink::rotation::watcher::datetime_t<> watcher_type;
+    typedef sink::rotator_t<Backend, watcher_type> rotator_type;
+    typedef sink::files_t<Backend, rotator_type> sink_type;
     typedef typename sink_type::config_type config_type;
 
     static config_type map_config(const boost::any& config) {
         config_type cfg;
         aux::extractor<sink_type> ex(config);
-        ex["path"].to(cfg.path);
-        ex["autoflush"].to(cfg.autoflush);
-        ex["rotation"]["pattern"].to(cfg.rotation.pattern);
-        ex["rotation"]["backups"].to(cfg.rotation.backups);
+        aux::filler<sink_type>::fill(ex, cfg);
+        aux::filler<rotator_type>::fill(ex, cfg);
         ex["rotation"]["period"].to(cfg.rotation.watcher.period);
         return cfg;
     }
