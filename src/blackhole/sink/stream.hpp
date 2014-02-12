@@ -79,7 +79,7 @@ private:
 template<>
 struct factory_traits<sink::stream_t> {
     typedef sink::stream_t sink_type;
-    typedef typename sink_type::config_type config_type;
+    typedef sink_type::config_type config_type;
 
     static config_type map_config(const boost::any& config) {
         config_type cfg;
