@@ -40,7 +40,7 @@ struct config_traits {
     //! \brief Statically maps sink or formatter type into unique key.
     /*! It contains information about its backends and strategies.
      * For example: file sink with rotation is mapped into: `files/rotate`.
-     * Without rotation it wile be just: `files`.
+     * Without rotation it will be just: `files`.
      */
     static std::string name() {
         return T::name();
@@ -48,6 +48,10 @@ struct config_traits {
 };
 
 template<class T>
-struct factory_traits;
+struct factory_traits {
+    static_assert(sizeof(T) == -1,
+                  "You should create 'factory_traits' template specialization for "
+                  "your type to properly map generic config object on real config.");
+};
 
 } // namespace blackhole
