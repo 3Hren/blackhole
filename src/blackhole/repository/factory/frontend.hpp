@@ -12,7 +12,7 @@
 
 namespace blackhole {
 
-template<typename T>
+template<class T>
 struct traits {
     typedef std::unique_ptr<base_frontend_t> return_type;
     typedef return_type(*function_type)(const formatter_config_t&, std::unique_ptr<T>);
@@ -25,19 +25,19 @@ template<typename Level>
 struct function_keeper_t {
     std::unordered_map<std::string, boost::any> functions;
 
-    template<typename Sink, typename Formatter>
+    template<class Sink, class Formatter>
     void add() {
         typedef typename traits<Sink>::function_type function_type;
         function_type function = static_cast<function_type>(&factory_t<Level>::template create<Formatter>);
         functions[Sink::name()] = function;
     }
 
-    template<typename Sink>
+    template<class Sink>
     bool has() const {
         return functions.find(Sink::name()) != functions.end();
     }
 
-    template<typename Sink>
+    template<class Sink>
     typename traits<Sink>::function_type get() const {
         boost::any any = functions.at(Sink::name());
         return boost::any_cast<typename traits<Sink>::function_type>(any);
@@ -49,7 +49,7 @@ class frontend_factory_t {
     mutable std::mutex mutex;
     std::unordered_map<std::string, function_keeper_t<Level>> factories;
 public:
-    template<typename Sink, typename Formatter>
+    template<class Sink, class Formatter>
     void add() {
         std::lock_guard<std::mutex> lock(mutex);
 
@@ -64,14 +64,14 @@ public:
         }
     }
 
-    template<typename Sink, typename Formatter>
+    template<class Sink, class Formatter>
     bool has() const {
         std::lock_guard<std::mutex> lock(mutex);
         auto it = factories.find(Formatter::name());
         return it != factories.end() && it->second.template has<Sink>();
     }
 
-    template<typename Sink>
+    template<class Sink>
     typename traits<Sink>::return_type
     create(const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink) const {
         typedef typename traits<Sink>::return_type return_type;
