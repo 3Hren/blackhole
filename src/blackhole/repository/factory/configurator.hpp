@@ -2,7 +2,7 @@
 
 #include <boost/mpl/for_each.hpp>
 
-#include "blackhole/repository/factory/id.hpp"
+#include "blackhole/utils/meta.hpp"
 
 namespace blackhole {
 
@@ -31,7 +31,7 @@ struct configurator<
     template<typename Level>
     static void execute(group_factory_t<Level>& factory) {
         aux::registrator::group<Level> action {factory};
-        boost::mpl::for_each<Sinks, aux::mpl::id<boost::mpl::_, Formatters>>(action);
+        boost::mpl::for_each<Sinks, meta::holder<boost::mpl::_, Formatters>>(action);
     }
 };
 
@@ -44,7 +44,7 @@ struct group {
     group_factory_t<Level>& factory;
 
     template<typename Sink, typename Formatters>
-    void operator ()(aux::mpl::id<Sink, Formatters>) const {
+    void operator ()(meta::holder<Sink, Formatters>) const {
         configurator<Sink, Formatters>::execute(factory);
     }
 };
@@ -54,7 +54,7 @@ struct frontend {
     frontend_factory_t<Level>& factory;
 
     template<typename Sink, typename Formatter>
-    void operator ()(aux::mpl::id<Sink, Formatter>) const {
+    void operator ()(meta::holder<Sink, Formatter>) const {
         factory.template add<Sink, Formatter>();
     }
 };

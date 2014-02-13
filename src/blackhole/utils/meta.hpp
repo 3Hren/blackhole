@@ -31,4 +31,6 @@ struct from_variadic<> {
 
 } // namespace vector
 
+template<class T1, class T2> struct holder {};
+
 } // namespace meta

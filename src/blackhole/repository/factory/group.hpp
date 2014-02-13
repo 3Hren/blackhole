@@ -31,7 +31,7 @@ struct frontend_repository<Sink, Formatters, typename std::enable_if<boost::mpl:
         aux::registrator::frontend<Level> action { factory };
         boost::mpl::for_each<
             Formatters,
-            aux::mpl::id<Sink, boost::mpl::_>
+            meta::holder<Sink, boost::mpl::_>
         >(action);
     }
 };
