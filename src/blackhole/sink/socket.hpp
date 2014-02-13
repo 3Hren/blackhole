@@ -3,7 +3,7 @@
 #include "socket/udp.hpp"
 #include "socket/tcp.hpp"
 
-#include "blackhole/factory.hpp"
+#include "blackhole/repository/factory/traits.hpp"
 
 namespace blackhole {
 

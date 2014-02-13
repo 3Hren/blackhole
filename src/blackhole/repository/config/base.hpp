@@ -4,8 +4,6 @@
 
 #include <boost/any.hpp>
 
-#include "blackhole/factory.hpp"
-
 namespace blackhole {
 
 namespace repository {

@@ -5,7 +5,7 @@
 
 #include <boost/assert.hpp>
 
-#include "blackhole/factory.hpp"
+#include "blackhole/repository/factory/traits.hpp"
 
 namespace blackhole {
 

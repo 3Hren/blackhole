@@ -13,22 +13,6 @@ class frontend_factory_t;
 
 class base_frontend_t;
 
-namespace aux {
-//!@todo: Move into separate file!
-template<class T>
-struct config_mapper {
-    typedef typename T::config_type config_type;
-
-    static config_type map(const boost::any& input) {
-        const aux::extractor<T> extractor(input);
-        config_type config;
-        factory_traits<T>::map_config(extractor, config);
-        return config;
-    }
-};
-
-} // namespace aux
-
 template<typename Level>
 struct factory_t {
     template<class Formatter, class Sink>

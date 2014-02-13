@@ -31,7 +31,6 @@ struct config_t<watcher::size_t> {
 
 namespace datetime {
 
-//!@todo: Maybe pull out the class in separate namespace 'datetime'.
 enum class period_t {
     hourly,
     daily,

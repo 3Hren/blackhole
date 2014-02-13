@@ -5,7 +5,7 @@
 #include <string>
 
 #include "blackhole/error.hpp"
-#include "blackhole/factory.hpp"
+#include "blackhole/repository/factory/traits.hpp"
 
 namespace blackhole {
 

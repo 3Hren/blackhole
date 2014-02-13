@@ -1,6 +1,6 @@
 #pragma once
 
-#include "blackhole/factory.hpp"
+#include "blackhole/repository/factory/traits.hpp"
 #include "blackhole/sink/files/backend.hpp"
 #include "blackhole/sink/files/config.hpp"
 #include "blackhole/sink/files/flusher.hpp"
