@@ -304,3 +304,33 @@ TEST(Repository, CombinationConfiguring) {
     EXPECT_TRUE(available);
     repository.clear();
 }
+
+TEST(Repository, ThrowsExceptionWhenSinkIsRegisteredButItsUniqueNameIsDifferent) {
+    auto& repo = repository_t<level>::instance();
+
+    formatter_config_t formatter("string");
+    formatter["pattern"] = "[%(timestamp)s]: %(message)s";
+
+    sink_config_t sink("files");
+    sink["path"] = "/dev/stdout";
+    sink["autoflush"] = true;
+    sink["rotation"]["size"] = 1000;
+
+    frontend_config_t frontend = { formatter, sink };
+    log_config_t config = { "root", { frontend } };
+
+    repo.configure<
+        sink::files_t<
+            sink::files::boost_backend_t,
+            sink::rotator_t<
+                sink::files::boost_backend_t,
+                sink::rotation::watcher::size_t
+            >
+        >,
+        formatter::string_t
+    >();
+    repo.add_config(config);
+
+    EXPECT_THROW(repo.create("root"), blackhole::error_t);
+    repo.clear();
+}

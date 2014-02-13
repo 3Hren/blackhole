@@ -71,8 +71,12 @@ public:
 
         const std::string& config_name = it->second(sink_config.config);
 
-        BOOST_ASSERT(sinks.find(config_name) != sinks.end());
-        const factory_type& fn = sinks.at(config_name);
+        auto cit = sinks.find(config_name);
+        if (cit == sinks.end()) {
+            throw error_t("sink '%s' is not properly configured: found '%s' subtype, but other is required", sink_config.type, config_name);
+        }
+
+        const factory_type& fn = cit->second;
         return fn(factory, formatter_config, sink_config);
     }
 
