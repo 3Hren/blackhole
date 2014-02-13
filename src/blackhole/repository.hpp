@@ -45,7 +45,7 @@ public:
         configs.clear();
     }
 
-    void init(log_config_t config) {
+    void add_config(const log_config_t& config) {
         std::lock_guard<std::mutex> lock(mutex);
         configs[config.name] = config;
     }
@@ -73,7 +73,7 @@ public:
 private:
     repository_t() {
         configure<sink::stream_t, formatter::string_t>();
-        init(repository::config::trivial());
+        add_config(repository::config::trivial());
     }
 };
 

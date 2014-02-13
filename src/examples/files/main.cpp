@@ -37,7 +37,7 @@ void init() {
     frontend_config_t frontend = { formatter, sink };
     log_config_t config{ "root", { frontend } };
 
-    repository_t<level>::instance().init(config);
+    repository_t<level>::instance().add_config(config);
 }
 
 int main(int, char**) {

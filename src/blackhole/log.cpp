@@ -1,5 +1,4 @@
 //!@todo: api: More verbose error messages.(!)
-//!@todo: api: Renaming repository methods.(!)
 
 //!@todo: feature: Verbosity filter from file.(2d)
 //!@todo: api: Ability to set global attribute mapper (?)

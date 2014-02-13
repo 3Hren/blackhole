@@ -189,20 +189,20 @@ log_config_t create_valid_config() {
 
 TEST(Repository, InitializationFromSettings) {
     log_config_t config = create_valid_config();
-    repository_t<testing::level>::instance().init(config);
+    repository_t<testing::level>::instance().add_config(config);
     const bool condition = std::is_same<verbose_logger_t<testing::level>, decltype(repository_t<testing::level>::instance().create("root"))>::value;
     static_assert(condition, "repository should return `verbose_logger_t` object");
 }
 
 TEST(Repository, ThrowsExceptionIfLoggerWithSpecifiedNameNotFound) {
     log_config_t config = create_valid_config();
-    repository_t<testing::level>::instance().init(config);
+    repository_t<testing::level>::instance().add_config(config);
     EXPECT_THROW(repository_t<testing::level>::instance().create("log"), std::out_of_range);
 }
 
 TEST(Repository, CreatesDuplicateOfRootLoggerByDefault) {
     log_config_t config = create_valid_config();
-    repository_t<testing::level>::instance().init(config);
+    repository_t<testing::level>::instance().add_config(config);
     repository_t<testing::level>::instance().root();
 }
 

@@ -19,7 +19,7 @@ void init(const rapidjson::Document& root) {
 
     repository_t<level>& repository = repository_t<level>::instance();
     for (auto it = configs.begin(); it != configs.end(); ++it) {
-        repository.init(*it);
+        repository.add_config(*it);
     }
 }
 
