@@ -51,7 +51,7 @@ public:
     template<typename Sink, typename Formatter>
     void add() {
         std::lock_guard<std::mutex> lock(mutex);
-        config_id_extractors[Sink::name()] = &generator::id<Sink>::extract;
+        config_id_extractors[Sink::name()] = &unique_id_traits<Sink>::generate;
         sinks[config_traits<Sink>::name()] = static_cast<factory_type>(&factory_t<Level>::template create<Sink>);
         frontend_repository<Sink, Formatter>::push(factory);
     }

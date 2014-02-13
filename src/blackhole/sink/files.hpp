@@ -83,16 +83,14 @@ public:
 
 } // namespace sink
 
-namespace generator {
-
 template<class Backend, class Watcher>
-struct id<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
+struct unique_id_traits<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
     typedef sink::rotator_t<Backend, Watcher> rotator_type;
     typedef sink::files_t<Backend, rotator_type> sink_type;
 
     typedef std::map<std::string, boost::any> variant_map_t;
 
-    static std::string extract(const boost::any& config) {
+    static std::string generate(const boost::any& config) {
         const variant_map_t& cfg = boost::any_cast<variant_map_t>(config);
 
         auto rotation_it = cfg.find("rotation");
@@ -116,8 +114,6 @@ struct id<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
         return sink_type::name();
     }
 };
-
-} // namespace generator
 
 template<class Backend>
 struct config_traits<sink::files_t<Backend, sink::NoRotation>> {

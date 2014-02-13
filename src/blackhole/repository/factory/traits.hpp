@@ -4,10 +4,8 @@
 
 namespace blackhole {
 
-namespace generator {
-
 template<typename T>
-struct id {
+struct unique_id_traits {
     //! \brief Extract sink or formatter unique key from its config.
     /*! Some sinks or formatters require more complex string mapping to type, than provided by its
         statis method `name`.
@@ -28,13 +26,13 @@ struct id {
         If we find `rotation` key, then rotation is used, so we add `/rotation` key to
         the `files`. After determining its strategy (size) we also append `/size` and
         the unique key (files/rotation/size) is completely built.
+
+        By default returns Formatter or Sink name.
     */
-    static std::string extract(const boost::any&) {
+    static std::string generate(const boost::any&) {
         return T::name();
     }
 };
-
-} // namespace generator
 
 template<typename T>
 struct config_traits {
