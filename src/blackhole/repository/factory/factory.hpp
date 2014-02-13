@@ -31,14 +31,14 @@ struct config_mapper {
 
 template<typename Level>
 struct factory_t {
-    template<typename Formatter, typename Sink>
+    template<class Formatter, class Sink>
     static
     std::unique_ptr<base_frontend_t>
     create(std::unique_ptr<Formatter> formatter, std::unique_ptr<Sink> sink) {
         return std::make_unique<frontend_t<Formatter, Sink, Level>>(std::move(formatter), std::move(sink));
     }
 
-    template<typename Formatter, typename Sink>
+    template<class Formatter, class Sink>
     static
     std::unique_ptr<base_frontend_t>
     create(const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink) {
@@ -48,7 +48,7 @@ struct factory_t {
         return create(std::move(formatter), std::move(sink));
     }
 
-    template<typename Sink>
+    template<class Sink>
     static
     std::unique_ptr<base_frontend_t>
     create(const frontend_factory_t<Level>& factory, const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink) {
