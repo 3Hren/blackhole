@@ -3,8 +3,6 @@
 #include <cstdint>
 #include <string>
 
-#include <boost/mpl/set.hpp>
-
 namespace blackhole {
 
 namespace sink {
