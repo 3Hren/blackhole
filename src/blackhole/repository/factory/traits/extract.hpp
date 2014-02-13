@@ -34,10 +34,10 @@ struct extractor {
 
     template<typename R>
     void to(R& value) const {
-        try{
+        try {
             cast_traits<R>::to(source, value);
-        } catch (boost::bad_any_cast&) {
-            throw error_t("conversion error for member '%s'", name);
+        } catch (const boost::bad_any_cast&) {
+            throw error_t("can not extract '%s' field from '%s': member is absent or has different type", name, T::name());
         }
     }
 
