@@ -180,9 +180,8 @@ log_config_t create_valid_config() {
     formatter_config_t formatter("string");
     formatter["pattern"] = "[%(timestamp)s]: %(message)s";
 
-    sink_config_t sink("files");
-    sink["path"] = "/dev/stdout";
-    sink["autoflush"] = true;
+    sink_config_t sink("stream");
+    sink["output"] = "stdout";
 
     frontend_config_t frontend = { formatter, sink };
     return log_config_t{ "root", { frontend } };
@@ -234,9 +233,9 @@ TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredFormatter) {
     EXPECT_THROW(factory.create(formatter, sink), blackhole::error_t);
 }
 
-TEST(Repository, FileSinkWithStringFormatterIsAvailableByDefault) {
+TEST(Repository, StreamSinkWithStringFormatterIsAvailableByDefault) {
     auto& repository = repository_t<level>::instance();
-    bool available = repository.available<sink::files_t<>, formatter::string_t>();
+    bool available = repository.available<sink::stream_t, formatter::string_t>();
     EXPECT_TRUE(available);
     repository.clear();
 }

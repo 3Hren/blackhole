@@ -11,7 +11,7 @@
 #include "repository/config/defaults.hpp"
 #include "repository/config/log.hpp"
 #include "repository/factory/group.hpp"
-#include "sink/files.hpp"
+#include "sink/stream.hpp"
 
 namespace blackhole {
 
@@ -72,7 +72,7 @@ public:
 
 private:
     repository_t() {
-        configure<sink::files_t<>, formatter::string_t>();
+        configure<sink::stream_t, formatter::string_t>();
         init(repository::config::trivial());
     }
 };

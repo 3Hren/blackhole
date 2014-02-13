@@ -16,9 +16,8 @@ void init() {
     formatter_config_t formatter("string");
     formatter["pattern"] = "[%(timestamp)s] [%(severity)s]: %(message)s";
 
-    sink_config_t sink("files");
-    sink["path"] = "/dev/stdout";
-    sink["autoflush"] = true;
+    sink_config_t sink("stream");
+    sink["output"] = "stdout";
 
     frontend_config_t frontend = { formatter, sink };
     log_config_t config{ "root", { frontend } };

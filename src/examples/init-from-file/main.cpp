@@ -1,3 +1,4 @@
+#include <fstream>
 #include <iostream>
 
 #include <blackhole/log.hpp>
