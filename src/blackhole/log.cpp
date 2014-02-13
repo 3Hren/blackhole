@@ -1,4 +1,3 @@
-//!@todo: example: Make stdout/string example with demonstration of formatting other attribute.(!)
 //!@todo: api: More verbose error messages.(!)
 //!@todo: api: Renaming repository methods.(!)
 
