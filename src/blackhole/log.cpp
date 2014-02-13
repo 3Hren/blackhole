@@ -1,5 +1,4 @@
-//!@todo: api: More verbose error messages.(!)
-
+//!@todo: feature: Thread id keyword & attribute.
 //!@todo: feature: Verbosity filter from file.(2d)
 //!@todo: api: Ability to set global attribute mapper (?)
 //!@todo: api: Microseconds support in timestamps.(1-2h)
