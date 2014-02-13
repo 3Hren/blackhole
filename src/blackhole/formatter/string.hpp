@@ -97,9 +97,8 @@ template<>
 struct factory_traits<formatter::string_t> {
     typedef formatter::string_t::config_type config_type;
 
-    static config_type map_config(const boost::any& config) {
-        aux::extractor<formatter::string_t> ex(config);
-        return formatter::string::pattern_parser_t::parse(ex["pattern"].get<std::string>());
+    static void map_config(const aux::extractor<formatter::string_t>& ex, config_type& cfg) {
+        cfg = formatter::string::pattern_parser_t::parse(ex["pattern"].get<std::string>());
     }
 };
 

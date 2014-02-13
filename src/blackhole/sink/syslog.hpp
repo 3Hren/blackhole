@@ -120,11 +120,8 @@ struct factory_traits<sink::syslog_t<Level>> {
     typedef sink::syslog_t<Level> sink_type;
     typedef typename sink_type::config_type config_type;
 
-    static config_type map_config(const boost::any& config) {
-        config_type cfg;
-        aux::extractor<sink_type> ex(config);
-        ex["identity"].to(cfg.identity);
-        return cfg;
+    static void map_config(const aux::extractor<sink_type>& ex, config_type& config) {
+        ex["identity"].to(config.identity);
     }
 };
 

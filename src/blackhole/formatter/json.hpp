@@ -186,14 +186,12 @@ public:
 
 template<>
 struct factory_traits<formatter::json_t> {
+    typedef formatter::json_t formatter_type;
     typedef formatter::json_t::config_type config_type;
 
-    static config_type map_config(const boost::any& config) {
+    static void map_config(const aux::extractor<formatter_type>& ex, config_type& cfg) {
         using namespace formatter::json::map;
 
-        config_type cfg;
-
-        aux::extractor<formatter::json_t> ex(config);
         ex["newline"].to(cfg.newline);
 
         auto mapping = ex["mapping"].get<std::map<std::string, boost::any>>();
@@ -214,8 +212,6 @@ struct factory_traits<formatter::json_t> {
                 throw blackhole::error_t("wrong configuration");
             }
         }
-
-        return cfg;
     }
 
     static void handle_specified(const std::string& name, const boost::any& value, config_type& cfg) {

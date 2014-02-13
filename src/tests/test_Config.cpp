@@ -4,7 +4,7 @@ TEST(FactoryTraits, StringFormatterConfig) {
     formatter_config_t formatter("string");
     formatter["pattern"] = "[%(timestamp)s]: %(message)s";
 
-    auto actual = factory_traits<formatter::string_t>::map_config(formatter.config);
+    auto actual = aux::config_mapper<formatter::string_t>::map(formatter.config);
 
     EXPECT_EQ("[%s]: %s", actual.pattern);
     EXPECT_EQ(std::vector<std::string>({ "timestamp", "message" }), actual.attribute_names);
@@ -17,7 +17,7 @@ TEST(FactoryTraits, JsonFormatterConfig) {
     formatter["routing"]["/"] = std::vector<std::string> { "message" };
     formatter["routing"]["/fields"] = "*";
 
-    formatter::json::config_t actual = factory_traits<formatter::json_t>::map_config(formatter.config);
+    formatter::json::config_t actual = aux::config_mapper<formatter::json_t>::map(formatter.config);
 
     using namespace formatter::json::map;
     EXPECT_TRUE(actual.newline);
@@ -35,7 +35,7 @@ TEST(FactoryTraits, FileSinkConfig) {
     sink["path"] = "/dev/null";
     sink["autoflush"] = false;
 
-    auto actual = factory_traits<sink::files_t<>>::map_config(sink.config);
+    auto actual = aux::config_mapper<sink::files_t<>>::map(sink.config);
 
     EXPECT_EQ("/dev/null", actual.path);
     EXPECT_FALSE(actual.autoflush);

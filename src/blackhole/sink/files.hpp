@@ -163,11 +163,8 @@ struct factory_traits<sink::files_t<Backend>> {
     typedef sink::files_t<Backend> sink_type;
     typedef typename sink_type::config_type config_type;
 
-    static config_type map_config(const boost::any& config) {
-        config_type cfg;
-        aux::extractor<sink::files_t<Backend>> ex(config);
-        aux::filler<sink_type>::extract_to(ex, cfg);
-        return cfg;
+    static void map_config(const aux::extractor<sink_type>& ex, config_type& config) {
+        aux::filler<sink_type>::extract_to(ex, config);
     }
 };
 
@@ -178,13 +175,10 @@ struct factory_traits<sink::files_t<Backend, sink::rotator_t<Backend, sink::rota
     typedef sink::files_t<Backend, rotator_type> sink_type;
     typedef typename sink_type::config_type config_type;
 
-    static config_type map_config(const boost::any& config) {
-        config_type cfg;
-        aux::extractor<sink_type> ex(config);
-        aux::filler<sink_type>::extract_to(ex, cfg);
-        aux::filler<rotator_type>::extract_to(ex, cfg);
-        ex["rotation"]["size"].to(cfg.rotation.watcher.size);
-        return cfg;
+    static void map_config(const aux::extractor<sink_type>& ex, config_type& config) {
+        aux::filler<sink_type>::extract_to(ex, config);
+        aux::filler<rotator_type>::extract_to(ex, config);
+        ex["rotation"]["size"].to(config.rotation.watcher.size);
     }
 };
 
@@ -195,13 +189,10 @@ struct factory_traits<sink::files_t<Backend, sink::rotator_t<Backend, sink::rota
     typedef sink::files_t<Backend, rotator_type> sink_type;
     typedef typename sink_type::config_type config_type;
 
-    static config_type map_config(const boost::any& config) {
-        config_type cfg;
-        aux::extractor<sink_type> ex(config);
-        aux::filler<sink_type>::extract_to(ex, cfg);
-        aux::filler<rotator_type>::extract_to(ex, cfg);
-        ex["rotation"]["period"].to(cfg.rotation.watcher.period);
-        return cfg;
+    static void map_config(const aux::extractor<sink_type>& ex, config_type& config) {
+        aux::filler<sink_type>::extract_to(ex, config);
+        aux::filler<rotator_type>::extract_to(ex, config);
+        ex["rotation"]["period"].to(config.rotation.watcher.period);
     }
 };
 

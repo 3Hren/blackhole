@@ -3,6 +3,8 @@
 #include "socket/udp.hpp"
 #include "socket/tcp.hpp"
 
+#include "blackhole/factory.hpp"
+
 namespace blackhole {
 
 namespace sink {
@@ -51,12 +53,9 @@ struct factory_traits<sink::socket_t<Protocol>> {
     typedef sink::socket_t<Protocol> sink_type;
     typedef typename sink_type::config_type config_type;
 
-    static config_type map_config(const boost::any& config) {
-        config_type cfg;
-        aux::extractor<sink_type> ex(config);
-        ex["host"].to(cfg.host);
-        ex["port"].to(cfg.port);
-        return cfg;
+    static void map_config(const aux::extractor<sink_type>& ex, config_type& config) {
+        ex["host"].to(config.host);
+        ex["port"].to(config.port);
     }
 };
 

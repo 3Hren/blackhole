@@ -5,7 +5,7 @@
 
 #include <boost/assert.hpp>
 
-#include <blackhole/factory.hpp>
+#include "blackhole/factory.hpp"
 
 namespace blackhole {
 
@@ -83,11 +83,8 @@ struct factory_traits<sink::stream_t> {
     typedef sink::stream_t sink_type;
     typedef sink_type::config_type config_type;
 
-    static config_type map_config(const boost::any& config) {
-        config_type cfg;
-        aux::extractor<sink_type> ex(config);
-        ex["output"].to(cfg.output);
-        return cfg;
+    static void map_config(const aux::extractor<sink_type>& ex, config_type& config) {
+        ex["output"].to(config.output);
     }
 };
 
