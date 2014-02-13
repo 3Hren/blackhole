@@ -28,7 +28,7 @@ public:
     }
 
     template<typename Sink, typename Formatter>
-    bool available() {
+    bool available() const {
         std::lock_guard<std::mutex> lock(mutex);
         return factory.template has<Sink, Formatter>();
     }
