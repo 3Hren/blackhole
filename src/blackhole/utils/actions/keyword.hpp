@@ -2,9 +2,9 @@
 
 namespace blackhole {
 
-namespace helper {
+namespace action {
 
-struct LessEqThan {
+struct LessEq {
     template<typename L, typename R>
     static bool execute(const L& left, const R& right) {
         return left <= right;
@@ -18,6 +18,6 @@ struct Eq {
     }
 };
 
-} // namespace helper
+} // namespace action
 
 } // namespace blackhole

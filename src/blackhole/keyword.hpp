@@ -2,7 +2,7 @@
 
 #include "attribute.hpp"
 #include "filter.hpp"
-#include "helper.hpp"
+#include "utils/actions/keyword.hpp"
 
 #define DECLARE_KEYWORD_IMPL(Name, Scope, T) \
     namespace tag { \
@@ -39,11 +39,11 @@ struct keyword_t {
     }
 
     filter_t operator >=(T value) const {
-        return action_t<helper::LessEqThan>({ value });
+        return action_t<action::LessEq>({ value });
     }
 
     filter_t operator ==(T value) const {
-        return action_t<helper::Eq>({ value });
+        return action_t<action::Eq>({ value });
     }
 
     template<typename Action>
