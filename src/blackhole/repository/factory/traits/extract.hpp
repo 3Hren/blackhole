@@ -13,10 +13,11 @@ namespace blackhole {
 namespace aux {
 
 template<class T>
-struct extractor {
+class extractor {
     boost::any source;
     std::string name;
 
+public:
     extractor(const boost::any& source, const std::string& name = T::name()) :
         source(source),
         name(name)
@@ -27,9 +28,15 @@ struct extractor {
         try {
             to(map);
         } catch (const std::exception&) {
-            throw error_t("can not extract '%s': '%s' is not map", name, this->name);
+            throw error_t("can't extract '%s': '%s' is not map", name, this->name);
         }
-        return extractor<T>(map[name], name);
+
+        auto it = map.find(name);
+        if (it == map.end()) {
+            throw error_t("can't extract '%s' field from '%s': member is absent", name, T::name());
+        }
+
+        return extractor<T>(it->second, name);
     }
 
     template<typename R>
@@ -37,7 +44,7 @@ struct extractor {
         try {
             cast_traits<R>::to(source, value);
         } catch (const boost::bad_any_cast&) {
-            throw error_t("can not extract '%s' field from '%s': member is absent or has different type", name, T::name());
+            throw error_t("can't extract '%s' field from '%s': member is absent or has different type", name, T::name());
         }
     }
 
@@ -47,6 +54,8 @@ struct extractor {
         to(value);
         return value;
     }
+
+private:
 };
 
 } // namespace aux
