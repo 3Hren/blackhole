@@ -8,6 +8,29 @@
 using namespace blackhole;
 
 #define VS_BOOST
+
+#if 0
+const int N = 100000;
+
+int main(int argc, char** argv) {
+    celero::Run(argc, argv);
+    return 0;
+}
+
+BASELINE(CeleroBenchTest, WTLS, 0, N) {
+    caster_t caster = {};
+    caster.as_pthread = pthread_self();
+    thread::id id(caster.as_uint);
+    std::ostringstream stream;
+    stream << id;
+    celero::DoNotOptimizeAway(stream.str());
+}
+
+BENCHMARK(CeleroBenchTest, TLS, 0, N) {
+    celero::DoNotOptimizeAway(blackhole::this_thread::get_id<std::string>());
+}
+#endif
+
 #ifdef VS_BOOST
 #include <boost/log/utility/setup.hpp>
 #include <boost/log/sources/logger.hpp>
@@ -80,7 +103,7 @@ void init_boost_log() {
     logging::add_common_attributes();
 }
 
-const int N = 10000;
+const int N = 100000;
 
 boost::log::sources::severity_logger<severity_level> slg;
 verbose_logger_t<severity_level> *log_;
@@ -108,7 +131,7 @@ std::string map_severity(const severity_level& level) {
 }
 
 void init_blackhole_log() {
-    repository_t<severity_level>::instance().configure<sink::file_t<>, formatter::string_t>();
+    repository_t<severity_level>::instance().configure<sink::files_t<>, formatter::string_t>();
 
     mapping::value_t mapper;
     mapper.add<std::time_t>("timestamp", &map_timestamp);
@@ -124,7 +147,7 @@ void init_blackhole_log() {
     frontend_config_t frontend = { formatter, sink };
     log_config_t config{ "root", { frontend } };
 
-    repository_t<severity_level>::instance().init(config);
+    repository_t<severity_level>::instance().add_config(config);
 }
 
 int main(int argc, char** argv) {
