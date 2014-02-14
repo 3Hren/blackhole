@@ -46,6 +46,7 @@ SET(Boost_USE_MULTITHREADED ON)
 SET(BOOST_COMPONENTS
     system
     filesystem
+    thread
 )
 
 SET(GOOGLE_LIBRARIES
