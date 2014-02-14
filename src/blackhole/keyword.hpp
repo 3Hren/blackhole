@@ -22,6 +22,12 @@
 #define DECLARE_KEYWORD(Name, T) \
     DECLARE_KEYWORD_IMPL(Name, global, T)
 
+#define DECLARE_THREAD_KEYWORD(Name, T) \
+    DECLARE_KEYWORD_IMPL(Name, thread, T)
+
+#define DECLARE_UNIVERSE_KEYWORD(Name, T) \
+    DECLARE_KEYWORD_IMPL(Name, universe, T)
+
 namespace blackhole {
 
 namespace keyword {
