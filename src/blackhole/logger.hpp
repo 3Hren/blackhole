@@ -12,6 +12,7 @@
 #include "keyword/message.hpp"
 #include "keyword/severity.hpp"
 #include "keyword/timestamp.hpp"
+#include "keyword/thread.hpp"
 #include "utils/unique.hpp"
 
 namespace blackhole {
@@ -84,7 +85,7 @@ public:
         if (enabled() && !m_frontends.empty()) {
             log::attributes_t attributes = merge({
                 // universe_attributes          // Program global.
-                // thread_attributes            // Thread local.
+                get_thread_attributes(),        // Thread local.
                 m_global_attributes,            // Logger object specific.
                 get_event_attributes(),         // Event specific, e.g. timestamp.
                 std::move(local_attributes)     // Any user attributes.
@@ -115,6 +116,13 @@ private:
     log::attributes_t get_event_attributes() const {
         log::attributes_t attributes = {
             keyword::timestamp() = std::time(nullptr)
+        };
+        return attributes;
+    }
+
+    log::attributes_t get_thread_attributes() const {
+        log::attributes_t attributes = {
+            keyword::tid() = this_thread::get_id<std::string>()
         };
         return attributes;
     }
