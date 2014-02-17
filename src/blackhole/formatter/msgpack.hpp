@@ -24,6 +24,10 @@ public:
     void operator ()(const T& value) const {
         packer->pack(value);
     }
+
+    void operator ()(const timeval& tv) const {
+        packer->pack(tv.tv_sec);
+    }
 };
 
 class msgpack_t : public base_t {

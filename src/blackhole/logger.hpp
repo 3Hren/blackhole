@@ -115,8 +115,10 @@ public:
 
 private:
     log::attributes_t get_event_attributes() const {
+        timeval tv;
+        gettimeofday(&tv, nullptr);
         log::attributes_t attributes = {
-            keyword::timestamp() = std::time(nullptr)
+            keyword::timestamp() = tv
         };
         return attributes;
     }

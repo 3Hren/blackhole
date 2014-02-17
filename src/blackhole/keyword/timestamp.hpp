@@ -1,7 +1,9 @@
 #pragma once
 
+#include <sys/time.h>
+
 #include "blackhole/keyword.hpp"
 
 namespace blackhole { namespace keyword {
-DECLARE_EVENT_KEYWORD(timestamp, std::time_t)
+DECLARE_EVENT_KEYWORD(timestamp, timeval)
 } }

@@ -87,30 +87,36 @@ TEST(string_t, ComplexFormatWithOtherLocalAttributes) {
 
 namespace testing {
 
-std::string map_timestamp(const std::time_t& time) {
-    char mbstr[128];
-    if(std::strftime(mbstr, 128, "%F %T", std::gmtime(&time))) {
-        return std::string(mbstr);
+std::string map_timestamp(const timeval& tv) {
+    char str[64];
+
+    struct tm tm;
+    gmtime_r((time_t *)&tv.tv_sec, &tm);
+    if (std::strftime(str, sizeof(str), "%F %T", &tm)) {
+        char usecs[64];
+        snprintf(usecs, sizeof(usecs), ".%06ld", (long)tv.tv_usec);
+        return std::string(str) + usecs;
     }
-    return std::string("?");
+
+    return "UNKNOWN";
 }
 
 } // namespace testing
 
 TEST(string_t, CustomMapping) {
     mapping::value_t mapper;
-    mapper.add<std::time_t>("timestamp", &testing::map_timestamp);
+    mapper.add<timeval>("timestamp", &testing::map_timestamp);
 
     log::record_t record;
     record.attributes = {
-        keyword::timestamp() = std::time_t(100500),
+        keyword::timestamp() = timeval { 100500, 0 },
         keyword::message() = "le message",
     };
     std::string pattern("[%(timestamp)s]: %(message)s");
     formatter::string_t formatter(pattern);
     formatter.set_mapper(std::move(mapper));
     std::string actual = formatter.format(record);
-    EXPECT_EQ(actual, "[1970-01-02 03:55:00]: le message");
+    EXPECT_EQ(actual, "[1970-01-02 03:55:00.000000]: le message");
 }
 
 TEST(string_t, CustomMappingWithKeyword) {
@@ -119,12 +125,12 @@ TEST(string_t, CustomMappingWithKeyword) {
 
     log::record_t record;
     record.attributes = {
-        keyword::timestamp() = std::time_t(100500),
+        keyword::timestamp() = timeval { 100500, 0 },
         keyword::message() = "le message",
     };
     std::string pattern("[%(timestamp)s]: %(message)s");
     formatter::string_t formatter(pattern);
     formatter.set_mapper(std::move(mapper));
     std::string actual = formatter.format(record);
-    EXPECT_EQ(actual, "[1970-01-02 03:55:00]: le message");
+    EXPECT_EQ(actual, "[1970-01-02 03:55:00.000000]: le message");
 }

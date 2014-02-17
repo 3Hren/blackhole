@@ -28,7 +28,7 @@ TEST(msgpack_t, FormatMultipleAttributes) {
     log::record_t record;
     record.attributes = {
         keyword::message() = "le message",
-        keyword::timestamp() = 100500
+        keyword::timestamp() = timeval{ 100500, 0 }
     };
 
     formatter::msgpack_t fmt;
@@ -40,5 +40,5 @@ TEST(msgpack_t, FormatMultipleAttributes) {
     unpacked.get().convert<std::map<std::string, msgpack::object>>(&root);
 
     EXPECT_EQ("le message", root["message"].as<std::string>());
-    EXPECT_EQ(100500, root["timestamp"].as<std::time_t>());
+    EXPECT_EQ(100500, root["timestamp"].as<long>());
 }

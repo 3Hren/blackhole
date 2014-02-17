@@ -31,12 +31,18 @@ std::string map_severity(level lvl) {
     return "UNKNOWN";
 }
 
-std::string map_timestamp(const std::time_t& time) {
-    char mbstr[128];
-    if(std::strftime(mbstr, 128, "%F %T", std::gmtime(&time))) {
-        return std::string(mbstr);
+std::string map_timestamp(const timeval& tv) {
+    char str[64];
+
+    struct tm tm;
+    localtime_r((time_t *)&tv.tv_sec, &tm);
+    if (std::strftime(str, sizeof(str), "%F %T", &tm)) {
+        char usecs[64];
+        snprintf(usecs, sizeof(usecs), ".%06ld", (long)tv.tv_usec);
+        return std::string(str) + usecs;
     }
-    return std::string("?");
+
+    return "UNKNOWN";
 }
 
 //! Initialization stage.

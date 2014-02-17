@@ -113,8 +113,8 @@ private:
         add_member_impl(node, name, value);
     }
 
-    void add_member(rapidjson::Value* node, const std::string& name, std::time_t value) {
-        add_member_impl(node, name, static_cast<int64_t>(value));
+    void add_member(rapidjson::Value* node, const std::string& name, const timeval& value) {
+        add_member_impl(node, name, static_cast<int64_t>(value.tv_sec));
     }
 
     void add_member(rapidjson::Value* node, const std::string& name, const std::string& value) {

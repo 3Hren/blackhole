@@ -20,7 +20,7 @@ TEST(json_t, FormatMultipleAttributes) {
     log::record_t record;
     record.attributes = {
         keyword::message() = "le message",
-        keyword::timestamp() = 100500
+        keyword::timestamp() = timeval{ 100500, 0 }
     };
 
     formatter::json_t fmt;
@@ -36,7 +36,7 @@ TEST(json_t, FormatMultipleComplexAttributes) {
     log::record_t record;
     record.attributes = {
         keyword::message() = "le message",
-        keyword::timestamp() = 100500,
+        keyword::timestamp() = timeval{ 100500, 0 },
         attribute::make("@source", "udp://127.0.0.1"),
         attribute::make("@source_host", "dhcp-218-248-wifi.yandex"),
         attribute::make("@source_path", "service/storage"),
@@ -60,7 +60,7 @@ TEST(json_t, SingleAttributeMapping) {
     log::record_t record;
     record.attributes = {
         keyword::message() = "le message",
-        keyword::timestamp() = 100500
+        keyword::timestamp() = timeval{ 100500, 0 }
     };
 
     formatter::json_t::config_type config;
@@ -82,7 +82,7 @@ TEST(json_t, MultipleAttributeMapping) {
     log::record_t record;
     record.attributes = {
         keyword::message() = "le message",
-        keyword::timestamp() = 100500
+        keyword::timestamp() = timeval{ 100500, 0 }
     };
 
     formatter::json_t::config_type config;
@@ -122,7 +122,7 @@ TEST(json_t, FieldMapping) {
     log::record_t record;
     record.attributes = {
         keyword::message() = "le message",
-        keyword::timestamp() = 100500
+        keyword::timestamp() = timeval{ 100500, 0 }
     };
 
     formatter::json_t::config_type config;
@@ -145,7 +145,7 @@ TEST(json_t, ComplexFieldMapping) {
     log::record_t record;
     record.attributes = {
         keyword::message() = "le message",
-        keyword::timestamp() = 100500
+        keyword::timestamp() = timeval{ 100500, 0 }
     };
 
     formatter::json_t::config_type config;
@@ -171,7 +171,7 @@ TEST(json_t, UnspecifiedPositionalMapping) {
     log::record_t record;
     record.attributes = {
         keyword::message() = "le message",
-        keyword::timestamp() = 100500
+        keyword::timestamp() = timeval{ 100500, 0 }
     };
 
     formatter::json_t::config_type config;

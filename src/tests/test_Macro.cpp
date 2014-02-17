@@ -71,7 +71,7 @@ struct attr_pack_t {
     std::string message;
     int value;
     std::string reason;
-    std::time_t timestamp;
+    timeval timestamp;
 };
 
 } // namespace testing
@@ -83,7 +83,7 @@ struct ExtractAttributesAction {
         actual.message = record.extract<std::string>("message");
         actual.value = record.extract<int>("value");
         actual.reason = record.extract<std::string>("reason");
-        actual.timestamp = record.extract<std::time_t>("timestamp");
+        actual.timestamp = record.extract<timeval>("timestamp");
     }
 };
 
@@ -105,13 +105,13 @@ TEST(Macro, FormatMessageWithAttributes) {
     BH_LOG(log, level::debug, "message")(
         attribute::make("value", 42),
         attribute::make("reason", "42"),
-        keyword::timestamp() = 100500
+        keyword::timestamp() = timeval{ 100500, 0 }
     );
 
     EXPECT_EQ("message", actual.message);
     EXPECT_EQ(42, actual.value);
     EXPECT_EQ("42", actual.reason);
-    EXPECT_EQ(100500, actual.timestamp);
+    EXPECT_EQ(100500, actual.timestamp.tv_sec);
 }
 
 TEST(Macro, FormatMessageWithPrintfStyleWithAttributes) {
@@ -132,13 +132,13 @@ TEST(Macro, FormatMessageWithPrintfStyleWithAttributes) {
     BH_LOG(log, level::debug, "value [%d]: %s - okay", 100500, "blah")(
         attribute::make("value", 42),
         attribute::make("reason", "42"),
-        keyword::timestamp() = 100500
+        keyword::timestamp() = timeval{ 100500, 0 }
     );
 
     EXPECT_EQ("value [100500]: blah - okay", actual.message);
     EXPECT_EQ(42, actual.value);
     EXPECT_EQ("42", actual.reason);
-    EXPECT_EQ(100500, actual.timestamp);
+    EXPECT_EQ(100500, actual.timestamp.tv_sec);
 }
 
 namespace blackhole {

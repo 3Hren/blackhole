@@ -90,8 +90,8 @@ TEST(FilterCustomAttribute, HasAndGetLessEq) {
 }
 
 TEST(FilterKeywordAttribute, Get) {
-    auto filter = expr::get_attr(keyword::timestamp()) == std::time_t(100500);
-    log::attributes_t attributes = {{"timestamp", log::attribute_t(std::time_t(100500))}};
+    auto filter = expr::get_attr(keyword::timestamp()) == timeval{ 100500, 0 };
+    log::attributes_t attributes = {{"timestamp", log::attribute_t(timeval{ 100500, 0 })}};
     EXPECT_TRUE(filter(attributes));
 }
 

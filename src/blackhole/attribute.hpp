@@ -18,6 +18,15 @@ typedef double double_t;
 } // namespace std
 #endif
 
+inline std::ostream& operator <<(std::ostream& stream, const timeval& tv) {
+    stream << tv.tv_sec << "." << tv.tv_usec;
+    return stream;
+}
+
+inline bool operator ==(const timeval& lhs, const timeval& rhs) {
+    return lhs.tv_sec == rhs.tv_sec && lhs.tv_usec == rhs.tv_usec;
+}
+
 namespace blackhole {
 
 namespace log {
@@ -29,8 +38,8 @@ typedef boost::variant<
     std::uint64_t,
     std::int64_t,
     std::double_t,
-    std::time_t,
-    std::string
+    std::string,
+    timeval
 > attribute_value_t;
 
 namespace attribute {
