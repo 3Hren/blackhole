@@ -1,4 +1,3 @@
-//!@todo: feature: Process id keyword & attribute.
 //!@todo: api: Microseconds support in timestamps.(1-2h)
 //!@todo: api: Ability to set global attribute mapper (?)
 //!@todo: feature: Verbosity filter from file.(2d)
