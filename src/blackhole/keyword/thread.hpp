@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <thread>
 
 #include "blackhole/keyword.hpp"
 #include "blackhole/utils/thread.hpp"
