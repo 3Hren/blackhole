@@ -75,7 +75,8 @@ std::string map_timestamp(const timeval& tv) {
 void init() {
     //! Register required frontend.
     repository_t<level>::instance().configure<
-        sink::socket_t<boost::asio::ip::tcp>, formatter::json_t
+        sink::socket_t<boost::asio::ip::tcp>,
+        formatter::json_t
     >();
 
     mapping::value_t mapper;
@@ -91,7 +92,7 @@ void init() {
 
     sink_config_t sink("tcp");
     sink["host"] = "localhost";
-    sink["port"] = std::uint16_t(50030);
+    sink["port"] = 50030;
 
     frontend_config_t frontend = { formatter, sink };
     log_config_t config{ "root", { frontend } };
