@@ -7,25 +7,9 @@
 
 #include <boost/variant.hpp>
 
+#include "utils/timeval.hpp"
+#include "utils/types.hpp"
 #include "utils/underlying.hpp"
-
-#if defined(__clang__) || defined(GCC47)
-#else
-namespace std {
-
-typedef double double_t;
-
-} // namespace std
-#endif
-
-inline std::ostream& operator <<(std::ostream& stream, const timeval& tv) {
-    stream << tv.tv_sec << "." << tv.tv_usec;
-    return stream;
-}
-
-inline bool operator ==(const timeval& lhs, const timeval& rhs) {
-    return lhs.tv_sec == rhs.tv_sec && lhs.tv_usec == rhs.tv_usec;
-}
 
 namespace blackhole {
 
