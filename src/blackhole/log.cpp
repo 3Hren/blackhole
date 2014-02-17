@@ -1,7 +1,7 @@
 //!@todo: feature: Process id keyword & attribute.
-//!@todo: feature: Verbosity filter from file.(2d)
-//!@todo: api: Ability to set global attribute mapper (?)
 //!@todo: api: Microseconds support in timestamps.(1-2h)
+//!@todo: api: Ability to set global attribute mapper (?)
+//!@todo: feature: Verbosity filter from file.(2d)
 
 //!@todo: benchmark: File logging comparing with boost::log.
 //!@todo: benchmark: Socket logging with json.
