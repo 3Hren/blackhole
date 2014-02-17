@@ -103,17 +103,21 @@ void init_boost_log() {
     logging::add_common_attributes();
 }
 
-const int N = 100000;
+const int N = 50000;
 
 boost::log::sources::severity_logger<severity_level> slg;
 verbose_logger_t<severity_level> *log_;
 
-std::string map_timestamp(const std::time_t& time) {
-    char mbstr[128];
-    if(std::strftime(mbstr, 128, "%F %T", std::gmtime(&time))) {
-        return std::string(mbstr);
+std::string map_timestamp(const timeval& tv) {
+    char str[64];
+
+    struct tm tm;
+    localtime_r((time_t *)&tv.tv_sec, &tm);
+    if (std::strftime(str, sizeof(str), "%F %T", &tm)) {
+        return str;
     }
-    return std::string("?");
+
+    return "UNKNOWN";
 }
 
 std::string map_severity(const severity_level& level) {
@@ -134,7 +138,7 @@ void init_blackhole_log() {
     repository_t<severity_level>::instance().configure<sink::files_t<>, formatter::string_t>();
 
     mapping::value_t mapper;
-    mapper.add<std::time_t>("timestamp", &map_timestamp);
+    mapper.add<timeval>("timestamp", &map_timestamp);
     mapper.add<severity_level>("severity", &map_severity);
 
     formatter_config_t formatter("string", mapper);
