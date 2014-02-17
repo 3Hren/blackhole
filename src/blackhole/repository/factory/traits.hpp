@@ -11,12 +11,13 @@
 #include "traits/filler.hpp"
 #include "traits/integer.hpp"
 #include "traits/unique.hpp"
+#include "blackhole/utils/lazy.hpp"
 
 namespace blackhole {
 
 template<class T>
 struct factory_traits {
-    static_assert(sizeof(T) == -1,
+    static_assert(lazy_false<T>::value,
                   "You should implement 'factory_traits' template specialization for "
                   "your type to properly map generic config object on real config.");
 };
