@@ -4,7 +4,7 @@
 
 #include <blackhole/log.hpp>
 #include <blackhole/logger.hpp>
-#include <blackhole/sink/files.hpp>
+#include <blackhole/sink/null.hpp>
 #include <blackhole/repository.hpp>
 
 using namespace blackhole;
@@ -17,7 +17,7 @@ enum level {
     critical
 };
 
-const int N = 10000;
+const int N = 200000;
 
 std::string map_timestamp(const timeval& tv) {
     char str[64];
@@ -29,27 +29,6 @@ std::string map_timestamp(const timeval& tv) {
     }
 
     return "UNKNOWN";
-}
-
-namespace null {
-struct config_t {};
-}
-
-class null_t{
-public:
-    typedef null::config_t config_type;
-    static const char* name() { return "null"; }
-    null_t(const config_type&) {}
-    void consume(const std::string&) {}
-};
-
-namespace blackhole {
-template<>
-struct factory_traits<null_t> {
-    typedef null_t sink_type;
-    typedef sink_type::config_type config_type;
-    static void map_config(const aux::extractor<sink_type>&, config_type&) {}
-};
 }
 
 std::string map_severity(const level& level) {
@@ -68,7 +47,7 @@ std::string map_severity(const level& level) {
 
 void init_blackhole_log() {
     repository_t<level>::instance().configure<
-        null_t,
+        sink::null_t,
         formatter::string_t
     >();
 

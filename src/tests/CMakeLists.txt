@@ -39,6 +39,7 @@ SET(SOURCES
     test_FileRotationSizeWatcher
     test_FileRotationDateTimeWatcher
     test_StreamSink
+    test_NullSink
 )
 
 SET(Boost_USE_MULTITHREADED ON)

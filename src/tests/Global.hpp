@@ -25,6 +25,7 @@ using namespace ::testing;
 #include "blackhole/log.hpp"
 #include "blackhole/logger.hpp"
 #include "blackhole/sink/files.hpp"
+#include "blackhole/sink/null.hpp"
 #include "blackhole/sink/socket.hpp"
 #include "blackhole/sink/stream.hpp"
 #include "blackhole/sink/syslog.hpp"
