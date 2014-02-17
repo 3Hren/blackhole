@@ -5,6 +5,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "bigbang.hpp"
 #include "formatter/string.hpp"
 #include "frontend.hpp"
 #include "logger.hpp"
@@ -78,3 +79,5 @@ private:
 };
 
 } // namespace blackhole
+
+static blackhole::aux::bigbang_t bigbang;

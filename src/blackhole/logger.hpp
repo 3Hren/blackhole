@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "attribute.hpp"
-#include "bigbang.hpp"
 #include "common.hpp"
 #include "error/handler.hpp"
 #include "filter.hpp"
@@ -14,6 +13,7 @@
 #include "keyword/severity.hpp"
 #include "keyword/timestamp.hpp"
 #include "keyword/thread.hpp"
+#include "storage.hpp"
 #include "utils/unique.hpp"
 
 namespace blackhole {
@@ -150,5 +150,3 @@ public:
 };
 
 } // namespace blackhole
-
-static blackhole::aux::bigbang_t bigbang;
