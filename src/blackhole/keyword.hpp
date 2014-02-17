@@ -40,7 +40,7 @@ struct keyword_t {
         return NameProvider::name();
     }
 
-    log::attribute_pair_t operator =(T value) const {
+    log::attribute_pair_t operator =(const T& value) const {
         return attribute::make(name(), attribute::traits<T>::pack(value), Scope);
     }
 
