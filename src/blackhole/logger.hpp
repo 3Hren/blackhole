@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "attribute.hpp"
+#include "bigbang.hpp"
 #include "common.hpp"
 #include "error/handler.hpp"
 #include "filter.hpp"
@@ -84,11 +85,11 @@ public:
     log::record_t open_record(log::attributes_t&& local_attributes) const {
         if (enabled() && !m_frontends.empty()) {
             log::attributes_t attributes = merge({
-                // universe_attributes          // Program global.
-                get_thread_attributes(),        // Thread local.
-                m_global_attributes,            // Logger object specific.
-                get_event_attributes(),         // Event specific, e.g. timestamp.
-                std::move(local_attributes)     // Any user attributes.
+                universe_storage_t::instance().dump(),  // Program global.
+                get_thread_attributes(),                // Thread local.
+                m_global_attributes,                    // Logger object specific.
+                get_event_attributes(),                 // Event specific, e.g. timestamp.
+                std::move(local_attributes)             // Any user attributes.
             });
 
             if (m_filter(attributes)) {
@@ -149,3 +150,5 @@ public:
 };
 
 } // namespace blackhole
+
+static blackhole::aux::bigbang_t bigbang;
