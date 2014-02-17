@@ -13,7 +13,7 @@
 #include "keyword/severity.hpp"
 #include "keyword/timestamp.hpp"
 #include "keyword/thread.hpp"
-#include "storage.hpp"
+#include "universe.hpp"
 #include "utils/unique.hpp"
 
 namespace blackhole {
