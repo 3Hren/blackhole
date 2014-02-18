@@ -22,6 +22,7 @@ typedef std::function<void(std::ostringstream&, const mapping::value_t&, const l
 
 namespace aux {
 
+//! Simple factory function that maps scope character to its enumeration type.
 inline log::attribute::scope map_to_scope(const char ch) {
     switch (ch) {
     case 'L':
