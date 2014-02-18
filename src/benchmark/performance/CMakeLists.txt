@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 SET(CMAKE_BUILD_TYPE "Release")
 
-SET(PROJECT blackhole-benchmark)
+SET(PROJECT blackhole-benchmark-performance)
 
 SET(HEADERS
 )

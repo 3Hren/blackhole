@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 SET(CMAKE_BUILD_TYPE "Release")
 
-SET(PROJECT blackhole-benchmark)
+SET(PROJECT blackhole-benchmark-vsboost)
 
 SET(HEADERS
 )
@@ -29,7 +29,7 @@ SET(GOOGLE_LIBRARIES
 
 PROJECT(${PROJECT})
 
-INCLUDE_DIRECTORIES(../../
+INCLUDE_DIRECTORIES(../..
     ../../../foreign/rapidjson/include
     /Users/esafronov/sandbox/Celero/include
 )
