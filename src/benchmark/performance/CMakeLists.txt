@@ -19,9 +19,6 @@ SET(BOOST_COMPONENTS
     system
     filesystem
     thread
-    date_time
-    log
-    log_setup
 )
 
 SET(GOOGLE_LIBRARIES
