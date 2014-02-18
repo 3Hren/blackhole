@@ -1,5 +1,7 @@
 #include <memory>
 
+#include <boost/lexical_cast.hpp>
+
 #include "celero/Celero.h"
 
 #include <blackhole/log.hpp>
@@ -17,7 +19,7 @@ enum level {
     critical
 };
 
-const int N = 200000;
+const int N = 100000;
 
 std::string map_timestamp(const timeval& tv) {
     char str[64];
@@ -42,7 +44,7 @@ std::string map_severity(const level& level) {
 
     if (static_cast<std::size_t>(level) < sizeof(descriptions) / sizeof(*descriptions))
         return descriptions[level];
-    return std::to_string(static_cast<int>(level));
+    return boost::lexical_cast<std::string>(level);
 }
 
 formatter::string_t fmt("[%(timestamp)s] [%(severity)s]: %(message)s");
