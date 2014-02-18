@@ -21,14 +21,6 @@ struct extracter {
         func(func)
     {}
 
-    std::string operator()(const T& value) const {
-        return func(value);
-    }
-
-    std::string operator()(T value) const {
-        return func(value);
-    }
-
     std::string operator()(const log::attribute_value_t& value) const {
         typedef typename aux::underlying_type<T>::type underlying_type;
         return func(static_cast<T>(boost::get<underlying_type>(value)));
