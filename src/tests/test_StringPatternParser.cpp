@@ -2,49 +2,42 @@
 
 TEST(PatternParser, ParseVariadicLocalScopeToken) {
     std::string pattern("%(...L)s");
-    auto config = formatter::string::pattern_parser_t::parse(pattern);
-    EXPECT_EQ("%s", config.pattern);
-    EXPECT_EQ(std::vector<std::string>({ "...1" }), config.attribute_names);
+    std::string::const_iterator it = pattern.begin();
+    EXPECT_EQ("...1", formatter::string::aux::extract_key(it, pattern.end()));
 }
 
 TEST(PatternParser, ParseVariadicEventScopeToken) {
     std::string pattern("%(...E)s");
-    auto config = formatter::string::pattern_parser_t::parse(pattern);
-    EXPECT_EQ("%s", config.pattern);
-    EXPECT_EQ(std::vector<std::string>({ "...2" }), config.attribute_names);
+    std::string::const_iterator it = pattern.begin();
+    EXPECT_EQ("...2", formatter::string::aux::extract_key(it, pattern.end()));
 }
 
 TEST(PatternParser, ParseVariadicGlobalScopeToken) {
     std::string pattern("%(...G)s");
-    auto config = formatter::string::pattern_parser_t::parse(pattern);
-    EXPECT_EQ("%s", config.pattern);
-    EXPECT_EQ(std::vector<std::string>({ "...4" }), config.attribute_names);
+    std::string::const_iterator it = pattern.begin();
+    EXPECT_EQ("...4", formatter::string::aux::extract_key(it, pattern.end()));
 }
 
 TEST(PatternParser, ParseVariadicThreadScopeToken) {
     std::string pattern("%(...T)s");
-    auto config = formatter::string::pattern_parser_t::parse(pattern);
-    EXPECT_EQ("%s", config.pattern);
-    EXPECT_EQ(std::vector<std::string>({ "...8" }), config.attribute_names);
+    std::string::const_iterator it = pattern.begin();
+    EXPECT_EQ("...8", formatter::string::aux::extract_key(it, pattern.end()));
 }
 
 TEST(PatternParser, ParseVariadicUniverseScopeToken) {
     std::string pattern("%(...U)s");
-    auto config = formatter::string::pattern_parser_t::parse(pattern);
-    EXPECT_EQ("%s", config.pattern);
-    EXPECT_EQ(std::vector<std::string>({ "...16" }), config.attribute_names);
+    std::string::const_iterator it = pattern.begin();
+    EXPECT_EQ("...16", formatter::string::aux::extract_key(it, pattern.end()));
 }
 
 TEST(PatternParser, ParseVariadicMixedScopeTokens) {
     std::string pattern("%(...LE)s");
-    auto config = formatter::string::pattern_parser_t::parse(pattern);
-    EXPECT_EQ("%s", config.pattern);
-    EXPECT_EQ(std::vector<std::string>({ "...3" }), config.attribute_names);
+    std::string::const_iterator it = pattern.begin();
+    EXPECT_EQ("...3", formatter::string::aux::extract_key(it, pattern.end()));
 }
 
 TEST(PatternParser, SquishScopes) {
     std::string pattern("%(...LLLUUE)s");
-    auto config = formatter::string::pattern_parser_t::parse(pattern);
-    EXPECT_EQ("%s", config.pattern);
-    EXPECT_EQ(std::vector<std::string>({ "...19" }), config.attribute_names);
+    std::string::const_iterator it = pattern.begin();
+    EXPECT_EQ("...19", formatter::string::aux::extract_key(it, pattern.end()));
 }

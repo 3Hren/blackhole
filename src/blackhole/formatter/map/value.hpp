@@ -51,26 +51,27 @@ public:
     }
 
     template<typename T>
-    boost::optional<std::string> execute(const std::string& key, T&& value) const {
-        boost::optional<std::string> result;
+    void operator ()(std::ostringstream& stream, const std::string& key, T&& value) const {
         auto it = m_mappings.find(key);
         if (it != m_mappings.end()) {
             const mapping_t& action = it->second;
-            result = std::move(action(std::forward<T>(value)));
+            stream << action(std::forward<T>(value));
+        } else {
+            stream << value;
+        }
+    }
+
+    template<typename T>
+    boost::optional<std::string> operator ()(const std::string& key, T&& value) const {
+        auto it = m_mappings.find(key);
+        if (it != m_mappings.end()) {
+            const mapping_t& action = it->second;
+            return boost::optional<std::string>(action(std::forward<T>(value)));
         }
 
-        return result;
+        return boost::optional<std::string>();
     }
 };
-
-inline void apply(const value_t& mapper, const std::string& key, const log::attribute_t& attribute, boost::format* format) {
-    auto result = mapper.execute(key, attribute.value);
-    if (result.is_initialized()) {
-        (*format) % result.get();
-    } else {
-        (*format) % attribute.value;
-    }
-}
 
 } // namespace mapping
 

@@ -6,8 +6,7 @@ TEST(FactoryTraits, StringFormatterConfig) {
 
     auto actual = aux::config_mapper<formatter::string_t>::map(formatter.config);
 
-    EXPECT_EQ("[%s]: %s", actual.pattern);
-    EXPECT_EQ(std::vector<std::string>({ "timestamp", "message" }), actual.attribute_names);
+    EXPECT_EQ("[%(timestamp)s]: %(message)s", actual.pattern);
 }
 
 TEST(FactoryTraits, JsonFormatterConfig) {
