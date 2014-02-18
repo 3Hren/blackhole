@@ -14,14 +14,14 @@ namespace formatter {
 namespace string {
 
 static const char VARIADIC_KEY_PREFIX[] = "...";
-static const std::size_t VARIADIC_KEY_PRFFIX_LENGTH = strlen(VARIADIC_KEY_PREFIX);
+static const std::size_t VARIADIC_KEY_PRFFIX_LENGTH = std::strlen(VARIADIC_KEY_PREFIX);
 
 namespace builder {
 
 struct variadic_t {
     typedef log::attribute::scope_underlying_type scope_underlying_type;
 
-    std::string placeholder;
+    const std::string placeholder;
 
     void operator ()(std::ostringstream& stream, const mapping::value_t&, const log::attributes_t& attributes) const {
         for (auto pit = placeholder.begin() + string::VARIADIC_KEY_PRFFIX_LENGTH; pit != placeholder.end(); ++pit) {
