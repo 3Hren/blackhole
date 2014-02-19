@@ -11,6 +11,5 @@
 
 //!@todo: api: Make fallback logger. Make it configurable.
 //!@todo: aux: Make internal exception class with attribute keeping, e.g. line, file or path.
-//!@todo: api: Maybe squish repository_t::init and ::configure methods?
 //!@todo: msgpack_t: Attribute mappings.
 //!@todo: socket_t: Make asynchronous TCP backend.
