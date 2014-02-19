@@ -7,6 +7,7 @@ namespace blackhole {
 
 namespace aux {
 
+//! Universe attributes initializer.
 class bigbang_t {
 public:
     bigbang_t() {

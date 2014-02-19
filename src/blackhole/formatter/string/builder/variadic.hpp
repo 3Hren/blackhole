@@ -32,6 +32,7 @@ struct variadic_t {
                 const log::attribute_t& attribute = it->second;
                 it++;
                 if (static_cast<scope_underlying_type>(attribute.scope) & scope) {
+                    //!@todo: Implement visitor to properly format int attributes (without quotes).
                     stream << "'" << name << "': '" << attribute.value << "'";
                     if (it != attributes.end()) {
                         stream << ", ";
