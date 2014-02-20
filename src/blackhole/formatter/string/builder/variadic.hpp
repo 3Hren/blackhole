@@ -27,16 +27,15 @@ struct variadic_t {
         for (auto pit = placeholder.begin() + string::VARIADIC_KEY_PRFFIX_LENGTH; pit != placeholder.end(); ++pit) {
             const scope_underlying_type scope = *pit - '0';
 
-            for (auto it = attributes.begin(); it != attributes.end();) {
+            for (auto it = attributes.begin(); it != attributes.end(); it++) {
                 const std::string& name = it->first;
                 const log::attribute_t& attribute = it->second;
-                it++;
                 if (static_cast<scope_underlying_type>(attribute.scope) & scope) {
                     //!@todo: Implement visitor to properly format int attributes (without quotes).
-                    stream << "'" << name << "': '" << attribute.value << "'";
-                    if (it != attributes.end()) {
+                    if (it != attributes.begin()) {
                         stream << ", ";
                     }
+                    stream << "'" << name << "': '" << attribute.value << "'";
                 }
             }
         }
