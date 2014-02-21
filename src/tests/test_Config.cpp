@@ -1,4 +1,13 @@
-#include "Mocks.hpp"
+#include <blackhole/formatter/json.hpp>
+#include <blackhole/formatter/string.hpp>
+#include <blackhole/repository/config/formatter.hpp>
+#include <blackhole/repository/config/sink.hpp>
+#include <blackhole/repository/factory/traits.hpp>
+#include <blackhole/sink/files.hpp>
+
+#include "global.hpp"
+
+using namespace blackhole;
 
 TEST(FactoryTraits, StringFormatterConfig) {
     formatter_config_t formatter("string");

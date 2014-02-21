@@ -1,4 +1,7 @@
-#include "Mocks.hpp"
+#include <blackhole/log.hpp>
+
+#include "global.hpp"
+#include "mocks/logger.hpp"
 
 using namespace blackhole;
 

@@ -1,4 +1,9 @@
-#include "Mocks.hpp"
+#include <blackhole/sink/syslog.hpp>
+
+#include "global.hpp"
+#include "mocks/syslog.hpp"
+
+using namespace blackhole;
 
 namespace testing {
 

@@ -1,4 +1,9 @@
-#include "Mocks.hpp"
+#include <blackhole/sink/socket.hpp>
+
+#include "global.hpp"
+#include "mocks/socket.hpp"
+
+using namespace blackhole;
 
 TEST(socket_t, Class) {
     sink::socket_t<boost::asio::ip::udp> sink("localhost", 50030);

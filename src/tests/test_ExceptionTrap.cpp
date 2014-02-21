@@ -1,4 +1,11 @@
-#include "Mocks.hpp"
+#include <blackhole/attribute.hpp>
+#include <blackhole/error/handler.hpp>
+#include <blackhole/logger.hpp>
+
+#include "global.hpp"
+#include "mocks/frontend.hpp"
+
+using namespace blackhole;
 
 namespace testing {
 

@@ -1,4 +1,8 @@
-#include "Mocks.hpp"
+#include <blackhole/sink/stream.hpp>
+
+#include "global.hpp"
+
+using namespace blackhole;
 
 TEST(stream_t, Class) {
    sink::stream_t sink1(sink::stream_t::output_t::stdout);

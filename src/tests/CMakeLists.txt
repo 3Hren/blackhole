@@ -8,38 +8,42 @@ SET(PROJECT blackhole-tests)
 ENABLE_TESTING()
 
 SET(HEADERS
-    Global.hpp
-    Mocks.hpp
+    global
+    mocks.hpp
+    mocks/files
+    mocks/logger
+    mocks/socket
+    mocks/syslog
 )
 
 SET(SOURCES
     main
-    test_StringFormatter
-    test_FileSink
-    test_Logger
-    test_VerboseLogger
     test_Attribute
-    test_Filter
-    test_StringPatternParser
-    test_UdpSink
-    test_SyslogSink
-    test_Functional
-    test_FactoryInitialization
-    test_JsonFormatter
-    test_ExceptionTrap
-    test_Macro
-    test_MsgpackFormatter
     test_Config
-    test_Manual
-    test_Utils
+    test_ConfigJsonInitialization
+    test_ExceptionTrap
+    test_FactoryInitialization
     test_FileRotation
     test_FileRotationNaming
     test_FileBackend
-    test_ConfigJsonInitialization
     test_FileRotationSizeWatcher
     test_FileRotationDateTimeWatcher
-    test_StreamSink
+    test_FileSink
+    test_Filter
+    test_Functional
+    test_JsonFormatter
+    test_Logger
+    test_Macro
+    test_Manual
+    test_MsgpackFormatter
     test_NullSink
+    test_StreamSink
+    test_StringFormatter
+    test_StringPatternParser
+    test_SyslogSink
+    test_UdpSink
+    test_Utils
+    test_VerboseLogger
 )
 
 SET(Boost_USE_MULTITHREADED ON)

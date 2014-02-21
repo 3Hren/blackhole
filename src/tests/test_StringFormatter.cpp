@@ -1,4 +1,8 @@
-#include "Mocks.hpp"
+#include <blackhole/formatter/string.hpp>
+#include <blackhole/keyword/message.hpp>
+#include <blackhole/keyword/timestamp.hpp>
+
+#include "global.hpp"
 
 using namespace blackhole;
 

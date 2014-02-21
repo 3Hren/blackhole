@@ -1,4 +1,8 @@
-#include "Mocks.hpp"
+#include <blackhole/sink/null.hpp>
+
+#include "global.hpp"
+
+using namespace blackhole;
 
 TEST(null_t, Class) {
     sink::null::config_t config;

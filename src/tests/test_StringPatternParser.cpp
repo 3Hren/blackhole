@@ -1,4 +1,8 @@
-#include "Mocks.hpp"
+#include <blackhole/formatter/string/builder.hpp>
+
+#include "global.hpp"
+
+using namespace blackhole;
 
 TEST(PatternParser, ParseVariadicLocalScopeToken) {
     std::string pattern("%(...L)s");

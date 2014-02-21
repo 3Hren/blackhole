@@ -1,4 +1,16 @@
-#include "Mocks.hpp"
+#include <blackhole/formatter/string.hpp>
+#include <blackhole/formatter/json.hpp>
+#include <blackhole/frontend.hpp>
+#include <blackhole/frontend/syslog.hpp>
+#include <blackhole/repository.hpp>
+#include <blackhole/sink/files.hpp>
+#include <blackhole/sink/socket.hpp>
+#include <blackhole/sink/stream.hpp>
+#include <blackhole/sink/syslog.hpp>
+
+#include "global.hpp"
+
+using namespace blackhole;
 
 namespace testing {
 

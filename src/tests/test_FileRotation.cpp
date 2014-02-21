@@ -1,4 +1,8 @@
-#include "Mocks.hpp"
+#include <blackhole/sink/files/rotation.hpp>
+
+#include "global.hpp"
+#include "mocks.hpp"
+#include "mocks/files.hpp"
 
 using namespace blackhole;
 

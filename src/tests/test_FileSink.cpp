@@ -1,4 +1,7 @@
-#include "Mocks.hpp"
+#include <blackhole/sink/files.hpp>
+
+#include "global.hpp"
+#include "mocks/files.hpp"
 
 using namespace blackhole;
 

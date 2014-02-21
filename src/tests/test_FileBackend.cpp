@@ -1,8 +1,14 @@
-#include "Mocks.hpp"
+#include <boost/filesystem.hpp>
+
+#include <blackhole/sink/files/backend.hpp>
+
+#include "global.hpp"
+
+using namespace blackhole;
 
 namespace testing {
 
-class boost_backend_t : public ::testing::Test {
+class boost_backend_t : public testing::Test {
 protected:
     void SetUp() {
         boost::filesystem::create_directory(".testing");

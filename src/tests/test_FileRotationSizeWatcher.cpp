@@ -1,4 +1,9 @@
-#include "Mocks.hpp"
+#include <blackhole/sink/files/rotation.hpp>
+
+#include "global.hpp"
+#include "mocks/files.hpp"
+
+using namespace blackhole;
 
 TEST(size_t, Class) {
     sink::rotation::watcher::size_t watcher(1024);

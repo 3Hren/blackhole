@@ -1,6 +1,10 @@
-#include "Mocks.hpp"
+#include <boost/algorithm/string.hpp>
 
-#include "blackhole/repository/config/parser/rapidjson.hpp"
+#include <blackhole/repository/config/parser/rapidjson.hpp>
+
+#include "global.hpp"
+
+using namespace blackhole;
 
 namespace testing {
 

@@ -1,4 +1,10 @@
-#include "Mocks.hpp"
+#include <blackhole/sink/files/rotation/watcher/datetime.hpp>
+
+#include "global.hpp"
+#include "mocks.hpp"
+#include "mocks/files.hpp"
+
+using namespace blackhole;
 
 TEST(datetime_t, Class) {
     sink::rotation::watcher::datetime_t<> watcher;
@@ -17,20 +23,6 @@ TEST(datetime_t, EnumInitialization) {
     UNUSED(watcher2);
     UNUSED(watcher3);
     UNUSED(watcher4);
-}
-
-namespace mock {
-class time_picker_t {
-public:
-    time_picker_t() {
-        std::tm timeinfo;
-        std::memset(&timeinfo, 0, sizeof(timeinfo));
-        ON_CALL(*this, now())
-                .WillByDefault(Return(timeinfo));
-    }
-
-    MOCK_CONST_METHOD0(now, std::tm());
-};
 }
 
 TEST(datetime_t, TriggerWhenDailyCounterIncreases) {
