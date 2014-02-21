@@ -9,6 +9,7 @@ struct context_t {
 };
 
 namespace aux {
+
 inline uint digits(int value) {
     if (value == 0) {
         return 1;
@@ -22,7 +23,8 @@ inline uint digits(int value) {
 
     return digits;
 }
-}
+
+} // namespace aux
 
 inline void fill(std::ostringstream& stream, int value, int length, char filler = '0') {
     const int digits = aux::digits(value);
@@ -54,14 +56,9 @@ struct literal_generator_t {
     std::string literal;
 
     void operator()(context_t& context) const {
+        context.stream << literal;
     }
 };
-
-//!@todo: Test base case: '%' -> '%%' literal | other -> literal.
-//!@todo: naming. string -> generic structure - parser; generic structure + time -> string - generator.
-//!       datetime_handler_t [[callbacks - add functions to formatter vector]].
-//!       datetime_generator_t [[formatter]].
-//! parser<date<time<common>>> parser;
 
 namespace datetime {
 
@@ -108,6 +105,7 @@ public:
     }
 
     virtual void literal(const boost::iterator_range<iterator_type>& range) {
+        actions.push_back(literal_generator_t { boost::copy_range<std::string>(range) });
     }
 
     virtual void placeholder(const boost::iterator_range<iterator_type>& range) {
@@ -116,6 +114,10 @@ public:
 
     virtual void full_year() {
         actions.push_back(&visit::year::full);
+    }
+
+    virtual void short_year() {
+        actions.push_back(&visit::year::normal);
     }
 };
 
@@ -128,13 +130,16 @@ public:
     static iterator_type parse(iterator_type it, iterator_type end, generator_handler_t& handler) {
         BOOST_ASSERT(it != end && it + 1 != end);
         handler.placeholder(boost::make_iterator_range(it, it + 2));
-        it += 2;
-        return it;
+        return it + 2;
     }
 };
 
 template<class Decorate = through_t>
 class common {
+};
+
+template<class Decorate>
+class time {
 };
 
 template<class Decorate>
@@ -144,21 +149,18 @@ public:
 
     static iterator_type parse(iterator_type it, iterator_type end, generator_handler_t& handler) {
         BOOST_ASSERT(it != end && it + 1 != end);
-        it++;
-        switch (*it) {
+        switch (*(it + 1)) {
         case 'Y':
             handler.full_year();
-            it++;
             break;
         case 'y':
-//            formatters.push_back(&visit::year::normal);
-//            it++;
+            handler.short_year();
             break;
         default:
             return Decorate::parse(it, end, handler);
         }
 
-        return it;
+        return it + 2;
     }
 };
 
@@ -177,11 +179,11 @@ public:
             iterator_type p = std::find(it, end, '%');
             handler.partial_literal(it, p);
 
-            if ((end - it) >= 2) {
-                it = Decorate::parse(it, end, handler);
+            if (std::distance(p, end) >= 2) {
+                it = Decorate::parse(p, end, handler);
             } else {
-                if (it != end) {
-                    handler.partial_literal(it, end);
+                if (p != end) {
+                    handler.partial_literal(p, end);
                 }
                 break;
             }
@@ -212,4 +214,40 @@ TEST(generator_t, FullYear) {
     tm.tm_year = 2014;
     generator(stream, tm);
     EXPECT_EQ("2014", stream.str());
+}
+
+TEST(generator_t, ShortYear) {
+    generator_t generator = generator_factory_t::make("%y");
+    std::ostringstream stream;
+    std::tm tm;
+    tm.tm_year = 2014;
+    generator(stream, tm);
+    EXPECT_EQ("14", stream.str());
+}
+
+TEST(generator_t, ShortYearWithZeroPrefix) {
+    generator_t generator = generator_factory_t::make("%y");
+    std::ostringstream stream;
+    std::tm tm;
+    tm.tm_year = 2004;
+    generator(stream, tm);
+    EXPECT_EQ("04", stream.str());
+}
+
+TEST(generator_t, ShortYearMinValue) {
+    generator_t generator = generator_factory_t::make("%y");
+    std::ostringstream stream;
+    std::tm tm;
+    tm.tm_year = 2000;
+    generator(stream, tm);
+    EXPECT_EQ("00", stream.str());
+}
+
+TEST(generator_t, FullYearWithSuffixLiteral) {
+    generator_t generator = generator_factory_t::make("%Y-");
+    std::ostringstream stream;
+    std::tm tm;
+    tm.tm_year = 2014;
+    generator(stream, tm);
+    EXPECT_EQ("2014-", stream.str());
 }
