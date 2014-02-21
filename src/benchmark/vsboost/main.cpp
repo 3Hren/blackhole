@@ -2,8 +2,10 @@
 
 #include "celero/Celero.h"
 
-#include "tests/Mocks.hpp"
-#include "blackhole/record.hpp"
+#include <blackhole/logger.hpp>
+#include <blackhole/log.hpp>
+#include <blackhole/sink/files.hpp>
+#include <blackhole/repository.hpp>
 
 using namespace blackhole;
 
