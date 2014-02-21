@@ -7,12 +7,6 @@
 
 using namespace blackhole;
 
-namespace testing {
-
-enum level : std::uint64_t { debug, info, warn, error };
-
-} // namespace testing
-
 TEST(verbose_logger_t, Class) {
     verbose_logger_t<testing::level> log;
     UNUSED(log);

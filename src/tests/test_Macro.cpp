@@ -5,15 +5,9 @@
 
 using namespace blackhole;
 
-namespace testing {
-
-enum level { debug, info, warn, error };
-
-} // namespace testing
-
 TEST(Macro, OpensInvalidLogRecordAndNotPush) {
     log::record_t record;
-    mock::verbose_log_t<testing::level> log;
+    mock::verbose_log_t<level> log;
     EXPECT_CALL(log, open_record(level::debug))
             .Times(1)
             .WillOnce(Return(record));
@@ -34,7 +28,7 @@ TEST(Macro, OpensValidRecordAndPush) {
     log::record_t record;
     record.attributes["attr1"] = {"value1"};
 
-    mock::verbose_log_t<testing::level> log;
+    mock::verbose_log_t<level> log;
     EXPECT_CALL(log, open_record(level::debug))
             .Times(1)
             .WillOnce(Return(record));
@@ -53,7 +47,7 @@ TEST(Macro, FormatMessageWithPrintfStyle) {
     log::record_t record;
     record.attributes["attr1"] = {"value1"};
 
-    mock::verbose_log_t<testing::level> log;
+    mock::verbose_log_t<level> log;
     EXPECT_CALL(log, open_record(level::debug))
             .Times(1)
             .WillOnce(Return(record));
@@ -94,7 +88,7 @@ TEST(Macro, FormatMessageWithAttributes) {
     log::record_t record;
     record.attributes["attr1"] = {"value1"};
 
-    mock::verbose_log_t<testing::level> log;
+    mock::verbose_log_t<level> log;
     EXPECT_CALL(log, open_record(level::debug))
             .Times(1)
             .WillOnce(Return(record));
@@ -121,7 +115,7 @@ TEST(Macro, FormatMessageWithPrintfStyleWithAttributes) {
     log::record_t record;
     record.attributes["attr1"] = {"value1"};
 
-    mock::verbose_log_t<testing::level> log;
+    mock::verbose_log_t<level> log;
     EXPECT_CALL(log, open_record(level::debug))
             .Times(1)
             .WillOnce(Return(record));
@@ -183,7 +177,7 @@ TEST(Macro, SpecificKeywordMessageFormatting) {
         keyword::severity<level>() = level::debug
     };
 
-    mock::verbose_log_t<testing::level> log;
+    mock::verbose_log_t<level> log;
     EXPECT_CALL(log, open_record(level::debug))
             .Times(1)
             .WillOnce(Return(record));

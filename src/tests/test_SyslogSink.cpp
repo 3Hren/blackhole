@@ -5,12 +5,6 @@
 
 using namespace blackhole;
 
-namespace testing {
-
-enum class level : std::uint8_t { debug, info, warn, error };
-
-} // namespace testing
-
 namespace blackhole { namespace sink {
 
 template<>

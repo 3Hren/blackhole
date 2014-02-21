@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include <blackhole/expression.hpp>
 #include <blackhole/keyword/severity.hpp>
 #include <blackhole/keyword/timestamp.hpp>
