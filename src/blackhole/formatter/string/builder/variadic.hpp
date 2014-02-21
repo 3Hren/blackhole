@@ -20,6 +20,23 @@ static const std::size_t VARIADIC_KEY_PRFFIX_LENGTH = std::strlen(VARIADIC_KEY_P
 
 namespace builder {
 
+class variadic_visitor_t : public boost::static_visitor<> {
+    std::ostringstream& stream;
+public:
+    variadic_visitor_t(std::ostringstream& stream) :
+        stream(stream)
+    {}
+
+    template<typename T>
+    void operator()(const T& value) const {
+        stream << value;
+    }
+
+    void operator()(const std::string& value) const {
+        stream << "'" << value << "'";
+    }
+};
+
 struct variadic_t {
     typedef log::attribute::scope_underlying_type scope_underlying_type;
 
@@ -36,9 +53,10 @@ struct variadic_t {
                 const std::string& name = it->first;
                 const log::attribute_t& attribute = it->second;
                 if (static_cast<scope_underlying_type>(attribute.scope) & scope) {
-                    //!@todo: Implement visitor to properly format int attributes (without quotes).
                     std::ostringstream stream;
-                    stream << "'" << name << "': '" << attribute.value << "'";
+                    variadic_visitor_t visitor(stream);
+                    stream << "'" << name << "': ";
+                    boost::apply_visitor(visitor, attribute.value);
                     passed.push_back(stream.str());
                 }
             }

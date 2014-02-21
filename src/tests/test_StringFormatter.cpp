@@ -64,7 +64,7 @@ TEST(string_t, FormatOtherLocalAttributes) {
     std::string pattern("[%(...L)s]");
     formatter::string_t formatter(pattern);
     std::string actual = formatter.format(record);
-    EXPECT_TRUE(actual.find("'answer to life the universe and everything': '42'") != std::string::npos);
+    EXPECT_TRUE(actual.find("'answer to life the universe and everything': 42") != std::string::npos);
     EXPECT_TRUE(actual.find("'uuid': '123-456'") != std::string::npos);
 }
 
@@ -81,7 +81,7 @@ TEST(string_t, ComplexFormatWithOtherLocalAttributes) {
     formatter::string_t formatter(pattern);
     std::string actual = formatter.format(record);
     EXPECT_TRUE(boost::starts_with(actual, "[1960-01-01 00:00:00] [INFO]: le message ["));
-    EXPECT_TRUE(actual.find("'answer to life the universe and everything': '42'") != std::string::npos);
+    EXPECT_TRUE(actual.find("'answer to life the universe and everything': 42") != std::string::npos);
     EXPECT_TRUE(actual.find("'uuid': '123-456'") != std::string::npos);
 }
 
