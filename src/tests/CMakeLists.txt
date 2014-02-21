@@ -8,12 +8,12 @@ SET(PROJECT blackhole-tests)
 ENABLE_TESTING()
 
 SET(HEADERS
-    global
+    global.hpp
     mocks.hpp
-    mocks/files
-    mocks/logger
-    mocks/socket
-    mocks/syslog
+    mocks/files.hpp
+    mocks/logger.hpp
+    mocks/socket.hpp
+    mocks/syslog.hpp
 )
 
 SET(SOURCES
