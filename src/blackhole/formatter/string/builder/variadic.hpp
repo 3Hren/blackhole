@@ -3,6 +3,8 @@
 #include <sstream>
 #include <string>
 
+#include <boost/algorithm/string.hpp>
+
 #include "blackhole/attribute.hpp"
 #include "blackhole/error.hpp"
 #include "blackhole/formatter/map/value.hpp"
@@ -24,6 +26,9 @@ struct variadic_t {
     const std::string placeholder;
 
     void operator ()(std::ostringstream& stream, const mapping::value_t&, const log::attributes_t& attributes) const {
+        std::vector<std::string> passed;
+        passed.reserve(attributes.size());
+
         for (auto pit = placeholder.begin() + string::VARIADIC_KEY_PRFFIX_LENGTH; pit != placeholder.end(); ++pit) {
             const scope_underlying_type scope = *pit - '0';
 
@@ -32,13 +37,13 @@ struct variadic_t {
                 const log::attribute_t& attribute = it->second;
                 if (static_cast<scope_underlying_type>(attribute.scope) & scope) {
                     //!@todo: Implement visitor to properly format int attributes (without quotes).
-                    if (it != attributes.begin()) {
-                        stream << ", ";
-                    }
+                    std::ostringstream stream;
                     stream << "'" << name << "': '" << attribute.value << "'";
+                    passed.push_back(stream.str());
                 }
             }
         }
+        stream << boost::algorithm::join(passed, ", ");
     }
 };
 
