@@ -2,6 +2,8 @@
 
 #include <ctime>
 
+#include "blackhole/utils/nullptr.hpp"
+
 namespace blackhole {
 
 namespace sink {

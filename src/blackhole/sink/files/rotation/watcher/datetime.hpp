@@ -3,6 +3,7 @@
 #include <ctime>
 
 #include "blackhole/sink/files/rotation/watcher/config.hpp"
+#include "blackhole/utils/nullptr.hpp"
 
 namespace blackhole {
 
