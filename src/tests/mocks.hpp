@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstring>
+
 #include "global.hpp"
 
 namespace testing {
