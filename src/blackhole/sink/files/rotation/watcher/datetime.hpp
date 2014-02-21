@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ctime>
+
 #include "blackhole/sink/files/rotation/watcher/config.hpp"
 
 namespace blackhole {

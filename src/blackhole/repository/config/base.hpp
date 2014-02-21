@@ -1,8 +1,12 @@
 #pragma once
 
+#include <map>
 #include <string>
 
 #include <boost/any.hpp>
+
+#include "blackhole/error.hpp"
+#include "blackhole/repository/factory/traits/cast.hpp"
 
 namespace blackhole {
 

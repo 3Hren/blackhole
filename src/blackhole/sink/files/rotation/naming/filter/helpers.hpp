@@ -4,6 +4,8 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include "blackhole/sink/files/rotation/naming/helpers.hpp"
+
 namespace blackhole {
 
 namespace sink {
