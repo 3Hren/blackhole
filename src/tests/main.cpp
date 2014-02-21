@@ -1,20 +1,20 @@
-#include "Global.hpp"
+#include "global.hpp"
 
 /*! @brief Log library specification.
  *
  *  === TYPICAL USAGE VIA MACRO ===
  *
- *  LOG(log, debug, "some information: %s at [%d]", "nothing", 100500, {
- *      keyword::id(42),
- *      keyword::address("127.0.0.1")
- *  });
+ *  LOG(log, debug, "some information: %s at [%d]", "nothing", 100500)(
+ *      keyword::id = 42,
+ *      keyword::address = "127.0.0.1"
+ *  );
  *
  *  === TYPYCAL USAGE VIA LOGGER OBJECT ===
  *
- *  log.debug("some information: %s at [%d]", "nothing", 100500, {
- *      keyword::id(42),
- *      keyword::address("127.0.0.1")
- *  });
+ *  log.debug("some information: %s at [%d]", "nothing", 100500)(
+ *      keyword::id = 42,
+ *      keyword::address = "127.0.0.1"
+ *  );
  *
  *  === YOU CAN CREATE OWN ATTRIBUTES DYNAMICALLY ===
  *
