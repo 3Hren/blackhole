@@ -56,6 +56,11 @@ struct attribute_t {
         scope(type)
     {}
 
+    attribute_t(attribute_value_t&& value, attribute::scope type = attribute::DEFAULT_SCOPE) :
+        value(std::move(value)),
+        scope(type)
+    {}
+
     // Force compiler to keep enum values according to its underlying type.
     // It is needed, cause for weakly-typed enums its underlying type and its values underlying
     // types may vary, which leads to exception while extracting from variant.
@@ -93,6 +98,11 @@ namespace attribute {
 template<typename T>
 inline log::attribute_pair_t make(const std::string& name, const T& value, log::attribute::scope scope = log::attribute::DEFAULT_SCOPE) {
     return std::make_pair(name, log::attribute_t(value, scope));
+}
+
+template<typename T>
+inline log::attribute_pair_t make(const std::string& name, T&& value, log::attribute::scope scope = log::attribute::DEFAULT_SCOPE) {
+    return std::make_pair(name, log::attribute_t(std::move(value), scope));
 }
 
 // Attribute packing/unpacking/extracting.

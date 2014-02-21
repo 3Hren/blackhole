@@ -44,6 +44,10 @@ struct keyword_t {
         return attribute::make(name(), attribute::traits<T>::pack(value), Scope);
     }
 
+    log::attribute_pair_t operator =(T&& value) const {
+        return attribute::make(name(), attribute::traits<T>::pack(std::forward<T>(value)), Scope);
+    }
+
     filter_t operator >=(T value) const {
         return action_t<action::LessEq>({ value });
     }
