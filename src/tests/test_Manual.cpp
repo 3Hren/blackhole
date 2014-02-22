@@ -113,10 +113,12 @@ public:
     }
 
     virtual void full_year() {
+        end_partial_literal();
         actions.push_back(&visit::year::full);
     }
 
     virtual void short_year() {
+        end_partial_literal();
         actions.push_back(&visit::year::normal);
     }
 };
@@ -250,4 +252,13 @@ TEST(generator_t, FullYearWithSuffixLiteral) {
     tm.tm_year = 2014;
     generator(stream, tm);
     EXPECT_EQ("2014-", stream.str());
+}
+
+TEST(generator_t, FullYearWithPrefixLiteral) {
+    generator_t generator = generator_factory_t::make("-%Y");
+    std::ostringstream stream;
+    std::tm tm;
+    tm.tm_year = 2014;
+    generator(stream, tm);
+    EXPECT_EQ("-2014", stream.str());
 }
