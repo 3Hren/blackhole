@@ -262,3 +262,12 @@ TEST(generator_t, FullYearWithPrefixLiteral) {
     generator(stream, tm);
     EXPECT_EQ("-2014", stream.str());
 }
+
+TEST(generator_t, FullYearWithPrefixAndSuffixLiteral) {
+    generator_t generator = generator_factory_t::make("-%Y-");
+    std::ostringstream stream;
+    std::tm tm;
+    tm.tm_year = 2014;
+    generator(stream, tm);
+    EXPECT_EQ("-2014-", stream.str());
+}
