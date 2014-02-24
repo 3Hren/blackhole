@@ -58,6 +58,18 @@ inline void numeric(context_t& context) {
 
 } // namespace month
 
+namespace day {
+
+namespace month {
+
+inline void numeric(context_t& context) {
+    fill(context.stream, context.tm.tm_mday, 2);
+}
+
+} // namespace month
+
+} // namespace day
+
 } // namespace visit
 
 struct literal_generator_t {
@@ -134,6 +146,11 @@ public:
         end_partial_literal();
         actions.push_back(&visit::month::numeric);
     }
+
+    virtual void month_day() {
+        end_partial_literal();
+        actions.push_back(&visit::day::month::numeric);
+    }
 };
 
 namespace parser {
@@ -173,6 +190,9 @@ public:
             break;
         case 'm':
             handler.numeric_month();
+            break;
+        case 'd':
+            handler.month_day();
             break;
         default:
             return Decorate::parse(it, end, handler);
@@ -295,4 +315,22 @@ TEST(generator_t, NumericMonth) {
     tm.tm_mon = 2;
     generator(stream, tm);
     EXPECT_EQ("02", stream.str());
+}
+
+TEST(generator_t, NumericDayOfMonth) {
+    generator_t generator = generator_factory_t::make("%d");
+    std::ostringstream stream;
+    std::tm tm;
+    tm.tm_mday = 23;
+    generator(stream, tm);
+    EXPECT_EQ("23", stream.str());
+}
+
+TEST(generator_t, NumericDayOfMonthWithSingleDigit) {
+    generator_t generator = generator_factory_t::make("%d");
+    std::ostringstream stream;
+    std::tm tm;
+    tm.tm_mday = 6;
+    generator(stream, tm);
+    EXPECT_EQ("06", stream.str());
 }
