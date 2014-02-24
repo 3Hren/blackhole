@@ -74,6 +74,14 @@ inline void numeric(context_t& context) {
 
 } // namespace day
 
+namespace hour {
+
+inline void h24(context_t& context) {
+    fill(context.stream, context.tm.tm_hour, 2);
+}
+
+}
+
 } // namespace visit
 
 struct literal_generator_t {
@@ -159,6 +167,11 @@ public:
             actions.push_back(&visit::day::month::numeric<' '>);
         }
     }
+
+    virtual void hours() {
+        end_partial_literal();
+        actions.push_back(&visit::hour::h24);
+    }
 };
 
 namespace parser {
@@ -176,10 +189,27 @@ public:
 
 template<class Decorate = through_t>
 class common {
+public:
+    typedef typename Decorate::iterator_type iterator_type;
 };
 
 template<class Decorate>
 class time {
+public:
+    typedef typename Decorate::iterator_type iterator_type;
+
+    static iterator_type parse(iterator_type it, iterator_type end, generator_handler_t& handler) {
+        BOOST_ASSERT(it != end && it + 1 != end);
+        switch (*(it + 1)) {
+        case 'H':
+            handler.hours();
+            break;
+        default:
+            return Decorate::parse(it, end, handler);
+        }
+
+        return it + 2;
+    }
 };
 
 template<class Decorate>
@@ -247,7 +277,7 @@ public:
     static generator_t make(const std::string& pattern) {
         std::vector<generator_action_t> actions;
         generator_handler_t handler(actions);
-        parser_t<parser::date<parser::through_t>>::parse(pattern, handler);
+        parser_t<parser::date<parser::time<parser::through_t>>>::parse(pattern, handler);
         return generator_t(std::move(actions));
     }
 };
@@ -355,12 +385,20 @@ TEST(generator_t, ShortNumericDayOfMonth) {
     EXPECT_EQ("23", stream.str());
 }
 
-TEST(generator_t, ShortNumericDayOfMonthWithSingleDigit) {
-    //!@note: Single digit is preceded by a space.
-    generator_t generator = generator_factory_t::make("%e");
+TEST(generator_t, FullHour) {
+    generator_t generator = generator_factory_t::make("%H");
     std::ostringstream stream;
     std::tm tm;
-    tm.tm_mday = 6;
+    tm.tm_hour = 11;
     generator(stream, tm);
-    EXPECT_EQ(" 6", stream.str());
+    EXPECT_EQ("11", stream.str());
+}
+
+TEST(generator_t, FullHourWithSingleDigit) {
+    generator_t generator = generator_factory_t::make("%H");
+    std::ostringstream stream;
+    std::tm tm;
+    tm.tm_hour = 0;
+    generator(stream, tm);
+    EXPECT_EQ("00", stream.str());
 }
