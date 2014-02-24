@@ -50,6 +50,14 @@ inline void normal(context_t& context) {
 
 } // namespace year
 
+namespace month {
+
+inline void numeric(context_t& context) {
+    fill(context.stream, context.tm.tm_mon, 2);
+}
+
+} // namespace month
+
 } // namespace visit
 
 struct literal_generator_t {
@@ -121,6 +129,11 @@ public:
         end_partial_literal();
         actions.push_back(&visit::year::normal);
     }
+
+    virtual void numeric_month() {
+        end_partial_literal();
+        actions.push_back(&visit::month::numeric);
+    }
 };
 
 namespace parser {
@@ -157,6 +170,9 @@ public:
             break;
         case 'y':
             handler.short_year();
+            break;
+        case 'm':
+            handler.numeric_month();
             break;
         default:
             return Decorate::parse(it, end, handler);
@@ -270,4 +286,13 @@ TEST(generator_t, FullYearWithPrefixAndSuffixLiteral) {
     tm.tm_year = 2014;
     generator(stream, tm);
     EXPECT_EQ("-2014-", stream.str());
+}
+
+TEST(generator_t, NumericMonth) {
+    generator_t generator = generator_factory_t::make("%m");
+    std::ostringstream stream;
+    std::tm tm;
+    tm.tm_mon = 2;
+    generator(stream, tm);
+    EXPECT_EQ("02", stream.str());
 }
