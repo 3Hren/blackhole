@@ -471,3 +471,13 @@ TEST_F(generator_test_case_t, SecondUpperBound) {
     tm.tm_sec = 60;
     EXPECT_EQ("60", generate("%S"));
 }
+
+TEST_F(generator_test_case_t, ComplexFormatting) {
+    tm.tm_year = 2014;
+    tm.tm_mon = 2;
+    tm.tm_mday = 23;
+    tm.tm_hour = 12;
+    tm.tm_min = 20;
+    tm.tm_sec = 30;
+    EXPECT_EQ("2014-02-23 12:20:30", generate("%Y-%m-%d %H:%M:%S"));
+}
