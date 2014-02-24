@@ -1,3 +1,6 @@
+#include <ctime>
+#include <functional>
+
 #include <boost/assert.hpp>
 #include <boost/range.hpp>
 
@@ -62,8 +65,9 @@ namespace day {
 
 namespace month {
 
+template<char Filler = '0'>
 inline void numeric(context_t& context) {
-    fill(context.stream, context.tm.tm_mday, 2);
+    fill(context.stream, context.tm.tm_mday, 2, Filler);
 }
 
 } // namespace month
@@ -147,9 +151,13 @@ public:
         actions.push_back(&visit::month::numeric);
     }
 
-    virtual void month_day() {
+    virtual void month_day(bool has_leading_zero = true) {
         end_partial_literal();
-        actions.push_back(&visit::day::month::numeric);
+        if (has_leading_zero) {
+            actions.push_back(&visit::day::month::numeric<'0'>);
+        } else {
+            actions.push_back(&visit::day::month::numeric<' '>);
+        }
     }
 };
 
@@ -193,6 +201,9 @@ public:
             break;
         case 'd':
             handler.month_day();
+            break;
+        case 'e':
+            handler.month_day(false);
             break;
         default:
             return Decorate::parse(it, end, handler);
@@ -333,4 +344,23 @@ TEST(generator_t, NumericDayOfMonthWithSingleDigit) {
     tm.tm_mday = 6;
     generator(stream, tm);
     EXPECT_EQ("06", stream.str());
+}
+
+TEST(generator_t, ShortNumericDayOfMonth) {
+    generator_t generator = generator_factory_t::make("%e");
+    std::ostringstream stream;
+    std::tm tm;
+    tm.tm_mday = 23;
+    generator(stream, tm);
+    EXPECT_EQ("23", stream.str());
+}
+
+TEST(generator_t, ShortNumericDayOfMonthWithSingleDigit) {
+    //!@note: Single digit is preceded by a space.
+    generator_t generator = generator_factory_t::make("%e");
+    std::ostringstream stream;
+    std::tm tm;
+    tm.tm_mday = 6;
+    generator(stream, tm);
+    EXPECT_EQ(" 6", stream.str());
 }
