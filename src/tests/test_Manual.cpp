@@ -85,7 +85,19 @@ inline void h12(context_t& context) {
     fill(context.stream, mod == 0 ? 12 : mod, 2);
 }
 
+} // namespace hour
+
+namespace time {
+
+namespace minute {
+
+inline void normal(context_t& context) {
+    fill(context.stream, context.tm.tm_min, 2);
 }
+
+} // namespace minute
+
+} // namespace time
 
 } // namespace visit
 
@@ -182,6 +194,11 @@ public:
         end_partial_literal();
         actions.push_back(&visit::hour::h12);
     }
+
+    virtual void minute() {
+        end_partial_literal();
+        actions.push_back(&visit::time::minute::normal);
+    }
 };
 
 namespace parser {
@@ -216,6 +233,9 @@ public:
             break;
         case 'I':
             handler.hours12();
+            break;
+        case 'M':
+            handler.minute();
             break;
         default:
             return Decorate::parse(it, end, handler);
@@ -404,4 +424,19 @@ TEST_F(generator_test_case_t, HalfDayHourLowerBorderCase) {
 TEST_F(generator_test_case_t, HalfDayHourUpperBorderCase) {
     tm.tm_hour = 12;
     EXPECT_EQ("12", generate("%I"));
+}
+
+TEST_F(generator_test_case_t, Minute) {
+    tm.tm_min = 30;
+    EXPECT_EQ("30", generate("%M"));
+}
+
+TEST_F(generator_test_case_t, MinuteLowerBound) {
+    tm.tm_min = 00;
+    EXPECT_EQ("00", generate("%M"));
+}
+
+TEST_F(generator_test_case_t, MinuteUpperBound) {
+    tm.tm_min = 59;
+    EXPECT_EQ("59", generate("%M"));
 }
