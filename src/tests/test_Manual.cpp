@@ -299,165 +299,109 @@ public:
 
 using namespace datetime;
 
-TEST(generator_t, FullYear) {
-    generator_t generator = generator_factory_t::make("%Y");
-    std::ostringstream stream;
+class generator_test_case_t : public Test {
+protected:
     std::tm tm;
+
+    void SetUp() {
+        tm = std::tm();
+    }
+
+    std::string generate(const std::string& pattern) {
+        std::ostringstream stream;
+        generator_t generator = generator_factory_t::make(pattern);
+        generator(stream, tm);
+        return stream.str();
+    }
+};
+
+TEST_F(generator_test_case_t, FullYear) {
     tm.tm_year = 2014;
-    generator(stream, tm);
-    EXPECT_EQ("2014", stream.str());
+    EXPECT_EQ("2014", generate("%Y"));
 }
 
-TEST(generator_t, ShortYear) {
-    generator_t generator = generator_factory_t::make("%y");
-    std::ostringstream stream;
-    std::tm tm;
+TEST_F(generator_test_case_t, ShortYear) {
     tm.tm_year = 2014;
-    generator(stream, tm);
-    EXPECT_EQ("14", stream.str());
+    EXPECT_EQ("14", generate("%y"));
 }
 
-TEST(generator_t, ShortYearWithZeroPrefix) {
-    generator_t generator = generator_factory_t::make("%y");
-    std::ostringstream stream;
-    std::tm tm;
+TEST_F(generator_test_case_t, ShortYearWithZeroPrefix) {
     tm.tm_year = 2004;
-    generator(stream, tm);
-    EXPECT_EQ("04", stream.str());
+    EXPECT_EQ("04", generate("%y"));
 }
 
-TEST(generator_t, ShortYearMinValue) {
-    generator_t generator = generator_factory_t::make("%y");
-    std::ostringstream stream;
-    std::tm tm;
+TEST_F(generator_test_case_t, ShortYearMinValue) {
     tm.tm_year = 2000;
-    generator(stream, tm);
-    EXPECT_EQ("00", stream.str());
+    EXPECT_EQ("00", generate("%y"));
 }
 
-TEST(generator_t, FullYearWithSuffixLiteral) {
-    generator_t generator = generator_factory_t::make("%Y-");
-    std::ostringstream stream;
-    std::tm tm;
+TEST_F(generator_test_case_t, FullYearWithSuffixLiteral) {
     tm.tm_year = 2014;
-    generator(stream, tm);
-    EXPECT_EQ("2014-", stream.str());
+    EXPECT_EQ("2014-", generate("%Y-"));
 }
 
-TEST(generator_t, FullYearWithPrefixLiteral) {
-    generator_t generator = generator_factory_t::make("-%Y");
-    std::ostringstream stream;
-    std::tm tm;
+TEST_F(generator_test_case_t, FullYearWithPrefixLiteral) {
     tm.tm_year = 2014;
-    generator(stream, tm);
-    EXPECT_EQ("-2014", stream.str());
+    EXPECT_EQ("-2014", generate("-%Y"));
 }
 
-TEST(generator_t, FullYearWithPrefixAndSuffixLiteral) {
-    generator_t generator = generator_factory_t::make("-%Y-");
-    std::ostringstream stream;
-    std::tm tm;
+TEST_F(generator_test_case_t, FullYearWithPrefixAndSuffixLiteral) {
     tm.tm_year = 2014;
-    generator(stream, tm);
-    EXPECT_EQ("-2014-", stream.str());
+    EXPECT_EQ("-2014-", generate("-%Y-"));
 }
 
-TEST(generator_t, NumericMonth) {
-    generator_t generator = generator_factory_t::make("%m");
-    std::ostringstream stream;
-    std::tm tm;
+TEST_F(generator_test_case_t, NumericMonth) {
     tm.tm_mon = 2;
-    generator(stream, tm);
-    EXPECT_EQ("02", stream.str());
+    EXPECT_EQ("02", generate("%m"));
 }
 
-TEST(generator_t, NumericDayOfMonth) {
-    generator_t generator = generator_factory_t::make("%d");
-    std::ostringstream stream;
-    std::tm tm;
+TEST_F(generator_test_case_t, NumericDayOfMonth) {
     tm.tm_mday = 23;
-    generator(stream, tm);
-    EXPECT_EQ("23", stream.str());
+    EXPECT_EQ("23", generate("%d"));
 }
 
-TEST(generator_t, NumericDayOfMonthWithSingleDigit) {
-    generator_t generator = generator_factory_t::make("%d");
-    std::ostringstream stream;
-    std::tm tm;
+TEST_F(generator_test_case_t, NumericDayOfMonthWithSingleDigit) {
     tm.tm_mday = 6;
-    generator(stream, tm);
-    EXPECT_EQ("06", stream.str());
+    EXPECT_EQ("06", generate("%d"));
 }
 
-TEST(generator_t, ShortNumericDayOfMonth) {
-    generator_t generator = generator_factory_t::make("%e");
-    std::ostringstream stream;
-    std::tm tm;
+TEST_F(generator_test_case_t, ShortNumericDayOfMonth) {
     tm.tm_mday = 23;
-    generator(stream, tm);
-    EXPECT_EQ("23", stream.str());
+    EXPECT_EQ("23", generate("%e"));
 }
 
-TEST(generator_t, FullDayHour) {
-    generator_t generator = generator_factory_t::make("%H");
-    std::ostringstream stream;
-    std::tm tm;
+TEST_F(generator_test_case_t, FullDayHour) {
     tm.tm_hour = 11;
-    generator(stream, tm);
-    EXPECT_EQ("11", stream.str());
+    EXPECT_EQ("11", generate("%H"));
 }
 
-TEST(generator_t, FullDayHourWithSingleDigit) {
-    generator_t generator = generator_factory_t::make("%H");
-    std::ostringstream stream;
-    std::tm tm;
+TEST_F(generator_test_case_t, FullDayHourWithSingleDigit) {
     tm.tm_hour = 0;
-    generator(stream, tm);
-    EXPECT_EQ("00", stream.str());
+    EXPECT_EQ("00", generate("%H"));
 }
 
-TEST(generator_t, HalfDayHour) {
+TEST_F(generator_test_case_t, HalfDayHour) {
     //!@note: tm_hour is treated as [0; 23], so 00:30 will be 12:30.
-    generator_t generator = generator_factory_t::make("%I");
-    std::ostringstream stream;
-    std::tm tm;
     tm.tm_hour = 11;
-    generator(stream, tm);
-    EXPECT_EQ("11", stream.str());
+    EXPECT_EQ("11", generate("%I"));
 }
 
-TEST(generator_t, HalfDayHourWithSingleDigit) {
-    generator_t generator = generator_factory_t::make("%I");
-    std::ostringstream stream;
-    std::tm tm;
+TEST_F(generator_test_case_t, HalfDayHourWithSingleDigit) {
     tm.tm_hour = 6;
-    generator(stream, tm);
-    EXPECT_EQ("06", stream.str());
+    EXPECT_EQ("06", generate("%I"));
 }
 
-TEST(generator_t, HalfDayHourWithOverflow) {
-    generator_t generator = generator_factory_t::make("%I");
-    std::ostringstream stream;
-    std::tm tm;
+TEST_F(generator_test_case_t, HalfDayHourWithOverflow) {
     tm.tm_hour = 13;
-    generator(stream, tm);
-    EXPECT_EQ("01", stream.str());
+    EXPECT_EQ("01", generate("%I"));
 }
 
-TEST(generator_t, HalfDayHourLowerBorderCase) {
-    generator_t generator = generator_factory_t::make("%I");
-    std::ostringstream stream;
-    std::tm tm;
+TEST_F(generator_test_case_t, HalfDayHourLowerBorderCase) {
     tm.tm_hour = 0;
-    generator(stream, tm);
-    EXPECT_EQ("12", stream.str());
+    EXPECT_EQ("12", generate("%I"));
 }
 
-TEST(generator_t, HalfDayHourUpperBorderCase) {
-    generator_t generator = generator_factory_t::make("%I");
-    std::ostringstream stream;
-    std::tm tm;
+TEST_F(generator_test_case_t, HalfDayHourUpperBorderCase) {
     tm.tm_hour = 12;
-    generator(stream, tm);
-    EXPECT_EQ("12", stream.str());
+    EXPECT_EQ("12", generate("%I"));
 }
