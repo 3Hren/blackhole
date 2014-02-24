@@ -80,6 +80,11 @@ inline void h24(context_t& context) {
     fill(context.stream, context.tm.tm_hour, 2);
 }
 
+inline void h12(context_t& context) {
+    const uint mod = context.tm.tm_hour % 12;
+    fill(context.stream, mod == 0 ? 12 : mod, 2);
+}
+
 }
 
 } // namespace visit
@@ -172,6 +177,11 @@ public:
         end_partial_literal();
         actions.push_back(&visit::hour::h24);
     }
+
+    virtual void hours12() {
+        end_partial_literal();
+        actions.push_back(&visit::hour::h12);
+    }
 };
 
 namespace parser {
@@ -203,6 +213,9 @@ public:
         switch (*(it + 1)) {
         case 'H':
             handler.hours();
+            break;
+        case 'I':
+            handler.hours12();
             break;
         default:
             return Decorate::parse(it, end, handler);
@@ -385,7 +398,7 @@ TEST(generator_t, ShortNumericDayOfMonth) {
     EXPECT_EQ("23", stream.str());
 }
 
-TEST(generator_t, FullHour) {
+TEST(generator_t, FullDayHour) {
     generator_t generator = generator_factory_t::make("%H");
     std::ostringstream stream;
     std::tm tm;
@@ -394,11 +407,57 @@ TEST(generator_t, FullHour) {
     EXPECT_EQ("11", stream.str());
 }
 
-TEST(generator_t, FullHourWithSingleDigit) {
+TEST(generator_t, FullDayHourWithSingleDigit) {
     generator_t generator = generator_factory_t::make("%H");
     std::ostringstream stream;
     std::tm tm;
     tm.tm_hour = 0;
     generator(stream, tm);
     EXPECT_EQ("00", stream.str());
+}
+
+TEST(generator_t, HalfDayHour) {
+    //!@note: tm_hour is treated as [0; 23], so 00:30 will be 12:30.
+    generator_t generator = generator_factory_t::make("%I");
+    std::ostringstream stream;
+    std::tm tm;
+    tm.tm_hour = 11;
+    generator(stream, tm);
+    EXPECT_EQ("11", stream.str());
+}
+
+TEST(generator_t, HalfDayHourWithSingleDigit) {
+    generator_t generator = generator_factory_t::make("%I");
+    std::ostringstream stream;
+    std::tm tm;
+    tm.tm_hour = 6;
+    generator(stream, tm);
+    EXPECT_EQ("06", stream.str());
+}
+
+TEST(generator_t, HalfDayHourWithOverflow) {
+    generator_t generator = generator_factory_t::make("%I");
+    std::ostringstream stream;
+    std::tm tm;
+    tm.tm_hour = 13;
+    generator(stream, tm);
+    EXPECT_EQ("01", stream.str());
+}
+
+TEST(generator_t, HalfDayHourLowerBorderCase) {
+    generator_t generator = generator_factory_t::make("%I");
+    std::ostringstream stream;
+    std::tm tm;
+    tm.tm_hour = 0;
+    generator(stream, tm);
+    EXPECT_EQ("12", stream.str());
+}
+
+TEST(generator_t, HalfDayHourUpperBorderCase) {
+    generator_t generator = generator_factory_t::make("%I");
+    std::ostringstream stream;
+    std::tm tm;
+    tm.tm_hour = 12;
+    generator(stream, tm);
+    EXPECT_EQ("12", stream.str());
 }
