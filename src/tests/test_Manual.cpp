@@ -97,6 +97,14 @@ inline void normal(context_t& context) {
 
 } // namespace minute
 
+namespace second {
+
+inline void normal(context_t& context) {
+    fill(context.stream, context.tm.tm_sec, 2);
+}
+
+} // namespace second
+
 } // namespace time
 
 } // namespace visit
@@ -199,6 +207,11 @@ public:
         end_partial_literal();
         actions.push_back(&visit::time::minute::normal);
     }
+
+    virtual void second() {
+        end_partial_literal();
+        actions.push_back(&visit::time::second::normal);
+    }
 };
 
 namespace parser {
@@ -236,6 +249,9 @@ public:
             break;
         case 'M':
             handler.minute();
+            break;
+        case 'S':
+            handler.second();
             break;
         default:
             return Decorate::parse(it, end, handler);
@@ -439,4 +455,19 @@ TEST_F(generator_test_case_t, MinuteLowerBound) {
 TEST_F(generator_test_case_t, MinuteUpperBound) {
     tm.tm_min = 59;
     EXPECT_EQ("59", generate("%M"));
+}
+
+TEST_F(generator_test_case_t, Second) {
+    tm.tm_sec = 30;
+    EXPECT_EQ("30", generate("%S"));
+}
+
+TEST_F(generator_test_case_t, SecondLowerBound) {
+    tm.tm_sec = 0;
+    EXPECT_EQ("00", generate("%S"));
+}
+
+TEST_F(generator_test_case_t, SecondUpperBound) {
+    tm.tm_sec = 60;
+    EXPECT_EQ("60", generate("%S"));
 }
