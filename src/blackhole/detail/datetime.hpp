@@ -2,6 +2,7 @@
 
 #include <ctime>
 #include <functional>
+#include <limits>
 #include <memory>
 #include <sstream>
 #include <vector>
@@ -11,13 +12,6 @@
 #include <boost/range.hpp>
 #include <boost/version.hpp>
 #include <boost/utility.hpp>
-
-#if BOOST_VERSION > 104000
-#include <boost/spirit/include/karma_uint.hpp>
-#include <boost/spirit/include/karma_generate.hpp>
-#else
-#include <boost/lexical_cast.hpp>
-#endif
 
 #include "blackhole/detail/stream/stream.hpp"
 
@@ -31,48 +25,24 @@ struct context_t {
     std::tm tm;
 };
 
-namespace aux2 {
-
-inline uint digits(int value) {
-    if (value == 0) {
-        return 1;
-    }
-
+inline void fill(std::string& str, int value, uint length, char filler = '0') {
+    char buffer[std::numeric_limits<uint32_t>::digits10 + 2];
     uint digits = 0;
-    while (value) {
+    do {
+        buffer[digits] = (value % 10) + '0';
         value /= 10;
         digits++;
-    }
+    } while (value);
 
-    return digits;
-}
-
-} // namespace aux
-
-inline void fill(std::string& str, int value, uint length, char filler = '0') {
-#if BOOST_VERSION > 104000
-    //!@note: Gives ~25% performance boost.
-    typedef boost::spirit::karma::uint_generator<uint32_t, 10> uint_gen;
-
-    char buffer[std::numeric_limits<uint32_t>::digits10 + 2];
-    char* it = buffer;
-
-    boost::spirit::karma::generate(it, uint_gen(), value);
-    const std::size_t len = it - buffer;
-    if (len < length) {
-        str.insert(str.end(), length - len, filler);
-    }
-
-    str.append(buffer, it);
-#else
-    const int digits = aux2::digits(value);
-    const int gap = length - digits;
-    BOOST_ASSERT(gap >= 0);
-    for (int i = 0; i < gap; ++i) {
+    BOOST_ASSERT(length >= digits);
+    const uint gap = length - digits;
+    for (uint i = 0; i < gap; ++i) {
         str.push_back(filler);
     }
-    str.append(boost::lexical_cast<std::string>(value));
-#endif
+
+    for (uint i = 0; i < digits; ++i) {
+        str.push_back(buffer[digits - 1 - i]);
+    }
 }
 
 namespace visit {
