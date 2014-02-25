@@ -19,8 +19,6 @@ enum level {
     critical
 };
 
-const int N = 100000;
-
 std::string map_timestamp(const timeval& tv) {
     char str[64];
 
@@ -83,6 +81,7 @@ int main(int argc, char** argv) {
     return 0;
 }
 
+const int N = 10000;
 BASELINE(PureStringFormatter, Baseline, 0, N) {
     log::record_t record;
     record.attributes.insert(keyword::message() = "Something bad is going on but I can handle it");
@@ -92,4 +91,30 @@ BASELINE(PureStringFormatter, Baseline, 0, N) {
     record.attributes.insert(keyword::timestamp() = tv);
     record.attributes.insert(keyword::severity<level>() = level::warning);
     celero::DoNotOptimizeAway(fmt.format(record));
+}
+
+#include <blackhole/detail/datetime.hpp>
+
+const int N2 = 100000;
+BASELINE(DatetimeGenerator, Baseline, 0, N2) {
+    std::time_t time = std::time(nullptr);
+    std::tm tm;
+    localtime_r(&time, &tm);
+    char buf[64];
+    strftime(buf, 64, "%Y-%m-%d %H:%M:%S", &tm);
+    celero::DoNotOptimizeAway(buf);
+}
+
+aux::datetime::generator_t generator = aux::datetime::generator_factory_t::make("%Y-%m-%d %H:%M:%S");
+
+std::string str;
+blackhole::aux::attachable_basic_ostringstream<char> stream(str);
+static std::string nullstr;
+BENCHMARK(DatetimeGenerator, Generator, 0, N2) {
+    std::time_t time = std::time(nullptr);
+    std::tm tm;
+    localtime_r(&time, &tm);
+    generator(stream, tm);
+    celero::DoNotOptimizeAway(str);
+    str.clear();
 }
