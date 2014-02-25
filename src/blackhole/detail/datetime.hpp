@@ -102,6 +102,8 @@ inline void numeric(context_t& context) {
 
 } // namespace day
 
+namespace time {
+
 namespace hour {
 
 inline void h24(context_t& context) {
@@ -114,8 +116,6 @@ inline void h12(context_t& context) {
 }
 
 } // namespace hour
-
-namespace time {
 
 namespace minute {
 
@@ -149,7 +149,7 @@ inline void standard(context_t& context) {
     context.str.push_back(' ');
     day::month::numeric(context);
     context.str.push_back(' ');
-    hour::h24(context);
+    time::hour::h24(context);
     context.str.push_back(':');
     time::minute::normal(context);
     context.str.push_back(':');
@@ -280,12 +280,12 @@ public:
 
     virtual void hours() {
         end_partial_literal();
-        actions.push_back(&visit::hour::h24);
+        actions.push_back(&visit::time::hour::h24);
     }
 
     virtual void hours12() {
         end_partial_literal();
-        actions.push_back(&visit::hour::h12);
+        actions.push_back(&visit::time::hour::h12);
     }
 
     virtual void minute() {
