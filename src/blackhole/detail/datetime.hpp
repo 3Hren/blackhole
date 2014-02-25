@@ -83,6 +83,14 @@ inline void numeric(context_t& context) {
 
 namespace day {
 
+namespace year {
+
+inline void numeric(context_t& context) {
+    fill(context.str, context.tm.tm_yday + 1, 3);
+}
+
+} // namespace year
+
 namespace month {
 
 template<char Filler = '0'>
@@ -221,6 +229,11 @@ public:
     virtual void full_month() {
         end_partial_literal();
         actions.push_back(&visit::localized<'B'>);
+    }
+
+    virtual void year_day() {
+        end_partial_literal();
+        actions.push_back(&visit::day::year::numeric);
     }
 
     virtual void month_day(bool has_leading_zero = true) {
@@ -368,6 +381,9 @@ public:
             handler.full_month();
             break;
         //! =========== DAY SECTION ===========
+        case 'j':
+            handler.year_day();
+            break;
         case 'd':
             handler.month_day();
             break;
