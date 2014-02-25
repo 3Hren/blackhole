@@ -105,12 +105,35 @@ BASELINE(DatetimeGenerator, Baseline, 0, N2) {
     celero::DoNotOptimizeAway(buf);
 }
 
-aux::datetime::generator_t generator = aux::datetime::generator_factory_t::make("%Y-%m-%d %H:%M:%S");
+BASELINE(DatetimeGeneratorUsingLocale, Baseline, 0, N2) {
+    std::time_t time = std::time(nullptr);
+    std::tm tm;
+    localtime_r(&time, &tm);
+    char buf[64];
+    strftime(buf, 64, "%c", &tm);
+    celero::DoNotOptimizeAway(buf);
+}
 
-std::string str;
-blackhole::aux::attachable_basic_ostringstream<char> stream(str);
-static std::string nullstr;
+aux::datetime::generator_t generator2 = aux::datetime::generator_factory_t::make("%c");
+
 BENCHMARK(DatetimeGenerator, Generator, 0, N2) {
+    static std::string str;
+    static aux::datetime::generator_t generator(aux::datetime::generator_factory_t::make("%Y-%m-%d %H:%M:%S"));
+    static aux::attachable_ostringstream stream(str);
+
+    std::time_t time = std::time(nullptr);
+    std::tm tm;
+    localtime_r(&time, &tm);
+    generator(stream, tm);
+    celero::DoNotOptimizeAway(str);
+    str.clear();
+}
+
+BENCHMARK(DatetimeGeneratorUsingLocale, Generator, 0, N2) {
+    static std::string str;
+    static aux::datetime::generator_t generator(aux::datetime::generator_factory_t::make("%c"));
+    static aux::attachable_ostringstream stream(str);
+
     std::time_t time = std::time(nullptr);
     std::tm tm;
     localtime_r(&time, &tm);
