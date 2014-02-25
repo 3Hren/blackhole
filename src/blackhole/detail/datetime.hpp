@@ -314,6 +314,7 @@ public:
     static iterator_type parse(iterator_type it, iterator_type end, generator_handler_t& handler) {
         BOOST_ASSERT(it != end && it + 1 != end);
         switch (*(it + 1)) {
+        //! =========== YEAR SECTION ===========
         case 'Y':
             handler.full_year();
             break;
@@ -323,6 +324,7 @@ public:
         case 'C':
             handler.short_year_first_two_digits();
             break;
+        //! =========== MONTH SECTION ===========
         case 'm':
             handler.numeric_month();
             break;
@@ -333,6 +335,7 @@ public:
         case 'B':
             handler.full_month();
             break;
+        //! =========== DAY SECTION ===========
         case 'd':
             handler.month_day();
             break;
@@ -345,6 +348,7 @@ public:
         case 'A':
             handler.full_weekday();
             break;
+        //! =========== OTHER SECTION ===========
         default:
             return Decorate::parse(it, end, handler);
         }
