@@ -60,7 +60,7 @@ inline void localized(context_t& context) {
 namespace year {
 
 inline void full(context_t& context) {
-    fill(context.str, context.tm.tm_year, 4);
+    fill(context.str, context.tm.tm_year + 1900, 4);
 }
 
 inline void last_two_digits(context_t& context) {
@@ -68,7 +68,7 @@ inline void last_two_digits(context_t& context) {
 }
 
 inline void first_two_digits(context_t& context) {
-    fill(context.str, context.tm.tm_year / 100, 2);
+    fill(context.str, context.tm.tm_year / 100 + 19, 2);
 }
 
 } // namespace year
@@ -181,6 +181,10 @@ public:
         }
     }
 
+    virtual void literal(const std::string& lit) {
+        actions.push_back(literal_generator_t { lit });
+    }
+
     virtual void literal(const boost::iterator_range<iterator_type>& range) {
         actions.push_back(literal_generator_t { boost::copy_range<std::string>(range) });
     }
@@ -257,6 +261,23 @@ public:
         end_partial_literal();
         actions.push_back(&visit::time::second::normal);
     }
+
+    virtual void standard_date_time() {
+        end_partial_literal();
+        abbreviate_weekday();
+        literal(std::string(" "));
+        abbreviate_month();
+        literal(std::string(" "));
+        month_day();
+        literal(std::string(" "));
+        hours();
+        literal(std::string(":"));
+        minute();
+        literal(std::string(":"));
+        second();
+        literal(std::string(" "));
+        full_year();
+    }
 };
 
 namespace parser {
@@ -276,6 +297,17 @@ template<class Decorate = through_t>
 class common {
 public:
     typedef typename Decorate::iterator_type iterator_type;
+
+    static iterator_type parse(iterator_type it, iterator_type end, generator_handler_t& handler) {
+        BOOST_ASSERT(it != end && it + 1 != end);
+        switch (*(it + 1)) {
+        case 'c':
+            break;
+        default:
+            return Decorate::parse(it, end, handler);
+        }
+        return it + 2;
+    }
 };
 
 template<class Decorate>
@@ -349,6 +381,9 @@ public:
             handler.full_weekday();
             break;
         //! =========== OTHER SECTION ===========
+        case 'c':
+            handler.standard_date_time();
+            break;
         default:
             return Decorate::parse(it, end, handler);
         }

@@ -1,53 +1,55 @@
 #include "common.hpp"
 
+//! \brief Depends on `tm_year` - years since 1900.
+
 class year_generator_test_case_t : public generator_test_case_t {};
 
 TEST_F(year_generator_test_case_t, FullYear) {
-    tm.tm_year = 2014;
+    tm.tm_year = 114;
     EXPECT_EQ("2014", generate("%Y"));
 }
 
 TEST_F(year_generator_test_case_t, ShortYear) {
-    tm.tm_year = 2014;
+    tm.tm_year = 114;
     EXPECT_EQ("14", generate("%y"));
 }
 
 TEST_F(year_generator_test_case_t, ShortYearWithZeroPrefix) {
-    tm.tm_year = 2004;
+    tm.tm_year = 104;
     EXPECT_EQ("04", generate("%y"));
 }
 
 TEST_F(year_generator_test_case_t, ShortYearMinValue) {
-    tm.tm_year = 2000;
+    tm.tm_year = 0;
     EXPECT_EQ("00", generate("%y"));
 }
 
-TEST_F(year_generator_test_case_t, ShortYearFirstTwoDigits) {
-    tm.tm_year = 2014;
+TEST_F(year_generator_test_case_t, FirstTwoDigits) {
+    tm.tm_year = 114;
     EXPECT_EQ("20", generate("%C"));
 }
 
-TEST_F(year_generator_test_case_t, ShortYearFirstTwoDigitsLowerBound) {
+TEST_F(year_generator_test_case_t, FirstTwoDigitsLowerBound) {
     tm.tm_year = 0;
-    EXPECT_EQ("00", generate("%C"));
+    EXPECT_EQ("19", generate("%C"));
 }
 
-TEST_F(year_generator_test_case_t, ShortYearFirstTwoDigitsUpperBound) {
-    tm.tm_year = 9914;
-    EXPECT_EQ("99", generate("%C"));
+TEST_F(year_generator_test_case_t, FirstTwoDigitsUpperBound) {
+    tm.tm_year = 200;
+    EXPECT_EQ("21", generate("%C"));
 }
 
 TEST_F(year_generator_test_case_t, FullYearWithSuffixLiteral) {
-    tm.tm_year = 2014;
+    tm.tm_year = 114;
     EXPECT_EQ("2014-", generate("%Y-"));
 }
 
 TEST_F(year_generator_test_case_t, FullYearWithPrefixLiteral) {
-    tm.tm_year = 2014;
+    tm.tm_year = 114;
     EXPECT_EQ("-2014", generate("-%Y"));
 }
 
 TEST_F(year_generator_test_case_t, FullYearWithPrefixAndSuffixLiteral) {
-    tm.tm_year = 2014;
+    tm.tm_year = 114;
     EXPECT_EQ("-2014-", generate("-%Y-"));
 }
