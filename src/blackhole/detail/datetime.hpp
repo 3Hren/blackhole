@@ -135,6 +135,29 @@ inline void normal(context_t& context) {
 
 } // namespace time
 
+inline void standard(context_t& context) {
+    typedef std::time_put<char> facet_type;
+    typedef typename facet_type::iter_type iter_type;
+    auto locale = context.stream.getloc();
+    std::use_facet<facet_type>(locale)
+            .put(iter_type(context.stream), context.stream, ' ', &context.tm, 'a');
+    context.stream.flush();
+    context.str.push_back(' ');
+    std::use_facet<facet_type>(locale)
+            .put(iter_type(context.stream), context.stream, ' ', &context.tm, 'b');
+    context.stream.flush();
+    context.str.push_back(' ');
+    day::month::numeric(context);
+    context.str.push_back(' ');
+    hour::h24(context);
+    context.str.push_back(':');
+    time::minute::normal(context);
+    context.str.push_back(':');
+    time::second::normal(context);
+    context.str.push_back(' ');
+    year::full(context);
+}
+
 } // namespace visit
 
 struct literal_generator_t {
@@ -277,19 +300,7 @@ public:
 
     virtual void standard_date_time() {
         end_partial_literal();
-        abbreviate_weekday();
-        literal(std::string(" "));
-        abbreviate_month();
-        literal(std::string(" "));
-        month_day();
-        literal(std::string(" "));
-        hours();
-        literal(std::string(":"));
-        minute();
-        literal(std::string(":"));
-        second();
-        literal(std::string(" "));
-        full_year();
+        actions.push_back(&visit::standard);
     }
 };
 
