@@ -3,6 +3,7 @@
 #include <ctime>
 #include <functional>
 #include <limits>
+#include <locale>
 #include <memory>
 #include <sstream>
 #include <vector>
