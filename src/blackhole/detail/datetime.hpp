@@ -228,6 +228,16 @@ public:
         }
     }
 
+    virtual void abbreviate_weekday() {
+        end_partial_literal();
+        actions.push_back(&visit::localized<'a'>);
+    }
+
+    virtual void full_weekday() {
+        end_partial_literal();
+        actions.push_back(&visit::localized<'A'>);
+    }
+
     virtual void hours() {
         end_partial_literal();
         actions.push_back(&visit::hour::h24);
@@ -329,6 +339,12 @@ public:
         case 'e':
             handler.month_day(false);
             break;
+        case 'a':
+            handler.abbreviate_weekday();
+            break;
+        case 'A':
+            handler.full_weekday();
+            break;
         default:
             return Decorate::parse(it, end, handler);
         }
@@ -371,7 +387,7 @@ public:
     static generator_t make(const std::string& pattern) {
         std::vector<generator_action_t> actions;
         generator_handler_t handler(actions);
-        parser_t<parser::date<parser::time<parser::through_t>>>::parse(pattern, handler);
+        parser_t<parser::date<parser::time<parser::common<parser::through_t>>>>::parse(pattern, handler);
         return generator_t(std::move(actions));
     }
 };

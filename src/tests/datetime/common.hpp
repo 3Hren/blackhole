@@ -23,3 +23,13 @@ protected:
         return stream.str();
     }
 };
+
+namespace common {
+
+inline std::string using_strftime(const std::string& format, const std::tm& tm) {
+    char buffer[64];
+    std::strftime(buffer, 64, format.c_str(), &tm);
+    return buffer;
+}
+
+} // namespace common
