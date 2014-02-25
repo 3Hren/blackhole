@@ -213,6 +213,11 @@ public:
         actions.push_back(&visit::localized<'b'>);
     }
 
+    virtual void full_month() {
+        end_partial_literal();
+        actions.push_back(&visit::localized<'B'>);
+    }
+
     virtual void month_day(bool has_leading_zero = true) {
         end_partial_literal();
         if (has_leading_zero) {
@@ -311,7 +316,11 @@ public:
             handler.numeric_month();
             break;
         case 'b':
+        case 'h':
             handler.abbreviate_month();
+            break;
+        case 'B':
+            handler.full_month();
             break;
         case 'd':
             handler.month_day();

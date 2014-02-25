@@ -85,6 +85,16 @@ TEST_F(month_generator_test_case_t, Abbreviated) {
     EXPECT_EQ("Mar", generate("%b"));
 }
 
+TEST_F(month_generator_test_case_t, AbbreviatedSynonym) {
+    tm.tm_mon = 2;
+    EXPECT_EQ("Mar", generate("%h"));
+}
+
+TEST_F(month_generator_test_case_t, Full) {
+    tm.tm_mon = 2;
+    EXPECT_EQ("March", generate("%B"));
+}
+
 TEST_F(generator_test_case_t, NumericDayOfMonth) {
     tm.tm_mday = 23;
     EXPECT_EQ("23", generate("%d"));
