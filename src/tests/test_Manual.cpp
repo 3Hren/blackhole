@@ -41,6 +41,21 @@ TEST_F(generator_test_case_t, ShortYearMinValue) {
     EXPECT_EQ("00", generate("%y"));
 }
 
+TEST_F(generator_test_case_t, ShortYearFirstTwoDigits) {
+    tm.tm_year = 2014;
+    EXPECT_EQ("20", generate("%C"));
+}
+
+TEST_F(generator_test_case_t, ShortYearFirstTwoDigitsLowerBound) {
+    tm.tm_year = 0;
+    EXPECT_EQ("00", generate("%C"));
+}
+
+TEST_F(generator_test_case_t, ShortYearFirstTwoDigitsUpperBound) {
+    tm.tm_year = 9914;
+    EXPECT_EQ("99", generate("%C"));
+}
+
 TEST_F(generator_test_case_t, FullYearWithSuffixLiteral) {
     tm.tm_year = 2014;
     EXPECT_EQ("2014-", generate("%Y-"));

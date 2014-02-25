@@ -53,8 +53,12 @@ inline void full(context_t& context) {
     fill(context.str, context.tm.tm_year, 4);
 }
 
-inline void normal(context_t& context) {
+inline void last_two_digits(context_t& context) {
     fill(context.str, context.tm.tm_year % 100, 2);
+}
+
+inline void first_two_digits(context_t& context) {
+    fill(context.str, context.tm.tm_year / 100, 2);
 }
 
 } // namespace year
@@ -182,7 +186,12 @@ public:
 
     virtual void short_year() {
         end_partial_literal();
-        actions.push_back(&visit::year::normal);
+        actions.push_back(&visit::year::last_two_digits);
+    }
+
+    virtual void short_year_first_two_digits() {
+        end_partial_literal();
+        actions.push_back(&visit::year::first_two_digits);
     }
 
     virtual void numeric_month() {
@@ -280,6 +289,9 @@ public:
             break;
         case 'y':
             handler.short_year();
+            break;
+        case 'C':
+            handler.short_year_first_two_digits();
             break;
         case 'm':
             handler.numeric_month();
