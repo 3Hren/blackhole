@@ -14,10 +14,12 @@ SET(HEADERS
     mocks/logger.hpp
     mocks/socket.hpp
     mocks/syslog.hpp
+    datetime/common.hpp
 )
 
 SET(SOURCES
     main
+    test_AttachableStream
     test_Attribute
     test_Config
     test_ConfigJsonInitialization
@@ -44,6 +46,14 @@ SET(SOURCES
     test_UdpSink
     test_Utils
     test_VerboseLogger
+    datetime/test_Year
+    datetime/test_Month
+    datetime/test_Week
+    datetime/test_DayOfYear
+    datetime/test_DayOfMonth
+    datetime/test_DayOfWeek
+    datetime/test_Time
+    datetime/test_Other
 )
 
 SET(Boost_USE_MULTITHREADED ON)
