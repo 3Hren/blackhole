@@ -19,3 +19,11 @@ TEST_F(generator_test_case_t, StandardDateTime) {
     tm.tm_sec = 30;
     EXPECT_EQ(common::using_strftime("%c", tm), generate("%c"));
 }
+
+TEST_F(generator_test_case_t, DateISO8601) {
+    tm.tm_year = 114;
+    tm.tm_mon = 1;
+    tm.tm_mday = 23;
+    EXPECT_EQ("2014-02-23", generate("%F"));
+    EXPECT_EQ(common::using_strftime("%F", tm), generate("%F"));
+}

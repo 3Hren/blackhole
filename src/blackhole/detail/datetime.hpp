@@ -158,6 +158,14 @@ inline void standard(context_t& context) {
     year::full(context);
 }
 
+inline void date_ISO8601(context_t& context) {
+    year::full(context);
+    context.str.push_back('-');
+    month::numeric(context);
+    context.str.push_back('-');
+    day::month::numeric(context);
+}
+
 } // namespace visit
 
 struct literal_generator_t {
@@ -302,6 +310,11 @@ public:
         end_partial_literal();
         actions.push_back(&visit::standard);
     }
+
+    virtual void date_ISO8601() {
+        end_partial_literal();
+        actions.push_back(&visit::date_ISO8601);
+    }
 };
 
 namespace parser {
@@ -410,6 +423,9 @@ public:
         //! =========== OTHER SECTION ===========
         case 'c':
             handler.standard_date_time();
+            break;
+        case 'F':
+            handler.date_ISO8601();
             break;
         default:
             return Decorate::parse(it, end, handler);
