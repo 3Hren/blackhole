@@ -86,11 +86,13 @@ TEST_F(month_generator_test_case_t, Abbreviated) {
 }
 
 TEST_F(month_generator_test_case_t, AbbreviatedSynonym) {
+    // Assuming English locale is set.
     tm.tm_mon = 2;
     EXPECT_EQ("Mar", generate("%h"));
 }
 
 TEST_F(month_generator_test_case_t, Full) {
+    // Assuming English locale is set.
     tm.tm_mon = 2;
     EXPECT_EQ("March", generate("%B"));
 }
