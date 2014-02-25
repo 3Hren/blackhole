@@ -21,59 +21,68 @@ protected:
     }
 };
 
-TEST_F(generator_test_case_t, FullYear) {
+class year_generator_test_case_t : public generator_test_case_t {};
+
+TEST_F(year_generator_test_case_t, FullYear) {
     tm.tm_year = 2014;
     EXPECT_EQ("2014", generate("%Y"));
 }
 
-TEST_F(generator_test_case_t, ShortYear) {
+TEST_F(year_generator_test_case_t, ShortYear) {
     tm.tm_year = 2014;
     EXPECT_EQ("14", generate("%y"));
 }
 
-TEST_F(generator_test_case_t, ShortYearWithZeroPrefix) {
+TEST_F(year_generator_test_case_t, ShortYearWithZeroPrefix) {
     tm.tm_year = 2004;
     EXPECT_EQ("04", generate("%y"));
 }
 
-TEST_F(generator_test_case_t, ShortYearMinValue) {
+TEST_F(year_generator_test_case_t, ShortYearMinValue) {
     tm.tm_year = 2000;
     EXPECT_EQ("00", generate("%y"));
 }
 
-TEST_F(generator_test_case_t, ShortYearFirstTwoDigits) {
+TEST_F(year_generator_test_case_t, ShortYearFirstTwoDigits) {
     tm.tm_year = 2014;
     EXPECT_EQ("20", generate("%C"));
 }
 
-TEST_F(generator_test_case_t, ShortYearFirstTwoDigitsLowerBound) {
+TEST_F(year_generator_test_case_t, ShortYearFirstTwoDigitsLowerBound) {
     tm.tm_year = 0;
     EXPECT_EQ("00", generate("%C"));
 }
 
-TEST_F(generator_test_case_t, ShortYearFirstTwoDigitsUpperBound) {
+TEST_F(year_generator_test_case_t, ShortYearFirstTwoDigitsUpperBound) {
     tm.tm_year = 9914;
     EXPECT_EQ("99", generate("%C"));
 }
 
-TEST_F(generator_test_case_t, FullYearWithSuffixLiteral) {
+TEST_F(year_generator_test_case_t, FullYearWithSuffixLiteral) {
     tm.tm_year = 2014;
     EXPECT_EQ("2014-", generate("%Y-"));
 }
 
-TEST_F(generator_test_case_t, FullYearWithPrefixLiteral) {
+TEST_F(year_generator_test_case_t, FullYearWithPrefixLiteral) {
     tm.tm_year = 2014;
     EXPECT_EQ("-2014", generate("-%Y"));
 }
 
-TEST_F(generator_test_case_t, FullYearWithPrefixAndSuffixLiteral) {
+TEST_F(year_generator_test_case_t, FullYearWithPrefixAndSuffixLiteral) {
     tm.tm_year = 2014;
     EXPECT_EQ("-2014-", generate("-%Y-"));
 }
 
-TEST_F(generator_test_case_t, NumericMonth) {
+class month_generator_test_case_t : public generator_test_case_t {};
+
+TEST_F(month_generator_test_case_t, Numeric) {
     tm.tm_mon = 2;
-    EXPECT_EQ("02", generate("%m"));
+    EXPECT_EQ("03", generate("%m"));
+}
+
+TEST_F(month_generator_test_case_t, Abbreviated) {
+    tm.tm_mon = 2;
+    EXPECT_EQ("Mar", generate("%b"));
 }
 
 TEST_F(generator_test_case_t, NumericDayOfMonth) {
@@ -159,7 +168,7 @@ TEST_F(generator_test_case_t, SecondUpperBound) {
 
 TEST_F(generator_test_case_t, ComplexFormatting) {
     tm.tm_year = 2014;
-    tm.tm_mon = 2;
+    tm.tm_mon = 1;
     tm.tm_mday = 23;
     tm.tm_hour = 12;
     tm.tm_min = 20;

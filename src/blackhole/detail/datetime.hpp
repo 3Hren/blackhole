@@ -47,6 +47,15 @@ inline void fill(std::string& str, int value, uint length, char filler = '0') {
 
 namespace visit {
 
+template<char Format>
+inline void localized(context_t& context) {
+    typedef std::time_put<char> facet_type;
+    typedef typename facet_type::iter_type iter_type;
+    std::use_facet<facet_type>(context.stream.getloc())
+            .put(iter_type(context.stream), context.stream, ' ', &context.tm, Format);
+    context.stream.flush();
+}
+
 namespace year {
 
 inline void full(context_t& context) {
@@ -66,7 +75,7 @@ inline void first_two_digits(context_t& context) {
 namespace month {
 
 inline void numeric(context_t& context) {
-    fill(context.str, context.tm.tm_mon, 2);
+    fill(context.str, context.tm.tm_mon + 1, 2);
 }
 
 } // namespace month
@@ -199,6 +208,11 @@ public:
         actions.push_back(&visit::month::numeric);
     }
 
+    virtual void abbreviate_month() {
+        end_partial_literal();
+        actions.push_back(&visit::localized<'b'>);
+    }
+
     virtual void month_day(bool has_leading_zero = true) {
         end_partial_literal();
         if (has_leading_zero) {
@@ -295,6 +309,9 @@ public:
             break;
         case 'm':
             handler.numeric_month();
+            break;
+        case 'b':
+            handler.abbreviate_month();
             break;
         case 'd':
             handler.month_day();
