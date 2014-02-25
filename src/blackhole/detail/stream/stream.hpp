@@ -9,7 +9,7 @@
 #include "blackhole/detail/support/char.hpp"
 
 #include "streambuf.hpp"
-//std::ostringstream
+
 namespace blackhole {
 
 namespace aux {
