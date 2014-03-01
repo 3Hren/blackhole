@@ -144,21 +144,21 @@ TEST(Traits, All) {
 TEST(Traits, IsStringLiteralTypeAuto) {
     auto literal = "blah";
     static_assert(
-        aux::is_string_literal_type<decltype(literal)>::type::value,
+        is_string_literal_type<decltype(literal)>::type::value,
         "`is_string_literal_type` is broken");
 }
 
 TEST(Traits, IsStringLiteralTypeConstCharArray) {
     const char* literal = "blah";
     static_assert(
-        aux::is_string_literal_type<decltype(literal)>::type::value,
+        is_string_literal_type<decltype(literal)>::type::value,
         "`is_string_literal_type` is broken");
 }
 
 TEST(Traits, IsStringLiteralTypeCharArray) {
     char literal[] = "blah";
     static_assert(
-        aux::is_string_literal_type<decltype(literal)>::type::value,
+        is_string_literal_type<decltype(literal)>::type::value,
         "`is_string_literal_type` is broken");
 }
 

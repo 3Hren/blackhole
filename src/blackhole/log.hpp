@@ -3,7 +3,7 @@
 #include <type_traits>
 #include <tuple>
 
-
+#include "blackhole/detail/traits/literal.hpp"
 #include "blackhole/detail/traits/or.hpp"
 #include "blackhole/detail/traits/same.hpp"
 #include "blackhole/detail/traits/tuple.hpp"
@@ -20,20 +20,6 @@ namespace aux {
 template<class... Args>
 struct is_keyword_pack {
     static const bool value = are_same<log::attribute_pair_t, Args...>::value;
-};
-
-template<typename T>
-struct is_string_literal_type {
-    typedef typename or_<
-        typename std::is_same<
-            const char*,
-            typename std::decay<T>::type
-        >::type,
-        typename std::is_same<
-            char*,
-            typename std::decay<T>::type
-        >::type
-    >::type type;
 };
 
 template<class... Args>
