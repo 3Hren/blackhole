@@ -176,7 +176,7 @@ struct all_odd_string_literal {
             is_string_literal_type,
             typename remove_index<
                 typename filter<
-                    even,
+                    even, //!@todo: Inject here `slice` metafunction.
                     typename add_index<
                         std::tuple<Args...>
                     >::type
@@ -186,33 +186,21 @@ struct all_odd_string_literal {
     >::value;
 };
 
-//template<class T>
-//struct all_odd_string_literal<T> : public std::true_type {};
-
-//template<class T, class Odd>
-//struct all_odd_string_literal<T, Odd> : public std::false_type {};
-
-//template<class T, class Odd, class Even, class... Args>
-//struct all_odd_string_literal<T, Odd, Even, Args...> {
-//    static const bool value =
-//            std::is_same<T, typename std::decay<Odd>::type>::value &&
-//            all_odd_string_literal<T, Args...>::value;
-//};
-
 template<class... Args>
-struct all_even_constructible;
-
-template<>
-struct all_even_constructible<> : public std::true_type {};
-
-template<class Odd>
-struct all_even_constructible<Odd> : public std::false_type {};
-
-template<class Odd, class Even, class... Args>
-struct all_even_constructible<Odd, Even, Args...> {
-    static const bool value =
-            log::attribute::is_constructible<typename std::decay<Even>::type>::value &&
-            all_even_constructible<Args...>::value;
+struct all_even_constructible {
+    static const bool value = all<
+        typename map<
+            log::attribute::is_constructible,
+            typename remove_index<
+                typename filter<
+                    odd, //!@todo: Inject here `slice` metafunction.
+                    typename add_index<
+                        std::tuple<Args...>
+                    >::type
+                >::type
+            >::type
+        >::type
+    >::value;
 };
 
 template<class... Args>
