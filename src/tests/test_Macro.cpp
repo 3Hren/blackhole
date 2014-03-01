@@ -202,7 +202,7 @@ struct MiniExtractAttributesAction {
     }
 };
 
-TEST(Macro, EmplaceArguments) {
+TEST(Macro, EmplaceAttributes) {
     log::record_t record;
     record.attributes["attr1"] = {"value1"};
 
