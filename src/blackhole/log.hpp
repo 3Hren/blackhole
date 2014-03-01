@@ -170,13 +170,13 @@ struct is_string_literal_type {
 };
 
 template<class... Args>
-struct all_odd_string_literal {
+struct all_first_string_literal {
     static const bool value = all<
         typename map<
             is_string_literal_type,
             typename remove_index<
                 typename filter<
-                    even, //!@todo: Inject here `slice` metafunction.
+                    slice<0, -1, 2>::type,
                     typename add_index<
                         std::tuple<Args...>
                     >::type
@@ -187,13 +187,13 @@ struct all_odd_string_literal {
 };
 
 template<class... Args>
-struct all_even_constructible {
+struct all_second_constructible {
     static const bool value = all<
         typename map<
             log::attribute::is_constructible,
             typename remove_index<
                 typename filter<
-                    odd, //!@todo: Inject here `slice` metafunction.
+                    slice<1, -1, 2>::type,
                     typename add_index<
                         std::tuple<Args...>
                     >::type
@@ -207,8 +207,8 @@ template<class... Args>
 struct is_emplace_pack {
     static const bool value =
             sizeof...(Args) % 2 == 0 &&
-            all_odd_string_literal<Args...>::value &&
-            all_even_constructible<Args...>::value;
+            all_first_string_literal<Args...>::value &&
+            all_second_constructible<Args...>::value;
 };
 
 template<bool, class... Args>
@@ -223,17 +223,13 @@ struct selector<true, Args...> {
 
 template<class... Args>
 struct selector<false, Args...> {
-    static void action(log::record_t& record, Args&&... args) {
-        action_impl(record, std::forward<Args>(args)...);
+    template<class T, class... Tail>
+    static void action(log::record_t& record, const char* name, T&& value, Tail&&... args) {
+        record.attributes.insert(std::make_pair(name, log::attribute_t(std::forward<T>(value))));
+        action(record, std::forward<Tail>(args)...);
     }
 
-    template<class T, class... Args2>
-    static void action_impl(log::record_t& record, const char* name, T&& t, Args2&&... args) {
-        record.attributes.insert(std::make_pair(name, log::attribute_t(std::forward<T>(t))));
-        action_impl(record, std::forward<Args2>(args)...);
-    }
-
-    static void action_impl(log::record_t&) {}
+    static void action(log::record_t&) {}
 };
 
 template<typename Log>
@@ -257,7 +253,7 @@ public:
     template<typename... Args>
     void operator()(Args&&... args) {
         static_assert((is_keyword_pack<Args...>::value || is_emplace_pack<Args...>::value),
-                      "parameter pack must be either attribute pack or emplace pairs");
+                      "parameter pack must be either attribute pack or emplace pack");
         selector<
             is_keyword_pack<Args...>::value,
             Args...
