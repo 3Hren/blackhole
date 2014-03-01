@@ -5,6 +5,8 @@
 #include <initializer_list>
 #include <unordered_map>
 
+#include <boost/mpl/contains.hpp>
+#include <boost/mpl/vector.hpp>
 #include <boost/variant.hpp>
 
 #include "utils/timeval.hpp"
@@ -39,6 +41,26 @@ enum class scope : std::uint8_t {
 typedef aux::underlying_type<scope>::type scope_underlying_type;
 
 static const scope DEFAULT_SCOPE = scope::local;
+
+// Helper metafunction that checks if type `T` is supported with attribute internal implementation,
+// i.e. `attribute_value_t` variant can be constructed using type `T`.
+// Note, that this metafunction ignores implicit type conversion.
+template<typename T>
+struct is_supported {
+    static const bool value = boost::mpl::contains<log::attribute_value_t::types, T>::value;
+};
+
+// Helper metafunction that checks if `attribute_value_t` can be constructed using type `T`.
+template<typename T>
+struct is_constructible {
+    typedef boost::mpl::vector<
+        const char*     // Implicit string conversion
+    > additional_types;
+
+    static const bool value =
+        boost::mpl::contains<additional_types, typename std::decay<T>::type>::value ||
+        is_supported<T>::value;
+};
 
 } // namespace attribute
 
