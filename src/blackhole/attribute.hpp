@@ -57,9 +57,13 @@ struct is_constructible {
         const char*     // Implicit string conversion
     > additional_types;
 
-    static const bool value =
-        boost::mpl::contains<additional_types, typename std::decay<T>::type>::value ||
-        is_supported<T>::value;
+    typedef typename std::conditional<
+        boost::mpl::contains<additional_types, typename std::decay<T>::type>::value || is_supported<T>::value,
+        std::true_type,
+        std::false_type
+    >::type type;
+
+    static const bool value = type::value;
 };
 
 } // namespace attribute
