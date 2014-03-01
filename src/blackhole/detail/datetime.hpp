@@ -137,7 +137,7 @@ inline void normal(context_t& context) {
 
 inline void standard(context_t& context) {
     typedef std::time_put<char> facet_type;
-    typedef typename facet_type::iter_type iter_type;
+    typedef facet_type::iter_type iter_type;
     auto locale = context.stream.getloc();
     std::use_facet<facet_type>(locale)
             .put(iter_type(context.stream), context.stream, ' ', &context.tm, 'a');
