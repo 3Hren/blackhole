@@ -32,7 +32,7 @@ TEST(Traits, AreSame) {
 TEST(Traits, AddIndexSimpleTuple) {
     static_assert(
         std::is_same<
-            aux::add_index<
+            tuple::add_index<
                 std::tuple<char>
             >::type,
             std::tuple<
@@ -45,7 +45,7 @@ TEST(Traits, AddIndexSimpleTuple) {
 TEST(Traits, AddIndexComplexTuple) {
     static_assert(
         std::is_same<
-            aux::add_index<
+            tuple::add_index<
                 std::tuple<char, short, int, double>
             >::type,
             std::tuple<
@@ -61,7 +61,7 @@ TEST(Traits, AddIndexComplexTuple) {
 TEST(Traits, RemoveIndexSimpleTuple) {
     static_assert(
         std::is_same<
-            aux::remove_index<
+            tuple::remove_index<
                 std::tuple<
                     std::tuple<std::integral_constant<int, 0>, char>
                 >
@@ -74,10 +74,10 @@ TEST(Traits, RemoveIndexSimpleTuple) {
 TEST(Traits, OddFilterOddCount) {
     static_assert(
         std::is_same<
-            aux::remove_index<
-                aux::filter<
-                    aux::slice<1, -1, 2>::type,
-                    aux::add_index<
+            tuple::remove_index<
+                tuple::filter<
+                    tuple::slice<1, -1, 2>::type,
+                    tuple::add_index<
                         std::tuple<int, float, double>
                     >::type
                 >::type
@@ -90,10 +90,10 @@ TEST(Traits, OddFilterOddCount) {
 TEST(Traits, OddFilterEvenCount) {
     static_assert(
         std::is_same<
-            aux::remove_index<
-                aux::filter<
-                    aux::slice<1, -1, 2>::type,
-                    aux::add_index<
+            tuple::remove_index<
+                tuple::filter<
+                    tuple::slice<1, -1, 2>::type,
+                    tuple::add_index<
                         std::tuple<int, float, double, short>
                     >::type
                 >::type
@@ -106,10 +106,10 @@ TEST(Traits, OddFilterEvenCount) {
 TEST(Traits, EvenFilterOddCount) {
     static_assert(
         std::is_same<
-            aux::remove_index<
-                aux::filter<
-                    aux::slice<0, -1, 2>::type,
-                    aux::add_index<
+            tuple::remove_index<
+                tuple::filter<
+                    tuple::slice<0, -1, 2>::type,
+                    tuple::add_index<
                         std::tuple<int, float, double>
                     >::type
                 >::type
@@ -122,10 +122,10 @@ TEST(Traits, EvenFilterOddCount) {
 TEST(Traits, EvenFilterEvenCount) {
     static_assert(
         std::is_same<
-            aux::remove_index<
-                aux::filter<
-                    aux::slice<0, -1, 2>::type,
-                    aux::add_index<
+            tuple::remove_index<
+                tuple::filter<
+                    tuple::slice<0, -1, 2>::type,
+                    tuple::add_index<
                         std::tuple<int, float, double, short>
                     >::type
                 >::type
@@ -137,7 +137,7 @@ TEST(Traits, EvenFilterEvenCount) {
 
 TEST(Traits, All) {
     static_assert(
-        aux::all<std::tuple<std::true_type, std::true_type>>::value,
+        tuple::all<std::tuple<std::true_type, std::true_type>>::value,
         "`all` map is broken");
 }
 
@@ -165,10 +165,10 @@ TEST(Traits, IsStringLiteralTypeCharArray) {
 TEST(Traits, SliceStart) {
     static_assert(
         std::is_same<
-            aux::remove_index<
-                aux::filter<
-                    aux::slice<1>::type,
-                    aux::add_index<
+            tuple::remove_index<
+                tuple::filter<
+                    tuple::slice<1>::type,
+                    tuple::add_index<
                         std::tuple<char, short, int>
                     >::type
                 >::type
@@ -181,10 +181,10 @@ TEST(Traits, SliceStart) {
 TEST(Traits, SliceStop) {
     static_assert(
         std::is_same<
-            aux::remove_index<
-                aux::filter<
-                    aux::slice<0, 2>::type,
-                    aux::add_index<
+            tuple::remove_index<
+                tuple::filter<
+                    tuple::slice<0, 2>::type,
+                    tuple::add_index<
                         std::tuple<char, short, int>
                     >::type
                 >::type
@@ -197,10 +197,10 @@ TEST(Traits, SliceStop) {
 TEST(Traits, SliceStep) {
     static_assert(
         std::is_same<
-            aux::remove_index<
-                aux::filter<
-                    aux::slice<0, -1, 2>::type,
-                    aux::add_index<
+            tuple::remove_index<
+                tuple::filter<
+                    tuple::slice<0, -1, 2>::type,
+                    tuple::add_index<
                         std::tuple<char, short, int, double>
                     >::type
                 >::type

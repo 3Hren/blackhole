@@ -3,9 +3,10 @@
 #include <type_traits>
 #include <tuple>
 
-#include <boost/integer_traits.hpp>
 
+#include "blackhole/detail/traits/or.hpp"
 #include "blackhole/detail/traits/same.hpp"
+#include "blackhole/detail/traits/tuple.hpp"
 
 #include "format/message/extraction.hpp"
 #include "format/message/insitu.hpp"
@@ -20,124 +21,6 @@ template<class... Args>
 struct is_keyword_pack {
     static const bool value = are_same<log::attribute_pair_t, Args...>::value;
 };
-
-template<int START, int STOP = -1, int STEP = 1>
-struct slice {
-    template<class IndexedSequence>
-    struct type;
-
-    template<int N, typename T>
-    struct type<std::tuple<std::integral_constant<int, N>, T>> {
-        static const int delta = N - START;
-        static const int stop = STOP == -1 ? boost::integer_traits<int>::const_max : STOP;
-        static const bool value = delta >= 0 && N < stop && delta % STEP == 0;
-    };
-};
-
-template<class Sequence, class OtherSequence>
-struct concat;
-
-template<typename... Sequence, typename... OtherSequence>
-struct concat<std::tuple<Sequence...>, std::tuple<OtherSequence...>> {
-    typedef std::tuple<Sequence..., OtherSequence...> type;
-};
-
-template<int N, int MAX, class Sequence>
-struct add_index_impl;
-
-template<int MAX>
-struct add_index_impl<MAX, MAX, std::tuple<>> {
-    typedef std::tuple<> type;
-};
-
-template<int N, int MAX, typename T, typename... Args>
-struct add_index_impl<N, MAX, std::tuple<T, Args...>> {
-    typedef typename concat<
-        std::tuple<std::tuple<std::integral_constant<int, N>, T>>,
-        typename add_index_impl<N + 1, MAX, std::tuple<Args...>>::type
-    >::type type;
-};
-
-template<class Sequence>
-struct add_index;
-
-template<typename... Args>
-struct add_index<std::tuple<Args...>> {
-    typedef typename add_index_impl<0, sizeof...(Args), std::tuple<Args...>>::type type;
-};
-
-template<class IndexedSequence>
-struct remove_index;
-
-template<>
-struct remove_index<std::tuple<>> {
-    typedef std::tuple<> type;
-};
-
-template<int N, typename T, typename... Args>
-struct remove_index<std::tuple<std::tuple<std::integral_constant<int, N>, T>, Args...>> {
-    typedef typename concat<
-        std::tuple<T>,
-        typename remove_index<std::tuple<Args...>>::type
-    >::type type;
-};
-
-template<template<typename> class F, class Sequence>
-struct filter_impl;
-
-template<template<typename> class F>
-struct filter_impl<F, std::tuple<>> {
-    typedef std::tuple<> type;
-};
-
-template<template<typename> class F, typename T, typename... Args>
-struct filter_impl<F, std::tuple<T, Args...>> {
-    typedef typename std::conditional<
-        F<T>::value,
-        typename concat<std::tuple<T>, typename filter_impl<F, std::tuple<Args...>>::type>::type,
-        typename filter_impl<F, std::tuple<Args...>>::type
-    >::type type;
-};
-
-template<template<typename> class F, class Sequence>
-struct filter;
-
-template<template<typename> class F, typename... Args>
-struct filter<F, std::tuple<Args...>> {
-    typedef typename filter_impl<F, std::tuple<Args...>>::type type;
-};
-
-template<template<typename> class F, class Sequence>
-struct map;
-
-template<template<typename> class F, typename... Args>
-struct map<F, std::tuple<Args...>>{
-    typedef std::tuple<typename F<Args>::type...> type;
-};
-
-template<class T>
-struct is_true_type {
-    static const bool value = std::is_same<T, std::true_type>::value;
-};
-
-template<class Sequence, template<class> class F = is_true_type>
-struct all;
-
-template<template<class> class F>
-struct all<std::tuple<>, F> {
-    static const bool value = true;
-};
-
-template<template<class> class F, typename T, typename... Args>
-struct all<std::tuple<T, Args...>, F> {
-    static const bool value = !F<T>::value ? false : all<std::tuple<Args...>, F>::value;
-};
-
-template<class, class>
-struct or_ : public std::true_type {};
-
-template<>
-struct or_<std::false_type, std::false_type> : public std::false_type {};
 
 template<typename T>
 struct is_string_literal_type {
@@ -155,13 +38,13 @@ struct is_string_literal_type {
 
 template<class... Args>
 struct all_first_string_literal {
-    static const bool value = all<
-        typename map<
+    static const bool value = tuple::all<
+        typename tuple::map<
             is_string_literal_type,
-            typename remove_index<
-                typename filter<
-                    slice<0, -1, 2>::type,
-                    typename add_index<
+            typename tuple::remove_index<
+                typename tuple::filter<
+                    tuple::slice<0, -1, 2>::type,
+                    typename tuple::add_index<
                         std::tuple<Args...>
                     >::type
                 >::type
@@ -172,13 +55,13 @@ struct all_first_string_literal {
 
 template<class... Args>
 struct all_second_constructible {
-    static const bool value = all<
-        typename map<
+    static const bool value = tuple::all<
+        typename tuple::map<
             log::attribute::is_constructible,
-            typename remove_index<
-                typename filter<
-                    slice<1, -1, 2>::type,
-                    typename add_index<
+            typename tuple::remove_index<
+                typename tuple::filter<
+                    tuple::slice<1, -1, 2>::type,
+                    typename tuple::add_index<
                         std::tuple<Args...>
                     >::type
                 >::type

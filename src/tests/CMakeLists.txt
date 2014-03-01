@@ -19,6 +19,14 @@ SET(HEADERS
 
 SET(SOURCES
     main
+    datetime/test_DayOfYear
+    datetime/test_DayOfMonth
+    datetime/test_DayOfWeek
+    datetime/test_Month
+    datetime/test_Other
+    datetime/test_Time
+    datetime/test_Year
+    datetime/test_Week
     test_AttachableStream
     test_Attribute
     test_Config
@@ -43,17 +51,10 @@ SET(SOURCES
     test_StringFormatter
     test_StringPatternParser
     test_SyslogSink
+    test_Traits
     test_UdpSink
     test_Utils
     test_VerboseLogger
-    datetime/test_Year
-    datetime/test_Month
-    datetime/test_Week
-    datetime/test_DayOfYear
-    datetime/test_DayOfMonth
-    datetime/test_DayOfWeek
-    datetime/test_Time
-    datetime/test_Other
 )
 
 SET(Boost_USE_MULTITHREADED ON)
