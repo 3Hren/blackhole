@@ -21,22 +21,6 @@ struct is_keyword_pack {
     static const bool value = are_same<log::attribute_pair_t, Args...>::value;
 };
 
-template<class IndexedSequence>
-struct odd;
-
-template<int N, typename T>
-struct odd<std::tuple<std::integral_constant<int, N>, T>> {
-    static const bool value = N % 2 == 1;
-};
-
-template<class IndexedSequence>
-struct even;
-
-template<int N, typename T>
-struct even<std::tuple<std::integral_constant<int, N>, T>> {
-    static const bool value = N % 2 == 0;
-};
-
 template<int START, int STOP = -1, int STEP = 1>
 struct slice {
     template<class IndexedSequence>

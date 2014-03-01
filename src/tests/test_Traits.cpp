@@ -76,7 +76,7 @@ TEST(Traits, OddFilterOddCount) {
         std::is_same<
             aux::remove_index<
                 aux::filter<
-                    aux::odd,
+                    aux::slice<1, -1, 2>::type,
                     aux::add_index<
                         std::tuple<int, float, double>
                     >::type
@@ -92,7 +92,7 @@ TEST(Traits, OddFilterEvenCount) {
         std::is_same<
             aux::remove_index<
                 aux::filter<
-                    aux::odd,
+                    aux::slice<1, -1, 2>::type,
                     aux::add_index<
                         std::tuple<int, float, double, short>
                     >::type
@@ -108,7 +108,7 @@ TEST(Traits, EvenFilterOddCount) {
         std::is_same<
             aux::remove_index<
                 aux::filter<
-                    aux::even,
+                    aux::slice<0, -1, 2>::type,
                     aux::add_index<
                         std::tuple<int, float, double>
                     >::type
@@ -124,7 +124,7 @@ TEST(Traits, EvenFilterEvenCount) {
         std::is_same<
             aux::remove_index<
                 aux::filter<
-                    aux::even,
+                    aux::slice<0, -1, 2>::type,
                     aux::add_index<
                         std::tuple<int, float, double, short>
                     >::type
