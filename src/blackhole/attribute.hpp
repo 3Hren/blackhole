@@ -47,7 +47,7 @@ static const scope DEFAULT_SCOPE = scope::local;
 // Note, that this metafunction ignores implicit type conversion.
 template<typename T>
 struct is_supported {
-    static const bool value = boost::mpl::contains<log::attribute_value_t::types, T>::value;
+    static const bool value = boost::mpl::contains<log::attribute_value_t::types, typename std::decay<T>::type>::value;
 };
 
 // Helper metafunction that checks if `attribute_value_t` can be constructed using type `T`.

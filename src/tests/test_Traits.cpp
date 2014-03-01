@@ -20,7 +20,12 @@ TEST(Traits, IsSupportedAttributeType) {
 }
 
 TEST(Traits, IsConvertibleToAttribute) {
-    static_assert(log::attribute::is_constructible<const char*>::value, "`const char*` must be convertible");
+    static_assert(log::attribute::is_constructible<const char*>::value,
+                  "`const char*` must be convertible");
+    static_assert(log::attribute::is_constructible<const int>::value,
+                  "`const int` must be convertible");
+    static_assert(log::attribute::is_constructible<const std::string&>::value,
+                  "`const std::string&` must be convertible");
 }
 
 TEST(Traits, AreSame) {
