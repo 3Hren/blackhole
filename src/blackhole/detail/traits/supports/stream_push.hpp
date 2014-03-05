@@ -3,6 +3,18 @@
 #include <ostream>
 #include <type_traits>
 
+#include "blackhole/platform.hpp"
+
+#ifdef HAVE_GCC44
+namespace std {
+
+template <class _Tp>
+typename add_lvalue_reference<_Tp>::type
+declval();
+
+}
+#endif
+
 namespace blackhole {
 
 namespace traits {
