@@ -42,8 +42,8 @@ typedef aux::underlying_type<scope>::type scope_underlying_type;
 
 static const scope DEFAULT_SCOPE = scope::local;
 
-// Helper metafunction that checks if type `T` is supported with attribute internal implementation,
-// i.e. `attribute_value_t` variant can be constructed using type `T`.
+// Helper metafunction that checks if type `T` is compatible with attribute internal
+// implementation, i.e. `attribute_value_t` variant can be constructed using type `T`.
 // Note, that this metafunction ignores implicit type conversion.
 template<typename T>
 struct is_supported {
