@@ -1,3 +1,4 @@
+//!@todo: api: Read more about difference between long and long long types.
 //!@todo: api: Ability to set global attribute mapper (?)
 //!@todo: feature: Verbosity filter from file.(2d)
 

@@ -19,13 +19,86 @@ TEST(Traits, IsSupportedAttributeType) {
     static_assert(log::attribute::is_supported<timeval>::value,         "`timeval` must be supported");
 }
 
-TEST(Traits, IsConvertibleToAttribute) {
+TEST(Traits, LiteralIsConvertibleToAttribute) {
     static_assert(log::attribute::is_constructible<const char*>::value,
                   "`const char*` must be convertible");
-    static_assert(log::attribute::is_constructible<const int>::value,
-                  "`const int` must be convertible");
+}
+
+TEST(Traits, StringIsConvertibleToAttribute) {
     static_assert(log::attribute::is_constructible<const std::string&>::value,
                   "`const std::string&` must be convertible");
+}
+
+TEST(Traits, AnyCharIsImplicitConvertible) {
+    static_assert(log::attribute::is_constructible<char>::value,
+                  "`char` must be convertible");
+    log::attribute_value_t(static_cast<char>(42));
+
+    static_assert(log::attribute::is_constructible<unsigned char>::value,
+                  "`unsigned char` must be convertible");
+    log::attribute_value_t(static_cast<unsigned char>(42));
+
+    static_assert(log::attribute::is_constructible<const char>::value,
+                  "`const char` must be convertible");
+    log::attribute_value_t(static_cast<const char>(42));
+
+    static_assert(log::attribute::is_constructible<const unsigned char>::value,
+                  "`const unsigned char` must be convertible");
+    log::attribute_value_t(static_cast<const unsigned char>(42));
+}
+
+TEST(Traits, AnyShortIsImplicitConvertible) {
+    static_assert(log::attribute::is_constructible<short>::value,
+                  "`short` must be convertible");
+    log::attribute_value_t(static_cast<short>(42));
+
+    static_assert(log::attribute::is_constructible<unsigned short>::value,
+                  "`unsigned short` must be convertible");
+    log::attribute_value_t(static_cast<unsigned short>(42));
+
+    static_assert(log::attribute::is_constructible<const short>::value,
+                  "`const short` must be convertible");
+    log::attribute_value_t(static_cast<const short>(42));
+
+    static_assert(log::attribute::is_constructible<const unsigned short>::value,
+                  "`const unsigned short` must be convertible");
+    log::attribute_value_t(static_cast<const unsigned short>(42));
+}
+
+TEST(Traits, AnyIntIsImplicitConvertible) {
+    static_assert(log::attribute::is_constructible<int>::value,
+                  "`int` must be convertible");
+    log::attribute_value_t(static_cast<int>(42));
+
+    static_assert(log::attribute::is_constructible<unsigned int>::value,
+                  "`unsigned int` must be convertible");
+    log::attribute_value_t(static_cast<unsigned int>(42));
+
+    static_assert(log::attribute::is_constructible<const int>::value,
+                  "`const int` must be convertible");
+    log::attribute_value_t(static_cast<const int>(42));
+
+    static_assert(log::attribute::is_constructible<const unsigned int>::value,
+                  "`const unsigned int` must be convertible");
+    log::attribute_value_t(static_cast<const unsigned int>(42));
+}
+
+TEST(Traits, AnyLongLongIsImplicitConvertible) {
+    static_assert(log::attribute::is_constructible<long long>::value,
+                  "`long long` must be convertible");
+    log::attribute_value_t(static_cast<long long>(42));
+
+    static_assert(log::attribute::is_constructible<unsigned long long>::value,
+                  "`unsigned long long` must be convertible");
+    log::attribute_value_t(static_cast<unsigned long long>(42));
+
+    static_assert(log::attribute::is_constructible<const long long>::value,
+                  "`const long long` must be convertible");
+    log::attribute_value_t(static_cast<const long long>(42));
+
+    static_assert(log::attribute::is_constructible<const unsigned long long>::value,
+                  "`const unsigned long long` must be convertible");
+    log::attribute_value_t(static_cast<const unsigned long long>(42));
 }
 
 TEST(Traits, AreSame) {

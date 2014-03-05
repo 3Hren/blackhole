@@ -54,7 +54,10 @@ struct is_supported {
 template<typename T>
 struct is_constructible {
     typedef boost::mpl::vector<
-        const char*     // Implicit string conversion
+        const char*,    // Implicit literal to string conversion.
+        char,
+        short,
+        unsigned short
     > additional_types;
 
     typedef typename std::conditional<
