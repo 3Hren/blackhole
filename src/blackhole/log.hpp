@@ -108,6 +108,7 @@ struct conv<T, typename std::enable_if<
 {
     static log::attribute_value_t from(T&&) {
         static_assert(lazy_false<T>::value, "stream operator<< is not defined for type `T`");
+        return log::attribute_value_t();
     }
 };
 
