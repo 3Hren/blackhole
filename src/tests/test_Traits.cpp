@@ -83,24 +83,6 @@ TEST(Traits, AnyIntIsImplicitConvertible) {
     log::attribute_value_t(static_cast<const unsigned int>(42));
 }
 
-TEST(Traits, AnyLongLongIsImplicitConvertible) {
-    static_assert(log::attribute::is_constructible<long long>::value,
-                  "`long long` must be convertible");
-    log::attribute_value_t(static_cast<long long>(42));
-
-    static_assert(log::attribute::is_constructible<unsigned long long>::value,
-                  "`unsigned long long` must be convertible");
-    log::attribute_value_t(static_cast<unsigned long long>(42));
-
-    static_assert(log::attribute::is_constructible<const long long>::value,
-                  "`const long long` must be convertible");
-    log::attribute_value_t(static_cast<const long long>(42));
-
-    static_assert(log::attribute::is_constructible<const unsigned long long>::value,
-                  "`const unsigned long long` must be convertible");
-    log::attribute_value_t(static_cast<const unsigned long long>(42));
-}
-
 TEST(Traits, AreSame) {
     static_assert(aux::are_same<int>::value, "`are_same` is broken on zero parameters");
     static_assert(aux::are_same<int, int>::value, "`are_same` is broken on single parameter");
