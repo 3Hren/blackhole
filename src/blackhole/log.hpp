@@ -2,6 +2,7 @@
 
 #include <type_traits>
 #include <tuple>
+#include <ostream>
 
 #include "blackhole/detail/traits/literal.hpp"
 #include "blackhole/detail/traits/or.hpp"
@@ -14,6 +15,40 @@
 #include "utils/format.hpp"
 
 namespace blackhole {
+
+namespace supports {
+
+namespace aux {
+
+struct return_t {};
+
+struct any_t {
+    template<typename T> any_t(const T&);
+};
+
+} // namespace aux
+
+aux::return_t operator<<(std::ostream&, const aux::any_t&);
+
+template<typename T>
+struct stream_push : public std::integral_constant<
+        bool,
+        !std::is_same<
+            aux::return_t,
+            decltype(std::declval<std::ostream&>() << std::declval<T>())
+        >::value
+    >
+{};
+
+} // namespace supports
+
+template<typename T>
+struct is_convertible : public std::conditional<
+        log::attribute::is_constructible<T>::value || supports::stream_push<T>::value,
+        std::true_type,
+        std::false_type
+    >
+{};
 
 namespace aux {
 
@@ -43,7 +78,7 @@ template<class... Args>
 struct all_second_constructible {
     static const bool value = tuple::all<
         typename tuple::map<
-            log::attribute::is_constructible,
+            is_convertible,
             typename tuple::remove_index<
                 typename tuple::filter<
                     tuple::slice<1, -1, 2>::type,
@@ -64,11 +99,48 @@ struct is_emplace_pack {
             all_second_constructible<Args...>::value;
 };
 
+template<typename T, class = void>
+struct conv;
+
+template<typename T>
+struct conv<T, typename std::enable_if<
+        log::attribute::is_constructible<T>::value>::type
+    >
+{
+    static log::attribute_value_t from(T&& value) {
+        return log::attribute_value_t(std::forward<T>(value));
+    }
+};
+
+template<typename T>
+struct conv<T, typename std::enable_if<
+        !log::attribute::is_constructible<T>::value &&
+        supports::stream_push<T>::value>::type
+    >
+{
+    static log::attribute_value_t from(T&& value) {
+        std::ostringstream stream;
+        stream << value;
+        return log::attribute_value_t(stream.str());
+    }
+};
+
+template<typename T>
+struct conv<T, typename std::enable_if<
+        !log::attribute::is_constructible<T>::value &&
+        !supports::stream_push<T>::value>::type
+    >
+{
+    static log::attribute_value_t from(T&&) {
+        static_assert(lazy_false<T>::value, "stream operator<< is not defined for type `T`");
+    }
+};
+
 template<bool, class... Args>
 struct selector;
 
 template<class... Args>
-struct selector<true, Args...> {
+struct selector<true, Args...> { //!@todo: true/false is not so readable.
     static void action(log::record_t& record, Args&&... args) {
         record.fill(std::forward<Args>(args)...);
     }
@@ -78,7 +150,7 @@ template<class... Args>
 struct selector<false, Args...> {
     template<class T, class... Tail>
     static void action(log::record_t& record, const char* name, T&& value, Tail&&... args) {
-        record.attributes.insert(std::make_pair(name, log::attribute_t(std::forward<T>(value))));
+        record.attributes.insert(std::make_pair(name, log::attribute_t(conv<T>::from(std::forward<T>(value)))));
         action(record, std::forward<Tail>(args)...);
     }
 

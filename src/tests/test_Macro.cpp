@@ -62,19 +62,15 @@ TEST(Macro, FormatMessageWithPrintfStyle) {
     EXPECT_EQ("value [100500]: blah - okay", actual);
 }
 
-namespace testing {
-
-struct attr_pack_t {
-    std::string message;
-    int value;
-    std::string reason;
-    timeval timestamp;
-};
-
-} // namespace testing
-
 struct ExtractAttributesAction {
-    attr_pack_t& actual;
+    struct pack_t {
+        std::string message;
+        int value;
+        std::string reason;
+        timeval timestamp;
+    };
+
+    pack_t& actual;
 
     void operator ()(log::record_t record) const {
         actual.message = record.extract<std::string>("message");
@@ -93,7 +89,7 @@ TEST(Macro, FormatMessageWithAttributes) {
             .Times(1)
             .WillOnce(Return(record));
 
-    testing::attr_pack_t actual;
+    ExtractAttributesAction::pack_t actual;
     ExtractAttributesAction action { actual };
     EXPECT_CALL(log, push(_))
             .Times(1)
@@ -120,7 +116,7 @@ TEST(Macro, FormatMessageWithPrintfStyleWithAttributes) {
             .Times(1)
             .WillOnce(Return(record));
 
-    testing::attr_pack_t actual;
+    ExtractAttributesAction::pack_t actual;
     ExtractAttributesAction action { actual };
     EXPECT_CALL(log, push(_))
             .Times(1)
@@ -192,8 +188,14 @@ TEST(Macro, SpecificKeywordMessageFormatting) {
     EXPECT_EQ("value: DEBUG", actual);
 }
 
-struct MiniExtractAttributesAction {
-    attr_pack_t& actual;
+struct EmplaceCheckExtractAttributesAction {
+    struct pack_t {
+        std::string message;
+        int value;
+        std::string reason;
+    };
+
+    pack_t& actual;
 
     void operator ()(log::record_t record) const {
         actual.message = record.extract<std::string>("message");
@@ -211,8 +213,8 @@ TEST(Macro, EmplaceAttributes) {
             .Times(1)
             .WillOnce(Return(record));
 
-    testing::attr_pack_t actual;
-    MiniExtractAttributesAction action { actual };
+    EmplaceCheckExtractAttributesAction::pack_t actual;
+    EmplaceCheckExtractAttributesAction action { actual };
     EXPECT_CALL(log, push(_))
             .Times(1)
             .WillOnce(WithArg<0>(Invoke(action)));
@@ -225,4 +227,58 @@ TEST(Macro, EmplaceAttributes) {
     EXPECT_EQ("message", actual.message);
     EXPECT_EQ(42, actual.value);
     EXPECT_EQ("42", actual.reason);
+}
+
+namespace testing {
+
+struct streamable_value_t {
+    std::string message;
+    int value;
+
+    friend std::ostream& operator<<(std::ostream& stream, const streamable_value_t& value) {
+        stream << "['" << value.message << "', " << value.value << "]";
+        return stream;
+    }
+};
+
+} // namespace testing
+
+struct ExtractStreamableValueAttributesAction {
+    struct pack_t {
+        std::string message;
+        std::string value;
+    };
+
+    pack_t& actual;
+
+    void operator()(const log::record_t& record) const {
+        actual.message = record.extract<std::string>("message");
+        actual.value = record.extract<std::string>("value");
+    }
+};
+
+TEST(Macro, UsingStreamOperatorIfNoImplicitConversionAvailable) {
+    static_assert(supports::stream_push<streamable_value_t>::value,
+                  "`streamable_value_t` must support stream push operator<<");
+
+    streamable_value_t value = { "42", 42 };
+
+    log::record_t record;
+    record.attributes["attr1"] = {"value1"};
+
+    mock::verbose_log_t<level> log;
+    EXPECT_CALL(log, open_record(level::debug))
+            .Times(1)
+            .WillOnce(Return(record));
+
+    ExtractStreamableValueAttributesAction::pack_t actual;
+    ExtractStreamableValueAttributesAction action { actual };
+    EXPECT_CALL(log, push(_))
+            .Times(1)
+            .WillOnce(WithArg<0>(Invoke(action)));
+
+    BH_LOG(log, level::debug, "message")("value", value);
+
+    EXPECT_EQ("message", actual.message);
+    EXPECT_EQ("['42', 42]", actual.value);
 }
