@@ -28,9 +28,7 @@ struct is_convertible : public std::conditional<
 namespace aux {
 
 template<class... Args>
-struct is_keyword_pack {
-    static const bool value = are_same<log::attribute_pair_t, Args...>::value;
-};
+struct is_keyword_pack : public are_same<log::attribute_pair_t, Args...> {};
 
 template<class... Args>
 struct all_first_string_literal {
