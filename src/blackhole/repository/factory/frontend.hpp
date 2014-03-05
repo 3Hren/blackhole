@@ -12,11 +12,15 @@
 
 namespace blackhole {
 
+namespace frontend {
+
 template<class T>
 struct traits {
     typedef std::unique_ptr<base_frontend_t> return_type;
     typedef return_type(*function_type)(const formatter_config_t&, std::unique_ptr<T>);
 };
+
+} // namespace frontend
 
 //! Keeps frontend factory functions using type erasure idiom.
 //! For each desired Formatter-Sink pair a function created and registered.
@@ -27,7 +31,7 @@ struct function_keeper_t {
 
     template<class Sink, class Formatter>
     void add() {
-        typedef typename traits<Sink>::function_type function_type;
+        typedef typename frontend::traits<Sink>::function_type function_type;
         function_type function = static_cast<function_type>(&factory_t<Level>::template create<Formatter>);
         functions[Sink::name()] = function;
     }
@@ -38,9 +42,9 @@ struct function_keeper_t {
     }
 
     template<class Sink>
-    typename traits<Sink>::function_type get() const {
+    typename frontend::traits<Sink>::function_type get() const {
         boost::any any = functions.at(Sink::name());
-        return boost::any_cast<typename traits<Sink>::function_type>(any);
+        return boost::any_cast<typename frontend::traits<Sink>::function_type>(any);
     }
 };
 
@@ -72,9 +76,9 @@ public:
     }
 
     template<class Sink>
-    typename traits<Sink>::return_type
+    typename frontend::traits<Sink>::return_type
     create(const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink) const {
-        typedef typename traits<Sink>::return_type return_type;
+        typedef typename frontend::traits<Sink>::return_type return_type;
 
         try {
             std::lock_guard<std::mutex> lock(mutex);

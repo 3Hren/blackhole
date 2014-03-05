@@ -8,6 +8,7 @@
 #include "blackhole/detail/traits/or.hpp"
 #include "blackhole/detail/traits/same.hpp"
 #include "blackhole/detail/traits/tuple.hpp"
+#include "blackhole/detail/traits/supports/stream_push.hpp"
 
 #include "format/message/extraction.hpp"
 #include "format/message/insitu.hpp"
@@ -16,35 +17,9 @@
 
 namespace blackhole {
 
-namespace supports {
-
-namespace aux {
-
-struct return_t {};
-
-struct any_t {
-    template<typename T> any_t(const T&);
-};
-
-} // namespace aux
-
-aux::return_t operator<<(std::ostream&, const aux::any_t&);
-
-template<typename T>
-struct stream_push : public std::integral_constant<
-        bool,
-        !std::is_same<
-            aux::return_t,
-            decltype(std::declval<std::ostream&>() << std::declval<T>())
-        >::value
-    >
-{};
-
-} // namespace supports
-
 template<typename T>
 struct is_convertible : public std::conditional<
-        log::attribute::is_constructible<T>::value || supports::stream_push<T>::value,
+        log::attribute::is_constructible<T>::value || traits::supports::stream_push<T>::value,
         std::true_type,
         std::false_type
     >
@@ -115,7 +90,7 @@ struct conv<T, typename std::enable_if<
 template<typename T>
 struct conv<T, typename std::enable_if<
         !log::attribute::is_constructible<T>::value &&
-        supports::stream_push<T>::value>::type
+        traits::supports::stream_push<T>::value>::type
     >
 {
     static log::attribute_value_t from(T&& value) {
@@ -128,7 +103,7 @@ struct conv<T, typename std::enable_if<
 template<typename T>
 struct conv<T, typename std::enable_if<
         !log::attribute::is_constructible<T>::value &&
-        !supports::stream_push<T>::value>::type
+        !traits::supports::stream_push<T>::value>::type
     >
 {
     static log::attribute_value_t from(T&&) {

@@ -258,7 +258,7 @@ struct ExtractStreamableValueAttributesAction {
 };
 
 TEST(Macro, UsingStreamOperatorIfNoImplicitConversionAvailable) {
-    static_assert(supports::stream_push<streamable_value_t>::value,
+    static_assert(traits::supports::stream_push<streamable_value_t>::value,
                   "`streamable_value_t` must support stream push operator<<");
 
     streamable_value_t value = { "42", 42 };
