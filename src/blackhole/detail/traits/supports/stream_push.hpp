@@ -8,8 +8,8 @@
 #ifdef HAVE_GCC44
 namespace std {
 
-template <class _Tp>
-typename add_lvalue_reference<_Tp>::type
+template<class T>
+typename add_lvalue_reference<T>::type
 declval();
 
 }
