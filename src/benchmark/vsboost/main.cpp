@@ -105,7 +105,7 @@ void init_blackhole_log() {
     mapper.add<severity_level>("severity", &map_severity);
 
     formatter_config_t formatter("string", mapper);
-    formatter["pattern"] = "[%(timestamp)s] [%(severity)s]: %(message)s";
+    formatter["pattern"] = "[%(severity)s]: %(message)s";
 
     sink_config_t sink("files");
     sink["path"] = "blackhole.log";
