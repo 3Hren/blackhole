@@ -1,4 +1,5 @@
 //!@todo: performance: Review string formatting. Use attached stream.
+//!@todo: api: Make elasticsearch frontend. Use swarm + asio and only index request with simple response checking.
 //!@todo: files_t: Make file naming by pattern.
 //!@todo: api: Ability to set global attribute mapper (?)
 
