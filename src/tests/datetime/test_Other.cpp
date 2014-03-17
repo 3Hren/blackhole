@@ -38,3 +38,8 @@ TEST_F(generator_test_case_t, TimeZone) {
     tm.tm_isdst = 3;
     EXPECT_EQ(common::using_strftime("%Z", tm), generate("%Z"));
 }
+
+TEST_F(generator_test_case_t, PercentSign) {
+    tm.tm_isdst = 3;
+    EXPECT_EQ(common::using_strftime("%%", tm), generate("%%"));
+}

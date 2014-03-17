@@ -495,6 +495,9 @@ public:
         case 'F':
             handler.date_ISO8601();
             break;
+        case '%':
+            handler.literal(std::string("%"));
+            break;
         default:
             return Decorate::parse(it, end, handler);
         }
