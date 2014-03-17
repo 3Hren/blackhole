@@ -110,26 +110,49 @@ struct conv<T, typename std::enable_if<
     }
 };
 
-template<bool, class... Args>
-struct selector;
+struct keyword_pack_tag_t;
+struct emplace_pack_tag_t;
+struct unknown_pack_tag_t;
 
-template<class... Args>
-struct selector<true, Args...> { //!@todo: true/false is not so readable.
-    static void action(log::record_t& record, Args&&... args) {
+//! Helper metafunction that determines tag type of attributes pack.
+//! At this moment only keyword and emplace pack are supported.
+template<typename... Args>
+struct pack_determiner :
+    public std::conditional<
+        is_keyword_pack<Args...>::value,
+        keyword_pack_tag_t,
+        typename std::conditional<
+            is_emplace_pack<Args...>::value,
+            emplace_pack_tag_t,
+            unknown_pack_tag_t
+        >::type
+    >
+{};
+
+template<class T>
+struct pack_feeder;
+
+template<>
+struct pack_feeder<keyword_pack_tag_t> {
+    template<class... Args>
+    static void feed(log::record_t& record, Args&&... args) {
         record.fill(std::forward<Args>(args)...);
     }
 };
 
-template<class... Args>
-struct selector<false, Args...> {
-    template<class T, class... Tail>
-    static void action(log::record_t& record, const char* name, T&& value, Tail&&... args) {
+template<>
+struct pack_feeder<emplace_pack_tag_t> {
+    template<class T, class... Args>
+    static void feed(log::record_t& record, const char* name, T&& value, Args&&... args) {
         record.attributes.insert(std::make_pair(name, log::attribute_t(conv<T>::from(std::forward<T>(value)))));
-        action(record, std::forward<Tail>(args)...);
+        feed(record, std::forward<Args>(args)...);
     }
 
-    static void action(log::record_t&) {}
+    static void feed(log::record_t&) {}
 };
+
+template<>
+struct pack_feeder<unknown_pack_tag_t> {};
 
 template<typename Log>
 class scoped_pump {
@@ -153,10 +176,8 @@ public:
     void operator()(Args&&... args) {
         static_assert((is_keyword_pack<Args...>::value || is_emplace_pack<Args...>::value),
                       "parameter pack must be either attribute pack or emplace pack");
-        selector<
-            is_keyword_pack<Args...>::value,
-            Args...
-        >::action(record, std::forward<Args>(args)...);
+        typedef typename pack_determiner<Args...>::type pack_type;
+        pack_feeder<pack_type>::feed(record, std::forward<Args>(args)...);
     }
 };
 
