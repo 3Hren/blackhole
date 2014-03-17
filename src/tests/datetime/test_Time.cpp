@@ -80,3 +80,13 @@ TEST_F(time_generator_test_case_t, SecondUpperBound) {
     EXPECT_EQ("60", generate("%S"));
     EXPECT_EQ(common::using_strftime("%S", tm), generate("%S"));
 }
+
+TEST_F(time_generator_test_case_t, Am) {
+    tm.tm_hour = 11;
+    EXPECT_EQ(common::using_strftime("%p", tm), generate("%p"));
+}
+
+TEST_F(time_generator_test_case_t, Pm) {
+    tm.tm_hour = 13;
+    EXPECT_EQ(common::using_strftime("%p", tm), generate("%p"));
+}

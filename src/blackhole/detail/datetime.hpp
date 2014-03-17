@@ -337,6 +337,11 @@ public:
         actions.push_back(&visit::time::second::normal);
     }
 
+    virtual void ampm() {
+        end_partial_literal();
+        actions.push_back(&visit::localized<'p'>);
+    }
+
     virtual void standard_date_time() {
         end_partial_literal();
         actions.push_back(&visit::standard);
@@ -397,6 +402,9 @@ public:
             break;
         case 'S':
             handler.second();
+            break;
+        case 'p':
+            handler.ampm();
             break;
         default:
             return Decorate::parse(it, end, handler);
