@@ -81,6 +81,14 @@ inline void numeric(context_t& context) {
 
 } // namespace month
 
+namespace week {
+
+inline void year(context_t& context) {
+    fill(context.str, (context.tm.tm_yday - context.tm.tm_wday + 7) / 7, 2);
+}
+
+}
+
 namespace day {
 
 namespace year {
@@ -262,6 +270,11 @@ public:
         actions.push_back(&visit::localized<'B'>);
     }
 
+    virtual void year_week() {
+        end_partial_literal();
+        actions.push_back(&visit::week::year);
+    }
+
     virtual void year_day() {
         end_partial_literal();
         actions.push_back(&visit::day::year::numeric);
@@ -403,6 +416,10 @@ public:
             break;
         case 'B':
             handler.full_month();
+            break;
+        //! =========== WEAK SECTION ===========
+        case 'U':
+            handler.year_week();
             break;
         //! =========== DAY SECTION ===========
         case 'j':
