@@ -11,7 +11,8 @@ namespace blackhole {
 
 namespace aux {
 
-//!@todo: Need comments!
+//! Helper metafunction that determines if all even arguments is string literal.
+//! It is used when determining if argument pack is emplace pack.
 template<class... Args>
 struct all_first_string_literal {
     static const bool value = tuple::all<
@@ -29,7 +30,8 @@ struct all_first_string_literal {
     >::value;
 };
 
-//!@todo: Need comments!
+//! Helper metafunction that determines if all odd arguments is convertible to `attribute_value_t`.
+//! It is used when determining if argument pack is emplace pack.
 template<class... Args>
 struct all_second_constructible {
     static const bool value = tuple::all<
@@ -47,7 +49,11 @@ struct all_second_constructible {
     >::value;
 };
 
-//!@todo: Need comments!
+//! Helper metafunction that determines if argument pack is emplace pack.
+//! Any argument pack is considered to be emplace pack if and only if:
+//!  - it has even number of arguments;
+//!  - all even arguments is string literal;
+//!  - all odd arguments is convertible to `attribute_valut_t`.
 template<class... Args>
 struct is_emplace_pack {
     static const bool value =
