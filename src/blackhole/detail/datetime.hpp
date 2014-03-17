@@ -353,6 +353,11 @@ public:
         actions.push_back(&visit::utc_offset);
     }
 
+    virtual void timezone() {
+        end_partial_literal();
+        actions.push_back(&visit::localized<'Z'>);
+    }
+
     virtual void standard_date_time() {
         end_partial_literal();
         actions.push_back(&visit::standard);
@@ -480,6 +485,9 @@ public:
         //! =========== OTHER SECTION ===========
         case 'z':
             handler.utc_offset();
+            break;
+        case 'Z':
+            handler.timezone();
             break;
         case 'c':
             handler.standard_date_time();

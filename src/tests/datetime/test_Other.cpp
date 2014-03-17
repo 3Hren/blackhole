@@ -33,3 +33,8 @@ TEST_F(generator_test_case_t, OffsetFromUTC) {
     tm.tm_isdst = 3;
     EXPECT_EQ(common::using_strftime("%z", tm), generate("%z"));
 }
+
+TEST_F(generator_test_case_t, TimeZone) {
+    tm.tm_isdst = 3;
+    EXPECT_EQ(common::using_strftime("%Z", tm), generate("%Z"));
+}
