@@ -202,6 +202,14 @@ inline void date_ISO8601(context_t& context) {
     day::month::numeric(context);
 }
 
+inline void time_ISO8601(context_t& context) {
+    time::hour::h24(context);
+    context.str.push_back(':');
+    time::minute::normal(context);
+    context.str.push_back(':');
+    time::second::normal(context);
+}
+
 } // namespace visit
 
 struct literal_generator_t {
@@ -380,6 +388,11 @@ public:
         end_partial_literal();
         actions.push_back(&visit::date_ISO8601);
     }
+
+    virtual void time_ISO8601() {
+        end_partial_literal();
+        actions.push_back(&visit::time_ISO8601);
+    }
 };
 
 namespace parser {
@@ -510,6 +523,9 @@ public:
             break;
         case 'F':
             handler.date_ISO8601();
+            break;
+        case 'T':
+            handler.time_ISO8601();
             break;
         case '%':
             handler.literal(std::string("%"));
