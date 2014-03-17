@@ -157,6 +157,12 @@ inline void normal(context_t& context) {
 
 } // namespace time
 
+inline void utc_offset(context_t& context) {
+    // It's too dificult to reinvent this case depending on platform.
+    // See GNUC strftime if you don't believe.
+    localized<'z'>(context);
+}
+
 inline void standard(context_t& context) {
     typedef std::time_put<char> facet_type;
     typedef facet_type::iter_type iter_type;
@@ -342,6 +348,11 @@ public:
         actions.push_back(&visit::localized<'p'>);
     }
 
+    virtual void utc_offset() {
+        end_partial_literal();
+        actions.push_back(&visit::utc_offset);
+    }
+
     virtual void standard_date_time() {
         end_partial_literal();
         actions.push_back(&visit::standard);
@@ -467,6 +478,9 @@ public:
             handler.full_weekday();
             break;
         //! =========== OTHER SECTION ===========
+        case 'z':
+            handler.utc_offset();
+            break;
         case 'c':
             handler.standard_date_time();
             break;
