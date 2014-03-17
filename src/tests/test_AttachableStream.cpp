@@ -14,6 +14,7 @@ TEST(ostringstreambuf, StoreDataString) {
     ostringstreambuf streambuf(storage);
     std::ostream stream(&streambuf);
     stream << "Blah";
+    stream.flush();
     EXPECT_EQ("Blah", storage);
 }
 
@@ -22,6 +23,7 @@ TEST(ostringstreambuf, StoreDataStringLongerThanInitialSize) {
     ostringstreambuf streambuf(storage);
     std::ostream stream(&streambuf);
     stream << "Blahblahblahblah-blah!";
+    stream.flush();
     EXPECT_EQ("Blahblahblahblah-blah!", storage);
 }
 
@@ -31,5 +33,6 @@ TEST(ostringstreambuf, CanAttachString) {
     std::ostream stream(&streambuf);
     streambuf.attach(storage);
     stream << "Blah";
+    stream.flush();
     EXPECT_EQ("Blah", storage);
 }
