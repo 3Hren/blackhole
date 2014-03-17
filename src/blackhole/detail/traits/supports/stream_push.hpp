@@ -3,17 +3,9 @@
 #include <ostream>
 #include <type_traits>
 
+#include <boost/utility/declval.hpp>
+
 #include "blackhole/platform.hpp"
-
-#ifdef HAVE_GCC44
-namespace std {
-
-template<class T>
-typename add_lvalue_reference<T>::type
-declval();
-
-}
-#endif
 
 namespace blackhole {
 
@@ -38,7 +30,7 @@ struct stream_push : public std::integral_constant<
         bool,
         !std::is_same<
             aux::return_t,
-            decltype(std::declval<std::ostream&>() << std::declval<T>())
+            decltype(boost::declval<std::ostream&>() << boost::declval<T>())
         >::value
     >
 {};
