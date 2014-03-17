@@ -29,5 +29,5 @@ before_script:
  - mkdir build && cd build
 
 script:
- - cmake -DENABLE_TESTING=ON $CMAKE_OPTIONS .. && make && make test 
+ - cmake -DENABLE_TESTING=ON $CMAKE_OPTIONS .. && make 
  - src/tests/blackhole-tests
