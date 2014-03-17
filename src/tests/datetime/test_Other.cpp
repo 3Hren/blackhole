@@ -8,6 +8,7 @@ TEST_F(generator_test_case_t, ComplexFormatting) {
     tm.tm_min = 20;
     tm.tm_sec = 30;
     EXPECT_EQ("2014-02-23 12:20:30", generate("%Y-%m-%d %H:%M:%S"));
+    EXPECT_EQ(common::using_strftime("%Y-%m-%d %H:%M:%S", tm), generate("%Y-%m-%d %H:%M:%S"));
 }
 
 TEST_F(generator_test_case_t, StandardDateTime) {
