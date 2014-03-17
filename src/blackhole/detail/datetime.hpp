@@ -46,6 +46,11 @@ inline void fill(std::string& str, int value, uint length, char filler = '0') {
     }
 }
 
+enum class days_t {
+    sunday,
+    monday
+};
+
 namespace visit {
 
 template<char Format>
@@ -83,11 +88,20 @@ inline void numeric(context_t& context) {
 
 namespace week {
 
-inline void year(context_t& context) {
+template<days_t firstweekday>
+inline void year(context_t& context);
+
+template<>
+inline void year<days_t::sunday>(context_t& context) {
     fill(context.str, (context.tm.tm_yday - context.tm.tm_wday + 7) / 7, 2);
 }
 
+template<>
+inline void year<days_t::monday>(context_t& context) {
+    fill(context.str, (context.tm.tm_yday - context.tm.tm_wday + (context.tm.tm_wday ? 8 : 1)) / 7, 2);
 }
+
+} // namespace week
 
 namespace day {
 
@@ -270,9 +284,13 @@ public:
         actions.push_back(&visit::localized<'B'>);
     }
 
-    virtual void year_week() {
+    virtual void year_week(days_t firstweekday) {
         end_partial_literal();
-        actions.push_back(&visit::week::year);
+        if (firstweekday == days_t::sunday) {
+            actions.push_back(&visit::week::year<days_t::sunday>);
+        } else {
+            actions.push_back(&visit::week::year<days_t::monday>);
+        }
     }
 
     virtual void year_day() {
@@ -419,7 +437,10 @@ public:
             break;
         //! =========== WEAK SECTION ===========
         case 'U':
-            handler.year_week();
+            handler.year_week(days_t::sunday);
+            break;
+        case 'W':
+            handler.year_week(days_t::monday);
             break;
         //! =========== DAY SECTION ===========
         case 'j':
