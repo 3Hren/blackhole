@@ -12,9 +12,7 @@ template<class Sequence, template<class> class F = blackhole::is_true_type>
 struct all;
 
 template<template<class> class F>
-struct all<std::tuple<>, F> {
-    static const bool value = true;
-};
+struct all<std::tuple<>, F> : public std::true_type {};
 
 template<template<class> class F, typename T, typename... Args>
 struct all<std::tuple<T, Args...>, F> {
