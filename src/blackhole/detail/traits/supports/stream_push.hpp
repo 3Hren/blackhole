@@ -3,11 +3,16 @@
 #include <ostream>
 #include <type_traits>
 
-#include <boost/utility/declval.hpp>
-
 #include "blackhole/platform.hpp"
 
 namespace blackhole {
+
+namespace support {
+
+template<typename T>
+typename std::add_rvalue_reference<T>::type declval();
+
+} // namespace support
 
 namespace traits {
 
@@ -30,7 +35,7 @@ struct stream_push : public std::integral_constant<
         bool,
         !std::is_same<
             aux::return_t,
-            decltype(boost::declval<std::ostream&>() << boost::declval<T>())
+            decltype(support::declval<std::ostream&>() << support::declval<T>())
         >::value
     >
 {};
