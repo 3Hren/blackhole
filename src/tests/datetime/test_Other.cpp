@@ -43,3 +43,14 @@ TEST_F(generator_test_case_t, PercentSign) {
     tm.tm_isdst = 3;
     EXPECT_EQ(common::using_strftime("%%", tm), generate("%%"));
 }
+
+TEST_F(generator_test_case_t, MonthDayYear) {
+    tm.tm_year = 114;
+    tm.tm_mon = 1;
+    tm.tm_mday = 23;
+    tm.tm_hour = 12;
+    tm.tm_min = 20;
+    tm.tm_sec = 30;
+    EXPECT_EQ(common::using_strftime("%m/%d/%y", tm), generate("%D"));
+    EXPECT_EQ(common::using_strftime("%D", tm), generate("%D"));
+}

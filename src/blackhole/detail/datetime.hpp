@@ -186,6 +186,14 @@ inline void standard(context_t& context) {
     year::full(context);
 }
 
+inline void date_mdy(context_t& context) {
+    month::numeric(context);
+    context.str.push_back('/');
+    day::month::numeric(context);
+    context.str.push_back('/');
+    year::last_two_digits(context);
+}
+
 inline void date_ISO8601(context_t& context) {
     year::full(context);
     context.str.push_back('-');
@@ -363,6 +371,11 @@ public:
         actions.push_back(&visit::standard);
     }
 
+    virtual void date_mdy() {
+        end_partial_literal();
+        actions.push_back(&visit::date_mdy);
+    }
+
     virtual void date_ISO8601() {
         end_partial_literal();
         actions.push_back(&visit::date_ISO8601);
@@ -491,6 +504,9 @@ public:
             break;
         case 'c':
             handler.standard_date_time();
+            break;
+        case 'D':
+            handler.date_mdy();
             break;
         case 'F':
             handler.date_ISO8601();
