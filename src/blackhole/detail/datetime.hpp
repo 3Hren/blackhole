@@ -509,12 +509,6 @@ public:
             handler.full_weekday();
             break;
         //! =========== OTHER SECTION ===========
-        case 'z':
-            handler.utc_offset();
-            break;
-        case 'Z':
-            handler.timezone();
-            break;
         case 'c':
             handler.standard_date_time();
             break;
@@ -526,6 +520,12 @@ public:
             break;
         case 'T':
             handler.time_ISO8601();
+            break;
+        case 'z':
+            handler.utc_offset();
+            break;
+        case 'Z':
+            handler.timezone();
             break;
         case '%':
             handler.literal(std::string("%"));
