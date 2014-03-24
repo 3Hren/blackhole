@@ -33,11 +33,11 @@ public:
     MOCK_CONST_METHOD1(changed, std::time_t(const std::string&));
     MOCK_CONST_METHOD1(size, std::uint64_t(const std::string&));
 
-    MOCK_METHOD0(open, bool());
+    MOCK_CONST_METHOD0(open, bool());
     MOCK_METHOD2(rename, void(const std::string&, const std::string&));
-    MOCK_METHOD1(write, void(const std::string&));
+    MOCK_CONST_METHOD1(write, void(const std::string&));
     MOCK_METHOD0(close, void());
-    MOCK_METHOD0(flush, void());
+    MOCK_CONST_METHOD0(flush, void());
 };
 
 namespace rotation {

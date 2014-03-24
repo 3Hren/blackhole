@@ -2,6 +2,7 @@
 //!@todo: api: Make elasticsearch frontend. Use swarm + asio and only index request with simple response checking.
 //!@todo: files_t: Make file naming by pattern.
 //!@todo: api: Ability to set global attribute mapper (?)
+//!@todo: api: Global thread-safe guarantee. Do not lock if underlying class is thread-safe itself.
 
 //!@todo: api: Make fallback logger. Make it configurable.
 //!@todo: aux: Make internal exception class with attribute keeping, e.g. line, file or path.

@@ -14,7 +14,13 @@ TEST(files_t, Class) {
 TEST(files_t, WritesToTheFile) {
     sink::files_t<NiceMock<mock::files::backend_t>>::config_type config("test.log");
     sink::files_t<NiceMock<mock::files::backend_t>> sink(config);
-    EXPECT_CALL(sink.backend(), write(std::string("formatted message"))).
+    //!@note: It is needed for first file handler creation.
+    sink.consume("");
+    const auto& handlers = sink.handlers();
+    auto it = handlers.find("test.log");
+    ASSERT_TRUE(it != handlers.end());
+    const auto& backend = it->second->backend();
+    EXPECT_CALL(backend, write(std::string("formatted message"))).
             Times(1);
     sink.consume("formatted message");
 }
@@ -22,13 +28,20 @@ TEST(files_t, WritesToTheFile) {
 TEST(files_t, OpensFileIfItClosedWhenWriting) {
     sink::files_t<NiceMock<mock::files::backend_t>>::config_type config("test.log");
     sink::files_t<NiceMock<mock::files::backend_t>> sink(config);
-    EXPECT_CALL(sink.backend(), opened()).
+
+    sink.consume("");
+    const auto& handlers = sink.handlers();
+    auto it = handlers.find("test.log");
+    ASSERT_TRUE(it != handlers.end());
+    const auto& backend = it->second->backend();
+
+    EXPECT_CALL(backend, opened()).
             Times(1).
             WillOnce(Return(false));
-    EXPECT_CALL(sink.backend(), open()).
+    EXPECT_CALL(backend, open()).
             Times(1).
             WillOnce(Return(true));
-    EXPECT_CALL(sink.backend(), write(_)).
+    EXPECT_CALL(backend, write(_)).
             Times(1);
     sink.consume("message");
 }
@@ -36,13 +49,20 @@ TEST(files_t, OpensFileIfItClosedWhenWriting) {
 TEST(files_t, ThrowsExceptionIfFileCannotBeOpened) {
     sink::files_t<NiceMock<mock::files::backend_t>>::config_type config("test.log");
     sink::files_t<NiceMock<mock::files::backend_t>> sink(config);
-    EXPECT_CALL(sink.backend(), opened())
+
+    sink.consume("");
+    const auto& handlers = sink.handlers();
+    auto it = handlers.find("test.log");
+    ASSERT_TRUE(it != handlers.end());
+    const auto& backend = it->second->backend();
+
+    EXPECT_CALL(backend, opened())
             .Times(1)
             .WillOnce(Return(false));
-    EXPECT_CALL(sink.backend(), open())
+    EXPECT_CALL(backend, open())
             .Times(1)
             .WillOnce(Return(false));
-    EXPECT_CALL(sink.backend(), write(_))
+    EXPECT_CALL(backend, write(_))
             .Times(0);
     EXPECT_THROW(sink.consume("message"), blackhole::error_t);
 }
@@ -50,7 +70,14 @@ TEST(files_t, ThrowsExceptionIfFileCannotBeOpened) {
 TEST(files_t, AutoFlushIfSpecified) {
     sink::files_t<NiceMock<mock::files::backend_t>>::config_type config("test.log", true);
     sink::files_t<NiceMock<mock::files::backend_t>> sink(config);
-    EXPECT_CALL(sink.backend(), flush())
+
+    sink.consume("");
+    const auto& handlers = sink.handlers();
+    auto it = handlers.find("test.log");
+    ASSERT_TRUE(it != handlers.end());
+    const auto& backend = it->second->backend();
+
+    EXPECT_CALL(backend, flush())
             .Times(1);
 
     sink.consume("message");
@@ -59,7 +86,14 @@ TEST(files_t, AutoFlushIfSpecified) {
 TEST(files_t, AutoFlushIsDisabledIfSpecified) {
     sink::files_t<NiceMock<mock::files::backend_t>>::config_type config("test.log", false);
     sink::files_t<NiceMock<mock::files::backend_t>> sink(config);
-    EXPECT_CALL(sink.backend(), flush())
+
+    sink.consume("");
+    const auto& handlers = sink.handlers();
+    auto it = handlers.find("test.log");
+    ASSERT_TRUE(it != handlers.end());
+    const auto& backend = it->second->backend();
+
+    EXPECT_CALL(backend, flush())
             .Times(0);
 
     sink.consume("message");
@@ -68,7 +102,14 @@ TEST(files_t, AutoFlushIsDisabledIfSpecified) {
 TEST(files_t, AutoFlushIsEnabledByDefault) {
     sink::files_t<NiceMock<mock::files::backend_t>>::config_type config("test.log");
     sink::files_t<NiceMock<mock::files::backend_t>> sink(config);
-    EXPECT_CALL(sink.backend(), flush())
+
+    sink.consume("");
+    const auto& handlers = sink.handlers();
+    auto it = handlers.find("test.log");
+    ASSERT_TRUE(it != handlers.end());
+    const auto& backend = it->second->backend();
+
+    EXPECT_CALL(backend, flush())
             .Times(1);
     sink.consume("message");
 }

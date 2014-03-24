@@ -1,6 +1,7 @@
 #include <blackhole/formatter/string.hpp>
 #include <blackhole/formatter/json.hpp>
 #include <blackhole/frontend.hpp>
+#include <blackhole/frontend/files.hpp>
 #include <blackhole/frontend/syslog.hpp>
 #include <blackhole/repository.hpp>
 #include <blackhole/sink/files.hpp>

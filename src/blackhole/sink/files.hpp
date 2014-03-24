@@ -1,49 +1,45 @@
 #pragma once
 
+#include "blackhole/attribute.hpp"
 #include "blackhole/repository/factory/traits.hpp"
 #include "blackhole/sink/files/backend.hpp"
 #include "blackhole/sink/files/config.hpp"
 #include "blackhole/sink/files/flusher.hpp"
 #include "blackhole/sink/files/rotation.hpp"
 #include "blackhole/sink/files/writer.hpp"
+#include "blackhole/utils/unique.hpp"
 
 namespace blackhole {
 
 namespace sink {
 
-template<class Backend = files::boost_backend_t, class Rotator = NoRotation, typename = void>
-class files_t;
+template<class Backend, class Rotator, class = void>
+class file_hander_t;
 
 template<class Backend>
-class files_t<Backend, NoRotation, void> {
+class file_hander_t<Backend, NoRotation, void> {
     Backend m_backend;
-    files::writer_t<Backend> m_writer;
-    files::flusher_t<Backend> m_flusher;
+    files::writer_t<Backend> writer;
+    files::flusher_t<Backend> flusher;
 public:
-    typedef files::config_t<NoRotation> config_type;
-
-    static const char* name() {
-        return "files";
-    }
-
-    files_t(const config_type& config) :
-        m_backend(config.path),
-        m_writer(m_backend),
-        m_flusher(config.autoflush, m_backend)
+    file_hander_t(const std::string& path, const files::config_t<NoRotation>& config) :
+        m_backend(path),
+        writer(m_backend),
+        flusher(config.autoflush, m_backend)
     {}
 
-    void consume(const std::string& message) {
-        m_writer.write(message);
-        m_flusher.flush();
+    void handle(const std::string& message) {
+        writer.write(message);
+        flusher.flush();
     }
 
-    Backend& backend() {
+    const Backend& backend() {
         return m_backend;
     }
 };
 
 template<class Backend, class Rotator>
-class files_t<
+class file_hander_t<
     Backend,
     Rotator,
     typename std::enable_if<
@@ -51,9 +47,37 @@ class files_t<
     >::type>
 {
     Backend m_backend;
-    files::writer_t<Backend> m_writer;
-    files::flusher_t<Backend> m_flusher;
-    Rotator m_rotator;
+    files::writer_t<Backend> writer;
+    files::flusher_t<Backend> flusher;
+    Rotator rotator;
+public:
+    file_hander_t(const std::string& path, const files::config_t<Rotator>& config) :
+        m_backend(path),
+        writer(m_backend),
+        flusher(config.autoflush, m_backend),
+        rotator(config.rotation, m_backend)
+    {}
+
+    void handle(const std::string& message) {
+        writer.write(message);
+        flusher.flush();
+        if (rotator.necessary(message)) { //!@todo: Unlikely optimization.
+            rotator.rotate();
+        }
+    }
+
+    const Backend& backend() {
+        return m_backend;
+    }
+};
+
+template<class Backend = files::boost_backend_t, class Rotator = NoRotation>
+class files_t {
+    typedef file_hander_t<Backend, Rotator> file_handler_type;
+    typedef std::map<std::string, std::shared_ptr<file_handler_type>> file_handlers_type;
+
+    files::config_t<Rotator> config;
+    file_handlers_type m_handlers;
 public:
     typedef files::config_t<Rotator> config_type;
 
@@ -62,22 +86,65 @@ public:
     }
 
     files_t(const config_type& config) :
-        m_backend(config.path),
-        m_writer(m_backend),
-        m_flusher(config.autoflush, m_backend),
-        m_rotator(config.rotation, m_backend)
+        config(config)
     {}
 
-    void consume(const std::string& message) {
-        m_writer.write(message);
-        m_flusher.flush();
-        if (m_rotator.necessary(message)) {
-            m_rotator.rotate();
+    //!@todo: second arg is temporary
+    void consume(const std::string& message, const log::attributes_t& attributes = log::attributes_t()) {
+        auto filename = make_filename(attributes);
+        auto it = m_handlers.find(filename);
+        if (it == m_handlers.end()) {
+            it = m_handlers.insert(it, std::make_pair(filename, std::make_shared<file_handler_type>(filename, config)));
         }
+        it->second->handle(message);
     }
 
-    Backend& backend() {
-        return m_backend;
+    const file_handlers_type& handlers() {
+        return m_handlers;
+    }
+
+    std::string make_filename(const log::attributes_t& attributes) const {
+        auto it = config.path.begin();
+        auto end = config.path.end();
+        std::string filename;
+        while (it != end) {
+            if (*it == '%' && it + 1 != end && *(it + 1) == '(') {
+                it += 2;
+
+                std::string key;
+                bool found = false;
+                while (it != end) {
+                    if (*it == ')' && it + 1 != end && *(it + 1) == 's') {
+                        found = true;
+                        it += 2;
+                        break;
+                    }
+                    key.push_back(*it);
+                    it++;
+                }
+
+                if (found) {
+                    auto ait = attributes.find(key);
+                    if (ait != attributes.end()) {
+                        std::ostringstream stream;
+                        stream << ait->second.value;
+                        filename.append(stream.str());
+                    } else {
+                        filename.append(key);
+                    }
+                } else {
+                    filename.append(key);
+                }
+            }
+
+            if (it == end) {
+                break;
+            }
+            filename.push_back(*it);
+            it++;
+        }
+//        std::cout << "filename=" << filename << std::endl;
+        return filename;
     }
 };
 

@@ -1,4 +1,6 @@
 #include <blackhole/formatter/string.hpp>
+#include <blackhole/frontend.hpp>
+#include <blackhole/frontend/files.hpp>
 #include <blackhole/log.hpp>
 #include <blackhole/repository.hpp>
 #include <blackhole/sink/files.hpp>
@@ -28,11 +30,11 @@ void init() {
     formatter["pattern"] = "[%(timestamp)s] [%(severity)s]: %(message)s";
 
     sink_config_t sink("files");
-    sink["path"] = "blackhole.log";
+    sink["path"] = "A-%(severity)s.log";
     sink["autoflush"] = true;
-    sink["rotation"]["pattern"] = "blackhole.log.%N";
+    sink["rotation"]["pattern"] = "%(filename)s.log.%N";
     sink["rotation"]["backups"] = std::uint16_t(10);
-    sink["rotation"]["size"] = std::uint64_t(100 * 1024);
+    sink["rotation"]["size"] = std::uint64_t(10 * 1024);
 
     frontend_config_t frontend = { formatter, sink };
     log_config_t config{ "root", { frontend } };
