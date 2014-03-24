@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/config.hpp>
+
 #include "blackhole/attribute.hpp"
 #include "blackhole/repository/factory/traits.hpp"
 #include "blackhole/sink/files/backend.hpp"
