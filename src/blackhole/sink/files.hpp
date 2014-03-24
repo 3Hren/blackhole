@@ -16,15 +16,15 @@ namespace blackhole {
 namespace sink {
 
 template<class Backend, class Rotator, class = void>
-class file_hander_t;
+class file_handler_t;
 
 template<class Backend>
-class file_hander_t<Backend, NoRotation, void> {
+class file_handler_t<Backend, NoRotation, void> {
     Backend m_backend;
     files::writer_t<Backend> writer;
     files::flusher_t<Backend> flusher;
 public:
-    file_hander_t(const std::string& path, const files::config_t<NoRotation>& config) :
+    file_handler_t(const std::string& path, const files::config_t<NoRotation>& config) :
         m_backend(path),
         writer(m_backend),
         flusher(config.autoflush, m_backend)
@@ -41,7 +41,7 @@ public:
 };
 
 template<class Backend, class Rotator>
-class file_hander_t<
+class file_handler_t<
     Backend,
     Rotator,
     typename std::enable_if<
@@ -53,7 +53,7 @@ class file_hander_t<
     files::flusher_t<Backend> flusher;
     Rotator rotator;
 public:
-    file_hander_t(const std::string& path, const files::config_t<Rotator>& config) :
+    file_handler_t(const std::string& path, const files::config_t<Rotator>& config) :
         m_backend(path),
         writer(m_backend),
         flusher(config.autoflush, m_backend),
@@ -75,7 +75,7 @@ public:
 
 template<class Backend = files::boost_backend_t, class Rotator = NoRotation>
 class files_t {
-    typedef file_hander_t<Backend, Rotator> handler_type;
+    typedef file_handler_t<Backend, Rotator> handler_type;
     typedef std::unordered_map<std::string, std::shared_ptr<handler_type>> handlers_type;
 
     files::config_t<Rotator> config;
