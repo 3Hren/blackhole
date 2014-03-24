@@ -61,7 +61,7 @@ public:
     void handle(const std::string& message) {
         writer.write(message);
         flusher.flush();
-        if (rotator.necessary(message)) { //!@todo: Unlikely optimization.
+        if (BOOST_UNLIKELY(rotator.necessary(message))) {
             rotator.rotate();
         }
     }
