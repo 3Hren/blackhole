@@ -63,7 +63,7 @@ public:
     void handle(const std::string& message) {
         writer.write(message);
         flusher.flush();
-        if (BOOST_UNLIKELY(rotator.necessary(message))) {
+        if (rotator.necessary(message)) {
             rotator.rotate();
         }
     }
