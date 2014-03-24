@@ -31,7 +31,7 @@ Yet another logging library.
  - **Attribute-based.**
  
    Every log event contains multiple attributes. For example, typical HTTP event from request contains HTTP code,
-   URL, message string and something else. In Blackhole log attributes is everything. It can be indexed, in can be
+   URL, message string and something else. In Blackhole log attributes is everything. It can be indexed, it can be
    filtered and it is type-safe.
    By the way, have you heard about [Elasticsearch](http://www.elasticsearch.org/)?
    With the Elasticsearch frontend (not implemented yet) you can index your logs on the fly and store it there with
