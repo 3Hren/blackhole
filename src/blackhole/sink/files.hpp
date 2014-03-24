@@ -73,11 +73,11 @@ public:
 
 template<class Backend = files::boost_backend_t, class Rotator = NoRotation>
 class files_t {
-    typedef file_hander_t<Backend, Rotator> file_handler_type;
-    typedef std::map<std::string, std::shared_ptr<file_handler_type>> file_handlers_type;
+    typedef file_hander_t<Backend, Rotator> handler_type;
+    typedef std::unordered_map<std::string, std::shared_ptr<handler_type>> handlers_type;
 
     files::config_t<Rotator> config;
-    file_handlers_type m_handlers;
+    handlers_type m_handlers;
 public:
     typedef files::config_t<Rotator> config_type;
 
@@ -89,17 +89,16 @@ public:
         config(config)
     {}
 
-    //!@todo: second arg is temporary
     void consume(const std::string& message, const log::attributes_t& attributes = log::attributes_t()) {
         auto filename = make_filename(attributes);
         auto it = m_handlers.find(filename);
         if (it == m_handlers.end()) {
-            it = m_handlers.insert(it, std::make_pair(filename, std::make_shared<file_handler_type>(filename, config)));
+            it = m_handlers.insert(it, std::make_pair(filename, std::make_shared<handler_type>(filename, config)));
         }
         it->second->handle(message);
     }
 
-    const file_handlers_type& handlers() {
+    const handlers_type& handlers() {
         return m_handlers;
     }
 
