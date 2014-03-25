@@ -40,13 +40,13 @@ public:
         std::string literal;
         literal.reserve(pattern.length());
         while (it != end) {
-            if (*it == '%' && it + 1 != end && *(it + 1) == '(') { // placeholder_begin -> equal({'%', '('})
+            if (placeholder_begin(it, end)) {
                 it += 2;
 
                 std::string placeholder;
                 bool found = false;
                 while (it != end) {
-                    if (*it == ')' && it + 1 != end && *(it + 1) == 's') {
+                    if (placeholder_end(it, end)) {
                         found = true;
                         it += 2;
                         break;
@@ -90,6 +90,15 @@ public:
             action(stream);
         }
         return buffer;
+    }
+
+private:
+    static bool placeholder_begin(std::string::const_iterator it, std::string::const_iterator end) {
+        return *it == '%' && it + 1 != end && *(it + 1) == '(';
+    }
+
+    static bool placeholder_end(std::string::const_iterator it, std::string::const_iterator end) {
+        return *it == ')' && it + 1 != end && *(it + 1) == 's';
     }
 };
 
