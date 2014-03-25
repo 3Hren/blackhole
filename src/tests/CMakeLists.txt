@@ -55,6 +55,7 @@ SET(SOURCES
     test_UdpSink
     test_Utils
     test_VerboseLogger
+    utils/test_GenericStringFormatter
 )
 
 SET(Boost_USE_MULTITHREADED ON)
