@@ -40,11 +40,6 @@ struct counter_t {
         return prefix == other.prefix && suffix == other.suffix && width == other.width;
     }
 
-    friend std::ostream& operator <<(std::ostream& stream, const counter_t& counter) {
-        stream << "counter_t('" << counter.prefix << "', '" << counter.suffix << "', " << counter.width << ")";
-        return stream;
-    }
-
     bool valid() const {
         return width != 0;
     }
