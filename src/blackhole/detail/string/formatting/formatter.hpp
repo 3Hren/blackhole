@@ -15,7 +15,7 @@ class formatter_t {
     typedef std::function<void(attachable_ostringstream&)> bound_action_type;
 
     const std::string pattern;
-    action_type on_placeholder;
+    action_type on_placeholder_action;
 
     std::vector<bound_action_type> actions;
 
@@ -28,7 +28,7 @@ class formatter_t {
     };
 
     struct placeholder_action_t {
-        action_type action;
+        action_type& action;
         std::string placeholder;
         void operator()(attachable_ostringstream& stream) const {
             stream.flush();
@@ -36,9 +36,9 @@ class formatter_t {
         }
     };
 public:
-    formatter_t(const std::string& pattern, action_type on_placeholder = action_type()) :
+    formatter_t(const std::string& pattern, action_type on_placeholder_action = action_type()) :
         pattern(pattern),
-        on_placeholder(on_placeholder)
+        on_placeholder_action(on_placeholder_action)
     {
         auto it = pattern.begin();
         auto end = pattern.end();
@@ -67,7 +67,7 @@ public:
                         literal.clear();
                     }
 
-                    actions.push_back(placeholder_action_t{ on_placeholder, placeholder });
+                    actions.push_back(placeholder_action_t{ this->on_placeholder_action, placeholder });
                 } else {
                     actions.push_back(literal_action_t{ literal + "%(" + placeholder });
                     literal.clear();
@@ -87,7 +87,11 @@ public:
         }
     }
 
-    std::string execute() {
+    void on_placeholder(action_type on_placeholder_action) {
+        this->on_placeholder_action = on_placeholder_action;
+    }
+
+    std::string execute() const {
         std::string buffer;
         attachable_ostringstream stream;
         stream.attach(buffer);
