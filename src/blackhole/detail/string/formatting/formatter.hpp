@@ -10,36 +10,67 @@ namespace blackhole {
 
 namespace aux {
 
+namespace action {
+
+typedef std::function<void(attachable_ostringstream&, const std::string&)> callback_t;
+typedef std::function<void(attachable_ostringstream&, const callback_t&)> bound_callback_t;
+
+struct literal_t {
+    std::string literal;
+
+    void operator()(attachable_ostringstream& stream, const callback_t&) const {
+        stream.flush();
+        stream.rdbuf()->storage()->append(literal);
+    }
+};
+
+struct placeholder_t {
+    std::string placeholder;
+
+    void operator()(attachable_ostringstream& stream, const callback_t& callback) const {
+        stream.flush();
+        callback(stream, placeholder);
+    }
+};
+
+} // namespace action
+
+namespace {
+
+inline bool placeholder_begin(std::string::const_iterator it, std::string::const_iterator end) {
+    return *it == '%' && it + 1 != end && *(it + 1) == '(';
+}
+
+inline bool placeholder_end(std::string::const_iterator it, std::string::const_iterator end) {
+    return *it == ')' && it + 1 != end && *(it + 1) == 's';
+}
+
+}
+
 class formatter_t {
-    typedef std::function<void(attachable_ostringstream&, const std::string&)> action_type;
-    typedef std::function<void(attachable_ostringstream&)> bound_action_type;
-
     const std::string pattern;
-    action_type on_placeholder_action;
-
-    std::vector<bound_action_type> actions;
-
-    struct literal_action_t {
-        std::string literal;
-        void operator()(attachable_ostringstream& stream) const {
-            stream.flush();
-            stream.rdbuf()->storage()->append(literal);
-        }
-    };
-
-    struct placeholder_action_t {
-        action_type& action;
-        std::string placeholder;
-        void operator()(attachable_ostringstream& stream) const {
-            stream.flush();
-            action(stream, placeholder);
-        }
-    };
+    const std::vector<action::bound_callback_t> actions;
 public:
-    formatter_t(const std::string& pattern, action_type on_placeholder_action = action_type()) :
+    formatter_t(const std::string& pattern) :
         pattern(pattern),
-        on_placeholder_action(on_placeholder_action)
+        actions(make_actions(pattern))
     {
+    }
+
+    std::string execute(const action::callback_t& callback) const {
+        std::string buffer;
+        attachable_ostringstream stream;
+        stream.attach(buffer);
+        for (auto it = actions.begin(); it != actions.end(); ++it) {
+            const action::bound_callback_t& action = *it;
+            action(stream, callback);
+        }
+        return buffer;
+    }
+
+private:
+    static std::vector<action::bound_callback_t> make_actions(const std::string& pattern) {
+        std::vector<action::bound_callback_t> actions;
         auto it = pattern.begin();
         auto end = pattern.end();
 
@@ -63,13 +94,13 @@ public:
 
                 if (found && !placeholder.empty()) {
                     if (!literal.empty()) {
-                        actions.push_back(literal_action_t{ literal });
+                        actions.push_back(action::literal_t{ literal });
                         literal.clear();
                     }
 
-                    actions.push_back(placeholder_action_t{ this->on_placeholder_action, placeholder });
+                    actions.push_back(action::placeholder_t{ placeholder });
                 } else {
-                    actions.push_back(literal_action_t{ literal + "%(" + placeholder });
+                    actions.push_back(action::literal_t{ literal + "%(" + placeholder });
                     literal.clear();
                 }
             }
@@ -82,33 +113,10 @@ public:
         }
 
         if (!literal.empty()) {
-            actions.push_back(literal_action_t{ literal });
+            actions.push_back(action::literal_t{ literal });
             literal.clear();
         }
-    }
-
-    void on_placeholder(action_type on_placeholder_action) {
-        this->on_placeholder_action = on_placeholder_action;
-    }
-
-    std::string execute() const {
-        std::string buffer;
-        attachable_ostringstream stream;
-        stream.attach(buffer);
-        for (auto it = actions.begin(); it != actions.end(); ++it) {
-            const bound_action_type& action = *it;
-            action(stream);
-        }
-        return buffer;
-    }
-
-private:
-    static bool placeholder_begin(std::string::const_iterator it, std::string::const_iterator end) {
-        return *it == '%' && it + 1 != end && *(it + 1) == '(';
-    }
-
-    static bool placeholder_end(std::string::const_iterator it, std::string::const_iterator end) {
-        return *it == ')' && it + 1 != end && *(it + 1) == 's';
+        return actions;
     }
 };
 

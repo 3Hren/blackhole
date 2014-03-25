@@ -9,11 +9,6 @@ TEST(formatter_t, Class) {
     UNUSED(formatter);
 }
 
-TEST(formatter_t, FormatOnlyLiteral) {
-    formatter_t formatter("literal");
-    EXPECT_EQ("literal", formatter.execute());
-}
-
 namespace testing {
 
 struct placeholder_action_t {
@@ -26,27 +21,32 @@ struct placeholder_action_t {
 
 } // namespace testing
 
+TEST(formatter_t, FormatOnlyLiteral) {
+    formatter_t formatter("literal");
+    EXPECT_EQ("literal", formatter.execute(placeholder_action_t()));
+}
+
 TEST(formatter_t, FormatOnlyPlaceholder) {
-    formatter_t formatter("%(level)s", placeholder_action_t());
-    EXPECT_EQ("WARNING", formatter.execute());
+    formatter_t formatter("%(level)s");
+    EXPECT_EQ("WARNING", formatter.execute(placeholder_action_t()));
 }
 
 TEST(formatter_t, FormatPrefixLiteralWithPlaceholder) {
-    formatter_t formatter("Level=%(level)s", placeholder_action_t());
-    EXPECT_EQ("Level=WARNING", formatter.execute());
+    formatter_t formatter("Level=%(level)s");
+    EXPECT_EQ("Level=WARNING", formatter.execute(placeholder_action_t()));
 }
 
 TEST(formatter_t, FormatSuffixLiteralWithPlaceholder) {
-    formatter_t formatter("%(level)s is level", placeholder_action_t());
-    EXPECT_EQ("WARNING is level", formatter.execute());
+    formatter_t formatter("%(level)s is level");
+    EXPECT_EQ("WARNING is level", formatter.execute(placeholder_action_t()));
 }
 
 TEST(formatter_t, FormatMixedLiteralWithPlaceholder) {
-    formatter_t formatter("Level=%(level)s is level", placeholder_action_t());
-    EXPECT_EQ("Level=WARNING is level", formatter.execute());
+    formatter_t formatter("Level=%(level)s is level");
+    EXPECT_EQ("Level=WARNING is level", formatter.execute(placeholder_action_t()));
 }
 
 TEST(formatter_t, FormatBrokenPlaceholder) {
-    formatter_t formatter("Level=%(level)", placeholder_action_t());
-    EXPECT_EQ("Level=%(level)", formatter.execute());
+    formatter_t formatter("Level=%(level)");
+    EXPECT_EQ("Level=%(level)", formatter.execute(placeholder_action_t()));
 }

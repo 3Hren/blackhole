@@ -122,8 +122,7 @@ public:
 
     std::string make_filename(const log::attributes_t& attributes) {
         aux::formatter_t formatter(config.path);
-        formatter.on_placeholder(substitute_attribute_t { attributes });
-        return formatter.execute();
+        return formatter.execute(substitute_attribute_t { attributes });
     }
 };
 
