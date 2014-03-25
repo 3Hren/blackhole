@@ -57,10 +57,11 @@ TEST(rotator_t, RotatingSequence) {
 TEST(rotator_t, RotateMultipleFiles) {
     sink::rotation::config_t<mock::files::rotation::watcher_t> config = { "test.log.%N", 2 };
     NiceMock<mock::files::backend_t> backend;
+    EXPECT_CALL(backend, filename())
+            .WillRepeatedly(Return("test.log"));
+
     mocked::rotator_t rotator(config, backend);
 
-    EXPECT_CALL(backend, filename())
-            .WillOnce(Return("test.log"));
     EXPECT_CALL(backend, listdir())
             .WillOnce(Return(std::vector<std::string>({ "test.log", "test.log.1" })));
     EXPECT_CALL(backend, exists(_))
@@ -76,10 +77,11 @@ TEST(rotator_t, RotateMultipleFiles) {
 TEST(rotator_t, RotateWithOverridingBackups) {
     sink::rotation::config_t<mock::files::rotation::watcher_t> config = { "test.log.%N", 2 };
     NiceMock<mock::files::backend_t> backend;
-    mocked::rotator_t rotator(config, backend);
-
     EXPECT_CALL(backend, filename())
             .WillRepeatedly(Return("test.log"));
+
+    mocked::rotator_t rotator(config, backend);
+
     EXPECT_CALL(backend, listdir())
             .WillOnce(Return(std::vector<std::string>({ "test.log", "test.log.1", "test.log.2" })));
     EXPECT_CALL(backend, exists(_))
@@ -93,10 +95,11 @@ TEST(rotator_t, RotateWithOverridingBackups) {
 TEST(rotator_t, ProperRolloverWithAbsentFiles) {
     sink::rotation::config_t<mock::files::rotation::watcher_t> config = { "test.log.%N", 10 };
     NiceMock<mock::files::backend_t> backend;
+    EXPECT_CALL(backend, filename())
+            .WillRepeatedly(Return("test.log"));
+
     mocked::rotator_t rotator(config, backend);
 
-    EXPECT_CALL(backend, filename())
-            .WillOnce(Return("test.log"));
     EXPECT_CALL(backend, listdir())
             .WillOnce(Return(std::vector<std::string>({ "test.log", "test.log.9" })));
     EXPECT_CALL(backend, exists(_))
@@ -112,10 +115,11 @@ TEST(rotator_t, ProperRolloverWithAbsentFiles) {
 TEST(rotator_t, IncreaseDigitsInTheMiddle) {
     sink::rotation::config_t<mock::files::rotation::watcher_t> config = { "test.log.%N.123", 10 };
     NiceMock<mock::files::backend_t> backend;
+    EXPECT_CALL(backend, filename())
+            .WillRepeatedly(Return("test.log"));
+
     mocked::rotator_t rotator(config, backend);
 
-    EXPECT_CALL(backend, filename())
-            .WillOnce(Return("test.log"));
     EXPECT_CALL(backend, listdir())
             .WillOnce(Return(std::vector<std::string>({ "test.log", "test.log.1.123" })));
     EXPECT_CALL(backend, exists(_))
@@ -131,10 +135,11 @@ TEST(rotator_t, IncreaseDigitsInTheMiddle) {
 TEST(rotator_t, NotRenameIfFileNotExists) {
     sink::rotation::config_t<mock::files::rotation::watcher_t> config = { "test.log.%N", 2 };
     NiceMock<mock::files::backend_t> backend;
+    EXPECT_CALL(backend, filename())
+            .WillRepeatedly(Return("test.log"));
+
     mocked::rotator_t rotator(config, backend);
 
-    EXPECT_CALL(backend, filename())
-            .WillOnce(Return("test.log"));
     EXPECT_CALL(backend, listdir())
             .WillOnce(Return(std::vector<std::string>({ "test.log" })));
     EXPECT_CALL(backend, exists("test.log"))
@@ -149,15 +154,56 @@ TEST(rotator_t, NotRenameIfFileNotExists) {
 TEST(rotator_t, SubstitutesFilenamePlaceholder) {
     sink::rotation::config_t<mock::files::rotation::watcher_t> config = { "%(filename)s.%N", 1 };
     NiceMock<mock::files::backend_t> backend;
+    EXPECT_CALL(backend, filename())
+            .WillRepeatedly(Return("test.log"));
+
     mocked::rotator_t rotator(config, backend);
 
-    EXPECT_CALL(backend, filename())
-            .WillOnce(Return("test.log"));
     EXPECT_CALL(backend, listdir())
             .WillOnce(Return(std::vector<std::string>({ "test.log" })));
     EXPECT_CALL(backend, exists("test.log"))
             .WillOnce(Return(true));
     EXPECT_CALL(backend, rename("test.log", "test.log.1"));
+
+    rotator.rotate();
+}
+
+TEST(rotator_t, SubstitutesFilenamePlaceholderAndProperlyRotates) {
+    sink::rotation::config_t<mock::files::rotation::watcher_t> config = { "%(filename)s.%N", 2 };
+    NiceMock<mock::files::backend_t> backend;
+    EXPECT_CALL(backend, filename())
+            .WillRepeatedly(Return("test.log"));
+
+    mocked::rotator_t rotator(config, backend);
+
+    EXPECT_CALL(backend, listdir())
+            .WillOnce(Return(std::vector<std::string>({ "test.log", "test.log.1" })));
+    EXPECT_CALL(backend, exists("test.log"))
+            .WillOnce(Return(true));
+    EXPECT_CALL(backend, exists("test.log.1"))
+            .WillOnce(Return(true));
+    EXPECT_CALL(backend, rename("test.log.1", "test.log.2"));
+    EXPECT_CALL(backend, rename("test.log", "test.log.1"));
+
+    rotator.rotate();
+}
+
+TEST(rotator_t, SubstitutesLongFilenamePlaceholder) {
+    sink::rotation::config_t<mock::files::rotation::watcher_t> config = { "%(filename)s.%N", 2 };
+    NiceMock<mock::files::backend_t> backend;
+    EXPECT_CALL(backend, filename())
+            .WillRepeatedly(Return("long_filename_test.log"));
+
+    mocked::rotator_t rotator(config, backend);
+
+    EXPECT_CALL(backend, listdir())
+            .WillOnce(Return(std::vector<std::string>({ "long_filename_test.log", "long_filename_test.log.1" })));
+    EXPECT_CALL(backend, exists("long_filename_test.log"))
+            .WillOnce(Return(true));
+    EXPECT_CALL(backend, exists("long_filename_test.log.1"))
+            .WillOnce(Return(true));
+    EXPECT_CALL(backend, rename("long_filename_test.log.1", "long_filename_test.log.2"));
+    EXPECT_CALL(backend, rename("long_filename_test.log", "long_filename_test.log.1"));
 
     rotator.rotate();
 }
