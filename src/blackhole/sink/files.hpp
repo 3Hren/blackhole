@@ -3,6 +3,7 @@
 #include <boost/config.hpp>
 
 #include "blackhole/attribute.hpp"
+#include "blackhole/detail/string/formatting/formatter.hpp"
 #include "blackhole/repository/factory/traits.hpp"
 #include "blackhole/sink/files/backend.hpp"
 #include "blackhole/sink/files/config.hpp"
@@ -73,6 +74,19 @@ public:
     }
 };
 
+struct substitute_attribute_t {
+    const log::attributes_t& attributes;
+
+    void operator()(aux::attachable_ostringstream& stream, const std::string& placeholder) const {
+        auto it = attributes.find(placeholder);
+        if (it == attributes.end()) {
+            stream.rdbuf()->storage()->append(placeholder);
+        } else {
+            stream << it->second.value;
+        }
+    }
+};
+
 template<class Backend = files::boost_backend_t, class Rotator = NoRotation>
 class files_t {
     typedef file_handler_t<Backend, Rotator> handler_type;
@@ -80,6 +94,7 @@ class files_t {
 
     files::config_t<Rotator> config;
     handlers_type m_handlers;
+//    aux::formatter_t formatter;
 public:
     typedef files::config_t<Rotator> config_type;
 
@@ -89,6 +104,7 @@ public:
 
     files_t(const config_type& config) :
         config(config)
+//        formatter(config.path)
     {}
 
     void consume(const std::string& message, const log::attributes_t& attributes = log::attributes_t()) {
@@ -104,48 +120,10 @@ public:
         return m_handlers;
     }
 
-    std::string make_filename(const log::attributes_t& attributes) const {
-        auto it = config.path.begin();
-        auto end = config.path.end();
-        std::string filename;
-        while (it != end) {
-            if (*it == '%' && it + 1 != end && *(it + 1) == '(') {
-                it += 2;
-
-                std::string key;
-                bool found = false;
-                while (it != end) {
-                    if (*it == ')' && it + 1 != end && *(it + 1) == 's') {
-                        found = true;
-                        it += 2;
-                        break;
-                    }
-                    key.push_back(*it);
-                    it++;
-                }
-
-                if (found) {
-                    auto ait = attributes.find(key);
-                    if (ait != attributes.end()) {
-                        std::ostringstream stream;
-                        stream << ait->second.value;
-                        filename.append(stream.str());
-                    } else {
-                        filename.append(key);
-                    }
-                } else {
-                    filename.append(key);
-                }
-            }
-
-            if (it == end) {
-                break;
-            }
-            filename.push_back(*it);
-            it++;
-        }
-//        std::cout << "filename=" << filename << std::endl;
-        return filename;
+    std::string make_filename(const log::attributes_t& attributes) {
+        aux::formatter_t formatter(config.path);
+        formatter.on_placeholder(substitute_attribute_t { attributes });
+        return formatter.execute();
     }
 };
 
