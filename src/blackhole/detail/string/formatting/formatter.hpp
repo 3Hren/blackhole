@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <blackhole/detail/stream/stream.hpp>
+#include "blackhole/detail/stream/stream.hpp"
 
 namespace blackhole {
 
