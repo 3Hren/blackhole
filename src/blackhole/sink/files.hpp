@@ -94,7 +94,7 @@ class files_t {
 
     files::config_t<Rotator> config;
     handlers_type m_handlers;
-//    aux::formatter_t formatter;
+    aux::formatter_t formatter;
 public:
     typedef files::config_t<Rotator> config_type;
 
@@ -103,8 +103,8 @@ public:
     }
 
     files_t(const config_type& config) :
-        config(config)
-//        formatter(config.path)
+        config(config),
+        formatter(config.path)
     {}
 
     void consume(const std::string& message, const log::attributes_t& attributes = log::attributes_t()) {
@@ -113,15 +113,16 @@ public:
         if (it == m_handlers.end()) {
             it = m_handlers.insert(it, std::make_pair(filename, std::make_shared<handler_type>(filename, config)));
         }
-        it->second->handle(message);
+
+        const std::shared_ptr<handler_type>& handler = it->second;
+        handler->handle(message);
     }
 
     const handlers_type& handlers() {
         return m_handlers;
     }
 
-    std::string make_filename(const log::attributes_t& attributes) {
-        aux::formatter_t formatter(config.path);
+    std::string make_filename(const log::attributes_t& attributes) const {
         return formatter.execute(substitute_attribute_t { attributes });
     }
 };
