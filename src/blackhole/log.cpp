@@ -1,4 +1,3 @@
-//!@todo: performance: Review string formatting. Use attached stream.
 //!@todo: api: Make elasticsearch frontend. Use swarm + asio and only index request with simple response checking.
 //!@todo: api: Ability to set global attribute mapper (?)
 //!@todo: api: Global thread-safe guarantee. Do not lock if underlying class is thread-safe itself.
