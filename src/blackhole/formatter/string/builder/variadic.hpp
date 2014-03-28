@@ -6,6 +6,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "blackhole/attribute.hpp"
+#include "blackhole/detail/stream/stream.hpp"
 #include "blackhole/error.hpp"
 #include "blackhole/formatter/map/value.hpp"
 
@@ -42,7 +43,7 @@ struct variadic_t {
 
     const std::string placeholder;
 
-    void operator ()(std::ostringstream& stream, const mapping::value_t&, const log::attributes_t& attributes) const {
+    void operator ()(blackhole::aux::attachable_ostringstream& stream, const mapping::value_t&, const log::attributes_t& attributes) const {
         std::vector<std::string> passed;
         passed.reserve(attributes.size());
 
@@ -61,7 +62,7 @@ struct variadic_t {
                 }
             }
         }
-        stream << boost::algorithm::join(passed, ", ");
+        stream.rdbuf()->storage()->append(boost::algorithm::join(passed, ", "));
     }
 };
 

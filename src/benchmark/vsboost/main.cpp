@@ -49,11 +49,12 @@ std::ostream& operator<<(std::ostream& stream, level lvl) {
 }
 
 //!     - and for blackhole ...
-std::string map_severity(level lvl) {
+void map_severity(blackhole::aux::attachable_ostringstream& stream, level lvl) {
     if (static_cast< std::size_t >(lvl) < sizeof(DESCRIPTION) / sizeof(*DESCRIPTION)) {
-        return DESCRIPTION[lvl];
+        stream << DESCRIPTION[lvl];
+    } else {
+        stream << static_cast<int>(lvl);
     }
-    return std::to_string(static_cast<int>(lvl));
 }
 
 //! Register severity keyword for boost logger.

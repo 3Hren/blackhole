@@ -16,7 +16,7 @@ namespace string {
 
 namespace builder {
 
-typedef std::function<void(std::ostringstream&, const mapping::value_t&, const log::attributes_t&)> type;
+typedef std::function<void(blackhole::aux::attachable_ostringstream&, const mapping::value_t&, const log::attributes_t&)> type;
 
 } // namespace builder
 

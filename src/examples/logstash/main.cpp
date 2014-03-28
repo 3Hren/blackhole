@@ -15,7 +15,7 @@ enum class level {
 };
 
 //! Attribute mapping from its real values to human-readable string representation.
-std::string map_severity(level lvl) {
+void map_severity(blackhole::aux::attachable_ostringstream& stream, level lvl) {
     static std::string LEVEL[] = {
         "DEBUG",
         "INFO",
@@ -25,13 +25,13 @@ std::string map_severity(level lvl) {
 
     auto value = static_cast<aux::underlying_type<level>::type>(lvl);
     if (value >= 0 && value < sizeof(LEVEL) / sizeof(LEVEL[0])) {
-        return LEVEL[value];
+        stream << LEVEL[value];
+    } else {
+        stream << "UNKNOWN";
     }
-
-    return "UNKNOWN";
 }
 
-std::string map_timestamp(const timeval& tv) {
+void map_timestamp(blackhole::aux::attachable_ostringstream& stream, const timeval& tv) {
     char str[64];
 
     struct tm tm;
@@ -39,10 +39,10 @@ std::string map_timestamp(const timeval& tv) {
     if (std::strftime(str, sizeof(str), "%F %T", &tm)) {
         char usecs[64];
         snprintf(usecs, sizeof(usecs), ".%06ld", (long)tv.tv_usec);
-        return std::string(str) + usecs;
+        stream << str << usecs;
+    } else {
+        stream << "UNKNOWN";
     }
-
-    return "UNKNOWN";
 }
 
 //! Initialization stage.

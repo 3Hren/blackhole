@@ -91,7 +91,7 @@ TEST(string_t, ComplexFormatWithOtherLocalAttributes) {
 
 namespace testing {
 
-std::string map_timestamp(const timeval& tv) {
+void map_timestamp(blackhole::aux::attachable_ostringstream& stream, const timeval& tv) {
     char str[64];
 
     struct tm tm;
@@ -99,10 +99,10 @@ std::string map_timestamp(const timeval& tv) {
     if (std::strftime(str, sizeof(str), "%F %T", &tm)) {
         char usecs[64];
         snprintf(usecs, sizeof(usecs), ".%06ld", (long)tv.tv_usec);
-        return std::string(str) + usecs;
+        stream << str << usecs;
+    } else {
+        stream << "UNKNOWN";
     }
-
-    return "UNKNOWN";
 }
 
 } // namespace testing

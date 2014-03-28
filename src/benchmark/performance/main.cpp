@@ -23,19 +23,19 @@ enum level {
     critical
 };
 
-std::string map_timestamp(const timeval& tv) {
+void map_timestamp(blackhole::aux::attachable_ostringstream& stream, const timeval& tv) {
     char str[64];
 
     struct tm tm;
     localtime_r((time_t *)&tv.tv_sec, &tm);
     if (std::strftime(str, sizeof(str), "%F %T", &tm)) {
-        return str;
+        stream << str;
+    } else {
+        stream << "UNKNOWN";
     }
-
-    return "UNKNOWN";
 }
 
-std::string map_severity(const level& level) {
+void map_severity(blackhole::aux::attachable_ostringstream& stream, const level& level) {
     static const char* descriptions[] = {
         "DEBUG",
         "INFO",
@@ -45,8 +45,9 @@ std::string map_severity(const level& level) {
     };
 
     if (static_cast<std::size_t>(level) < sizeof(descriptions) / sizeof(*descriptions))
-        return descriptions[level];
-    return boost::lexical_cast<std::string>(level);
+        stream << descriptions[level];
+    else
+        stream << level;
 }
 
 formatter::string_t fmt("[%(timestamp)s] [%(severity)s]: %(message)s");

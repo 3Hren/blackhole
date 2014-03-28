@@ -7,13 +7,13 @@
 #include <boost/algorithm/string.hpp>
 
 #include "blackhole/error.hpp"
+#include "blackhole/detail/stream/stream.hpp"
 #include "blackhole/formatter/base.hpp"
 #include "blackhole/formatter/map/value.hpp"
 #include "blackhole/formatter/string/builder.hpp"
 #include "blackhole/formatter/string/config.hpp"
 #include "blackhole/record.hpp"
 #include "blackhole/repository/factory/traits.hpp"
-
 
 namespace blackhole {
 
@@ -41,14 +41,16 @@ public:
     {}
 
     std::string format(const log::record_t& record) const {
+        std::string buffer;
+        blackhole::aux::attachable_ostringstream stream;
+        stream.attach(buffer);
         try {
-            std::ostringstream stream;
             for (auto it = formatters.begin(); it != formatters.end(); ++it) {
                 const string::builder::type& formatter = *it;
                 formatter(stream, mapper, record.attributes);
+                stream.flush();
             }
-
-            return stream.str();
+            return buffer;
         } catch (const error_t& err) {
             throw error_t("bad format string '%s': %s", pattern, err.what());
         }
