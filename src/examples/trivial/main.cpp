@@ -1,5 +1,4 @@
-#include <blackhole/log.hpp>
-#include <blackhole/repository.hpp>
+#include <blackhole/blackhole.hpp>
 
 //! This example demonstrates the simpliest blackhole logging library usage.
 
@@ -19,7 +18,7 @@ enum class level {
 };
 
 int main(int, char**) {
-    verbose_logger_t<level> log = repository_t<level>::instance().trivial();
+    verbose_logger_t<level> log = repository_t<level>::instance().root();
 
     BH_LOG(log, level::debug,   "[%d] %s - done", 0, "debug");
     BH_LOG(log, level::info,    "[%d] %s - done", 1, "info");

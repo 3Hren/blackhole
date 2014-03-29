@@ -66,11 +66,6 @@ public:
     verbose_logger_t<Level> root() const {
         return create("root");
     }
-
-    verbose_logger_t<Level> trivial() const {
-        return create("trivial");
-    }
-
 private:
     repository_t() {
         configure<sink::stream_t, formatter::string_t>();

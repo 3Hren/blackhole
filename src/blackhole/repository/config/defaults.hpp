@@ -16,7 +16,7 @@ static inline log_config_t trivial() {
     sink["output"] = "stdout";
 
     frontend_config_t frontend = { formatter, sink };
-    return log_config_t{ "trivial", { frontend } };
+    return log_config_t{ "root", { frontend } };
 }
 
 } // namespace config
