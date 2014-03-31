@@ -1,0 +1,8 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+
+install/blackhole-dev::
+	install -d $(DEB_DESTDIR)usr
+	install -d $(DEB_DESTDIR)usr/include
+	cp -R src/blackhole $(DEB_DESTDIR)usr/include/blackhole

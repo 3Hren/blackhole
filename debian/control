@@ -1,0 +1,17 @@
+Source: blackhole
+Priority: extra
+Maintainer: Evgenyi Safronov <division494@gmail.com>
+Build-Depends: debhelper (>= 7), cmake, cdbs
+Standards-Version: 3.8.3
+Section: libs
+Vcs-Git: git://github.com/3Hren/blackhole.git
+Vcs-Browser: https://github.com/3Hren/blackhole.git
+Homepage: http://3hren.github.io/blackhole
+
+Package: blackhole-dev
+Section: libdevel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Blackhole Logger - Development Headers
+ Blackhole logger development headers package.
+
