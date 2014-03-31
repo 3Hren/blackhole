@@ -1,16 +1,12 @@
-#include <blackhole/formatter/string.hpp>
-#include <blackhole/frontend.hpp>
+#include <blackhole/blackhole.hpp>
 #include <blackhole/frontend/files.hpp>
-#include <blackhole/log.hpp>
-#include <blackhole/repository.hpp>
-#include <blackhole/sink/files.hpp>
+
+// Tags: file sink, registration, size rotation, placeholder naming, user attributes
 
 using namespace blackhole;
 
 enum class level {
     debug,
-    info,
-    warning,
     error
 };
 
@@ -30,9 +26,9 @@ void init() {
     formatter["pattern"] = "[%(timestamp)s] [%(severity)s]: %(message)s";
 
     sink_config_t sink("files");
-    sink["path"] = "A-%(severity)s.log";
+    sink["path"] = "blackhole-%(host)s.log";
     sink["autoflush"] = true;
-    sink["rotation"]["pattern"] = "%(filename)s.log.%N";
+    sink["rotation"]["pattern"] = "%(filename)s.%N";
     sink["rotation"]["backups"] = std::uint16_t(10);
     sink["rotation"]["size"] = std::uint64_t(10 * 1024);
 
@@ -47,10 +43,8 @@ int main(int, char**) {
     verbose_logger_t<level> log = repository_t<level>::instance().root();
 
     for (int i = 0; i < 32; ++i) {
-    BH_LOG(log, level::debug,   "[%d] %s - done", 0, "debug");
-    BH_LOG(log, level::info,    "[%d] %s - done", 1, "info");
-    BH_LOG(log, level::warning, "[%d] %s - done", 2, "warning");
-    BH_LOG(log, level::error,   "[%d] %s - done", 3, "error");
+        BH_LOG(log, level::debug, "debug event")("host", "127.0.0.1");
+        BH_LOG(log, level::error, "error event")("host", "localhost");
     }
 
     return 0;
