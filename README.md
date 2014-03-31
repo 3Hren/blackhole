@@ -2,6 +2,7 @@
 
 Yet another logging library.
 
+Please visit project [site](http://3hren.github.io/blackhole/) for more information, including design overview, tutorials, examples and library reference.
 
 ## Features
 
