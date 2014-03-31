@@ -107,7 +107,7 @@ public:
         formatter(config.path)
     {}
 
-    void consume(const std::string& message, const log::attributes_t& attributes = log::attributes_t()) {
+    void consume(const std::string& message, const log::attributes_t& attributes) {
         auto filename = make_filename(attributes);
         auto it = m_handlers.find(filename);
         if (it == m_handlers.end()) {
