@@ -5,12 +5,17 @@
 
 using namespace blackhole;
 
+// As always define severity enumeration.
 enum class level {
     debug,
     error
 };
 
 void init() {
+    // This combination of formatter/sink is not default for Blackhole, thus it must be registered
+    // in the repository. After registering new loggers can be created with configuration that uses
+    // newly registered formatter's or sink's features.
+    // You can look consider this action as some kind of plugin system.
     repository_t<level>::instance().configure<
         sink::files_t<
             sink::files::boost_backend_t,
@@ -22,9 +27,11 @@ void init() {
         formatter::string_t
     >();
 
+    // Formatter configuration is almost standard.
     formatter_config_t formatter("string");
     formatter["pattern"] = "[%(timestamp)s] [%(severity)s]: %(message)s";
 
+    // But sink configuration opens more intresting features.
     sink_config_t sink("files");
     sink["path"] = "blackhole-%(host)s.log";
     sink["autoflush"] = true;
@@ -42,6 +49,8 @@ int main(int, char**) {
     init();
     verbose_logger_t<level> log = repository_t<level>::instance().root();
 
+    // See that 'second' invocation after macro? That's how additional attributes are attached to
+    // the log event.
     for (int i = 0; i < 32; ++i) {
         BH_LOG(log, level::debug, "debug event")("host", "127.0.0.1");
         BH_LOG(log, level::error, "error event")("host", "localhost");
