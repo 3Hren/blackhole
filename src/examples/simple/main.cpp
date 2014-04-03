@@ -1,10 +1,8 @@
 #include <blackhole/blackhole.hpp>
 
 //! This example demonstrates the a bit extended blackhole logging library usage and its features.
-
-/*! - detailed formatters and sinks configuration;
- *  - logger usage without macro.
- */
+//!  - detailed formatters and sinks configuration;
+//!  - logger usage without macro.
 
 using namespace blackhole;
 
@@ -33,7 +31,7 @@ void init() {
 
 // Here it's an example how to create and handle log events without using any macros at all.
 template<typename Log>
-void debug(Log& log, level lvl, const char* message) {
+void handle(Log& log, level lvl, const char* message) {
     // Tries to create log record. Returns invalid record object if created log record couldn't
     // pass filtering stage.
     // For our case it will be created anyway, because we don't have any filters registered now.
@@ -54,7 +52,7 @@ int main(int, char**) {
     verbose_logger_t<level> log = repository_t<level>::instance().root();
 
     BH_LOG(log, level::debug, "log message using macro API");
-    debug(log, level::debug, "log message using log object directly");
+    handle(log, level::debug, "log message using log object directly");
 
     return 0;
 }
