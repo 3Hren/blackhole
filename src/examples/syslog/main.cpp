@@ -1,19 +1,18 @@
-#include <blackhole/log.hpp>
-#include <blackhole/repository.hpp>
-
+#include <blackhole/blackhole.hpp>
 #include <blackhole/frontend/syslog.hpp>
-#include <blackhole/sink/syslog.hpp>
 
-using namespace blackhole;
+//! This example demonstrates how to configure syslog sink and its features.
+//!  - mapping from user-defined severity to the syslog's one.
 
 enum class level {
     debug,
-    info,
     warning,
     error
 };
 
-//! Priority mapping traits.
+// To be able to properly map user-defined severity enumeration to the syslog's one
+// we should implement special mapping trait that is called by library each time when
+// mapping is required.
 namespace blackhole {
 
 namespace sink {
@@ -24,8 +23,6 @@ struct priority_traits<level> {
         switch (lvl) {
         case level::debug:
             return priority_t::debug;
-        case level::info:
-            return priority_t::info;
         case level::warning:
             return priority_t::warning;
         case level::error:
@@ -42,13 +39,19 @@ struct priority_traits<level> {
 
 } // namespace blackhole
 
-//! Initialization stage.
+using namespace blackhole;
+
+// Here we are going to configure our string/syslog frontend and to register it.
 void init() {
+    // As always register necessary formatter and sink. Note that syslog sink requires
+    // user-defined severity enumeration symbol as template parameter.
     repository_t<level>::instance().configure<sink::syslog_t<level>, formatter::string_t>();
 
+    // Formatter is configured as usual.
     formatter_config_t formatter("string");
     formatter["pattern"] = "[%(timestamp)s] [%(severity)s]: %(message)s";
 
+    // Syslog sink in its current implementation also hasn't large amout of options.
     sink_config_t sink("syslog");
     sink["identity"] = "test-application";
 
@@ -62,10 +65,8 @@ int main(int, char**) {
     init();
     verbose_logger_t<level> log = repository_t<level>::instance().root();
 
-    BH_LOG(log, level::debug,   "[%d] %s - done", 0, "debug");
-    BH_LOG(log, level::info,    "[%d] %s - done", 1, "info");
-    BH_LOG(log, level::warning, "[%d] %s - done", 2, "warning");
-    BH_LOG(log, level::error,   "[%d] %s - done", 3, "error");
+    BH_LOG(log, level::debug, "debug message");
+    BH_LOG(log, level::error, "error message");
 
     return 0;
 }
