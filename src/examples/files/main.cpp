@@ -1,7 +1,11 @@
 #include <blackhole/blackhole.hpp>
 #include <blackhole/frontend/files.hpp>
 
-// Tags: file sink, registration, size rotation, placeholder naming, user attributes
+//! This example demonstrates files sink usage with rotation support and other features.
+//!  - how to register non-default formatter and sink in the repository.
+//!  - how to configure files sink to support files rotation by size and datetime.
+//!  - how to write in multiple files depending on current log event's attributes set.
+//!  - how to attach additional attributes to the log event.
 
 using namespace blackhole;
 
