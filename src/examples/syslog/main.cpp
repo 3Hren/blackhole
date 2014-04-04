@@ -48,9 +48,9 @@ void init() {
     // This information is needed for severity level mapping.
     repository_t<level>::instance().configure<sink::syslog_t<level>, formatter::string_t>();
 
-    // Formatter is configured as usual.
+    // Formatter is configured as usual, except we don't need anything than message.
     formatter_config_t formatter("string");
-    formatter["pattern"] = "[%(timestamp)s] [%(severity)s]: %(message)s";
+    formatter["pattern"] = "%(message)s";
 
     // Syslog sink in its current implementation also hasn't large amout of options.
     sink_config_t sink("syslog");
