@@ -45,6 +45,7 @@ using namespace blackhole;
 void init() {
     // As always register necessary formatter and sink. Note that syslog sink requires
     // user-defined severity enumeration symbol as template parameter.
+    // This information is needed for severity level mapping.
     repository_t<level>::instance().configure<sink::syslog_t<level>, formatter::string_t>();
 
     // Formatter is configured as usual.
@@ -66,6 +67,7 @@ int main(int, char**) {
     verbose_logger_t<level> log = repository_t<level>::instance().root();
 
     BH_LOG(log, level::debug, "debug message");
+    BH_LOG(log, level::warning, "warning message");
     BH_LOG(log, level::error, "error message");
 
     return 0;
