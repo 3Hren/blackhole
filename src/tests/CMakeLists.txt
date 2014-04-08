@@ -7,7 +7,11 @@ SET(PROJECT blackhole-tests)
 
 ENABLE_TESTING()
 
+
+file(GLOB_RECURSE BLACKHOLE_HEADERS . ../blackhole/*.hpp)
+
 SET(HEADERS
+    ${BLACKHOLE_HEADERS}
     global.hpp
     mocks.hpp
     mocks/files.hpp
@@ -86,7 +90,6 @@ TARGET_LINK_LIBRARIES(${PROJECT}
     ${CMAKE_THREAD_LIBS_INIT}
     ${Boost_LIBRARIES}
     ${GOOGLE_LIBRARIES}
-    blackhole
     msgpack
 )
 
