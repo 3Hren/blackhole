@@ -16,3 +16,10 @@ ENDIF()
 IF(ENABLE_EXAMPLES)
     ADD_SUBDIRECTORY(examples)
 ENDIF()
+
+INSTALL(
+    DIRECTORY
+        blackhole/
+    DESTINATION include/blackhole
+    COMPONENT development
+)
