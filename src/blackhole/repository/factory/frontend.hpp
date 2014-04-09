@@ -5,48 +5,15 @@
 #include <mutex>
 #include <unordered_map>
 
+#include <boost/any.hpp>
+
 #include "blackhole/error.hpp"
 #include "blackhole/repository/config/formatter.hpp"
 #include "blackhole/repository/config/sink.hpp"
-#include "blackhole/repository/factory/factory.hpp"
+#include "blackhole/repository/factory/frontend/keeper.hpp"
+#include "blackhole/repository/factory/frontend/traits.hpp"
 
 namespace blackhole {
-
-namespace frontend {
-
-template<class T>
-struct traits {
-    typedef std::unique_ptr<base_frontend_t> return_type;
-    typedef return_type(*function_type)(const formatter_config_t&, std::unique_ptr<T>);
-};
-
-} // namespace frontend
-
-//! Keeps frontend factory functions using type erasure idiom.
-/*! For each desired Formatter-Sink pair a function created and registered.
- *  Later that function can be extracted by Sink type parameter.
- */
-struct function_keeper_t {
-    std::unordered_map<std::string, boost::any> functions;
-
-    template<class Sink, class Formatter>
-    void add() {
-        typedef typename frontend::traits<Sink>::function_type function_type;
-        function_type function = static_cast<function_type>(&factory_t::create<Formatter>);
-        functions[Sink::name()] = function;
-    }
-
-    template<class Sink>
-    bool has() const {
-        return functions.find(Sink::name()) != functions.end();
-    }
-
-    template<class Sink>
-    typename frontend::traits<Sink>::function_type get() const {
-        boost::any any = functions.at(Sink::name());
-        return boost::any_cast<typename frontend::traits<Sink>::function_type>(any);
-    }
-};
 
 class frontend_factory_t {
     mutable std::mutex mutex;
@@ -59,10 +26,10 @@ public:
         auto it = factories.find(Formatter::name());
         if (it != factories.end()) {
             function_keeper_t& keeper = it->second;
-            keeper.template add<Sink, Formatter>();
+            keeper.add<Sink, Formatter>();
         } else {
             function_keeper_t keeper;
-            keeper.template add<Sink, Formatter>();
+            keeper.add<Sink, Formatter>();
             factories[Formatter::name()] = keeper;
         }
     }
@@ -82,7 +49,7 @@ public:
         try {
             std::lock_guard<std::mutex> lock(mutex);
             const function_keeper_t& keeper = factories.at(formatter_config.type);
-            auto factory = keeper.template get<Sink>();
+            auto factory = keeper.get<Sink>();
             return factory(formatter_config, std::move(sink));
         } catch (const std::exception&) {
             throw error_t("there are no registered formatter '%s' for sink '%s", formatter_config.type, Sink::name());

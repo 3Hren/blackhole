@@ -5,22 +5,21 @@
 #include <string>
 #include <unordered_map>
 
-#include "bigbang.hpp"
-#include "formatter/string.hpp"
-#include "frontend.hpp"
-#include "logger.hpp"
-#include "repository/config/defaults.hpp"
-#include "repository/config/log.hpp"
-#include "repository/factory/group.hpp"
-#include "blackhole/repository/factory/configurator.hpp"
-#include "sink/stream.hpp"
+#include "blackhole/bigbang.hpp"
+#include "blackhole/formatter/string.hpp"
+#include "blackhole/frontend.hpp"
+#include "blackhole/logger.hpp"
+#include "blackhole/repository/config/defaults.hpp"
+#include "blackhole/repository/config/log.hpp"
+#include "blackhole/repository/factory/external.hpp"
+#include "blackhole/sink/stream.hpp"
 
 namespace blackhole {
 
 template<typename Level>
 class repository_t {
     mutable std::mutex mutex;
-    group_factory_t factory;
+    external_factory_t factory;
     std::unordered_map<std::string, log_config_t> configs;
 
 public:
@@ -38,7 +37,7 @@ public:
     template<typename Sink, typename Formatter>
     void configure() {
         std::lock_guard<std::mutex> lock(mutex);
-        configurator<Sink, Formatter>::execute(factory);
+        external_inserter<Sink, Formatter>::insert(factory);
     }
 
     void clear() {
