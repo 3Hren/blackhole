@@ -74,7 +74,7 @@ void map_timestamp(blackhole::aux::attachable_ostringstream& stream, const timev
 */
 void init() {
     //! Register required frontend.
-    repository_t<level>::instance().configure<
+    repository_t::instance().configure<
         sink::socket_t<boost::asio::ip::tcp>,
         formatter::json_t
     >();
@@ -97,12 +97,12 @@ void init() {
     frontend_config_t frontend = { formatter, sink };
     log_config_t config{ "root", { frontend } };
 
-    repository_t<level>::instance().add_config(config);
+    repository_t::instance().add_config(config);
 }
 
 int main(int, char**) {
     init();
-    verbose_logger_t<level> log = repository_t<level>::instance().root();
+    verbose_logger_t<level> log = repository_t::instance().root<level>();
 
     BH_LOG(log, level::debug,   "[%d] %s - done", 0, "debug");
     BH_LOG(log, level::info,    "[%d] %s - done", 1, "info");

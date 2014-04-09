@@ -196,21 +196,21 @@ log_config_t create_valid_config() {
 
 TEST(Repository, InitializationFromSettings) {
     log_config_t config = create_valid_config();
-    repository_t<testing::level>::instance().add_config(config);
-    const bool condition = std::is_same<verbose_logger_t<testing::level>, decltype(repository_t<testing::level>::instance().create("root"))>::value;
+    repository_t::instance().add_config(config);
+    const bool condition = std::is_same<verbose_logger_t<testing::level>, decltype(repository_t::instance().create<testing::level>("root"))>::value;
     static_assert(condition, "repository should return `verbose_logger_t` object");
 }
 
 TEST(Repository, ThrowsExceptionIfLoggerWithSpecifiedNameNotFound) {
     log_config_t config = create_valid_config();
-    repository_t<testing::level>::instance().add_config(config);
-    EXPECT_THROW(repository_t<testing::level>::instance().create("log"), std::out_of_range);
+    repository_t::instance().add_config(config);
+    EXPECT_THROW(repository_t::instance().create<testing::level>("log"), std::out_of_range);
 }
 
 TEST(Repository, CreatesDuplicateOfRootLoggerByDefault) {
     log_config_t config = create_valid_config();
-    repository_t<testing::level>::instance().add_config(config);
-    repository_t<testing::level>::instance().root();
+    repository_t::instance().add_config(config);
+    repository_t::instance().root<testing::level>();
 }
 
 TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredSink) {
@@ -241,7 +241,7 @@ TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredFormatter) {
 }
 
 TEST(Repository, StreamSinkWithStringFormatterIsAvailableByDefault) {
-    auto& repository = repository_t<level>::instance();
+    auto& repository = repository_t::instance();
     bool available = repository.available<sink::stream_t, formatter::string_t>();
     EXPECT_TRUE(available);
     repository.clear();
@@ -249,7 +249,7 @@ TEST(Repository, StreamSinkWithStringFormatterIsAvailableByDefault) {
 
 TEST(Repository, PairConfiguring) {
     bool available = false;
-    auto& repository = repository_t<level>::instance();
+    auto& repository = repository_t::instance();
 
     available = repository.available<sink::syslog_t<level>, formatter::string_t>();
     EXPECT_FALSE(available);
@@ -268,7 +268,7 @@ TEST(Repository, GroupConfiguring) {
     > formatters_t;
 
     bool available = false;
-    auto& repository = repository_t<level>::instance();
+    auto& repository = repository_t::instance();
 
     available = repository.available<sink::files_t<>, formatter::json_t>();
     EXPECT_FALSE(available);
@@ -292,7 +292,7 @@ TEST(Repository, CombinationConfiguring) {
     > formatters_t;
 
     bool available = false;
-    auto& repository = repository_t<level>::instance();
+    auto& repository = repository_t::instance();
 
     available = repository.available<sink::files_t<>, formatter::json_t>();
     ASSERT_FALSE(available);
@@ -313,7 +313,7 @@ TEST(Repository, CombinationConfiguring) {
 }
 
 TEST(Repository, ThrowsExceptionWhenSinkIsRegisteredButItsUniqueNameIsDifferent) {
-    auto& repo = repository_t<level>::instance();
+    auto& repo = repository_t::instance();
 
     formatter_config_t formatter("string");
     formatter["pattern"] = "[%(timestamp)s]: %(message)s";
@@ -338,6 +338,6 @@ TEST(Repository, ThrowsExceptionWhenSinkIsRegisteredButItsUniqueNameIsDifferent)
     >();
     repo.add_config(config);
 
-    EXPECT_THROW(repo.create("root"), blackhole::error_t);
+    EXPECT_THROW(repo.create<level>("root"), blackhole::error_t);
     repo.clear();
 }

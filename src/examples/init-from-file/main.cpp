@@ -17,7 +17,7 @@ enum class level {
 void init(const rapidjson::Document& root) {
     const std::vector<log_config_t>& configs = repository::config::parser_t<std::vector<log_config_t>>::parse(root);
 
-    repository_t<level>& repository = repository_t<level>::instance();
+    repository_t& repository = repository_t::instance();
     for (auto it = configs.begin(); it != configs.end(); ++it) {
         repository.add_config(*it);
     }
@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
     }
 
     init(doc);
-    verbose_logger_t<level> log = repository_t<level>::instance().root();
+    verbose_logger_t<level> log = repository_t::instance().root<level>();
 
     BH_LOG(log, level::info,   "this is just testing message")(
         attribute::make("id", 42)

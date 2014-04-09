@@ -26,7 +26,7 @@ void init() {
     frontend_config_t frontend = { formatter, sink };
     log_config_t config{ "root", { frontend } };
 
-    repository_t<level>::instance().add_config(config);
+    repository_t::instance().add_config(config);
 }
 
 // Here it's an example how to create and handle log events without using any macros at all.
@@ -49,7 +49,7 @@ void handle(Log& log, level lvl, const char* message) {
 
 int main(int, char**) {
     init();
-    verbose_logger_t<level> log = repository_t<level>::instance().root();
+    verbose_logger_t<level> log = repository_t::instance().root<level>();
 
     BH_LOG(log, level::debug, "log message using macro API");
     handle(log, level::debug, "log message using log object directly");

@@ -16,7 +16,6 @@
 
 namespace blackhole {
 
-template<typename Level>
 class repository_t {
     mutable std::mutex mutex;
     external_factory_t factory;
@@ -31,7 +30,7 @@ public:
     template<typename Sink, typename Formatter>
     bool available() const {
         std::lock_guard<std::mutex> lock(mutex);
-        return factory.template has<Sink, Formatter>();
+        return factory.has<Sink, Formatter>();
     }
 
     template<typename Sink, typename Formatter>
@@ -51,6 +50,7 @@ public:
         configs[config.name] = config;
     }
 
+    template<typename Level>
     verbose_logger_t<Level> create(const std::string& name) const {
         std::lock_guard<std::mutex> lock(mutex);
         log_config_t config = configs.at(name);
@@ -63,8 +63,9 @@ public:
         return logger;
     }
 
+    template<typename Level>
     verbose_logger_t<Level> root() const {
-        return create("root");
+        return create<Level>("root");
     }
 private:
     repository_t() {
