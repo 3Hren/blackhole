@@ -10,25 +10,56 @@
 
 #include "blackhole/repository/config/formatter.hpp"
 #include "blackhole/repository/config/sink.hpp"
-#include "blackhole/repository/factory/configurator.hpp"
 #include "blackhole/repository/factory/factory.hpp"
 #include "blackhole/repository/factory/frontend.hpp"
 
 namespace blackhole {
 
+// Forward declarations.
+class group_factory_t;
+class frontend_factory_t;
+namespace aux { namespace registrator { struct group; } }
+
+template<typename Sink, typename Formatter, class = void>
+struct configurator;
+
+namespace aux {
+
+namespace registrator {
+
+struct group {
+    group_factory_t& factory;
+
+    template<typename Sink, typename Formatters>
+    void operator ()(meta::holder<Sink, Formatters>) const {
+        configurator<Sink, Formatters>::execute(factory);
+    }
+};
+
+struct frontend {
+    frontend_factory_t& factory;
+
+    template<typename Sink, typename Formatter>
+    void operator ()(meta::holder<Sink, Formatter>) const {
+        factory.add<Sink, Formatter>();
+    }
+};
+
+} // namespace registrator
+
+} // namespace aux
+
 template<typename Sink, typename Formatter, class = void>
 struct frontend_repository {
-    template<typename Level>
-    static void push(frontend_factory_t<Level>& factory) {
+    static void push(frontend_factory_t& factory) {
         factory.template add<Sink, Formatter>();
     }
 };
 
 template<typename Sink, typename Formatters>
 struct frontend_repository<Sink, Formatters, typename std::enable_if<boost::mpl::is_sequence<Formatters>::type::value>::type> {
-    template<typename Level>
-    static void push(frontend_factory_t<Level>& factory) {
-        aux::registrator::frontend<Level> action { factory };
+    static void push(frontend_factory_t& factory) {
+        aux::registrator::frontend action { factory };
         boost::mpl::for_each<
             Formatters,
             meta::holder<Sink, boost::mpl::_>
@@ -36,23 +67,22 @@ struct frontend_repository<Sink, Formatters, typename std::enable_if<boost::mpl:
     }
 };
 
-template<typename Level>
 class group_factory_t {
     typedef std::unique_ptr<base_frontend_t> return_type;
-    typedef return_type(*factory_type)(const frontend_factory_t<Level>&, const formatter_config_t&, const sink_config_t&);
+    typedef return_type(*factory_type)(const frontend_factory_t&, const formatter_config_t&, const sink_config_t&);
     typedef std::string(*extractor_type)(const boost::any&);
 
     mutable std::mutex mutex;
     std::unordered_map<std::string, factory_type> sinks;
     std::unordered_map<std::string, extractor_type> config_id_extractors;
 
-    frontend_factory_t<Level> factory;
+    frontend_factory_t factory;
 public:
     template<typename Sink, typename Formatter>
     void add() {
         std::lock_guard<std::mutex> lock(mutex);
         config_id_extractors[Sink::name()] = &unique_id_traits<Sink>::generate;
-        sinks[config_traits<Sink>::name()] = static_cast<factory_type>(&factory_t<Level>::template create<Sink>);
+        sinks[config_traits<Sink>::name()] = static_cast<factory_type>(&factory_t::template create<Sink>);
         frontend_repository<Sink, Formatter>::push(factory);
     }
 
@@ -84,6 +114,32 @@ public:
         std::lock_guard<std::mutex> lock(mutex);
         sinks.clear();
         factory.clear();
+    }
+};
+
+template<typename Sink, typename Formatter>
+struct configurator<Sink, Formatter,
+        typename std::enable_if<
+            !(boost::mpl::is_sequence<Sink>::type::value &&
+            boost::mpl::is_sequence<Formatter>::type::value)
+        >::type> {
+    static void execute(group_factory_t& factory) {
+        factory.add<Sink, Formatter>();
+    }
+};
+
+template<typename Sinks, typename Formatters>
+struct configurator<
+    Sinks,
+    Formatters,
+    typename std::enable_if<
+        boost::mpl::is_sequence<Sinks>::type::value &&
+        boost::mpl::is_sequence<Formatters>::type::value
+    >::type
+> {
+    static void execute(group_factory_t& factory) {
+        aux::registrator::group action { factory };
+        boost::mpl::for_each<Sinks, meta::holder<boost::mpl::_, Formatters>>(action);
     }
 };
 

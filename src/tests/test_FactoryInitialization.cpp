@@ -37,7 +37,7 @@ struct priority_traits<testing::level> {
 } } // namespace blackhole::sink
 
 TEST(Factory, StreamStringsFrontend) {
-    group_factory_t<level> factory;
+    group_factory_t factory;
     factory.add<sink::stream_t, formatter::string_t>();
 
     formatter_config_t formatter("string");
@@ -50,7 +50,7 @@ TEST(Factory, StreamStringsFrontend) {
 }
 
 TEST(Factory, FileStringsFrontend) {
-    group_factory_t<level> factory;
+    group_factory_t factory;
     factory.add<sink::files_t<>, formatter::string_t>();
 
     formatter_config_t formatter("string");
@@ -64,7 +64,7 @@ TEST(Factory, FileStringsFrontend) {
 }
 
 TEST(Repository, RotationFileStringsFrontendWithSizeWatcher) {
-    group_factory_t<level> factory;
+    group_factory_t factory;
     factory.add<
         sink::files_t<
             sink::files::boost_backend_t,
@@ -90,7 +90,7 @@ TEST(Repository, RotationFileStringsFrontendWithSizeWatcher) {
 }
 
 TEST(Repository, RotationFileStringsFrontendWithDatetimeWatcher) {
-    group_factory_t<level> factory;
+    group_factory_t factory;
     factory.add<
         sink::files_t<
             sink::files::boost_backend_t,
@@ -116,7 +116,7 @@ TEST(Repository, RotationFileStringsFrontendWithDatetimeWatcher) {
 }
 
 TEST(Repository, ThrowsExceptionIfRotationWatcherNotSpecified) {
-    group_factory_t<level> factory;
+    group_factory_t factory;
     factory.add<
         sink::files_t<
             sink::files::boost_backend_t,
@@ -141,7 +141,7 @@ TEST(Repository, ThrowsExceptionIfRotationWatcherNotSpecified) {
 }
 
 TEST(Factory, SyslogStringsFrontend) {
-    group_factory_t<level> factory;
+    group_factory_t factory;
     factory.add<sink::syslog_t<level>, formatter::string_t>();
 
     formatter_config_t formatter("string");
@@ -154,7 +154,7 @@ TEST(Factory, SyslogStringsFrontend) {
 }
 
 TEST(Factory, UdpSocketStringsFrontend) {
-    group_factory_t<level> factory;
+    group_factory_t factory;
     factory.add<sink::socket_t<boost::asio::ip::udp>, formatter::string_t>();
 
     formatter_config_t formatter("string");
@@ -168,7 +168,7 @@ TEST(Factory, UdpSocketStringsFrontend) {
 }
 
 TEST(Factory, TcpSocketStringsFrontend) {
-    group_factory_t<level> factory;
+    group_factory_t factory;
     factory.add<sink::socket_t<boost::asio::ip::tcp>, formatter::string_t>();
 
     formatter_config_t formatter("string");
@@ -214,7 +214,7 @@ TEST(Repository, CreatesDuplicateOfRootLoggerByDefault) {
 }
 
 TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredSink) {
-    group_factory_t<level> factory;
+    group_factory_t factory;
 
     formatter_config_t formatter("string");
     formatter["pattern"] = "[%(timestamp)s]: %(message)s";
@@ -227,7 +227,7 @@ TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredSink) {
 }
 
 TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredFormatter) {
-    group_factory_t<level> factory;
+    group_factory_t factory;
     factory.add<sink::socket_t<boost::asio::ip::udp>, boost::mpl::list<>>();
 
     formatter_config_t formatter("string");

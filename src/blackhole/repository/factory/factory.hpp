@@ -4,16 +4,12 @@
 
 #include "blackhole/repository/config/formatter.hpp"
 #include "blackhole/repository/config/sink.hpp"
-#include "blackhole/repository/factory/traits.hpp"
 
 namespace blackhole {
 
-template<typename Level>
+class base_frontend_t;
 class frontend_factory_t;
 
-class base_frontend_t;
-
-template<typename Level>
 struct factory_t {
     template<class Formatter, class Sink>
     static
@@ -35,18 +31,32 @@ struct factory_t {
     template<class Sink>
     static
     std::unique_ptr<base_frontend_t>
-    create(const frontend_factory_t<Level>& factory, const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink) {
-        return factory.create(formatter_config, std::move(sink));
-    }
+    create(const frontend_factory_t& factory, const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink);
 
     template<class Sink>
     static
     std::unique_ptr<base_frontend_t>
-    create(const frontend_factory_t<Level>& factory, const formatter_config_t& formatter_config, const sink_config_t& sink_config) {
-        auto config = aux::config_mapper<Sink>::map(sink_config.config);
-        auto sink = std::make_unique<Sink>(config);
-        return create(factory, formatter_config, std::move(sink));
-    }
+    create(const frontend_factory_t& factory, const formatter_config_t& formatter_config, const sink_config_t& sink_config);
 };
 
-} // nameaspace blackhole
+} // namespace blackhole
+
+#include "blackhole/repository/factory/frontend.hpp"
+
+namespace blackhole {
+
+template<class Sink>
+std::unique_ptr<base_frontend_t>
+factory_t::create(const frontend_factory_t& factory, const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink) {
+    return factory.create(formatter_config, std::move(sink));
+}
+
+template<class Sink>
+std::unique_ptr<base_frontend_t>
+factory_t::create(const frontend_factory_t& factory, const formatter_config_t& formatter_config, const sink_config_t& sink_config) {
+    auto config = aux::config_mapper<Sink>::map(sink_config.config);
+    auto sink = std::make_unique<Sink>(config);
+    return create(factory, formatter_config, std::move(sink));
+}
+
+}

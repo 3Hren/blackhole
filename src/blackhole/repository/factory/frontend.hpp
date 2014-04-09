@@ -23,16 +23,16 @@ struct traits {
 } // namespace frontend
 
 //! Keeps frontend factory functions using type erasure idiom.
-//! For each desired Formatter-Sink pair a function created and registered.
-//! Later that function can be extracted by Sink type parameter.
-template<typename Level>
+/*! For each desired Formatter-Sink pair a function created and registered.
+ *  Later that function can be extracted by Sink type parameter.
+ */
 struct function_keeper_t {
     std::unordered_map<std::string, boost::any> functions;
 
     template<class Sink, class Formatter>
     void add() {
         typedef typename frontend::traits<Sink>::function_type function_type;
-        function_type function = static_cast<function_type>(&factory_t<Level>::template create<Formatter>);
+        function_type function = static_cast<function_type>(&factory_t::create<Formatter>);
         functions[Sink::name()] = function;
     }
 
@@ -48,10 +48,9 @@ struct function_keeper_t {
     }
 };
 
-template<typename Level>
 class frontend_factory_t {
     mutable std::mutex mutex;
-    std::unordered_map<std::string, function_keeper_t<Level>> factories;
+    std::unordered_map<std::string, function_keeper_t> factories;
 public:
     template<class Sink, class Formatter>
     void add() {
@@ -59,10 +58,10 @@ public:
 
         auto it = factories.find(Formatter::name());
         if (it != factories.end()) {
-            function_keeper_t<Level>& keeper = it->second;
+            function_keeper_t& keeper = it->second;
             keeper.template add<Sink, Formatter>();
         } else {
-            function_keeper_t<Level> keeper;
+            function_keeper_t keeper;
             keeper.template add<Sink, Formatter>();
             factories[Formatter::name()] = keeper;
         }
@@ -82,7 +81,7 @@ public:
 
         try {
             std::lock_guard<std::mutex> lock(mutex);
-            const function_keeper_t<Level>& keeper = factories.at(formatter_config.type);
+            const function_keeper_t& keeper = factories.at(formatter_config.type);
             auto factory = keeper.template get<Sink>();
             return factory(formatter_config, std::move(sink));
         } catch (const std::exception&) {

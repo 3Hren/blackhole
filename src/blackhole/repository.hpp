@@ -12,6 +12,7 @@
 #include "repository/config/defaults.hpp"
 #include "repository/config/log.hpp"
 #include "repository/factory/group.hpp"
+#include "blackhole/repository/factory/configurator.hpp"
 #include "sink/stream.hpp"
 
 namespace blackhole {
@@ -19,7 +20,7 @@ namespace blackhole {
 template<typename Level>
 class repository_t {
     mutable std::mutex mutex;
-    group_factory_t<Level> factory;
+    group_factory_t factory;
     std::unordered_map<std::string, log_config_t> configs;
 
 public:
