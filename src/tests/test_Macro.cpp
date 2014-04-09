@@ -282,3 +282,24 @@ TEST(Macro, UsingStreamOperatorIfNoImplicitConversionAvailable) {
     EXPECT_EQ("message", actual.message);
     EXPECT_EQ("['42', 42]", actual.value);
 }
+
+TEST(Macro, InitializerListAttributes) {
+    log::record_t record;
+    record.attributes["attr1"] = {"value1"};
+
+    mock::verbose_log_t<level> log;
+    EXPECT_CALL(log, open_record(level::debug))
+            .Times(1)
+            .WillOnce(Return(record));
+
+    ExtractStreamableValueAttributesAction::pack_t actual;
+    ExtractStreamableValueAttributesAction action { actual };
+    EXPECT_CALL(log, push(_))
+            .Times(1)
+            .WillOnce(WithArg<0>(Invoke(action)));
+
+    BH_LOG(log, level::debug, "message")({ {"value", "42"} });
+
+    EXPECT_EQ("message", actual.message);
+    EXPECT_EQ("42", actual.value);
+}

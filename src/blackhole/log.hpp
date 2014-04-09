@@ -33,6 +33,12 @@ public:
         log.push(std::move(record));
     }
 
+    void operator()(std::initializer_list<std::pair<std::string, log::attribute_value_t>>&& args) {
+        for (auto it = args.begin(); it != args.end(); ++it) {
+            record.attributes.insert(std::make_pair(it->first, log::attribute_t(it->second)));
+        }
+    }
+
     template<typename... Args>
     void operator()(Args&&... args) {
         static_assert((is_keyword_pack<Args...>::value || is_emplace_pack<Args...>::value),
