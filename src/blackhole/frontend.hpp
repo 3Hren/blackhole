@@ -25,7 +25,7 @@ public:
     {}
 };
 
-template<class Formatter, class Sink, class Level = void>
+template<class Formatter, class Sink>
 class frontend_t : public abstract_frontend_t<Formatter, Sink> {
 public:
     frontend_t(std::unique_ptr<Formatter> formatter, std::unique_ptr<Sink> sink) :

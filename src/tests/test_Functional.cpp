@@ -38,7 +38,7 @@ TEST(Functional, SyslogConfiguredVerboseLogger) {
 
     auto formatter = std::make_unique<formatter_type>("%(message)s [%(...L)s]");
     auto sink = std::make_unique<sink_type>("testing");
-    auto frontend = std::make_unique<frontend_t<formatter_type, sink_type, level>>(std::move(formatter), std::move(sink));
+    auto frontend = std::make_unique<frontend_t<formatter_type, sink_type>>(std::move(formatter), std::move(sink));
     log.add_frontend(std::move(frontend));
 
     log::record_t record = log.open_record(level::error);

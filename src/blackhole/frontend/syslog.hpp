@@ -7,7 +7,7 @@
 namespace blackhole {
 
 template<class Formatter, typename Level>
-class frontend_t<Formatter, sink::syslog_t<Level>, Level> : public abstract_frontend_t<Formatter, sink::syslog_t<Level>> {
+class frontend_t<Formatter, sink::syslog_t<Level>> : public abstract_frontend_t<Formatter, sink::syslog_t<Level>> {
 public:
     frontend_t(std::unique_ptr<Formatter> formatter, std::unique_ptr<sink::syslog_t<Level>> sink) :
         abstract_frontend_t<Formatter, sink::syslog_t<Level>>(std::move(formatter), std::move(sink))

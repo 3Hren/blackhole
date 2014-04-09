@@ -19,7 +19,7 @@ struct factory_t {
     static
     std::unique_ptr<base_frontend_t>
     create(std::unique_ptr<Formatter> formatter, std::unique_ptr<Sink> sink) {
-        return std::make_unique<frontend_t<Formatter, Sink, Level>>(std::move(formatter), std::move(sink));
+        return std::make_unique<frontend_t<Formatter, Sink>>(std::move(formatter), std::move(sink));
     }
 
     template<class Formatter, class Sink>
