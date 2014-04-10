@@ -10,7 +10,7 @@ using namespace ::testing;
 
 namespace testing {
 
-enum level : std::uint8_t { debug, info, warn, error };
+enum level { debug, info, warn, error };
 
 } // namespace testing
 
