@@ -253,6 +253,8 @@ public:
         actions(actions)
     {}
 
+    virtual ~generator_handler_t() {}
+
     virtual void partial_literal(iterator_type begin, iterator_type end) {
         m_literal.append(begin, end);
     }
