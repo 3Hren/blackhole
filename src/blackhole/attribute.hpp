@@ -123,6 +123,7 @@ inline log::attributes_t merge(const std::initializer_list<log::attributes_t>& a
 
 namespace attribute {
 
+// Simple typedef for attributes initializer list. Useful when specifying local attributes.
 typedef std::initializer_list<std::pair<std::string, log::attribute_value_t>> list;
 
 // Dynamic attribute factory function.

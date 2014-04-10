@@ -11,13 +11,15 @@ namespace blackhole {
 
 namespace aux {
 
-//! Helper hierarchy of template classes that allows to pass objects of user defined classes
-//! as attribute in main logging macro. To make this possible user defined class must have fully
-//! defined stream push `operator<<`.
-//! The logic is as follows: if the object can be implicitly converted to `attribute_value_t`
-//! object, then that convertion is used. Otherwise library would check via SFINAE if custom class
-//! has defined stream push `operator<<` and, if yes - uses it. Otherwise static assert with
-//! human-readable message is triggered.
+//! \brief Converts various types to log event attributes.
+/*! Helper hierarchy of template classes that allows to pass objects of user defined classes
+    as attribute in main logging macro. To make this possible user defined class must have fully
+    defined stream push `operator<<`.
+    The logic is as follows: if the object can be implicitly converted to `attribute_value_t`
+    object, then that convertion is used. Otherwise library would check via SFINAE if custom class
+    has defined stream push `operator<<` and, if yes - uses it. Otherwise static assert with
+    human-readable message is triggered.
+*/
 template<typename T, class = void>
 struct conv;
 
