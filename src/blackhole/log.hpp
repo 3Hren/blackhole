@@ -37,7 +37,8 @@ public:
     // decude { { "value", "42" } } expressions in function call to the initializer list
     // without looking at the overload resolution. This violates C++11 standard, which
     // allows such deducing only for `auto` keyword (including range-based `for` loop).
-    // Please, specify `attribute::list` type explicitly before list.
+    // Please, specify `attribute::list` type explicitly when using initialize lists to
+    // provide attributes.
     void operator()(std::initializer_list<std::pair<std::string, log::attribute_value_t>>&& args) {
         for (auto it = args.begin(); it != args.end(); ++it) {
             record.attributes.insert(std::make_pair(it->first, log::attribute_t(it->second)));
