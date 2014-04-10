@@ -123,6 +123,8 @@ inline log::attributes_t merge(const std::initializer_list<log::attributes_t>& a
 
 namespace attribute {
 
+typedef std::initializer_list<std::pair<std::string, log::attribute_value_t>> list;
+
 // Dynamic attribute factory function.
 template<typename T>
 inline log::attribute_pair_t make(const std::string& name, const T& value, log::attribute::scope scope = log::attribute::DEFAULT_SCOPE) {
