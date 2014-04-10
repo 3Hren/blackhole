@@ -298,9 +298,9 @@ TEST(Macro, InitializerListAttributes) {
             .Times(1)
             .WillOnce(WithArg<0>(Invoke(action)));
 
-    BH_LOG(log, level::debug, "message")(attribute::list{
+    BH_LOG(log, level::debug, "message")(attribute::list({
         {"value", "42"}
-    });
+    }));
 
     EXPECT_EQ("message", actual.message);
     EXPECT_EQ("42", actual.value);
