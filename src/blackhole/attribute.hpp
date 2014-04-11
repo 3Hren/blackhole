@@ -18,7 +18,6 @@ namespace blackhole {
 namespace log {
 
 typedef boost::variant<
-    std::uint8_t,
     std::uint32_t,
     std::int32_t,
     std::uint64_t,

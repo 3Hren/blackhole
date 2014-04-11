@@ -42,7 +42,7 @@ TEST(logger_base_t, DoNotOpenRecordIfDisabled) {
     EXPECT_FALSE(log.open_record().valid());
 }
 
-namespace blackhole { namespace keyword { DECLARE_KEYWORD(urgent, std::uint8_t) } }
+namespace blackhole { namespace keyword { DECLARE_KEYWORD(urgent, std::uint32_t) } }
 
 TEST(logger_base_t, OpensRecordWhenAttributeFilterSucceed) {
     std::unique_ptr<mock::frontend_t> frontend;

@@ -9,7 +9,6 @@
 using namespace blackhole;
 
 TEST(Traits, IsSupportedAttributeType) {
-    static_assert(log::attribute::is_supported<std::uint8_t>::value,    "`std::uint8_t` must be supported");
     static_assert(log::attribute::is_supported<std::uint32_t>::value,   "`std::uint32_t` must be supported");
     static_assert(log::attribute::is_supported<std::int32_t>::value,    "`std::int32_t` must be supported");
     static_assert(log::attribute::is_supported<std::uint64_t>::value,   "`std::uint64_t` must be supported");
@@ -27,24 +26,6 @@ TEST(Traits, LiteralIsConvertibleToAttribute) {
 TEST(Traits, StringIsConvertibleToAttribute) {
     static_assert(log::attribute::is_constructible<const std::string&>::value,
                   "`const std::string&` must be convertible");
-}
-
-TEST(Traits, AnyCharIsImplicitConvertible) {
-    static_assert(log::attribute::is_constructible<char>::value,
-                  "`char` must be convertible");
-    log::attribute_value_t(static_cast<char>(42));
-
-    static_assert(log::attribute::is_constructible<unsigned char>::value,
-                  "`unsigned char` must be convertible");
-    log::attribute_value_t(static_cast<unsigned char>(42));
-
-    static_assert(log::attribute::is_constructible<const char>::value,
-                  "`const char` must be convertible");
-    log::attribute_value_t(static_cast<const char>(42));
-
-    static_assert(log::attribute::is_constructible<const unsigned char>::value,
-                  "`const unsigned char` must be convertible");
-    log::attribute_value_t(static_cast<const unsigned char>(42));
 }
 
 TEST(Traits, AnyShortIsImplicitConvertible) {
