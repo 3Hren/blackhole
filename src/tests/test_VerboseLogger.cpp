@@ -37,9 +37,9 @@ TEST(verbose_logger_t, Manual) {
     verbose_logger_t<testing::level> log;
 
     //!@note: Factory starts here...
-    auto formatter = std::make_unique<formatter::string_t>("[]: %(message)s [%(...L)s]");
-    auto sink = std::make_unique<sink::files_t<>>(sink::files_t<>::config_type("/dev/stdout"));
-    auto frontend = std::make_unique<frontend_t<formatter::string_t, sink::files_t<>>>(std::move(formatter), std::move(sink));
+    auto formatter = utils::make_unique<formatter::string_t>("[]: %(message)s [%(...L)s]");
+    auto sink = utils::make_unique<sink::files_t<>>(sink::files_t<>::config_type("/dev/stdout"));
+    auto frontend = utils::make_unique<frontend_t<formatter::string_t, sink::files_t<>>>(std::move(formatter), std::move(sink));
     //!@note ... till here.
     log.add_frontend(std::move(frontend));
 

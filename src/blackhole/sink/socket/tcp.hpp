@@ -55,7 +55,7 @@ private:
     static inline
     std::unique_ptr<Protocol::socket>
     initialize(boost::asio::io_service& io_service, const std::string& host, std::uint16_t port) {
-        std::unique_ptr<Protocol::socket> socket = std::make_unique<Protocol::socket>(io_service);
+        std::unique_ptr<Protocol::socket> socket = utils::make_unique<Protocol::socket>(io_service);
         connect<Protocol>(io_service, *socket, host, port);
         return socket;
     }
