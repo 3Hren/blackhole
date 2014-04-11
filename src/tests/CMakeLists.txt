@@ -47,6 +47,7 @@ SET(SOURCES
     test_Functional
     test_JsonFormatter
     test_Logger
+    test_LoggerSynchronized
     test_Macro
     test_Manual
     test_MsgpackFormatter
