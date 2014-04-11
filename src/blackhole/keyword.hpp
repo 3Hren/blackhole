@@ -6,6 +6,7 @@
 
 #define DECLARE_KEYWORD_IMPL(Name, Scope, T) \
     namespace tag { \
+        static_assert(blackhole::log::attribute::is_supported<T>::value, "invalid attribute type"); \
         struct Name##_t { \
             typedef T type; \
             static const char* name() { return #Name; } \
