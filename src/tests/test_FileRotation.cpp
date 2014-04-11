@@ -30,6 +30,8 @@ struct config_t<mock::files::rotation::watcher_t> {};
 TEST(rotator_t, Class) {
     sink::rotation::config_t<mock::files::rotation::watcher_t> config = { "test.log.%N", 1 };
     mock::files::backend_t backend;
+    EXPECT_CALL(backend, filename())
+            .WillRepeatedly(Return("test.log"));
     mocked::rotator_t rotator(config, backend);
     UNUSED(rotator);
 }
@@ -37,6 +39,8 @@ TEST(rotator_t, Class) {
 TEST(rotator_t, RotatingSequence) {
     sink::rotation::config_t<mock::files::rotation::watcher_t> config = { "test.log.%N", 1 };
     mock::files::backend_t backend;
+    EXPECT_CALL(backend, filename())
+            .WillRepeatedly(Return("test.log"));
     mocked::rotator_t rotator(config, backend);
 
     InSequence s;
