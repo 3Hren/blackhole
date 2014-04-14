@@ -305,3 +305,45 @@ TEST(Macro, InitializerListAttributes) {
     EXPECT_EQ("message", actual.message);
     EXPECT_EQ("42", actual.value);
 }
+
+namespace RecursiveAttributeFeeders {
+
+struct action_t {
+    struct pack_t {
+        std::string message;
+        std::string value;
+        int nested;
+    };
+
+    pack_t& actual;
+
+    void operator()(const log::record_t& record) const {
+        actual.message = record.extract<std::string>("message");
+        actual.value = record.extract<std::string>("value");
+        actual.nested = record.extract<int>("nested");
+    }
+};
+
+} // namespace RecursiveAttributeFeeders
+
+TEST(Macro, RecursiveAttributeFeeders) {
+    log::record_t record;
+    record.attributes["attr1"] = {"value1"};
+
+    mock::verbose_log_t<level> log;
+    EXPECT_CALL(log, open_record(level::debug))
+            .Times(1)
+            .WillOnce(Return(record));
+
+    RecursiveAttributeFeeders::action_t::pack_t actual;
+    RecursiveAttributeFeeders::action_t action { actual };
+    EXPECT_CALL(log, push(_))
+            .Times(1)
+            .WillOnce(WithArg<0>(Invoke(action)));
+
+    BH_LOG(log, level::debug, "message")("value", "42")("nested", 42);
+
+    EXPECT_EQ("message", actual.message);
+    EXPECT_EQ("42", actual.value);
+    EXPECT_EQ(42, actual.nested);
+}
