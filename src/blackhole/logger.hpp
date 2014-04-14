@@ -14,6 +14,7 @@
 #include "keyword/timestamp.hpp"
 #include "keyword/thread.hpp"
 #include "universe.hpp"
+#include "blackhole/utils/noexcept.hpp"
 #include "utils/unique.hpp"
 
 namespace blackhole {
@@ -37,13 +38,23 @@ public:
     {}
 
     // Blaming GCC 4.4 - it needs explicit move constructor definition,
-    // cause it cannot define default move constructor for derived class.
-    logger_base_t(logger_base_t&& other) {
-        m_enabled = other.m_enabled;
-        m_filter = std::move(other.m_filter);
-        m_exception_handler = std::move(other.m_exception_handler);
-        m_frontends = std::move(other.m_frontends);
-        m_global_attributes = std::move(other.m_global_attributes);
+    // because it cannot define default move constructor for derived class.
+    logger_base_t(logger_base_t&& other) BLACKHOLE_NOEXCEPT {
+        *this = std::move(other);
+    }
+
+    logger_base_t& operator=(logger_base_t&& other) BLACKHOLE_NOEXCEPT {
+        swap(*this, other);
+        return *this;
+    }
+
+    friend void swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT {
+        using std::swap;
+        std::swap(lhs.m_enabled, rhs.m_enabled);
+        std::swap(lhs.m_filter, rhs.m_filter);
+        std::swap(lhs.m_exception_handler, rhs.m_exception_handler);
+        std::swap(lhs.m_frontends, rhs.m_frontends);
+        std::swap(lhs.m_global_attributes, rhs.m_global_attributes);
     }
 
     bool enabled() const {

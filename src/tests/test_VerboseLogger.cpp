@@ -12,6 +12,12 @@ TEST(verbose_logger_t, Class) {
     UNUSED(log);
 }
 
+TEST(verbose_logger_t, MoveConstructor) {
+    verbose_logger_t<testing::level> log;
+    verbose_logger_t<testing::level> other(std::move(log));
+    UNUSED(other);
+}
+
 TEST(verbose_logger_t, OpenRecordByDefault) {
     std::unique_ptr<mock::frontend_t> frontend;
 

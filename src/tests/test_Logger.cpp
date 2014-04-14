@@ -8,6 +8,37 @@ using namespace blackhole;
 
 namespace expr = blackhole::expression;
 
+TEST(logger_base_t, Class) {
+    logger_base_t logger;
+    UNUSED(logger);
+}
+
+TEST(logger_base_t, MoveExplicitConstructor) {
+    logger_base_t logger;
+    logger.disable();
+
+    logger_base_t other(std::move(logger));
+    EXPECT_FALSE(other.enabled());
+}
+
+TEST(logger_base_t, MoveImplicitConstructor) {
+    logger_base_t logger;
+    logger.disable();
+
+    logger_base_t other = std::move(logger);
+    EXPECT_FALSE(other.enabled());
+}
+
+TEST(logger_base_t, MoveExplicitAssignment) {
+    logger_base_t logger;
+    logger.disable();
+
+    logger_base_t other;
+    EXPECT_TRUE(other.enabled());
+    other = std::move(logger);
+    EXPECT_FALSE(other.enabled());
+}
+
 TEST(logger_base_t, CanBeEnabled) {
     logger_base_t log;
     log.enable();
