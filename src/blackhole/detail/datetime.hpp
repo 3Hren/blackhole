@@ -405,6 +405,9 @@ public:
 
     static iterator_type parse(iterator_type it, iterator_type end, generator_handler_t& handler) {
         BOOST_ASSERT(it != end && it + 1 != end);
+#ifdef BOOST_DISABLE_ASSERTS
+        (void)end;
+#endif
         handler.placeholder(boost::make_iterator_range(it, it + 2));
         return it + 2;
     }
