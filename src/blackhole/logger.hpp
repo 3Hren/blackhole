@@ -151,10 +151,15 @@ public:
         logger_base_t()
     {}
 
-    // GCC4.4 doesn't create default copy/move constructor for derived classes. It's a bug.
-    verbose_logger_t(verbose_logger_t&& other) :
+    // GCC 4.4 doesn't create default copy/move constructor for derived classes. It's a bug.
+    verbose_logger_t(verbose_logger_t&& other) BLACKHOLE_NOEXCEPT :
         logger_base_t(std::move(other))
     {}
+
+    verbose_logger_t& operator=(verbose_logger_t&& other) BLACKHOLE_NOEXCEPT {
+        logger_base_t::operator=(std::move(other));
+        return *this;
+    }
 
     log::record_t open_record(Level level) const {
         log::attributes_t attributes = { keyword::severity<Level>() = level };

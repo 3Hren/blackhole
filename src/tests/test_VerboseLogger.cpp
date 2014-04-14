@@ -12,10 +12,22 @@ TEST(verbose_logger_t, Class) {
     UNUSED(log);
 }
 
-TEST(verbose_logger_t, MoveConstructor) {
+TEST(verbose_logger_t, MoveExplicitConstructor) {
     verbose_logger_t<testing::level> log;
     verbose_logger_t<testing::level> other(std::move(log));
     UNUSED(other);
+}
+
+TEST(verbose_logger_t, MoveImplicitConstructor) {
+    verbose_logger_t<testing::level> log;
+    verbose_logger_t<testing::level> other = std::move(log);
+    UNUSED(other);
+}
+
+TEST(verbose_logger_t, MoveAssignment) {
+    verbose_logger_t<testing::level> log;
+    verbose_logger_t<testing::level> other;
+    other = std::move(log);
 }
 
 TEST(verbose_logger_t, OpenRecordByDefault) {
