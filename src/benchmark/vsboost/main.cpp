@@ -3,10 +3,8 @@
 
 #include "celero/Celero.h"
 
-#include <blackhole/logger.hpp>
-#include <blackhole/log.hpp>
-#include <blackhole/sink/files.hpp>
-#include <blackhole/repository.hpp>
+#include <blackhole/blackhole.hpp>
+#include <blackhole/frontend/files.hpp>
 
 #include <boost/log/core.hpp>
 #include <boost/log/expressions.hpp>
@@ -81,7 +79,7 @@ void init_boost_log() {
 
 //! Initialialize blackhole logger.
 void init_blackhole_log() {
-    repository_t<level>::instance().configure<sink::files_t<>, formatter::string_t>();
+    repository_t::instance().configure<sink::files_t<>, formatter::string_t>();
 
     mapping::value_t mapper;
     mapper.add<level>("severity", &map_severity);
@@ -96,7 +94,7 @@ void init_blackhole_log() {
     frontend_config_t frontend = { formatter, sink };
     log_config_t config{ "root", { frontend } };
 
-    repository_t<level>::instance().add_config(config);
+    repository_t::instance().add_config(config);
 }
 
 //! Create logger objects.
@@ -106,7 +104,7 @@ verbose_logger_t<level> *blackhole_log; // Cannot create logger object if it isn
 int main(int argc, char** argv) {
     init_boost_log();
     init_blackhole_log();
-    auto log = repository_t<level>::instance().root();
+    auto log = repository_t::instance().root<level>();
     blackhole_log = &log;
 
     celero::Run(argc, argv);

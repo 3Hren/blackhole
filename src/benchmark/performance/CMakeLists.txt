@@ -39,7 +39,6 @@ TARGET_LINK_LIBRARIES(${PROJECT}
     ${CMAKE_THREAD_LIBS_INIT}
     ${Boost_LIBRARIES}
     ${GOOGLE_LIBRARIES}
-    blackhole
     /Users/esafronov/sandbox/Celero/build/libcelero.dylib
 )
 
