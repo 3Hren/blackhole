@@ -51,6 +51,13 @@ TEST(verbose_logger_t, OpenRecordForValidVerbosityLevel) {
     EXPECT_TRUE(log.open_record(testing::level::error).valid());
 }
 
+TEST(verbose_logger_t, ImportsOpenRecordFromAncestor) {
+    verbose_logger_t<testing::level> log;
+    log.open_record(blackhole::log::attributes_t({
+        blackhole::attribute::make("key", 42)
+    }));
+}
+
 TEST(verbose_logger_t, Manual) {
     verbose_logger_t<testing::level> log;
 

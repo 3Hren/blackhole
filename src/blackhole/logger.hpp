@@ -161,6 +161,8 @@ public:
         return *this;
     }
 
+    using logger_base_t::open_record;
+
     log::record_t open_record(Level level) const {
         log::attributes_t attributes = { keyword::severity<Level>() = level };
         return logger_base_t::open_record(std::move(attributes));
