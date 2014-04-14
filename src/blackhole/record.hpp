@@ -10,6 +10,10 @@ namespace log {
 struct record_t {
     attributes_t attributes;
 
+    operator bool() const {
+        return !attributes.empty();
+    }
+
     bool valid() const {
         return !attributes.empty();
     }
