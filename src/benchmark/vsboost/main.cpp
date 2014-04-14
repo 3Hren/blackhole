@@ -5,6 +5,7 @@
 
 #include <blackhole/blackhole.hpp>
 #include <blackhole/frontend/files.hpp>
+#include <blackhole/synchronized.hpp>
 
 #include <boost/log/core.hpp>
 #include <boost/log/expressions.hpp>
@@ -99,13 +100,13 @@ void init_blackhole_log() {
 
 //! Create logger objects.
 boost::log::sources::severity_logger<level> boost_log;
-verbose_logger_t<level> *blackhole_log; // Cannot create logger object if it isn't initialized.
+verbose_logger_t<level> blackhole_log;
 
 int main(int argc, char** argv) {
     init_boost_log();
     init_blackhole_log();
     auto log = repository_t::instance().root<level>();
-    blackhole_log = &log;
+    blackhole_log = std::move(log);
 
     celero::Run(argc, argv);
     return 0;
@@ -119,5 +120,5 @@ BASELINE(Benchmark, BoostLog, SAMPLES, CALLS) {
 }
 
 BENCHMARK(Benchmark, BlackholeLog, SAMPLES, CALLS) {
-    BH_LOG((*blackhole_log), warning, "Something bad is going on but I can handle it");
+    BH_LOG(blackhole_log, warning, "Something bad is going on but I can handle it");
 }
