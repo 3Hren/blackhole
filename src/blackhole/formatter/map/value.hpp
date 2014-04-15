@@ -7,6 +7,8 @@
 
 #include "blackhole/attribute.hpp"
 #include "blackhole/detail/stream/stream.hpp"
+#include "blackhole/formatter/map/datetime.hpp"
+#include "blackhole/keyword/timestamp.hpp"
 #include "blackhole/utils/unique.hpp"
 #include "blackhole/utils/underlying.hpp"
 
@@ -42,6 +44,11 @@ public:
     template<typename Keyword>
     void add(typename extracter<typename Keyword::type>::function_type handler) {
         add<typename Keyword::type>(Keyword::name(), handler);
+    }
+
+    template<typename Keyword, class = typename std::enable_if<std::is_same<Keyword, keyword::tag::timestamp_t>::value>::type>
+    void add(const std::string& format) {
+        add<Keyword>(datetime_formatter_action_t(format));
     }
 
     template<typename T>

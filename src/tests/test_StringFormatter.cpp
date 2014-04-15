@@ -138,3 +138,15 @@ TEST(string_t, CustomMappingWithKeyword) {
     std::string actual = formatter.format(record);
     EXPECT_EQ(actual, "[1970-01-02 03:55:00.000000]: le message");
 }
+
+TEST(mapping, DatetimeMapping) {
+    mapping::value_t mapper;
+    mapper.add<keyword::tag::timestamp_t>("%Y-%m-%d %H:%M:%S");
+
+    std::string result;
+    aux::attachable_ostringstream stream;
+    stream.attach(result);
+    timeval tv{ 100500, 0 };
+    mapper(stream, "timestamp", tv);
+    EXPECT_EQ("1970-01-02 03:55:00", result);
+}
