@@ -16,9 +16,14 @@ private:
 
 public:
     synchronized() {}
+
     explicit synchronized(logger_type&& logger) :
         logger(std::move(logger))
     {}
+
+    synchronized(synchronized&& other) {
+        *this = std::move(other);
+    }
 
     synchronized& operator=(synchronized&& other) {
         std::lock_guard<mutex_type>(other.mutex);

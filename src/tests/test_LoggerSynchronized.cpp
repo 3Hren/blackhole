@@ -10,6 +10,18 @@ TEST(SynchronizedLogger, Class) {
     UNUSED(logger);
 }
 
+TEST(SynchronizedLogger, ExplicitMoveConstructor) {
+    synchronized<verbose_logger_t<level>> logger;
+    synchronized<verbose_logger_t<level>> other(std::move(logger));
+    UNUSED(other);
+}
+
+TEST(SynchronizedLogger, ImplicitMoveConstructor) {
+    synchronized<verbose_logger_t<level>> logger;
+    synchronized<verbose_logger_t<level>> other = std::move(logger);
+    UNUSED(other);
+}
+
 TEST(SynchronizedLogger, ExplicitMoveConstructorForLogger) {
     verbose_logger_t<level> log;
     synchronized<verbose_logger_t<level>> logger(std::move(log));
