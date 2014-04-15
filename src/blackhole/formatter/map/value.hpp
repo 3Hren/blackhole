@@ -55,6 +55,11 @@ public:
         add<Keyword>(datetime_formatter_action_t(format));
     }
 
+    template<typename Keyword, class = typename std::enable_if<std::is_same<Keyword, keyword::tag::timestamp_t>::value>::type>
+    void add(const char* format) {
+        add<Keyword>(datetime_formatter_action_t(format));
+    }
+
     template<typename T>
     void operator()(aux::attachable_ostringstream& stream, const std::string& key, T&& value) const {
         auto it = m_mappings.find(key);
