@@ -23,8 +23,8 @@ namespace aux {
 struct context_t {
     attachable_ostringstream& stream;
     std::string& str;
-    std::tm tm;
-    suseconds_t usec;
+    const std::tm tm;
+    const suseconds_t usec;
 };
 
 inline void fill(std::string& str, int value, uint length, char filler = '0') {
