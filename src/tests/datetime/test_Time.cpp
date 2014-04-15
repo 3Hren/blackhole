@@ -90,3 +90,24 @@ TEST_F(time_generator_test_case_t, Pm) {
     tm.tm_hour = 13;
     EXPECT_EQ(common::using_strftime("%p", tm), generate("%p"));
 }
+
+TEST_F(time_generator_test_case_t, Microsecond) {
+    usec = 100500;
+    EXPECT_EQ("100500", generate("%f"));
+}
+
+TEST_F(time_generator_test_case_t, MicrosecondLowerBould) {
+    usec = 0;
+    EXPECT_EQ("000000", generate("%f"));
+}
+
+TEST_F(time_generator_test_case_t, MicrosecondUpperBould) {
+    usec = 999999;
+    EXPECT_EQ("999999", generate("%f"));
+}
+
+TEST_F(time_generator_test_case_t, MicrosecondIncomplete) {
+    usec = 42;
+    EXPECT_EQ("000042", generate("%f"));
+}
+

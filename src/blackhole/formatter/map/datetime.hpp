@@ -16,7 +16,7 @@ struct datetime_formatter_action_t {
     void operator()(aux::attachable_ostringstream& stream, const timeval& value) const {
         std::tm tm;
         gmtime_r(&value.tv_sec, &tm);
-        generator(stream, tm);
+        generator(stream, tm, value.tv_usec);
     }
 };
 

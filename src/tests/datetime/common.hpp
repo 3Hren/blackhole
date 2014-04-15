@@ -9,9 +9,11 @@
 class generator_test_case_t : public Test {
 protected:
     std::tm tm;
+    suseconds_t usec;
 
     void SetUp() {
         tm = std::tm();
+        usec = 0;
     }
 
     std::string generate(const std::string& pattern) const {
@@ -19,7 +21,7 @@ protected:
         blackhole::aux::attachable_basic_ostringstream<char> stream(str);
         blackhole::aux::datetime::generator_t generator =
                 blackhole::aux::datetime::generator_factory_t::make(pattern);
-        generator(stream, tm);
+        generator(stream, tm, usec);
         return stream.str();
     }
 };

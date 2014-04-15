@@ -24,6 +24,7 @@ struct context_t {
     attachable_ostringstream& stream;
     std::string& str;
     std::tm tm;
+    suseconds_t usec;
 };
 
 inline void fill(std::string& str, int value, uint length, char filler = '0') {
@@ -155,6 +156,14 @@ inline void normal(context_t& context) {
 
 } // namespace second
 
+namespace usecond {
+
+inline void normal(context_t& context) {
+    fill(context.str, context.usec, 6);
+}
+
+} // namespace usecond
+
 } // namespace time
 
 inline void utc_offset(context_t& context) {
@@ -233,8 +242,8 @@ public:
     {}
 
     template<class Stream>
-    void operator()(Stream& stream, const std::tm& tm) const {
-        context_t context { stream, *stream.rdbuf()->storage(), tm };
+    void operator()(Stream& stream, const std::tm& tm, suseconds_t usec = 0) const {
+        context_t context { stream, *stream.rdbuf()->storage(), tm, usec };
 
         for (auto it = actions.begin(); it != actions.end(); ++it) {
             const generator_action_t& action = *it;
@@ -361,6 +370,11 @@ public:
         actions.push_back(&visit::time::second::normal);
     }
 
+    virtual void usecond() {
+        end_partial_literal();
+        actions.push_back(&visit::time::usecond::normal);
+    }
+
     virtual void ampm() {
         end_partial_literal();
         actions.push_back(&visit::localized<'p'>);
@@ -449,6 +463,9 @@ public:
             break;
         case 'S':
             handler.second();
+            break;
+        case 'f':
+            handler.usecond();
             break;
         case 'p':
             handler.ampm();
