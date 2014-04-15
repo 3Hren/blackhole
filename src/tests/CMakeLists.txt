@@ -46,6 +46,7 @@ SET(SOURCES
     test_Filter
     test_Functional
     test_JsonFormatter
+    test_Keyword
     test_Logger
     test_LoggerSynchronized
     test_Macro
