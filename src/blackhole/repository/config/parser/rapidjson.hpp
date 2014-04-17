@@ -2,8 +2,6 @@
 
 #include <rapidjson/document.h>
 
-#include "blackhole/repository/config/base.hpp"
-#include "blackhole/repository/config/log.hpp"
 #include "blackhole/repository/config/parser.hpp"
 
 namespace blackhole {
@@ -12,14 +10,12 @@ namespace repository {
 
 namespace config {
 
-template<typename T>
-struct convert_adapter;
-
+// Converter adapter specialization for rapidjson value.
 template<>
 struct convert_adapter<rapidjson::Value> {
     typedef rapidjson::Value value_type;
-    typedef rapidjson::Value::ConstValueIterator const_iterator;
-    typedef rapidjson::Value::ConstMemberIterator const_object_iterator;
+    typedef value_type::ConstValueIterator const_iterator;
+    typedef value_type::ConstMemberIterator const_object_iterator;
 
     static const_iterator begin(const value_type& value) {
         return value.Begin();
@@ -48,135 +44,61 @@ struct convert_adapter<rapidjson::Value> {
     static bool has(const std::string& name, const value_type& value) {
         return value.HasMember(name.c_str());
     }
+
+    static std::string as_string(const value_type& value) {
+        return std::string(value.GetString());
+    }
 };
 
-namespace aux {
-
-struct filler {
-    typedef rapidjson::Value value_type;
-    typedef convert_adapter<value_type> conv;
+template<>
+struct filler<rapidjson::Value> {
+    typedef convert_adapter<rapidjson::Value> conv;
 
     template<typename T>
-    static void fill(T& builder, const value_type& node, const std::string& path) {
+    static void fill(T& builder, const rapidjson::Value& node, const std::string& path) {
         for (auto it = conv::object_begin(node); it != conv::object_end(node); ++it) {
             const auto& name = conv::name(it);
             const auto& value = conv::value(it);
 
-            if (value.IsObject()) {
-                auto recursive = builder[name];
-                filler::fill(recursive, value, path + "/" + name);
-            } else if (value.IsNull() || value.IsArray()) {
-                throw blackhole::error_t("array and null parsing is not implemented yet");
-            } else {
-                if (name == "type") {
-                    continue;
-                }
+            if (name == "type") {
+                continue;
+            }
 
-                if (value.IsBool()) {
-                    builder[name] = value.GetBool();
-                } else if (value.IsInt()) {
+            switch (value.GetType()) {
+            case rapidjson::kNullType:
+            case rapidjson::kArrayType:
+                throw blackhole::error_t("both null and array parsing is not supported");
+                break;
+            case rapidjson::kFalseType:
+            case rapidjson::kTrueType:
+                builder[name] = value.GetBool();
+                break;
+            case rapidjson::kNumberType: {
+                if (value.IsInt()) {
                     builder[name] = value.GetInt();
-                } else if (value.IsUint()) {
-                    builder[name] = value.GetUint();
                 } else if (value.IsInt64()) {
                     builder[name] = value.GetInt64();
+                } else if (value.IsUint()) {
+                    builder[name] = value.GetUint();
                 } else if (value.IsUint64()) {
                     builder[name] = value.GetUint64();
-                } else if (value.IsDouble()) {
+                } else {
                     builder[name] = value.GetDouble();
-                } else if (value.IsString()) {
-                    builder[name] = std::string(value.GetString());
                 }
+                break;
+            }
+            case rapidjson::kStringType:
+                builder[name] = value.GetString();
+                break;
+            case rapidjson::kObjectType: {
+                auto recursive = builder[name];
+                filler<rapidjson::Value>::fill(recursive, value, path + "/" + name);
+                break;
+            }
+            default:
+                BOOST_ASSERT(false);
             }
         }
-    }
-};
-
-} // namespace aux
-
-template<>
-class parser_t<repository::config::base_t> {
-    typedef rapidjson::Value value_type;
-
-public:
-    template<typename T>
-    static T parse(const std::string& path, const value_type& value) {
-        const std::string& type = value["type"].GetString();
-        T config(type);
-        aux::filler::fill(config, value, path + "/" + type);
-        return config;
-    }
-};
-
-template<>
-class parser_t<formatter_config_t> {
-    typedef rapidjson::Value value_type;
-
-public:
-    static formatter_config_t parse(const value_type& value) {
-        return parser_t<repository::config::base_t>::parse<formatter_config_t>("formatter", value);
-    }
-};
-
-template<>
-class parser_t<sink_config_t> {
-    typedef rapidjson::Value value_type;
-
-public:
-    static sink_config_t parse(const value_type& value) {
-        return parser_t<repository::config::base_t>::parse<sink_config_t>("sink", value);
-    }
-};
-
-template<>
-class parser_t<frontend_config_t> {
-    typedef rapidjson::Value value_type;
-    typedef convert_adapter<value_type> conv;
-
-public:
-    static frontend_config_t parse(const value_type& value) {
-        if (!(conv::has("formatter", value) && conv::has("sink", value))) {
-            throw blackhole::error_t("both 'formatter' and 'sink' section must be specified");
-        }
-
-        const auto& formatter = parser_t<formatter_config_t>::parse(value["formatter"]);
-        const auto& sink = parser_t<sink_config_t>::parse(value["sink"]);
-        return frontend_config_t { formatter, sink };
-    }
-};
-
-template<>
-class parser_t<log_config_t> {
-    typedef rapidjson::Value value_type;
-    typedef convert_adapter<value_type> conv;
-
-public:
-    static log_config_t parse(const std::string& name, const value_type& value) {
-        log_config_t config;
-        config.name = name;
-        for (auto it = conv::begin(value); it != conv::end(value); ++it) {
-            const auto& frontend = parser_t<frontend_config_t>::parse(*it);
-            config.frontends.push_back(frontend);
-        }
-
-        return config;
-    }
-};
-
-template<>
-class parser_t<std::vector<log_config_t>> {
-    typedef rapidjson::Value value_type;
-    typedef convert_adapter<value_type> conv;
-
-public:
-    static std::vector<log_config_t> parse(const value_type& root) {
-        std::vector<log_config_t> configs;
-        for (auto it = conv::object_begin(root); it != conv::object_end(root); ++it) {
-            const auto& config = parser_t<log_config_t>::parse(conv::name(it), conv::value(it));
-            configs.push_back(config);
-        }
-
-        return configs;
     }
 };
 

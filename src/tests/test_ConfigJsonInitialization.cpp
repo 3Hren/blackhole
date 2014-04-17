@@ -103,7 +103,7 @@ protected:
         rapidjson::Document doc;
         doc.Parse<0>(valid.c_str());
         ASSERT_FALSE(doc.HasParseError());
-        configs = repository::config::parser_t<std::vector<log_config_t>>::parse(doc);
+        configs = repository::config::parser_t<rapidjson::Value, std::vector<log_config_t>>::parse(doc);
     }
 };
 
@@ -138,7 +138,8 @@ TEST(parser_t, ThrowsExceptionIfFormatterSectionIsAbsent) {
     rapidjson::Document doc;
     doc.Parse<0>(invalid.c_str());
     ASSERT_FALSE(doc.HasParseError());
-    EXPECT_THROW(repository::config::parser_t<std::vector<log_config_t>>::parse(doc), blackhole::error_t);
+    typedef repository::config::parser_t<rapidjson::Value, std::vector<log_config_t>> parser_t;
+    EXPECT_THROW(parser_t::parse(doc), blackhole::error_t);
 }
 
 TEST(parser_t, ThrowsExceptionIfSinkSectionIsAbsent) {
@@ -146,7 +147,8 @@ TEST(parser_t, ThrowsExceptionIfSinkSectionIsAbsent) {
     rapidjson::Document doc;
     doc.Parse<0>(invalid.c_str());
     ASSERT_FALSE(doc.HasParseError());
-    EXPECT_THROW(repository::config::parser_t<std::vector<log_config_t>>::parse(doc), blackhole::error_t);
+    typedef repository::config::parser_t<rapidjson::Value, std::vector<log_config_t>> parser_t;
+    EXPECT_THROW(parser_t::parse(doc), blackhole::error_t);
 }
 
 TEST(parser_t, MultipleFrontends) {
@@ -155,7 +157,7 @@ TEST(parser_t, MultipleFrontends) {
     doc.Parse<0>(valid.c_str());
     ASSERT_FALSE(doc.HasParseError());
 
-    const std::vector<log_config_t>& configs = repository::config::parser_t<std::vector<log_config_t>>::parse(doc);
+    const std::vector<log_config_t>& configs = repository::config::parser_t<rapidjson::Value, std::vector<log_config_t>>::parse(doc);
     ASSERT_EQ(1, configs.size());
     EXPECT_EQ("root", configs.at(0).name);
     ASSERT_EQ(2, configs.at(0).frontends.size());
