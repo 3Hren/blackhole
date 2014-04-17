@@ -18,8 +18,8 @@ struct convert_adapter;
 template<>
 struct convert_adapter<rapidjson::Value> {
     typedef rapidjson::Value value_type;
-    typedef typename rapidjson::Value::ConstValueIterator const_iterator;
-    typedef typename rapidjson::Value::ConstMemberIterator const_object_iterator;
+    typedef rapidjson::Value::ConstValueIterator const_iterator;
+    typedef rapidjson::Value::ConstMemberIterator const_object_iterator;
 
     static const_iterator begin(const value_type& value) {
         return value.Begin();
