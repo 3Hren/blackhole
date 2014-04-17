@@ -50,6 +50,13 @@ public:
         configs[config.name] = config;
     }
 
+    void add_configs(const std::vector<log_config_t>& configs) {
+        std::lock_guard<std::mutex> lock(mutex);
+        for (auto it = configs.begin(); it != configs.end(); ++it) {
+            this->configs[it->name] = *it;
+        }
+    }
+
     template<typename Level>
     verbose_logger_t<Level> create(const std::string& name) const {
         std::lock_guard<std::mutex> lock(mutex);

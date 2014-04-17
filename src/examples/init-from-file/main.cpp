@@ -16,11 +16,8 @@ enum class level {
 
 void init(const rapidjson::Document& root) {
     const auto& configs = repository::config::parser_t<rapidjson::Value, std::vector<log_config_t>>::parse(root);
-
-    repository_t& repository = repository_t::instance();
-    for (auto it = configs.begin(); it != configs.end(); ++it) {
-        repository.add_config(*it);
-    }
+    auto& repository = repository_t::instance();
+    repository.add_configs(configs);
 }
 
 int main(int argc, char** argv) {
