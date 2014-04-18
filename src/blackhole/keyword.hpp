@@ -70,6 +70,10 @@ struct keyword_t {
         return operation<expression::aux::Less>(other);
     }
 
+    typename expression::aux::LessEq<extracter_t> operator<=(const T& other) const {
+        return operation<expression::aux::LessEq>(other);
+    }
+
     typename expression::aux::GtEq<extracter_t> operator>=(const T& other) const {
         return operation<expression::aux::GtEq>(other);
     }
