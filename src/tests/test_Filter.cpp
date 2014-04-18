@@ -744,3 +744,27 @@ TEST(FilterKeyword, GreaterEqThan) {
     };
     EXPECT_TRUE(filter(attributes));
 }
+
+TEST(FilterKeyword, Eq) {
+    auto filter = keyword::severity<level>() == level::info;
+
+    log::attributes_t attributes = {
+        {keyword::severity<level>() = level::debug}
+    };
+    EXPECT_FALSE(filter(attributes));
+
+    attributes = {
+        {keyword::severity<level>() = level::info}
+    };
+    EXPECT_TRUE(filter(attributes));
+
+    attributes = {
+        {keyword::severity<level>() = level::warn}
+    };
+    EXPECT_FALSE(filter(attributes));
+
+    attributes = {
+        {keyword::severity<level>() = level::error}
+    };
+    EXPECT_FALSE(filter(attributes));
+}
