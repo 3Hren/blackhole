@@ -768,3 +768,55 @@ TEST(FilterKeyword, Eq) {
     };
     EXPECT_FALSE(filter(attributes));
 }
+
+TEST(FilterKeyword, AndComplex) {
+    auto filter =
+            keyword::severity<level>() >= level::info &&
+            keyword::severity<level>() < level::error;
+
+    log::attributes_t attributes = {
+        {keyword::severity<level>() = level::debug}
+    };
+    EXPECT_FALSE(filter(attributes));
+
+    attributes = {
+        {keyword::severity<level>() = level::info}
+    };
+    EXPECT_TRUE(filter(attributes));
+
+    attributes = {
+        {keyword::severity<level>() = level::warn}
+    };
+    EXPECT_TRUE(filter(attributes));
+
+    attributes = {
+        {keyword::severity<level>() = level::error}
+    };
+    EXPECT_FALSE(filter(attributes));
+}
+
+TEST(FilterKeyword, OrComplex) {
+    auto filter =
+            keyword::severity<level>() < level::info ||
+            keyword::severity<level>() == level::error;
+
+    log::attributes_t attributes = {
+        {keyword::severity<level>() = level::debug}
+    };
+    EXPECT_TRUE(filter(attributes));
+
+    attributes = {
+        {keyword::severity<level>() = level::info}
+    };
+    EXPECT_FALSE(filter(attributes));
+
+    attributes = {
+        {keyword::severity<level>() = level::warn}
+    };
+    EXPECT_FALSE(filter(attributes));
+
+    attributes = {
+        {keyword::severity<level>() = level::error}
+    };
+    EXPECT_TRUE(filter(attributes));
+}
