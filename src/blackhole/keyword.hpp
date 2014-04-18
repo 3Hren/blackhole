@@ -29,6 +29,8 @@
 #define DECLARE_UNIVERSE_KEYWORD(Name, T) \
     DECLARE_KEYWORD_IMPL(Name, universe, T)
 
+#include "blackhole/expression/helper.hpp"
+
 namespace blackhole {
 
 namespace keyword {
@@ -41,30 +43,40 @@ struct keyword_t {
         return NameProvider::name();
     }
 
-    log::attribute_pair_t operator =(const T& value) const {
+    struct extracter_t {
+        typedef typename blackhole::aux::underlying_type<T>::type result_type;
+
+        result_type operator()(const log::attributes_t& attributes) const {
+            return static_cast<result_type>(attribute::traits<T>::extract(attributes, name()));
+        }
+    };
+
+    log::attribute_pair_t operator=(const T& value) const {
         return attribute::make(name(), attribute::traits<T>::pack(value), Scope);
     }
 
-    log::attribute_pair_t operator =(T&& value) const {
+    log::attribute_pair_t operator=(T&& value) const {
         return attribute::make(name(), attribute::traits<T>::pack(std::forward<T>(value)), Scope);
     }
 
-    filter_t operator >=(T value) const {
-        return action_t<action::LessEq>({ value });
+    template<template<typename> class Operator>
+    inline
+    Operator<extracter_t> operation(const T& other) const {
+        typedef typename blackhole::aux::underlying_type<T>::type result_type;
+        return Operator<extracter_t>({ extracter_t(), static_cast<result_type>(other) });
     }
 
-    filter_t operator ==(T value) const {
-        return action_t<action::Eq>({ value });
+    typename expression::aux::Less<extracter_t> operator<(const T& other) const {
+        return operation<expression::aux::Less>(other);
     }
 
-    template<typename Action>
-    struct action_t {
-        T value;
+    typename expression::aux::GtEq<extracter_t> operator>=(const T& other) const {
+        return operation<expression::aux::GtEq>(other);
+    }
 
-        bool operator()(const log::attributes_t& attributes) const {
-            return Action::execute(value, attribute::traits<T>::extract(attributes, name()));
-        }
-    };
+    typename expression::aux::Eq<extracter_t> operator==(const T& other) const {
+        return operation<expression::aux::Eq>(other);
+    }
 };
 
 } // namespace keyword

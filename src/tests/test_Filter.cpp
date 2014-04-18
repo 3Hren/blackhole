@@ -648,3 +648,27 @@ TEST(FilterCustomAttribute, ReversedCombinationOfLogicOperatorsWithEqFilter) {
     };
     EXPECT_FALSE(filter(attributes));
 }
+
+TEST(FilterKeyword, LessEqThan) {
+    auto filter = keyword::severity<level>() < level::info;
+
+    log::attributes_t attributes = {
+        {keyword::severity<level>() = level::debug}
+    };
+    EXPECT_TRUE(filter(attributes));
+
+    attributes = {
+        {keyword::severity<level>() = level::info}
+    };
+    EXPECT_FALSE(filter(attributes));
+
+    attributes = {
+        {keyword::severity<level>() = level::warn}
+    };
+    EXPECT_FALSE(filter(attributes));
+
+    attributes = {
+        {keyword::severity<level>() = level::error}
+    };
+    EXPECT_FALSE(filter(attributes));
+}
