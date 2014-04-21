@@ -16,6 +16,8 @@
 
 namespace blackhole {
 
+//!@todo: Maybe create synchronized wrapper?
+
 class repository_t {
     mutable std::mutex mutex;
     external_factory_t factory;
