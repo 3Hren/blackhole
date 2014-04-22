@@ -5,6 +5,8 @@
 #include "utils/actions/keyword.hpp"
 
 #define DECLARE_KEYWORD_IMPL(Name, Scope, T) \
+    namespace blackhole { \
+    namespace keyword { \
     namespace tag { \
         static_assert(blackhole::log::attribute::is_supported<T>::value, "invalid attribute type"); \
         struct Name##_t { \
@@ -15,6 +17,8 @@
     static inline blackhole::keyword::keyword_t<T, tag::Name##_t, log::attribute::scope::Scope>& Name() { \
         static blackhole::keyword::keyword_t<T, tag::Name##_t, log::attribute::scope::Scope> self; \
         return self; \
+    } \
+    } \
     }
 
 #define DECLARE_EVENT_KEYWORD(Name, T) \
