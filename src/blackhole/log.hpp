@@ -34,7 +34,7 @@ public:
     }
 
     // Using initializer lists is problematic, since GCC 4.6 has an extension which can
-    // decude { { "value", "42" } } expressions in function call to the initializer list
+    // deduce { { "value", "42" } } expressions in function call to the initializer list
     // without looking at the overload resolution. This violates C++11 standard, which
     // allows such deducing only for `auto` keyword (including range-based `for` loop).
     // Please, specify `attribute::list` type explicitly when using initializer lists to
