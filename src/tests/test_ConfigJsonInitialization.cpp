@@ -57,7 +57,7 @@ static const std::string MULTIPLE_FRONTENDS = "{\
     ]\
 }";
 
-} // namespace vaid
+} // namespace valid
 
 namespace invalid {
 
