@@ -30,18 +30,18 @@ class parser_t;
 
 template<class From>
 class parser_t<From, repository::config::base_t> {
-    typedef adapter::array_traits<From> at;
-    typedef adapter::object_traits<From> ot;
+    typedef adapter::array_traits<From> array;
+    typedef adapter::object_traits<From> object;
 
 public:
     template<typename T>
     static T parse(const std::string& path, const From& value) {
-        const auto* type_member = ot::at(value, "type");
+        const auto* type_member = object::at(value, "type");
         if (!type_member) {
             throw blackhole::error_t("'type' field if missing for %s", path);
         }
 
-        std::string type = ot::as_string(*type_member);
+        std::string type = object::as_string(*type_member);
         T config(type);
         filler<From>::fill(config, value, path + "/" + type);
         return config;
@@ -66,12 +66,12 @@ public:
 
 template<class From>
 class parser_t<From, frontend_config_t> {
-    typedef adapter::object_traits<From> ot;
+    typedef adapter::object_traits<From> object;
 
 public:
     static frontend_config_t parse(const From& value) {
-        const auto* form_member = ot::at(value, "formatter");
-        const auto* sink_member = ot::at(value, "sink");
+        const auto* form_member = object::at(value, "formatter");
+        const auto* sink_member = object::at(value, "sink");
         if (!(form_member && sink_member)) {
             throw blackhole::error_t("both 'formatter' and 'sink' sections must be specified");
         }
@@ -84,13 +84,13 @@ public:
 
 template<class From>
 class parser_t<From, log_config_t> {
-    typedef adapter::array_traits<From> at;
+    typedef adapter::array_traits<From> array;
 
 public:
     static log_config_t parse(const std::string& name, const From& value) {
         log_config_t config;
         config.name = name;
-        for (auto it = at::begin(value); it != at::end(value); ++it) {
+        for (auto it = array::begin(value); it != array::end(value); ++it) {
             const auto& frontend = parser_t<From, frontend_config_t>::parse(*it);
             config.frontends.push_back(frontend);
         }
@@ -101,13 +101,13 @@ public:
 
 template<class From>
 class parser_t<From, std::vector<log_config_t>> {
-    typedef adapter::object_traits<From> ot;
+    typedef adapter::object_traits<From> object;
 
 public:
     static std::vector<log_config_t> parse(const From& root) {
         std::vector<log_config_t> configs;
-        for (auto it = ot::begin(root); it != ot::end(root); ++it) {
-            const auto& config = parser_t<From, log_config_t>::parse(ot::name(it), ot::value(it)); //!@todo: own iterator
+        for (auto it = object::begin(root); it != object::end(root); ++it) {
+            const auto& config = parser_t<From, log_config_t>::parse(object::name(it), object::value(it));
             configs.push_back(config);
         }
 
