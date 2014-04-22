@@ -10,55 +10,84 @@ namespace repository {
 
 namespace config {
 
-// Converter adapter specialization for rapidjson value.
+// Converter adapter specializations for rapidjson value.
+namespace adapter {
+
 template<>
-struct convert_adapter<rapidjson::Value> {
+struct array_traits<rapidjson::Value> {
     typedef rapidjson::Value value_type;
     typedef value_type::ConstValueIterator const_iterator;
-    typedef value_type::ConstMemberIterator const_object_iterator;
 
-    static const_iterator begin(const value_type& value) {
+    static
+    const_iterator
+    begin(const value_type& value) {
         return value.Begin();
     }
 
-    static const_iterator end(const value_type& value) {
+    static
+    const_iterator
+    end(const value_type& value) {
         return value.End();
-    }
-
-    static const_object_iterator object_begin(const value_type& value) {
-        return value.MemberBegin();
-    }
-
-    static const_object_iterator object_end(const value_type& value) {
-        return value.MemberEnd();
-    }
-
-    static std::string name(const const_object_iterator& it) {
-        return std::string(it->name.GetString());
-    }
-
-    static const value_type& value(const const_object_iterator& it) {
-        return it->value;
-    }
-
-    static bool has(const std::string& name, const value_type& value) {
-        return value.HasMember(name.c_str());
-    }
-
-    static std::string as_string(const value_type& value) {
-        return std::string(value.GetString());
     }
 };
 
 template<>
+struct object_traits<rapidjson::Value> {
+    typedef rapidjson::Value value_type;
+    typedef value_type::ConstMemberIterator const_iterator;
+
+    static
+    const_iterator
+    begin(const value_type& value) {
+        return value.MemberBegin();
+    }
+
+    static
+    const_iterator
+    end(const value_type& value) {
+        return value.MemberEnd();
+    }
+
+    static
+    std::string
+    name(const const_iterator& it) {
+        return std::string(it->name.GetString());
+    }
+
+    static
+    const value_type&
+    value(const const_iterator& it) {
+        return it->value;
+    }
+
+    static
+    const value_type*
+    at(const value_type& value, const std::string& name) {
+        if (value.HasMember(name.c_str())) {
+            return &value[name.c_str()];
+        }
+
+        return nullptr;
+    }
+
+    static
+    std::string
+    as_string(const value_type& value) {
+        return std::string(value.GetString());
+    }
+};
+
+} // namespace adapter
+
+template<>
 struct filler<rapidjson::Value> {
-    typedef convert_adapter<rapidjson::Value> conv;
+    typedef adapter::object_traits<rapidjson::Value> ot;
 
     template<typename T>
     static void fill(T& builder, const rapidjson::Value& node, const std::string& path) {
-        for (auto it = conv::object_begin(node); it != conv::object_end(node); ++it) {
-            const auto& name = conv::name(it);
-            const auto& value = conv::value(it);
+        for (auto it = ot::begin(node); it != ot::end(node); ++it) {
+            const auto& name = ot::name(it);
+            const auto& value = ot::value(it);
 
             if (name == "type") {
                 continue;

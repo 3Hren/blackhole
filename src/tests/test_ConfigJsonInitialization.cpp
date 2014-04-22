@@ -171,3 +171,43 @@ TEST(parser_t, MultipleFrontends) {
     ASSERT_EQ("tcp", front2.sink.type);
 
 }
+
+namespace testing {
+
+namespace config {
+
+namespace invalid {
+
+static const std::string ABSENT_FORMATTER_TYPE = "{\
+    'root': [\
+        {\
+            'formatter': {\
+                'pattern': '[%(level)s]: %(message)s'\
+            },\
+            'sink': {\
+                'type': 'files',\
+                'path': 'test.log',\
+                'rotation': {\
+                    'pattern': 'test.log.%N',\
+                    'backups': 5,\
+                    'size': 1000000\
+                }\
+            }\
+        }\
+    ]\
+}";
+
+} // namespace invalid
+
+} // namespace config
+
+} // namespace testing
+
+TEST(parser_t, ThrowsExceptionIfFormatterTypeIsAbsent) {
+    std::string invalid(boost::algorithm::replace_all_copy(config::invalid::ABSENT_FORMATTER_TYPE, "'", "\""));
+    rapidjson::Document doc;
+    doc.Parse<0>(invalid.c_str());
+    ASSERT_FALSE(doc.HasParseError());
+    typedef repository::config::parser_t<rapidjson::Value, std::vector<log_config_t>> parser_t;
+    EXPECT_THROW(parser_t::parse(doc), blackhole::error_t);
+}
