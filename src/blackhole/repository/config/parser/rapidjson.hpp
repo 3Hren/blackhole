@@ -89,13 +89,13 @@ struct object_traits<rapidjson::Value> {
 
 template<>
 struct filler<rapidjson::Value> {
-    typedef adapter::object_traits<rapidjson::Value> ot;
+    typedef adapter::object_traits<rapidjson::Value> object;
 
     template<typename T>
     static void fill(T& builder, const rapidjson::Value& node, const std::string& path) {
-        for (auto it = ot::begin(node); it != ot::end(node); ++it) {
-            const auto& name = ot::name(it);
-            const auto& value = ot::value(it);
+        for (auto it = object::begin(node); it != object::end(node); ++it) {
+            const auto& name = object::name(it);
+            const auto& value = object::value(it);
 
             if (name == "type") {
                 continue;
@@ -104,7 +104,7 @@ struct filler<rapidjson::Value> {
             switch (value.GetType()) {
             case rapidjson::kNullType:
             case rapidjson::kArrayType:
-                throw blackhole::error_t("both null and array parsing is not supported");
+                throw blackhole::error_t("both null and array parsing are not supported");
                 break;
             case rapidjson::kFalseType:
             case rapidjson::kTrueType:
