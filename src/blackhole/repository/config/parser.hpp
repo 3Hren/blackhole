@@ -36,12 +36,11 @@ class parser_t<From, repository::config::base_t> {
 public:
     template<typename T>
     static T parse(const std::string& path, const From& value) {
-        const auto* type_member = object::at(value, "type");
-        if (!type_member) {
+        if (!object::has(value, "type")) {
             throw blackhole::error_t("'type' field if missing for %s", path);
         }
 
-        std::string type = object::as_string(*type_member);
+        std::string type = object::as_string(object::at(value, "type"));
         T config(type);
         filler<From>::fill(config, value, path + "/" + type);
         return config;
@@ -70,14 +69,12 @@ class parser_t<From, frontend_config_t> {
 
 public:
     static frontend_config_t parse(const From& value) {
-        const auto* form_member = object::at(value, "formatter");
-        const auto* sink_member = object::at(value, "sink");
-        if (!(form_member && sink_member)) {
+        if (!(object::has(value, "formatter") && object::has(value, "sink"))) {
             throw blackhole::error_t("both 'formatter' and 'sink' sections must be specified");
         }
 
-        const auto& form = parser_t<From, formatter_config_t>::parse(*form_member);
-        const auto& sink = parser_t<From, sink_config_t>::parse(*sink_member);
+        const auto& form = parser_t<From, formatter_config_t>::parse(object::at(value, "formatter"));
+        const auto& sink = parser_t<From, sink_config_t>::parse(object::at(value, "sink"));
         return frontend_config_t { form, sink };
     }
 };

@@ -61,13 +61,17 @@ struct object_traits<rapidjson::Value> {
     }
 
     static
-    const value_type*
-    at(const value_type& value, const std::string& name) {
-        if (value.HasMember(name.c_str())) {
-            return &value[name.c_str()];
-        }
+    bool
+    has(const value_type& value, const std::string& name) {
+        BOOST_ASSERT(value.IsObject());
+        return value.HasMember(name.c_str());
+    }
 
-        return nullptr;
+    static
+    const value_type&
+    at(const value_type& value, const std::string& name) {
+        BOOST_ASSERT(has(value, name.c_str()));
+        return value[name.c_str()];
     }
 
     static
