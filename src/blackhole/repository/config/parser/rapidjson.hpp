@@ -39,18 +39,21 @@ struct object_traits<rapidjson::Value> {
     static
     const_iterator
     begin(const value_type& value) {
+        BOOST_ASSERT(value.IsObject());
         return value.MemberBegin();
     }
 
     static
     const_iterator
     end(const value_type& value) {
+        BOOST_ASSERT(value.IsObject());
         return value.MemberEnd();
     }
 
     static
     std::string
     name(const const_iterator& it) {
+        BOOST_ASSERT(it->name.IsString());
         return std::string(it->name.GetString());
     }
 
@@ -77,6 +80,7 @@ struct object_traits<rapidjson::Value> {
     static
     std::string
     as_string(const value_type& value) {
+        BOOST_ASSERT(value.IsString());
         return std::string(value.GetString());
     }
 };
