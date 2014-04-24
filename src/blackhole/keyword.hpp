@@ -8,7 +8,6 @@
     namespace blackhole { \
     namespace keyword { \
     namespace tag { \
-        static_assert(blackhole::log::attribute::is_supported<T>::value, "invalid attribute type"); \
         struct Name##_t { \
             typedef T type; \
             static const char* name() { return #Name; } \
@@ -42,6 +41,9 @@ namespace keyword {
 template<typename T, typename NameProvider, log::attribute::scope Scope = log::attribute::DEFAULT_SCOPE>
 struct keyword_t {
     typedef T type;
+    static_assert(log::attribute::is_supported<
+        typename blackhole::aux::underlying_type<T>::type
+    >::value, "invalid attribute type");
 
     static const char* name() {
         return NameProvider::name();
