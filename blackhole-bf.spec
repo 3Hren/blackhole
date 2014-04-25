@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
 Version:	0.1.0
-Release:	1%{?dist}
+Release:	3%{?dist}
 
 License:	GPLv2+
 Group:		System Environment/Libraries
