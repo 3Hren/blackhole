@@ -1,3 +1,9 @@
+blackhole (0.1.0-3) unstable; urgency=low
+
+  * Bug Fix: added forgotten include.
+
+   -- Evgenyi Safronov <division494@gmail.com>  Fri, 25 Apr 2014 14:14:00 +0400
+
 blackhole (0.1.0-2) unstable; urgency=low
 
   * Debianization has been reviewed.
