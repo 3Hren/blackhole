@@ -6,6 +6,7 @@
 
 namespace blackhole {
 
+//!@todo: Consider setting mapper for entire frontend or maybe logger.
 class base_frontend_t {
 public:
     virtual ~base_frontend_t() {}
