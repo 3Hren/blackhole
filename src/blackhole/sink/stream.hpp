@@ -61,6 +61,8 @@ private:
             default:
                 BOOST_ASSERT(false);
             }
+
+            return std::cout;
         }
 
         static std::ostream& get(const std::string& output) {
