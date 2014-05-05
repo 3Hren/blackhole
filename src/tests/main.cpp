@@ -9,7 +9,7 @@
  *      keyword::address = "127.0.0.1"
  *  );
  *
- *  === TYPYCAL USAGE VIA LOGGER OBJECT ===
+ *  === TYPICAL USAGE VIA LOGGER OBJECT ===
  *
  *  log.debug("some information: %s at [%d]", "nothing", 100500)(
  *      keyword::id = 42,
@@ -49,7 +49,7 @@
  * sink: tcp/udp
  *   address: 0.0.0.0
  *   port: 5000
- *   format: msgpack/json
+ *   format:
  *
  * sink: syslog
  *   identity: blah
