@@ -32,6 +32,7 @@ SET(SOURCES
     datetime/test_Time
     datetime/test_Year
     datetime/test_Week
+    extra/ElasticsearchSink
     test_AttachableStream
     test_Attribute
     test_Config
@@ -63,7 +64,6 @@ SET(SOURCES
     test_Utils
     test_VerboseLogger
     utils/test_GenericStringFormatter
-    extra/ElasticsearchSink
 )
 
 SET(Boost_USE_MULTITHREADED ON)

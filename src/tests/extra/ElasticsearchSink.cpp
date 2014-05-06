@@ -6,6 +6,7 @@
 #include <blackhole/logger.hpp>
 #include <blackhole/sink/stream.hpp>
 #include <blackhole/synchronized.hpp>
+#include <blackhole/utils/atomic.hpp>
 #include <blackhole/utils/format.hpp>
 
 #include "../global.hpp"
@@ -122,6 +123,7 @@ class elasticsearch_t {
     std::thread thread;
     bulk::queue_t<std::string> queue;
 
+    std::atomic<bool> stopped;
     boost::asio::io_service loop;
     boost::asio::deadline_timer timer;
 
@@ -129,8 +131,9 @@ class elasticsearch_t {
 public:
     elasticsearch_t(std::uint16_t bulk = 100, std::uint32_t interval = 1000) :
         interval(interval),
-        client({ { "localhost", 9200 } }),
+        client(std::vector<elasticsearch::endpoint_t>({{ "localhost", 9200}})),
         queue(bulk, std::bind(&elasticsearch_t::on_bulk, this, std::placeholders::_1)),
+        stopped(true),
         timer(loop),
         logger(logger_factory_t::create())
     {
@@ -148,7 +151,7 @@ public:
     }
 
     void consume(std::string&& message) {
-        if (loop.stopped()) {
+        if (stopped) {
             log("dropping '%s', because worker thread is stopped", message);
             return;
         }
@@ -159,13 +162,12 @@ public:
 
 private:
     void run(std::condition_variable& started) {
-        BOOST_ASSERT(!loop.stopped());
+        BOOST_ASSERT(stopped);
 
         log("starting elasticsearch sink ...");
-        loop.post([this, &started]{
-            log("elasticsearch sink has been started");
-            started.notify_all();
-        });
+        loop.post(
+            std::bind(&elasticsearch_t::on_started, this, std::ref(started))
+        );
         timer.expires_from_now(interval);
         timer.async_wait(
             std::bind(&elasticsearch_t::on_timer, this, std::placeholders::_1)
@@ -176,11 +178,17 @@ private:
 
     void stop() {
         loop.stop();
+        stopped = true;
 
         if (thread.joinable()) {
             log("stopping worker thread ...");
             thread.join();
         }
+    }
+
+    void on_started(std::condition_variable& started) {
+        log("elasticsearch sink has been started");
+        started.notify_all();
     }
 
     void on_bulk(std::vector<std::string>&& result) {
