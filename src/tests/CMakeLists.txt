@@ -63,6 +63,7 @@ SET(SOURCES
     test_Utils
     test_VerboseLogger
     utils/test_GenericStringFormatter
+    extra/ElasticsearchSink
 )
 
 SET(Boost_USE_MULTITHREADED ON)
