@@ -172,8 +172,9 @@ private:
         timer.async_wait(
             std::bind(&elasticsearch_t::on_timer, this, std::placeholders::_1)
         );
-        loop.run();
-        log("elasticsearch sink has been stopped");
+        boost::system::error_code ec;
+        loop.run(ec);
+        log("elasticsearch sink has been stopped: %s", ec ? ec.message() : "ok");
     }
 
     void stop() {
@@ -188,6 +189,7 @@ private:
 
     void on_started(std::condition_variable& started) {
         log("elasticsearch sink has been started");
+        stopped = false;
         started.notify_all();
     }
 
