@@ -1,3 +1,9 @@
 [submodule "foreign/rapidjson"]
 	path = foreign/rapidjson
 	url = git://github.com/andrusha97/rapidjson.git
+[submodule "foreign/gmock"]
+	path = foreign/gmock
+	url = https://chromium.googlesource.com/external/googlemock
+[submodule "foreign/gtest"]
+	path = foreign/gtest
+	url = https://chromium.googlesource.com/external/googletest
