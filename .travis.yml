@@ -9,18 +9,8 @@ notifications:
   template:
    - "it's %{author}'s turn to pay the next round of drinks for the massacre he caused in %{repository}: %{build_url}"
 
-env:
- - CMAKE_OPTIONS="-DGOOGLE_MOCK_SOURCE_DIR=`pwd`/3Hren/blackhole/gmock-1.6.0"
-
 before_install:
  - sudo apt-get update -qq
- - wget http://googlemock.googlecode.com/files/gmock-1.6.0.zip && unzip gmock-1.6.0.zip
- - cd gmock-1.6.0 && mkdir build && cd build && cmake .. && make
- - sudo cp -r ../include/gmock/ /usr/include/
- - sudo cp -r ../gtest/include/gtest/ /usr/include/
- - sudo cp libgmock.a /usr/lib/
- - sudo cp gtest/libgtest.a /usr/lib/
- - cd ../..
 
 install:
  - sudo apt-get install -qq cdbs cmake libboost-dev libboost-thread-dev libboost-filesystem-dev libmsgpack-dev
@@ -29,5 +19,5 @@ before_script:
  - mkdir build && cd build
 
 script:
- - cmake -DENABLE_TESTING=ON $CMAKE_OPTIONS .. && make 
+ - cmake -DENABLE_TESTING=ON .. && make 
  - src/tests/blackhole-tests

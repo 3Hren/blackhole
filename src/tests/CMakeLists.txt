@@ -2,12 +2,14 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 PROJECT(tests)
 
 SET(CMAKE_BUILD_TYPE "Debug")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
 
 SET(PROJECT blackhole-tests)
 
 ENABLE_TESTING()
 
+ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/foreign/gmock ${CMAKE_BINARY_DIR}/gmock)
+
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
 
 file(GLOB_RECURSE BLACKHOLE_HEADERS . ../blackhole/*.hpp)
 
@@ -74,16 +76,18 @@ SET(BOOST_COMPONENTS
     thread
 )
 
-SET(GOOGLE_LIBRARIES
-    gtest
-    gmock
-)
-
 PROJECT(${PROJECT})
 
 INCLUDE_DIRECTORIES(
     ../
-    ../../foreign/rapidjson/include
+    ${CMAKE_SOURCE_DIR}/foreign/rapidjson/include
+    SYSTEM ${CMAKE_SOURCE_DIR}/foreign/gmock/include
+    SYSTEM ${CMAKE_SOURCE_DIR}/foreign/gtest/include
+)
+
+LINK_DIRECTORIES(
+    ${CMAKE_BINARY_DIR}/gmock/gtest
+    ${CMAKE_BINARY_DIR}/gmock
 )
 
 FIND_PACKAGE(Boost COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
@@ -93,10 +97,12 @@ ADD_EXECUTABLE(${PROJECT} ${HEADERS} ${SOURCES})
 TARGET_LINK_LIBRARIES(${PROJECT}
     ${CMAKE_THREAD_LIBS_INIT}
     ${Boost_LIBRARIES}
-    ${GOOGLE_LIBRARIES}
+    gmock
+    gtest
     msgpack
 )
 
 ADD_TEST(NAME blackhole-tests COMMAND blackhole-tests)
 
 ADD_DEFINITIONS(-std=c++0x)
+
