@@ -1,5 +1,6 @@
 #pragma once
 
+//!@todo: Seems like it's the dead code.
 namespace blackhole {
 
 namespace action {
