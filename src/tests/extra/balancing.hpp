@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <boost/assert.hpp>
+
 namespace elasticsearch {
 
 namespace balancing {
@@ -39,7 +41,7 @@ public:
 
         auto it = std::next(pool.begin(), current++);
         std::shared_ptr<connection_type>& connection = it->second;
-//        BH_LOG(log(), level::debug, "balancing at %s", connection->endpoint());
+//        LOG(log(), level::debug, "balancing at %s", connection->endpoint());
         return connection;
     }
 };

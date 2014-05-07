@@ -23,6 +23,8 @@ SET(HEADERS
     datetime/common.hpp
     # Temporary
     extra/balancing.hpp
+    extra/client.hpp
+    extra/log.hpp
     extra/pool.hpp
     extra/settings.hpp
     extra/transport.hpp
