@@ -20,8 +20,6 @@ CONFIGURE_FILE(
 
 IF(ENABLE_TESTING)
     ENABLE_TESTING()
-    # Find GTEST and GMOCK frameworks
-    SET(GOOGLE_MOCK_SOURCE_DIR "" CACHE PATH "Path to the GMock source")
 ENDIF()
 
 ADD_SUBDIRECTORY(src)
