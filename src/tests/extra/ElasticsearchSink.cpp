@@ -10,98 +10,28 @@
 #include <blackhole/utils/atomic.hpp>
 #include <blackhole/utils/format.hpp>
 
+#include "balancing.hpp"
+#include "pool.hpp"
+#include "settings.hpp"
+#include "transport.hpp"
+#include "queue.hpp"
+
 #include "../global.hpp"
 
 #define LOG(__log__, ...) \
     if (blackhole::log::record_t record = __log__.open_record()) \
         blackhole::aux::make_scoped_pump(__log__, record, __VA_ARGS__)
 
-namespace blackhole {
-
-namespace sink {
-
-namespace bulk {
-
-template<typename T>
-class queue_t {
-public:
-    typedef T value_type;
-    typedef std::vector<value_type> bulk_type;
-    typedef std::function<void(bulk_type&&)> callback_type;
-
-private:
-    const std::uint16_t bulk;
-    callback_type callback;
-
-    std::queue<T> queue;
-    mutable std::mutex mutex;
-public:
-    queue_t(std::uint16_t bulk, callback_type callback) :
-        bulk(bulk),
-        callback(callback)
-    {}
-
-    void push(T&& value) {
-        std::unique_lock<std::mutex> lock(mutex);
-
-        queue.push(std::move(value));
-        if (queue.size() >= bulk) {
-            auto result = dump(lock);
-            lock.unlock();
-            callback(std::move(result));
-        }
-    }
-
-    std::vector<std::string> dump() {
-        std::lock_guard<std::mutex> lock(mutex);
-        return dump(lock);
-    }
-
-private:
-    template<class Lock>
-    std::vector<std::string> dump(Lock&) {
-        std::vector<std::string> result;
-        result.reserve(bulk);
-        for (uint i = 0; i < bulk && !queue.empty(); ++i) {
-            result.push_back(std::move(queue.front()));
-            queue.pop();
-        }
-        return result;
-    }
-};
-
-} // namespace bulk
-
 namespace elasticsearch {
 
-//!@todo: Dummy yet.
-struct config_t {
-};
-
-struct settings_t {
-    typedef boost::asio::ip::tcp::endpoint endpoint_type;
-
-    std::string index;
-    std::vector<endpoint_type> endpoints;
-    struct {
-        struct {
-            bool start;
-        } when;
-    } sniffer;
-
-    settings_t() :
-        index("log"),
-        endpoints(std::vector<endpoint_type>({
-            { endpoint_type(boost::asio::ip::address_v4(), 9200) }
-        })),
-        sniffer({ { true } })
-    {}
-};
+using blackhole::logger_base_t;
+using blackhole::synchronized;
 
 class client_t {
 public:
     typedef boost::asio::io_service loop_type;
     typedef synchronized<logger_base_t> logger_type;
+
     typedef std::function<void()> callback_type;
     typedef std::function<
         void(const boost::system::error_code&)
@@ -111,6 +41,8 @@ private:
     settings_t settings;
     loop_type& loop;
     logger_type& log;
+
+    http_transport_t transport;
 
 public:
     client_t(const settings_t& settings, loop_type& loop, logger_type& log) :
@@ -132,6 +64,17 @@ public:
 };
 
 } // namespace elasticsearch
+
+namespace blackhole {
+
+namespace es {
+
+//!@todo: Dummy yet.
+struct config_t {};
+
+} // namespace es
+
+namespace sink {
 
 class logger_factory_t {
 public:

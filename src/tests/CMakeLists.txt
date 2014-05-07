@@ -21,6 +21,12 @@ SET(HEADERS
     mocks/socket.hpp
     mocks/syslog.hpp
     datetime/common.hpp
+    # Temporary
+    extra/balancing.hpp
+    extra/pool.hpp
+    extra/settings.hpp
+    extra/transport.hpp
+    extra/queue.hpp
 )
 
 SET(SOURCES
