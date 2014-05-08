@@ -4,6 +4,8 @@
 
 #include <boost/assert.hpp>
 
+#include "pool.hpp"
+
 namespace elasticsearch {
 
 namespace balancing {
@@ -14,7 +16,7 @@ public:
     typedef Pool pool_type;
     typedef typename Pool::connection_type connection_type;
 
-    virtual std::shared_ptr<connection_type>& next(pool_type& pool) = 0;
+    virtual std::shared_ptr<connection_type> next(pool_type& pool) = 0;
 };
 
 template<class Pool>
@@ -32,16 +34,18 @@ public:
         current(0)
     {}
 
-    std::shared_ptr<connection_type>& next(pool_type& pool) {
-        BOOST_ASSERT(!pool.empty());
+    std::shared_ptr<connection_type> next(pool_type& pool) {
+        pool_lock_t<pool_type> lock(pool);
+        BOOST_ASSERT(!pool.empty(lock));
 
-        if (current >= pool.size() - 1) {
+        if (current >= pool.size(lock) - 1) {
             current = 0;
         }
 
-        auto it = std::next(pool.begin(), current++);
-        std::shared_ptr<connection_type>& connection = it->second;
-//        LOG(log(), level::debug, "balancing at %s", connection->endpoint());
+        auto it = std::next(pool.begin(lock), current++);
+        std::shared_ptr<connection_type> connection = it->second;
+//!@todo: Move this line into transport just after balancing:
+//!       LOG(log(), level::debug, "balancing at %s", connection->endpoint());
         return connection;
     }
 };

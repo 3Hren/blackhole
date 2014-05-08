@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <mutex>
+#include <tuple>
 
 #include "balancing.hpp"
 #include "log.hpp"
@@ -35,9 +36,6 @@ private:
 
     pool_type pool;
     std::unique_ptr<balancing::strategy<pool_type>> balancer;
-
-    mutable std::mutex mutex;
-
 public:
     http_transport_t(loop_type& loop, logger_type& log) :
         loop(loop),
@@ -57,17 +55,21 @@ public:
             //!@todo: Do something useful.
         }
 
-        LOG(log, "adding '%s:%d' to the pool", address, endpoint.port());
+        LOG(log, "adding '%s:%d' to the pool ...", address, endpoint.port());
+        bool inserted;
+        std::tie(std::ignore, inserted) = pool.insert(
+            endpoint, std::make_shared<connection_type>(endpoint, loop)
+        );
 
-        std::lock_guard<std::mutex> lock(mutex);
-        if (pool.contains(endpoint)) {
+        if (!inserted) {
             LOG(log, "adding endpoint to the pool is rejected - already exists");
             return;
         }
-        pool.insert(endpoint, std::make_shared<connection_type>(endpoint, loop));
     }
 
-    void sniff() {}
+    void sniff() {
+        LOG(log, "sniffing nodes info ...");
+    }
 };
 
 } // namespace elasticsearch

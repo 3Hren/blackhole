@@ -24,6 +24,20 @@ struct hash<boost::asio::ip::tcp::endpoint> {
 
 namespace elasticsearch {
 
+template<class Pool>
+class pool_lock_t {
+public:
+    typedef typename Pool::mutex_type mutex_type;
+
+private:
+    std::lock_guard<mutex_type> lock;
+
+public:
+    pool_lock_t(Pool& pool) :
+        lock(pool.mutex)
+    {}
+};
+
 template<typename Connection>
 class pool_t {
 public:
@@ -40,8 +54,12 @@ public:
     typedef typename pool_type::iterator iterator;
     typedef typename pool_type::const_iterator const_iterator;
 
+    typedef std::mutex mutex_type;
+    friend class pool_lock_t<pool_t<Connection>>;
+
 private:
     pool_type pool;
+    mutable mutex_type mutex;
 
 public:
     bool empty() const {
@@ -52,13 +70,11 @@ public:
         return pool.size();
     }
 
-    bool contains(const endpoint_type& endpoint) const {
-        return pool.find(endpoint) != pool.end();
-    }
-
-    void insert(const endpoint_type& endpoint,
-                const std::shared_ptr<connection_type>& connection) {
-        pool[endpoint] = connection;
+    std::pair<iterator, bool>
+    insert(const endpoint_type& endpoint,
+           const std::shared_ptr<connection_type>& connection) {
+        std::lock_guard<mutex_type> lock(mutex);
+        return pool.insert(std::make_pair(endpoint, connection));
     }
 
     void remove(const endpoint_type& endpoint) {
