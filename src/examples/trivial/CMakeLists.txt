@@ -4,8 +4,6 @@ SET(CMAKE_BUILD_TYPE "Debug")
 
 SET(PROJECT blackhole-example-trivial)
 
-ENABLE_TESTING()
-
 SET(HEADERS
 )
 
