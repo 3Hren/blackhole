@@ -53,6 +53,7 @@ public:
         auto address = endpoint.address().to_string(ec);
         if (ec) {
             //!@todo: Do something useful.
+            return;
         }
 
         LOG(log, "adding '%s:%d' to the pool ...", address, endpoint.port());
