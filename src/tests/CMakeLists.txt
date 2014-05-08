@@ -1,14 +1,13 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT(tests)
-
-SET(CMAKE_BUILD_TYPE "Debug")
-
 SET(PROJECT blackhole-tests)
+
+# The next line enforces google testing framework to use own tuple implementation.
+ADD_DEFINITIONS(-DGTEST_USE_OWN_TR1_TUPLE=1)
+ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/foreign/gmock ${CMAKE_BINARY_DIR}/gmock)
 
 ENABLE_TESTING()
 
-ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/foreign/gmock ${CMAKE_BINARY_DIR}/gmock)
-
+SET(CMAKE_BUILD_TYPE "Debug")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
 
 file(GLOB_RECURSE BLACKHOLE_HEADERS . ../blackhole/*.hpp)
