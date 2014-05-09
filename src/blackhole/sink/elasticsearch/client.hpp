@@ -5,16 +5,11 @@
 
 #include <boost/asio.hpp>
 
-#include "actions/bulk_write.hpp"
+#include "request/bulk_write.hpp"
 #include "log.hpp"
 #include "result.hpp"
 #include "settings.hpp"
 #include "transport.hpp"
-
-//!@todo: Tmp.
-#include "../global.hpp"
-
-//!@todo: Temporary.
 
 namespace elasticsearch {
 

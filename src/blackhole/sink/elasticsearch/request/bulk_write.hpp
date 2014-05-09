@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "../result.hpp"
+#include "blackhole/sink/elasticsearch/result.hpp"
 
 namespace elasticsearch {
 

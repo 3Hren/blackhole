@@ -2,8 +2,6 @@
 
 #include <memory>
 
-#include <boost/assert.hpp>
-
 #include "pool.hpp"
 
 namespace elasticsearch {

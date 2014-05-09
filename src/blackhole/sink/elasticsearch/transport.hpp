@@ -4,11 +4,11 @@
 #include <mutex>
 #include <tuple>
 
-#include "actions/info.hpp"
-#include "balancing.hpp"
+#include "balancer.hpp"
 #include "log.hpp"
 #include "pool.hpp"
 #include "result.hpp"
+#include "request/info.hpp"
 
 namespace elasticsearch {
 

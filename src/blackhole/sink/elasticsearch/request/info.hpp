@@ -1,13 +1,14 @@
 #pragma once
 
 #include <sstream>
+#include <string>
 
 #include <boost/algorithm/string.hpp>
 
 #include <boost/assert.hpp>
 
-#include "../result.hpp"
-#include "../response/cluster/nodes/info.hpp"
+#include "blackhole/sink/elasticsearch/response/info.hpp"
+#include "blackhole/sink/elasticsearch/result.hpp"
 
 namespace elasticsearch {
 
