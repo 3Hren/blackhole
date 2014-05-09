@@ -3,7 +3,7 @@ Name:		libblackhole
 Version:	0.1.0
 Release:	3%{?dist}
 
-License:	GPLv2+
+License:	BSD
 Group:		System Environment/Libraries
 URL:		http://www.ioremap.net/projects/elliptics
 Source0:	%{name}-%{version}.tar.bz2
