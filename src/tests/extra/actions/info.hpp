@@ -7,6 +7,7 @@
 #include <boost/assert.hpp>
 
 #include "../result.hpp"
+#include "../response/cluster/nodes/info.hpp"
 
 namespace elasticsearch {
 
@@ -42,7 +43,7 @@ namespace actions {
 
 class nodes_info_t {
 public:
-    typedef result_t<int> result_type;
+    typedef result_t<response::nodes_info_t> result_type;
 
     enum class type_t {
         none        = 0,

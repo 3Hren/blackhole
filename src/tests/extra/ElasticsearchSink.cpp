@@ -159,7 +159,7 @@ private:
         LOG(log, "processing bulk containing %d messages ...", result.size());
         std::string message = boost::algorithm::join(result, "");
         client.bulk_write(
-            message,
+            std::move(message),
             std::bind(&elasticsearch_t::on_response, this, std::placeholders::_1)
         );
 

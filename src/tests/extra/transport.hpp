@@ -109,7 +109,7 @@ public:
     }
 
 private:
-    void on_sniff(result_t<int>&&) {}
+    void on_sniff(result_t<response::nodes_info_t>&&) {}
 };
 
 } // namespace elasticsearch

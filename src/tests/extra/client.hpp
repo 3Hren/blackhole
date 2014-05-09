@@ -5,6 +5,7 @@
 
 #include <boost/asio.hpp>
 
+#include "actions/bulk_write.hpp"
 #include "log.hpp"
 #include "result.hpp"
 #include "settings.hpp"
@@ -43,11 +44,9 @@ public:
         }
     }
 
-    void bulk_write(std::string message, callback_type callback) {
+    void bulk_write(std::string&& message, callback_type callback) {
         LOG(log, "requesting 'bulk_write' ...");
-        UNUSED(message);
-        UNUSED(callback);
-//        transport.perform(actions::bulk_write_t(std::move(message)), callback);
+        transport.perform(actions::bulk_write_t(std::move(message)), callback);
     }
 };
 
