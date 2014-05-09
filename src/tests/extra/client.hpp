@@ -6,6 +6,7 @@
 #include <boost/asio.hpp>
 
 #include "log.hpp"
+#include "result.hpp"
 #include "settings.hpp"
 #include "transport.hpp"
 
@@ -21,10 +22,7 @@ public:
     typedef boost::asio::io_service loop_type;
     typedef blackhole::synchronized<blackhole::logger_base_t> logger_type;
 
-    typedef std::function<void()> callback_type;
-    typedef std::function<
-        void(const boost::system::error_code&)
-    > errback_type;
+    typedef std::function<void(result_t<void>&&)> callback_type;
 
 private:
     settings_t settings;
@@ -45,13 +43,11 @@ public:
         }
     }
 
-    void bulk_write(std::string message,
-                    callback_type callback,
-                    errback_type errback) {
+    void bulk_write(std::string message, callback_type callback) {
         LOG(log, "requesting 'bulk_write' ...");
         UNUSED(message);
         UNUSED(callback);
-        UNUSED(errback);
+//        transport.perform(actions::bulk_write_t(std::move(message)), callback);
     }
 };
 

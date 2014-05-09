@@ -36,7 +36,9 @@ public:
 
     std::shared_ptr<connection_type> next(pool_type& pool) {
         pool_lock_t<pool_type> lock(pool);
-        BOOST_ASSERT(!pool.empty(lock));
+        if (pool.empty(lock)) {
+            return std::shared_ptr<connection_type>();
+        }
 
         if (current >= pool.size(lock) - 1) {
             current = 0;
@@ -44,8 +46,6 @@ public:
 
         auto it = std::next(pool.begin(lock), current++);
         std::shared_ptr<connection_type> connection = it->second;
-//!@todo: Move this line into transport just after balancing:
-//!       LOG(log(), level::debug, "balancing at %s", connection->endpoint());
         return connection;
     }
 };

@@ -22,10 +22,12 @@ SET(HEADERS
     mocks/syslog.hpp
     datetime/common.hpp
     # Temporary
+    extra/actions/info.hpp
     extra/balancing.hpp
     extra/client.hpp
     extra/log.hpp
     extra/pool.hpp
+    extra/result.hpp
     extra/settings.hpp
     extra/transport.hpp
     extra/queue.hpp

@@ -13,6 +13,7 @@
 #include "balancing.hpp"
 #include "client.hpp"
 #include "pool.hpp"
+#include "result.hpp"
 #include "settings.hpp"
 #include "transport.hpp"
 #include "queue.hpp"
@@ -159,8 +160,7 @@ private:
         std::string message = boost::algorithm::join(result, "");
         client.bulk_write(
             message,
-            std::bind(&elasticsearch_t::on_success, this),
-            std::bind(&elasticsearch_t::on_error, this, std::placeholders::_1)
+            std::bind(&elasticsearch_t::on_response, this, std::placeholders::_1)
         );
 
         timer.expires_from_now(interval);
@@ -169,12 +169,13 @@ private:
         );
     }
 
-    void on_success() {
-        LOG(log, "success!");
-    }
+    void on_response(elasticsearch::result_t<void>&& result) {
+        if (auto* ec = boost::get<boost::system::error_code*>(result)) {
+            LOG(log, "ec: %s", ec->message());
+            return;
+        }
 
-    void on_error(const boost::system::error_code& ec) {
-        LOG(log, "ec: %s", ec.message());
+        LOG(log, "success!");
     }
 };
 

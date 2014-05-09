@@ -55,18 +55,19 @@ public:
     typedef typename pool_type::const_iterator const_iterator;
 
     typedef std::mutex mutex_type;
-    friend class pool_lock_t<pool_t<Connection>>;
+    typedef pool_lock_t<pool_t<connection_type>> pool_lock_type;
+    friend class pool_lock_t<pool_t<connection_type>>;
 
 private:
     pool_type pool;
     mutable mutex_type mutex;
 
 public:
-    bool empty() const {
+    bool empty(pool_lock_type&) const {
         return pool.empty();
     }
 
-    size_type size() const {
+    size_type size(pool_lock_type&) const {
         return pool.size();
     }
 
@@ -78,22 +79,23 @@ public:
     }
 
     void remove(const endpoint_type& endpoint) {
+        std::lock_guard<mutex_type> lock(mutex);
         pool.erase(endpoint);
     }
 
-    iterator begin() BLACKHOLE_NOEXCEPT {
+    iterator begin(pool_lock_type&) BLACKHOLE_NOEXCEPT {
         return pool.begin();
     }
 
-    iterator end() BLACKHOLE_NOEXCEPT {
+    iterator end(pool_lock_type&) BLACKHOLE_NOEXCEPT {
         return pool.end();
     }
 
-    const_iterator begin() const BLACKHOLE_NOEXCEPT {
+    const_iterator begin(pool_lock_type&) const BLACKHOLE_NOEXCEPT {
         return pool.begin();
     }
 
-    const_iterator end() const BLACKHOLE_NOEXCEPT {
+    const_iterator end(pool_lock_type&) const BLACKHOLE_NOEXCEPT {
         return pool.end();
     }
 };

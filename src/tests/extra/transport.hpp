@@ -4,11 +4,18 @@
 #include <mutex>
 #include <tuple>
 
+#include "actions/info.hpp"
 #include "balancing.hpp"
 #include "log.hpp"
 #include "pool.hpp"
+#include "result.hpp"
 
 namespace elasticsearch {
+
+template<class Action>
+struct callback {
+    typedef std::function<void(typename Action::result_type)> type;
+};
 
 class http_connection_t {
 public:
@@ -16,9 +23,20 @@ public:
     typedef boost::asio::ip::tcp protocol_type;
     typedef protocol_type::endpoint endpoint_type;
 
+private:
+    endpoint_type endpoint_;
+
 public:
-    http_connection_t(endpoint_type, loop_type&)
+    http_connection_t(endpoint_type endpoint, loop_type&) :
+        endpoint_(endpoint)
     {}
+
+    endpoint_type endpoint() const {
+        return endpoint_;
+    }
+
+    template<class Action>
+    void perform(Action&&, typename callback<Action>::type) {}
 };
 
 class http_transport_t {
@@ -39,7 +57,8 @@ private:
 public:
     http_transport_t(loop_type& loop, logger_type& log) :
         loop(loop),
-        log(log)
+        log(log),
+        balancer(new balancing::round_robin<pool_type>())
     {}
 
     void add_nodes(const std::vector<endpoint_type>& endpoints) {
@@ -52,7 +71,7 @@ public:
         boost::system::error_code ec;
         auto address = endpoint.address().to_string(ec);
         if (ec) {
-            //!@todo: Do something useful.
+            LOG(log, "can't add node endpoint '%s': %s", endpoint, ec.message());
             return;
         }
 
@@ -70,7 +89,28 @@ public:
 
     void sniff() {
         LOG(log, "sniffing nodes info ...");
+        perform(actions::nodes_info_t(),
+                std::bind(&http_transport_t::on_sniff, this, std::placeholders::_1));
     }
+
+    template<class Action>
+    void perform(Action&& action, typename callback<Action>::type callback) {
+        BOOST_ASSERT(balancer);
+
+        LOG(log, "performing request ...");
+        auto connection = balancer->next(pool);
+        if (!connection) {
+            //!@todo: Write error to the callback via post.
+            return;
+        }
+
+        LOG(log, "balancing at %s", connection->endpoint());
+        connection->perform(std::move(action), callback);
+    }
+
+private:
+    void on_sniff(result_t<int>&&) {}
 };
 
 } // namespace elasticsearch
+
