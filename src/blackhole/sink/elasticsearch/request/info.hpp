@@ -9,6 +9,7 @@
 
 #include "blackhole/sink/elasticsearch/response/info.hpp"
 #include "blackhole/sink/elasticsearch/result.hpp"
+#include "blackhole/sink/elasticsearch/request/method.hpp"
 
 namespace elasticsearch {
 
@@ -44,6 +45,8 @@ namespace actions {
 
 class nodes_info_t {
 public:
+    static const request::method_t method_value = request::method_t::get;
+
     typedef result_t<response::nodes_info_t> result_type;
 
     enum class type_t {
