@@ -71,7 +71,7 @@ public:
             response.url().to_string(), status, ec.value(), data);
 
         if (ec) {
-            LOG(log, "error occurred: %s", ec.message());
+            LOG(log, "request failed with error: %s", ec.message());
             callback(result_type(ec));
             return;
         }
@@ -79,17 +79,19 @@ public:
         rapidjson::Document doc;
         doc.Parse<0>(data.c_str());
         if (doc.HasParseError()) {
-            LOG(log, "error occurred: %s", doc.GetParseError());
-            //!@todo: (status, doc.GetParseError())
+            LOG(log, "request failed with error: %s", doc.GetParseError());
+            callback(result_type(boost::system::errc::make_error_code(
+                boost::system::errc::bad_message)));
             return;
         }
 
         if (is_client_error(status) || is_server_error(status)) {
-            if (doc.HasMember("error")) {
-                //!@todo: (status, doc["error"].GetString())
-            } else {
-                //!@todo: (status, "unknown error")
-            }
+            const rapidjson::Value& error = doc["error"];
+            LOG(log, "request failed with error: %s",
+                error.IsString() ? error.GetString() : "unknown");
+
+            callback(result_type(boost::system::errc::make_error_code(
+                boost::system::errc::io_error)));
             return;
         }
 
