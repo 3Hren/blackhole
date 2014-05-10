@@ -52,7 +52,7 @@ public:
         LOG(log, "adding '%s:%d' to the pool ...", address, endpoint.port());
         bool inserted;
         std::tie(std::ignore, inserted) = pool.insert(
-            endpoint, std::make_shared<connection_type>(endpoint, loop)
+            endpoint, std::make_shared<connection_type>(endpoint, loop, log)
         );
 
         if (!inserted) {
