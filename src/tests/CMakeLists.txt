@@ -99,6 +99,8 @@ TARGET_LINK_LIBRARIES(${PROJECT}
     gmock
     gtest
     msgpack
+    swarm
+    swarm_urlfetcher
 )
 
 ADD_TEST(NAME blackhole-tests COMMAND blackhole-tests)
