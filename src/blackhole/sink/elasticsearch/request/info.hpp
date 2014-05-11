@@ -47,7 +47,8 @@ class nodes_info_t {
 public:
     static const request::method_t method_value = request::method_t::get;
 
-    typedef result_t<response::nodes_info_t> result_type;
+    typedef response::nodes_info_t response_type;
+    typedef result_t<response_type> result_type;
 
     enum class type_t {
         none        = 0,
