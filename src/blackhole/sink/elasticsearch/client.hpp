@@ -18,7 +18,7 @@ public:
     typedef boost::asio::io_service loop_type;
     typedef blackhole::synchronized<blackhole::logger_base_t> logger_type;
 
-    typedef std::function<void(result_t<void>&&)> callback_type;
+    typedef std::function<void(result_t<response::bulk_write_t>&&)> callback_type;
 
 private:
     settings_t settings;

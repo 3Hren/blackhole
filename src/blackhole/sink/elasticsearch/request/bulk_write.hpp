@@ -3,6 +3,7 @@
 #include <string>
 
 #include "blackhole/sink/elasticsearch/result.hpp"
+#include "blackhole/sink/elasticsearch/response/bulk_write.hpp"
 #include "blackhole/sink/elasticsearch/request/method.hpp"
 
 namespace elasticsearch {
@@ -11,7 +12,7 @@ namespace actions {
 
 class bulk_write_t {
 public:
-    typedef void response_type;
+    typedef response::bulk_write_t response_type;
     typedef result_t<response_type> result_type;
 
     static const request::method_t method_value = request::method_t::post;
