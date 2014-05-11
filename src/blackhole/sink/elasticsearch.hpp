@@ -142,7 +142,9 @@ private:
         );
     }
 
-    void on_response(elasticsearch::result_t<void>&& result) {
+    void on_response(elasticsearch::result_t<
+                        elasticsearch::response::bulk_write_t
+                     >&& result) {
         if (auto* ec = boost::get<boost::system::error_code>(&result)) {
             LOG(log, "bulk write failed: %s", ec->message());
             return;
