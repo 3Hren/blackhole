@@ -10,6 +10,7 @@
 #include "pool.hpp"
 #include "result.hpp"
 #include "request/info.hpp"
+#include "settings.hpp"
 
 namespace elasticsearch {
 
@@ -23,13 +24,16 @@ public:
     typedef pool_type::endpoint_type endpoint_type;
 
 private:
+    settings_t settings;
+
     loop_type& loop;
     logger_type& log;
 
     pool_type pool;
     std::unique_ptr<balancing::strategy<pool_type>> balancer;
 public:
-    http_transport_t(loop_type& loop, logger_type& log) :
+    http_transport_t(settings_t settings, loop_type& loop, logger_type& log) :
+        settings(settings),
         loop(loop),
         log(log),
         balancer(new balancing::round_robin<pool_type>())

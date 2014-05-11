@@ -30,7 +30,7 @@ public:
     client_t(const settings_t& settings, loop_type& loop, logger_type& log) :
         settings(settings),
         log(log),
-        transport(loop, log)
+        transport(settings, loop, log)
     {
         transport.add_nodes(settings.endpoints);
         if (settings.sniffer.when.start) {
