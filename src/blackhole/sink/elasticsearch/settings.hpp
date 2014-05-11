@@ -15,6 +15,7 @@ struct settings_t {
     struct {
         struct {
             bool start;
+            bool error;
         } when;
     } sniffer;
 
@@ -23,7 +24,12 @@ struct settings_t {
         endpoints(std::vector<endpoint_type>({
             { endpoint_type(boost::asio::ip::address_v4(), 9200) }
         })),
-        sniffer({ { true } })
+        sniffer({
+            {
+                true,
+                true
+            }
+        })
     {}
 };
 

@@ -83,11 +83,36 @@ public:
         }
 
         LOG(log, "balancing at %s", connection->endpoint());
-        connection->perform(std::move(action), callback);
+        request_watcher_t<Action> watcher(*this, callback);
+        connection->perform(std::move(action), watcher);
     }
 
 private:
     void on_sniff(result_t<response::nodes_info_t>&&) {}
+
+    template<class Action>
+    struct request_watcher_t {
+        typedef Action action_type;
+        typedef typename Action::result_type result_type;
+        typedef typename callback<action_type>::type callback_type;
+
+        const http_transport_t& transport;
+        callback_type callback;
+
+        request_watcher_t(const http_transport_t& transport,
+                          callback_type callback) :
+            transport(transport),
+            callback(callback)
+        {}
+
+        void operator()(result_type&& result) {
+            if (transport.settings.sniffer.when.error) {
+                //!@todo: Resniff if failed.
+            }
+
+            callback(std::move(result));
+        }
+    };
 };
 
 } // namespace elasticsearch
