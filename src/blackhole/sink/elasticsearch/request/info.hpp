@@ -106,6 +106,8 @@ private:
         default:
             BOOST_ASSERT(false);
         }
+
+        return "_all";
     }
 };
 
