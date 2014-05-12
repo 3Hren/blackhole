@@ -186,7 +186,6 @@ private:
     perform(Action&&,
             urlfetcher_t::request_type&& request,
             std::shared_ptr<urlfetcher_t::stream_type>&& stream) {
-        LOG(log, "method: get");
         urlfetcher.manager.get(stream, std::move(request));
     }
 
@@ -197,7 +196,6 @@ private:
     perform(Action&& action,
             urlfetcher_t::request_type&& request,
             std::shared_ptr<urlfetcher_t::stream_type>&& stream) {
-        LOG(log, "method: post");
         urlfetcher.manager.post(stream, std::move(request), action.body());
     }
 };
