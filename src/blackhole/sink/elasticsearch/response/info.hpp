@@ -3,6 +3,8 @@
 #include <string>
 #include <map>
 
+#include "extract.hpp"
+
 namespace elasticsearch {
 
 namespace response {
@@ -17,5 +19,12 @@ struct nodes_info_t {
 };
 
 } // namespace response
+
+template<>
+struct extractor_t<response::nodes_info_t> {
+    static response::nodes_info_t extract(const rapidjson::Value&) {
+        return response::nodes_info_t();
+    }
+};
 
 } // namespace elasticsearch
