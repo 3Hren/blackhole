@@ -116,7 +116,7 @@ private:
             if (boost::get<boost::system::error_code>(&result)) {
                 if (transport.settings.sniffer.when.error) {
                     //!@todo: Need to transfer sniff try number with error.
-                    //!       If if > max -> stop sniffing.
+                    //!       If it > max -> stop sniffing.
                     LOG(transport.log, "sniff.when.error is true - resniffing ...");
                     transport.sniff();
                 }
