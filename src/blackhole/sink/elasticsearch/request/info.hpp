@@ -71,7 +71,8 @@ private:
 
 public:
     nodes_info_t(type_t type = type_t::none) :
-        type(map_type(type))
+        type(map_type(type)),
+        nodes("_all")
     {}
 
     std::string path() const {
