@@ -12,6 +12,7 @@
 #include <swarm/urlfetcher/url_fetcher.hpp>
 
 #include "log.hpp"
+#include "response/extract.hpp"
 #include "request/method.hpp"
 
 namespace elasticsearch {
@@ -50,6 +51,7 @@ public:
 
     typedef Action action_type;
     typedef typename action_type::result_type result_type;
+    typedef typename action_type::response_type response_type;
     typedef typename callback<action_type>::type callback_type;
 
 private:
@@ -85,7 +87,7 @@ public:
             return;
         }
 
-        if (is_client_error(status) || is_server_error(status)) {
+        if (has_error(status)) {
             const rapidjson::Value& error = doc["error"];
             LOG(log, "request failed with error: %s",
                 error.IsString() ? error.GetString() : "unknown");
@@ -95,16 +97,21 @@ public:
             return;
         }
 
-        //!@todo: callback(result_t)
+        try {
+            callback(result_type(
+                extractor_t<response_type>::extract(doc)
+            ));
+        } catch (const std::exception& err) {
+            LOG(log, "response parsing failed: %s", err.what());
+            callback(result_type(boost::system::errc::make_error_code(
+                    boost::system::errc::io_error)));
+        }
     }
 
 private:
-    static inline bool is_client_error(int status) {
-        return status / 100 == 4;
-    }
-
-    static inline bool is_server_error(int status) {
-        return status / 100 == 5;
+    static inline bool has_error(int status) {
+        const int type = status / 100;
+        return type == 4 || type == 5;
     }
 };
 
