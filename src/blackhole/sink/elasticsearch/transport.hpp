@@ -88,7 +88,15 @@ public:
     }
 
 private:
-    void on_sniff(result_t<response::nodes_info_t>&&) {}
+    void on_sniff(result_t<response::nodes_info_t>&& result) {
+        if (auto* nodes_info = boost::get<response::nodes_info_t>(&result)) {
+            LOG(log, "successfully sniffed %d nodes", nodes_info->nodes.size());
+
+            const auto& nodes = nodes_info->nodes;
+            for (auto it = nodes.begin(); it != nodes.end(); ++it) {
+            }
+        }
+    }
 
     template<class Action>
     struct request_watcher_t {
@@ -96,18 +104,22 @@ private:
         typedef typename Action::result_type result_type;
         typedef typename callback<action_type>::type callback_type;
 
-        const http_transport_t& transport;
+        http_transport_t& transport;
         callback_type callback;
 
-        request_watcher_t(const http_transport_t& transport,
-                          callback_type callback) :
+        request_watcher_t(http_transport_t& transport, callback_type callback) :
             transport(transport),
             callback(callback)
         {}
 
-        void operator()(result_type&& result) {
-            if (transport.settings.sniffer.when.error) {
-                //!@todo: Resniff if failed.
+        void operator()(result_type&& result) const {
+            if (boost::get<boost::system::error_code>(&result)) {
+                if (transport.settings.sniffer.when.error) {
+                    //!@todo: Need to transfer sniff try number with error.
+                    //!       If if > max -> stop sniffing.
+                    LOG(transport.log, "sniff.when.error is true - resniffing ...");
+                    transport.sniff();
+                }
             }
 
             callback(std::move(result));
