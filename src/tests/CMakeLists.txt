@@ -44,7 +44,6 @@ SET(SOURCES
     extra/ElasticsearchSink
     test_AttachableStream
     test_Attribute
-    test_AttributesGuard
     test_Config
     test_ConfigJsonInitialization
     test_ExceptionTrap
@@ -65,6 +64,7 @@ SET(SOURCES
     test_Manual
     test_MsgpackFormatter
     test_NullSink
+    test_ScopedAttributes
     test_StreamSink
     test_StringFormatter
     test_StringPatternParser

@@ -22,11 +22,11 @@
 
 namespace blackhole {
 
-class scoped_attributes_t;
+class scoped_attributes_concept_t;
 
 namespace detail {
 
-inline void dummy_guard_deleter(scoped_attributes_t*) { }
+inline void dummy_guard_deleter(scoped_attributes_concept_t*) { }
 
 } //namespace detail
 
@@ -41,9 +41,9 @@ protected:
 
     log::attributes_t m_global_attributes;
 
-    boost::thread_specific_ptr<scoped_attributes_t> m_scoped_attributes;
+    boost::thread_specific_ptr<scoped_attributes_concept_t> m_scoped_attributes;
 
-    friend class scoped_attributes_t;
+    friend class scoped_attributes_concept_t;
 
     friend void swap(logger_base_t&, logger_base_t&) BLACKHOLE_NOEXCEPT;
 
@@ -134,44 +134,41 @@ private:
 };
 
 // NOTE: It's not movable to avoid moving to another thread.
-class scoped_attributes_t {
-    DECLARE_NONCOPYABLE(scoped_attributes_t);
+class scoped_attributes_concept_t {
+    DECLARE_NONCOPYABLE(scoped_attributes_concept_t);
 
     logger_base_t *m_logger;
-    scoped_attributes_t *m_previous;
-    // Attributes provided by this guard.
-    mutable log::attributes_t m_guard_attributes;
-    // Merged attributes provided by this guard and all the parent guards.
-    // This value is computed lazily.
-    mutable log::attributes_t m_merged_attributes;
+    scoped_attributes_concept_t *m_previous;
 
     friend void swap(logger_base_t&, logger_base_t&) BLACKHOLE_NOEXCEPT;
 
 public:
-    scoped_attributes_t(logger_base_t &logger, log::attributes_t&& attributes) :
+    scoped_attributes_concept_t(logger_base_t &logger) :
         m_logger(&logger),
-        m_previous(logger.m_scoped_attributes.get()),
-        m_guard_attributes(std::move(attributes))
+        m_previous(logger.m_scoped_attributes.get())
     {
         logger.m_scoped_attributes.reset(this);
     }
 
-    ~scoped_attributes_t() {
+    ~scoped_attributes_concept_t() {
         BOOST_ASSERT(m_logger);
         BOOST_ASSERT(m_logger->m_scoped_attributes.get() == this);
         m_logger->m_scoped_attributes.reset(m_previous);
     }
 
+    virtual
     const log::attributes_t&
-    attributes() const {
-        if (m_merged_attributes.empty()) {
-            m_merged_attributes = std::move(m_guard_attributes);
-            if (m_previous) {
-                const auto &parent_attributes = m_previous->attributes();
-                m_merged_attributes.insert(parent_attributes.begin(), parent_attributes.end());
-            }
-        }
-        return m_merged_attributes;
+    attributes() const = 0;
+
+protected:
+    bool
+    has_parent() const {
+        return m_previous;
+    }
+
+    const scoped_attributes_concept_t&
+    parent() const {
+        return *m_previous;
     }
 };
 

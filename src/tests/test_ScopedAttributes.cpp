@@ -1,5 +1,6 @@
 #include <blackhole/formatter/string.hpp>
 #include <blackhole/logger.hpp>
+#include <blackhole/scoped_attributes.hpp>
 #include <blackhole/sink/stream.hpp>
 
 #include "global.hpp"
@@ -36,11 +37,12 @@ public:
 
 } // namespace
 
-TEST(AttributesGuard, BasicUsage) {
+TEST(ScopedAttributes, BasicUsage) {
     auto logger = logger_factory_t::create();
 
     {
-        scoped_attributes_t guard1(logger, log::attributes_t({{"att1", 1}, {"att2", 2}}));
+        scoped_attributes_t guard1(logger, log::attributes_t({attribute::make("att1", 1),
+                                                              attribute::make("att2", 2)}));
 
         auto record1 = logger.open_record();
 
@@ -51,7 +53,8 @@ TEST(AttributesGuard, BasicUsage) {
         EXPECT_TRUE(record1.attributes["att2"].value == log::attribute_value_t(2));
 
         {
-            scoped_attributes_t guard2(logger, log::attributes_t({{"att1", 10}, {"att3", 3}}));
+            scoped_attributes_t guard2(logger, log::attributes_t({attribute::make("att1", 10),
+                                                                  attribute::make("att3", 3)}));
 
             auto record2 = logger.open_record();
 
@@ -83,12 +86,14 @@ TEST(AttributesGuard, BasicUsage) {
     EXPECT_EQ(0, record4.attributes.count("att3"));
 }
 
-TEST(AttributesGuard, SwapLoggers) {
+TEST(ScopedAttributes, SwapLoggers) {
     auto logger1 = logger_factory_t::create();
     auto logger2 = logger_factory_t::create();
 
-    scoped_attributes_t guard1(logger1, log::attributes_t({{"att1", 1}, {"att2", 2}}));
-    scoped_attributes_t guard2(logger2, log::attributes_t({{"att3", 3}, {"att4", 4}}));
+    scoped_attributes_t guard1(logger1, log::attributes_t({attribute::make("att1", 1),
+                                                           attribute::make("att2", 2)}));
+    scoped_attributes_t guard2(logger2, log::attributes_t({attribute::make("att3", 3),
+                                                           attribute::make("att4", 4)}));
 
     {
         auto record1 = logger1.open_record();
@@ -149,7 +154,7 @@ struct thread_tester_t {
     int value;
 
     void run() {
-        scoped_attributes_t guard(*logger, log::attributes_t({{"attr", value}}));
+        scoped_attributes_t guard(*logger, log::attributes_t({attribute::make("attr", value)}));
 
         barrier->wait();
 
@@ -164,7 +169,7 @@ struct thread_tester_t {
 
 } // namespace
 
-TEST(AttributesGuard, ThreadLocality) {
+TEST(ScopedAttributes, ThreadLocality) {
     auto logger = logger_factory_t::create();
     boost::barrier barrier(2);
 
