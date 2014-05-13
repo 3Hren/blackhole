@@ -90,7 +90,7 @@ public:
 private:
     void on_sniff(result_t<response::nodes_info_t>&& result) {
         if (auto* nodes_info = boost::get<response::nodes_info_t>(&result)) {
-            LOG(log, "successfully sniffed %d nodes", nodes_info->nodes.size());
+            LOG(log, "successfully sniffed %d node(s)", nodes_info->nodes.size());
 
             const auto& nodes = nodes_info->nodes;
             for (auto it = nodes.begin(); it != nodes.end(); ++it) {
