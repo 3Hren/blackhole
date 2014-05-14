@@ -1,11 +1,11 @@
+#include <boost/thread.hpp>
+
 #include <blackhole/formatter/string.hpp>
 #include <blackhole/logger.hpp>
 #include <blackhole/scoped_attributes.hpp>
 #include <blackhole/sink/stream.hpp>
 
 #include "global.hpp"
-
-#include <boost/thread.hpp>
 
 using namespace blackhole;
 
