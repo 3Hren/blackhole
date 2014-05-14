@@ -18,7 +18,7 @@ public:
         blackhole::logger_base_t logger;
         auto formatter = blackhole::utils::make_unique<
             blackhole::formatter::string_t
-        >("[%(timestamp)s]: %(message)s");
+        >("[%(timestamp)s] [%(tid)s]: %(message)s");
 
         auto sink = blackhole::utils::make_unique<
             blackhole::sink::stream_t
