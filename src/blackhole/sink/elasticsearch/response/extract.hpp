@@ -52,7 +52,11 @@ struct extractor_t<std::map<std::string, T>> {
     static std::map<std::string, T> extract(const rapidjson::Value& object) {
         std::map<std::string, T> map;
         for (auto it = object.MemberBegin(); it != object.MemberEnd(); ++it) {
-            map.emplace(it->name.GetString(), extractor_t<T>::extract(it->value));
+            map.insert(
+                std::make_pair(
+                    it->name.GetString(), extractor_t<T>::extract(it->value)
+                )
+            );
         }
 
         return map;
