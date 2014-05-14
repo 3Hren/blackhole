@@ -59,6 +59,7 @@ SET(BASE_SOURCES
     test_Manual
     test_MsgpackFormatter
     test_NullSink
+    test_ScopedAttributes
     test_StreamSink
     test_StringFormatter
     test_StringPatternParser
