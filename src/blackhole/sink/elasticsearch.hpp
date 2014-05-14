@@ -50,6 +50,7 @@ public:
         stopped(true),
         timer(loop),
         thread(start()),
+        //!@todo: Post via event loop.
         queue(bulk, std::bind(&elasticsearch_t::on_bulk, this, std::placeholders::_1)),
         client(settings, loop, log)
     {}
