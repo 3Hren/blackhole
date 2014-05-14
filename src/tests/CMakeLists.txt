@@ -125,9 +125,14 @@ TARGET_LINK_LIBRARIES(${PROJECT}
     gmock
     gtest
     msgpack
-    swarm
-    swarm_urlfetcher
 )
+
+IF(ENABLE_ELASTICSEARCH)
+    TARGET_LINK_LIBRARIES(${PROJECT}
+	swarm
+	swarm_urlfetcher
+    )
+ENDIF()
 
 ADD_TEST(NAME blackhole-tests COMMAND blackhole-tests)
 
