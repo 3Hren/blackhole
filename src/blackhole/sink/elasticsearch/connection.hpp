@@ -145,9 +145,6 @@ public:
         urlfetcher.manager.set_total_limit(20);
     }
 
-    ~http_connection_t() {
-    }
-
     endpoint_type endpoint() const {
         return endpoint_;
     }
