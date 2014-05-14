@@ -46,9 +46,13 @@ namespace actions {
 class nodes_info_t {
 public:
     typedef response::nodes_info_t response_type;
-    typedef result_t<response_type> result_type;
+    typedef result_t<response_type>::type result_type;
 
     static const request::method_t method_value = request::method_t::get;
+
+    static const char* name() {
+        return "nodes.info";
+    }
 
     enum class type_t {
         none        = 0,

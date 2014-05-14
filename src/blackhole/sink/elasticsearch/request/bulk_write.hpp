@@ -13,9 +13,13 @@ namespace actions {
 class bulk_write_t {
 public:
     typedef response::bulk_write_t response_type;
-    typedef result_t<response_type> result_type;
+    typedef result_t<response_type>::type result_type;
 
     static const request::method_t method_value = request::method_t::post;
+
+    static const char* name() {
+        return "bulk_write";
+    }
 
 private:
     std::string data;

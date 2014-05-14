@@ -18,7 +18,9 @@ public:
     typedef boost::asio::io_service loop_type;
     typedef blackhole::synchronized<blackhole::logger_base_t> logger_type;
 
-    typedef std::function<void(result_t<response::bulk_write_t>&&)> callback_type;
+    typedef std::function<
+        void(result_t<response::bulk_write_t>::type&&)
+    > callback_type;
 
 private:
     settings_t settings;
@@ -34,7 +36,7 @@ public:
     {
         transport.add_nodes(settings.endpoints);
         if (settings.sniffer.when.start) {
-            LOG(log, "sniff.when.start is true - preparing to update nodes list");
+            LOG(log, "sniff.on.start is true - preparing to update nodes list");
             transport.sniff();
         }
     }

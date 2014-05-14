@@ -13,9 +13,12 @@
 
 #include "log.hpp"
 #include "response/extract.hpp"
+#include "result.hpp"
 #include "request/method.hpp"
 
 namespace elasticsearch {
+
+class http_connection_t;
 
 struct urlfetcher_t {
     typedef boost::asio::io_service loop_type;
@@ -54,13 +57,20 @@ public:
     typedef typename action_type::response_type response_type;
     typedef typename callback<action_type>::type callback_type;
 
+    typedef boost::asio::ip::tcp protocol_type;
+    typedef protocol_type::endpoint endpoint_type;
+
 private:
     callback_type callback;
+    endpoint_type endpoint;
     logger_type& log;
 
 public:
-    response_handler_t(callback_type callback, logger_type& log) :
+    response_handler_t(callback_type callback,
+                       endpoint_type endpoint,
+                       logger_type& log) :
         callback(callback),
+        endpoint(endpoint),
         log(log)
     {}
 
@@ -73,27 +83,24 @@ public:
             response.url().to_string(), status, ec.value(), data);
 
         if (ec) {
-            LOG(log, "request failed with error: %s", ec.message());
-            callback(result_type(ec));
+            callback(result_type(
+                error_t(connection_error_t(endpoint, ec.message()))));
             return;
         }
 
         rapidjson::Document doc;
         doc.Parse<0>(data.c_str());
         if (doc.HasParseError()) {
-            LOG(log, "request failed with error: %s", doc.GetParseError());
-            callback(result_type(boost::system::errc::make_error_code(
-                boost::system::errc::bad_message)));
+            callback(result_type(
+                error_t(generic_error_t(doc.GetParseError()))));
             return;
         }
 
         if (has_error(status)) {
             const rapidjson::Value& error = doc["error"];
-            LOG(log, "request failed with error: %s",
-                error.IsString() ? error.GetString() : "unknown");
-
-            callback(result_type(boost::system::errc::make_error_code(
-                boost::system::errc::io_error)));
+            callback(result_type(
+                error_t(generic_error_t(
+                    error.IsString() ? error.GetString() : "unknown"))));
             return;
         }
 
@@ -102,9 +109,7 @@ public:
                 extractor_t<response_type>::extract(doc)
             ));
         } catch (const std::exception& err) {
-            LOG(log, "response parsing failed: %s", err.what());
-            callback(result_type(boost::system::errc::make_error_code(
-                    boost::system::errc::io_error)));
+            callback(result_type(error_t(generic_error_t(err.what()))));
         }
     }
 
@@ -125,17 +130,22 @@ public:
 
 private:
     endpoint_type endpoint_;
-    urlfetcher_t urlfetcher;
+    urlfetcher_t& urlfetcher;
     logger_type& log;
 
 public:
-    http_connection_t(endpoint_type endpoint, loop_type& loop, logger_type& log) :
+    http_connection_t(endpoint_type endpoint,
+                      urlfetcher_t& urlfetcher,
+                      logger_type& log) :
         endpoint_(endpoint),
-        urlfetcher(loop),
+        urlfetcher(urlfetcher),
         log(log)
     {
         //!@todo: Make configurable.
         urlfetcher.manager.set_total_limit(20);
+    }
+
+    ~http_connection_t() {
     }
 
     endpoint_type endpoint() const {
@@ -170,7 +180,7 @@ public:
         request.set_url(url);
         request.headers().set_keep_alive();
 
-        response_handler_t<Action> handler(callback, log);
+        response_handler_t<Action> handler(callback, endpoint_, log);
         std::shared_ptr<urlfetcher_t::stream_type> stream = std::move(
             urlfetcher_t::stream_type::create(handler)
         );
