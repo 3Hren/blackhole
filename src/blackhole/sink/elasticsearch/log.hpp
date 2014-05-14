@@ -9,8 +9,18 @@
 #define LOG(__log__, ...) \
     if (::blackhole::log::record_t record = __log__.open_record()) \
         ::blackhole::aux::make_scoped_pump(__log__, record, __VA_ARGS__)
+//#undef LOG
+//#define LOG(__log__, ...) \
+//    ::elasticsearch::aux::ignore_unused_variable_warning(__log__, __VA_ARGS__)
 
 namespace elasticsearch {
+
+namespace aux {
+
+template<typename... Args>
+inline void ignore_unused_variable_warning(const Args&...) {}
+
+} // namespace aux
 
 class logger_factory_t {
 public:
