@@ -12,6 +12,7 @@ OPTION(BLACKHOLE_DEBUG "Enable debugging messages support" ON)
 OPTION(ENABLE_TESTING "Enable testing" ON)
 OPTION(ENABLE_EXAMPLES "Enable examples" ON)
 OPTION(ENABLE_BENCHMARKING "Enable benchmarking" OFF)
+OPTION(ENABLE_ELASTICSEARCH "Enable elasticsearch sink" OFF)
 
 CONFIGURE_FILE(
     "${PROJECT_SOURCE_DIR}/config.hpp.in"

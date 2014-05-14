@@ -10,6 +10,10 @@ ENABLE_TESTING()
 SET(CMAKE_BUILD_TYPE "Debug")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
 
+IF(ENABLE_ELASTICSEARCH)
+    ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/foreign/swarm ${CMAKE_BINARY_DIR}/swarm)
+ENDIF()
+
 file(GLOB_RECURSE BLACKHOLE_HEADERS . ../blackhole/*.hpp)
 
 SET(HEADERS
@@ -23,7 +27,7 @@ SET(HEADERS
     datetime/common.hpp
 )
 
-SET(SOURCES
+SET(BASE_SOURCES
     main
     datetime/test_DayOfYear
     datetime/test_DayOfMonth
@@ -33,7 +37,6 @@ SET(SOURCES
     datetime/test_Time
     datetime/test_Year
     datetime/test_Week
-    extra/ElasticsearchSink
     test_AttachableStream
     test_Attribute
     test_Config
@@ -67,6 +70,18 @@ SET(SOURCES
     utils/test_GenericStringFormatter
 )
 
+IF(ENABLE_ELASTICSEARCH)
+    SET(ES_SOURCES
+	extra/ElasticsearchSink
+    )
+ENDIF()
+
+SET(SOURCES
+    ${BASE_SOURCES}
+    ${ES_SOURCES}
+)
+
+
 SET(Boost_USE_MULTITHREADED ON)
 
 SET(BOOST_COMPONENTS
@@ -88,6 +103,16 @@ LINK_DIRECTORIES(
     ${CMAKE_BINARY_DIR}/gmock/gtest
     ${CMAKE_BINARY_DIR}/gmock
 )
+
+IF(ENABLE_ELASTICSEARCH)
+    INCLUDE_DIRECTORIES(
+	SYSTEM ${CMAKE_SOURCE_DIR}/foreign/swarm
+    )
+
+    LINK_DIRECTORIES(
+	${CMAKE_SOURCE_DIR}/swarm
+    )
+ENDIF()
 
 FIND_PACKAGE(Boost COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
 

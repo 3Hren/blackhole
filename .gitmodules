@@ -7,3 +7,6 @@
 [submodule "foreign/gtest"]
 	path = foreign/gtest
 	url = https://chromium.googlesource.com/external/googletest
+[submodule "foreign/swarm"]
+	path = foreign/swarm
+	url = https://github.com/reverbrain/swarm.git
