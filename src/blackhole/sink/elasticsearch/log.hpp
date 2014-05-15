@@ -6,12 +6,14 @@
 #include "blackhole/sink/stream.hpp"
 #include "blackhole/synchronized.hpp"
 
+#ifndef DISABLE_ELASTICSEARCH_LOGGING
 #define LOG(__log__, ...) \
     if (::blackhole::log::record_t record = __log__.open_record()) \
         ::blackhole::aux::make_scoped_pump(__log__, record, __VA_ARGS__)
-//#undef LOG
-//#define LOG(__log__, ...) \
-//    ::elasticsearch::aux::ignore_unused_variable_warning(__log__, __VA_ARGS__)
+#else
+#define LOG(__log__, ...) \
+    ::elasticsearch::aux::ignore_unused_variable_warning(__log__, __VA_ARGS__)
+#endif
 
 namespace elasticsearch {
 
