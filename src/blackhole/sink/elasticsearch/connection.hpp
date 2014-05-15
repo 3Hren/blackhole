@@ -135,14 +135,14 @@ private:
 
 public:
     http_connection_t(endpoint_type endpoint,
+                      int connections,
                       urlfetcher_t& urlfetcher,
                       logger_type& log) :
         endpoint_(endpoint),
         urlfetcher(urlfetcher),
         log(log)
     {
-        //!@todo: Make configurable.
-        urlfetcher.manager.set_total_limit(20);
+        urlfetcher.manager.set_total_limit(connections);
     }
 
     endpoint_type endpoint() const {
