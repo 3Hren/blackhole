@@ -10,6 +10,7 @@
 #include "connection.hpp"
 #include "log.hpp"
 #include "pool.hpp"
+#include "resolver.hpp"
 #include "result.hpp"
 #include "request/info.hpp"
 #include "settings.hpp"
@@ -137,15 +138,58 @@ public:
 private:
     void on_sniff(result_t<response::nodes_info_t>::type&& result,
                   std::function<void()> next) {
-        if (auto* nodes_info = boost::get<response::nodes_info_t>(&result)) {
-            LOG(log, "successfully sniffed %d node(s)", nodes_info->nodes.size());
+        if (auto* info = boost::get<response::nodes_info_t>(&result)) {
+            LOG(log, "successfully sniffed %d node%s",
+                info->nodes.size(),
+                info->nodes.size() > 1 ? "s" : ""
+            );
 
-            const auto& nodes = nodes_info->nodes;
+            std::set<std::string> addresses;
+            const auto& nodes = info->nodes;
             for (auto it = nodes.begin(); it != nodes.end(); ++it) {
+                const response::node_t& node = it->second;
+                extract_addresses(addresses, node.addresses);
             }
+
+            typedef boost::asio::ip::tcp protocol_type;
+            std::vector<endpoint_type> endpoints;
+            for (auto it = addresses.begin(); it != addresses.end(); ++it) {
+                try {
+                    endpoints.push_back(
+                        resolver<protocol_type>::resolve(*it, loop)
+                    );
+                } catch (const std::exception& err) {
+                    LOG(log, "failed to resolve %s address: %s", *it, err.what());
+                }
+            }
+
+            add_nodes(endpoints);
         }
 
         next();
+    }
+
+    const std::string INET_ADDR_PREFIX = "inet[";
+    const std::string INET_ADDR_SUFFIX = "]";
+    void extract_addresses(std::set<std::string>& result,
+                           const response::node_t::addresses_type& addresses) const {
+        auto it = addresses.find("http");
+        if (it == addresses.end()) {
+            return;
+        }
+
+        const std::string& address = it->second;
+        if (boost::algorithm::starts_with(address, INET_ADDR_PREFIX)) {
+            const std::string& parsed = address.substr(
+                INET_ADDR_PREFIX.size(),
+                address.size() -
+                    INET_ADDR_PREFIX.size() -
+                    INET_ADDR_SUFFIX.size()
+            );
+            result.insert(parsed);
+        } else {
+            LOG(log, "unknown address type: %s", address);
+        }
     }
 };
 
