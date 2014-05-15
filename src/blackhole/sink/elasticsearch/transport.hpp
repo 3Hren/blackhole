@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <mutex>
+#include <set>
 #include <tuple>
 
 #include "balancer.hpp"
