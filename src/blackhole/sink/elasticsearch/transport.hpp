@@ -206,14 +206,14 @@ struct error_handler_t : public boost::static_visitor<> {
     typedef Watcher watcher_type;
 
     const watcher_type& watcher;
-    http_transport_t& transport;
 
-    error_handler_t(const watcher_type& watcher, http_transport_t& transport) :
-        watcher(watcher),
-        transport(transport)
+    error_handler_t(const watcher_type& watcher) :
+        watcher(watcher)
     {}
 
     void operator()(const connection_error_t& err) {
+        http_transport_t& transport = watcher.transport;
+
         LOG(transport.log, "request failed with error: %s", err.reason);
 
         transport.remove_node(err.endpoint);
@@ -226,7 +226,7 @@ struct error_handler_t : public boost::static_visitor<> {
     }
 
     void operator()(const generic_error_t& err) {
-        LOG(transport.log, "request failed with error: %s", err.reason);
+        LOG(watcher.transport.log, "request failed with error: %s", err.reason);
     }
 };
 
@@ -236,6 +236,8 @@ struct request_watcher_t {
     typedef request_watcher_t<action_type> this_type;
     typedef typename action_type::result_type result_type;
     typedef typename callback<action_type>::type callback_type;
+
+    friend struct error_handler_t<request_watcher_t>;
 
     http_transport_t& transport;
     const action_type action;
@@ -248,7 +250,7 @@ struct request_watcher_t {
     >::type
     operator()(result_type&& result) const {
         if (error_t* error = boost::get<error_t>(&result)) {
-            auto visitor = error_handler_t<this_type>(*this, transport);
+            auto visitor = error_handler_t<this_type>(*this);
             boost::apply_visitor(visitor, *error);
         }
 
