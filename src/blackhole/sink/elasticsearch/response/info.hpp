@@ -10,7 +10,9 @@ namespace elasticsearch {
 namespace response {
 
 struct node_t {
-    std::map<std::string, std::string> addresses;
+    typedef std::map<std::string, std::string> addresses_type;
+
+    addresses_type addresses;
 };
 
 struct nodes_info_t {
