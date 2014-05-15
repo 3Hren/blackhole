@@ -22,6 +22,9 @@ void nullcb() {}
 template<class Action> struct error_handler_t;
 template<class Action> struct request_watcher_t;
 
+const std::string INET_ADDR_PREFIX = "inet[";
+const std::string INET_ADDR_SUFFIX = "]";
+
 class http_transport_t {
 public:
     typedef blackhole::synchronized<blackhole::logger_base_t> logger_type;
@@ -169,8 +172,6 @@ private:
         next();
     }
 
-    const std::string INET_ADDR_PREFIX = "inet[";
-    const std::string INET_ADDR_SUFFIX = "]";
     void extract_addresses(std::set<std::string>& result,
                            const response::node_t::addresses_type& addresses) const {
         auto it = addresses.find("http");
