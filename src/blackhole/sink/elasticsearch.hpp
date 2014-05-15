@@ -50,7 +50,6 @@ public:
         stopped(true),
         timer(loop),
         thread(start()),
-        //!@todo: Post via event loop.
         queue(bulk, std::bind(&elasticsearch_t::on_bulk, this, std::placeholders::_1)),
         client(settings, loop, log)
     {}
@@ -116,6 +115,12 @@ private:
     }
 
     void on_bulk(std::vector<std::string>&& result) {
+        loop.post(
+            std::bind(&elasticsearch_t::handle_bulk, this, std::move(result))
+        );
+    }
+
+    void handle_bulk(std::vector<std::string> result) {
         LOG(log, "processing bulk event ...");
         process(std::move(result));
     }
