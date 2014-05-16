@@ -10,36 +10,9 @@
 #include "blackhole/sink/elasticsearch/response/info.hpp"
 #include "blackhole/sink/elasticsearch/result.hpp"
 #include "blackhole/sink/elasticsearch/request/method.hpp"
+#include "blackhole/sink/elasticsearch/request/utils.hpp"
 
 namespace elasticsearch {
-
-namespace utils {
-
-namespace aux {
-
-inline void substitute(std::ostringstream&) {}
-
-template<typename... Args>
-inline void substitute(std::ostringstream& stream,
-                       const std::string arg,
-                       const Args&... args) {
-    if (!arg.empty()) {
-        stream << "/" << arg;
-    }
-
-    substitute(stream, args...);
-}
-
-} // namespace aux
-
-template<typename... Args>
-inline std::string make_path(const Args&... args) {
-    std::ostringstream stream;
-    aux::substitute(stream, args...);
-    return stream.str();
-}
-
-} // namespace utils
 
 namespace actions {
 
