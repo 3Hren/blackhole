@@ -136,9 +136,8 @@ private:
 
     void process(std::vector<std::string>&& result) {
         LOG(log, "processing bulk containing %d messages ...", result.size());
-        std::string message = boost::algorithm::join(result, "");
         client.bulk_write(
-            std::move(message),
+            std::move(result),
             std::bind(&elasticsearch_t::on_response, this, std::placeholders::_1)
         );
 
