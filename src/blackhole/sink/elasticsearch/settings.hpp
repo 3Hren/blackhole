@@ -36,7 +36,6 @@ struct settings_t {
     int retries;
     long timeout;
 
-
     settings_t() :
         index("logs-%Y.%m.%d"),
         type("log"),
