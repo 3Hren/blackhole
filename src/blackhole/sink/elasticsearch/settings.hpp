@@ -37,7 +37,7 @@ struct settings_t {
     long timeout;
 
     settings_t() :
-        index("logs-%Y.%m.%d"),
+        index("logs"),
         type("log"),
         endpoints(std::vector<endpoint_type>({ defaults::endpoint })),
         sniffer({{ true, true }, 10, 60000 }),
