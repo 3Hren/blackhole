@@ -19,6 +19,7 @@ struct settings_t {
     typedef boost::asio::ip::tcp::endpoint endpoint_type;
 
     std::string index;
+    std::string type;
     std::vector<endpoint_type> endpoints;
 
     struct sniffer_t {
@@ -37,7 +38,8 @@ struct settings_t {
 
 
     settings_t() :
-        index("log"),
+        index("logs-%Y.%m.%d"),
+        type("log"),
         endpoints(std::vector<endpoint_type>({ defaults::endpoint })),
         sniffer({{ true, true }, 10, 60000 }),
         connections(20),
