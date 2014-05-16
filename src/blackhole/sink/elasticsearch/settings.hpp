@@ -48,23 +48,3 @@ struct settings_t {
 
 } // namespace elasticsearch
 
-/*!
-  rtm - retries <= max && retries != -1
-  srt - sniff retries
-  soe - sniff on error
-
-  (1) rq -(rtm !)-> cb(fail).
-         -(rtm v)-> succ -> cb(succ).
-                 -> fail -(soe v)-> (2)sniff -> succ -> (1)
-                                             -> fail -(srt v)-> (2)
-                                                     -(srt !)-> cb(fail).
-                         -(soe !)-> (1)
-
-  TestCases:
-  1. rq -> succ -> cb(succ).
-  2. sniff.when.error=false, retries=0:
-     rq -> fail -> cb(fail).
-  3. sniff.when.error=true, sniff.retries=0, retries=0:
-     rq -> fail -> sniff -> fail -> cb(fail).
-  4.
-  */
