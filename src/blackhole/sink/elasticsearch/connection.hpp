@@ -80,7 +80,7 @@ public:
         const int status = response.code();
 
         LOG(log, "response received from '%s' [%d] (%s): %s",
-            response.url().to_string(), status, ec.value(), data);
+            response.request().url().to_string(), status, ec.value(), data);
 
         if (ec) {
             callback(result_type(
