@@ -128,14 +128,21 @@ public:
 
         auto connection = balancer->next(pool);
         if (!connection) {
-            LOG(log, "failed: no connections left");
-            loop.post(
-                std::bind(
-                    callback,
-                    result_type(error_t(generic_error_t("no connections left")))
-                )
-            );
-            return;
+            if (attempt == 1) {
+                add_nodes(settings.endpoints);
+                //!@todo: Ideally it must be handled via loop.post.
+                perform(std::move(action), callback, ++attempt);
+                return;
+            } else {
+                LOG(log, "failed: no connections left");
+                loop.post(
+                    std::bind(
+                        callback,
+                        result_type(error_t(generic_error_t("no connections left")))
+                    )
+                );
+                return;
+            }
         }
 
         LOG(log, "balancing at %s", connection->endpoint());
