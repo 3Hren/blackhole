@@ -132,7 +132,6 @@ public:
                 add_nodes(settings.endpoints);
                 //!@todo: Ideally it must be handled via loop.post.
                 perform(std::move(action), callback, ++attempt);
-                return;
             } else {
                 LOG(log, "failed: no connections left");
                 loop.post(
@@ -141,8 +140,9 @@ public:
                         result_type(error_t(generic_error_t("no connections left")))
                     )
                 );
-                return;
             }
+
+            return;
         }
 
         LOG(log, "balancing at %s", connection->endpoint());
