@@ -22,7 +22,7 @@ protected:
 };
 
 class universe_storage_t : public singleton_mixin<universe_storage_t> {
-    DECLARE_NONCOPYABLE(universe_storage_t);
+    BLACKHOLE_DECLARE_NONCOPYABLE(universe_storage_t);
     friend class singleton_mixin<universe_storage_t>;
 
     typedef boost::shared_mutex mutex_type;

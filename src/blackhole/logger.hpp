@@ -135,7 +135,7 @@ private:
 
 // NOTE: It's not movable to avoid moving to another thread.
 class scoped_attributes_concept_t {
-    DECLARE_NONCOPYABLE(scoped_attributes_concept_t);
+    BLACKHOLE_DECLARE_NONCOPYABLE(scoped_attributes_concept_t);
 
     logger_base_t *m_logger;
     scoped_attributes_concept_t *m_previous;

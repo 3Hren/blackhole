@@ -1,5 +1,5 @@
 #pragma once
 
-#define DECLARE_NONCOPYABLE(_type_) \
-    _type_(const _type_& other) = delete; \
-    _type_& operator=(const _type_& other) = delete
+#define BLACKHOLE_DECLARE_NONCOPYABLE(__type__) \
+    __type__(const __type__& other) = delete; \
+    __type__& operator=(const __type__& other) = delete
