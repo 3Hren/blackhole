@@ -11,6 +11,9 @@
 
 #define FIRE_DATETIME_GENERATOR
 #define FIRE_STRING_FORMATTER
+#define FIRE_STRING_TO_NULL_LOGGING
+
+const char MESSAGE_LONG[] = "Something bad is going on but I can handle it";
 
 using namespace blackhole;
 
@@ -130,5 +133,51 @@ BENCHMARK(DatetimeGeneratorUsingLocale, Generator, DATETIME_GENERATOR_SAMPLES, D
     generator(stream, tm);
     celero::DoNotOptimizeAway(str);
     str.clear();
+}
+#endif
+
+#ifdef FIRE_STRING_TO_NULL_LOGGING
+#include <blackhole/sink/null.hpp>
+
+static const int LOG_STRING_TO_NULL_SAMPLES = 30;
+static const int LOG_STRING_TO_NULL_CALLS = 200000;
+
+namespace log_string_to_null {
+
+enum level {
+    debug
+};
+
+verbose_logger_t<level> init_log() {
+    auto formatter = utils::make_unique<
+        formatter::string_t
+    >("%(message)s");
+
+    auto sink = utils::make_unique<
+        sink::null_t
+    >();
+
+    auto frontend = utils::make_unique<
+        frontend_t<
+            formatter::string_t,
+            sink::null_t
+        >
+    >(std::move(formatter), std::move(sink));
+
+    verbose_logger_t<level> log;
+    log.add_frontend(std::move(frontend));
+    return log;
+}
+
+} // namespace log_string_to_null
+
+BASELINE(LogStringToNull, Baseline, LOG_STRING_TO_NULL_SAMPLES, LOG_STRING_TO_NULL_CALLS) {
+    static verbose_logger_t<log_string_to_null::level> log =
+        log_string_to_null::init_log();
+
+    BH_LOG(log, log_string_to_null::debug, MESSAGE_LONG)(attribute::list({
+        {"int", 42},
+        {"string", "le string"},
+    }));
 }
 #endif
