@@ -132,6 +132,15 @@ public:
                 add_nodes(settings.endpoints);
                 //!@todo: Ideally it must be handled via loop.post.
                 perform(std::move(action), callback, ++attempt);
+                //!@note: Something with move semanthic occurs here. Check!
+//                typedef std::function<void(typename Action::result_type)> callback_type;
+//                typedef void(http_transport_t::*fn_type)(Action&&, callback_type, int);
+//                fn_type fn = static_cast<fn_type>(&http_transport_t::perform<Action>);
+//                typedef void(*fn_type2)(Action&&, callback_type, int);
+//                std::function<void(Action&&, callback_type, int)> fn2 = std::bind(fn, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+//                std::function<void(Action&&)> fn3 = std::bind(fn2, std::placeholders::_1, callback, ++attempt);
+//                std::function<void()>&& fn4 = std::bind(fn3, std::move(action));
+
             } else {
                 LOG(log, "failed: no connections left");
                 loop.post(
