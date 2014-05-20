@@ -22,6 +22,7 @@ public:
         return "null";
     }
 
+    null_t() {}
     null_t(const config_type&) {}
 
     void consume(const std::string&) {}
