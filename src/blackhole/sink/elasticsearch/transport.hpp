@@ -18,7 +18,11 @@
 
 namespace elasticsearch {
 
-void nullcb() {}
+namespace aux {
+
+void empty() {}
+
+} // namespace aux
 
 template<class Action> struct error_handler_t;
 template<class Action> struct request_watcher_t;
@@ -94,7 +98,7 @@ public:
     }
 
     void sniff() {
-        sniff(&nullcb);
+        sniff(&aux::empty);
     }
 
     void sniff(std::function<void()>&& then) {
