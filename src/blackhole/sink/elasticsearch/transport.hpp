@@ -113,7 +113,7 @@ public:
 
         BOOST_ASSERT(balancer);
 
-        LOG(log, "performing '%s' request [attempt %d from %d] ...",
+        LOG(log, "performing '%s' request [attempt %d/%d] ...",
             action.name(), attempt, settings.retries);
         if (attempt > settings.retries) {
             LOG(log, "failed: too many attempts done");
