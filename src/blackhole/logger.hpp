@@ -102,7 +102,32 @@ public:
         return open_record(log::attributes_t({ std::move(local_attribute) }));
     }
 
-    inline log::record_t open_record(log::attributes_t&& local_attributes) const;
+    log::record_t open_record(log::attributes_t&& local_attributes) const {
+        return open_record(std::move(local_attributes), m_scoped_attributes);
+    }
+
+    template<class ScopedAttributes>
+    log::record_t open_record(log::attributes_t&& local_attributes,
+                              const ScopedAttributes& scoped_attributes) const {
+        if (enabled() && !m_frontends.empty()) {
+            log::attributes_t attributes = merge({
+                universe_storage_t::instance().dump(),  // Program global.
+                get_thread_attributes(),                // Thread local.
+                m_global_attributes,                    // Logger object specific.
+                get_event_attributes(),                 // Event specific, e.g. timestamp.
+                std::move(local_attributes),            // Any user attributes.
+                scoped_attributes.get() ? scoped_attributes->attributes() : log::attributes_t()
+            });
+
+            if (m_filter(attributes)) {
+                log::record_t record;
+                record.attributes = std::move(attributes);
+                return record;
+            }
+        }
+
+        return log::record_t();
+    }
 
     void push(log::record_t&& record) const {
         for (auto it = m_frontends.begin(); it != m_frontends.end(); ++it) {
@@ -191,27 +216,6 @@ inline void swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT {
     if (rhs.m_scoped_attributes.get()) {
         rhs.m_scoped_attributes->m_logger = &rhs;
     }
-}
-
-inline log::record_t logger_base_t::open_record(log::attributes_t&& local_attributes) const {
-    if (enabled() && !m_frontends.empty()) {
-        log::attributes_t attributes = merge({
-            universe_storage_t::instance().dump(),  // Program global.
-            get_thread_attributes(),                // Thread local.
-            m_global_attributes,                    // Logger object specific.
-            get_event_attributes(),                 // Event specific, e.g. timestamp.
-            std::move(local_attributes),            // Any user attributes.
-            m_scoped_attributes.get() ? m_scoped_attributes->attributes() : log::attributes_t()
-        });
-
-        if (m_filter(attributes)) {
-            log::record_t record;
-            record.attributes = std::move(attributes);
-            return record;
-        }
-    }
-
-    return log::record_t();
 }
 
 template<typename Level>
