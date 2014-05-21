@@ -38,7 +38,7 @@ public:
             return std::shared_ptr<connection_type>();
         }
 
-        if (current >= pool.size(lock) - 1) {
+        if (current >= pool.size(lock)) {
             current = 0;
         }
 
