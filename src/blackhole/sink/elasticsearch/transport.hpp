@@ -25,8 +25,24 @@ void empty() {}
 
 } // namespace aux
 
-template<class Action> struct error_handler_t;
-template<class Action> struct request_watcher_t;
+struct error_handler_t : public boost::static_visitor<> {
+    std::function<void(const connection_error_t&)> connection;
+    std::function<void(const generic_error_t&)>    generic;
+
+    error_handler_t(std::function<void(const connection_error_t&)> connection,
+                    std::function<void(const generic_error_t&)> generic) :
+        connection(connection),
+        generic(generic)
+    {}
+
+    void operator()(const connection_error_t& err) {
+        connection(err);
+    }
+
+    void operator()(const generic_error_t& err) {
+        generic(err);
+    }
+};
 
 const std::string INET_ADDR_PREFIX = "inet[";
 const std::string INET_ADDR_SUFFIX = "]";
@@ -39,9 +55,6 @@ public:
     typedef http_connection_t connection_type;
     typedef pool_t<connection_type> pool_type;
     typedef pool_type::endpoint_type endpoint_type;
-
-    template<class Action> friend struct error_handler_t;
-    template<class Action> friend struct request_watcher_t;
 
 private:
     settings_t settings;
@@ -89,7 +102,6 @@ public:
 
         if (!inserted) {
             LOG(log, "adding endpoint to the pool is rejected - already exists");
-            return;
         }
     }
 
@@ -134,14 +146,12 @@ public:
         auto connection = balancer->next(pool);
         if (!connection) {
             if (attempt == 1) {
+                LOG(log, "no connections - adding default nodes ...");
                 add_nodes(settings.endpoints);
                 loop.post(
                     std::bind(
                         &http_transport_t::perform<Action>,
-                        this,
-                        std::move(action),
-                        callback,
-                        ++attempt
+                        this, std::move(action), callback, attempt + 1
                     )
                 );
             } else {
@@ -158,13 +168,79 @@ public:
         }
 
         LOG(log, "balancing at %s", connection->endpoint());
-        request_watcher_t<Action> watcher {
-            *this, action, callback, ++attempt
-        };
+        auto watcher = std::bind(
+            &http_transport_t::on_response<Action>,
+            this, action, callback, attempt + 1, std::placeholders::_1
+        );
         connection->perform(std::move(action), watcher);
     }
 
 private:
+    template<class Action>
+    void on_response(Action action,
+                typename callback<Action>::type callback,
+                int attempt,
+                typename Action::result_type&& result) {
+        if (error_t* error = boost::get<error_t>(&result)) {
+            error_handler_t visitor(
+                std::bind(
+                    &http_transport_t::on_connection_error<Action>,
+                    this, std::move(action), callback, attempt, std::placeholders::_1
+                ),
+                std::bind(
+                    &http_transport_t::on_generic_error,
+                    this, std::placeholders::_1
+                )
+            );
+            boost::apply_visitor(visitor, *error);
+        }
+
+        callback(std::move(result));
+    }
+
+    template<class Action>
+    typename std::enable_if<
+        !std::is_same<Action, actions::nodes_info_t>::value
+    >::type
+    on_connection_error(Action action,
+                        typename callback<Action>::type callback,
+                        int attempt,
+                        const connection_error_t& err) {
+        LOG(log, "request failed with error: %s", err.reason);
+
+        remove_node(err.endpoint);
+        if (settings.sniffer.when.error) {
+            LOG(log, "sniff.on.error is true - preparing to update nodes list");
+            sniff(
+                std::bind(
+                    &http_transport_t::perform<Action>,
+                    this,
+                    std::move(action),
+                    callback,
+                    attempt
+                )
+            );
+            return;
+        }
+    }
+
+    template<class Action>
+    typename std::enable_if<
+        std::is_same<Action, actions::nodes_info_t>::value
+    >::type
+    on_connection_error(Action,
+                        typename callback<Action>::type,
+                        int,
+                        const connection_error_t& err) {
+        LOG(log, "request failed with error: %s", err.reason);
+
+        remove_node(err.endpoint);
+    }
+
+    void on_generic_error(const generic_error_t& err) {
+        LOG(log, "request failed with error: %s", err.reason);
+    }
+
     void on_sniff(result_t<response::nodes_info_t>::type&& result,
                   std::function<void()> next) {
         if (auto* info = boost::get<response::nodes_info_t>(&result)) {
@@ -217,76 +293,6 @@ private:
         } else {
             LOG(log, "unknown address type: %s", address);
         }
-    }
-};
-
-template<class Watcher>
-struct error_handler_t : public boost::static_visitor<> {
-    typedef Watcher watcher_type;
-
-    const watcher_type& watcher;
-
-    error_handler_t(const watcher_type& watcher) :
-        watcher(watcher)
-    {}
-
-    void operator()(const connection_error_t& err) {
-        http_transport_t& transport = watcher.transport;
-
-        LOG(transport.log, "request failed with error: %s", err.reason);
-
-        transport.remove_node(err.endpoint);
-        if (transport.settings.sniffer.when.error) {
-            LOG(transport.log,
-                "sniff.on.error is true - preparing to update nodes list");
-            transport.sniff(watcher);
-            return;
-        }
-    }
-
-    void operator()(const generic_error_t& err) {
-        LOG(watcher.transport.log, "request failed with error: %s", err.reason);
-    }
-};
-
-template<class Action>
-struct request_watcher_t {
-    typedef Action action_type;
-    typedef request_watcher_t<action_type> this_type;
-    typedef typename action_type::result_type result_type;
-    typedef typename callback<action_type>::type callback_type;
-
-    friend struct error_handler_t<request_watcher_t>;
-
-    http_transport_t& transport;
-    const action_type action;
-    const callback_type callback;
-    const int attempt;
-
-    template<class Result = result_type>
-    typename std::enable_if<
-        !std::is_same<Result, result_t<response::nodes_info_t>::type>::value
-    >::type
-    operator()(result_type&& result) const {
-        if (error_t* error = boost::get<error_t>(&result)) {
-            auto visitor = error_handler_t<this_type>(*this);
-            boost::apply_visitor(visitor, *error);
-        }
-
-        callback(std::move(result));
-    }
-
-    template<class Result = result_type>
-    typename std::enable_if<
-        std::is_same<Result, result_t<response::nodes_info_t>::type>::value
-    >::type
-    operator()(result_t<response::nodes_info_t>::type&& result) const {
-        callback(std::move(result));
-    }
-
-
-    void operator()() {
-        transport.perform(std::move(action), callback, attempt);
     }
 };
 
