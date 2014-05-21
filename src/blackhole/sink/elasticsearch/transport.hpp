@@ -214,10 +214,7 @@ private:
             sniff(
                 std::bind(
                     &http_transport_t::perform<Action>,
-                    this,
-                    std::move(action),
-                    callback,
-                    attempt
+                    this, std::move(action), callback, attempt
                 )
             );
             return;
