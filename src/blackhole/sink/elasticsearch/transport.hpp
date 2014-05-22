@@ -143,8 +143,14 @@ public:
             return;
         }
 
-        auto connection = balancer->next(pool);
-        if (!connection) {
+        if (auto connection = balancer->next(pool)) {
+            LOG(log, "balancing at %s", connection->endpoint());
+            auto watcher = std::bind(
+                &http_transport_t::on_response<Action>,
+                this, action, callback, attempt + 1, std::placeholders::_1
+            );
+            connection->perform(std::move(action), watcher);
+        } else {
             if (attempt == 1) {
                 LOG(log, "no connections - adding default nodes ...");
                 add_nodes(settings.endpoints);
@@ -166,13 +172,6 @@ public:
 
             return;
         }
-
-        LOG(log, "balancing at %s", connection->endpoint());
-        auto watcher = std::bind(
-            &http_transport_t::on_response<Action>,
-            this, action, callback, attempt + 1, std::placeholders::_1
-        );
-        connection->perform(std::move(action), watcher);
     }
 
 private:
