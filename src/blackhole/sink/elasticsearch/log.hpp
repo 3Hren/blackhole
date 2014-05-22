@@ -5,6 +5,7 @@
 #include "blackhole/logger.hpp"
 #include "blackhole/sink/stream.hpp"
 #include "blackhole/synchronized.hpp"
+#include "blackhole/utils/unused.hpp"
 
 #ifndef DISABLE_ELASTICSEARCH_LOGGING
 #define LOG(__log__, ...) \
@@ -12,17 +13,10 @@
         ::blackhole::aux::make_scoped_pump(__log__, record, __VA_ARGS__)
 #else
 #define LOG(__log__, ...) \
-    ::elasticsearch::aux::ignore_unused_variable_warning(__log__, __VA_ARGS__)
+    ::blackhole::utils::ignore_unused_variable_warning(__log__, __VA_ARGS__)
 #endif
 
 namespace elasticsearch {
-
-namespace aux {
-
-template<typename... Args>
-inline void ignore_unused_variable_warning(const Args&...) {}
-
-} // namespace aux
 
 class logger_factory_t {
 public:
