@@ -169,8 +169,6 @@ public:
                     )
                 );
             }
-
-            return;
         }
     }
 
