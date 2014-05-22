@@ -28,7 +28,6 @@ struct settings_t {
             bool error;
         } when;
 
-        long timeout;
         long invertal;
     } sniffer;
 
@@ -40,7 +39,7 @@ struct settings_t {
         index("logs"),
         type("log"),
         endpoints(std::vector<endpoint_type>({ defaults::endpoint })),
-        sniffer({{ true, true }, 10, 60000 }),
+        sniffer({{ true, true }, 60000 }),
         connections(20),
         retries(3),
         timeout(1000)
