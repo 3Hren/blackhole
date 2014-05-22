@@ -36,13 +36,13 @@ public:
     {
         transport.add_nodes(settings.endpoints);
         if (settings.sniffer.when.start) {
-            LOG(log, "sniff.on.start is true - preparing to update nodes list");
+            ES_LOG(log, "sniff.on.start is true - preparing to update nodes list");
             transport.sniff();
         }
     }
 
     void bulk_write(std::vector<std::string>&& bulk, callback_type callback) {
-        LOG(log, "requesting 'bulk_write' ...");
+        ES_LOG(log, "requesting 'bulk_write' ...");
         transport.perform(
             actions::bulk_write_t(settings.index, settings.type, std::move(bulk)),
             callback

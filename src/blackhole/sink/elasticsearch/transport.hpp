@@ -84,11 +84,11 @@ public:
         boost::system::error_code ec;
         auto address = endpoint.address().to_string(ec);
         if (ec) {
-            LOG(log, "can't add node endpoint '%s': %s", endpoint, ec.message());
+            ES_LOG(log, "can't add node endpoint '%s': %s", endpoint, ec.message());
             return;
         }
 
-        LOG(log, "adding '%s:%d' to the pool ...", address, endpoint.port());
+        ES_LOG(log, "adding '%s:%d' to the pool ...", address, endpoint.port());
         bool inserted;
         std::tie(std::ignore, inserted) = pool.insert(
             endpoint,
@@ -101,12 +101,12 @@ public:
         );
 
         if (!inserted) {
-            LOG(log, "adding endpoint to the pool is rejected - already exists");
+            ES_LOG(log, "adding endpoint to the pool is rejected - already exists");
         }
     }
 
     void remove_node(const endpoint_type& endpoint) {
-        LOG(log, "removing '%s' from the pool ...", endpoint);
+        ES_LOG(log, "removing '%s' from the pool ...", endpoint);
         pool.remove(endpoint);
     }
 
@@ -115,7 +115,7 @@ public:
     }
 
     void sniff(std::function<void()>&& then) {
-        LOG(log, "sniffing nodes info ...");
+        ES_LOG(log, "sniffing nodes info ...");
         auto callback = std::bind(
             &http_transport_t::on_sniff, this, std::placeholders::_1, then
         );
@@ -130,10 +130,10 @@ public:
 
         BOOST_ASSERT(balancer);
 
-        LOG(log, "performing '%s' request [attempt %d/%d] ...",
+        ES_LOG(log, "performing '%s' request [attempt %d/%d] ...",
             action.name(), attempt, settings.retries);
         if (attempt > settings.retries) {
-            LOG(log, "failed: too many attempts done");
+            ES_LOG(log, "failed: too many attempts done");
             loop.post(
                 std::bind(
                     callback,
@@ -144,7 +144,7 @@ public:
         }
 
         if (auto connection = balancer->next(pool)) {
-            LOG(log, "balancing at %s", connection->endpoint());
+            ES_LOG(log, "balancing at %s", connection->endpoint());
             auto watcher = std::bind(
                 &http_transport_t::on_response<Action>,
                 this, action, callback, attempt + 1, std::placeholders::_1
@@ -152,7 +152,7 @@ public:
             connection->perform(std::move(action), watcher);
         } else {
             if (attempt == 1) {
-                LOG(log, "no connections - adding default nodes ...");
+                ES_LOG(log, "no connections - adding default nodes ...");
                 add_nodes(settings.endpoints);
                 loop.post(
                     std::bind(
@@ -161,7 +161,7 @@ public:
                     )
                 );
             } else {
-                LOG(log, "failed: no connections left");
+                ES_LOG(log, "failed: no connections left");
                 loop.post(
                     std::bind(
                         callback,
@@ -203,11 +203,11 @@ private:
                         typename callback<Action>::type callback,
                         int attempt,
                         const connection_error_t& err) {
-        LOG(log, "request failed with error: %s", err.reason);
+        ES_LOG(log, "request failed with error: %s", err.reason);
 
         remove_node(err.endpoint);
         if (settings.sniffer.when.error) {
-            LOG(log, "sniff.on.error is true - preparing to update nodes list");
+            ES_LOG(log, "sniff.on.error is true - preparing to update nodes list");
             sniff(
                 std::bind(
                     &http_transport_t::perform<Action>,
@@ -226,19 +226,19 @@ private:
                         typename callback<Action>::type,
                         int,
                         const connection_error_t& err) {
-        LOG(log, "request failed with error: %s", err.reason);
+        ES_LOG(log, "request failed with error: %s", err.reason);
 
         remove_node(err.endpoint);
     }
 
     void on_generic_error(const generic_error_t& err) {
-        LOG(log, "request failed with error: %s", err.reason);
+        ES_LOG(log, "request failed with error: %s", err.reason);
     }
 
     void on_sniff(result_t<response::nodes_info_t>::type&& result,
                   std::function<void()> next) {
         if (auto* info = boost::get<response::nodes_info_t>(&result)) {
-            LOG(log, "successfully sniffed %d node%s",
+            ES_LOG(log, "successfully sniffed %d node%s",
                 info->nodes.size(),
                 info->nodes.size() > 1 ? "s" : ""
             );
@@ -258,7 +258,7 @@ private:
                         resolver<protocol_type>::resolve(*it, loop)
                     );
                 } catch (const std::exception& err) {
-                    LOG(log, "failed to resolve %s address: %s", *it, err.what());
+                    ES_LOG(log, "failed to resolve %s address: %s", *it, err.what());
                 }
             }
 
@@ -285,7 +285,7 @@ private:
             );
             result.insert(parsed);
         } else {
-            LOG(log, "unknown address type: %s", address);
+            ES_LOG(log, "unknown address type: %s", address);
         }
     }
 };

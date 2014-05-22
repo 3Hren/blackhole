@@ -79,7 +79,7 @@ public:
                     const boost::system::error_code& ec) {
         const int status = response.code();
 
-        LOG(log, "response received from '%s' [%d] (%s): %s",
+        ES_LOG(log, "response received from '%s' [%d] (%s): %s",
             response.request().url().to_string(), status, ec.value(), data);
 
         if (ec) {
@@ -181,7 +181,7 @@ public:
         std::shared_ptr<urlfetcher_t::stream_type> stream = std::move(
             urlfetcher_t::stream_type::create(handler)
         );
-        LOG(log, "requesting '%s' ...", request.url().to_string());
+        ES_LOG(log, "requesting '%s' ...", request.url().to_string());
         perform(std::move(action), std::move(request), std::move(stream));
     }
 

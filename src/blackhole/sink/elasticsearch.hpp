@@ -62,11 +62,11 @@ public:
 
     void consume(std::string&& message) {
         if (stopped) {
-            LOG(log, "dropping '%s', because worker thread is stopped", message);
+            ES_LOG(log, "dropping '%s', because worker thread is stopped", message);
             return;
         }
 
-        LOG(log, "pushing '%s' to the queue", message);
+        ES_LOG(log, "pushing '%s' to the queue", message);
         queue.push(std::move(message));
     }
 
@@ -85,7 +85,7 @@ private:
     void run(std::condition_variable& started) {
         BOOST_ASSERT(stopped);
 
-        LOG(log, "starting elasticsearch sink ...");
+        ES_LOG(log, "starting elasticsearch sink ...");
         loop.post(
             std::bind(&elasticsearch_t::on_started, this, std::ref(started))
         );
@@ -95,7 +95,7 @@ private:
         );
         boost::system::error_code ec;
         loop.run(ec);
-        LOG(log, "elasticsearch sink has been stopped: %s", ec ? ec.message() : "ok");
+        ES_LOG(log, "elasticsearch sink has been stopped: %s", ec ? ec.message() : "ok");
     }
 
     void stop() {
@@ -103,13 +103,13 @@ private:
         stopped = true;
 
         if (thread.joinable()) {
-            LOG(log, "stopping worker thread ...");
+            ES_LOG(log, "stopping worker thread ...");
             thread.join();
         }
     }
 
     void on_started(std::condition_variable& started) {
-        LOG(log, "elasticsearch sink has been started");
+        ES_LOG(log, "elasticsearch sink has been started");
         stopped = false;
         started.notify_all();
     }
@@ -121,21 +121,21 @@ private:
     }
 
     void handle_bulk(std::vector<std::string> result) {
-        LOG(log, "processing bulk event ...");
+        ES_LOG(log, "processing bulk event ...");
         process(std::move(result));
     }
 
     void on_timer(const boost::system::error_code& ec) {
         if (ec) {
-            LOG(log, "processing timer event failed: %s", ec.message());
+            ES_LOG(log, "processing timer event failed: %s", ec.message());
         } else {
-            LOG(log, "processing timer event ...");
+            ES_LOG(log, "processing timer event ...");
             process(std::move(queue.dump()));
         }
     }
 
     void process(std::vector<std::string>&& result) {
-        LOG(log, "processing bulk containing %d messages ...", result.size());
+        ES_LOG(log, "processing bulk containing %d messages ...", result.size());
         client.bulk_write(
             std::move(result),
             std::bind(&elasticsearch_t::on_response, this, std::placeholders::_1)
@@ -151,11 +151,11 @@ private:
                         elasticsearch::response::bulk_write_t
                      >::type&& result) {
         if (boost::get<elasticsearch::error_t>(&result)) {
-            LOG(log, "bulk write failed");
+            ES_LOG(log, "bulk write failed");
             return;
         }
 
-        LOG(log, "success!");
+        ES_LOG(log, "success!");
     }
 };
 
