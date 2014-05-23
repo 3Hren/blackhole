@@ -149,7 +149,7 @@ public:
                 &http_transport_t::on_response<Action>,
                 this, action, callback, attempt + 1, std::placeholders::_1
             );
-            connection->perform(std::move(action), watcher);
+            connection->perform(std::move(action), watcher, settings.timeout);
         } else {
             if (attempt == 1) {
                 ES_LOG(log, "no connections - adding default nodes ...");

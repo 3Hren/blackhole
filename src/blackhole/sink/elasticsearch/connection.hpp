@@ -164,7 +164,9 @@ public:
     }
 
     template<class Action>
-    void perform(Action&& action, typename callback<Action>::type callback) {
+    void perform(Action&& action,
+                 typename callback<Action>::type callback,
+                 long timeout) {
         urlfetcher_t::url_type url;
         url.set_scheme("http");
         url.set_host(address());
@@ -174,6 +176,7 @@ public:
         urlfetcher_t::request_type request;
         request.set_url(url);
         request.headers().set_keep_alive();
+        request.set_timeout(timeout);
 
         response_handler_t<Action> handler(callback, endpoint_, log);
         std::shared_ptr<urlfetcher_t::stream_type> stream = std::move(
