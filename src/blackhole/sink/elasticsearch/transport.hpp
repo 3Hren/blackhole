@@ -25,25 +25,6 @@ void empty() {}
 
 } // namespace aux
 
-struct error_handler_t : public boost::static_visitor<> {
-    std::function<void(const connection_error_t&)> connection;
-    std::function<void(const generic_error_t&)>    generic;
-
-    error_handler_t(std::function<void(const connection_error_t&)> connection,
-                    std::function<void(const generic_error_t&)> generic) :
-        connection(connection),
-        generic(generic)
-    {}
-
-    void operator()(const connection_error_t& err) {
-        connection(err);
-    }
-
-    void operator()(const generic_error_t& err) {
-        generic(err);
-    }
-};
-
 const std::string INET_ADDR_PREFIX = "inet[";
 const std::string INET_ADDR_SUFFIX = "]";
 
@@ -179,17 +160,21 @@ private:
                 int attempt,
                 typename Action::result_type&& result) {
         if (error_t* error = boost::get<error_t>(&result)) {
-            error_handler_t visitor(
-                std::bind(
-                    &http_transport_t::on_connection_error<Action>,
-                    this, std::move(action), callback, attempt, std::placeholders::_1
-                ),
-                std::bind(
-                    &http_transport_t::on_generic_error,
-                    this, std::placeholders::_1
-                )
-            );
-            boost::apply_visitor(visitor, *error);
+            switch (error->which()) {
+            case 0:
+                on_connection_error<Action>(
+                    std::move(action),
+                    callback,
+                    attempt,
+                    boost::get<connection_error_t>(*error)
+                );
+                break;
+            case 1:
+                on_generic_error(boost::get<generic_error_t>(*error));
+                break;
+            default:
+                BOOST_ASSERT(false);
+            }
         }
 
         callback(std::move(result));
