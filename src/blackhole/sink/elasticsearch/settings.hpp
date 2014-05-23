@@ -28,7 +28,7 @@ struct settings_t {
             bool error;
         } when;
 
-        long invertal;
+        long invertal; //!@todo: Use it somewhere.
     } sniffer;
 
     int connections;
