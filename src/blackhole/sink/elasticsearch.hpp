@@ -99,8 +99,9 @@ private:
     }
 
     void stop() {
-        loop.stop();
         stopped = true;
+        timer.cancel();
+        loop.stop();
 
         if (thread.joinable()) {
             ES_LOG(log, "stopping worker thread ...");
@@ -135,6 +136,12 @@ private:
     }
 
     void process(std::vector<std::string>&& result) {
+        if (stopped) {
+            ES_LOG(log, "dropping %d messages, because worker thread is stopped",
+                   result.size());
+            return;
+        }
+
         ES_LOG(log, "processing bulk containing %d messages ...", result.size());
         client.bulk_write(
             std::move(result),
