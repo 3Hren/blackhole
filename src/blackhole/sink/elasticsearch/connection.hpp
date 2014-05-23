@@ -29,14 +29,12 @@ struct urlfetcher_t {
     typedef ioremap::swarm::url_fetcher::response response_type;
 
     loop_type& loop;
-    loop_type::work work;
     ioremap::swarm::logger logger;
     ioremap::swarm::boost_event_loop loop_wrapper;
     ioremap::swarm::url_fetcher manager;
 
     urlfetcher_t(loop_type& loop) :
         loop(loop),
-        work(loop),
         loop_wrapper(loop),
         manager(loop_wrapper, logger)
     {}
