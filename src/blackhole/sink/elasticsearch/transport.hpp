@@ -147,7 +147,7 @@ public:
             ES_LOG(log, "balancing at %s", connection->endpoint());
             auto watcher = std::bind(
                 &http_transport_t::on_response<Action>,
-                this, action, callback, attempt + 1, std::placeholders::_1
+                this, action, callback, attempt, std::placeholders::_1
             );
             connection->perform(std::move(action), watcher, settings.timeout);
         } else {
@@ -211,7 +211,7 @@ private:
             sniff(
                 std::bind(
                     &http_transport_t::perform<Action>,
-                    this, std::move(action), callback, attempt
+                    this, std::move(action), callback, attempt + 1
                 )
             );
             return;
