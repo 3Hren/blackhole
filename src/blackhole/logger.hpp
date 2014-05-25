@@ -106,6 +106,7 @@ public:
         return open_record(std::move(local_attributes), m_scoped_attributes);
     }
 
+protected:
     template<class ScopedAttributes>
     log::record_t open_record(log::attributes_t&& local_attributes,
                               const ScopedAttributes& scoped_attributes) const {
@@ -129,6 +130,7 @@ public:
         return log::record_t();
     }
 
+public:
     void push(log::record_t&& record) const {
         for (auto it = m_frontends.begin(); it != m_frontends.end(); ++it) {
             try {
