@@ -199,7 +199,6 @@ private:
                     this, std::move(action), callback, attempt + 1
                 )
             );
-            return;
         }
     }
 
