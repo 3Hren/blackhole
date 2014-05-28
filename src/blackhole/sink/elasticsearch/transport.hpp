@@ -41,7 +41,7 @@ public:
     typedef Pool pool_type;
     typedef typename pool_type::endpoint_type endpoint_type;
 
-private:
+protected:
     settings_t settings;
 
     loop_type& loop;
