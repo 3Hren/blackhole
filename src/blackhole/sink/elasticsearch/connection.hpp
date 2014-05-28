@@ -43,18 +43,18 @@ struct callback {
     typedef std::function<void(typename Action::result_type)> type;
 };
 
-template<class Action>
+template<class Action, class Connection>
 class response_handler_t {
 public:
     typedef blackhole::synchronized<blackhole::logger_base_t> logger_type;
 
     typedef Action action_type;
+    typedef Connection connection_type;
+
     typedef typename action_type::result_type result_type;
     typedef typename action_type::response_type response_type;
     typedef typename callback<action_type>::type callback_type;
-
-    typedef boost::asio::ip::tcp protocol_type;
-    typedef protocol_type::endpoint endpoint_type;
+    typedef typename connection_type::endpoint_type endpoint_type;
 
 private:
     callback_type callback;
@@ -176,7 +176,10 @@ public:
         request.headers().set_keep_alive();
         request.set_timeout(timeout);
 
-        response_handler_t<Action> handler(callback, endpoint_, log);
+        response_handler_t<
+            Action,
+            http_connection_t
+        > handler(callback, endpoint_, log);
         std::shared_ptr<urlfetcher_t::stream_type> stream = std::move(
             urlfetcher_t::stream_type::create(handler)
         );

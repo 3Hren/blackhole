@@ -241,12 +241,13 @@ private:
                 extract_addresses(addresses, node.addresses);
             }
 
-            typedef boost::asio::ip::tcp protocol_type;
             std::vector<endpoint_type> endpoints;
             for (auto it = addresses.begin(); it != addresses.end(); ++it) {
                 try {
                     endpoints.push_back(
-                        resolver<protocol_type>::resolve(*it, loop)
+                        resolver<
+                            typename connection_type::protocol_type
+                        >::resolve(*it, loop)
                     );
                 } catch (const std::exception& err) {
                     ES_LOG(log, "failed to resolve %s address: %s", *it, err.what());
