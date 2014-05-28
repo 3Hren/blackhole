@@ -46,6 +46,7 @@ private:
     pool_type pool;
     std::unique_ptr<balancing::strategy<pool_type>> balancer;
     urlfetcher_t urlfetcher;
+
 public:
     http_transport_t(settings_t settings, loop_type& loop, logger_type& log) :
         settings(settings),
@@ -156,9 +157,9 @@ public:
 private:
     template<class Action>
     void on_response(Action action,
-                typename callback<Action>::type callback,
-                int attempt,
-                typename Action::result_type&& result) {
+                     typename callback<Action>::type callback,
+                     int attempt,
+                     typename Action::result_type&& result) {
         if (error_t* error = boost::get<error_t>(&result)) {
             switch (error->which()) {
             case 0:
