@@ -28,14 +28,18 @@ void empty() {}
 const std::string INET_ADDR_PREFIX = "inet[";
 const std::string INET_ADDR_SUFFIX = "]";
 
+template<
+    class Connection = http_connection_t,
+    class Pool = pool_t<Connection>
+>
 class http_transport_t {
 public:
     typedef blackhole::synchronized<blackhole::logger_base_t> logger_type;
 
     typedef boost::asio::io_service loop_type;
-    typedef http_connection_t connection_type;
-    typedef pool_t<connection_type> pool_type;
-    typedef pool_type::endpoint_type endpoint_type;
+    typedef Connection connection_type;
+    typedef Pool pool_type;
+    typedef typename pool_type::endpoint_type endpoint_type;
 
 private:
     settings_t settings;

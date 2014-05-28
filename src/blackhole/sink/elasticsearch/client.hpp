@@ -26,7 +26,7 @@ private:
     settings_t settings;
     logger_type& log;
 
-    http_transport_t transport;
+    http_transport_t<> transport;
 
 public:
     client_t(const settings_t& settings, loop_type& loop, logger_type& log) :
