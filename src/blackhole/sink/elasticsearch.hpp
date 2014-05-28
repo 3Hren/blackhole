@@ -60,7 +60,7 @@ public:
         stop();
     }
 
-    void consume(std::string&& message) {
+    void consume(std::string message) {
         if (stopped) {
             ES_LOG(log, "dropping '%s', because worker thread is stopped", message);
             return;
