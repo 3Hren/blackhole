@@ -42,9 +42,7 @@ template<typename Connection>
 class pool_t {
 public:
     typedef Connection connection_type;
-
-    typedef boost::asio::ip::tcp protocol_type;
-    typedef typename protocol_type::endpoint endpoint_type;
+    typedef typename connection_type::endpoint_type endpoint_type;
 
     typedef std::unordered_map<
         endpoint_type,
