@@ -14,6 +14,8 @@ public:
     typedef Pool pool_type;
     typedef typename Pool::connection_type connection_type;
 
+    virtual ~strategy() {}
+
     virtual std::shared_ptr<connection_type> next(pool_type& pool) = 0;
 };
 
