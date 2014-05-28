@@ -46,6 +46,7 @@ public:
         stream(stream_factory_t::get(config.output))
     {}
 
+    //!@todo: Can be value type.
     void consume(const std::string& message) {
         stream << message << std::endl;
     }
