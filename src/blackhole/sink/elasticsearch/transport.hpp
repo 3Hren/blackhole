@@ -177,6 +177,8 @@ private:
             default:
                 BOOST_ASSERT(false);
             }
+        } else {
+            callback(std::move(result));
         }
     }
 
