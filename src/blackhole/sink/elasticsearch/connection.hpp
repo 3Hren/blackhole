@@ -18,8 +18,6 @@
 
 namespace elasticsearch {
 
-class http_connection_t;
-
 struct urlfetcher_t {
     typedef boost::asio::io_service loop_type;
 
