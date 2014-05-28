@@ -172,13 +172,12 @@ private:
                 break;
             case 1:
                 on_generic_error(boost::get<generic_error_t>(*error));
+                callback(std::move(result));
                 break;
             default:
                 BOOST_ASSERT(false);
             }
         }
-
-        callback(std::move(result));
     }
 
     template<class Action>
@@ -208,12 +207,13 @@ private:
         std::is_same<Action, actions::nodes_info_t>::value
     >::type
     on_connection_error(Action,
-                        typename callback<Action>::type,
+                        typename callback<Action>::type callback,
                         int,
                         const connection_error_t& err) {
         ES_LOG(log, "request failed with error: %s", err.reason);
 
         remove_node(err.endpoint);
+        callback(error_t(err));
     }
 
     void on_generic_error(const generic_error_t& err) {
