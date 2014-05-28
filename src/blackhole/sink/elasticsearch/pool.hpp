@@ -52,7 +52,6 @@ public:
     > pool_type;
     typedef typename pool_type::size_type size_type;
     typedef typename pool_type::iterator iterator;
-    typedef typename pool_type::const_iterator const_iterator;
 
     typedef std::mutex mutex_type;
     typedef pool_lock_t<pool_t<connection_type>> pool_lock_type;
@@ -88,14 +87,6 @@ public:
     }
 
     iterator end(pool_lock_type&) BLACKHOLE_NOEXCEPT {
-        return pool.end();
-    }
-
-    const_iterator begin(pool_lock_type&) const BLACKHOLE_NOEXCEPT {
-        return pool.begin();
-    }
-
-    const_iterator end(pool_lock_type&) const BLACKHOLE_NOEXCEPT {
         return pool.end();
     }
 };
