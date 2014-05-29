@@ -226,7 +226,7 @@ private:
         ES_LOG(log, "request failed with error: %s", err.reason);
     }
 
-    void on_sniff(result_t<response::nodes_info_t>::type&& result,
+    void on_sniff(result_t<response::nodes_info_t>::type result,
                   std::function<void()> next) {
         if (auto* info = boost::get<response::nodes_info_t>(&result)) {
             ES_LOG(log, "successfully sniffed %d node%s",
