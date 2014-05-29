@@ -121,6 +121,14 @@ private:
         add_member_impl(node, name, value.c_str());
     }
 
+    void add_member(rapidjson::Value* node, const std::string& name, long value) {
+        add_member_impl(node, name, static_cast<int64_t>(value));
+    }
+
+    void add_member(rapidjson::Value* node, const std::string& name, unsigned long value) {
+        add_member_impl(node, name, static_cast<int64_t>(value));
+    }
+
     template<typename T>
     void add_member_impl(rapidjson::Value* node, const std::string& name, T&& value) {
         node->AddMember(mapped(name).c_str(), std::forward<T>(value), root->GetAllocator());

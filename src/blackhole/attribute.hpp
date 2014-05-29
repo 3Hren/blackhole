@@ -18,10 +18,12 @@ namespace blackhole {
 namespace log {
 
 typedef boost::variant<
-    std::uint32_t,
     std::int32_t,
-    std::uint64_t,
+    std::uint32_t,
+    long,
+    unsigned long,
     std::int64_t,
+    std::uint64_t,
     std::double_t,
     std::string,
     timeval
@@ -41,13 +43,17 @@ typedef aux::underlying_type<scope>::type scope_underlying_type;
 
 static const scope DEFAULT_SCOPE = scope::local;
 
-// Helper metafunction that checks if type `T` is compatible with attribute internal
-// implementation, i.e. `attribute_value_t` variant can be constructed using type `T`.
-// Note, that this metafunction ignores implicit type conversion.
+//! Helper metafunction that checks if the type `T` is compatible with attribute
+//! internal implementation, i.e. `attribute_value_t` variant can be constructed
+//! using type `T`.
+//! @note: This metafunction ignores implicit type conversion.
 template<typename T>
-struct is_supported {
-    static const bool value = boost::mpl::contains<log::attribute_value_t::types, typename std::decay<T>::type>::value;
-};
+struct is_supported :
+    public boost::mpl::contains<
+        log::attribute_value_t::types,
+        typename std::decay<T>::type
+    >
+{};
 
 // Helper metafunction that checks if `attribute_value_t` can be constructed using type `T`.
 template<typename T>
@@ -55,6 +61,7 @@ struct is_constructible {
     typedef boost::mpl::vector<
         const char*,    // Implicit literal to string conversion.
         char,
+        unsigned char,
         short,
         unsigned short
     > additional_types;
