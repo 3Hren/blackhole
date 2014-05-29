@@ -155,6 +155,12 @@ struct event_t {
     }
 };
 
+void post(boost::asio::io_service& loop, callback<mock::action_t>::type callback) {
+    loop.post(
+        std::bind(callback, result_t<mock::response_t>::type(mock::response_t()))
+    );
+}
+
 TEST(transport_t, SuccessfullyHandleMessage) {
     boost::asio::io_service loop;
     synchronized<logger_base_t> log(logger_factory_t::create());
@@ -167,6 +173,7 @@ TEST(transport_t, SuccessfullyHandleMessage) {
         mock::connection_t,
         mock::pool_t
     > transport(settings, loop, log);
+
     EXPECT_CALL(*balancer, next(_))
             .Times(1)
             .WillOnce(Return(connection));
@@ -176,8 +183,8 @@ TEST(transport_t, SuccessfullyHandleMessage) {
     EXPECT_CALL(*connection, perform(An<mock::action_t>(), _, _))
             .Times(1)
             .WillOnce(
-                InvokeArgument<1>(
-                    result_t<mock::response_t>::type(mock::response_t())
+                WithArg<1>(
+                    Invoke(std::bind(&post, std::ref(loop), std::placeholders::_1))
                 )
             );
 
@@ -186,7 +193,7 @@ TEST(transport_t, SuccessfullyHandleMessage) {
     std::atomic<int> counter(0);
     event_t<mock::action_t> event { counter };
     transport.perform(mock::action_t(), event);
-    loop.run();
+    loop.run_one();
 
     EXPECT_EQ(1, counter);
 }
