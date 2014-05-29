@@ -155,10 +155,10 @@ struct event_t {
     }
 };
 
-void post(boost::asio::io_service& loop, callback<mock::action_t>::type callback) {
-    loop.post(
-        std::bind(callback, result_t<mock::response_t>::type(mock::response_t()))
-    );
+void post(boost::asio::io_service& loop,
+          callback<mock::action_t>::type callback,
+          result_t<mock::response_t>::type result) {
+    loop.post(std::bind(callback, result));
 }
 
 namespace stub {
@@ -188,7 +188,14 @@ TEST(transport_t, SuccessfullyHandleMessage) {
             .Times(1)
             .WillOnce(
                 WithArg<1>(
-                    Invoke(std::bind(&post, std::ref(loop), std::placeholders::_1))
+                    Invoke(
+                        std::bind(
+                            &post,
+                            std::ref(loop),
+                            std::placeholders::_1,
+                            mock::response_t()
+                        )
+                    )
                 )
             );
 
