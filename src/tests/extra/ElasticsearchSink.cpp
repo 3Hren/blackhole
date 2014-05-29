@@ -161,9 +161,14 @@ void post(boost::asio::io_service& loop, callback<mock::action_t>::type callback
     );
 }
 
+namespace stub {
+
+synchronized<logger_base_t> log(logger_factory_t::create());
+
+} // namespace stub
+
 TEST(transport_t, SuccessfullyHandleMessage) {
     boost::asio::io_service loop;
-    synchronized<logger_base_t> log(logger_factory_t::create());
 
     std::unique_ptr<mock::balancer> balancer(new mock::balancer);
     std::shared_ptr<mock::connection_t> connection(new mock::connection_t);
@@ -172,13 +177,12 @@ TEST(transport_t, SuccessfullyHandleMessage) {
     inspector::http_transport_t<
         mock::connection_t,
         mock::pool_t
-    > transport(settings, loop, log);
+    > transport(settings, loop, stub::log);
 
     EXPECT_CALL(*balancer, next(_))
             .Times(1)
             .WillOnce(Return(connection));
     EXPECT_CALL(*connection, endpoint())
-            .Times(1)
             .WillOnce(Return(mock::connection_t::endpoint_type()));
     EXPECT_CALL(*connection, perform(An<mock::action_t>(), _, _))
             .Times(1)
