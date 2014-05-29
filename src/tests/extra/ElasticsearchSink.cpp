@@ -202,8 +202,7 @@ TEST(transport_t, SuccessfullyHandleMessage) {
     transport.balancer = std::move(balancer);
 
     std::atomic<int> counter(0);
-    event_t<mock::action_t> event { counter };
-    transport.perform(mock::action_t(), event);
+    transport.perform(mock::action_t(), event_t<mock::action_t> { counter });
     loop.run_one();
 
     EXPECT_EQ(1, counter);
