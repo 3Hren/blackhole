@@ -11,6 +11,8 @@ SET(CMAKE_BUILD_TYPE "Debug")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
 
 IF(ENABLE_ELASTICSEARCH)
+    SET(BUILD_EXAMPLES OFF CACHE BOOL "Build swarm examples")
+    SET(PERF OFF CACHE BOOL "Build swarm performance tests")
     ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/foreign/swarm ${CMAKE_BINARY_DIR}/swarm)
 ENDIF()
 
