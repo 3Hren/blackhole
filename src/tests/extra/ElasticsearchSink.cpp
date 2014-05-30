@@ -282,6 +282,8 @@ TEST(transport_t, HandleConnectionErrorWhenSniffOnErrorIsFalse) {
             .WillRepeatedly(Return(connection));
     EXPECT_CALL(*connection, endpoint())
             .WillRepeatedly(Return(mock::connection_t::endpoint_type()));
+    EXPECT_CALL(transport.pool, remove(mock::connection_t::endpoint_type()))
+            .Times(1);
     EXPECT_CALL(*connection, perform(An<mock::action_t>(), _, _))
             .Times(2)
             .WillOnce(
