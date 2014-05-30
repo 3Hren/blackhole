@@ -118,6 +118,7 @@ struct extractor_t<mock::response_t> {
 } // namespace elasticsearch
 
 class transport_t_AddEndpointToThePool_Test;
+class transport_t_AddEndpointsToThePool_Test;
 class transport_t_RemoveEndpointFromThePool_Test;
 class transport_t_SuccessfullyHandleMessage_Test;
 class transport_t_HandleGenericError_Test;
@@ -134,6 +135,7 @@ namespace inspector {
 template<class Connection, class Pool>
 class http_transport_t : public elasticsearch::http_transport_t<Connection, Pool> {
     friend class ::transport_t_AddEndpointToThePool_Test;
+    friend class ::transport_t_AddEndpointsToThePool_Test;
     friend class ::transport_t_RemoveEndpointFromThePool_Test;
     friend class ::transport_t_SuccessfullyHandleMessage_Test;
     friend class ::transport_t_HandleGenericError_Test;
@@ -194,6 +196,22 @@ TEST(transport_t, AddEndpointToThePool) {
             .Times(1)
             .WillOnce(Return(std::make_pair(mock::pool_t::pool_type().begin(), true)));
     transport.add_node(defaults::endpoint);
+}
+
+TEST(transport_t, AddEndpointsToThePool) {
+    boost::asio::io_service loop;
+    settings_t settings;
+
+    inspector::http_transport_t<
+        mock::connection_t,
+        mock::pool_t
+    > transport(settings, loop, stub::log);
+
+    EXPECT_CALL(transport.pool, insert(_, _))
+            .Times(2)
+            .WillOnce(Return(std::make_pair(mock::pool_t::pool_type().begin(), true)))
+            .WillOnce(Return(std::make_pair(mock::pool_t::pool_type().begin(), false)));
+    transport.add_nodes({ defaults::endpoint, defaults::endpoint});
 }
 
 TEST(transport_t, RemoveEndpointFromThePool) {
