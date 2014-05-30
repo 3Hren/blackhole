@@ -584,13 +584,13 @@ TEST(transport_t, HandleConnectionErrorWhenSniffOnErrorIsTrue) {
 
     // Then, sniff operation returns a single node.
     const response::node_t node {
-        {
+        response::node_t::addresses_type {
             { "http", "inet[localhost/127.0.0.1:9200]" }
         }
     };
     const response::nodes_info_t nodes {
         "mock.cluster",
-        {
+        std::map<std::string, response::node_t> {
             { "mock.node", node }
         }
     };
