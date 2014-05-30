@@ -132,7 +132,7 @@ TEST(nodes_info_t, PathByDefault) {
 }
 
 TEST(bulk_write_t, Class) {
-    actions::bulk_write_t action("index", "type", { "{}" });
+    actions::bulk_write_t action("index", "type", std::vector<std::string> { "{}" });
     UNUSED(action);
 }
 
@@ -141,7 +141,7 @@ TEST(bulk_write_t, Method) {
 }
 
 TEST(bulk_write_t, Path) {
-    actions::bulk_write_t action("index", "type", { "{}" });
+    actions::bulk_write_t action("index", "type", std::vector<std::string> { "{}" });
     EXPECT_EQ("/index/type/_bulk", action.path());
 }
 
