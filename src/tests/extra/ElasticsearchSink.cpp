@@ -138,12 +138,13 @@ public:
 
 } // namespace inspector
 
-template<class Action>
+template<class Action, class T>
 struct event_t {
     std::atomic<int>& counter;
 
-    void operator()(typename Action::result_type) {
+    void operator()(typename Action::result_type result) {
         counter++;
+        EXPECT_TRUE(boost::get<T>(&result));
     }
 };
 
@@ -195,7 +196,10 @@ TEST(transport_t, SuccessfullyHandleMessage) {
     transport.balancer = std::move(balancer);
 
     std::atomic<int> counter(0);
-    transport.perform(mock::action_t(), event_t<mock::action_t> { counter });
+    transport.perform(
+        mock::action_t(),
+        event_t<mock::action_t, mock::response_t> { counter }
+    );
     loop.run_one();
 
     EXPECT_EQ(1, counter);
@@ -241,7 +245,10 @@ TEST(transport_t, HandleGenericError) {
     transport.balancer = std::move(balancer);
 
     std::atomic<int> counter(0);
-    transport.perform(mock::action_t(), event_t<mock::action_t> { counter });
+    transport.perform(
+        mock::action_t(),
+        event_t<mock::action_t, elasticsearch::error_t> { counter }
+    );
     loop.run_one();
 
     EXPECT_EQ(1, counter);
