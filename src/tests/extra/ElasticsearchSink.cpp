@@ -23,6 +23,12 @@ TEST(elasticsearch_t, Manual) {
     }
 }
 
+TEST(utils, MakePath) {
+    EXPECT_EQ("/", elasticsearch::utils::make_path("/"));
+    EXPECT_EQ("/index", elasticsearch::utils::make_path("index"));
+    EXPECT_EQ("/index/type", elasticsearch::utils::make_path("index", "type"));
+}
+
 TEST(nodes_info_t, Class) {
     actions::nodes_info_t action;
     UNUSED(action);

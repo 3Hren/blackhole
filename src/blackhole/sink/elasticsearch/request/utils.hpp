@@ -13,11 +13,14 @@ inline void substitute(std::ostringstream&) {}
 
 template<typename... Args>
 inline void substitute(std::ostringstream& stream,
-                       const std::string arg,
                        const std::string& arg,
                        const Args&... args) {
     if (!arg.empty()) {
-        stream << "/" << arg;
+        stream << "/";
+
+        if (arg != "/") {
+            stream << arg;
+        }
     }
 
     substitute(stream, args...);
