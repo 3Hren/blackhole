@@ -25,8 +25,7 @@ using namespace elasticsearch;
 
 namespace mock {
 
-class response_t {
-};
+class response_t {};
 
 class action_t {
 public:
@@ -118,6 +117,8 @@ struct extractor_t<mock::response_t> {
 
 } // namespace elasticsearch
 
+class transport_t_AddEndpointToThePool_Test;
+class transport_t_RemoveEndpointFromThePool_Test;
 class transport_t_SuccessfullyHandleMessage_Test;
 class transport_t_HandleGenericError_Test;
 class transport_t_HandleConnectionErrorWhenSniffOnErrorIsFalse_Test;
@@ -132,6 +133,8 @@ namespace inspector {
 //!@note: Helper class to easy ancestor's mock fields inspection.
 template<class Connection, class Pool>
 class http_transport_t : public elasticsearch::http_transport_t<Connection, Pool> {
+    friend class ::transport_t_AddEndpointToThePool_Test;
+    friend class ::transport_t_RemoveEndpointFromThePool_Test;
     friend class ::transport_t_SuccessfullyHandleMessage_Test;
     friend class ::transport_t_HandleGenericError_Test;
     friend class ::transport_t_HandleConnectionErrorWhenSniffOnErrorIsFalse_Test;
@@ -177,6 +180,35 @@ namespace stub {
 synchronized<logger_base_t> log(logger_factory_t::create());
 
 } // namespace stub
+
+TEST(transport_t, AddEndpointToThePool) {
+    boost::asio::io_service loop;
+    settings_t settings;
+
+    inspector::http_transport_t<
+        mock::connection_t,
+        mock::pool_t
+    > transport(settings, loop, stub::log);
+
+    EXPECT_CALL(transport.pool, insert(defaults::endpoint, _))
+            .Times(1)
+            .WillOnce(Return(std::make_pair(mock::pool_t::pool_type().begin(), true)));
+    transport.add_node(defaults::endpoint);
+}
+
+TEST(transport_t, RemoveEndpointFromThePool) {
+    boost::asio::io_service loop;
+    settings_t settings;
+
+    inspector::http_transport_t<
+        mock::connection_t,
+        mock::pool_t
+    > transport(settings, loop, stub::log);
+
+    EXPECT_CALL(transport.pool, remove(defaults::endpoint))
+            .Times(1);
+    transport.remove_node(defaults::endpoint);
+}
 
 TEST(transport_t, SuccessfullyHandleMessage) {
     boost::asio::io_service loop;
