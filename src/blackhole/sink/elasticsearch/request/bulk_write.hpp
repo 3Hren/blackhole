@@ -16,7 +16,7 @@ public:
     typedef response::bulk_write_t response_type;
     typedef result_t<response_type>::type result_type;
 
-    static const request::method_t method_value = request::method_t::post;
+    static const request::method_t method_value;
 
     static const char* name() {
         return "bulk_write";
@@ -65,6 +65,8 @@ private:
         return result;
     }
 };
+
+const request::method_t bulk_write_t::method_value = request::method_t::post;
 
 } // namespace actions
 

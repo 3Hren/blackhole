@@ -117,6 +117,34 @@ struct extractor_t<mock::response_t> {
 
 } // namespace elasticsearch
 
+TEST(nodes_info_t, Class) {
+    actions::nodes_info_t action;
+    UNUSED(action);
+}
+
+TEST(nodes_info_t, Method) {
+    EXPECT_EQ(request::method_t::get, actions::nodes_info_t::method_value);
+}
+
+TEST(nodes_info_t, PathByDefault) {
+    actions::nodes_info_t action;
+    EXPECT_EQ("/_nodes/_all/none", action.path());
+}
+
+TEST(bulk_write_t, Class) {
+    actions::bulk_write_t action("index", "type", { "{}" });
+    UNUSED(action);
+}
+
+TEST(bulk_write_t, Method) {
+    EXPECT_EQ(request::method_t::post, actions::bulk_write_t::method_value);
+}
+
+TEST(bulk_write_t, Path) {
+    actions::bulk_write_t action("index", "type", { "{}" });
+    EXPECT_EQ("/index/type/_bulk", action.path());
+}
+
 class transport_t_AddEndpointToThePool_Test;
 class transport_t_AddEndpointsToThePool_Test;
 class transport_t_RemoveEndpointFromThePool_Test;
