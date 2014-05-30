@@ -26,6 +26,7 @@ private:
 
     std::queue<T> queue;
     mutable std::mutex mutex;
+
 public:
     queue_t(std::uint16_t bulk, callback_type callback) :
         bulk(bulk),
