@@ -122,6 +122,7 @@ class transport_t_SuccessfullyHandleMessage_Test;
 class transport_t_HandleGenericError_Test;
 class transport_t_HandleConnectionErrorWhenSniffOnErrorIsFalse_Test;
 class transport_t_HandleConnectionErrorWhenSniffOnErrorIsFalseAndNoConnectionsLeft_Test;
+class transport_t_HandleConnectionErrorWhenSniffOnErrorIsFalseAndNoAttemptsLeft_Test;
 
 namespace inspector {
 
@@ -132,6 +133,7 @@ class http_transport_t : public elasticsearch::http_transport_t<Connection, Pool
     friend class ::transport_t_HandleGenericError_Test;
     friend class ::transport_t_HandleConnectionErrorWhenSniffOnErrorIsFalse_Test;
     friend class ::transport_t_HandleConnectionErrorWhenSniffOnErrorIsFalseAndNoConnectionsLeft_Test;
+    friend class ::transport_t_HandleConnectionErrorWhenSniffOnErrorIsFalseAndNoAttemptsLeft_Test;
 
 public:
     template<typename... Args>
@@ -395,6 +397,70 @@ TEST(transport_t, HandleConnectionErrorWhenSniffOnErrorIsFalseAndNoConnectionsLe
         event_t<mock::action_t, elasticsearch::error_t> { counter }
     );
     loop.run_one();
+    loop.run_one();
+
+    EXPECT_EQ(1, counter);
+}
+
+TEST(transport_t, HandleConnectionErrorWhenSniffOnErrorIsFalseAndNoAttemptsLeft) {
+    /*! After receiving connection error, transport should remove the corrupted
+     *  node from the pool and try another endpoint.
+     *  Sniffing after error shouldn't occur, because we disable this option
+     *  explicitly.
+     *  The second request will fail, because we ran out of attempts.
+     */
+
+    boost::asio::io_service loop;
+
+    std::unique_ptr<mock::balancer> balancer(new mock::balancer);
+    std::shared_ptr<mock::connection_t> connection(new mock::connection_t);
+
+    settings_t settings;
+    settings.sniffer.when.error = false;
+    settings.retries = 1;
+
+    inspector::http_transport_t<
+        mock::connection_t,
+        mock::pool_t
+    > transport(settings, loop, stub::log);
+
+    EXPECT_CALL(*balancer, next(_))
+            .Times(1)
+            .WillOnce(Return(connection));
+    EXPECT_CALL(*connection, endpoint())
+            .WillRepeatedly(Return(mock::connection_t::endpoint_type()));
+    EXPECT_CALL(transport.pool, remove(mock::connection_t::endpoint_type()))
+            .Times(1);
+    EXPECT_CALL(*connection, perform(An<mock::action_t>(), _, _))
+            .Times(1)
+            // Here we mock first perform to be failed with connection error.
+            .WillOnce(
+                WithArg<1>(
+                    Invoke(
+                        std::bind(
+                            &post,
+                            std::ref(loop),
+                            std::placeholders::_1,
+                            elasticsearch::error_t(
+                                connection_error_t(
+                                    mock::connection_t::endpoint_type(),
+                                    "mock"
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+
+    transport.balancer = std::move(balancer);
+
+    std::atomic<int> counter(0);
+    transport.perform(
+        mock::action_t(),
+        event_t<mock::action_t, elasticsearch::error_t> { counter }
+    );
+    loop.run_one();
+    // The second poll needs to extract error task from the event loop.
     loop.run_one();
 
     EXPECT_EQ(1, counter);
