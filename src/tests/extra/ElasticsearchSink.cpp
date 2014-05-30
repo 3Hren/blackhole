@@ -288,6 +288,7 @@ TEST(transport_t, HandleConnectionErrorWhenSniffOnErrorIsFalse) {
             .Times(1);
     EXPECT_CALL(*connection, perform(An<mock::action_t>(), _, _))
             .Times(2)
+            // Here we mock first perform to be failed with connection error.
             .WillOnce(
                 WithArg<1>(
                     Invoke(
@@ -305,6 +306,7 @@ TEST(transport_t, HandleConnectionErrorWhenSniffOnErrorIsFalse) {
                     )
                 )
             )
+            // And here (the second perform) it'll be okay.
             .WillOnce(
                 WithArg<1>(
                     Invoke(
