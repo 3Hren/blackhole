@@ -205,6 +205,8 @@ private:
                     this, std::move(action), callback, attempt + 1
                 )
             );
+        } else {
+            perform(std::move(action), callback, attempt + 1);
         }
     }
 

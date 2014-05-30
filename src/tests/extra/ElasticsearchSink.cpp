@@ -120,6 +120,7 @@ struct extractor_t<mock::response_t> {
 
 class transport_t_SuccessfullyHandleMessage_Test;
 class transport_t_HandleGenericError_Test;
+class transport_t_HandleConnectionErrorWhenSniffOnErrorIsFalse_Test;
 
 namespace inspector {
 
@@ -128,6 +129,7 @@ template<class Connection, class Pool>
 class http_transport_t : public elasticsearch::http_transport_t<Connection, Pool> {
     friend class ::transport_t_SuccessfullyHandleMessage_Test;
     friend class ::transport_t_HandleGenericError_Test;
+    friend class ::transport_t_HandleConnectionErrorWhenSniffOnErrorIsFalse_Test;
 
 public:
     template<typename... Args>
@@ -249,6 +251,79 @@ TEST(transport_t, HandleGenericError) {
         mock::action_t(),
         event_t<mock::action_t, elasticsearch::error_t> { counter }
     );
+    loop.run_one();
+
+    EXPECT_EQ(1, counter);
+}
+
+TEST(transport_t, HandleConnectionErrorWhenSniffOnErrorIsFalse) {
+    /*! After receiving connection error, transport should remove the corrupted
+     *  node from the pool and try another endpoint.
+     *  Sniffing after error shouldn't occur, because we disable this option
+     *  explicitly.
+     *  The second request succeed.
+     */
+
+    boost::asio::io_service loop;
+
+    std::unique_ptr<mock::balancer> balancer(new mock::balancer);
+    std::shared_ptr<mock::connection_t> connection(new mock::connection_t);
+
+    settings_t settings;
+    settings.sniffer.when.error = false;
+
+    inspector::http_transport_t<
+        mock::connection_t,
+        mock::pool_t
+    > transport(settings, loop, stub::log);
+
+    EXPECT_CALL(*balancer, next(_))
+            .Times(2)
+            .WillRepeatedly(Return(connection));
+    EXPECT_CALL(*connection, endpoint())
+            .WillRepeatedly(Return(mock::connection_t::endpoint_type()));
+    EXPECT_CALL(*connection, perform(An<mock::action_t>(), _, _))
+            .Times(2)
+            .WillOnce(
+                WithArg<1>(
+                    Invoke(
+                        std::bind(
+                            &post,
+                            std::ref(loop),
+                            std::placeholders::_1,
+                            elasticsearch::error_t(
+                                connection_error_t(
+                                    mock::connection_t::endpoint_type(),
+                                    "mock"
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+            .WillOnce(
+                WithArg<1>(
+                    Invoke(
+                        std::bind(
+                            &post,
+                            std::ref(loop),
+                            std::placeholders::_1,
+                            mock::response_t()
+                        )
+                    )
+                )
+            );
+
+    transport.balancer = std::move(balancer);
+
+    std::atomic<int> counter(0);
+    transport.perform(
+        mock::action_t(),
+        event_t<mock::action_t, mock::response_t> { counter }
+    );
+    loop.run_one();
+
+    //! Poll the second callback (should be successful).
     loop.run_one();
 
     EXPECT_EQ(1, counter);
