@@ -25,16 +25,6 @@ using namespace elasticsearch;
 
 namespace mock {
 
-class logger_t {
-public:
-    template<typename... Args>
-    log::record_t open_record(Args&&...) const {
-        return log::record_t();
-    }
-
-    void push(log::record_t&&) const {}
-};
-
 class response_t {
 };
 
