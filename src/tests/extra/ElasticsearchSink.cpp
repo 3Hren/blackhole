@@ -166,6 +166,7 @@ TEST(transport_t, SuccessfullyHandleMessage) {
     std::shared_ptr<mock::connection_t> connection(new mock::connection_t);
 
     settings_t settings;
+
     inspector::http_transport_t<
         mock::connection_t,
         mock::pool_t
@@ -201,8 +202,9 @@ TEST(transport_t, SuccessfullyHandleMessage) {
 }
 
 TEST(transport_t, HandleGenericError) {
-    //! After receiving the response with some elasticsearch error,
-    //! a caller's callback must be called during next event loop tick.
+    /*! After receiving the response with some elasticsearch error, a caller's
+     *  callback must be called during the next event loop tick.
+     */
 
     boost::asio::io_service loop;
 
@@ -210,6 +212,7 @@ TEST(transport_t, HandleGenericError) {
     std::shared_ptr<mock::connection_t> connection(new mock::connection_t);
 
     settings_t settings;
+
     inspector::http_transport_t<
         mock::connection_t,
         mock::pool_t
