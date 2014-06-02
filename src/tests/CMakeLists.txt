@@ -17,16 +17,11 @@ IF(ENABLE_ELASTICSEARCH)
 ENDIF()
 
 file(GLOB_RECURSE BLACKHOLE_HEADERS . ../blackhole/*.hpp)
+file(GLOB_RECURSE BLACKHOLE_TESTING_HEADERS . *.hpp)
 
 SET(HEADERS
     ${BLACKHOLE_HEADERS}
-    global.hpp
-    mocks.hpp
-    mocks/files.hpp
-    mocks/logger.hpp
-    mocks/socket.hpp
-    mocks/syslog.hpp
-    datetime/common.hpp
+    ${BLACKHOLE_TESTING_HEADERS}
 )
 
 SET(BASE_SOURCES
