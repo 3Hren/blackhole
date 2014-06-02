@@ -45,6 +45,9 @@ protected:
     settings_t settings;
 
     loop_type& loop;
+    boost::asio::deadline_timer timer;
+    boost::posix_time::milliseconds interval;
+
     logger_type& log;
 
     pool_type pool;
@@ -55,10 +58,21 @@ public:
     http_transport_t(settings_t settings, loop_type& loop, logger_type& log) :
         settings(settings),
         loop(loop),
+        timer(loop),
+        interval(settings.sniffer.invertal),
         log(log),
         balancer(new balancing::round_robin<pool_type>()),
         urlfetcher(loop)
-    {}
+    {
+        timer.expires_from_now(interval);
+        timer.async_wait(
+            std::bind(
+                &http_transport_t::on_sniff_timer,
+                this,
+                std::placeholders::_1
+            )
+        );
+    }
 
     void add_nodes(const std::vector<endpoint_type>& endpoints) {
         for (auto it = endpoints.begin(); it != endpoints.end(); ++it) {
@@ -101,6 +115,15 @@ public:
     }
 
     void sniff(std::function<void()>&& then) {
+        timer.expires_from_now(interval);
+        timer.async_wait(
+            std::bind(
+                &http_transport_t::on_sniff_timer,
+                this,
+                std::placeholders::_1
+            )
+        );
+
         ES_LOG(log, "sniffing nodes info ...");
         auto callback = std::bind(
             &http_transport_t::on_sniff, this, std::placeholders::_1, then
@@ -260,6 +283,15 @@ private:
         }
 
         next();
+    }
+
+    void on_sniff_timer(const boost::system::error_code& ec) {
+        if (ec) {
+            ES_LOG(log, "sniff on timer event failed: %s", ec.message());
+        } else {
+            ES_LOG(log, "processing sniff on timer event ...");
+            sniff();
+        }
     }
 
     void extract_addresses(std::set<std::string>& result,

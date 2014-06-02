@@ -626,6 +626,9 @@ TEST(transport_t, HandleConnectionErrorWhenSniffOnErrorIsTrue) {
             );
     loop.run_one();
 
+    // Extract sniff on timer cancelled event.
+    loop.run_one();
+
     // Extract callback with successful result.
     loop.run_one();
 
@@ -719,6 +722,9 @@ TEST(transport_t, HandleConnectionErrorWhenSniffOnErrorIsTrueAndItFails) {
                     )
                 )
             );
+    loop.run_one();
+
+    // Extract sniff on timer cancelled event.
     loop.run_one();
 
     // Extract callback with successful result.
