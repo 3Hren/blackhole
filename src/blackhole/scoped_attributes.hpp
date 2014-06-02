@@ -14,7 +14,7 @@ class scoped_attributes_t :
     mutable log::attributes_t m_merged_attributes;
 
 public:
-    scoped_attributes_t(logger_base_t &logger, log::attributes_t&& attributes) :
+    scoped_attributes_t(logger_base_t& logger, log::attributes_t&& attributes) :
         scoped_attributes_concept_t(logger),
         m_guard_attributes(std::move(attributes))
     { }
