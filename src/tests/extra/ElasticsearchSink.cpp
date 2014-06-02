@@ -13,16 +13,6 @@ TEST(elasticsearch_t, Class) {
     UNUSED(sink);
 }
 
-TEST(elasticsearch_t, Manual) {
-    using blackhole::sink::elasticsearch_t;
-    elasticsearch_t sink;
-    std::string msg = "{}";
-    boost::algorithm::replace_all(msg, "'", "\"");
-    for (int i = 0; i < 200; ++i) {
-        sink.consume(msg);
-    }
-}
-
 TEST(utils, MakePath) {
     EXPECT_EQ("/", elasticsearch::utils::make_path("/"));
     EXPECT_EQ("/index", elasticsearch::utils::make_path("index"));
@@ -735,4 +725,14 @@ TEST(transport_t, HandleConnectionErrorWhenSniffOnErrorIsTrueAndItFails) {
     loop.run_one();
 
     EXPECT_EQ(1, counter);
+}
+
+TEST(elasticsearch_t, Manual) {
+    using blackhole::sink::elasticsearch_t;
+    elasticsearch_t sink;
+    std::string msg = "{}";
+    boost::algorithm::replace_all(msg, "'", "\"");
+    for (int i = 0; i < 200; ++i) {
+        sink.consume(msg);
+    }
 }
