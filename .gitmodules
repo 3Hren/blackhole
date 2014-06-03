@@ -10,3 +10,6 @@
 [submodule "foreign/swarm"]
 	path = foreign/swarm
 	url = https://github.com/reverbrain/swarm.git
+[submodule "foreign/urdl"]
+	path = foreign/urdl
+	url = git@github.com:chriskohlhoff/urdl.git
