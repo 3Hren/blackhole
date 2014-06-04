@@ -2,8 +2,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET(PROJECT blackhole-tests)
 
 # The next line enforces google testing framework to use own tuple implementation.
-ADD_DEFINITIONS(-DURDL_HEADER_ONLY=1)
-ADD_DEFINITIONS(-DURDL_DISABLE_SSL=1)
 ADD_DEFINITIONS(-DGTEST_USE_OWN_TR1_TUPLE=1)
 ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/foreign/gmock ${CMAKE_BINARY_DIR}/gmock)
 
@@ -13,9 +11,8 @@ SET(CMAKE_BUILD_TYPE "Debug")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
 
 IF(ENABLE_ELASTICSEARCH)
-    SET(BUILD_EXAMPLES OFF CACHE BOOL "Build swarm examples")
-    SET(PERF OFF CACHE BOOL "Build swarm performance tests")
-    ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/foreign/swarm ${CMAKE_BINARY_DIR}/swarm)
+    ADD_DEFINITIONS(-DURDL_HEADER_ONLY=1)
+    ADD_DEFINITIONS(-DURDL_DISABLE_SSL=1)
 ENDIF()
 
 file(GLOB_RECURSE BLACKHOLE_HEADERS . ../blackhole/*.hpp)
@@ -98,7 +95,6 @@ PROJECT(${PROJECT})
 INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/foreign/rapidjson/include
-    SYSTEM ${CMAKE_SOURCE_DIR}/foreign/urdl/include
     SYSTEM ${CMAKE_SOURCE_DIR}/foreign/gmock/include
     SYSTEM ${CMAKE_SOURCE_DIR}/foreign/gtest/include
 )
@@ -122,16 +118,7 @@ TARGET_LINK_LIBRARIES(${PROJECT}
 
 IF(ENABLE_ELASTICSEARCH)
     INCLUDE_DIRECTORIES(
-	SYSTEM ${CMAKE_SOURCE_DIR}/foreign/swarm
-    )
-
-    LINK_DIRECTORIES(
-	${CMAKE_BINARY_DIR}/swarm
-    )
-
-    TARGET_LINK_LIBRARIES(${PROJECT}
-	swarm
-	swarm_urlfetcher
+	SYSTEM ${CMAKE_SOURCE_DIR}/foreign/urdl/include
     )
 ENDIF()
 
