@@ -5,6 +5,8 @@
 #include <urdl/option_set.hpp>
 #include <urdl/read_stream.hpp>
 
+#include <blackhole/utils/atomic.hpp>
+
 #include "../global.hpp"
 
 namespace urlfetch {
