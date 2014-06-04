@@ -31,7 +31,7 @@ public:
     > callback_type;
 
 private:
-    std::array<char, 4096> buffer;
+    char buffer[4096];
 
     request_t request;
     response_t response;
@@ -95,7 +95,7 @@ private:
             return;
         }
 
-        response.data.append(buffer.begin(), buffer.begin() + length);
+        response.data.append(buffer, length);
         post_read();
     }
 
