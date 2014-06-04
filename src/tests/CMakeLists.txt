@@ -2,6 +2,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET(PROJECT blackhole-tests)
 
 # The next line enforces google testing framework to use own tuple implementation.
+ADD_DEFINITIONS(-DURDL_HEADER_ONLY=1)
+ADD_DEFINITIONS(-DURDL_DISABLE_SSL=1)
 ADD_DEFINITIONS(-DGTEST_USE_OWN_TR1_TUPLE=1)
 ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/foreign/gmock ${CMAKE_BINARY_DIR}/gmock)
 
@@ -72,6 +74,7 @@ IF(ENABLE_ELASTICSEARCH)
     SET(ES_SOURCES
 	extra/ElasticsearchSink
 	extra/Resolver
+	extra/UrlFetch
     )
 ENDIF()
 
@@ -87,6 +90,7 @@ SET(BOOST_COMPONENTS
     system
     filesystem
     thread
+    date_time
 )
 
 PROJECT(${PROJECT})
@@ -94,6 +98,7 @@ PROJECT(${PROJECT})
 INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/foreign/rapidjson/include
+    SYSTEM ${CMAKE_SOURCE_DIR}/foreign/urdl/include
     SYSTEM ${CMAKE_SOURCE_DIR}/foreign/gmock/include
     SYSTEM ${CMAKE_SOURCE_DIR}/foreign/gtest/include
 )
