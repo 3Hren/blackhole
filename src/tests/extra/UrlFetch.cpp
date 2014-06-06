@@ -197,6 +197,21 @@ struct successfull_get_t {
 } // namespace testing
 
 TEST(urlfetch_t, SuccessfullGet) {
+    //!\brief GET request, which should handle correctly.
+
+    /*! The main idea of this test is to check http stream's correct method
+     *  invocation sequence.
+     *  We create GET request and push it into the urlfetch::task_t object.
+     *  The first event should be a connection opening, from which our mock
+     *  must be called, which puts stream's read callback invocation with
+     *  correct error code (no errors) into the event loop.
+     *  Then we poll one event which should be exactly that callback.
+     *  We mock it to write empty json string "{}" into the buffer and then
+     *  just wait for the next chunk.
+     *  The next event loop tick there will be no chunks, but there will be EOF
+     *  error, which should trigger result callback's invocation with all
+     *  received data.
+     */
     urlfetch::request_t request;
     request.url = "http://127.0.0.1:80";
 
@@ -207,6 +222,7 @@ TEST(urlfetch_t, SuccessfullGet) {
         urlfetch::task_t<mock::stream_t>
     >(request, event, loop);
 
+    // We mock `async_open` to handle correctly and post channel reading.
     EXPECT_CALL(task->stream(), async_open(urdl::url("http://127.0.0.1:80"), _))
             .Times(1)
             .WillOnce(
@@ -223,7 +239,7 @@ TEST(urlfetch_t, SuccessfullGet) {
             );
     task->run();
 
-    // First read event - just writing some bytes to the buffer.
+    // The first read event - just writing some bytes to the buffer.
     EXPECT_CALL(task->stream(), async_read_some(_, _))
             .Times(1)
             .WillOnce(
@@ -242,8 +258,8 @@ TEST(urlfetch_t, SuccessfullGet) {
     // Poll `on_open` task.
     loop.run_one();
 
-    // Second read event - pushing EOF "error" to notify, that no more bytes
-    // will be received.
+    // The second read event - pushing EOF "error" to notify, that there will
+    // no more bytes be received.
     EXPECT_CALL(task->stream(), async_read_some(_, _))
             .Times(1)
             .WillOnce(
