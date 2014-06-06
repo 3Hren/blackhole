@@ -63,18 +63,17 @@ public:
 
 private:
     void on_open(const boost::system::error_code& ec) {
-        std::cout << "on_open" << std::endl;
-        //!@todo:
-//        if (ec) {
-//            callback(url, "", ec);
-//            return;
-//        }
+        std::cout << "on_open: " << ec.message() << std::endl;
+        if (ec) {
+            callback(std::move(request), std::move(response), ec);
+            return;
+        }
 
         post_read();
     }
 
     void on_read(const boost::system::error_code& ec, std::size_t length) {
-        std::cout << "on_read" << std::endl;
+        std::cout << "on_read: " << ec.message() << std::endl;
         if (ec) {
             //!@todo: timer.cancel();
             if (ec.value() == boost::asio::error::eof) {
@@ -85,11 +84,7 @@ private:
                 );
             } else {
                 //!@todo:
-//                callback(
-//                    std::move(request),
-//                    std::move(response),
-//                    ec
-//                );
+                //callback(std::move(request), std::move(response), ec);
             }
 
             return;
@@ -284,6 +279,70 @@ TEST(urlfetch_t, SuccessfulGet) {
     loop.run_one();
 
     EXPECT_EQ(1, counter);
+}
+
+TEST(urlfetch_t, SuccessfulPost) {
+    //!@todo: Implement.
+}
+
+namespace testing {
+
+struct connection_error_t {
+    std::atomic<int>& counter;
+
+    void operator()(urlfetch::request_t&&,
+                    urlfetch::response_t&&,
+                    const boost::system::error_code& ec) {
+        EXPECT_EQ(boost::asio::error::connection_refused, ec.value());
+        counter++;
+    }
+};
+
+} // namespace testing
+
+TEST(urlfetch_t, DirectConnectionError) {
+    std::atomic<int> counter(0);
+
+    urlfetch::request_t request;
+    request.url = "http://127.0.0.1:80";
+
+    testing::connection_error_t event { counter };
+    urlfetch::task_t<mock::stream_t>::loop_type loop;
+    auto task = std::make_shared<
+        urlfetch::task_t<mock::stream_t>
+    >(request, event, loop);
+
+    // We mock `async_open` to emit connection error.
+    EXPECT_CALL(task->stream(), async_open(_, _))
+            .Times(1)
+            .WillOnce(
+                WithArg<1>(
+                    Invoke(
+                        std::bind(
+                            &post_open,
+                            std::ref(loop),
+                            std::placeholders::_1,
+                            boost::asio::error::make_error_code(
+                                boost::asio::error::connection_refused
+                            )
+                        )
+                    )
+                )
+            );
+    task->run();
+
+    // Extract callback.
+    loop.run_one();
+    EXPECT_EQ(1, counter);
+}
+
+TEST(urlfetch_t, DeferredConnectionError) {
+}
+
+TEST(urlfetch_t, Timeout) {
+}
+
+TEST(urlfetch_t, Cancel) {
 }
 
 // Test-> failed
