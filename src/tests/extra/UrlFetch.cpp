@@ -172,10 +172,6 @@ void post_read(boost::asio::io_service& loop,
 
 namespace testing {
 
-struct event_t {
-    std::atomic<int>& counter;
-};
-
 struct successfull_get_t {
     std::atomic<int>& counter;
 
