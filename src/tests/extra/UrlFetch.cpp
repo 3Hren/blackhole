@@ -69,7 +69,7 @@ private:
             return;
         }
 
-        post_read();
+        async_read_some();
     }
 
     void on_read(const boost::system::error_code& ec, std::size_t length) {
@@ -91,10 +91,10 @@ private:
         }
 
         response.data.append(buffer, length);
-        post_read();
+        async_read_some();
     }
 
-    void post_read() {
+    void async_read_some() {
         stream_.async_read_some(
             boost::asio::buffer(buffer),
             std::bind(
