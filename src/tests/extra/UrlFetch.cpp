@@ -196,7 +196,7 @@ struct successfull_get_t {
 
 } // namespace testing
 
-TEST(urlfetch_t, SuccessfullGet) {
+TEST(urlfetch_t, SuccessfulGet) {
     //!\brief GET request, which should handle correctly.
 
     /*! The main idea of this test is to check http stream's correct method
