@@ -341,10 +341,6 @@ TEST(urlfetch_t, Timeout) {
 TEST(urlfetch_t, Cancel) {
 }
 
-// Test-> failed
-// Test-> timeout
-// Test-> cancel
-
 TEST(urlfetch_t, Manual) {
 //    urlfetch::get(url, callback, loop, timeout=default);
 //    urlfetch::post(url, body, callback, loop, timeout=default);
