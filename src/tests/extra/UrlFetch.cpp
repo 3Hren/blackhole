@@ -450,29 +450,30 @@ TEST(urlfetch_t, DeferredConnectionError) {
     EXPECT_EQ(1, counter);
 }
 
-struct save_callback_t {
-    typedef std::function<
-        void(const boost::system::error_code&, std::size_t length)
-    > task_type;
+namespace testing {
 
-    boost::optional<task_type>& task;
+typedef std::function<
+    void(const boost::system::error_code&, std::size_t length)
+> task_type;
 
-    void operator()(task_type task) {
-        this->task = task;
-    }
+void assign(boost::optional<task_type>& lhs, task_type rhs) {
+    lhs = rhs;
+}
 
-    void operator()(boost::asio::io_service& loop,
-                    const boost::system::error_code& ec) {
-        ASSERT_TRUE(task.is_initialized());
-        loop.post(std::bind(task.get(), ec, 0));
-    }
-};
+void apply(boost::optional<task_type>& task,
+           boost::asio::io_service& loop,
+           const boost::system::error_code& ec) {
+    ASSERT_TRUE(task.is_initialized());
+    loop.post(std::bind(task.get(), ec, 0));
+}
+
+} // namespace testing
 
 TEST(urlfetch_t, Timeout) {
     //! \brief Test timeout event.
 
     /*! By default every request has 1000 milliseconds timeout. We set it to
-     *  10 and create GET task. After successful stream opening we just do
+     *  10 ms and create GET task. After successful stream opening we just do
      *  nothing, imitating by that long delay, which should be interrupted
      *  by the timeout event.
      *  Entire request should fail with timed out error.
@@ -514,15 +515,15 @@ TEST(urlfetch_t, Timeout) {
     // method invocation, so the only way to stop the event loop - is to wait
     // for timeout. Thus, we must save callback into some variable to be able
     // to invoke it later.
-    boost::optional<save_callback_t::task_type> saved_task;
-    auto saver = save_callback_t { saved_task };
+    boost::optional<testing::task_type> saved_task;
     EXPECT_CALL(task->stream(), async_read_some(_, _))
             .Times(1)
             .WillOnce(
                 WithArg<1>(
                     Invoke(
                         std::bind(
-                            saver,
+                            testing::assign,
+                            std::ref(saved_task),
                             std::placeholders::_1
                         )
                     )
@@ -540,7 +541,8 @@ TEST(urlfetch_t, Timeout) {
             .WillOnce(
                 Invoke(
                     std::bind(
-                        saver,
+                        testing::apply,
+                        std::ref(saved_task),
                         std::ref(loop),
                         boost::asio::error::make_error_code(
                             boost::asio::error::operation_aborted
@@ -594,15 +596,15 @@ TEST(urlfetch_t, Cancel) {
     // method invocation, so there are two ways to stop the event loop -
     // is to wait for timeout or to cancel. Thus, we must save callback into
     // some variable to be able to invoke it later.
-    boost::optional<save_callback_t::task_type> saved_task;
-    auto saver = save_callback_t { saved_task };
+    boost::optional<testing::task_type> saved_task;
     EXPECT_CALL(task->stream(), async_read_some(_, _))
             .Times(1)
             .WillOnce(
                 WithArg<1>(
                     Invoke(
                         std::bind(
-                            saver,
+                            testing::assign,
+                            std::ref(saved_task),
                             std::placeholders::_1
                         )
                     )
@@ -620,7 +622,8 @@ TEST(urlfetch_t, Cancel) {
             .WillOnce(
                 Invoke(
                     std::bind(
-                        saver,
+                        testing::apply,
+                        std::ref(saved_task),
                         std::ref(loop),
                         boost::asio::error::make_error_code(
                             boost::asio::error::operation_aborted
