@@ -48,6 +48,10 @@ public:
             callback
         );
     }
+
+    void stop() {
+        transport.stop();
+    }
 };
 
 } // namespace elasticsearch

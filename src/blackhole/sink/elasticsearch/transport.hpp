@@ -52,7 +52,6 @@ protected:
 
     pool_type pool;
     std::unique_ptr<balancing::strategy<pool_type>> balancer;
-    urlfetcher_t urlfetcher;
 
 public:
     http_transport_t(settings_t settings, loop_type& loop, logger_type& log) :
@@ -61,8 +60,7 @@ public:
         timer(loop),
         interval(settings.sniffer.invertal),
         log(log),
-        balancer(new balancing::round_robin<pool_type>()),
-        urlfetcher(loop)
+        balancer(new balancing::round_robin<pool_type>())
     {
         timer.expires_from_now(interval);
         timer.async_wait(
@@ -72,6 +70,10 @@ public:
                 std::placeholders::_1
             )
         );
+    }
+
+    void stop() {
+        timer.cancel();
     }
 
     void add_nodes(const std::vector<endpoint_type>& endpoints) {
@@ -94,8 +96,7 @@ public:
             endpoint,
             std::make_shared<connection_type>(
                 endpoint,
-                settings.connections,
-                urlfetcher,
+                loop,
                 log
             )
         );

@@ -1,3 +1,4 @@
+//#define DISABLE_ELASTICSEARCH_LOGGING
 #include <blackhole/sink/elasticsearch.hpp>
 #include <blackhole/utils/atomic.hpp>
 
@@ -733,10 +734,29 @@ TEST(transport_t, HandleConnectionErrorWhenSniffOnErrorIsTrueAndItFails) {
     EXPECT_EQ(1, counter);
 }
 
-TEST(elasticsearch_t, Manual) {
+TEST(elasticsearch_t, ManualLocal) {
     using blackhole::sink::elasticsearch_t;
     elasticsearch_t sink;
-    std::string msg = "{}";
+    std::string msg = "{'@message':'le message', '@timestamp':'2014-06-02T21:20:00.000Z'}";
+    boost::algorithm::replace_all(msg, "'", "\"");
+    for (int i = 0; i < 200; ++i) {
+        sink.consume(msg);
+    }
+}
+
+TEST_OFF(elasticsearch_t, ManualRemote) {
+    using blackhole::sink::elasticsearch_t;
+    settings_t settings;
+    settings.endpoints = {
+        defaults::endpoint_type(
+            boost::asio::ip::address_v6::from_string("2a02:6b8:0:1a30::16"),
+            9200
+        )
+    };
+    settings.index = "logs_35";
+
+    elasticsearch_t sink(100, 1000, settings);
+    std::string msg = "{'@message':'le message', '@timestamp':'2014-06-02T21:20:00.000Z'}";
     boost::algorithm::replace_all(msg, "'", "\"");
     for (int i = 0; i < 200; ++i) {
         sink.consume(msg);

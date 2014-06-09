@@ -1,42 +1,22 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 #include <boost/asio.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <rapidjson/document.h>
 
-#include <swarm/logger.h>
-#include <swarm/urlfetcher/boost_event_loop.hpp>
-#include <swarm/urlfetcher/stream.hpp>
-#include <swarm/urlfetcher/url_fetcher.hpp>
+#include <urdl/read_stream.hpp>
 
 #include "log.hpp"
 #include "response/extract.hpp"
 #include "result.hpp"
 #include "request/method.hpp"
+#include "urlfetch.hpp"
 
 namespace elasticsearch {
-
-struct urlfetcher_t {
-    typedef boost::asio::io_service loop_type;
-
-    typedef ioremap::swarm::url url_type;
-    typedef ioremap::swarm::simple_stream stream_type;
-    typedef ioremap::swarm::url_fetcher::request request_type;
-    typedef ioremap::swarm::url_fetcher::response response_type;
-
-    loop_type& loop;
-    ioremap::swarm::logger logger;
-    ioremap::swarm::boost_event_loop loop_wrapper;
-    ioremap::swarm::url_fetcher manager;
-
-    urlfetcher_t(loop_type& loop) :
-        loop(loop),
-        loop_wrapper(loop),
-        manager(loop_wrapper, logger)
-    {}
-};
 
 template<class Action>
 struct callback {
@@ -70,49 +50,45 @@ public:
         log(log)
     {}
 
-    void operator()(const urlfetcher_t::response_type& response,
-                    const std::string& data,
-                    const boost::system::error_code& ec) {
-        const int status = response.code();
-
-        ES_LOG(log, "response received from '%s' [%d] (%s): %s",
-            response.request().url().to_string(), status, ec.value(), data);
+    void
+    operator()(urlfetch::request_t&& request,
+               urlfetch::response_t&& response,
+               const boost::system::error_code& ec) {
+        ES_LOG(log, "response received from '%s' [%s]: %s",
+               request.url, ec.value(), response.data
+        );
 
         if (ec) {
-            callback(result_type(
-                error_t(connection_error_t(endpoint, ec.message()))));
+            callback(
+                result_type(
+                    error_t(connection_error_t(endpoint, ec.message()))
+                )
+            );
             return;
         }
 
         rapidjson::Document doc;
-        doc.Parse<0>(data.c_str());
+        doc.Parse<0>(response.data.c_str());
         if (doc.HasParseError()) {
-            callback(result_type(
-                error_t(generic_error_t(doc.GetParseError()))));
+            callback(result_type(error_t(generic_error_t(doc.GetParseError()))));
             return;
         }
 
-        if (has_error(status)) {
-            const rapidjson::Value& error = doc["error"];
+        const rapidjson::Value& error = doc["error"];
+        if (!error.IsNull()) {
             callback(result_type(
                 error_t(generic_error_t(
-                    error.IsString() ? error.GetString() : "unknown"))));
+                    error.IsString() ? error.GetString() : "unknown"))
+                )
+            );
             return;
         }
 
         try {
-            callback(result_type(
-                extractor_t<response_type>::extract(doc)
-            ));
+            callback(result_type(extractor_t<response_type>::extract(doc)));
         } catch (const std::exception& err) {
             callback(result_type(error_t(generic_error_t(err.what()))));
         }
-    }
-
-private:
-    static inline bool has_error(int status) {
-        const int type = status / 100;
-        return type == 4 || type == 5;
     }
 };
 
@@ -126,20 +102,17 @@ public:
 
 private:
     endpoint_type endpoint_;
-    urlfetcher_t& urlfetcher;
+    loop_type& loop;
     logger_type& log;
 
 public:
     http_connection_t(endpoint_type endpoint,
-                      int connections,
-                      urlfetcher_t& urlfetcher,
+                      loop_type& loop,
                       logger_type& log) :
         endpoint_(endpoint),
-        urlfetcher(urlfetcher),
+        loop(loop),
         log(log)
-    {
-        urlfetcher.manager.set_total_limit(connections);
-    }
+    {}
 
     endpoint_type endpoint() const {
         return endpoint_;
@@ -165,37 +138,36 @@ public:
     void perform(Action&& action,
                  typename callback<Action>::type callback,
                  long timeout) {
-        urlfetcher_t::url_type url;
-        url.set_scheme("http");
-        url.set_host(address());
-        url.set_port(port());
-        url.set_path(action.path());
-
-        urlfetcher_t::request_type request;
-        request.set_url(url);
-        request.headers().set_keep_alive();
-        request.set_timeout(timeout);
-
+        const std::string url = make_url(action.path());
         response_handler_t<
             Action,
             http_connection_t
         > handler(callback, endpoint_, log);
-        std::shared_ptr<urlfetcher_t::stream_type> stream = std::move(
-            urlfetcher_t::stream_type::create(handler)
-        );
-        ES_LOG(log, "requesting '%s' ...", request.url().to_string());
-        perform(std::move(action), std::move(request), std::move(stream));
+        ES_LOG(log, "requesting '%s' ...", url);
+        perform(std::move(action), std::move(handler), url, timeout);
     }
 
 private:
+    std::string
+    make_url(const std::string& path) const {
+        std::string url("http://");
+        url.reserve(128);
+        url.append(address());
+        url.push_back(':');
+        url.append(boost::lexical_cast<std::string>(port()));
+        url.append(path);
+        return url;
+    }
+
     template<class Action>
     typename std::enable_if<
         Action::method_value == request::method_t::get
     >::type
     perform(Action&&,
-            urlfetcher_t::request_type&& request,
-            std::shared_ptr<urlfetcher_t::stream_type>&& stream) {
-        urlfetcher.manager.get(stream, std::move(request));
+            response_handler_t<Action, http_connection_t>&& handler,
+            std::string url,
+            long timeout) {
+        urlfetch::get(url, handler, loop, timeout);
     }
 
     template<class Action>
@@ -203,9 +175,10 @@ private:
         Action::method_value == request::method_t::post
     >::type
     perform(Action&& action,
-            urlfetcher_t::request_type&& request,
-            std::shared_ptr<urlfetcher_t::stream_type>&& stream) {
-        urlfetcher.manager.post(stream, std::move(request), action.body());
+            response_handler_t<Action, http_connection_t>&& handler,
+            std::string url,
+            long timeout) {
+        urlfetch::post(url, std::move(action.body()), handler, loop, timeout);
     }
 };
 

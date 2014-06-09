@@ -101,7 +101,7 @@ private:
     void stop() {
         stopped = true;
         timer.cancel();
-        loop.stop();
+        client.stop();
 
         if (thread.joinable()) {
             ES_LOG(log, "stopping worker thread ...");
