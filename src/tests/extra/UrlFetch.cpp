@@ -60,7 +60,10 @@ public:
     }
 
     void run() {
-        //!@todo: do nothing if the stream is active.
+        if (stream_.is_open()) {
+            return;
+        }
+
         stream_.set_options(request.options);
         stream_.async_open(
             request.url,
@@ -232,7 +235,9 @@ public:
     );
 
     MOCK_METHOD0(close, void());
+
     MOCK_METHOD1(set_options, void(const urdl::option_set&));
+    MOCK_CONST_METHOD0(is_open, bool());
 };
 
 } // namespace mock
@@ -317,6 +322,10 @@ TEST(urlfetch_t, SuccessfulGet) {
     >(request, event, loop);
 
     EXPECT_CALL(task->stream(), set_options(_));
+    EXPECT_CALL(task->stream(), is_open())
+            .Times(1)
+            .WillOnce(Return(false));
+
     // We mock `async_open` to handle correctly and post channel reading.
     EXPECT_CALL(task->stream(), async_open(urdl::url("http://127.0.0.1:80"), _))
             .Times(1)
@@ -424,6 +433,9 @@ TEST(urlfetch_t, DirectConnectionError) {
     >(request, event, loop);
 
     EXPECT_CALL(task->stream(), set_options(_));
+    EXPECT_CALL(task->stream(), is_open())
+            .Times(1)
+            .WillOnce(Return(false));
 
     // We mock `async_open` to emit connection error.
     EXPECT_CALL(task->stream(), async_open(_, _))
@@ -470,6 +482,9 @@ TEST(urlfetch_t, DeferredConnectionError) {
     >(request, event, loop);
 
     EXPECT_CALL(task->stream(), set_options(_));
+    EXPECT_CALL(task->stream(), is_open())
+            .Times(1)
+            .WillOnce(Return(false));
 
     // We mock `async_open` to handle correctly and post channel reading.
     EXPECT_CALL(task->stream(), async_open(_, _))
@@ -558,6 +573,9 @@ TEST(urlfetch_t, Timeout) {
     >(request, event, loop);
 
     EXPECT_CALL(task->stream(), set_options(_));
+    EXPECT_CALL(task->stream(), is_open())
+            .Times(1)
+            .WillOnce(Return(false));
 
     // We mock `async_open` to handle correctly and post channel reading.
     EXPECT_CALL(task->stream(), async_open(_, _))
@@ -641,6 +659,9 @@ TEST(urlfetch_t, Cancel) {
     >(request, event, loop);
 
     EXPECT_CALL(task->stream(), set_options(_));
+    EXPECT_CALL(task->stream(), is_open())
+            .Times(1)
+            .WillOnce(Return(false));
 
     // We mock `async_open` to handle correctly and post channel reading.
     EXPECT_CALL(task->stream(), async_open(_, _))
