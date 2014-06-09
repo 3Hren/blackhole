@@ -726,23 +726,3 @@ TEST(urlfetch_t, Cancel) {
 
     EXPECT_EQ(1, counter);
 }
-
-namespace testing {
-
-struct successfull_manual_get_t {
-    void operator()(urlfetch::request_t&&,
-                    urlfetch::response_t&& response,
-                    const boost::system::error_code& ec) {
-        std::cout << response.data << std::endl << ec.message() << std::endl;
-    }
-};
-
-} // namespace testing
-
-TEST(urlfetch_t, ManualGet) {
-    boost::asio::io_service loop;
-//    urlfetch::get("http://localhost:9200", testing::successfull_manual_get_t(), loop);
-    urlfetch::post("http://127.0.0.1:9200/twitter/tweet", "{}", testing::successfull_manual_get_t(), loop);
-    loop.run();
-//    urlfetch::execute(request, callback, loop);
-}
