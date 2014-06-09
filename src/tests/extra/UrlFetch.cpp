@@ -1,6 +1,7 @@
 #include <array>
 
 #include <boost/asio.hpp>
+#include <boost/optional.hpp>
 
 #include <urdl/option_set.hpp>
 #include <urdl/read_stream.hpp>
@@ -14,7 +15,9 @@ namespace urlfetch {
 struct request_t {
     std::string url;
     urdl::option_set options;
-    long timeout;
+    boost::posix_time::milliseconds timeout;
+
+    request_t() : timeout(1000) {}
 };
 
 struct response_t {
@@ -36,13 +39,16 @@ private:
     request_t request;
     response_t response;
     callback_type callback;
+
     stream_type stream_;
+    boost::asio::deadline_timer timer;
 
 public:
     task_t(request_t request, callback_type callback, loop_type& loop) :
         request(std::move(request)),
         callback(std::move(callback)),
         stream_(loop),
+        timer(loop)
     {
         response.data.reserve(16384);
     }
@@ -57,6 +63,15 @@ public:
             request.url,
             std::bind(
                 &task_t::on_open,
+                this->shared_from_this(),
+                std::placeholders::_1
+            )
+        );
+
+        timer.expires_from_now(request.timeout);
+        timer.async_wait(
+            std::bind(
+                &task_t::on_timeout,
                 this->shared_from_this(),
                 std::placeholders::_1
             )
@@ -84,6 +99,14 @@ private:
                     std::move(response),
                     boost::system::error_code()
                 );
+            } else if (ec.value() == boost::asio::error::operation_aborted){
+                callback(
+                    std::move(request),
+                    std::move(response),
+                    boost::asio::error::make_error_code(
+                        boost::asio::error::timed_out
+                    )
+                );
             } else {
                 callback(std::move(request), std::move(response), ec);
             }
@@ -93,6 +116,13 @@ private:
 
         response.data.append(buffer, length);
         async_read_some();
+    }
+
+    void on_timeout(const boost::system::error_code& ec) {
+        std::cout << "on_timeout: " << ec.message() << std::endl;
+        if (!ec) {
+            stream_.close();
+        }
     }
 
     void async_read_some() {
@@ -131,6 +161,8 @@ public:
             std::function<void(const boost::system::error_code&, std::size_t)>
         )
     );
+
+    MOCK_METHOD0(close, void());
 };
 
 } // namespace mock
@@ -286,7 +318,7 @@ namespace testing {
 
 struct connection_error_t {
     std::atomic<int>& counter;
-    boost::system::error_code ec;
+    const boost::system::error_code ec;
 
     void operator()(urlfetch::request_t&&,
                     urlfetch::response_t&&,
@@ -307,11 +339,11 @@ TEST(urlfetch_t, DirectConnectionError) {
     urlfetch::request_t request;
     request.url = "http://127.0.0.1:80";
 
-    const auto expected_ec = boost::asio::error::make_error_code(
+    const auto expected = boost::asio::error::make_error_code(
         boost::asio::error::connection_refused
     );
 
-    testing::connection_error_t event { counter, expected_ec };
+    testing::connection_error_t event { counter, expected };
     urlfetch::task_t<mock::stream_t>::loop_type loop;
     auto task = std::make_shared<
         urlfetch::task_t<mock::stream_t>
@@ -327,7 +359,7 @@ TEST(urlfetch_t, DirectConnectionError) {
                             &post_open,
                             std::ref(loop),
                             std::placeholders::_1,
-                            expected_ec
+                            expected
                         )
                     )
                 )
@@ -340,7 +372,7 @@ TEST(urlfetch_t, DirectConnectionError) {
 }
 
 TEST(urlfetch_t, DeferredConnectionError) {
-    //!\brief GET request, which should fail with connection error on opening.
+    //!\brief GET request, which should fail with connection error on reading.
 
     /*! Entire request should results in callback invocation with error. */
     std::atomic<int> counter(0);
@@ -348,10 +380,10 @@ TEST(urlfetch_t, DeferredConnectionError) {
     urlfetch::request_t request;
     request.url = "http://127.0.0.1:80";
 
-    const auto expected_ec = boost::asio::error::make_error_code(
+    const auto expected = boost::asio::error::make_error_code(
         boost::asio::error::broken_pipe
     );
-    testing::connection_error_t event { counter, expected_ec };
+    testing::connection_error_t event { counter, expected };
     urlfetch::task_t<mock::stream_t>::loop_type loop;
     auto task = std::make_shared<
         urlfetch::task_t<mock::stream_t>
@@ -384,7 +416,7 @@ TEST(urlfetch_t, DeferredConnectionError) {
                         std::ref(loop),
                         std::placeholders::_1,
                         std::placeholders::_2,
-                        expected_ec,
+                        expected,
                         ""
                     )
                 )
@@ -399,7 +431,99 @@ TEST(urlfetch_t, DeferredConnectionError) {
     EXPECT_EQ(1, counter);
 }
 
+struct save_callback_t {
+    typedef std::function<
+        void(const boost::system::error_code&, std::size_t length)
+    > task_type;
+
+    boost::optional<task_type>& task;
+
+    void operator()(task_type task) {
+        this->task = task;
+    }
+
+    void operator()(boost::asio::io_service& loop,
+                    const boost::system::error_code& ec) {
+        ASSERT_TRUE(task.is_initialized());
+        loop.post(std::bind(task.get(), ec, 0));
+    }
+};
+
 TEST(urlfetch_t, Timeout) {
+    std::atomic<int> counter(0);
+
+    urlfetch::request_t request;
+    request.url = "http://127.0.0.1:80";
+    request.timeout = boost::posix_time::milliseconds(10);
+
+    const auto expected = boost::asio::error::make_error_code(
+        boost::asio::error::timed_out
+    );
+    testing::connection_error_t event { counter, expected };
+    urlfetch::task_t<mock::stream_t>::loop_type loop;
+    auto task = std::make_shared<
+        urlfetch::task_t<mock::stream_t>
+    >(request, event, loop);
+
+    // We mock `async_open` to handle correctly and post channel reading.
+    EXPECT_CALL(task->stream(), async_open(_, _))
+            .Times(1)
+            .WillOnce(
+                WithArg<1>(
+                    Invoke(
+                        std::bind(
+                            &post_open,
+                            std::ref(loop),
+                            std::placeholders::_1,
+                            boost::system::error_code()
+                        )
+                    )
+                )
+            );
+    task->run();
+
+    // The first read event results in nothing. There will be no `post_read`
+    // method invocation, so the only way to stop the event loop - is to wait
+    // for timeout. Thus, we must save callback into some variable.
+    boost::optional<save_callback_t::task_type> saved_task;
+    auto saver = save_callback_t { saved_task };
+    EXPECT_CALL(task->stream(), async_read_some(_, _))
+            .Times(1)
+            .WillOnce(
+                WithArg<1>(
+                    Invoke(
+                        std::bind(
+                            saver,
+                            std::placeholders::_1
+                        )
+                    )
+                )
+            );
+
+    // Extract open event.
+    loop.run_one();
+
+    EXPECT_CALL(task->stream(), close())
+            .Times(1)
+            .WillOnce(
+                Invoke(
+                    std::bind(
+                        saver,
+                        std::ref(loop),
+                        boost::asio::error::make_error_code(
+                            boost::asio::error::operation_aborted
+                        )
+                    )
+                )
+            );
+
+    // Extract timeout event.
+    loop.run_one();
+
+    // Extract posted `on_read` event with aborted operation.
+    loop.run_one();
+
+    EXPECT_EQ(1, counter);
 }
 
 TEST(urlfetch_t, Cancel) {
