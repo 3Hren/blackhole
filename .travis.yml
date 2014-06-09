@@ -19,5 +19,5 @@ before_script:
  - mkdir build && cd build
 
 script:
- - cmake -DENABLE_TESTING=ON .. && make 
+ - cmake -DENABLE_TESTING=ON -DENABLE_ELASTICSEARCH=ON -DDISABLE_ELASTICSEARCH_LOGGING=1 .. && make 
  - src/tests/blackhole-tests
