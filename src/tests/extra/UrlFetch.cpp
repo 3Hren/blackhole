@@ -333,7 +333,10 @@ struct connection_error_t {
 TEST(urlfetch_t, DirectConnectionError) {
     //!\brief GET request, which should fail with connection error on opening.
 
-    /*! Entire request should results in callback invocation with error. */
+    /*! We manually set connection refused error when the stream tries to open
+     *  connection. Entire request should fail, so there should be expected
+     *  callback invocation with that error.
+     */
     std::atomic<int> counter(0);
 
     urlfetch::request_t request;
@@ -366,7 +369,7 @@ TEST(urlfetch_t, DirectConnectionError) {
             );
     task->run();
 
-    // Extract callback.
+    // Extract callback fromt the event loop.
     loop.run_one();
     EXPECT_EQ(1, counter);
 }
@@ -374,7 +377,11 @@ TEST(urlfetch_t, DirectConnectionError) {
 TEST(urlfetch_t, DeferredConnectionError) {
     //!\brief GET request, which should fail with connection error on reading.
 
-    /*! Entire request should results in callback invocation with error. */
+    /*! A connection should successfully be opened without errors, but then we
+     *  manually set connection refused error when the stream receives read
+     *  event. Entire request should fail, so there should be expected callback
+     *  invocation with that error.
+     */
     std::atomic<int> counter(0);
 
     urlfetch::request_t request;
@@ -406,7 +413,7 @@ TEST(urlfetch_t, DeferredConnectionError) {
             );
     task->run();
 
-    // The first read event results in connection error.
+    // The first read event results in broken pipe error.
     EXPECT_CALL(task->stream(), async_read_some(_, _))
             .Times(1)
             .WillOnce(
@@ -422,7 +429,7 @@ TEST(urlfetch_t, DeferredConnectionError) {
                 )
             );
 
-    // Extract open event.
+    // Extract open event from the event loop.
     loop.run_one();
 
     // Extract callback.
@@ -450,6 +457,15 @@ struct save_callback_t {
 };
 
 TEST(urlfetch_t, Timeout) {
+    //! \brief Test timeout event.
+
+    /*! By default every request has 1000 milliseconds timeout. We set it to
+     *  10 and create GET task. After successful stream opening we just do
+     *  nothing, imitating by that long delay, which should be interrupted
+     *  by the timeout event.
+     *  Entire request should fail with timed out error.
+     */
+
     std::atomic<int> counter(0);
 
     urlfetch::request_t request;
@@ -484,7 +500,8 @@ TEST(urlfetch_t, Timeout) {
 
     // The first read event results in nothing. There will be no `post_read`
     // method invocation, so the only way to stop the event loop - is to wait
-    // for timeout. Thus, we must save callback into some variable.
+    // for timeout. Thus, we must save callback into some variable to be able
+    // to invoke it later.
     boost::optional<save_callback_t::task_type> saved_task;
     auto saver = save_callback_t { saved_task };
     EXPECT_CALL(task->stream(), async_read_some(_, _))
@@ -503,6 +520,9 @@ TEST(urlfetch_t, Timeout) {
     // Extract open event.
     loop.run_one();
 
+    // Expected that the next event will be the timer event. We just call
+    // previously saved `on_read` callback with operation aborted error to
+    // imitate real stream behaviour.
     EXPECT_CALL(task->stream(), close())
             .Times(1)
             .WillOnce(
