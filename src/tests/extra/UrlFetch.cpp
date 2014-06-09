@@ -149,6 +149,59 @@ private:
     }
 };
 
+inline
+std::shared_ptr<task_t<>>
+execute(request_t request,
+        task_t<>::callback_type callback,
+        task_t<>::loop_type& loop) {
+    auto task = std::make_shared<task_t<>>(std::move(request), callback, loop);
+    task->run();
+    return task;
+}
+
+inline
+std::shared_ptr<task_t<>>
+get(std::string url,
+    task_t<>::callback_type callback,
+    task_t<>::loop_type& loop,
+    task_t<>::timeout_type timeout = task_t<>::timeout_type(1000)) {
+    request_t request;
+    request.url = url;
+    request.timeout = timeout;
+    return execute(std::move(request), callback, loop);
+}
+
+inline
+std::shared_ptr<task_t<>>
+put(std::string url,
+    std::string body,
+    task_t<>::callback_type callback,
+    task_t<>::loop_type& loop,
+    task_t<>::timeout_type timeout = task_t<>::timeout_type(1000)) {
+
+    request_t request;
+    request.url = std::move(url);
+    request.timeout = timeout;
+    request.options.set_option(urdl::http::request_method("PUT"));
+    request.options.set_option(urdl::http::request_content(std::move(body)));
+    return execute(std::move(request), callback, loop);
+}
+
+inline
+std::shared_ptr<task_t<>>
+post(std::string url,
+     std::string body,
+     task_t<>::callback_type callback,
+     task_t<>::loop_type& loop,
+     task_t<>::timeout_type timeout = task_t<>::timeout_type(1000)) {
+    request_t request;
+    request.url = url;
+    request.timeout = timeout;
+    request.options.set_option(urdl::http::request_method("POST"));
+    request.options.set_option(urdl::http::request_content(std::move(body)));
+    return execute(std::move(request), callback, loop);
+}
+
 } // namespace urlfetch
 
 namespace mock {
@@ -648,8 +701,22 @@ TEST(urlfetch_t, Cancel) {
     EXPECT_EQ(1, counter);
 }
 
-TEST(urlfetch_t, Manual) {
-//    urlfetch::get(url, callback, loop, timeout=default);
-//    urlfetch::post(url, body, callback, loop, timeout=default);
+namespace testing {
+
+struct successfull_manual_get_t {
+    void operator()(urlfetch::request_t&&,
+                    urlfetch::response_t&& response,
+                    const boost::system::error_code& ec) {
+        std::cout << response.data << std::endl << ec.message() << std::endl;
+    }
+};
+
+} // namespace testing
+
+TEST(urlfetch_t, ManualGet) {
+    boost::asio::io_service loop;
+//    urlfetch::get("http://localhost:9200", testing::successfull_manual_get_t(), loop);
+    urlfetch::post("http://127.0.0.1:9200/twitter/tweet", "{}", testing::successfull_manual_get_t(), loop);
+    loop.run();
 //    urlfetch::execute(request, callback, loop);
 }
