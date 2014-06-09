@@ -82,6 +82,7 @@ private:
     void on_open(const boost::system::error_code& ec) {
         std::cout << "on_open: " << ec.message() << std::endl;
         if (ec) {
+            timer.cancel();
             callback(std::move(request), std::move(response), ec);
             return;
         }
