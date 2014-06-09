@@ -42,8 +42,10 @@ public:
     task_t(request_t request, callback_type callback, loop_type& loop) :
         request(std::move(request)),
         callback(std::move(callback)),
-        stream_(loop)
-    {}
+        stream_(loop),
+    {
+        response.data.reserve(16384);
+    }
 
     stream_type& stream() {
         return stream_;
