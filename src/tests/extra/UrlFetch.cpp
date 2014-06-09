@@ -91,6 +91,7 @@ private:
 
     void on_read(const boost::system::error_code& ec, std::size_t length) {
         std::cout << "on_read: " << ec.message() << std::endl;
+        response.data.append(buffer, length);
         if (ec) {
             timer.cancel();
             if (ec.value() == boost::asio::error::eof) {
@@ -114,7 +115,6 @@ private:
             return;
         }
 
-        response.data.append(buffer, length);
         async_read_some();
     }
 
