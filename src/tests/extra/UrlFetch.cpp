@@ -83,8 +83,7 @@ private:
                     boost::system::error_code()
                 );
             } else {
-                //!@todo:
-                //callback(std::move(request), std::move(response), ec);
+                callback(std::move(request), std::move(response), ec);
             }
 
             return;
@@ -285,11 +284,12 @@ namespace testing {
 
 struct connection_error_t {
     std::atomic<int>& counter;
+    boost::system::error_code ec;
 
     void operator()(urlfetch::request_t&&,
                     urlfetch::response_t&&,
                     const boost::system::error_code& ec) {
-        EXPECT_EQ(boost::asio::error::connection_refused, ec.value());
+        EXPECT_EQ(this->ec.value(), ec.value());
         counter++;
     }
 };
@@ -297,12 +297,19 @@ struct connection_error_t {
 } // namespace testing
 
 TEST(urlfetch_t, DirectConnectionError) {
+    //!\brief GET request, which should fail with connection error on opening.
+
+    /*! Entire request should results in callback invocation with error. */
     std::atomic<int> counter(0);
 
     urlfetch::request_t request;
     request.url = "http://127.0.0.1:80";
 
-    testing::connection_error_t event { counter };
+    const auto expected_ec = boost::asio::error::make_error_code(
+        boost::asio::error::connection_refused
+    );
+
+    testing::connection_error_t event { counter, expected_ec };
     urlfetch::task_t<mock::stream_t>::loop_type loop;
     auto task = std::make_shared<
         urlfetch::task_t<mock::stream_t>
@@ -318,9 +325,7 @@ TEST(urlfetch_t, DirectConnectionError) {
                             &post_open,
                             std::ref(loop),
                             std::placeholders::_1,
-                            boost::asio::error::make_error_code(
-                                boost::asio::error::connection_refused
-                            )
+                            expected_ec
                         )
                     )
                 )
@@ -333,6 +338,63 @@ TEST(urlfetch_t, DirectConnectionError) {
 }
 
 TEST(urlfetch_t, DeferredConnectionError) {
+    //!\brief GET request, which should fail with connection error on opening.
+
+    /*! Entire request should results in callback invocation with error. */
+    std::atomic<int> counter(0);
+
+    urlfetch::request_t request;
+    request.url = "http://127.0.0.1:80";
+
+    const auto expected_ec = boost::asio::error::make_error_code(
+        boost::asio::error::broken_pipe
+    );
+    testing::connection_error_t event { counter, expected_ec };
+    urlfetch::task_t<mock::stream_t>::loop_type loop;
+    auto task = std::make_shared<
+        urlfetch::task_t<mock::stream_t>
+    >(request, event, loop);
+
+    // We mock `async_open` to handle correctly and post channel reading.
+    EXPECT_CALL(task->stream(), async_open(_, _))
+            .Times(1)
+            .WillOnce(
+                WithArg<1>(
+                    Invoke(
+                        std::bind(
+                            &post_open,
+                            std::ref(loop),
+                            std::placeholders::_1,
+                            boost::system::error_code()
+                        )
+                    )
+                )
+            );
+    task->run();
+
+    // The first read event results in connection error.
+    EXPECT_CALL(task->stream(), async_read_some(_, _))
+            .Times(1)
+            .WillOnce(
+                Invoke(
+                    std::bind(
+                        &post_read,
+                        std::ref(loop),
+                        std::placeholders::_1,
+                        std::placeholders::_2,
+                        expected_ec,
+                        ""
+                    )
+                )
+            );
+
+    // Extract open event.
+    loop.run_one();
+
+    // Extract callback.
+    loop.run_one();
+
+    EXPECT_EQ(1, counter);
 }
 
 TEST(urlfetch_t, Timeout) {
