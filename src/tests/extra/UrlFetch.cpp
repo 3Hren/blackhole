@@ -86,7 +86,6 @@ public:
 
 private:
     void on_open(const boost::system::error_code& ec) {
-        std::cout << "on_open: " << ec.message() << std::endl;
         if (ec) {
             timer.cancel();
             callback(std::move(request), std::move(response), ec);
@@ -97,7 +96,6 @@ private:
     }
 
     void on_read(const boost::system::error_code& ec, std::size_t length) {
-        std::cout << "on_read: " << ec.message() << std::endl;
         response.data.append(buffer, length);
         if (ec) {
             timer.cancel();
@@ -113,7 +111,6 @@ private:
     }
 
     void on_timeout(const boost::system::error_code& ec) {
-        std::cout << "on_timeout: " << ec.message() << std::endl;
         if (!ec) {
             stream_.close();
         }
