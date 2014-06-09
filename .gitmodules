@@ -9,4 +9,4 @@
 	url = https://chromium.googlesource.com/external/googletest
 [submodule "foreign/urdl"]
 	path = foreign/urdl
-	url = git://github.com:chriskohlhoff/urdl.git
+	url = git://github.com/chriskohlhoff/urdl.git
