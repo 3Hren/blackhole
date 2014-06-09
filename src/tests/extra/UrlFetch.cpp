@@ -92,7 +92,7 @@ private:
     void on_read(const boost::system::error_code& ec, std::size_t length) {
         std::cout << "on_read: " << ec.message() << std::endl;
         if (ec) {
-            //!@todo: timer.cancel();
+            timer.cancel();
             if (ec.value() == boost::asio::error::eof) {
                 callback(
                     std::move(request),
