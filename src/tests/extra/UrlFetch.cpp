@@ -78,6 +78,10 @@ public:
         );
     }
 
+    void cancel() {
+        stream_.close();
+    }
+
 private:
     void on_open(const boost::system::error_code& ec) {
         std::cout << "on_open: " << ec.message() << std::endl;
@@ -95,24 +99,11 @@ private:
         response.data.append(buffer, length);
         if (ec) {
             timer.cancel();
-            if (ec.value() == boost::asio::error::eof) {
-                callback(
-                    std::move(request),
-                    std::move(response),
-                    boost::system::error_code()
-                );
-            } else if (ec.value() == boost::asio::error::operation_aborted){
-                callback(
-                    std::move(request),
-                    std::move(response),
-                    boost::asio::error::make_error_code(
-                        boost::asio::error::timed_out
-                    )
-                );
-            } else {
-                callback(std::move(request), std::move(response), ec);
-            }
-
+            callback(
+                std::move(request),
+                std::move(response),
+                make_error_code(ec)
+            );
             return;
         }
 
@@ -124,6 +115,26 @@ private:
         if (!ec) {
             stream_.close();
         }
+    }
+
+    boost::system::error_code
+    make_error_code(const boost::system::error_code& ec) const {
+        switch (ec.value()) {
+        case boost::asio::error::eof:
+            return boost::system::error_code();
+        case boost::asio::error::operation_aborted:
+            if (timer.expires_from_now() > boost::posix_time::time_duration()) {
+                return ec;
+            } else {
+                return boost::asio::error::make_error_code(
+                    boost::asio::error::timed_out
+                );
+            }
+        default:
+            return ec;
+        }
+
+        return ec;
     }
 
     void async_read_some() {
@@ -548,6 +559,81 @@ TEST(urlfetch_t, Timeout) {
 }
 
 TEST(urlfetch_t, Cancel) {
+    std::atomic<int> counter(0);
+
+    urlfetch::request_t request;
+    request.url = "http://127.0.0.1:80";
+
+    const auto expected = boost::asio::error::make_error_code(
+        boost::asio::error::operation_aborted
+    );
+    testing::connection_error_t event { counter, expected };
+    urlfetch::task_t<mock::stream_t>::loop_type loop;
+    auto task = std::make_shared<
+        urlfetch::task_t<mock::stream_t>
+    >(request, event, loop);
+
+    // We mock `async_open` to handle correctly and post channel reading.
+    EXPECT_CALL(task->stream(), async_open(_, _))
+            .Times(1)
+            .WillOnce(
+                WithArg<1>(
+                    Invoke(
+                        std::bind(
+                            &post_open,
+                            std::ref(loop),
+                            std::placeholders::_1,
+                            boost::system::error_code()
+                        )
+                    )
+                )
+            );
+    task->run();
+
+    // The first read event results in nothing. There will be no `post_read`
+    // method invocation, so there are two ways to stop the event loop -
+    // is to wait for timeout or to cancel. Thus, we must save callback into
+    // some variable to be able to invoke it later.
+    boost::optional<save_callback_t::task_type> saved_task;
+    auto saver = save_callback_t { saved_task };
+    EXPECT_CALL(task->stream(), async_read_some(_, _))
+            .Times(1)
+            .WillOnce(
+                WithArg<1>(
+                    Invoke(
+                        std::bind(
+                            saver,
+                            std::placeholders::_1
+                        )
+                    )
+                )
+            );
+
+    // Extract open event.
+    loop.run_one();
+
+    // Expected that the next event will be the cancel event. We just call
+    // previously saved `on_read` callback with operation aborted error to
+    // imitate real stream behaviour.
+    EXPECT_CALL(task->stream(), close())
+            .Times(1)
+            .WillOnce(
+                Invoke(
+                    std::bind(
+                        saver,
+                        std::ref(loop),
+                        boost::asio::error::make_error_code(
+                            boost::asio::error::operation_aborted
+                        )
+                    )
+                )
+            );
+    task->cancel();
+
+    // Extract cancel event.
+    loop.run_one();
+
+    EXPECT_EQ(1, counter);
 }
 
 TEST(urlfetch_t, Manual) {
