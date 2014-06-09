@@ -29,6 +29,7 @@ class task_t : public std::enable_shared_from_this<task_t<Stream>> {
 public:
     typedef Stream stream_type;
     typedef boost::asio::io_service loop_type;
+    typedef boost::posix_time::milliseconds timeout_type;
     typedef std::function<
         void(request_t&&, response_t&&, const boost::system::error_code&)
     > callback_type;
