@@ -21,6 +21,7 @@ struct request_t {
 };
 
 struct response_t {
+    int status;
     std::string data;
 };
 
@@ -86,7 +87,11 @@ public:
 
 private:
     void on_open(const boost::system::error_code& ec) {
-        if (ec) {
+        if (ec.category() == urdl::http::error_category() && ec.value() >= 100) {
+            response.status = ec.value();
+        }
+
+        if (ec && ec.category() != urdl::http::error_category()) {
             timer.cancel();
             callback(std::move(request), std::move(response), ec);
             return;
