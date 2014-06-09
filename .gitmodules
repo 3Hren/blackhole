@@ -3,10 +3,10 @@
 	url = git://github.com/andrusha97/rapidjson.git
 [submodule "foreign/gmock"]
 	path = foreign/gmock
-	url = git://chromium.googlesource.com/external/googlemock.git
+	url = https://chromium.googlesource.com/external/googlemock
 [submodule "foreign/gtest"]
 	path = foreign/gtest
-	url = git://chromium.googlesource.com/external/googletest.git
+	url = https://chromium.googlesource.com/external/googletest
 [submodule "foreign/urdl"]
 	path = foreign/urdl
 	url = git://github.com:chriskohlhoff/urdl.git
