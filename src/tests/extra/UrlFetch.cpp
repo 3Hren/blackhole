@@ -59,6 +59,7 @@ public:
 
     void run() {
         //!@todo: do nothing if the stream is active.
+        stream_.set_options(request.options);
         stream_.async_open(
             request.url,
             std::bind(
@@ -175,6 +176,7 @@ public:
     );
 
     MOCK_METHOD0(close, void());
+    MOCK_METHOD1(set_options, void(const urdl::option_set&));
 };
 
 } // namespace mock
@@ -258,6 +260,7 @@ TEST(urlfetch_t, SuccessfulGet) {
         urlfetch::task_t<mock::stream_t>
     >(request, event, loop);
 
+    EXPECT_CALL(task->stream(), set_options(_));
     // We mock `async_open` to handle correctly and post channel reading.
     EXPECT_CALL(task->stream(), async_open(urdl::url("http://127.0.0.1:80"), _))
             .Times(1)
@@ -364,6 +367,8 @@ TEST(urlfetch_t, DirectConnectionError) {
         urlfetch::task_t<mock::stream_t>
     >(request, event, loop);
 
+    EXPECT_CALL(task->stream(), set_options(_));
+
     // We mock `async_open` to emit connection error.
     EXPECT_CALL(task->stream(), async_open(_, _))
             .Times(1)
@@ -407,6 +412,8 @@ TEST(urlfetch_t, DeferredConnectionError) {
     auto task = std::make_shared<
         urlfetch::task_t<mock::stream_t>
     >(request, event, loop);
+
+    EXPECT_CALL(task->stream(), set_options(_));
 
     // We mock `async_open` to handle correctly and post channel reading.
     EXPECT_CALL(task->stream(), async_open(_, _))
@@ -494,6 +501,8 @@ TEST(urlfetch_t, Timeout) {
         urlfetch::task_t<mock::stream_t>
     >(request, event, loop);
 
+    EXPECT_CALL(task->stream(), set_options(_));
+
     // We mock `async_open` to handle correctly and post channel reading.
     EXPECT_CALL(task->stream(), async_open(_, _))
             .Times(1)
@@ -574,6 +583,8 @@ TEST(urlfetch_t, Cancel) {
     auto task = std::make_shared<
         urlfetch::task_t<mock::stream_t>
     >(request, event, loop);
+
+    EXPECT_CALL(task->stream(), set_options(_));
 
     // We mock `async_open` to handle correctly and post channel reading.
     EXPECT_CALL(task->stream(), async_open(_, _))
