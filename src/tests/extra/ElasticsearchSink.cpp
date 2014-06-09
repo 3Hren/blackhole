@@ -1,4 +1,3 @@
-//#define DISABLE_ELASTICSEARCH_LOGGING
 #include <blackhole/sink/elasticsearch.hpp>
 #include <blackhole/utils/atomic.hpp>
 
