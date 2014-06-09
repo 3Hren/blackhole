@@ -180,6 +180,15 @@ get(std::string url,
 
 inline
 std::shared_ptr<task_t<>>
+get(std::string url,
+    task_t<>::callback_type callback,
+    task_t<>::loop_type& loop,
+    long timeout = 1000) {
+    return get(std::move(url), callback, loop, task_t<>::timeout_type(timeout));
+}
+
+inline
+std::shared_ptr<task_t<>>
 put(std::string url,
     std::string body,
     task_t<>::callback_type callback,
@@ -196,6 +205,22 @@ put(std::string url,
 
 inline
 std::shared_ptr<task_t<>>
+put(std::string url,
+    std::string body,
+    task_t<>::callback_type callback,
+    task_t<>::loop_type& loop,
+    long timeout = 1000) {
+    return put(
+        std::move(url),
+        std::move(body),
+        callback,
+        loop,
+        task_t<>::timeout_type(timeout)
+    );
+}
+
+inline
+std::shared_ptr<task_t<>>
 post(std::string url,
      std::string body,
      task_t<>::callback_type callback,
@@ -207,6 +232,21 @@ post(std::string url,
     request.options.set_option(urdl::http::request_method("POST"));
     request.options.set_option(urdl::http::request_content(std::move(body)));
     return execute(std::move(request), callback, loop);
+}
+
+inline
+std::shared_ptr<task_t<>>
+post(std::string url,
+     std::string body,
+     task_t<>::callback_type callback,
+     task_t<>::loop_type& loop,
+    long timeout = 1000) {
+    return post(
+        std::move(url),
+        std::move(body),
+        callback,
+        loop, task_t<>::timeout_type(timeout)
+    );
 }
 
 } // namespace urlfetch
