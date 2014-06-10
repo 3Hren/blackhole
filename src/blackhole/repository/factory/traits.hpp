@@ -17,9 +17,11 @@ namespace blackhole {
 
 template<class T>
 struct factory_traits {
-    static_assert(lazy_false<T>::value,
-                  "You should implement 'factory_traits' template specialization for "
-                  "your type to properly map generic config object on real config.");
+    static_assert(
+        lazy_false<T>::value,
+        "You should implement 'factory_traits' template specialization for "
+        "your type to properly map generic config object on real config."
+    );
 };
 
 namespace aux {
