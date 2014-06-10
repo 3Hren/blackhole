@@ -3,6 +3,7 @@
 #include <queue>
 
 #include <boost/asio.hpp>
+#include <boost/thread/barrier.hpp>
 
 #include <blackhole/formatter/string.hpp>
 #include <blackhole/log.hpp>
@@ -96,23 +97,22 @@ public:
 
 private:
     std::thread start() {
-        std::mutex mutex;
-        std::unique_lock<std::mutex> lock(mutex);
-        std::condition_variable started;
+        boost::barrier started(2);
         std::thread thread(
             std::bind(&elasticsearch_t::run, this, std::ref(started))
         );
-        started.wait(lock);
+        started.wait();
         return std::move(thread);
     }
 
-    void run(std::condition_variable& started) {
+    void run(boost::barrier& started) {
         BOOST_ASSERT(stopped);
 
         ES_LOG(log, "starting elasticsearch sink ...");
         loop.post(
             std::bind(&elasticsearch_t::on_started, this, std::ref(started))
         );
+
         timer.expires_from_now(interval);
         timer.async_wait(
             std::bind(&elasticsearch_t::on_timer, this, std::placeholders::_1)
@@ -126,6 +126,7 @@ private:
         stopped = true;
         timer.cancel();
         client.stop();
+        loop.stop();
 
         if (thread.joinable()) {
             ES_LOG(log, "stopping worker thread ...");
@@ -133,10 +134,10 @@ private:
         }
     }
 
-    void on_started(std::condition_variable& started) {
+    void on_started(boost::barrier& started) {
         ES_LOG(log, "elasticsearch sink has been started");
         stopped = false;
-        started.notify_all();
+        started.wait();
     }
 
     void on_bulk(std::vector<std::string>&& result) {
@@ -205,6 +206,7 @@ struct factory_traits<sink::elasticsearch_t> {
         ex["index"].to(config.settings.index);
         ex["type"].to(config.settings.type);
         auto endpoints = ex["endpoints"].get<std::vector<std::string>>();
+        //!@todo: Map vector of strings to the real endpoints collection.
 
         ex["sniffer"]["when"]["start"].to(config.settings.sniffer.when.start);
         ex["sniffer"]["when"]["error"].to(config.settings.sniffer.when.error);
