@@ -24,9 +24,14 @@ namespace sink {
 namespace elasticsearch_ {
 
 struct config_t {
-    int bulk;
-    int interval;
+    std::uint16_t bulk;
+    std::uint32_t interval;
     elasticsearch::settings_t settings;
+
+    config_t() :
+        bulk(100),
+        interval(1000)
+    {}
 };
 
 } // namespace elasticsearch
