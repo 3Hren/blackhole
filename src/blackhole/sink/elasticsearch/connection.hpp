@@ -161,7 +161,7 @@ private:
 
     template<class Action>
     typename std::enable_if<
-        Action::method_value == request::method_t::get
+        Action::method::value == request::method_t::get
     >::type
     perform(Action&&,
             response_handler_t<Action, http_connection_t>&& handler,
@@ -172,7 +172,7 @@ private:
 
     template<class Action>
     typename std::enable_if<
-        Action::method_value == request::method_t::post
+        Action::method::value == request::method_t::post
     >::type
     perform(Action&& action,
             response_handler_t<Action, http_connection_t>&& handler,

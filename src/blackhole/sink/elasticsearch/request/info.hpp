@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <string>
+#include <type_traits>
 
 #include <boost/algorithm/string.hpp>
 
@@ -21,7 +22,10 @@ public:
     typedef response::nodes_info_t response_type;
     typedef result_t<response_type>::type result_type;
 
-    static const request::method_t method_value;
+    typedef std::integral_constant<
+        request::method_t,
+        request::method_t::get
+    > method;
 
     static const char* name() {
         return "nodes.info";
@@ -88,8 +92,6 @@ private:
         return "_all";
     }
 };
-
-const request::method_t nodes_info_t::method_value = request::method_t::get;
 
 } // namespace actions
 

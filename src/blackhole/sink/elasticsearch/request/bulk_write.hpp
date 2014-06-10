@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <type_traits>
 
 #include "blackhole/sink/elasticsearch/result.hpp"
 #include "blackhole/sink/elasticsearch/response/bulk_write.hpp"
@@ -16,7 +17,10 @@ public:
     typedef response::bulk_write_t response_type;
     typedef result_t<response_type>::type result_type;
 
-    static const request::method_t method_value;
+    typedef std::integral_constant<
+        request::method_t,
+        request::method_t::post
+    > method;
 
     static const char* name() {
         return "bulk_write";
@@ -65,8 +69,6 @@ private:
         return result;
     }
 };
-
-const request::method_t bulk_write_t::method_value = request::method_t::post;
 
 } // namespace actions
 
