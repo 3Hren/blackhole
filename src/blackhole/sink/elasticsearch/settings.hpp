@@ -28,12 +28,12 @@ struct settings_t {
             bool error;
         } when;
 
-        long invertal;
+        std::uint64_t invertal;
     } sniffer;
 
     int connections;
     int retries;
-    long timeout;
+    std::uint64_t timeout;
 
     settings_t() :
         index("logs"),
