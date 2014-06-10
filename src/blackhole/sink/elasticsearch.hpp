@@ -187,4 +187,27 @@ private:
 
 } // namespace sink
 
+template<>
+struct factory_traits<sink::elasticsearch_t> {
+    typedef sink::elasticsearch_t sink_type;
+    typedef sink_type::config_type config_type;
+
+    static
+    void
+    map_config(const aux::extractor<sink_type>& ex, config_type& config) {
+        ex["bulk"].to(config.bulk);
+        ex["interval"].to(config.interval);
+        ex["index"].to(config.settings.index);
+        ex["type"].to(config.settings.type);
+        auto endpoints = ex["endpoints"].get<std::vector<std::string>>();
+
+        ex["sniffer"]["when"]["start"].to(config.settings.sniffer.when.start);
+        ex["sniffer"]["when"]["error"].to(config.settings.sniffer.when.error);
+        ex["sniffer"]["interval"].to(config.settings.sniffer.invertal);
+        ex["connections"].to(config.settings.connections);
+        ex["retries"].to(config.settings.retries);
+        ex["timeout"].to(config.settings.timeout);
+    }
+};
+
 } // namespace blackhole
