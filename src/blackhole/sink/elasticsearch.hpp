@@ -205,8 +205,16 @@ struct factory_traits<sink::elasticsearch_t> {
         ex["interval"].to(config.interval);
         ex["index"].to(config.settings.index);
         ex["type"].to(config.settings.type);
+
         auto endpoints = ex["endpoints"].get<std::vector<std::string>>();
-        //!@todo: Map vector of strings to the real endpoints collection.
+        boost::asio::io_service loop;
+        for (auto it = endpoints.begin(); it != endpoints.end(); ++it) {
+            config.settings.endpoints.push_back(
+                elasticsearch::resolver<
+                    boost::asio::ip::tcp
+                >::resolve(*it, loop)
+            );
+        }
 
         ex["sniffer"]["when"]["start"].to(config.settings.sniffer.when.start);
         ex["sniffer"]["when"]["error"].to(config.settings.sniffer.when.error);
