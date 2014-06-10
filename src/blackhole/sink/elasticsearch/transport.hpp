@@ -21,7 +21,7 @@ namespace elasticsearch {
 
 namespace aux {
 
-void empty() {}
+inline void empty() {}
 
 } // namespace aux
 
