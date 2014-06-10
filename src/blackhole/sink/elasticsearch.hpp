@@ -19,16 +19,23 @@
 
 namespace blackhole {
 
-namespace es {
-
-//!@todo: Dummy yet.
-struct config_t {};
-
-} // namespace es
-
 namespace sink {
 
+namespace elasticsearch_ {
+
+struct config_t {
+    int bulk;
+    int interval;
+    elasticsearch::settings_t settings;
+};
+
+} // namespace elasticsearch
+
 class elasticsearch_t {
+public:
+    typedef elasticsearch_::config_t config_type;
+
+private:
     synchronized<logger_base_t> log;
 
     boost::posix_time::milliseconds interval;
@@ -54,7 +61,15 @@ public:
         client(settings, loop, log)
     {}
 
-    //!@todo: Config constructor.
+    elasticsearch_t(const config_type& config) :
+        log(elasticsearch::logger_factory_t::create()),
+        interval(config.interval),
+        stopped(true),
+        timer(loop),
+        thread(start()),
+        queue(config.bulk, std::bind(&elasticsearch_t::on_bulk, this, std::placeholders::_1)),
+        client(config.settings, loop, log)
+    {}
 
     ~elasticsearch_t() {
         stop();

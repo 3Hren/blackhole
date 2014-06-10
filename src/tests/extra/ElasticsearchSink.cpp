@@ -13,6 +13,12 @@ TEST(elasticsearch_t, Class) {
     UNUSED(sink);
 }
 
+TEST(elasticsearch_t, ConfigConstructor) {
+    sink::elasticsearch_t::config_type config;
+    sink::elasticsearch_t sink(config);
+    UNUSED(sink);
+}
+
 TEST(utils, MakePath) {
     EXPECT_EQ("/", elasticsearch::utils::make_path("/"));
     EXPECT_EQ("/index", elasticsearch::utils::make_path("index"));
