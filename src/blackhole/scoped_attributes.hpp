@@ -9,7 +9,7 @@ class scoped_attributes_t :
 {
     // Attributes provided by this guard.
     mutable log::attributes_t m_guard_attributes;
-    // Merged attributes provided by this guard and all the parent guards.
+    // Merged attributes are provided by this guard and all the parent guards.
     // This value is computed lazily.
     mutable log::attributes_t m_merged_attributes;
 
