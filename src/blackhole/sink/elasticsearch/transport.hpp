@@ -72,7 +72,7 @@ public:
         );
     }
 
-    void stop() {
+    void cancel() {
         timer.cancel();
     }
 

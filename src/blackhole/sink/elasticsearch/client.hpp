@@ -41,16 +41,16 @@ public:
         }
     }
 
-    void bulk_write(std::vector<std::string>&& bulk, callback_type callback) {
+    void cancel() {
+        transport.cancel();
+    }
+
+    void bulk_write(std::vector<std::string> bulk, callback_type callback) {
         ES_LOG(log, "requesting 'bulk_write' ...");
         transport.perform(
             actions::bulk_write_t(settings.index, settings.type, std::move(bulk)),
             callback
         );
-    }
-
-    void stop() {
-        transport.stop();
     }
 };
 

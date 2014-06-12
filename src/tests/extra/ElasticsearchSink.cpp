@@ -762,7 +762,7 @@ TEST_OFF(elasticsearch_t, ManualRemote) {
     };
     settings.index = "logs_35";
 
-    elasticsearch_t sink(100, 1000, settings);
+    elasticsearch_t sink(100, 1000, 1, settings);
     std::string msg = "{'@message':'le message', '@timestamp':'2014-06-02T21:20:00.000Z'}";
     boost::algorithm::replace_all(msg, "'", "\"");
     for (int i = 0; i < 200; ++i) {
@@ -780,6 +780,7 @@ TEST(Factory, ElasticsearchJsonFrontend) {
     sink_config_t sink("elasticsearch");
     sink["bulk"] = 100;
     sink["interval"] = 1000;
+    sink["workers"] = 1;
     sink["index"] = "logs";
     sink["type"] = "log";
     sink["endpoints"] = std::vector<std::string>({"localhost:9200"});
