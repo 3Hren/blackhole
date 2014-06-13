@@ -42,7 +42,7 @@ public:
     typedef typename pool_type::endpoint_type endpoint_type;
 
 protected:
-    settings_t settings;
+    const settings_t settings;
 
     loop_type& loop;
     boost::asio::deadline_timer timer;
