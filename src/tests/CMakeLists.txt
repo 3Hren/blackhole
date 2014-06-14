@@ -75,6 +75,7 @@ IF(ENABLE_ELASTICSEARCH)
     SET(ES_SOURCES
 	extra/ElasticsearchSink
 	extra/elasticsearch/Factory
+	extra/elasticsearch/Transport
 	extra/Resolver
 	extra/UrlFetch
     )
