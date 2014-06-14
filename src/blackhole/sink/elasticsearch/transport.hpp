@@ -28,6 +28,8 @@ inline void empty() {}
 const std::string INET_ADDR_PREFIX = "inet[";
 const std::string INET_ADDR_SUFFIX = "]";
 
+//! @threadsafe: All methods are thread-safe.
+//! @note: This class must live until event loop completely stopped.
 template<
     class Connection = http_connection_t,
     class Pool = pool_t<Connection>
