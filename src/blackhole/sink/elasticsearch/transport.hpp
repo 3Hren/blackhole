@@ -62,14 +62,7 @@ public:
         log(log),
         balancer(new balancing::round_robin<pool_type>())
     {
-        timer.expires_from_now(interval);
-        timer.async_wait(
-            std::bind(
-                &http_transport_t::on_sniff_timer,
-                this,
-                std::placeholders::_1
-            )
-        );
+        sniff(interval);
     }
 
     void cancel() {
@@ -116,6 +109,15 @@ public:
     }
 
     void sniff(std::function<void()>&& then) {
+        ES_LOG(log, "sniffing nodes info ...");
+        sniff(interval);
+        auto callback = std::bind(
+            &http_transport_t::on_sniff, this, std::placeholders::_1, then
+        );
+        perform(actions::nodes_info_t(), callback);
+    }
+
+    void sniff(boost::posix_time::milliseconds interval) {
         timer.expires_from_now(interval);
         timer.async_wait(
             std::bind(
@@ -124,12 +126,6 @@ public:
                 std::placeholders::_1
             )
         );
-
-        ES_LOG(log, "sniffing nodes info ...");
-        auto callback = std::bind(
-            &http_transport_t::on_sniff, this, std::placeholders::_1, then
-        );
-        perform(actions::nodes_info_t(), callback);
     }
 
     template<class Action>
