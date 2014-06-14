@@ -71,7 +71,6 @@ public:
         ES_LOG(log, "stopping worker thread ...");
         work.reset();
         client.cancel();
-        loop.stop();
         thread.join();
     }
 

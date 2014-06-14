@@ -49,6 +49,7 @@ protected:
     loop_type& loop;
     boost::asio::deadline_timer timer;
     boost::posix_time::milliseconds interval;
+    std::atomic<bool> active;
 
     logger_type& log;
 
@@ -61,6 +62,7 @@ public:
         loop(loop),
         timer(loop),
         interval(settings.sniffer.invertal),
+        active(true),
         log(log),
         balancer(new balancing::round_robin<pool_type>())
     {
@@ -68,6 +70,7 @@ public:
     }
 
     void cancel() {
+        active = false;
         timer.cancel();
     }
 
@@ -120,6 +123,11 @@ public:
     }
 
     void sniff(boost::posix_time::milliseconds interval) {
+        if (!active) {
+            ES_LOG(log, "stop sniffing on timer: transport no longer active");
+            return;
+        }
+
         timer.expires_from_now(interval);
         timer.async_wait(
             std::bind(
