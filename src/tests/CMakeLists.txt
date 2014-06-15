@@ -76,6 +76,8 @@ IF(ENABLE_ELASTICSEARCH)
 	extra/ElasticsearchSink
 	extra/elasticsearch/Factory
 	extra/elasticsearch/Transport
+	extra/elasticsearch/Requests
+	extra/elasticsearch/Utils
 	extra/Resolver
 	extra/UrlFetch
     )
