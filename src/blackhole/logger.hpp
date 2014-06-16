@@ -222,6 +222,7 @@ inline void swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT {
 
 template<typename Level>
 class verbose_logger_t : public logger_base_t {
+public:
     typedef Level level_type;
 
 public:
