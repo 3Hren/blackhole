@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/thread/lock_algorithms.hpp>
+
 #include "blackhole/logger.hpp"
 
 namespace blackhole {
@@ -26,7 +28,7 @@ public:
     }
 
     synchronized& operator=(synchronized&& other) {
-        std::lock(mutex, other.mutex);
+        boost::lock(mutex, other.mutex);
         logger = std::move(other.logger);
         return *this;
     }
