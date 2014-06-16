@@ -26,7 +26,7 @@ public:
     }
 
     synchronized& operator=(synchronized&& other) {
-        std::lock_guard<mutex_type>(other.mutex);
+        std::lock(mutex, other.mutex);
         logger = std::move(other.logger);
         return *this;
     }
