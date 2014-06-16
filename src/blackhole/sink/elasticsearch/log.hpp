@@ -7,7 +7,7 @@
 #include "blackhole/synchronized.hpp"
 #include "blackhole/utils/unused.hpp"
 
-#ifndef DISABLE_ELASTICSEARCH_LOGGING
+#ifdef ENABLE_ELASTICSEARCH_DEBUG
 #define ES_LOG(__log__, ...) \
     if (::blackhole::log::record_t record = __log__.open_record()) \
         ::blackhole::aux::make_scoped_pump(__log__, record, __VA_ARGS__)
