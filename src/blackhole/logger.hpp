@@ -98,11 +98,11 @@ public:
         return open_record(log::attributes_t());
     }
 
-    log::record_t open_record(log::attribute_pair_t&& local_attribute) const {
+    log::record_t open_record(log::attribute_pair_t local_attribute) const {
         return open_record(log::attributes_t({ std::move(local_attribute) }));
     }
 
-    log::record_t open_record(log::attributes_t&& local_attributes) const {
+    log::record_t open_record(log::attributes_t local_attributes) const {
         return open_record(std::move(local_attributes), m_scoped_attributes);
     }
 
