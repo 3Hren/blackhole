@@ -16,8 +16,10 @@
 namespace blackhole {
 
 class frontend_factory_t {
-    mutable std::mutex mutex;
     std::unordered_map<std::string, function_keeper_t> factories;
+
+    mutable std::mutex mutex;
+
 public:
     template<class Sink, class Formatter>
     void add() {
@@ -43,12 +45,13 @@ public:
 
     template<class Sink>
     typename frontend::traits<Sink>::return_type
-    create(const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink) const {
+    create(const formatter_config_t& formatter_config,
+           std::unique_ptr<Sink> sink) const {
         typedef typename frontend::traits<Sink>::return_type return_type;
 
         try {
             std::lock_guard<std::mutex> lock(mutex);
-            const function_keeper_t& keeper = factories.at(formatter_config.type);
+            auto keeper = factories.at(formatter_config.type);
             auto factory = keeper.get<Sink>();
             return factory(formatter_config, std::move(sink));
         } catch (const std::out_of_range&) {
