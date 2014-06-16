@@ -70,6 +70,7 @@ SET(BASE_SOURCES
     test_UdpSink
     test_Utils
     test_VerboseLogger
+    Wrapper
     utils/test_GenericStringFormatter
 )
 
