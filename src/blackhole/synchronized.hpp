@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/thread/lock_algorithms.hpp>
+#include <boost/thread.hpp>
 
 #include "blackhole/logger.hpp"
 
