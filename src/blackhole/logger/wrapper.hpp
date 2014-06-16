@@ -1,6 +1,7 @@
 #pragma once
 
 #include "blackhole/record.hpp"
+#include "blackhole/utils/noncopyable.hpp"
 
 namespace blackhole {
 
