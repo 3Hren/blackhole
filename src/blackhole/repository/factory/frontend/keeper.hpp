@@ -29,9 +29,11 @@ struct function_keeper_t {
     }
 
     template<class Sink>
-    typename frontend::traits<Sink>::function_type get() const {
-        boost::any any = functions.at(Sink::name());
-        return boost::any_cast<typename frontend::traits<Sink>::function_type>(any);
+    typename frontend::traits<Sink>::function_type
+    get() const {
+        return boost::any_cast<typename frontend::traits<Sink>::function_type>(
+            functions.at(Sink::name())
+        );
     }
 };
 
