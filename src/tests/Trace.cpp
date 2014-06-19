@@ -33,6 +33,15 @@ struct span_t {
         return trace == other.trace && span == other.span && parent == other.parent;
     }
 
+    friend
+    std::ostream&
+    operator<<(std::ostream& stream, const span_t& span) {
+        stream << "span("
+               << span.trace << ", " << span.span << ", " << span.parent
+               << ")";
+        return stream;
+    }
+
 private:
     span_t() :
         trace(0),
