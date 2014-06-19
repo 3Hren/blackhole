@@ -72,6 +72,7 @@ SET(BASE_SOURCES
     test_VerboseLogger
     Wrapper
     utils/test_GenericStringFormatter
+    Trace
 )
 
 IF(ENABLE_ELASTICSEARCH)
