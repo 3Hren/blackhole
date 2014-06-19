@@ -38,7 +38,7 @@ public:
 
 } // namespace
 
-TEST(Keeper, Class) {
+TEST(Wrapper, Class) {
     verbose_logger_t<testing::level> log;
     wrapper_t<verbose_logger_t<testing::level>> wrapper(log, log::attributes_t({
         attribute::make("answer", 42)
@@ -46,7 +46,7 @@ TEST(Keeper, Class) {
     UNUSED(wrapper);
 }
 
-TEST(Keeper, Usage) {
+TEST(Wrapper, Usage) {
     auto log = logger_factory_t::create<logger_base_t>();
     log.add_attribute(attribute::make("id", 100500));
 
@@ -73,7 +73,7 @@ TEST(Keeper, Usage) {
     EXPECT_EQ(0, record.attributes.count("answer"));
 }
 
-TEST(Keeper, UsageWithVerboseLogger) {
+TEST(Wrapper, UsageWithVerboseLogger) {
     auto log = logger_factory_t::create<verbose_logger_t<testing::level>>();
     log.add_attribute(attribute::make("id", 100500));
 
@@ -118,7 +118,7 @@ TEST(Keeper, UsageWithVerboseLogger) {
     EXPECT_EQ(0, record.attributes.count("answer"));
 }
 
-TEST(Keeper, MacroUsage) {
+TEST(Wrapper, MacroUsage) {
     auto log = logger_factory_t::create<verbose_logger_t<testing::level>>();
     log.add_attribute(attribute::make("id", 100500));
 
