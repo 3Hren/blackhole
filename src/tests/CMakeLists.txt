@@ -70,9 +70,9 @@ SET(BASE_SOURCES
     test_UdpSink
     test_Utils
     test_VerboseLogger
+    Trace
     Wrapper
     utils/test_GenericStringFormatter
-    Trace
 )
 
 IF(ENABLE_ELASTICSEARCH)
