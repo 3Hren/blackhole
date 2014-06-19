@@ -92,7 +92,7 @@ TEST(Wrapper, UsageWithVerboseLogger) {
         ASSERT_EQ(1, record.attributes.count("severity"));
         EXPECT_EQ(testing::info,
                   boost::get<
-                        typename aux::underlying_type<testing::level>::type
+                        aux::underlying_type<testing::level>::type
                   >(record.attributes["severity"].value)
                 );
 
@@ -105,7 +105,7 @@ TEST(Wrapper, UsageWithVerboseLogger) {
         ASSERT_EQ(1, record.attributes.count("severity"));
         EXPECT_EQ(testing::info,
                   boost::get<
-                        typename aux::underlying_type<testing::level>::type
+                        aux::underlying_type<testing::level>::type
                   >(record.attributes["severity"].value)
                 );
 
@@ -120,7 +120,7 @@ TEST(Wrapper, UsageWithVerboseLogger) {
     ASSERT_EQ(1, record.attributes.count("severity"));
     EXPECT_EQ(testing::info,
               boost::get<
-                    typename aux::underlying_type<testing::level>::type
+                    aux::underlying_type<testing::level>::type
               >(record.attributes["severity"].value)
             );
 
