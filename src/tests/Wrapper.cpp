@@ -90,8 +90,11 @@ TEST(Wrapper, UsageWithVerboseLogger) {
         EXPECT_EQ(log::attribute_value_t(100500), record.attributes["id"].value);
 
         ASSERT_EQ(1, record.attributes.count("severity"));
-        EXPECT_EQ(log::attribute_value_t(testing::info),
-                  record.attributes["severity"].value);
+        EXPECT_EQ(testing::info,
+                  boost::get<
+                        typename aux::underlying_type<testing::level>::type
+                  >(record.attributes["severity"].value)
+                );
 
         EXPECT_EQ(0, record.attributes.count("answer"));
 
@@ -100,8 +103,11 @@ TEST(Wrapper, UsageWithVerboseLogger) {
         EXPECT_EQ(log::attribute_value_t(100500), record.attributes["id"].value);
 
         ASSERT_EQ(1, record.attributes.count("severity"));
-        EXPECT_EQ(log::attribute_value_t(testing::info),
-                  record.attributes["severity"].value);
+        EXPECT_EQ(testing::info,
+                  boost::get<
+                        typename aux::underlying_type<testing::level>::type
+                  >(record.attributes["severity"].value)
+                );
 
         ASSERT_EQ(1, record.attributes.count("answer"));
         EXPECT_EQ(log::attribute_value_t(42), record.attributes["answer"].value);
@@ -112,8 +118,11 @@ TEST(Wrapper, UsageWithVerboseLogger) {
     EXPECT_EQ(log::attribute_value_t(100500), record.attributes["id"].value);
 
     ASSERT_EQ(1, record.attributes.count("severity"));
-    EXPECT_EQ(log::attribute_value_t(testing::info),
-              record.attributes["severity"].value);
+    EXPECT_EQ(testing::info,
+              boost::get<
+                    typename aux::underlying_type<testing::level>::type
+              >(record.attributes["severity"].value)
+            );
 
     EXPECT_EQ(0, record.attributes.count("answer"));
 }
