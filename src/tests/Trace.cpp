@@ -366,6 +366,20 @@ TEST(Context, SimultaneousSimpleTraceHandlingViaEventLoop) {
     EXPECT_EQ(2, counter);
 }
 
+//!@todo: Letter to myself in the future.
+//! After two week vacation you will remember nothing about this subproject.
+//! 1. More tests:
+//! 1.1. Asynchronous context with random delay (timer).
+//! 1.2. Nested contexts: 2 traces, 2 spans in each.
+//! 1.3. Two threads.
+//! 1.4. Nested contexts in threads.
+//! 1.5. Event loop in threads.
+//! 1.6. Single event loop in multiple threads.
+//! 1.7. Less code magic with tests. Less code templatization. More concrete
+//!      hardcoded cases. In simplifies further reading.
+//! 2. Think about returning span context after `trace::context_t` leaves its
+//!    scope.
+
 void print(std::initializer_list<std::string> list) {
     static std::mutex mutex;
     std::lock_guard<std::mutex> lock(mutex);
