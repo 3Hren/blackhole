@@ -4,6 +4,8 @@ SET(CMAKE_BUILD_TYPE "Debug")
 
 SET(PROJECT blackhole-example-init-from-file)
 
+ADD_DEFINITIONS(-DBLACKHOLE_HEADER_ONLY=1)
+
 SET(HEADERS
 )
 
