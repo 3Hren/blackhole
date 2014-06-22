@@ -581,8 +581,6 @@ TEST(Manual, 2) {
     print({ "main end" });
 }
 
-#include <boost/asio.hpp>
-
 void on_timer(int i, const boost::system::error_code&) {
     print({"timer", boost::lexical_cast<std::string>(i)});
     func(i);
