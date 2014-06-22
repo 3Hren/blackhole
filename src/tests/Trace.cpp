@@ -449,7 +449,8 @@ void print(std::initializer_list<std::string> list) {
     static std::mutex mutex;
     std::lock_guard<std::mutex> lock(mutex);
     auto span = this_thread::current_span();
-    std::cout << "[" << std::setw(20) << span.trace << "]" << "[" << std::setw(20) << span.span << "]: ";
+    std::cout << "[" << std::setw(20) << span.trace << "] ["
+              << std::setw(20) << span.span << "]: ";
     for (auto it = list.begin(); it != list.end(); ++it) {
         std::cout << *it;
     }
