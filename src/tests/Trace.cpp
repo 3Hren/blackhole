@@ -369,7 +369,6 @@ TEST(Context, SimultaneousSimpleTraceHandlingViaEventLoop) {
 //!@todo: Letter to myself in the future.
 //! After two week vacation you will remember nothing about this subproject.
 //! 1. More tests:
-//! 1.1. Asynchronous context with random delay (timer).
 //! 1.2. Nested contexts: 2 traces, 2 spans in each.
 //! 1.3. Two threads.
 //! 1.4. Nested contexts in threads.
@@ -380,6 +379,72 @@ TEST(Context, SimultaneousSimpleTraceHandlingViaEventLoop) {
 //! 2. Think about returning span context after `trace::context_t` leaves its
 //!    scope.
 
+namespace random_delay {
+
+void check_first(int& counter, const boost::system::error_code&) {
+    EXPECT_EQ(span_t(44, 44, 0), this_thread::current_span());
+    EXPECT_EQ(0, counter);
+    counter++;
+}
+
+void check_second(int& counter) {
+    EXPECT_EQ(span_t(45, 45, 0), this_thread::current_span());
+    EXPECT_EQ(1, counter);
+    counter++;
+}
+
+// Emulate socket accept handler.
+void create_first_trace(boost::asio::io_service& loop, int& counter) {
+    trace::context_t<random_t<mock::distribution_t>> context(44);
+    boost::asio::deadline_timer timer(loop);
+    timer.expires_from_now(boost::posix_time::milliseconds(1));
+    timer.async_wait(
+        trace::wrap(
+            std::bind(&check_first, std::ref(counter), std::placeholders::_1)
+        )
+    );
+}
+
+void create_second_trace(boost::asio::io_service& loop, int& counter) {
+    trace::context_t<random_t<mock::distribution_t>> context(45);
+    loop.post(
+        trace::wrap(
+            std::bind(&check_second, std::ref(counter))
+        )
+    );
+}
+
+} // namespace random_delay
+
+TEST(Context, AsynchronousContextWithRandomDelay) {
+    //! Sequence diagram:
+    //! --44----c1
+    //! ----45c2--
+
+    boost::asio::io_service loop;
+    int counter = 0;
+
+    loop.post(
+        std::bind(
+            &random_delay::create_first_trace,
+            std::ref(loop),
+            std::ref(counter)
+        )
+    );
+    loop.post(
+        std::bind(
+            &random_delay::create_second_trace,
+            std::ref(loop),
+            std::ref(counter)
+        )
+    );
+
+    loop.run();
+
+    EXPECT_EQ(span_t::invalid(), this_thread::current_span());
+
+    EXPECT_EQ(2, counter);
+}
 void print(std::initializer_list<std::string> list) {
     static std::mutex mutex;
     std::lock_guard<std::mutex> lock(mutex);
