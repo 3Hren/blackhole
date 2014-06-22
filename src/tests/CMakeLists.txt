@@ -77,13 +77,13 @@ SET(BASE_SOURCES
 
 IF(ENABLE_ELASTICSEARCH)
     SET(ES_SOURCES
-	extra/ElasticsearchSink
-	extra/elasticsearch/Factory
-	extra/elasticsearch/Transport
-	extra/elasticsearch/Requests
-	extra/elasticsearch/Utils
-	extra/Resolver
-	extra/UrlFetch
+    extra/ElasticsearchSink
+    extra/elasticsearch/Factory
+    extra/elasticsearch/Transport
+    extra/elasticsearch/Requests
+    extra/elasticsearch/Utils
+    extra/Resolver
+    extra/UrlFetch
     )
 ENDIF()
 
