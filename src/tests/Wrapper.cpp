@@ -3,7 +3,7 @@
 #include <blackhole/logger.hpp>
 #include <blackhole/logger/wrapper.hpp>
 #include <blackhole/record.hpp>
-#include <blackhole/sink/stream.hpp>
+#include <blackhole/sink/null.hpp>
 
 #include "global.hpp"
 
@@ -21,13 +21,13 @@ public:
         >("[%(timestamp)s]: %(message)s");
 
         auto sink = utils::make_unique<
-            sink::stream_t
-        >(sink::stream_t::output_t::stdout);
+            sink::null_t
+        >();
 
         auto frontend = utils::make_unique<
             frontend_t<
                 formatter::string_t,
-                sink::stream_t
+                sink::null_t
             >
         >(std::move(formatter), std::move(sink));
 
