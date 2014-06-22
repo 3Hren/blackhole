@@ -17,6 +17,12 @@ public:
         m_guard_attributes(std::move(attributes))
     {}
 
+    template<class Wrapper>
+    scoped_attributes_t(Wrapper& wrapper, log::attributes_t&& attributes) :
+        scoped_attributes_concept_t(wrapper.log),
+        m_guard_attributes(std::move(attributes))
+    {}
+
     virtual
     const log::attributes_t&
     attributes() const {

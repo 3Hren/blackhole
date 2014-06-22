@@ -9,6 +9,8 @@ template<class Logger>
 class wrapper_t {
     BLACKHOLE_DECLARE_NONCOPYABLE(wrapper_t<Logger>);
 
+    friend class scoped_attributes_t;
+
 public:
     typedef Logger logger_type;
 

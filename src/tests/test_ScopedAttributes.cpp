@@ -204,3 +204,36 @@ TEST(ScopedAttributes, ThreadLocality) {
     t1.join();
     t2.join();
 }
+
+#include <blackhole/logger/wrapper.hpp>
+
+TEST(ScopedAttrbutes, CompatibleWithWrapper) {
+    auto log = logger_factory_t::create();
+    wrapper_t<logger_base_t> wrapper(log, log::attributes_t({
+        attribute::make("answer", 42)
+    }));
+
+    {
+        scoped_attributes_t guard(
+            wrapper,
+            log::attributes_t({
+                attribute::make("piece of", "shit")
+            })
+        );
+
+        auto record = wrapper.open_record();
+
+        ASSERT_TRUE(record.attributes.count("answer") > 0);
+        EXPECT_EQ(log::attribute_value_t(42), record.attributes["answer"].value);
+
+        ASSERT_TRUE(record.attributes.count("piece of") > 0);
+        EXPECT_EQ(log::attribute_value_t("shit"), record.attributes["piece of"].value);
+    }
+
+    auto record = wrapper.open_record();
+
+    ASSERT_TRUE(record.attributes.count("answer") > 0);
+    EXPECT_EQ(log::attribute_value_t(42), record.attributes["answer"].value);
+
+    EXPECT_EQ(0, record.attributes.count("piece of"));
+}
