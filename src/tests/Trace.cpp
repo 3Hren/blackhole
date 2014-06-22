@@ -1,6 +1,7 @@
 #include <thread>
 #include <random>
 
+#include <boost/asio.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread.hpp>
 
@@ -156,28 +157,32 @@ public:
 
 private:
     span_t span;
+    span_t* parent;
 
 public:
     context_t() :
-        span(generate())
+        span(generate()),
+        parent(state_t::instance().get())
     {
         state_t::instance().reset(&this->span);
     }
 
     context_t(value_type trace) :
-        span(span_t(trace, trace))
+        span(span_t(trace, trace)),
+        parent(state_t::instance().get())
     {
         state_t::instance().reset(&this->span);
     }
 
     context_t(span_t span) :
-        span(std::move(span))
+        span(std::move(span)),
+        parent(state_t::instance().get())
     {
         state_t::instance().reset(&this->span);
     }
 
     ~context_t() {
-        state_t::instance().reset();
+        state_t::instance().reset(parent);
     }
 
 private:
@@ -277,6 +282,7 @@ TEST(Context, ResetContextAfterLeavingScope) {
         EXPECT_EQ(0, this_thread::current_span().parent);
     }
 
+    // Trace context is completery reset.
     EXPECT_EQ(0, this_thread::current_span().trace);
     EXPECT_EQ(0, this_thread::current_span().span);
     EXPECT_EQ(0, this_thread::current_span().parent);
@@ -306,22 +312,30 @@ TEST(Context, ExactlyResetNotFallbackContextAfterLeavingScope) {
             EXPECT_EQ(42, this_thread::current_span().parent);
         }
 
-        EXPECT_EQ(0, this_thread::current_span().trace);
-        EXPECT_EQ(0, this_thread::current_span().span);
+        // Trace context is partially reset at this moment.
+        EXPECT_EQ(42, this_thread::current_span().trace);
+        EXPECT_EQ(42, this_thread::current_span().span);
         EXPECT_EQ(0, this_thread::current_span().parent);
     }
 
+    // Trace context is completery reset now.
     EXPECT_EQ(0, this_thread::current_span().trace);
     EXPECT_EQ(0, this_thread::current_span().span);
     EXPECT_EQ(0, this_thread::current_span().parent);
 }
 
-#include <boost/asio.hpp>
+namespace testing {
 
-void checker(int& counter, span_t expected) {
-    EXPECT_EQ(expected, this_thread::current_span());
+namespace loop_handling {
+
+void check(int& counter) {
+    EXPECT_EQ(span_t(43, 43), this_thread::current_span());
     counter++;
 }
+
+} // namespace loop_handling
+
+} // namespace testing
 
 TEST(Context, AsynchronousHandlingViaEventLoop) {
     boost::asio::io_service loop;
@@ -335,7 +349,7 @@ TEST(Context, AsynchronousHandlingViaEventLoop) {
 
     loop.post(
         trace::wrap(
-            std::bind(&checker, std::ref(counter), span_t(43, 43))
+            std::bind(&loop_handling::check, std::ref(counter))
         )
     );
 
@@ -343,24 +357,58 @@ TEST(Context, AsynchronousHandlingViaEventLoop) {
     EXPECT_EQ(1, counter);
 }
 
-void create_trace(boost::asio::io_service& loop,
-                  int& counter,
-                  std::uint64_t id)
-{
-    trace::context_t<random_t<mock::distribution_t>> context(id);
-    loop.post(
-        trace::wrap(
-            std::bind(&checker, std::ref(counter), span_t(id, id))
-        )
-    );
+namespace testing {
+
+namespace loop_handling {
+
+namespace simultaneous {
+
+void check_first(int& counter) {
+    EXPECT_EQ(span_t(1, 1), this_thread::current_span());
+    EXPECT_EQ(0, counter);
+    counter++;
 }
+
+void check_second(int& counter) {
+    EXPECT_EQ(span_t(2, 2), this_thread::current_span());
+    EXPECT_EQ(1, counter);
+    counter++;
+}
+
+void create_first_trace(boost::asio::io_service& loop, int& counter) {
+    trace::context_t<random_t<mock::distribution_t>> context(1);
+    loop.post(trace::wrap(std::bind(&check_first, std::ref(counter))));
+}
+
+void create_second_trace(boost::asio::io_service& loop, int& counter) {
+    trace::context_t<random_t<mock::distribution_t>> context(2);
+    loop.post(trace::wrap(std::bind(&check_second, std::ref(counter))));
+}
+
+} // namespace simultaneous
+
+} // namespace loop_handling
+
+} // namespace testing
 
 TEST(Context, SimultaneousSimpleTraceHandlingViaEventLoop) {
     boost::asio::io_service loop;
     int counter = 0;
 
-    loop.post(std::bind(&create_trace, std::ref(loop), std::ref(counter), 1));
-    loop.post(std::bind(&create_trace, std::ref(loop), std::ref(counter), 2));
+    loop.post(
+        std::bind(
+            &loop_handling::simultaneous::create_first_trace,
+            std::ref(loop),
+            std::ref(counter)
+        )
+    );
+    loop.post(
+        std::bind(
+            &loop_handling::simultaneous::create_second_trace,
+            std::ref(loop),
+            std::ref(counter)
+        )
+    );
 
     loop.run();
     EXPECT_EQ(2, counter);
@@ -370,14 +418,15 @@ TEST(Context, SimultaneousSimpleTraceHandlingViaEventLoop) {
 //! After two week vacation you will remember nothing about this subproject.
 //! 1. More tests:
 //! 1.2. Nested contexts: 2 traces, 2 spans in each.
-//! 1.3. Two threads.
 //! 1.4. Nested contexts in threads.
 //! 1.5. Event loop in threads.
 //! 1.6. Single event loop in multiple threads.
-//! 1.7. Less code magic with tests. Less code templatization. More concrete
-//!      hardcoded cases. In simplifies further reading.
 //! 2. Think about returning span context after `trace::context_t` leaves its
 //!    scope.
+
+namespace testing {
+
+namespace loop_handling {
 
 namespace random_delay {
 
@@ -416,6 +465,10 @@ void create_second_trace(boost::asio::io_service& loop, int& counter) {
 
 } // namespace random_delay
 
+} // namespace loop_handling
+
+} // namespace testing
+
 TEST(Context, AsynchronousContextWithRandomDelay) {
     //! Sequence diagram:
     //! --44----c1
@@ -426,14 +479,14 @@ TEST(Context, AsynchronousContextWithRandomDelay) {
 
     loop.post(
         std::bind(
-            &random_delay::create_first_trace,
+            &loop_handling::random_delay::create_first_trace,
             std::ref(loop),
             std::ref(counter)
         )
     );
     loop.post(
         std::bind(
-            &random_delay::create_second_trace,
+            &loop_handling::random_delay::create_second_trace,
             std::ref(loop),
             std::ref(counter)
         )
@@ -445,6 +498,37 @@ TEST(Context, AsynchronousContextWithRandomDelay) {
 
     EXPECT_EQ(2, counter);
 }
+
+namespace testing {
+
+namespace thread_handling {
+
+void check(std::atomic<int>& counter) {
+    EXPECT_EQ(span_t(46, 46, 0), this_thread::current_span());
+    counter++;
+}
+
+} // namespace thread_handling
+
+} // namespace testing
+
+TEST(Context, AsynchronousHandlingViaThreads) {
+    std::atomic<int> counter(0);
+
+    auto& distribution = random_t<mock::distribution_t>::instance().distribution();
+    EXPECT_CALL(distribution, next())
+            .Times(1)
+            .WillOnce(Return(46));
+    trace::context_t<random_t<mock::distribution_t>> context;
+
+    std::thread thread(
+        trace::wrap(std::bind(&thread_handling::check, std::ref(counter)))
+    );
+    thread.join();
+
+    EXPECT_EQ(1, counter);
+}
+
 void print(std::initializer_list<std::string> list) {
     static std::mutex mutex;
     std::lock_guard<std::mutex> lock(mutex);
