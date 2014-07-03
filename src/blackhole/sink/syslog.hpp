@@ -29,6 +29,7 @@ namespace backend {
 
 class native_t {
     const std::string m_identity;
+
 public:
     native_t(const std::string& identity, int option = LOG_PID, int facility = LOG_USER) :
         m_identity(identity)
@@ -63,7 +64,11 @@ struct config_t {
     int option;
     int facility;
 
-    config_t() {}
+    config_t() :
+        identity("blackhole"),
+        option(LOG_PID),
+        facility(LOG_USER)
+    {}
 
     config_t(const std::string& identity, int option = LOG_PID, int facility = LOG_USER) :
         identity(identity),
