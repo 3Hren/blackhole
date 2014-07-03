@@ -8,7 +8,7 @@ using namespace blackhole;
 
 namespace expr = blackhole::expression;
 
-//!@todo: Check state of the objects.
+//!@todo: Check state of objects.
 TEST(logger_base_t, Class) {
     logger_base_t logger;
     UNUSED(logger);
