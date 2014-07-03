@@ -64,7 +64,7 @@ private:
 public:
     distribution_t() :
         generator(device()),
-        distribution(1, std::numeric_limits<value_type>::max())
+        distribution(min(), max())
     {}
 #else
 private:
@@ -74,12 +74,21 @@ private:
 public:
     distribution_t() :
         generator(static_cast<value_type>(std::time(nullptr))),
-        distribution(1, std::numeric_limits<value_type>::max())
+        distribution(min(), max())
     {}
 #endif
 
     value_type next() {
         return distribution(generator);
+    }
+
+private:
+    static value_type min() {
+        return 1;
+    }
+
+    static value_type max() {
+        return std::numeric_limits<value_type>::max();
     }
 };
 
