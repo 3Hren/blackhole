@@ -46,7 +46,7 @@ public:
 
 private:
     void initialize(int option, int facility) {
-        if(m_identity.empty()) {
+        if (m_identity.empty()) {
             throw error_t("no syslog identity has been specified");
         }
 
