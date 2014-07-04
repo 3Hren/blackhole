@@ -113,7 +113,10 @@ public:
 
     using logger_base_t::open_record;
 
+    //!@todo: Add ability to get/set maximum severity level.
+
     log::record_t open_record(Level level) const {
+        //!@todo: Severity filter.
         log::attributes_t attributes = { keyword::severity<Level>() = level };
         return logger_base_t::open_record(std::move(attributes));
     }
