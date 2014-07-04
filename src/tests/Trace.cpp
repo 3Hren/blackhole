@@ -426,16 +426,6 @@ TEST(Context, SimultaneousSimpleTraceHandlingViaEventLoop) {
     EXPECT_EQ(2, counter);
 }
 
-//!@todo: Letter to myself in the future.
-//! After two week vacation you will remember nothing about this subproject.
-//! 1. More tests:
-//! 1.2. Nested contexts: 2 traces, 2 spans in each.
-//! 1.4. Nested contexts in threads.
-//! 1.5. Event loop in threads.
-//! 1.6. Single event loop in multiple threads.
-//! 2. Think about returning span context after `trace::context_t` leaves its
-//!    scope.
-
 namespace testing {
 
 namespace loop_handling {
