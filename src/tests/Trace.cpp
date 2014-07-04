@@ -1,26 +1,11 @@
 #include <thread>
-#include <random>
 
 #include <boost/asio.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/thread.hpp>
 
-#include <blackhole/utils/nullptr.hpp>
-#include <blackhole/platform/random.hpp>
 #include <blackhole/trace.hpp>
 
 #include "global.hpp"
-
-namespace mock {
-
-class distribution_t {
-public:
-    typedef std::uint64_t value_type;
-
-    MOCK_METHOD0(next, value_type());
-};
-
-} // namespace mock
+#include "mocks/trace.hpp"
 
 TEST(Context, Initiating) {
     auto& distribution = random_t<mock::distribution_t>::instance().distribution();
