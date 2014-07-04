@@ -99,8 +99,9 @@ public:
         logger_base_t()
     {}
 
-    // GCC 4.4 doesn't create default copy/move constructor for derived classes.
-    // It's a bug.
+    //! @compat GCC4.4
+    //! GCC 4.4 doesn't create default copy/move constructor for derived
+    //! classes. It's a bug.
     verbose_logger_t(verbose_logger_t&& other) BLACKHOLE_NOEXCEPT :
         logger_base_t(std::move(other))
     {}
