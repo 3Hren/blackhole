@@ -37,18 +37,6 @@ wrapper_t<Logger>::open_record(log::attributes_t attributes) const {
 }
 
 template<class Logger>
-template<typename Level>
-typename std::enable_if<
-    std::is_same<Logger, verbose_logger_t<Level>>::value,
-    log::record_t
->::type
-wrapper_t<Logger>::open_record(Level level) const {
-    log::attributes_t attributes = this->attributes;
-    attributes.insert(keyword::severity<Level>() = level);
-    return log.open_record(std::move(attributes));
-}
-
-template<class Logger>
 void
 wrapper_t<Logger>::push(log::record_t&& record) const {
     log.push(std::move(record));

@@ -30,7 +30,11 @@ public:
         std::is_same<Logger, verbose_logger_t<Level>>::value,
         log::record_t
     >::type
-    open_record(Level level) const;
+    open_record(Level level) const {
+        log::attributes_t attributes = this->attributes;
+        attributes.insert(keyword::severity<Level>() = level);
+        return log.open_record(std::move(attributes));
+    }
 
     void push(log::record_t&& record) const;
 };
