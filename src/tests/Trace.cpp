@@ -19,7 +19,10 @@ struct span_t {
         trace(trace),
         span(span),
         parent(parent)
-    {}
+    {
+        // There is special invalid state, that shouldn't be created manually.
+        BOOST_ASSERT(trace != 0 && span != 0);
+    }
 
     bool valid() const {
         return trace != 0 && span != 0;
