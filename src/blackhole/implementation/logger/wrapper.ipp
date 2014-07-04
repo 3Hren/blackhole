@@ -9,7 +9,7 @@ namespace blackhole {
 template<class Logger>
 wrapper_t<Logger>::wrapper_t(logger_type& log, log::attributes_t&& attributes) :
     log(log),
-    attributes(attributes)
+    attributes(std::move(attributes))
 {
     BOOST_ASSERT(!this->attributes.empty());
 }
