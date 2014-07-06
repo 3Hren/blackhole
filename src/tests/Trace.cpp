@@ -179,22 +179,22 @@ namespace loop_handling {
 
 namespace random_delay {
 
-void check_first(int& counter, const boost::system::error_code&) {
+void check_first(int& counter, const boost::system::error_code& ec) {
+    ASSERT_EQ(0, ec.value());
     EXPECT_EQ(span_t(44, 44, 0), this_thread::current_span());
-    EXPECT_EQ(0, counter);
+    EXPECT_EQ(1, counter);
     counter++;
 }
 
 void check_second(int& counter) {
     EXPECT_EQ(span_t(45, 45, 0), this_thread::current_span());
-    EXPECT_EQ(1, counter);
+    EXPECT_EQ(0, counter);
     counter++;
 }
 
 // Emulate socket accept handler.
-void create_first_trace(boost::asio::io_service& loop, int& counter) {
+void create_first_trace(boost::asio::deadline_timer& timer, int& counter) {
     trace::context_t<random_t<mock::distribution_t>> context(44);
-    boost::asio::deadline_timer timer(loop);
     timer.expires_from_now(boost::posix_time::milliseconds(1));
     timer.async_wait(
         trace::wrap(
@@ -226,13 +226,15 @@ TEST(Context, AsynchronousContextWithRandomDelay) {
     boost::asio::io_service loop;
     int counter = 0;
 
+    boost::asio::deadline_timer timer(loop);
     loop.post(
         std::bind(
             &loop_handling::random_delay::create_first_trace,
-            std::ref(loop),
+            std::ref(timer),
             std::ref(counter)
         )
     );
+
     loop.post(
         std::bind(
             &loop_handling::random_delay::create_second_trace,
@@ -241,11 +243,18 @@ TEST(Context, AsynchronousContextWithRandomDelay) {
         )
     );
 
-    loop.run();
+    loop.run_one();
+    loop.run_one();
+
+    EXPECT_EQ(0, counter);
+
+    loop.run_one();
+    EXPECT_EQ(1, counter);
+
+    loop.run_one();
+    EXPECT_EQ(2, counter);
 
     EXPECT_EQ(span_t::invalid(), this_thread::current_span());
-
-    EXPECT_EQ(2, counter);
 }
 
 namespace testing {
