@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 #include <boost/thread.hpp>
 
 #include "blackhole/logger.hpp"
