@@ -70,20 +70,20 @@ SET(BASE_SOURCES
     test_UdpSink
     test_Utils
     test_VerboseLogger
+    utils/test_GenericStringFormatter
     Trace
     Wrapper
-    utils/test_GenericStringFormatter
 )
 
 IF(ENABLE_ELASTICSEARCH)
     SET(ES_SOURCES
-    extra/ElasticsearchSink
-    extra/elasticsearch/Factory
-    extra/elasticsearch/Transport
-    extra/elasticsearch/Requests
-    extra/elasticsearch/Utils
-    extra/Resolver
-    extra/UrlFetch
+	extra/ElasticsearchSink
+	extra/elasticsearch/Factory
+	extra/elasticsearch/Transport
+	extra/elasticsearch/Requests
+	extra/elasticsearch/Utils
+	extra/Resolver
+	extra/UrlFetch
     )
 ENDIF()
 
