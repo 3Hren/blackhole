@@ -31,6 +31,8 @@ public:
 
     synchronized& operator=(synchronized&& other) {
         boost::lock(mutex, other.mutex);
+        std::lock_guard<mutex_type> lock(mutex, std::adopt_lock);
+        std::lock_guard<mutex_type> other_lock(other.mutex, std::adopt_lock);
         logger = std::move(other.logger);
         return *this;
     }
