@@ -4,11 +4,12 @@
 
 #include <boost/thread.hpp>
 
+#include "blackhole/forwards.hpp"
 #include "blackhole/logger.hpp"
 
 namespace blackhole {
 
-template<class Logger, class Mutex = std::mutex>
+template<class Logger, class Mutex>
 class synchronized {
 public:
     typedef Logger logger_type;
@@ -17,6 +18,8 @@ public:
 private:
     logger_type log;
     mutable mutex_type mutex;
+
+    friend class scoped_attributes_t;
 
 public:
     synchronized() {}
