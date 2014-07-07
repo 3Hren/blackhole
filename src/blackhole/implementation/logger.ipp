@@ -24,7 +24,9 @@ logger_base_t::logger_base_t() :
 {}
 
 BLACKHOLE_DECL
-logger_base_t::logger_base_t(logger_base_t&& other) BLACKHOLE_NOEXCEPT {
+logger_base_t::logger_base_t(logger_base_t&& other) BLACKHOLE_NOEXCEPT :
+    m_scoped_attributes(&aux::guard::no_deleter)
+{
     *this = std::move(other);
 }
 

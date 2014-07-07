@@ -237,3 +237,13 @@ TEST(ScopedAttrbutes, CompatibleWithWrapper) {
 
     EXPECT_EQ(0, record.attributes.count("piece of"));
 }
+
+TEST(ScopedAttributes, CorrectlyBehavesOnMovedLogger) {
+    auto log = logger_base_t();
+
+    // After moving, newly created log should explicitly set no deletion
+    // function for thread local scoped attributes.
+    auto other = std::move(log);
+
+    scoped_attributes_t guard(other, log::attributes_t());
+}
