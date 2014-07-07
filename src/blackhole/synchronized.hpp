@@ -87,6 +87,30 @@ public:
         std::lock_guard<mutex_type> lock(mutex);
         log.push(std::move(record));
     }
+
+    template<typename Level>
+    typename std::enable_if<
+        std::is_same<
+            logger_type,
+            verbose_logger_t<Level>
+        >::value,
+        Level
+    >::type
+    verbosity() const {
+        std::lock_guard<mutex_type> lock(mutex);
+        return log.verbosity();
+    }
+
+    template<typename Level>
+    typename std::enable_if<
+        std::is_same<
+            logger_type,
+            verbose_logger_t<Level>
+        >::value
+    >::type
+    verbosity(Level level) {
+        std::lock_guard<mutex_type> lock(mutex);
+        return log.verbosity(level);
     }
 };
 
