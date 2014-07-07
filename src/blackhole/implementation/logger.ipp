@@ -175,7 +175,8 @@ scoped_attributes_concept_t::parent() const {
 }
 
 BLACKHOLE_DECL
-void swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT {
+void
+swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT {
     using std::swap;
     std::swap(lhs.m_enabled, rhs.m_enabled);
     std::swap(lhs.m_filter, rhs.m_filter);
