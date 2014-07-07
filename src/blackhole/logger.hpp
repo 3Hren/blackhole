@@ -80,7 +80,7 @@ class scoped_attributes_concept_t {
 
 public:
     scoped_attributes_concept_t(logger_base_t& log);
-    ~scoped_attributes_concept_t();
+    virtual ~scoped_attributes_concept_t();
 
     virtual const log::attributes_t& attributes() const = 0;
 
