@@ -25,11 +25,9 @@ public:
     log::record_t open_record(log::attribute_pair_t attribute) const;
     log::record_t open_record(log::attributes_t attributes) const;
 
+    //!@todo: Add more gentle concept check.
     template<typename Level>
-    typename std::enable_if<
-        std::is_same<Logger, verbose_logger_t<Level>>::value,
-        log::record_t
-    >::type
+    log::record_t
     open_record(Level level) const {
         log::attributes_t attributes = this->attributes;
         attributes.insert(keyword::severity<Level>() = level);
