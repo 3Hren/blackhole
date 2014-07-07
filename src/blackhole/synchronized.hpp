@@ -30,10 +30,12 @@ public:
     }
 
     synchronized& operator=(synchronized&& other) {
+        //! @compat GCC4.4
+        //! GCC4.4 doesn't implement `std::lock` as like as `std::adopt_lock`.
         boost::lock(mutex, other.mutex);
-        std::lock_guard<mutex_type> lock(mutex, std::adopt_lock);
-        std::lock_guard<mutex_type> other_lock(other.mutex, std::adopt_lock);
-        logger = std::move(other.logger);
+        boost::lock_guard<mutex_type> lock(mutex, boost::adopt_lock);
+        boost::lock_guard<mutex_type> other_lock(other.mutex, boost::adopt_lock);
+        log = std::move(other.log);
         return *this;
     }
 
