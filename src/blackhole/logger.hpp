@@ -94,16 +94,21 @@ class verbose_logger_t : public logger_base_t {
 public:
     typedef Level level_type;
 
+private:
+    Level level;
+
 public:
     verbose_logger_t() :
-        logger_base_t()
+        logger_base_t(),
+        level(static_cast<level_type>(0))
     {}
 
     //! @compat GCC4.4
     //! GCC 4.4 doesn't create default copy/move constructor for derived
     //! classes. It's a bug.
     verbose_logger_t(verbose_logger_t&& other) BLACKHOLE_NOEXCEPT :
-        logger_base_t(std::move(other))
+        logger_base_t(std::move(other)),
+        level(static_cast<level_type>(0))
     {}
 
     verbose_logger_t& operator=(verbose_logger_t&& other) BLACKHOLE_NOEXCEPT {
@@ -111,12 +116,29 @@ public:
         return *this;
     }
 
+    // Explicit import other overloaded methods.
     using logger_base_t::open_record;
 
-    //!@todo: Add ability to get/set maximum severity level.
+    //!@todo: Docs.
+    level_type verbosity() const {
+        return level;
+    }
 
-    log::record_t open_record(Level level) const {
-        //!@todo: Severity filter.
+    /*!
+     * Sets the upper verbosity bound.
+     * Every log event with a verbosity less than `level` will be dropped.
+     * @param[in] level - Upper verbosity value.
+     */
+    void verbosity(level_type level) {
+        this->level = level;
+    }
+
+    log::record_t open_record(level_type level) const {
+        typedef typename aux::underlying_type<level_type>::type underlying_type;
+        if (static_cast<underlying_type>(level) < static_cast<underlying_type>(this->level)) {
+            return log::record_t();
+        }
+
         log::attributes_t attributes = { keyword::severity<Level>() = level };
         return logger_base_t::open_record(std::move(attributes));
     }
