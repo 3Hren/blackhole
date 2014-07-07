@@ -15,11 +15,6 @@ public:
 
 private:
     span_t span;
-
-    //!@note: It's not safe to call `this_thread::current_span` after
-    //!       current `context_t` object has been destroyed.
-    //!       So maybe there is no need to keep the parent's pointer?
-    //!       Otherwise heap allocation should be involved, which costs highly.
     span_t* parent;
 
 public:
