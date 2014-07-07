@@ -15,14 +15,14 @@ public:
     typedef Mutex mutex_type;
 
 private:
-    logger_type logger;
+    logger_type log;
     mutable mutex_type mutex;
 
 public:
     synchronized() {}
 
     explicit synchronized(logger_type&& logger) :
-        logger(std::move(logger))
+        log(std::move(logger))
     {}
 
     synchronized(synchronized&& other) {
@@ -41,48 +41,49 @@ public:
 
     bool enabled() const {
         std::lock_guard<mutex_type> lock(mutex);
-        return logger.enabled();
+        return log.enabled();
     }
 
     void enable() {
         std::lock_guard<mutex_type> lock(mutex);
-        logger.enable();
+        log.enable();
     }
 
     void disable() {
         std::lock_guard<mutex_type> lock(mutex);
-        logger.disable();
+        log.disable();
     }
 
     void set_filter(filter_t&& filter) {
         std::lock_guard<mutex_type> lock(mutex);
-        logger.set_filter(std::move(filter));
+        log.set_filter(std::move(filter));
     }
 
     void add_attribute(const log::attribute_pair_t& attr) {
         std::lock_guard<mutex_type> lock(mutex);
-        logger.add_attribute(attr);
+        log.add_attribute(attr);
     }
 
     void add_frontend(std::unique_ptr<base_frontend_t> frontend) {
         std::lock_guard<mutex_type> lock(mutex);
-        logger.add_frontend(std::move(frontend));
+        log.add_frontend(std::move(frontend));
     }
 
     void set_exception_handler(log::exception_handler_t&& handler) {
         std::lock_guard<mutex_type> lock(mutex);
-        logger.set_exception_handler(std::move(handler));
+        log.set_exception_handler(std::move(handler));
     }
 
     template<typename... Args>
     log::record_t open_record(Args&&... args) const {
         std::lock_guard<mutex_type> lock(mutex);
-        return logger.open_record(std::forward<Args>(args)...);
+        return log.open_record(std::forward<Args>(args)...);
     }
 
     void push(log::record_t&& record) const {
         std::lock_guard<mutex_type> lock(mutex);
-        logger.push(std::move(record));
+        log.push(std::move(record));
+    }
     }
 };
 
