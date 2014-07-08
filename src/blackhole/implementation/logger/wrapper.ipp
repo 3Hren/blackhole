@@ -7,7 +7,7 @@
 namespace blackhole {
 
 template<class Logger>
-wrapper_t<Logger>::wrapper_t(logger_type& log, log::attributes_t&& attributes) :
+wrapper_t<Logger>::wrapper_t(logger_type& log, log::attributes_t attributes) :
     log(log),
     attributes(std::move(attributes))
 {

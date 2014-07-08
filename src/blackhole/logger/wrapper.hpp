@@ -19,7 +19,7 @@ private:
     const log::attributes_t attributes;
 
 public:
-    wrapper_t(logger_type& log, log::attributes_t&& attributes);
+    wrapper_t(logger_type& log, log::attributes_t attributes);
 
     log::record_t open_record() const;
     log::record_t open_record(log::attribute_pair_t attribute) const;
