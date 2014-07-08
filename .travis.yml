@@ -19,4 +19,4 @@ before_script:
     - mkdir build && cd build
 
 script:
-    - ./ci/run.sh
+    - ../ci/script.sh
