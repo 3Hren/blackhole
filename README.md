@@ -1,4 +1,4 @@
-# Blackhole [![Build Status](https://travis-ci.org/3Hren/blackhole.png?branch=master)](https://travis-ci.org/3Hren/blackhole) [![Build Status](https://drone.io/github.com/3Hren/blackhole/status.png)](https://drone.io/github.com/3Hren/blackhole/latest)
+# Blackhole [![Build Status](https://travis-ci.org/3Hren/blackhole.png?branch=master)](https://travis-ci.org/3Hren/blackhole) 
 
 Yet another logging library.
 
