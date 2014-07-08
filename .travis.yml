@@ -1,23 +1,22 @@
-language: cpp
+os:
+    - linux
+    - osx
 
-compiler: 
- - gcc
+env:
+    - SUITE=tests
+    - SUITE=examples
 
-notifications:
-  on_success: change
-  on_failure: always
-  template:
-   - "it's %{author}'s turn to pay the next round of drinks for the massacre he caused in %{repository}: %{build_url}"
+language:
+    - cpp
 
 before_install:
- - sudo apt-get update -qq
+    - ./ci/before_install.sh
 
 install:
- - sudo apt-get install -qq cdbs cmake libboost-dev libboost-thread-dev libboost-filesystem-dev libmsgpack-dev
+    - ./ci/install.sh
 
 before_script:
- - mkdir build && cd build
+    - mkdir build && cd build
 
 script:
- - cmake -DENABLE_TESTING=ON -DENABLE_ELASTICSEARCH=ON .. && make 
- - src/tests/blackhole-tests
+    - ./ci/run.sh
