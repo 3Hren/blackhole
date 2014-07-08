@@ -119,7 +119,9 @@ public:
     // Explicit import other overloaded methods.
     using logger_base_t::open_record;
 
-    //!@todo: Docs.
+    /*!
+     * Gets the current upper verbosity bound.
+     */
     level_type verbosity() const {
         return level;
     }
