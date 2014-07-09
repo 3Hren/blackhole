@@ -58,7 +58,7 @@ private:
 
 namespace this_thread {
 
-const span_t& current_span() {
+inline const span_t& current_span() {
     auto span = trace::state_t::instance().get();
     return span ? *span : span_t::invalid();
 }
