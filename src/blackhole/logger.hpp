@@ -135,6 +135,13 @@ public:
         this->level = level;
     }
 
+    /*!
+     * Tries to open log record with specific verbosity level.
+     * Internally this method compares desired verbosity level with the upper
+     * one. Can return invalid log record if some conditions are not met.
+     * @param[in] level - Desired verbosity level.
+     * @return valid or invalid `log::record_t` object.
+     */
     log::record_t open_record(level_type level) const {
         typedef typename aux::underlying_type<level_type>::type underlying_type;
         if (static_cast<underlying_type>(level) < static_cast<underlying_type>(this->level)) {
