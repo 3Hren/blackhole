@@ -95,7 +95,7 @@ public:
 
 private:
     static inline boost::filesystem::path initial_path() {
-        return boost::filesystem::initial_path();
+        return boost::filesystem::initial_path<boost::filesystem::path>();
     }
 
     static inline std::string filename(const boost::filesystem::path& path) {
