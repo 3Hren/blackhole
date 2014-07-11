@@ -9,9 +9,10 @@
 
 namespace blackhole {
 
-//! \brief Keeps frontend factory functions using type erasure idiom.
-/*! For each desired Formatter-Sink pair a function created and registered.
-    Later that function can be extracted by Sink type parameter.
+/*!
+ * Keeps frontend factory functions using type erasure idiom.
+ * For each desired formatter/sink pair a function is created and registered.
+ * Later that function can be extracted by the sink type parameter.
 */
 struct function_keeper_t {
     std::unordered_map<std::string, boost::any> functions;
@@ -19,8 +20,12 @@ struct function_keeper_t {
     template<class Sink, class Formatter>
     void add() {
         typedef typename frontend::traits<Sink>::function_type function_type;
-        function_type function = static_cast<function_type>(&factory::frontend::create<Formatter>);
-        functions[Sink::name()] = function;
+        //!@todo: There is an issue, the `Sink::name()` should provide unique
+        //!       name to be able to separate the same sinks with multiple
+        //!       inner configuration.
+        functions[Sink::name()] = static_cast<
+            function_type
+        >(&factory::frontend::create<Formatter>);
     }
 
     template<class Sink>
@@ -31,9 +36,8 @@ struct function_keeper_t {
     template<class Sink>
     typename frontend::traits<Sink>::function_type
     get() const {
-        return boost::any_cast<typename frontend::traits<Sink>::function_type>(
-            functions.at(Sink::name())
-        );
+        typedef typename frontend::traits<Sink>::function_type function_type;
+        return boost::any_cast<function_type>(functions.at(Sink::name()));
     }
 };
 
