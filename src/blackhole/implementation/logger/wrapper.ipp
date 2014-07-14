@@ -8,7 +8,7 @@ namespace blackhole {
 
 template<class Logger>
 wrapper_t<Logger>::wrapper_t(logger_type& log, log::attributes_t attributes) :
-    log(log),
+    log_(log),
     attributes(std::move(attributes))
 {
     BOOST_ASSERT(!this->attributes.empty());
@@ -17,7 +17,7 @@ wrapper_t<Logger>::wrapper_t(logger_type& log, log::attributes_t attributes) :
 template<class Logger>
 log::record_t
 wrapper_t<Logger>::open_record() const {
-    return log.open_record(attributes);
+    return log_.open_record(attributes);
 }
 
 template<class Logger>
@@ -25,7 +25,7 @@ log::record_t
 wrapper_t<Logger>::open_record(log::attribute_pair_t attribute) const {
     log::attributes_t attributes = this->attributes;
     attributes.insert(attribute);
-    return log.open_record(std::move(attributes));
+    return log_.open_record(std::move(attributes));
 }
 
 template<class Logger>
@@ -33,13 +33,13 @@ log::record_t
 wrapper_t<Logger>::open_record(log::attributes_t attributes) const {
     log::attributes_t attributes_ = this->attributes;
     attributes_.insert(attributes.begin(), attributes.end());
-    return log.open_record(std::move(attributes_));
+    return log_.open_record(std::move(attributes_));
 }
 
 template<class Logger>
 void
 wrapper_t<Logger>::push(log::record_t&& record) const {
-    log.push(std::move(record));
+    log_.push(std::move(record));
 }
 
 } // namespace blackhole
