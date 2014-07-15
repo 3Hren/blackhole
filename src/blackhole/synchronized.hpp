@@ -16,7 +16,7 @@ public:
     typedef Mutex mutex_type;
 
 private:
-    logger_type log;
+    logger_type log_;
     mutable mutex_type mutex;
 
     friend class scoped_attributes_t;
@@ -25,7 +25,7 @@ public:
     synchronized() {}
 
     explicit synchronized(logger_type&& logger) :
-        log(std::move(logger))
+        log_(std::move(logger))
     {}
 
     synchronized(synchronized&& other) {
@@ -38,54 +38,58 @@ public:
         boost::lock(mutex, other.mutex);
         boost::lock_guard<mutex_type> lock(mutex, boost::adopt_lock);
         boost::lock_guard<mutex_type> other_lock(other.mutex, boost::adopt_lock);
-        log = std::move(other.log);
+        log_ = std::move(other.log_);
         return *this;
+    }
+
+    logger_type& log() {
+        return log_;
     }
 
     bool enabled() const {
         std::lock_guard<mutex_type> lock(mutex);
-        return log.enabled();
+        return log_.enabled();
     }
 
     void enable() {
         std::lock_guard<mutex_type> lock(mutex);
-        log.enable();
+        log_.enable();
     }
 
     void disable() {
         std::lock_guard<mutex_type> lock(mutex);
-        log.disable();
+        log_.disable();
     }
 
     void set_filter(filter_t&& filter) {
         std::lock_guard<mutex_type> lock(mutex);
-        log.set_filter(std::move(filter));
+        log_.set_filter(std::move(filter));
     }
 
     void add_attribute(const log::attribute_pair_t& attr) {
         std::lock_guard<mutex_type> lock(mutex);
-        log.add_attribute(attr);
+        log_.add_attribute(attr);
     }
 
     void add_frontend(std::unique_ptr<base_frontend_t> frontend) {
         std::lock_guard<mutex_type> lock(mutex);
-        log.add_frontend(std::move(frontend));
+        log_.add_frontend(std::move(frontend));
     }
 
     void set_exception_handler(log::exception_handler_t&& handler) {
         std::lock_guard<mutex_type> lock(mutex);
-        log.set_exception_handler(std::move(handler));
+        log_.set_exception_handler(std::move(handler));
     }
 
     template<typename... Args>
     log::record_t open_record(Args&&... args) const {
         std::lock_guard<mutex_type> lock(mutex);
-        return log.open_record(std::forward<Args>(args)...);
+        return log_.open_record(std::forward<Args>(args)...);
     }
 
     void push(log::record_t&& record) const {
         std::lock_guard<mutex_type> lock(mutex);
-        log.push(std::move(record));
+        log_.push(std::move(record));
     }
 
     template<typename Level>
@@ -98,7 +102,7 @@ public:
     >::type
     verbosity() const {
         std::lock_guard<mutex_type> lock(mutex);
-        return log.verbosity();
+        return log_.verbosity();
     }
 
     template<typename Level>
@@ -110,7 +114,7 @@ public:
     >::type
     verbosity(Level level) {
         std::lock_guard<mutex_type> lock(mutex);
-        return log.verbosity(level);
+        return log_.verbosity(level);
     }
 };
 
