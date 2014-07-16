@@ -178,11 +178,11 @@ BLACKHOLE_DECL
 void
 swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT {
     using std::swap;
-    std::swap(lhs.m_enabled, rhs.m_enabled);
-    std::swap(lhs.m_filter, rhs.m_filter);
-    std::swap(lhs.m_exception_handler, rhs.m_exception_handler);
-    std::swap(lhs.m_frontends, rhs.m_frontends);
-    std::swap(lhs.m_global_attributes, rhs.m_global_attributes);
+    swap(lhs.m_enabled, rhs.m_enabled);
+    swap(lhs.m_filter, rhs.m_filter);
+    swap(lhs.m_exception_handler, rhs.m_exception_handler);
+    swap(lhs.m_frontends, rhs.m_frontends);
+    swap(lhs.m_global_attributes, rhs.m_global_attributes);
 
     auto lhs_operation_attributes = lhs.m_scoped_attributes.get();
     lhs.m_scoped_attributes.reset(rhs.m_scoped_attributes.get());
