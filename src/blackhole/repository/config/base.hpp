@@ -14,7 +14,7 @@ namespace repository {
 
 namespace config {
 
-//!@todo: Documentation.
+//!@todo: Write documentation.
 struct base_t {
     typedef boost::any any_type;
     typedef std::vector<any_type> array_type;
