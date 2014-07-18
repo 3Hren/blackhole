@@ -14,42 +14,78 @@ namespace repository {
 
 namespace config {
 
+//!@todo: Documentation.
 struct base_t {
-    std::string type;
-    boost::any config;
+    typedef boost::any any_type;
+    typedef std::vector<any_type> array_type;
+    typedef std::map<std::string, any_type> map_type;
 
-    base_t(const std::string& type) :
-        type(type),
-        config(std::map<std::string, boost::any>())
-    {
+    std::string type;
+    any_type config;
+
+    base_t(std::string type) :
+        type(std::move(type)),
+        config(map_type())
+    {}
+
+    template<typename T>
+    base_t& operator=(const T& value) {
+        config = value;
+        return *this;
     }
 
+    //!@todo: Merge these two classes into the single one.
     struct builder_t {
-        boost::any& any;
+        any_type& any;
 
         template<typename T>
-        builder_t& operator =(const T& value) {
+        builder_t& operator=(const T& value) {
             any = value;
             return *this;
         }
 
-        builder_t& operator =(const char* value) {
-            return operator =(std::string(value));
+        builder_t& operator=(const char* value) {
+            return operator=(std::string(value));
         }
 
-        builder_t operator [](const std::string& name) {
-            auto* map = boost::any_cast<std::map<std::string, boost::any>>(&any);
+        builder_t operator[](array_type::size_type id) {
+            auto* array = boost::any_cast<array_type>(&any);
+            if (!array) {
+                any = array_type();
+                array = boost::any_cast<array_type>(&any);
+            }
+            if (id >= array->size()) {
+                array->resize(id + 1);
+            }
+            return builder_t { array->at(id) };
+        }
+
+        builder_t operator[](const std::string& name) {
+            auto* map = boost::any_cast<map_type>(&any);
             if (!map) {
-                any = std::map<std::string, boost::any>();
-                map = boost::any_cast<std::map<std::string, boost::any>>(&any);
+                any = map_type();
+                map = boost::any_cast<map_type>(&any);
             }
 
-            return builder_t { map->operator [](name) };
+            if (map->find(name) == map->end()) {
+                map->insert(std::make_pair(name, any_type()));
+            }
+
+            return builder_t { map->at(name) };
         }
     };
 
     struct extractor_t {
         const boost::any& any;
+
+        extractor_t operator [](std::vector<boost::any>::size_type id) const {
+            auto* array = boost::any_cast<std::vector<boost::any>>(&any);
+            if (!array) {
+                throw blackhole::error_t("not array");
+            }
+
+            return extractor_t { array->at(id) };
+        }
 
         extractor_t operator [](const std::string& name) const {
             auto* map = boost::any_cast<std::map<std::string, boost::any>>(&any);
@@ -77,12 +113,22 @@ struct base_t {
         }
     };
 
-    builder_t operator [](const std::string& name) {
+    builder_t operator[](array_type::size_type id) {
+        auto& array = *boost::any_cast<std::vector<boost::any>>(&config);
+        return builder_t { array[id] };
+    }
+
+    builder_t operator[](const std::string& name) {
         auto& map = *boost::any_cast<std::map<std::string, boost::any>>(&config);
         return builder_t { map[name] };
     }
 
-    extractor_t operator [](const std::string& name) const {
+    extractor_t operator[](array_type::size_type id) const {
+        const auto& array = *boost::any_cast<std::vector<boost::any>>(&config);
+        return extractor_t { array.at(id) };
+    }
+
+    extractor_t operator[](const std::string& name) const {
         const auto& map = *boost::any_cast<std::map<std::string, boost::any>>(&config);
         return extractor_t { map.at(name) };
     }

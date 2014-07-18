@@ -211,3 +211,58 @@ TEST(parser_t, ThrowsExceptionIfFormatterTypeIsAbsent) {
     typedef repository::config::parser_t<rapidjson::Value, std::vector<log_config_t>> parser_t;
     EXPECT_THROW(parser_t::parse(doc), blackhole::error_t);
 }
+
+namespace testing {
+
+namespace config {
+
+namespace valid {
+
+static const std::string WITH_ARRAY = "{\
+    'root': [\
+        {\
+            'formatter': {\
+                'type': 'json',\
+                'newline': true,\
+                'mapping': {\
+                    'message': '@message',\
+                    'timestamp': '@timestamp'\
+                },\
+                'routing': { \
+                    '/': ['@message', '@timestamp'],\
+                    'fields': '*'\
+                }\
+            },\
+            'sink': {\
+                'type': 'stream',\
+                'output': 'stdout'\
+            }\
+        }\
+    ]\
+}";
+
+} // namespace valid
+
+} // namespace config
+
+} // namespace testing
+
+TEST(parser_t, FormatterWithArray) {
+    std::string valid(boost::algorithm::replace_all_copy(config::valid::WITH_ARRAY, "'", "\""));
+    rapidjson::Document doc;
+    doc.Parse<0>(valid.c_str());
+    ASSERT_FALSE(doc.HasParseError());
+
+    const std::vector<log_config_t>& configs = repository::config::parser_t<
+        rapidjson::Value,
+        std::vector<log_config_t>
+    >::parse(doc);
+    ASSERT_EQ(1, configs.size());
+    EXPECT_EQ("root", configs.at(0).name);
+    ASSERT_EQ(1, configs.at(0).frontends.size());
+
+    const frontend_config_t& front = configs.at(0).frontends.at(0);
+    ASSERT_EQ("json", front.formatter.type);
+    ASSERT_EQ("stream", front.sink.type);
+
+}

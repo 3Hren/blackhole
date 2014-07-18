@@ -89,52 +89,67 @@ struct object_traits<rapidjson::Value> {
 
 template<>
 struct filler<rapidjson::Value> {
+    typedef adapter::array_traits<rapidjson::Value> array;
     typedef adapter::object_traits<rapidjson::Value> object;
 
     template<typename T>
-    static void fill(T& builder, const rapidjson::Value& node, const std::string& path) {
-        for (auto it = object::begin(node); it != object::end(node); ++it) {
-            const auto& name = object::name(it);
-            const auto& value = object::value(it);
-
-            if (name == "type") {
-                continue;
+    static void fill(T& builder, const rapidjson::Value& value) {
+        switch (value.GetType()) {
+        case rapidjson::kNullType:
+            std::cout << "null" << std::endl;
+            throw blackhole::error_t("null values are not supported");
+            break;
+        case rapidjson::kFalseType:
+        case rapidjson::kTrueType:
+            std::cout << "bool: " << value.GetBool() << std::endl;
+            builder = value.GetBool();
+            break;
+        case rapidjson::kNumberType: {
+            if (value.IsInt()) {
+                std::cout << "number: " << value.GetInt() << std::endl;
+                builder = value.GetInt();
+            } else if (value.IsInt64()) {
+                std::cout << "number: " << value.GetInt64() << std::endl;
+                builder = value.GetInt64();
+            } else if (value.IsUint()) {
+                std::cout << "number: " << value.GetUint() << std::endl;
+                builder = value.GetUint();
+            } else if (value.IsUint64()) {
+                std::cout << "number: " << value.GetUint64() << std::endl;
+                builder = value.GetUint64();
+            } else {
+                std::cout << "number: " << value.GetDouble() << std::endl;
+                builder = value.GetDouble();
             }
-
-            switch (value.GetType()) {
-            case rapidjson::kNullType:
-            case rapidjson::kArrayType:
-                throw blackhole::error_t("both null and array parsing are not supported");
-                break;
-            case rapidjson::kFalseType:
-            case rapidjson::kTrueType:
-                builder[name] = value.GetBool();
-                break;
-            case rapidjson::kNumberType: {
-                if (value.IsInt()) {
-                    builder[name] = value.GetInt();
-                } else if (value.IsInt64()) {
-                    builder[name] = value.GetInt64();
-                } else if (value.IsUint()) {
-                    builder[name] = value.GetUint();
-                } else if (value.IsUint64()) {
-                    builder[name] = value.GetUint64();
-                } else {
-                    builder[name] = value.GetDouble();
-                }
-                break;
+            break;
+        }
+        case rapidjson::kStringType:
+            std::cout << "string: " << value.GetString() << std::endl;
+            builder = value.GetString();
+            break;
+        case rapidjson::kArrayType:
+            std::cout << "begin array" << std::endl;
+            for (auto it = array::begin(value); it != array::end(value); ++it) {
+                auto pos = std::distance(array::begin(value), it);
+                auto recursive = builder[pos];
+                filler<rapidjson::Value>::fill(recursive, *it);
             }
-            case rapidjson::kStringType:
-                builder[name] = value.GetString();
-                break;
-            case rapidjson::kObjectType: {
+            std::cout << "end array" << std::endl;
+            break;
+        case rapidjson::kObjectType: {
+            std::cout << "begin object" << std::endl;
+            for (auto it = object::begin(value); it != object::end(value); ++it) {
+                const auto& name = object::name(it);
+                const auto& value = object::value(it);
+                std::cout << "key: " << name << std::endl;
                 auto recursive = builder[name];
-                filler<rapidjson::Value>::fill(recursive, value, path + "/" + name);
-                break;
+                filler<rapidjson::Value>::fill(recursive, value);
             }
-            default:
-                BOOST_ASSERT(false);
-            }
+            std::cout << "end object" << std::endl;
+            break;
+        }
+        default:
+            BOOST_ASSERT(false);
         }
     }
 };
