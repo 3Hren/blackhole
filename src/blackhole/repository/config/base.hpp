@@ -36,11 +36,11 @@ struct base_t {
 
     //!@todo: Merge these two classes into the single one.
     struct builder_t {
-        holder_type& any;
+        holder_type& holder;
 
         template<typename T>
         builder_t& operator=(const T& value) {
-            any = value;
+            holder = value;
             return *this;
         }
 
@@ -49,10 +49,10 @@ struct base_t {
         }
 
         builder_t operator[](array_type::size_type id) {
-            auto array = boost::any_cast<array_type>(&any);
+            auto array = boost::any_cast<array_type>(&holder);
             if (!array) {
-                any = array_type();
-                array = boost::any_cast<array_type>(&any);
+                holder = array_type();
+                array = boost::any_cast<array_type>(&holder);
             }
             if (id >= array->size()) {
                 array->resize(id + 1);
@@ -61,10 +61,10 @@ struct base_t {
         }
 
         builder_t operator[](const std::string& name) {
-            auto map = boost::any_cast<map_type>(&any);
+            auto map = boost::any_cast<map_type>(&holder);
             if (!map) {
-                any = map_type();
-                map = boost::any_cast<map_type>(&any);
+                holder = map_type();
+                map = boost::any_cast<map_type>(&holder);
             }
 
             if (map->find(name) == map->end()) {
@@ -76,10 +76,10 @@ struct base_t {
     };
 
     struct extractor_t {
-        const boost::any& any;
+        const holder_type& holder;
 
-        extractor_t operator [](std::vector<boost::any>::size_type id) const {
-            auto array = boost::any_cast<std::vector<boost::any>>(&any);
+        extractor_t operator[](array_type::size_type id) const {
+            auto array = boost::any_cast<array_type>(&holder);
             if (!array) {
                 throw blackhole::error_t("not array");
             }
@@ -88,7 +88,7 @@ struct base_t {
         }
 
         extractor_t operator [](const std::string& name) const {
-            auto map = boost::any_cast<std::map<std::string, boost::any>>(&any);
+            auto map = boost::any_cast<map_type>(&holder);
             if (!map) {
                 throw blackhole::error_t("not map");
             }
@@ -99,7 +99,7 @@ struct base_t {
         template<typename T>
         void to(T& value) const {
             try {
-                aux::any_to(any, value);
+                aux::any_to(holder, value);
             } catch (boost::bad_any_cast&) {
                 throw error_t("conversion error");
             }
@@ -114,22 +114,22 @@ struct base_t {
     };
 
     builder_t operator[](array_type::size_type id) {
-        auto& array = *boost::any_cast<std::vector<boost::any>>(&config);
+        auto& array = *boost::any_cast<array_type>(&config);
         return builder_t { array[id] };
     }
 
     builder_t operator[](const std::string& name) {
-        auto& map = *boost::any_cast<std::map<std::string, boost::any>>(&config);
+        auto& map = *boost::any_cast<map_type>(&config);
         return builder_t { map[name] };
     }
 
     extractor_t operator[](array_type::size_type id) const {
-        const auto& array = *boost::any_cast<std::vector<boost::any>>(&config);
+        const auto& array = *boost::any_cast<array_type>(&config);
         return extractor_t { array.at(id) };
     }
 
     extractor_t operator[](const std::string& name) const {
-        const auto& map = *boost::any_cast<std::map<std::string, boost::any>>(&config);
+        const auto& map = *boost::any_cast<map_type>(&config);
         return extractor_t { map.at(name) };
     }
 };
