@@ -49,7 +49,7 @@ struct base_t {
         }
 
         builder_t operator[](array_type::size_type id) {
-            auto* array = boost::any_cast<array_type>(&any);
+            auto array = boost::any_cast<array_type>(&any);
             if (!array) {
                 any = array_type();
                 array = boost::any_cast<array_type>(&any);
@@ -61,7 +61,7 @@ struct base_t {
         }
 
         builder_t operator[](const std::string& name) {
-            auto* map = boost::any_cast<map_type>(&any);
+            auto map = boost::any_cast<map_type>(&any);
             if (!map) {
                 any = map_type();
                 map = boost::any_cast<map_type>(&any);
@@ -79,7 +79,7 @@ struct base_t {
         const boost::any& any;
 
         extractor_t operator [](std::vector<boost::any>::size_type id) const {
-            auto* array = boost::any_cast<std::vector<boost::any>>(&any);
+            auto array = boost::any_cast<std::vector<boost::any>>(&any);
             if (!array) {
                 throw blackhole::error_t("not array");
             }
@@ -88,7 +88,7 @@ struct base_t {
         }
 
         extractor_t operator [](const std::string& name) const {
-            auto* map = boost::any_cast<std::map<std::string, boost::any>>(&any);
+            auto map = boost::any_cast<std::map<std::string, boost::any>>(&any);
             if (!map) {
                 throw blackhole::error_t("not map");
             }
