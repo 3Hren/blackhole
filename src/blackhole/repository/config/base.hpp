@@ -14,12 +14,12 @@ namespace repository {
 
 namespace config {
 
+typedef boost::any any_type;
+typedef std::vector<any_type> array_type;
+typedef std::map<std::string, any_type> map_type;
+
 //!@todo: Write documentation.
 struct base_t {
-    typedef boost::any any_type;
-    typedef std::vector<any_type> array_type;
-    typedef std::map<std::string, any_type> map_type;
-
     std::string type;
     any_type config;
 
