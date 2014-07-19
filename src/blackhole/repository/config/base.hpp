@@ -14,14 +14,14 @@ namespace repository {
 
 namespace config {
 
-typedef boost::any any_type;
-typedef std::vector<any_type> array_type;
-typedef std::map<std::string, any_type> map_type;
+typedef boost::any holder_type;
+typedef std::vector<holder_type> array_type;
+typedef std::map<std::string, holder_type> map_type;
 
 //!@todo: Write documentation.
 struct base_t {
     std::string type;
-    any_type config;
+    holder_type config;
 
     base_t(std::string type) :
         type(std::move(type)),
@@ -36,7 +36,7 @@ struct base_t {
 
     //!@todo: Merge these two classes into the single one.
     struct builder_t {
-        any_type& any;
+        holder_type& any;
 
         template<typename T>
         builder_t& operator=(const T& value) {
@@ -68,7 +68,7 @@ struct base_t {
             }
 
             if (map->find(name) == map->end()) {
-                map->insert(std::make_pair(name, any_type()));
+                map->insert(std::make_pair(name, holder_type()));
             }
 
             return builder_t { map->at(name) };
