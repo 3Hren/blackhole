@@ -34,20 +34,20 @@ struct base_t {
         return *this;
     }
 
-    struct builder_t {
+    struct writer_t {
         holder_type& holder;
 
         template<typename T>
-        builder_t& operator=(const T& value) {
+        writer_t& operator=(const T& value) {
             holder = value;
             return *this;
         }
 
-        builder_t& operator=(const char* value) {
+        writer_t& operator=(const char* value) {
             return operator=(std::string(value));
         }
 
-        builder_t operator[](array_type::size_type id) {
+        writer_t operator[](array_type::size_type id) {
             auto array = boost::any_cast<array_type>(&holder);
             if (!array) {
                 holder = array_type();
@@ -56,10 +56,10 @@ struct base_t {
             if (id >= array->size()) {
                 array->resize(id + 1);
             }
-            return builder_t { array->at(id) };
+            return writer_t { array->at(id) };
         }
 
-        builder_t operator[](const std::string& name) {
+        writer_t operator[](const std::string& name) {
             auto map = boost::any_cast<map_type>(&holder);
             if (!map) {
                 holder = map_type();
@@ -70,29 +70,29 @@ struct base_t {
                 map->insert(std::make_pair(name, holder_type()));
             }
 
-            return builder_t { map->at(name) };
+            return writer_t { map->at(name) };
         }
     };
 
-    struct extractor_t {
+    struct reader_t {
         const holder_type& holder;
 
-        extractor_t operator[](array_type::size_type id) const {
+        reader_t operator[](array_type::size_type id) const {
             auto array = boost::any_cast<array_type>(&holder);
             if (!array) {
                 throw blackhole::error_t("not array");
             }
 
-            return extractor_t { array->at(id) };
+            return reader_t { array->at(id) };
         }
 
-        extractor_t operator [](const std::string& name) const {
+        reader_t operator [](const std::string& name) const {
             auto map = boost::any_cast<map_type>(&holder);
             if (!map) {
                 throw blackhole::error_t("not map");
             }
 
-            return extractor_t { map->at(name) };
+            return reader_t { map->at(name) };
         }
 
         template<typename T>
@@ -112,24 +112,24 @@ struct base_t {
         }
     };
 
-    builder_t operator[](array_type::size_type id) {
+    writer_t operator[](array_type::size_type id) {
         auto& array = *boost::any_cast<array_type>(&config);
-        return builder_t { array[id] };
+        return writer_t { array[id] };
     }
 
-    builder_t operator[](const std::string& name) {
+    writer_t operator[](const std::string& name) {
         auto& map = *boost::any_cast<map_type>(&config);
-        return builder_t { map[name] };
+        return writer_t { map[name] };
     }
 
-    extractor_t operator[](array_type::size_type id) const {
+    reader_t operator[](array_type::size_type id) const {
         const auto& array = *boost::any_cast<array_type>(&config);
-        return extractor_t { array.at(id) };
+        return reader_t { array.at(id) };
     }
 
-    extractor_t operator[](const std::string& name) const {
+    reader_t operator[](const std::string& name) const {
         const auto& map = *boost::any_cast<map_type>(&config);
-        return extractor_t { map.at(name) };
+        return reader_t { map.at(name) };
     }
 };
 
