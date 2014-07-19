@@ -34,7 +34,6 @@ struct base_t {
         return *this;
     }
 
-    //!@todo: Merge these two classes into the single one.
     struct builder_t {
         holder_type& holder;
 
