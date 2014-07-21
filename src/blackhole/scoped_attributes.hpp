@@ -1,6 +1,7 @@
 #pragma once
 
 #include "logger.hpp"
+#include "logger/wrapper.hpp"
 
 namespace blackhole {
 
