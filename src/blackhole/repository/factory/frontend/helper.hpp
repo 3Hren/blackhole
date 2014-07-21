@@ -62,7 +62,7 @@ create(std::unique_ptr<Formatter> formatter, std::unique_ptr<Sink> sink) {
 template<class Formatter, class Sink>
 std::unique_ptr<base_frontend_t>
 create(const formatter_config_t& formatter_config, std::unique_ptr<Sink> sink) {
-    auto config = aux::config_mapper<Formatter>::map(formatter_config.config);
+    auto config = aux::config_mapper<Formatter>::map(formatter_config.config());
     auto formatter = utils::make_unique<Formatter>(config);
     formatter->set_mapper(formatter_config.mapper);
     return create(std::move(formatter), std::move(sink));
@@ -77,7 +77,7 @@ create(const frontend_factory_t& factory, const formatter_config_t& formatter_co
 template<class Sink>
 std::unique_ptr<base_frontend_t>
 create(const frontend_factory_t& factory, const formatter_config_t& formatter_config, const sink_config_t& sink_config) {
-    auto config = aux::config_mapper<Sink>::map(sink_config.config);
+    auto config = aux::config_mapper<Sink>::map(sink_config.config());
     auto sink = utils::make_unique<Sink>(config);
     return create(factory, formatter_config, std::move(sink));
 }

@@ -4,13 +4,14 @@
 
 #include <boost/any.hpp>
 
-#include "blackhole/error.hpp"
 #include "traits/cast.hpp"
 #include "traits/config.hpp"
 #include "traits/extract.hpp"
 #include "traits/filler.hpp"
 #include "traits/integer.hpp"
 #include "traits/unique.hpp"
+#include "blackhole/dynamic.hpp"
+#include "blackhole/error.hpp"
 #include "blackhole/utils/lazy.hpp"
 
 namespace blackhole {
@@ -30,7 +31,7 @@ template<class T>
 struct config_mapper {
     typedef typename T::config_type config_type;
 
-    static config_type map(const boost::any& input) {
+    static config_type map(const dynamic_t& input) {
         const aux::extractor<T> extractor(input);
         config_type config;
         factory_traits<T>::map_config(extractor, config);

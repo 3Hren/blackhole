@@ -46,16 +46,16 @@ public:
 
     return_type create(const formatter_config_t& formatter_config, const sink_config_t& sink_config) const {
         std::lock_guard<std::mutex> lock(mutex);
-        auto it = config_id_extractors.find(sink_config.type);
+        auto it = config_id_extractors.find(sink_config.type());
         if (it == config_id_extractors.end()) {
-            throw error_t("sink '%s' is not registered", sink_config.type);
+            throw error_t("sink '%s' is not registered", sink_config.type());
         }
 
-        const std::string& config_name = it->second(sink_config.config);
+        const std::string& config_name = it->second(sink_config);
 
         auto cit = sinks.find(config_name);
         if (cit == sinks.end()) {
-            throw error_t("sink '%s' is not properly configured: found '%s' subtype, but other is required", sink_config.type, config_name);
+            throw error_t("sink '%s' is not properly configured: found '%s' subtype, but other is required", sink_config.type(), config_name);
         }
 
         const factory_type& fn = cit->second;

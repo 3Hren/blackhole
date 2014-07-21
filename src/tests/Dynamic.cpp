@@ -1,9 +1,8 @@
 #include "global.hpp"
 
-#include "blackhole/repository/config/base.hpp"
+#include "blackhole/dynamic.hpp"
 
 using namespace blackhole;
-using namespace blackhole::repository::config;
 
 TEST(Dynamic, Class) {
     dynamic_t d;
@@ -195,12 +194,13 @@ TEST(Dynamic, NestedArray) {
     EXPECT_EQ(true, base["output"][1].to<bool>());
 }
 
-TEST(Base, Class) {
-    base_tV2 base("string");
-    UNUSED(base);
-}
+//!@todo: Uncomment.
+//TEST(Base, Class) {
+//    base_t base("string");
+//    UNUSED(base);
+//}
 
-TEST(Base, GetType) {
-    base_tV2 base("string");
-    EXPECT_EQ("string", base.type());
-}
+//TEST(Base, GetType) {
+//    base_t base("string");
+//    EXPECT_EQ("string", base.type());
+//}

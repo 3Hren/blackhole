@@ -31,59 +31,60 @@ SET(HEADERS
 
 SET(BASE_SOURCES
     main
-    datetime/test_DayOfYear
-    datetime/test_DayOfMonth
-    datetime/test_DayOfWeek
-    datetime/test_Month
-    datetime/test_Other
-    datetime/test_Time
-    datetime/test_Year
-    datetime/test_Week
-    test_AttachableStream
-    test_Attribute
-    test_Config
-    test_ConfigJsonInitialization
-    test_ExceptionTrap
+#    datetime/test_DayOfYear
+#    datetime/test_DayOfMonth
+#    datetime/test_DayOfWeek
+#    datetime/test_Month
+#    datetime/test_Other
+#    datetime/test_Time
+#    datetime/test_Year
+#    datetime/test_Week
+#    test_AttachableStream
+#    test_Attribute
+#    test_Config
+#    test_ConfigJsonInitialization
+#    test_ExceptionTrap
     test_FactoryInitialization
-    test_FileRotation
-    test_FileRotationNaming
-    test_FileBackend
-    test_FileRotationSizeWatcher
-    test_FileRotationDateTimeWatcher
-    test_FileSink
-    test_Filter
-    test_Functional
-    test_JsonFormatter
-    test_Keyword
-    test_Logger
-    test_LoggerSynchronized
-    test_Macro
-    test_Manual
-    test_MsgpackFormatter
-    test_NullSink
-    test_ScopedAttributes
-    test_StreamSink
-    test_StringFormatter
-    test_StringPatternParser
-    test_SyslogSink
-    test_Traits
-    test_UdpSink
-    test_Utils
-    test_VerboseLogger
-    utils/test_GenericStringFormatter
-    Trace
-    Wrapper
+#    test_FileRotation
+#    test_FileRotationNaming
+#    test_FileBackend
+#    test_FileRotationSizeWatcher
+#    test_FileRotationDateTimeWatcher
+#    test_FileSink
+#    test_Filter
+#    test_Functional
+#    test_JsonFormatter
+#    test_Keyword
+#    test_Logger
+#    test_LoggerSynchronized
+#    test_Macro
+#    test_Manual
+#    test_MsgpackFormatter
+#    test_NullSink
+#    test_ScopedAttributes
+#    test_StreamSink
+#    test_StringFormatter
+#    test_StringPatternParser
+#    test_SyslogSink
+#    test_Traits
+#    test_UdpSink
+#    test_Utils
+#    test_VerboseLogger
+#    utils/test_GenericStringFormatter
+#    Trace
+#    Wrapper
+    Dynamic
 )
 
 IF(ENABLE_ELASTICSEARCH)
     SET(ES_SOURCES
-	extra/ElasticsearchSink
-	extra/elasticsearch/Factory
-	extra/elasticsearch/Transport
-	extra/elasticsearch/Requests
-	extra/elasticsearch/Utils
-	extra/Resolver
-	extra/UrlFetch
+#	extra/ElasticsearchSink
+#	extra/elasticsearch/Factory
+#	extra/elasticsearch/Transport
+#	extra/elasticsearch/Requests
+#	extra/elasticsearch/Utils
+#	extra/Resolver
+#	extra/UrlFetch
     )
 ENDIF()
 
@@ -129,7 +130,7 @@ TARGET_LINK_LIBRARIES(${PROJECT}
 
 IF(ENABLE_ELASTICSEARCH)
     INCLUDE_DIRECTORIES(
-	SYSTEM ${CMAKE_SOURCE_DIR}/foreign/urdl/include
+        SYSTEM ${CMAKE_SOURCE_DIR}/foreign/urdl/include
     )
 ENDIF()
 

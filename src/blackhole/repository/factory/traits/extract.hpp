@@ -5,6 +5,7 @@
 
 #include <boost/any.hpp>
 
+#include "blackhole/dynamic.hpp"
 #include "blackhole/error.hpp"
 #include "cast.hpp"
 
@@ -14,17 +15,17 @@ namespace aux {
 
 template<class T>
 class extractor {
-    boost::any source;
+    dynamic_t source;
     std::string name;
 
 public:
-    extractor(const boost::any& source, const std::string& name = T::name()) :
-        source(source),
-        name(name)
+    extractor(dynamic_t source, std::string name = T::name()) :
+        source(std::move(source)),
+        name(std::move(name))
     {}
 
-    extractor<T> operator [](const std::string& name) const {
-        std::map<std::string, boost::any> map;
+    extractor<T> operator[](const std::string& name) const {
+        dynamic_t::object_t map;
         try {
             to(map);
         } catch (const std::exception&) {

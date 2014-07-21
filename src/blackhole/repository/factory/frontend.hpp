@@ -51,19 +51,19 @@ public:
 
         try {
             std::lock_guard<std::mutex> lock(mutex);
-            auto keeper = factories.at(formatter_config.type);
+            auto keeper = factories.at(formatter_config.type());
             auto factory = keeper.get<Sink>();
             return factory(formatter_config, std::move(sink));
         } catch (const std::out_of_range&) {
             throw error_t(
                 "there are no registered formatter '%s' for sink '%s",
-                formatter_config.type,
+                formatter_config.type(),
                 Sink::name()
             );
         } catch (const std::exception& e) {
             throw error_t(
                 "failed to instantiate formatter for '%s/%s' frontend: %s",
-                formatter_config.type,
+                formatter_config.type(),
                 Sink::name(),
                 e.what()
             );
