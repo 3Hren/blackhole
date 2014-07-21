@@ -43,9 +43,9 @@ public:
     template<typename R>
     void to(R& value) const {
         try {
-            cast_traits<R>::to(source, value);
-        } catch (const boost::bad_any_cast&) {
-            throw error_t("can't extract '%s' field from '%s': member is absent or has different type", name, T::name());
+            value = source.to<R>();
+        } catch (const dynamic::bad_cast& err) {
+            throw error_t("unable to extract '%s' field from '%s': %s", name, T::name(), err.what());
         }
     }
 

@@ -22,7 +22,7 @@ namespace blackhole {
 class external_factory_t {
     typedef std::unique_ptr<base_frontend_t> return_type;
     typedef return_type(*factory_type)(const frontend_factory_t&, const formatter_config_t&, const sink_config_t&);
-    typedef std::string(*extractor_type)(const boost::any&);
+    typedef std::string(*extractor_type)(const dynamic_t&);
 
     mutable std::mutex mutex;
     std::unordered_map<std::string, factory_type> sinks;
@@ -51,7 +51,7 @@ public:
             throw error_t("sink '%s' is not registered", sink_config.type());
         }
 
-        const std::string& config_name = it->second(sink_config);
+        const std::string& config_name = it->second(sink_config.config());
 
         auto cit = sinks.find(config_name);
         if (cit == sinks.end()) {
