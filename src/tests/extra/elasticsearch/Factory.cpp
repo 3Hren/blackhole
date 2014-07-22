@@ -18,7 +18,7 @@ TEST(Factory, ElasticsearchJsonFrontend) {
     sink["workers"] = 1;
     sink["index"] = "logs";
     sink["type"] = "log";
-    sink["endpoints"] = std::vector<std::string>({"localhost:9200"});
+    sink["endpoints"] = dynamic_t::array_t({"localhost:9200"});
     sink["sniffer"]["when"]["start"] = true;
     sink["sniffer"]["when"]["error"] = true;
     sink["sniffer"]["interval"] = 60000;

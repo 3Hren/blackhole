@@ -87,7 +87,7 @@ void init() {
     formatter["newline"] = true;
     formatter["mapping"]["message"] = "@message";
     formatter["mapping"]["timestamp"] = "@timestamp";
-    formatter["routing"]["/"] = std::vector<std::string> { "message", "timestamp" };
+    formatter["routing"]["/"] = dynamic_t::array_t { "message", "timestamp" };
     formatter["routing"]["/fields"] = "*";
 
     sink_config_t sink("tcp");

@@ -51,7 +51,7 @@ void init() {
     formatter["newline"] = false;
     formatter["mapping"]["message"] = "@message";
     formatter["mapping"]["timestamp"] = "@timestamp";
-    formatter["routing"]["/"] = std::vector<std::string> { "message", "timestamp" };
+    formatter["routing"]["/"] = dynamic_t::array_t { "message", "timestamp" };
     formatter["routing"]["/fields"] = "*";
 
     sink_config_t sink("elasticsearch");
@@ -60,7 +60,7 @@ void init() {
     sink["workers"] = 1;
     sink["index"] = "logs";
     sink["type"] = "log";
-    sink["endpoints"] = std::vector<std::string> { "localhost:9200" };
+    sink["endpoints"] = dynamic_t::array_t { "localhost:9200" };
     sink["sniffer"]["when"]["start"] = true;
     sink["sniffer"]["when"]["error"] = true;
     sink["sniffer"]["interval"] = 60000;

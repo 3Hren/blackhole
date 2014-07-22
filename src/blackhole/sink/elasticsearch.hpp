@@ -305,13 +305,13 @@ struct factory_traits<sink::elasticsearch_t> {
         ex["index"].to(config.settings.index);
         ex["type"].to(config.settings.type);
 
-        auto endpoints = ex["endpoints"].get<std::vector<std::string>>();
+        auto endpoints = ex["endpoints"].get<dynamic_t::array_t>();
         boost::asio::io_service loop;
         for (auto it = endpoints.begin(); it != endpoints.end(); ++it) {
             config.settings.endpoints.push_back(
                 elasticsearch::resolver<
                     boost::asio::ip::tcp
-                >::resolve(*it, loop)
+                >::resolve(it->to<std::string>(), loop)
             );
         }
 

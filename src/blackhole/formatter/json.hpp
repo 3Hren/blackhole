@@ -202,19 +202,19 @@ struct factory_traits<formatter::json_t> {
 
         ex["newline"].to(cfg.newline);
 
-        auto mapping = ex["mapping"].get<std::map<std::string, boost::any>>();
+        auto mapping = ex["mapping"].get<dynamic_t::object_t>();
         for (auto it = mapping.begin(); it != mapping.end(); ++it) {
-            cfg.naming[it->first] = boost::any_cast<std::string>(it->second);
+            cfg.naming[it->first] = it->second.to<std::string>();
         }
 
-        auto routing = ex["routing"].get<std::map<std::string, boost::any>>();
+        auto routing = ex["routing"].get<dynamic_t::object_t>();
         for (auto it = routing.begin(); it != routing.end(); ++it) {
             const std::string& name = it->first;
-            const boost::any& value = it->second;
+            const dynamic_t& value = it->second;
 
-            if (value.type() == typeid(std::string)) {
+            if (value.is<dynamic_t::string_t>()) {
                 handle_unspecified(name, value, cfg);
-            } else if (value.type() == typeid(std::vector<std::string>)) {
+            } else if (value.is<dynamic_t::array_t>()) {
                 handle_specified(name, value, cfg);
             } else {
                 throw blackhole::error_t("wrong configuration");
@@ -222,18 +222,29 @@ struct factory_traits<formatter::json_t> {
         }
     }
 
-    static void handle_specified(const std::string& name, const boost::any& value, config_type& cfg) {
+    //!@todo: Code style for this file.
+    static
+    void
+    handle_specified(const std::string& name,
+                     const dynamic_t& value,
+                     config_type& cfg)
+    {
+        //!@todo: cfg? Better name!
         std::vector<std::string> positions = aux::split(name, "/");
-        std::vector<std::string> keys;
-        aux::any_to(value, keys);
+        dynamic_t::array_t keys = value.to<dynamic_t::array_t>();
         for (auto it = keys.begin(); it != keys.end(); ++it) {
-            const std::string& key = *it;
+            const std::string& key = it->to<std::string>();
             cfg.routing.specified[key] = positions;
         }
     }
 
-    static void handle_unspecified(const std::string& name, const boost::any& value, config_type& cfg) {
-        if (boost::any_cast<std::string>(value) == "*") {
+    static
+    void
+    handle_unspecified(const std::string& name,
+                       const dynamic_t& value,
+                       config_type& cfg)
+    {
+        if (value.to<std::string>() == "*") {
             cfg.routing.unspecified = aux::split(name, "/");
         } else {
             throw blackhole::error_t("wrong configuration");

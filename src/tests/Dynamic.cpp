@@ -63,6 +63,12 @@ TEST(Dynamic, ThrowsExceptionOnRequestingIndexFromNonObject) {
     EXPECT_THROW(d["key"], dynamic::bad_cast);
 }
 
+TEST(Dynamic, IsArray) {
+    dynamic_t d;
+    d[0] = "item";
+    EXPECT_TRUE(d.is<dynamic_t::array_t>());
+}
+
 TEST(Dynamic, LikeDictBool) {
     dynamic_t base;
     base["input"] = true;
