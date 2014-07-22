@@ -10,6 +10,7 @@
 
 namespace blackhole {
 
+//!@todo: Move to the blackhole/forwards.hpp or blackhole/detail/forwards.hpp
 class base_frontend_t;
 class frontend_factory_t;
 
