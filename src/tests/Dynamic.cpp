@@ -311,3 +311,10 @@ TEST(Dynamic, NotContainsIfObject) {
     d["key"] = "value";
     EXPECT_FALSE(d.contains("key-value"));
 }
+
+TEST(Dynamic, MustNotCompile) {
+    dynamic_t d = "le govno";
+
+    // This must not compile!
+    d.is<std::exception>();
+}
