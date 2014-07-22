@@ -29,6 +29,10 @@ public:
         return config_;
     }
 
+    void config(dynamic_t::object_t value) {
+        config_ = std::move(value);
+    }
+
     dynamic_t&
     operator[](const std::string& key) {
         return config_[key];
