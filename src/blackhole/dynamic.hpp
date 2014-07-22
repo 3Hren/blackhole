@@ -97,6 +97,11 @@ public:
     dynamic_t& operator[](const std::string& key);
     const dynamic_t& operator[](const std::string& key) const;
 
+    //!@todo: Enable if.
+    template<typename T>
+    bool is() const;
+
+    //!@todo: Enable if.
     template<typename T>
     typename std::enable_if<!type_traits::is_integer<T>::value, T>::type
     to() const;
@@ -269,7 +274,7 @@ bool dynamic_t::operator==(const dynamic_t& other) const {
 
 BLACKHOLE_DECL
 bool dynamic_t::invalid() const {
-    return boost::get<null_t>(&value) != nullptr;
+    return is<null_t>();
 }
 
 BLACKHOLE_DECL
@@ -325,6 +330,12 @@ const dynamic_t& dynamic_t::operator[](const std::string &key) const {
     }
 
     throw dynamic::bad_cast(value);
+}
+
+template<typename T>
+BLACKHOLE_DECL
+bool dynamic_t::is() const {
+    return boost::get<T>(&value) != nullptr;
 }
 
 template<typename T>
