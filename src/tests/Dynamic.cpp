@@ -63,10 +63,110 @@ TEST(Dynamic, ThrowsExceptionOnRequestingIndexFromNonObject) {
     EXPECT_THROW(d["key"], dynamic::bad_cast);
 }
 
+TEST(Dynamic, IsNullByDefault) {
+    dynamic_t d;
+
+    EXPECT_TRUE(d.is<dynamic_t::null_t>());
+    EXPECT_FALSE(d.is<dynamic_t::bool_t>());
+    EXPECT_FALSE(d.is<dynamic_t::uint_t>());
+    EXPECT_FALSE(d.is<dynamic_t::int_t>());
+    EXPECT_FALSE(d.is<dynamic_t::double_t>());
+    EXPECT_FALSE(d.is<dynamic_t::string_t>());
+    EXPECT_FALSE(d.is<dynamic_t::array_t>());
+    EXPECT_FALSE(d.is<dynamic_t::object_t>());
+}
+
+TEST(Dynamic, IsBool) {
+    dynamic_t d = true;
+
+    EXPECT_FALSE(d.is<dynamic_t::null_t>());
+    EXPECT_TRUE(d.is<dynamic_t::bool_t>());
+    EXPECT_FALSE(d.is<dynamic_t::uint_t>());
+    EXPECT_FALSE(d.is<dynamic_t::int_t>());
+    EXPECT_FALSE(d.is<dynamic_t::double_t>());
+    EXPECT_FALSE(d.is<dynamic_t::string_t>());
+    EXPECT_FALSE(d.is<dynamic_t::array_t>());
+    EXPECT_FALSE(d.is<dynamic_t::object_t>());
+}
+
+TEST(Dynamic, IsUint) {
+    dynamic_t d = 42u;
+
+    EXPECT_FALSE(d.is<dynamic_t::null_t>());
+    EXPECT_FALSE(d.is<dynamic_t::bool_t>());
+    EXPECT_TRUE(d.is<dynamic_t::uint_t>());
+    EXPECT_FALSE(d.is<dynamic_t::int_t>());
+    EXPECT_FALSE(d.is<dynamic_t::double_t>());
+    EXPECT_FALSE(d.is<dynamic_t::string_t>());
+    EXPECT_FALSE(d.is<dynamic_t::array_t>());
+    EXPECT_FALSE(d.is<dynamic_t::object_t>());
+}
+
+TEST(Dynamic, IsInt) {
+    dynamic_t d = 42;
+
+    EXPECT_FALSE(d.is<dynamic_t::null_t>());
+    EXPECT_FALSE(d.is<dynamic_t::bool_t>());
+    EXPECT_FALSE(d.is<dynamic_t::uint_t>());
+    EXPECT_TRUE(d.is<dynamic_t::int_t>());
+    EXPECT_FALSE(d.is<dynamic_t::double_t>());
+    EXPECT_FALSE(d.is<dynamic_t::string_t>());
+    EXPECT_FALSE(d.is<dynamic_t::array_t>());
+    EXPECT_FALSE(d.is<dynamic_t::object_t>());
+}
+
+TEST(Dynamic, IsDouble) {
+    dynamic_t d = 42.5;
+
+    EXPECT_FALSE(d.is<dynamic_t::null_t>());
+    EXPECT_FALSE(d.is<dynamic_t::bool_t>());
+    EXPECT_FALSE(d.is<dynamic_t::uint_t>());
+    EXPECT_FALSE(d.is<dynamic_t::int_t>());
+    EXPECT_TRUE(d.is<dynamic_t::double_t>());
+    EXPECT_FALSE(d.is<dynamic_t::string_t>());
+    EXPECT_FALSE(d.is<dynamic_t::array_t>());
+    EXPECT_FALSE(d.is<dynamic_t::object_t>());
+}
+
+TEST(Dynamic, IsString) {
+    dynamic_t d = "le govno";
+
+    EXPECT_FALSE(d.is<dynamic_t::null_t>());
+    EXPECT_FALSE(d.is<dynamic_t::bool_t>());
+    EXPECT_FALSE(d.is<dynamic_t::uint_t>());
+    EXPECT_FALSE(d.is<dynamic_t::int_t>());
+    EXPECT_FALSE(d.is<dynamic_t::double_t>());
+    EXPECT_TRUE(d.is<dynamic_t::string_t>());
+    EXPECT_FALSE(d.is<dynamic_t::array_t>());
+    EXPECT_FALSE(d.is<dynamic_t::object_t>());
+}
+
 TEST(Dynamic, IsArray) {
     dynamic_t d;
     d[0] = "item";
+
+    EXPECT_FALSE(d.is<dynamic_t::null_t>());
+    EXPECT_FALSE(d.is<dynamic_t::bool_t>());
+    EXPECT_FALSE(d.is<dynamic_t::uint_t>());
+    EXPECT_FALSE(d.is<dynamic_t::int_t>());
+    EXPECT_FALSE(d.is<dynamic_t::double_t>());
+    EXPECT_FALSE(d.is<dynamic_t::string_t>());
     EXPECT_TRUE(d.is<dynamic_t::array_t>());
+    EXPECT_FALSE(d.is<dynamic_t::object_t>());
+}
+
+TEST(Dynamic, IsObject) {
+    dynamic_t d;
+    d["key"] = "value";
+
+    EXPECT_FALSE(d.is<dynamic_t::null_t>());
+    EXPECT_FALSE(d.is<dynamic_t::bool_t>());
+    EXPECT_FALSE(d.is<dynamic_t::uint_t>());
+    EXPECT_FALSE(d.is<dynamic_t::int_t>());
+    EXPECT_FALSE(d.is<dynamic_t::double_t>());
+    EXPECT_FALSE(d.is<dynamic_t::string_t>());
+    EXPECT_FALSE(d.is<dynamic_t::array_t>());
+    EXPECT_TRUE(d.is<dynamic_t::object_t>());
 }
 
 TEST(Dynamic, LikeDictBool) {
