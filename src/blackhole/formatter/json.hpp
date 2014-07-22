@@ -198,8 +198,6 @@ struct factory_traits<formatter::json_t> {
     typedef formatter::json_t::config_type config_type;
 
     static void map_config(const aux::extractor<formatter_type>& ex, config_type& cfg) {
-        using namespace formatter::json::map;
-
         ex["newline"].to(cfg.newline);
 
         auto mapping = ex["mapping"].get<dynamic_t::object_t>();
