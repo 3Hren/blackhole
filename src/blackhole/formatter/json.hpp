@@ -29,6 +29,7 @@ template<typename Visitor, typename T>
 void apply_visitor(Visitor&, const std::string&, const T&);
 } // namespace aux
 
+//!@todo: Fix code style for this file.
 //! This class looks creppy, because of inconvenient rapidjson interface. Hope someone could refactor it.
 class json_visitor_t : public boost::static_visitor<> {
     rapidjson::Document* root;
@@ -197,12 +198,14 @@ struct factory_traits<formatter::json_t> {
     typedef formatter::json_t formatter_type;
     typedef formatter::json_t::config_type config_type;
 
-    static void map_config(const aux::extractor<formatter_type>& ex, config_type& cfg) {
-        ex["newline"].to(cfg.newline);
+    static
+    void
+    map_config(const aux::extractor<formatter_type>& ex, config_type& config) {
+        ex["newline"].to(config.newline);
 
         auto mapping = ex["mapping"].get<dynamic_t::object_t>();
         for (auto it = mapping.begin(); it != mapping.end(); ++it) {
-            cfg.naming[it->first] = it->second.to<std::string>();
+            config.naming[it->first] = it->second.to<std::string>();
         }
 
         auto routing = ex["routing"].get<dynamic_t::object_t>();
@@ -211,28 +214,26 @@ struct factory_traits<formatter::json_t> {
             const dynamic_t& value = it->second;
 
             if (value.is<dynamic_t::string_t>()) {
-                handle_unspecified(name, value, cfg);
+                handle_unspecified(name, value, config);
             } else if (value.is<dynamic_t::array_t>()) {
-                handle_specified(name, value, cfg);
+                handle_specified(name, value, config);
             } else {
                 throw blackhole::error_t("wrong configuration");
             }
         }
     }
 
-    //!@todo: Code style for this file.
     static
     void
     handle_specified(const std::string& name,
                      const dynamic_t& value,
-                     config_type& cfg)
+                     config_type& config)
     {
-        //!@todo: cfg? Better name!
         std::vector<std::string> positions = aux::split(name, "/");
         dynamic_t::array_t keys = value.to<dynamic_t::array_t>();
         for (auto it = keys.begin(); it != keys.end(); ++it) {
             const std::string& key = it->to<std::string>();
-            cfg.routing.specified[key] = positions;
+            config.routing.specified[key] = positions;
         }
     }
 
@@ -240,10 +241,10 @@ struct factory_traits<formatter::json_t> {
     void
     handle_unspecified(const std::string& name,
                        const dynamic_t& value,
-                       config_type& cfg)
+                       config_type& config)
     {
         if (value.to<std::string>() == "*") {
-            cfg.routing.unspecified = aux::split(name, "/");
+            config.routing.unspecified = aux::split(name, "/");
         } else {
             throw blackhole::error_t("wrong configuration");
         }
