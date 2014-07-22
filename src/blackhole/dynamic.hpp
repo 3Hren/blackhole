@@ -97,7 +97,6 @@ public:
     dynamic_t& operator[](const std::string& key);
     const dynamic_t& operator[](const std::string& key) const;
 
-    //!@todo: Enable if.
     template<typename T>
     typename std::enable_if<
         std::is_convertible<T, value_type>::value,
