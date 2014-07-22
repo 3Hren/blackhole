@@ -9,8 +9,8 @@ if [ "$TRAVIS_OS_NAME" = "linux" ]; then
     echo 'sudo apt-get install -qq cdbs cmake libboost-dev libboost-thread-dev libboost-filesystem-dev libmsgpack-dev'
     sudo apt-get install -qq cdbs cmake libboost-dev libboost-thread-dev libboost-filesystem-dev libmsgpack-dev
 elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
-    echo 'brew install cmake msgpack boost --with-c++11'
-    brew install cmake msgpack boost --with-c++11
+    echo 'brew install msgpack'
+    brew install msgpack
 else
     echo "Unknown OS ($TRAVIS_OS_NAME). Stopping build ..."
     exit 1
