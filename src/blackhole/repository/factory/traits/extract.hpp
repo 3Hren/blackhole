@@ -7,7 +7,6 @@
 
 #include "blackhole/dynamic.hpp"
 #include "blackhole/error.hpp"
-#include "cast.hpp"
 
 namespace blackhole {
 

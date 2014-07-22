@@ -4,7 +4,6 @@
 
 #include <boost/any.hpp>
 
-#include "traits/cast.hpp"
 #include "traits/config.hpp"
 #include "traits/extract.hpp"
 #include "traits/filler.hpp"
