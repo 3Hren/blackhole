@@ -42,7 +42,7 @@ SET(BASE_SOURCES
 #    test_AttachableStream
 #    test_Attribute
 #    test_Config
-#    test_ConfigJsonInitialization
+    test_ConfigJsonInitialization
 #    test_ExceptionTrap
     test_FactoryInitialization
 #    test_FileRotation

@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+#include "blackhole/error.hpp"
 #include "blackhole/repository/config/base.hpp"
 #include "blackhole/repository/config/log.hpp"
 
@@ -12,28 +13,14 @@ namespace repository {
 
 namespace config {
 
-namespace adapter {
-
-template<typename T>
-struct array_traits;
-
-template<typename T>
-struct object_traits;
-
-} // namespace adapter
-
 template<class T>
-struct filler;
+struct transformer_t;
 
-template<class From, class To>
+template<class To>
 class parser_t;
 
-template<class From>
-class parser_t<From, repository::config::base_t> {
-    typedef From from_type;
-    typedef adapter::array_traits<from_type> array;
-    typedef adapter::object_traits<from_type> object;
-
+template<>
+class parser_t<repository::config::base_t> {
 public:
     template<class T>
     static
@@ -41,72 +28,64 @@ public:
         std::is_base_of<base_t, T>::value,
         T
     >::type
-    parse(std::string component, const from_type& value) {
-        if (!object::has(value, "type")) {
-            throw blackhole::error_t("'type' field if missing for '%s' component", component);
+    parse(std::string component, dynamic_t value) {
+        if (!value.contains("type")) {
+            //!@todo: Throw specialized exception.
+            throw blackhole::error_t("'type' field is missing for '%s' component", component);
         }
 
-        std::string type = object::as_string(object::at(value, "type"));
+        std::string type = value["type"].to<std::string>();
         T config(std::move(type));
-        filler<from_type>::fill(static_cast<base_t&>(config), value);
+        config.config(std::move(value.to<dynamic_t::object_t>()));
         return config;
     }
 };
 
-template<class From>
-class parser_t<From, formatter_config_t> {
-    typedef From from_type;
-
+template<>
+class parser_t<formatter_config_t> {
 public:
-    static formatter_config_t parse(const from_type& value) {
+    static formatter_config_t parse(dynamic_t value) {
         return parser_t<
-            from_type,
             repository::config::base_t
-        >::template parse<formatter_config_t>("formatter", value);
+        >::template parse<formatter_config_t>("formatter", std::move(value));
     }
 };
 
-template<class From>
-class parser_t<From, sink_config_t> {
-    typedef From from_type;
-
+template<>
+class parser_t<sink_config_t> {
 public:
-    static sink_config_t parse(const from_type& value) {
+    static sink_config_t parse(dynamic_t value) {
         return parser_t<
-            from_type,
             repository::config::base_t
-        >::template parse<sink_config_t>("sink", value);
+        >::template parse<sink_config_t>("sink", std::move(value));
     }
 };
 
-template<class From>
-class parser_t<From, frontend_config_t> {
-    typedef From from_type;
-    typedef adapter::object_traits<from_type> object;
-
+template<>
+class parser_t<frontend_config_t> {
 public:
-    static frontend_config_t parse(const from_type& value) {
-        if (!(object::has(value, "formatter") && object::has(value, "sink"))) {
+    static frontend_config_t parse(dynamic_t value) {
+        if (!(value.contains("formatter") && value.contains("sink"))) {
+            //!@todo: Throw specialized exception.
             throw blackhole::error_t("both 'formatter' and 'sink' sections must be specified");
         }
 
-        auto form = parser_t<from_type, formatter_config_t>::parse(object::at(value, "formatter"));
-        auto sink = parser_t<from_type, sink_config_t>::parse(object::at(value, "sink"));
+        auto form = parser_t<formatter_config_t>::parse(value["formatter"]);
+        auto sink = parser_t<sink_config_t>::parse(value["sink"]);
         return frontend_config_t { std::move(form), std::move(sink) };
     }
 };
 
-template<class From>
-class parser_t<From, log_config_t> {
-    typedef From from_type;
-    typedef adapter::array_traits<from_type> array;
-
+template<>
+class parser_t<log_config_t> {
 public:
-    static log_config_t parse(const std::string& name, const from_type& value) {
+    static log_config_t parse(std::string name, dynamic_t value) {
         log_config_t config;
-        config.name = name;
-        for (auto it = array::begin(value); it != array::end(value); ++it) {
-            auto frontend = parser_t<from_type, frontend_config_t>::parse(*it);
+        config.name = std::move(name);
+
+        auto array = value.to<dynamic_t::array_t>();
+        for (auto it = array.begin(); it != array.end(); ++it) {
+            auto frontend = parser_t<frontend_config_t>::parse(*it);
             config.frontends.push_back(std::move(frontend));
         }
 
@@ -114,25 +93,36 @@ public:
     }
 };
 
-template<class From>
-class parser_t<From, std::vector<log_config_t>> {
-    typedef From from_type;
-    typedef adapter::object_traits<from_type> object;
-
+template<>
+class parser_t<std::vector<log_config_t>> {
 public:
-    static std::vector<log_config_t> parse(const from_type& root) {
+    static std::vector<log_config_t> parse(dynamic_t root) {
         std::vector<log_config_t> configs;
-        for (auto it = object::begin(root); it != object::end(root); ++it) {
+        auto object = root.to<dynamic_t::object_t>();
+        for (auto it = object.begin(); it != object.end(); ++it) {
             auto config = parser_t<
-                from_type,
                 log_config_t
-            >::parse(object::name(it), object::value(it));
+            >::parse(it->first, it->second);
             configs.push_back(std::move(config));
         }
 
         return configs;
     }
 };
+
+namespace parser {
+
+template<class From, class To>
+class adapter_t {
+public:
+    static To parse(const From& value) {
+        return parser_t<To>::parse(
+            transformer_t<From>::transform(value)
+        );
+    }
+};
+
+} // namespace parser
 
 } // namespace config
 
