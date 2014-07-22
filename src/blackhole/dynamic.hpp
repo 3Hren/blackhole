@@ -90,6 +90,8 @@ public:
 
     bool invalid() const;
 
+    bool contains(const std::string& key) const;
+
     dynamic_t& operator[](array_t::size_type key);
     const dynamic_t& operator[](array_t::size_type key) const;
     dynamic_t& operator[](const std::string& key);
@@ -268,6 +270,12 @@ bool dynamic_t::operator==(const dynamic_t& other) const {
 BLACKHOLE_DECL
 bool dynamic_t::invalid() const {
     return boost::get<null_t>(&value) != nullptr;
+}
+
+BLACKHOLE_DECL
+bool dynamic_t::contains(const std::string& key) const {
+    auto object = to<object_t>();
+    return object.find(key) != object.end();
 }
 
 BLACKHOLE_DECL

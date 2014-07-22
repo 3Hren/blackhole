@@ -194,6 +194,18 @@ TEST(Dynamic, NestedArray) {
     EXPECT_EQ(true, base["output"][1].to<bool>());
 }
 
+TEST(Dynamic, ContainsIfObject) {
+    dynamic_t d;
+    d["key"] = "value";
+    EXPECT_TRUE(d.contains("key"));
+}
+
+TEST(Dynamic, NotContainsIfObject) {
+    dynamic_t d;
+    d["key"] = "value";
+    EXPECT_FALSE(d.contains("key-value"));
+}
+
 //!@todo: Uncomment.
 //TEST(Base, Class) {
 //    base_t base("string");
