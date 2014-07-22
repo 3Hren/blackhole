@@ -311,14 +311,3 @@ TEST(Dynamic, NotContainsIfObject) {
     d["key"] = "value";
     EXPECT_FALSE(d.contains("key-value"));
 }
-
-//!@todo: Uncomment.
-//TEST(Base, Class) {
-//    base_t base("string");
-//    UNUSED(base);
-//}
-
-//TEST(Base, GetType) {
-//    base_t base("string");
-//    EXPECT_EQ("string", base.type());
-//}
