@@ -26,6 +26,7 @@ class scoped_attributes_concept_t;
 
 class logger_base_t {
     bool m_enabled;
+    bool tracked_;
 
 protected:
     filter_t m_filter;
@@ -57,6 +58,7 @@ public:
     void add_attribute(const log::attribute_pair_t& attribute);
     void add_frontend(std::unique_ptr<base_frontend_t> frontend);
     void set_exception_handler(log::exception_handler_t&& handler);
+    void track(bool enable = true);
 
     log::record_t open_record() const;
     log::record_t open_record(log::attribute_pair_t local_attribute) const;

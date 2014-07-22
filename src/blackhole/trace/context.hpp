@@ -26,7 +26,7 @@ public:
     }
 
     context_t(value_type trace) :
-        span(span_t(trace, trace)),
+        span(trace == 0 ? generate() : span_t(trace, trace)),
         parent(state_t::instance().get())
     {
         state_t::instance().reset(&this->span);
