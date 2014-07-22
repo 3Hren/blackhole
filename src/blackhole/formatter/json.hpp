@@ -214,9 +214,9 @@ struct factory_traits<formatter::json_t> {
             const dynamic_t& value = it->second;
 
             if (value.is<dynamic_t::string_t>()) {
-                handle_unspecified(name, value, config);
+                unspecified(name, value, config);
             } else if (value.is<dynamic_t::array_t>()) {
-                handle_specified(name, value, config);
+                specified(name, value, config);
             } else {
                 throw blackhole::error_t("wrong configuration");
             }
@@ -225,10 +225,7 @@ struct factory_traits<formatter::json_t> {
 
     static
     void
-    handle_specified(const std::string& name,
-                     const dynamic_t& value,
-                     config_type& config)
-    {
+    specified(const std::string& name, const dynamic_t& value, config_type& config) {
         std::vector<std::string> positions = aux::split(name, "/");
         dynamic_t::array_t keys = value.to<dynamic_t::array_t>();
         for (auto it = keys.begin(); it != keys.end(); ++it) {
@@ -239,10 +236,7 @@ struct factory_traits<formatter::json_t> {
 
     static
     void
-    handle_unspecified(const std::string& name,
-                       const dynamic_t& value,
-                       config_type& config)
-    {
+    unspecified(const std::string& name, const dynamic_t& value, config_type& config) {
         if (value.to<std::string>() == "*") {
             config.routing.unspecified = aux::split(name, "/");
         } else {
