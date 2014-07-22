@@ -47,7 +47,7 @@ public:
     static formatter_config_t parse(dynamic_t value) {
         return parser_t<
             repository::config::base_t
-        >::template parse<formatter_config_t>("formatter", std::move(value));
+        >::parse<formatter_config_t>("formatter", std::move(value));
     }
 };
 
@@ -57,7 +57,7 @@ public:
     static sink_config_t parse(dynamic_t value) {
         return parser_t<
             repository::config::base_t
-        >::template parse<sink_config_t>("sink", std::move(value));
+        >::parse<sink_config_t>("sink", std::move(value));
     }
 };
 
