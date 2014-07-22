@@ -99,11 +99,18 @@ public:
 
     //!@todo: Enable if.
     template<typename T>
-    bool is() const;
+    typename std::enable_if<
+        std::is_convertible<T, value_type>::value,
+        bool
+    >::type
+    is() const;
 
     //!@todo: Enable if.
     template<typename T>
-    typename std::enable_if<!type_traits::is_integer<T>::value, T>::type
+    typename std::enable_if<
+        !type_traits::is_integer<T>::value,
+        T
+    >::type
     to() const;
 
     template<typename T>
@@ -334,7 +341,11 @@ const dynamic_t& dynamic_t::operator[](const std::string &key) const {
 
 template<typename T>
 BLACKHOLE_DECL
-bool dynamic_t::is() const {
+typename std::enable_if<
+    std::is_convertible<T, dynamic_t::value_type>::value,
+    bool
+>::type
+dynamic_t::is() const {
     return boost::get<T>(&value) != nullptr;
 }
 
