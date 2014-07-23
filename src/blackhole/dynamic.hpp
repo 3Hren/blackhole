@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <map>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 #include <vector>
 
@@ -63,6 +64,21 @@ public:
 private:
     value_type value;
 
+    template<typename T>
+    struct is_convertible : public
+        std::integral_constant<
+            bool,
+            std::is_convertible<dynamic_t::null_t,   T>::value ||
+            std::is_convertible<dynamic_t::bool_t,   T>::value ||
+            std::is_convertible<dynamic_t::uint_t,   T>::value ||
+            std::is_convertible<dynamic_t::int_t,    T>::value ||
+            std::is_convertible<dynamic_t::double_t, T>::value ||
+            std::is_convertible<dynamic_t::string_t, T>::value ||
+            std::is_convertible<dynamic_t::array_t,  T>::value ||
+            std::is_convertible<dynamic_t::object_t, T>::value
+        >
+    {};
+
 public:
     dynamic_t();
     dynamic_t(const dynamic_t& other);
@@ -99,21 +115,23 @@ public:
 
     template<typename T>
     typename std::enable_if<
-        std::is_convertible<T, value_type>::value,
+        is_convertible<T>::value,
         bool
     >::type
     is() const;
 
-    //!@todo: Enable if.
     template<typename T>
     typename std::enable_if<
-        !type_traits::is_integer<T>::value,
+        is_convertible<T>::value && !type_traits::is_integer<T>::value,
         T
     >::type
     to() const;
 
     template<typename T>
-    typename std::enable_if<type_traits::is_integer<T>::value, T>::type
+    typename std::enable_if<
+        is_convertible<T>::value && type_traits::is_integer<T>::value,
+        T
+    >::type
     to() const;
 };
 
@@ -341,7 +359,7 @@ const dynamic_t& dynamic_t::operator[](const std::string &key) const {
 template<typename T>
 BLACKHOLE_DECL
 typename std::enable_if<
-    std::is_convertible<T, dynamic_t::value_type>::value,
+    dynamic_t::is_convertible<T>::value,
     bool
 >::type
 dynamic_t::is() const {
@@ -350,7 +368,10 @@ dynamic_t::is() const {
 
 template<typename T>
 BLACKHOLE_DECL
-typename std::enable_if<!type_traits::is_integer<T>::value, T>::type
+typename std::enable_if<
+    dynamic_t::is_convertible<T>::value && !type_traits::is_integer<T>::value,
+    T
+>::type
 dynamic_t::to() const {
     if (auto result = boost::get<T>(&value)) {
         return *result;
@@ -361,7 +382,10 @@ dynamic_t::to() const {
 
 template<typename T>
 BLACKHOLE_DECL
-typename std::enable_if<type_traits::is_integer<T>::value, T>::type
+typename std::enable_if<
+    dynamic_t::is_convertible<T>::value && type_traits::is_integer<T>::value,
+    T
+>::type
 dynamic_t::to() const {
     if (auto actual = boost::get<int_t>(&value)) {
         return dynamic::safe_cast<T>(*actual);
