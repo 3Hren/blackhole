@@ -92,6 +92,8 @@ class syslog_t {
 public:
     typedef syslog::config_t config_type;
 
+    //!@todo: Thread safety depends from backend!
+
     static const char* name() {
         return "syslog";
     }

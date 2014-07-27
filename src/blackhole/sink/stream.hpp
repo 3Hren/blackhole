@@ -30,6 +30,8 @@ public:
 
     typedef stream::config_t config_type;
 
+    //!@todo: Thread unsafe!
+
     static const char* name() {
         return "stream";
     }

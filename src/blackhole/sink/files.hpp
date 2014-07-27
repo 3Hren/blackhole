@@ -95,8 +95,10 @@ class files_t {
     files::config_t<Rotator> config;
     handlers_type m_handlers;
     aux::formatter_t formatter;
+
 public:
     typedef files::config_t<Rotator> config_type;
+    //!@todo: Thread safety depends from backend! Rotating is unsafe.
 
     static const char* name() {
         return "files";

@@ -18,6 +18,7 @@ private:
     const log::attributes_t attributes;
 
 public:
+    //!@todo: Check if logger_type is a wrapper itself.
     wrapper_t(logger_type& log, log::attributes_t attributes);
 
     logger_type& log() {

@@ -25,6 +25,8 @@ class socket_t {
 public:
     typedef socket::config_t config_type;
 
+    //!@todo: Thread unsafe!
+
     static const char* name() {
         return Backend::name();
     }

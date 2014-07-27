@@ -150,6 +150,8 @@ class elasticsearch_t {
 public:
     typedef elasticsearch_::config_t config_type;
 
+    //!@todo: Thread safe.
+
 private:
     synchronized<logger_base_t> log;
 

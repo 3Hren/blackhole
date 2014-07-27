@@ -18,6 +18,8 @@ class null_t {
 public:
     typedef null::config_t config_type;
 
+    //!@todo: Thread safe!
+
     static const char* name() {
         return "null";
     }
