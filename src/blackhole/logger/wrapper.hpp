@@ -13,6 +13,7 @@ public:
     typedef Logger logger_type;
 
 private:
+    //!@todo: It can be const, I suppose!
     logger_type& log_;
     const log::attributes_t attributes;
 
