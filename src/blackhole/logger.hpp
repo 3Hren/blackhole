@@ -13,8 +13,9 @@
 #include "keyword.hpp"
 #include "keyword/message.hpp"
 #include "keyword/severity.hpp"
-#include "keyword/timestamp.hpp"
 #include "keyword/thread.hpp"
+#include "keyword/timestamp.hpp"
+#include "keyword/tracebit.hpp"
 #include "universe.hpp"
 #include "blackhole/utils/noexcept.hpp"
 #include "utils/noncopyable.hpp"
@@ -155,14 +156,14 @@ public:
 
         bool trace = false;
         if (!passed) {
-            auto it = local.find("tracebit");
+            auto it = local.find(keyword::tracebit().name());
             if (it != local.end()) {
-                trace = boost::get<bool>(it->second.value);
+                trace = boost::get<keyword::tag::tracebit_t::type>(it->second.value);
             } else if (m_scoped_attributes.get()) {
                 const auto& scoped = m_scoped_attributes->attributes();
-                auto scoped_it = scoped.find("tracebit");
+                auto scoped_it = scoped.find(keyword::tracebit().name());
                 if (scoped_it != scoped.end()) {
-                    trace = boost::get<bool>(scoped_it->second.value);
+                    trace = boost::get<keyword::tag::tracebit_t::type>(scoped_it->second.value);
                 }
             }
         }
