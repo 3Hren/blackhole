@@ -6,7 +6,6 @@
 
 #include "traits/config.hpp"
 #include "traits/extract.hpp"
-#include "traits/filler.hpp"
 #include "traits/integer.hpp"
 #include "traits/unique.hpp"
 #include "blackhole/dynamic.hpp"

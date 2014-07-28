@@ -180,6 +180,9 @@ struct config_traits<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> 
 
 namespace aux {
 
+template<class T>
+struct filler;
+
 template<class Backend, class Rotator>
 struct filler<sink::files_t<Backend, Rotator>> {
     template<class Extractor, class Config>
