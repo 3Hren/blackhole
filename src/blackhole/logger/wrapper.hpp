@@ -47,10 +47,11 @@ public:
     //!@todo: Add more gentle concept check.
     template<typename Level>
     log::record_t
-    open_record(Level level) const {
-        log::attributes_t attributes = this->attributes;
-        attributes.insert(keyword::severity<Level>() = level);
-        return log_.open_record(std::move(attributes));
+    open_record(Level level,
+                log::attributes_t attributes = log::attributes_t()) const
+    {
+        attributes.insert(this->attributes.begin(), this->attributes.end());
+        return log_->open_record(level, std::move(attributes));
     }
 
     void push(log::record_t&& record) const;

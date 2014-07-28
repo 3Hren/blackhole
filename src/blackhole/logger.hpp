@@ -137,21 +137,43 @@ public:
         this->level = level;
     }
 
-    /*!
+    /*! @INVALID
      * Tries to open log record with specific verbosity level.
      * Internally this method compares desired verbosity level with the upper
      * one. Can return invalid log record if some conditions are not met.
      * @param[in] level - Desired verbosity level.
      * @return valid or invalid `log::record_t` object.
      */
-    log::record_t open_record(level_type level) const {
+    log::record_t
+    open_record(level_type level,
+                log::attributes_t local = log::attributes_t()) const
+    {
         typedef typename aux::underlying_type<level_type>::type underlying_type;
-        if (static_cast<underlying_type>(level) < static_cast<underlying_type>(this->level)) {
-            return log::record_t();
+        const bool passed =
+            static_cast<underlying_type>(level) >=
+            static_cast<underlying_type>(this->level);
+
+        bool trace = false;
+        if (!passed) {
+            auto it = local.find("tracebit");
+            if (it != local.end()) {
+                trace = boost::get<bool>(it->second.value);
+            } else if (m_scoped_attributes.get()) {
+                const auto& scoped = m_scoped_attributes->attributes();
+                auto scoped_it = scoped.find("tracebit");
+                if (scoped_it != scoped.end()) {
+                    trace = boost::get<bool>(scoped_it->second.value);
+                }
+            }
         }
 
-        log::attributes_t attributes = { keyword::severity<Level>() = level };
-        return logger_base_t::open_record(std::move(attributes));
+        if (passed || trace) {
+            log::attributes_t attributes = { keyword::severity<Level>() = level };
+            attributes.insert(local.begin(), local.end());
+            return logger_base_t::open_record(std::move(attributes));
+        }
+
+        return log::record_t();
     }
 };
 
