@@ -13,16 +13,31 @@ public:
     typedef Logger logger_type;
 
 private:
-    //!@todo: It can be const, I suppose!
-    logger_type& log_;
-    const log::attributes_t attributes;
+    logger_type* log_;
+    log::attributes_t attributes;
 
 public:
-    //!@todo: Check if logger_type is a wrapper itself.
     wrapper_t(logger_type& log, log::attributes_t attributes);
+    wrapper_t(wrapper_t& wrapper, log::attributes_t attributes);
+
+    //!@todo: Test.
+    wrapper_t(wrapper_t&& other) {
+        *this = std::move(other);
+    }
+
+    //!@todo: Test.
+    wrapper_t& operator=(wrapper_t&& other) {
+        if (this != &other) {
+            log_ = other.log_;
+            other.log_ = nullptr;
+            attributes = std::move(other.attributes);
+        }
+
+        return *this;
+    }
 
     logger_type& log() {
-        return log_;
+        return *log_;
     }
 
     log::record_t open_record() const;
