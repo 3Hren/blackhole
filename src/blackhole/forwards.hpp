@@ -16,6 +16,9 @@ namespace blackhole {
         } // namespace config
     } // namespace repository
 
+    class base_frontend_t;
+    class frontend_factory_t;
+
     class logger_base_t;
 
     template<typename Level>

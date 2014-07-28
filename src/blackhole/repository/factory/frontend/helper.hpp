@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "blackhole/forwards.hpp"
 #include "blackhole/frontend.hpp"
 #include "blackhole/repository/config/formatter.hpp"
 #include "blackhole/repository/config/sink.hpp"
@@ -9,10 +10,6 @@
 //! Helper factory function and its overloads to ease fronetnd creation.
 
 namespace blackhole {
-
-//!@todo: Move to the blackhole/forwards.hpp or blackhole/detail/forwards.hpp
-class base_frontend_t;
-class frontend_factory_t;
 
 namespace factory {
 
