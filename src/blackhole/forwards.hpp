@@ -2,17 +2,28 @@
 
 #include <mutex>
 
+/*!
+ * Namespace indents were made intentionally to improve the readability.
+ */
 namespace blackhole {
+    namespace repository {
+        namespace config {
+            template<class T>
+            struct transformer_t;
 
-class logger_base_t;
+            template<class To>
+            class parser_t;
+        } // namespace config
+    } // namespace repository
 
-template<typename Level>
-class verbose_logger_t;
+    class logger_base_t;
 
-template<class Logger>
-class wrapper_t;
+    template<typename Level>
+    class verbose_logger_t;
 
-template<class T, class Mutex = std::mutex>
-class synchronized;
+    template<class Logger>
+    class wrapper_t;
 
+    template<class T, class Mutex = std::mutex>
+    class synchronized;
 } // namespace blackhole

@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "blackhole/error.hpp"
+#include "blackhole/forwards.hpp"
 #include "blackhole/repository/config/base.hpp"
 #include "blackhole/repository/config/log.hpp"
 
@@ -12,12 +13,6 @@ namespace blackhole {
 namespace repository {
 
 namespace config {
-
-template<class T>
-struct transformer_t;
-
-template<class To>
-class parser_t;
 
 template<>
 class parser_t<repository::config::base_t> {
