@@ -19,6 +19,9 @@ namespace blackhole {
     class base_frontend_t;
     class frontend_factory_t;
 
+    class formatter_config_t;
+    class sink_config_t;
+
     class logger_base_t;
 
     template<typename Level>

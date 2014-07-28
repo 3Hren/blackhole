@@ -5,7 +5,8 @@
 
 namespace blackhole {
 
-struct formatter_config_t : public repository::config::base_t {
+class formatter_config_t : public repository::config::base_t {
+public:
     mapping::value_t mapper;
 
     formatter_config_t(const std::string& type) :

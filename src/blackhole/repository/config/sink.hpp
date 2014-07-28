@@ -4,7 +4,8 @@
 
 namespace blackhole {
 
-struct sink_config_t : public repository::config::base_t {
+class sink_config_t : public repository::config::base_t {
+public:
     sink_config_t(const std::string& type) :
         base_t(type)
     {}
