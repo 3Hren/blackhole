@@ -137,7 +137,7 @@ public:
         this->level = level;
     }
 
-    /*! @INVALID
+    /*! @todo: Documentation is @deprecated.
      * Tries to open log record with specific verbosity level.
      * Internally this method compares desired verbosity level with the upper
      * one. Can return invalid log record if some conditions are not met.
