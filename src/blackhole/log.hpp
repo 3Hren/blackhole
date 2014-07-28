@@ -69,6 +69,6 @@ scoped_pump<Log> make_scoped_pump(Log& log, log::record_t& record, Args&&... arg
 
 } // namespace blackhole
 
-#define BH_LOG(__log__, level, ...) \
-    if (blackhole::log::record_t record = __log__.open_record(level)) \
-        blackhole::aux::make_scoped_pump(__log__, record, __VA_ARGS__)
+#define BH_LOG(__log__, __level__, ...) \
+    if (blackhole::log::record_t record = (__log__).open_record((__level__))) \
+        blackhole::aux::make_scoped_pump((__log__), record, __VA_ARGS__)
