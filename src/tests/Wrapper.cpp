@@ -142,3 +142,47 @@ TEST(Wrapper, MacroUsage) {
         BH_LOG(wrapper, testing::info, "everything is bad");
     }
 }
+
+TEST(Wrapper, NestedWrappers) {
+    auto log = logger_factory_t::create<verbose_logger_t<testing::level>>();
+    log.add_attribute(attribute::make("id", 100500));
+
+    {
+        wrapper_t<verbose_logger_t<testing::level>> wrapper(
+            log,
+            log::attributes_t({
+                attribute::make("answer", 42)
+            })
+        );
+
+        auto record = wrapper.open_record();
+        ASSERT_EQ(1, record.attributes.count("id"));
+        EXPECT_EQ(log::attribute_value_t(100500), record.attributes["id"].value);
+        ASSERT_EQ(1, record.attributes.count("answer"));
+        EXPECT_EQ(log::attribute_value_t(42), record.attributes["answer"].value);
+        EXPECT_EQ(0, record.attributes.count("result"));
+
+        {
+            wrapper_t<verbose_logger_t<testing::level>> nested(
+                wrapper,
+                log::attributes_t({
+                    attribute::make("result", 300)
+                })
+            );
+            auto record = nested.open_record();
+            ASSERT_EQ(1, record.attributes.count("id"));
+            EXPECT_EQ(log::attribute_value_t(100500), record.attributes["id"].value);
+            ASSERT_EQ(1, record.attributes.count("answer"));
+            EXPECT_EQ(log::attribute_value_t(42), record.attributes["answer"].value);
+            EXPECT_EQ(1, record.attributes.count("result"));
+            EXPECT_EQ(log::attribute_value_t(300), record.attributes["result"].value);
+        }
+
+        record = wrapper.open_record();
+        ASSERT_EQ(1, record.attributes.count("id"));
+        EXPECT_EQ(log::attribute_value_t(100500), record.attributes["id"].value);
+        ASSERT_EQ(1, record.attributes.count("answer"));
+        EXPECT_EQ(log::attribute_value_t(42), record.attributes["answer"].value);
+        EXPECT_EQ(0, record.attributes.count("result"));
+    }
+}
