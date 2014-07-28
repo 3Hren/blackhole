@@ -3,12 +3,11 @@
 #include <boost/mpl/for_each.hpp>
 #include <boost/mpl/is_sequence.hpp>
 
+#include "blackhole/forwards.hpp"
 #include "blackhole/repository/factory/registrator.hpp"
 #include "blackhole/utils/meta.hpp"
 
 namespace blackhole {
-
-class frontend_factory_t;
 
 template<class Sink, class Formatter, class = void>
 struct frontend_inserter {

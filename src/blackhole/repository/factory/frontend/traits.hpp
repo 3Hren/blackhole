@@ -2,10 +2,9 @@
 
 #include <memory>
 
-namespace blackhole {
+#include "blackhole/forwards.hpp"
 
-class base_frontend_t;
-struct formatter_config_t;
+namespace blackhole {
 
 namespace frontend {
 
