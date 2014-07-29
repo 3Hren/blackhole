@@ -9,6 +9,16 @@
 
 namespace blackhole {
 
+/*!
+ * Wraps the logger, providing the same interface and making it thread-safe.
+ *
+ * This is achieved by using stupid mutex, locking it just before calling every
+ * underlying logger's method. Not very super-fast, indeed.
+ *
+ * @deprecated: This class is deprecated and will be removed at 0.2.
+ *              Logger itself will become thread-safe when compiling and linking
+ *              with pthreads.
+ */
 template<class Logger, class Mutex>
 class synchronized {
 public:
