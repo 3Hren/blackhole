@@ -117,6 +117,19 @@ public:
     }
 };
 
+template<class From>
+class adapter_t<From, log_config_t> {
+    typedef log_config_t result_type;
+
+public:
+    static result_type parse(std::string name, const From& value) {
+        return parser_t<result_type>::parse(
+            std::move(name),
+            transformer_t<From>::transform(value)
+        );
+    }
+};
+
 } // namespace parser
 
 } // namespace config
