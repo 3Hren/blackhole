@@ -1,3 +1,9 @@
+blackhole (0.2.0-0rc1) unstable; urgency=low
+  
+  * Much-much more changes are pending. This field will be filled later.
+
+ -- Evgenyi Safronov <division494@gmail.com>  Tue, 29 Jul 2014 13:51:48 +0400
+
 blackhole (0.1.0-3) unstable; urgency=low
 
   * Bug Fix: added forgotten include.

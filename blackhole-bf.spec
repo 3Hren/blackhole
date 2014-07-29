@@ -1,11 +1,11 @@
 Summary:	Blackhole
 Name:		libblackhole
-Version:	0.1.0
-Release:	3%{?dist}
+Version:	0.2.0
+Release:	0r1%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
-URL:		http://www.ioremap.net/projects/elliptics
+URL:		http://github.com/3Hren/blackhole
 Source0:	%{name}-%{version}.tar.bz2
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -67,8 +67,11 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Tue Jul 29 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-0rc1
+- Much-much more changes are pending. This field will be filled later.
+
 * Fri Apr 25 2014 Evgeny Safronov <division494@gmail.com> - 0.1.0-3
 - Bug Fix: added forgotten include.
 
-* Mon Mar 31 2014 Evgenyi Safronov <division494@gmail.com> - 0.1.0-1
+* Mon Mar 31 2014 Evgeny Safronov <division494@gmail.com> - 0.1.0-1
 - Initial release.
