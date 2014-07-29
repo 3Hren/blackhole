@@ -69,6 +69,7 @@ scoped_pump<Log> make_scoped_pump(Log& log, log::record_t& record, Args&&... arg
 
 } // namespace blackhole
 
+//!@todo: Catch exceptions from message inline formatting.
 #define BH_LOG(__log__, __level__, ...) \
     if (blackhole::log::record_t record = (__log__).open_record((__level__))) \
         blackhole::aux::make_scoped_pump((__log__), record, __VA_ARGS__)
