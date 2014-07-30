@@ -46,6 +46,10 @@ public:
         stream(stream_factory_t::get(config.output))
     {}
 
+    stream_t(std::ostream& stream) :
+        stream(stream)
+    {}
+
     static const char* name() {
         return "stream";
     }

@@ -18,6 +18,13 @@ TEST(stream_t, StringConstructor) {
     UNUSED(sink2);
 }
 
+TEST(stream_t, StreamConstructor) {
+    std::ostringstream stream;
+    sink::stream_t sink(stream);
+    sink.consume("test message");
+    EXPECT_EQ("test message\n", stream.str());
+}
+
 TEST(stream_t, CanConsumeLogMessage) {
     sink::stream_t sink(sink::stream_t::output_t::stdout);
     sink.consume("test message for stream sink");
