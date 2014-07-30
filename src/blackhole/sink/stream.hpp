@@ -40,8 +40,8 @@ public:
         stream(stream_factory_t::get(output))
     {}
 
-    stream_t(const std::string& output) :
-        stream(stream_factory_t::get(output))
+    stream_t(std::string output) :
+        stream(stream_factory_t::get(std::move(output)))
     {}
 
     stream_t(const config_type& config) :
