@@ -18,6 +18,7 @@ namespace aux {
 // For example actual level attribute string representation is substituted:
 // BH_LOG(log, level::debug, "level = %s", keyword::severity_t<level>());
 
+//!@todo: Consider migrating to something more faster than boost::format.
 static inline
 std::string
 substitute(const log::attributes_t&, boost::format&& message) {
