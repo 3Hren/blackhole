@@ -1,4 +1,4 @@
-#include <blackhole/log.hpp>
+#include <blackhole/macro.hpp>
 
 #include "global.hpp"
 #include "mocks/logger.hpp"

@@ -4,8 +4,8 @@
 
 #include "celero/Celero.h"
 
-#include <blackhole/log.hpp>
 #include <blackhole/logger.hpp>
+#include <blackhole/macro.hpp>
 #include <blackhole/sink/null.hpp>
 #include <blackhole/repository.hpp>
 

@@ -2,7 +2,7 @@
 
 #include <blackhole/attribute.hpp>
 #include <blackhole/detail/traits/same.hpp>
-#include <blackhole/log.hpp>
+#include <blackhole/macro.hpp>
 
 #include "global.hpp"
 

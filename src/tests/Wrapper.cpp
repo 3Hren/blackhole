@@ -1,7 +1,7 @@
 #include <blackhole/formatter/string.hpp>
-#include <blackhole/log.hpp>
 #include <blackhole/logger.hpp>
 #include <blackhole/logger/wrapper.hpp>
+#include <blackhole/macro.hpp>
 #include <blackhole/record.hpp>
 #include <blackhole/sink/null.hpp>
 

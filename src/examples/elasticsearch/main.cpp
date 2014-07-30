@@ -1,5 +1,4 @@
-#include <blackhole/log.hpp>
-#include <blackhole/repository.hpp>
+#include <blackhole/blackhole.hpp>
 
 #include <blackhole/formatter/json.hpp>
 #include <blackhole/sink/elasticsearch.hpp>

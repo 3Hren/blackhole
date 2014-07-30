@@ -5,8 +5,8 @@
 #include <boost/asio.hpp>
 #include <boost/thread/barrier.hpp>
 
+#include <blackhole/detail/logger/pusher.hpp>
 #include <blackhole/formatter/string.hpp>
-#include <blackhole/log.hpp>
 #include <blackhole/logger.hpp>
 #include <blackhole/sink/stream.hpp>
 #include <blackhole/synchronized.hpp>

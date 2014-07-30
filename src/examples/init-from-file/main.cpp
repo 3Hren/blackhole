@@ -1,8 +1,7 @@
 #include <fstream>
 #include <iostream>
 
-#include <blackhole/log.hpp>
-#include <blackhole/repository.hpp>
+#include <blackhole/blackhole.hpp>
 #include <blackhole/repository/config/parser/rapidjson.hpp>
 
 using namespace blackhole;

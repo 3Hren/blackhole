@@ -1,7 +1,7 @@
 #pragma once
 
+#include "blackhole/detail/logger/pusher.hpp"
 #include "blackhole/formatter/string.hpp"
-#include "blackhole/log.hpp"
 #include "blackhole/logger.hpp"
 #include "blackhole/sink/stream.hpp"
 #include "blackhole/synchronized.hpp"
@@ -9,11 +9,11 @@
 
 #ifdef ENABLE_ELASTICSEARCH_DEBUG
 #define ES_LOG(__log__, ...) \
-    if (::blackhole::log::record_t record = __log__.open_record()) \
-        ::blackhole::aux::make_scoped_pump(__log__, record, __VA_ARGS__)
+    if (auto record = (__log__).open_record()) \
+        ::blackhole::aux::make_pusher((__log__), record, __VA_ARGS__)
 #else
 #define ES_LOG(__log__, ...) \
-    ::blackhole::utils::ignore_unused_variable_warning(__log__, __VA_ARGS__)
+    ::blackhole::utils::ignore_unused_variable_warning((__log__), __VA_ARGS__)
 #endif
 
 namespace elasticsearch {
