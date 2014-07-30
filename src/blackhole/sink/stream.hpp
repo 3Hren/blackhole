@@ -21,7 +21,6 @@ struct config_t {
 } // namespace stream
 
 class stream_t{
-    std::ostream& stream;
 public:
     enum class output_t {
         stdout,
@@ -29,13 +28,12 @@ public:
     };
 
     typedef stream::config_t config_type;
-
     //!@todo: Thread unsafe!
 
-    static const char* name() {
-        return "stream";
-    }
+private:
+    std::ostream& stream;
 
+public:
     stream_t(output_t output) :
         stream(stream_factory_t::get(output))
     {}
@@ -47,6 +45,10 @@ public:
     stream_t(const config_type& config) :
         stream(stream_factory_t::get(config.output))
     {}
+
+    static const char* name() {
+        return "stream";
+    }
 
     void consume(std::string message) {
         stream << std::move(message) << std::endl;
@@ -88,7 +90,9 @@ struct factory_traits<sink::stream_t> {
     typedef sink::stream_t sink_type;
     typedef sink_type::config_type config_type;
 
-    static void map_config(const aux::extractor<sink_type>& ex, config_type& config) {
+    static
+    void
+    map_config(const aux::extractor<sink_type>& ex, config_type& config) {
         ex["output"].to(config.output);
     }
 };
