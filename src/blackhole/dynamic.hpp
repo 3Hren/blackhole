@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <boost/variant.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include "blackhole/config.hpp"
 #include "blackhole/detail/traits/integer.hpp"
@@ -176,19 +177,37 @@ public:
 
 } // namespace visitor
 
-class precision_loss : public std::logic_error {
+class precision_loss : public std::out_of_range {
 public:
     template<typename T>
     precision_loss(T actual,
+                   const std::string& reason,
                    typename std::enable_if<
                        type_traits::is_integer<typename std::decay<T>::type>::value
                    >::type* = 0) :
-        std::logic_error(
+        std::out_of_range(
             blackhole::utils::format(
-                "unable to convert integer (%d) without precision loss",
-                actual
+                "unable to convert integer (%d) without precision loss: %s",
+                actual,
+                reason
             )
         )
+    {}
+};
+
+class negative_overflow : public precision_loss {
+public:
+    template<typename T>
+    negative_overflow(T actual) :
+        precision_loss(actual, "negative overflow")
+    {}
+};
+
+class positive_overflow : public precision_loss {
+public:
+    template<typename T>
+    positive_overflow(T actual) :
+        precision_loss(actual, "positive overflow")
     {}
 };
 
@@ -208,12 +227,13 @@ template<typename T, typename Actual>
 static inline
 typename std::enable_if<type_traits::is_integer<T>::value, T>::type
 safe_cast(Actual actual) {
-    T converted = static_cast<T>(actual);
-    if (actual != static_cast<Actual>(converted)) {
-        throw dynamic::precision_loss(actual);
+    try {
+        return boost::numeric_cast<T>(actual);
+    } catch (const boost::numeric::negative_overflow&) {
+        throw dynamic::negative_overflow(actual);
+    } catch (const boost::numeric::positive_overflow&) {
+        throw dynamic::positive_overflow(actual);
     }
-
-    return converted;
 }
 
 } // namespace dynamic

@@ -40,12 +40,12 @@ TEST(Dynamic, MoveAssignable) {
 }
 
 TEST(Dynamic, ThrowsExceptionWhenPrecisionLossOccurs) {
-    EXPECT_THROW(dynamic_t(256u).to<unsigned char>(), dynamic::precision_loss);
-    EXPECT_THROW(dynamic_t(256).to<unsigned char>(), dynamic::precision_loss);
+    EXPECT_THROW(dynamic_t(256u).to<unsigned char>(), dynamic::positive_overflow);
+    EXPECT_THROW(dynamic_t(256).to<unsigned char>(), dynamic::positive_overflow);
 }
 
 TEST(Dynamic, ThrowsExceptionWhenUnderflowOccurs) {
-    EXPECT_THROW(dynamic_t(-1).to<unsigned char>(), dynamic::precision_loss);
+    EXPECT_THROW(dynamic_t(-1).to<unsigned char>(), dynamic::negative_overflow);
 }
 
 TEST(Dynamic, ThrowsExceptionWhenOverflowOccurs) {
@@ -53,7 +53,7 @@ TEST(Dynamic, ThrowsExceptionWhenOverflowOccurs) {
     EXPECT_THROW(dynamic_t(value).to<
                     std::int64_t
                  >(),
-                 dynamic::precision_loss);
+                 dynamic::positive_overflow);
 }
 
 TEST(Dynamic, ThrowsExceptionOnInvalidCast) {
