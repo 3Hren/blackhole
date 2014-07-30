@@ -44,6 +44,18 @@ TEST(Dynamic, ThrowsExceptionWhenPrecisionLossOccurs) {
     EXPECT_THROW(dynamic_t(256).to<unsigned char>(), dynamic::precision_loss);
 }
 
+TEST(Dynamic, ThrowsExceptionWhenUnderflowOccurs) {
+    EXPECT_THROW(dynamic_t(-1).to<unsigned char>(), dynamic::precision_loss);
+}
+
+TEST(Dynamic, ThrowsExceptionWhenOverflowOccurs) {
+    std::uint64_t value = std::numeric_limits<std::int64_t>::max() + 1;
+    EXPECT_THROW(dynamic_t(value).to<
+                    std::int64_t
+                 >(),
+                 dynamic::precision_loss);
+}
+
 TEST(Dynamic, ThrowsExceptionOnInvalidCast) {
     EXPECT_THROW(dynamic_t(42.5).to<unsigned char>(), dynamic::bad_cast);
     EXPECT_THROW(dynamic_t("le shit").to<bool>(), dynamic::bad_cast);
