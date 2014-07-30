@@ -11,6 +11,13 @@ TEST(stream_t, Class) {
    UNUSED(sink2);
 }
 
+TEST(stream_t, IsThreadUnsafe) {
+    static_assert(
+        !sink::stream_t::thread_safe::value,
+        "stream_t sink must be thread unsafe"
+    );
+}
+
 TEST(stream_t, StringConstructor) {
     sink::stream_t sink1("stdout");
     sink::stream_t sink2("stderr");

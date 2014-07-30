@@ -20,6 +20,21 @@ struct config_t {
 
 } // namespace stream
 
+namespace thread {
+
+enum class safety_t { unsafe = 0, safe };
+
+}
+
+template<thread::safety_t safety>
+struct thread_safety : public
+    std::conditional<
+        safety == thread::safety_t::safe,
+        std::true_type,
+        std::false_type
+    >::type
+{};
+
 class stream_t{
 public:
     enum class output_t {
@@ -28,7 +43,7 @@ public:
     };
 
     typedef stream::config_t config_type;
-    //!@todo: Thread unsafe!
+    typedef thread_safety<thread::safety_t::unsafe> thread_safe;
 
 private:
     std::ostream& stream;
