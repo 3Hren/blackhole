@@ -88,33 +88,37 @@ struct config_t {
 
 template<typename Level, typename Backend = backend::native_t>
 class syslog_t {
-    Backend m_backend;
-
 public:
+    typedef Level level_type;
+    typedef Backend backend_type;
     typedef syslog::config_t config_type;
 
-    static const char* name() {
-        return "syslog";
-    }
+private:
+    backend_type m_backend;
 
+public:
     syslog_t(const config_type& config) :
         m_backend(config.identity, config.option, config.facility)
     {
-        static_assert(std::is_enum<Level>::value, "level type must be enum");
+        static_assert(std::is_enum<level_type>::value, "level type must be enum");
     }
 
     syslog_t(const std::string& identity, int option = LOG_PID, int facility = LOG_USER) :
         m_backend(identity, option, facility)
     {
-        static_assert(std::is_enum<Level>::value, "level type must be enum");
+        static_assert(std::is_enum<level_type>::value, "level type must be enum");
     }
 
-    void consume(Level level, const std::string& message) {
-        priority_t priority = priority_traits<Level>::map(level);
+    static const char* name() {
+        return "syslog";
+    }
+
+    void consume(level_type level, const std::string& message) {
+        priority_t priority = priority_traits<level_type>::map(level);
         m_backend.write(priority, message);
     }
 
-    Backend& backend() {
+    backend_type& backend() {
         return m_backend;
     }
 };
