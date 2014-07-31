@@ -22,8 +22,7 @@ public:
     {}
 
     void handle(const log::record_t& record) {
-        std::string message = this->formatter->format(record);
-        this->sink->consume(std::move(message), record.attributes);
+        this->sink.consume(this->formatter.format(record), record.attributes);
     }
 };
 

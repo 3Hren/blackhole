@@ -22,8 +22,7 @@ public:
 
     void handle(const log::record_t& record) {
         const Level level = record.extract<Level>(keyword::severity<Level>().name());
-        std::string message = this->formatter->format(record);
-        this->sink->consume(level, std::move(message));
+        this->sink.consume(level, this->formatter.format(record));
     }
 };
 

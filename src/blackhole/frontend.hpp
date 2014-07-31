@@ -2,9 +2,86 @@
 
 #include <memory>
 
-#include "record.hpp"
+#include "blackhole/sink/thread.hpp"
+#include "blackhole/record.hpp"
 
 namespace blackhole {
+
+namespace handler {
+
+template<class Formatter>
+class formatter_t {
+public:
+    typedef Formatter formatter_type;
+
+private:
+    const std::unique_ptr<formatter_type> formatter;
+
+public:
+    formatter_t(std::unique_ptr<formatter_type> formatter) :
+        formatter(std::move(formatter))
+    {}
+
+    template<typename... Args>
+    std::string format(Args&&... args) {
+        return formatter->format(std::forward<Args>(args)...);
+    }
+};
+
+template<class Sink, class = void>
+class sink_t;
+
+template<class Sink>
+class sink_t<
+    Sink,
+    typename std::enable_if<
+        sink::thread_safety<Sink>::type::value == sink::thread::safety_t::safe
+    >::type
+> {
+public:
+    typedef Sink sink_type;
+
+private:
+    const std::unique_ptr<sink_type> sink;
+
+public:
+    sink_t(std::unique_ptr<sink_type> sink) :
+        sink(std::move(sink))
+    {}
+
+    template<typename... Args>
+    void consume(Args&&... args) {
+        sink->consume(std::forward<Args>(args)...);
+    }
+};
+
+template<class Sink>
+class sink_t<
+    Sink,
+    typename std::enable_if<
+        sink::thread_safety<Sink>::type::value == sink::thread::safety_t::unsafe
+    >::type
+> {
+public:
+    typedef Sink sink_type;
+
+private:
+    const std::unique_ptr<sink_type> sink;
+    mutable std::mutex mutex;
+
+public:
+    sink_t(std::unique_ptr<sink_type> sink) :
+        sink(std::move(sink))
+    {}
+
+    template<typename... Args>
+    void consume(Args&&... args) {
+        std::lock_guard<std::mutex> lock(mutex);
+        sink->consume(std::forward<Args>(args)...);
+    }
+};
+
+} // namespace handler
 
 //!@todo: Consider setting mapper for entire frontend or maybe logger.
 class base_frontend_t {
@@ -19,8 +96,8 @@ protected:
     typedef Formatter formatter_type;
     typedef Sink sink_type;
 
-    const std::unique_ptr<formatter_type> formatter;
-    const std::unique_ptr<sink_type> sink;
+    handler::formatter_t<formatter_type> formatter;
+    handler::sink_t<sink_type> sink;
 
 public:
     abstract_frontend_t(std::unique_ptr<formatter_type> formatter,
@@ -43,8 +120,7 @@ public:
     {}
 
     void handle(const log::record_t& record) {
-        std::string message = this->formatter->format(record);
-        this->sink->consume(std::move(message));
+        this->sink.consume(this->formatter.format(record));
     }
 };
 
