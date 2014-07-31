@@ -118,9 +118,11 @@ public:
         backend_.write(priority, message);
     }
 
+#ifdef BLACKHOLE_TESTING
     backend_type& backend() {
         return backend_;
     }
+#endif
 };
 
 template<typename Level>
