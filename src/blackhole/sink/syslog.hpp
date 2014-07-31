@@ -29,11 +29,11 @@ struct priority_traits;
 namespace backend {
 
 class native_t {
-    const std::string m_identity;
+    const std::string identity;
 
 public:
-    native_t(const std::string& identity, int option = LOG_PID, int facility = LOG_USER) :
-        m_identity(identity)
+    native_t(std::string identity, int option = LOG_PID, int facility = LOG_USER) :
+        identity(std::move(identity))
     {
         initialize(option, facility);
     }
@@ -48,11 +48,11 @@ public:
 
 private:
     void initialize(int option, int facility) {
-        if (m_identity.empty()) {
+        if (identity.empty()) {
             throw error_t("no syslog identity has been specified");
         }
 
-        ::openlog(m_identity.c_str(), option, facility);
+        ::openlog(identity.c_str(), option, facility);
     }
 };
 
@@ -94,17 +94,17 @@ public:
     typedef syslog::config_t config_type;
 
 private:
-    backend_type m_backend;
+    backend_type backend_;
 
 public:
     syslog_t(const config_type& config) :
-        m_backend(config.identity, config.option, config.facility)
+        backend_(config.identity, config.option, config.facility)
     {
         static_assert(std::is_enum<level_type>::value, "level type must be enum");
     }
 
     syslog_t(const std::string& identity, int option = LOG_PID, int facility = LOG_USER) :
-        m_backend(identity, option, facility)
+        backend_(identity, option, facility)
     {
         static_assert(std::is_enum<level_type>::value, "level type must be enum");
     }
@@ -115,11 +115,11 @@ public:
 
     void consume(level_type level, const std::string& message) {
         priority_t priority = priority_traits<level_type>::map(level);
-        m_backend.write(priority, message);
+        backend_.write(priority, message);
     }
 
     backend_type& backend() {
-        return m_backend;
+        return backend_;
     }
 };
 
