@@ -99,7 +99,6 @@ class files_t {
 
 public:
     typedef files::config_t<Rotator> config_type;
-    //!@todo: Thread safety depends from backend! Rotating is unsafe.
 
     static const char* name() {
         return "files";
