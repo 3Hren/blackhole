@@ -6,6 +6,7 @@
 
 #include "blackhole/error.hpp"
 #include "blackhole/repository/factory/traits.hpp"
+#include "blackhole/sink/thread.hpp"
 
 namespace blackhole {
 
@@ -92,8 +93,6 @@ class syslog_t {
 public:
     typedef syslog::config_t config_type;
 
-    //!@todo: Thread safety depends from backend!
-
     static const char* name() {
         return "syslog";
     }
@@ -119,6 +118,14 @@ public:
         return m_backend;
     }
 };
+
+template<typename Level>
+struct thread_safety<syslog_t<Level>> :
+    public std::integral_constant<
+        thread::safety_t,
+        thread::safety_t::safe
+    >::type
+{};
 
 } // namespace sink
 

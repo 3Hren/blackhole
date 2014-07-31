@@ -33,6 +33,15 @@ TEST(syslog_t, Class) {
     UNUSED(sink);
 }
 
+TEST(syslog, NativeBackendIsThreadSafe) {
+    static_assert(
+        sink::thread_safety<
+            sink::syslog_t<testing::level>
+        >::type::value == sink::thread::safety_t::safe,
+        "`syslog_t<>` sink must be thread safe"
+    );
+}
+
 TEST(syslog_t, ConsumeAcceptsLevel) {
     sink::syslog_t<testing::level> sink("identity");
     sink.consume(testing::level::debug, "le message");
