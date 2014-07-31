@@ -11,6 +11,15 @@ TEST(files_t, Class) {
     UNUSED(sink);
 }
 
+TEST(files_t, DefaultBackendIsThreadUnsafe) {
+    static_assert(
+        sink::thread_safety<
+            sink::files_t<>
+        >::type::value == sink::thread::safety_t::unsafe,
+        "`files_t<>` sink must be thread safe"
+    );
+}
+
 TEST(files_t, WritesToTheFile) {
     sink::files_t<NiceMock<mock::files::backend_t>>::config_type config("test.log");
     sink::files_t<NiceMock<mock::files::backend_t>> sink(config);

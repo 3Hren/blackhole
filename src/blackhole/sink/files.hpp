@@ -10,6 +10,7 @@
 #include "blackhole/sink/files/flusher.hpp"
 #include "blackhole/sink/files/rotation.hpp"
 #include "blackhole/sink/files/writer.hpp"
+#include "blackhole/sink/thread.hpp"
 #include "blackhole/utils/unique.hpp"
 
 namespace blackhole {
