@@ -3,6 +3,7 @@
 #include <string>
 
 #include "blackhole/repository/factory/traits.hpp"
+#include "blackhole/sink/thread.hpp"
 
 namespace blackhole {
 
@@ -18,17 +19,23 @@ class null_t {
 public:
     typedef null::config_t config_type;
 
-    //!@todo: Thread safe!
+    null_t() {}
+    null_t(const config_type&) {}
 
     static const char* name() {
         return "null";
     }
 
-    null_t() {}
-    null_t(const config_type&) {}
-
     void consume(const std::string&) {}
 };
+
+template<>
+struct thread_safety<null_t> :
+    public std::integral_constant<
+        thread::safety_t,
+        thread::safety_t::safe
+    >::type
+{};
 
 } // namespace sink
 
