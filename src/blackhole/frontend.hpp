@@ -16,26 +16,35 @@ public:
 template<class Formatter, class Sink>
 class abstract_frontend_t : public base_frontend_t {
 protected:
-    const std::unique_ptr<Formatter> m_formatter;
-    const std::unique_ptr<Sink> m_sink;
+    typedef Formatter formatter_type;
+    typedef Sink sink_type;
+
+    const std::unique_ptr<formatter_type> formatter;
+    const std::unique_ptr<sink_type> sink;
 
 public:
-    abstract_frontend_t(std::unique_ptr<Formatter> formatter, std::unique_ptr<Sink> sink) :
-        m_formatter(std::move(formatter)),
-        m_sink(std::move(sink))
+    abstract_frontend_t(std::unique_ptr<formatter_type> formatter,
+                        std::unique_ptr<sink_type> sink) :
+        formatter(std::move(formatter)),
+        sink(std::move(sink))
     {}
 };
 
 template<class Formatter, class Sink>
 class frontend_t : public abstract_frontend_t<Formatter, Sink> {
+    typedef abstract_frontend_t<Formatter, Sink> base_type;
+    typedef typename base_type::formatter_type formatter_type;
+    typedef typename base_type::sink_type sink_type;
+
 public:
-    frontend_t(std::unique_ptr<Formatter> formatter, std::unique_ptr<Sink> sink) :
-        abstract_frontend_t<Formatter, Sink>(std::move(formatter), std::move(sink))
+    frontend_t(std::unique_ptr<formatter_type> formatter,
+               std::unique_ptr<sink_type> sink) :
+        base_type(std::move(formatter), std::move(sink))
     {}
 
     void handle(const log::record_t& record) {
-        std::string msg = std::move(this->m_formatter->format(record));
-        this->m_sink->consume(msg);
+        std::string msg = std::move(this->formatter->format(record));
+        this->sink->consume(msg);
     }
 };
 
