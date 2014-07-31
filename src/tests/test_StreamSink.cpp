@@ -13,7 +13,9 @@ TEST(stream_t, Class) {
 
 TEST(stream_t, IsThreadUnsafe) {
     static_assert(
-        !sink::stream_t::thread_safe::value,
+        sink::thread_safety<
+            sink::stream_t
+        >::type::value == sink::thread::safety_t::unsafe,
         "stream_t sink must be thread unsafe"
     );
 }
