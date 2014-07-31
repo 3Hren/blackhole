@@ -87,14 +87,6 @@ private:
     };
 };
 
-template<>
-struct thread_safety<sink::stream_t> {
-    typedef std::integral_constant<
-        thread::safety_t,
-        thread::safety_t::unsafe
-    >::type type;
-};
-
 } // namespace sink
 
 template<>
