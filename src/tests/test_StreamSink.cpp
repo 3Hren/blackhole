@@ -16,7 +16,7 @@ TEST(stream_t, IsThreadUnsafe) {
         sink::thread_safety<
             sink::stream_t
         >::type::value == sink::thread::safety_t::unsafe,
-        "stream_t sink must be thread unsafe"
+        "`stream_t` sink must be thread unsafe"
     );
 }
 
