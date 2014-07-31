@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 
 #include "blackhole/sink/thread.hpp"
 #include "blackhole/record.hpp"
