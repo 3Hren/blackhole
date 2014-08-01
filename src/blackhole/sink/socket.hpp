@@ -19,32 +19,39 @@ struct config_t {
 
 } // namespace socket
 
-template<typename Protocol, typename Backend = socket::boost_backend_t<Protocol> >
+template<typename Protocol, typename Backend = socket::boost_backend_t<Protocol>>
 class socket_t {
-    Backend m_backend;
-
 public:
+    typedef Protocol protocol_type;
+    typedef Backend backend_type;
+
     typedef socket::config_t config_type;
 
+private:
+    backend_type backend_;
+
+public:
     socket_t(const config_type& config) :
-        m_backend(config.host, config.port)
+        backend_(config.host, config.port)
     {}
 
-    socket_t(const std::string& host, std::uint16_t port) :
-        m_backend(host, port)
+    socket_t(std::string host, std::uint16_t port) :
+        backend_(std::move(host), port)
     {}
 
     static const char* name() {
-        return Backend::name();
+        return backend_type::name();
     }
 
     void consume(const std::string& message) {
-        m_backend.write(message);
+        backend_.write(message);
     }
 
-    Backend& backend() {
-        return m_backend;
+#ifdef BLACKHOLE_TESTING
+    backend_type& backend() {
+        return backend_;
     }
+#endif
 };
 
 template<>
