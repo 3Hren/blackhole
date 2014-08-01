@@ -25,6 +25,18 @@ namespace blackhole {
 
 class scoped_attributes_concept_t;
 
+template <typename Level>
+struct logger_verbosity_traits
+{
+    static bool passed(Level logger_verbosity, Level record_verbosity)
+    {
+        typedef typename aux::underlying_type<Level>::type underlying_type;
+
+        return static_cast<underlying_type>(record_verbosity) >=
+            static_cast<underlying_type>(logger_verbosity);
+    }
+};
+
 class logger_base_t {
     bool m_enabled;
     bool tracked_;
@@ -149,10 +161,8 @@ public:
     open_record(level_type level,
                 log::attributes_t local = log::attributes_t()) const
     {
-        typedef typename aux::underlying_type<level_type>::type underlying_type;
-        const bool passed =
-            static_cast<underlying_type>(level) >=
-            static_cast<underlying_type>(this->level);
+        typedef logger_verbosity_traits<level_type> verbosity_traits;
+        const bool passed = verbosity_traits::passed(this->level, level);
 
         bool trace = false;
         if (!passed) {
