@@ -26,10 +26,12 @@ namespace blackhole {
 class scoped_attributes_concept_t;
 
 template <typename Level>
-struct logger_verbosity_traits
-{
-    static bool passed(Level logger_verbosity, Level record_verbosity)
-    {
+struct logger_verbosity_traits {
+    typedef Level level_type;
+
+    static
+    bool
+    passed(level_type logger_verbosity, level_type record_verbosity) {
         typedef typename aux::underlying_type<Level>::type underlying_type;
 
         return static_cast<underlying_type>(record_verbosity) >=
@@ -110,7 +112,7 @@ public:
     typedef Level level_type;
 
 private:
-    Level level;
+    level_type level;
 
 public:
     verbose_logger_t() :
