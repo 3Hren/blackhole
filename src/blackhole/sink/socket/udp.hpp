@@ -17,17 +17,20 @@ namespace socket {
 
 template<>
 class boost_backend_t<boost::asio::ip::udp> {
-    typedef boost::asio::ip::udp Protocol;
+public:
+    typedef boost::asio::ip::udp protocol_type;
+    typedef protocol_type::socket socket_type;
 
-    const std::string m_host;
+private:
+    const std::string host;
 
-    boost::asio::io_service m_io_service;
-    std::unique_ptr<Protocol::socket> m_socket;
+    boost::asio::io_service service;
+    std::unique_ptr<socket_type> socket;
 
 public:
-    boost_backend_t(const std::string& host, std::uint16_t port) :
-        m_host(host),
-        m_socket(initialize(m_io_service, host, port))
+    boost_backend_t(std::string host, std::uint16_t port) :
+        host(std::move(host)),
+        socket(initialize(service, this->host, port))
     {
     }
 
@@ -36,15 +39,18 @@ public:
     }
 
     ssize_t write(const std::string& message) {
-        return m_socket->send(boost::asio::buffer(message.data(), message.size()));
+        return socket->send(boost::asio::buffer(message.data(), message.size()));
     }
 
 private:
     static inline
-    std::unique_ptr<Protocol::socket>
-    initialize(boost::asio::io_service& io_service, const std::string& host, std::uint16_t port) {
-        auto socket = utils::make_unique<Protocol::socket>(io_service);
-        connect<Protocol>(io_service, *socket.get(), host, port);
+    std::unique_ptr<protocol_type::socket>
+    initialize(boost::asio::io_service& service,
+               const std::string& host,
+               std::uint16_t port)
+    {
+        auto socket = utils::make_unique<protocol_type::socket>(service);
+        connect<protocol_type>(service, *socket, host, port);
         return socket;
     }
 };
