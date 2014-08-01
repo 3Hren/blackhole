@@ -43,7 +43,10 @@ public:
         }
 
         try {
-            return m_socket->write_some(boost::asio::buffer(message.data(), message.size()));
+            return boost::asio::write(
+                *m_socket,
+                boost::asio::buffer(message.data(), message.size())
+            );
         } catch (const boost::system::system_error&) {
             m_socket.release();
             std::rethrow_exception(std::current_exception());
