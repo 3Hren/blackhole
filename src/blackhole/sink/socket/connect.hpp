@@ -13,7 +13,11 @@ namespace blackhole {
 namespace aux {
 
 template<typename Protocol, typename SocketService, typename Iterator>
-Iterator connect(boost::asio::basic_socket<Protocol, SocketService>& s, Iterator begin, Iterator end, boost::system::error_code& ec) {
+Iterator connect(boost::asio::basic_socket<Protocol, SocketService>& s,
+                 Iterator begin,
+                 Iterator end,
+                 boost::system::error_code& ec)
+{
     ec = boost::system::error_code();
 
     for (Iterator iter = begin; iter != end; ++iter) {
@@ -34,7 +38,9 @@ Iterator connect(boost::asio::basic_socket<Protocol, SocketService>& s, Iterator
 }
 
 template <typename Protocol, typename SocketService, typename Iterator>
-Iterator connect(boost::asio::basic_socket<Protocol, SocketService>& s, Iterator begin) {
+Iterator connect(boost::asio::basic_socket<Protocol, SocketService>& s,
+                 Iterator begin)
+{
     boost::system::error_code ec;
     Iterator end = typename Protocol::resolver::iterator();
     Iterator result = aux::connect(s, begin, end, ec);
@@ -49,7 +55,11 @@ namespace sink {
 //! Resolves specified host and tries to connect to the socket.
 template<typename Protocol>
 void
-connect(boost::asio::io_service& io_service, typename Protocol::socket& socket, const std::string& host, std::uint16_t port) {
+connect(boost::asio::io_service& io_service,
+        typename Protocol::socket& socket,
+        const std::string& host,
+        std::uint16_t port)
+{
     try {
         typename Protocol::resolver resolver(io_service);
         typename Protocol::resolver::query query(host, boost::lexical_cast<std::string>(port));
