@@ -49,9 +49,6 @@ protected:
         std::atomic<bool> tracked;
 
         filter_t filter; // used in open_record.
-        log::exception_handler_t exception; // used in push.
-        std::vector<std::unique_ptr<base_frontend_t>> frontends; // used in push.
-
         struct attrbutes_t {
             log::attributes_t global;
             boost::thread_specific_ptr<scoped_attributes_concept_t> scoped;
@@ -60,6 +57,9 @@ protected:
                 scoped(deleter)
             {}
         } attributes; // used in open_record.
+
+        log::exception_handler_t exception; // used in push.
+        std::vector<std::unique_ptr<base_frontend_t>> frontends; // used in push.
 
         state_t();
     };

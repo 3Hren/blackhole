@@ -26,8 +26,8 @@ logger_base_t::state_t::state_t() :
     enabled(true),
     tracked(false), //!@todo: Test - is false dy default.
     filter(default_filter_t::instance()),
-    exception(log::default_exception_handler_t()),
-    attributes(&aux::guard::no_deleter)
+    attributes(&aux::guard::no_deleter),
+    exception(log::default_exception_handler_t())
 {}
 
 BLACKHOLE_DECL
