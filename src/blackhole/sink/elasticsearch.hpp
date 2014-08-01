@@ -9,6 +9,7 @@
 #include <blackhole/formatter/string.hpp>
 #include <blackhole/logger.hpp>
 #include <blackhole/sink/stream.hpp>
+#include <blackhole/sink/thread.hpp>
 #include <blackhole/synchronized.hpp>
 #include <blackhole/utils/atomic.hpp>
 #include <blackhole/utils/format.hpp>
@@ -150,8 +151,6 @@ class elasticsearch_t {
 public:
     typedef elasticsearch_::config_t config_type;
 
-    //!@todo: Thread safe.
-
 private:
     synchronized<logger_base_t> log;
 
@@ -290,6 +289,14 @@ private:
         ES_LOG(log, "success!");
     }
 };
+
+template<>
+struct thread_safety<elasticsearch_t> :
+    public std::integral_constant<
+        thread::safety_t,
+        thread::safety_t::safe
+    >::type
+{};
 
 } // namespace sink
 

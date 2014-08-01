@@ -18,6 +18,15 @@ TEST(elasticsearch_t, ConfigConstructor) {
     UNUSED(sink);
 }
 
+TEST(elasticsearch_t, IsThreadSafe) {
+    static_assert(
+        sink::thread_safety<
+            sink::elasticsearch_t
+        >::type::value == sink::thread::safety_t::safe,
+        "`elasticsearch_t` sink must be thread safe"
+    );
+}
+
 TEST(elasticsearch_t, ManualLocal) {
     using blackhole::sink::elasticsearch_t;
     elasticsearch_t sink;
