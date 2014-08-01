@@ -4,6 +4,11 @@
 #include "blackhole/trace/context.hpp"
 #include "blackhole/utils/noexcept.hpp"
 
+#ifdef __linux__
+# define BLACKHOLE_HAS_LWP
+# include <sys/syscall.h>
+#endif
+
 namespace blackhole {
 
 namespace aux {
@@ -158,7 +163,11 @@ BLACKHOLE_DECL
 log::attributes_t
 logger_base_t::get_thread_attributes() const {
     log::attributes_t attributes = {
+#ifdef BLACKHOLE_HAS_LWP
+        keyword::lwp() = syscall(SYS_gettid)
+#else
         keyword::tid() = this_thread::get_id<std::string>()
+#endif
     };
     return attributes;
 }
