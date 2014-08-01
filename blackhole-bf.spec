@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
 Version:	0.2.0
-Release:	0r1%{?dist}
+Release:	0r2%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
@@ -67,6 +67,10 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Fri Aug 01 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-0rc2
+- Logger frontends are now thread-aware.
+- Will be filled later.
+
 * Tue Jul 29 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-0rc1
 - Much-much more changes are pending. This field will be filled later.
 

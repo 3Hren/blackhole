@@ -1,23 +1,30 @@
+blackhole (0.2.0-0rc2) unstable; urgency=low
+
+  * Logger frontends are now thread-aware.
+  * Will be filled later.
+
+ -- Evgeny Safronov <division494@gmail.com>  Fri, 01 Aug 2014 18:09:23 +0400
+
 blackhole (0.2.0-0rc1) unstable; urgency=low
   
   * Much-much more changes are pending. This field will be filled later.
 
- -- Evgenyi Safronov <division494@gmail.com>  Tue, 29 Jul 2014 13:51:48 +0400
+ -- Evgeny Safronov <division494@gmail.com>  Tue, 29 Jul 2014 13:51:48 +0400
 
 blackhole (0.1.0-3) unstable; urgency=low
 
   * Bug Fix: added forgotten include.
 
- -- Evgenyi Safronov <division494@gmail.com>  Fri, 25 Apr 2014 14:14:00 +0400
+ -- Evgeny Safronov <division494@gmail.com>  Fri, 25 Apr 2014 14:14:00 +0400
 
 blackhole (0.1.0-2) unstable; urgency=low
 
   * Debianization has been reviewed.
 
- -- Evgenyi Safronov <division494@gmail.com>  Tue, 08 Apr 2014 14:20:00 +0400
+ -- Evgeny Safronov <division494@gmail.com>  Tue, 08 Apr 2014 14:20:00 +0400
 
 blackhole (0.1.0-1) unstable; urgency=low
 
   * Initial release.
 
- -- Evgenyi Safronov <division494@gmail.com>  Mon, 31 Mar 2014 15:20:30 +0400
+ -- Evgeny Safronov <division494@gmail.com>  Mon, 31 Mar 2014 15:20:30 +0400
