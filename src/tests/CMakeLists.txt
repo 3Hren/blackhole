@@ -67,13 +67,14 @@ SET(BASE_SOURCES
     test_StringPatternParser
     test_SyslogSink
     test_Traits
-    test_UdpSink
     test_Utils
     test_VerboseLogger
     utils/test_GenericStringFormatter
-    Trace
-    Wrapper
     Dynamic
+    TcpSink
+    Trace
+    UdpSink
+    Wrapper
 )
 
 IF(ENABLE_ELASTICSEARCH)

@@ -10,6 +10,15 @@ TEST(socket_t, Class) {
     UNUSED(sink);
 }
 
+TEST(socket_t, UdpSocketIsThreadSafe) {
+    static_assert(
+        sink::thread_safety<
+            sink::socket_t<boost::asio::ip::udp>
+        >::type::value == sink::thread::safety_t::safe,
+        "`socket_t<boost::asio::ip::udp>` sink must be thread safe"
+    );
+}
+
 TEST(socket_t, TestCanSendMessages) {
     sink::socket_t<
         boost::asio::ip::udp,

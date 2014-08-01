@@ -4,6 +4,7 @@
 #include "socket/tcp.hpp"
 
 #include "blackhole/repository/factory/traits.hpp"
+#include "blackhole/sink/thread.hpp"
 
 namespace blackhole {
 
@@ -25,12 +26,6 @@ class socket_t {
 public:
     typedef socket::config_t config_type;
 
-    //!@todo: Thread unsafe!
-
-    static const char* name() {
-        return Backend::name();
-    }
-
     socket_t(const config_type& config) :
         m_backend(config.host, config.port)
     {}
@@ -38,6 +33,10 @@ public:
     socket_t(const std::string& host, std::uint16_t port) :
         m_backend(host, port)
     {}
+
+    static const char* name() {
+        return Backend::name();
+    }
 
     void consume(const std::string& message) {
         m_backend.write(message);
@@ -47,6 +46,14 @@ public:
         return m_backend;
     }
 };
+
+template<>
+struct thread_safety<socket_t<boost::asio::ip::udp>> :
+    public std::integral_constant<
+        thread::safety_t,
+        thread::safety_t::safe
+    >::type
+{};
 
 } // namespace sink
 
