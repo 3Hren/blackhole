@@ -18,19 +18,22 @@ namespace socket {
 
 template<>
 class boost_backend_t<boost::asio::ip::tcp> {
-    typedef boost::asio::ip::tcp Protocol;
+public:
+    typedef boost::asio::ip::tcp protocol_type;
+    typedef protocol_type::socket socket_type;
 
-    const std::string m_host;
-    const std::uint16_t m_port;
+private:
+    const std::string host;
+    const std::uint16_t port;
 
-    boost::asio::io_service m_io_service;
-    std::unique_ptr<Protocol::socket> m_socket;
+    boost::asio::io_service service;
+    std::unique_ptr<socket_type> socket;
 
 public:
-    boost_backend_t(const std::string& host, std::uint16_t port) :
-        m_host(host),
-        m_port(port),
-        m_socket(initialize(m_io_service, host, port))
+    boost_backend_t(std::string host, std::uint16_t port) :
+        host(std::move(host)),
+        port(port),
+        socket(initialize(service, this->host, this->port))
     {}
 
     static const char* name() {
@@ -38,27 +41,30 @@ public:
     }
 
     ssize_t write(const std::string& message) {
-        if (!m_socket) {
-            m_socket = initialize(m_io_service, m_host, m_port);
+        if (!socket) {
+            socket = initialize(service, host, port);
         }
 
         try {
             return boost::asio::write(
-                *m_socket,
+                *socket,
                 boost::asio::buffer(message.data(), message.size())
             );
         } catch (const boost::system::system_error&) {
-            m_socket.release();
+            socket.release();
             std::rethrow_exception(std::current_exception());
         }
     }
 
 private:
     static inline
-    std::unique_ptr<Protocol::socket>
-    initialize(boost::asio::io_service& io_service, const std::string& host, std::uint16_t port) {
-        std::unique_ptr<Protocol::socket> socket = utils::make_unique<Protocol::socket>(io_service);
-        connect<Protocol>(io_service, *socket, host, port);
+    std::unique_ptr<socket_type>
+    initialize(boost::asio::io_service& service,
+               const std::string& host,
+               std::uint16_t port)
+    {
+        auto socket = utils::make_unique<socket_type>(service);
+        connect<protocol_type>(service, *socket, host, port);
         return socket;
     }
 };
