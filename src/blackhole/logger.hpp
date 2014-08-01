@@ -21,6 +21,9 @@
 #include "utils/noncopyable.hpp"
 #include "utils/unique.hpp"
 
+#include "blackhole/detail/utils/synchronized.hpp"
+#include "blackhole/utils/atomic.hpp"
+
 namespace blackhole {
 
 class scoped_attributes_concept_t;
@@ -40,10 +43,28 @@ struct logger_verbosity_traits {
 };
 
 class logger_base_t {
-    bool m_enabled;
-    bool tracked_;
-
 protected:
+    struct state_t {
+        std::atomic<bool> enabled;
+        std::atomic<bool> tracked;
+
+        filter_t filter; // used in open_record.
+        log::exception_handler_t exception; // used in push.
+        std::vector<std::unique_ptr<base_frontend_t>> frontends; // used in push.
+
+        struct attrbutes_t {
+            log::attributes_t global;
+            boost::thread_specific_ptr<scoped_attributes_concept_t> scoped;
+
+            attrbutes_t(void(*deleter)(scoped_attributes_concept_t*)) :
+                scoped(deleter)
+            {}
+        } attributes; // used in open_record.
+
+        state_t();
+    };
+    state_t state;
+
     filter_t m_filter;
     log::exception_handler_t m_exception_handler;
 
@@ -55,7 +76,7 @@ protected:
 
     friend class scoped_attributes_concept_t;
 
-    friend void swap(logger_base_t&, logger_base_t&) BLACKHOLE_NOEXCEPT;
+    friend void swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT;
 
 public:
     logger_base_t();
@@ -67,13 +88,15 @@ public:
     logger_base_t& operator=(logger_base_t&& other) BLACKHOLE_NOEXCEPT;
 
     bool enabled() const;
-    void enable();
-    void disable();
+    void enabled(bool enable);
+
+    bool tracked() const;
+    void tracked(bool enable);
+
     void set_filter(filter_t&& filter);
     void add_attribute(const log::attribute_pair_t& attribute);
     void add_frontend(std::unique_ptr<base_frontend_t> frontend);
     void set_exception_handler(log::exception_handler_t&& handler);
-    void track(bool enable = true);
 
     log::record_t open_record() const;
     log::record_t open_record(log::attribute_pair_t local_attribute) const;

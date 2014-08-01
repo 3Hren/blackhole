@@ -32,15 +32,29 @@ TEST(logger_base_t, MoveExplicitAssignment) {
     other = std::move(logger);
 }
 
+TEST(logger_base_t, Swap) {
+    logger_base_t l, r;
+    l.enabled(false);
+    l.tracked(true);
+
+    EXPECT_FALSE(l.enabled());
+    EXPECT_TRUE(r.enabled());
+
+    std::swap(l, r);
+
+    EXPECT_TRUE(l.enabled());
+    EXPECT_FALSE(r.enabled());
+}
+
 TEST(logger_base_t, CanBeEnabled) {
     logger_base_t log;
-    log.enable();
+    log.enabled(true);
     EXPECT_TRUE(log.enabled());
 }
 
 TEST(logger_base_t, CanBeDisabled) {
     logger_base_t log;
-    log.disable();
+    log.enabled(false);
     EXPECT_FALSE(log.enabled());
 }
 
@@ -62,7 +76,7 @@ TEST(logger_base_t, DoNotOpenRecordIfDisabled) {
 
     logger_base_t log;
     log.add_frontend(std::move(frontend));
-    log.disable();
+    log.enabled(false);
     EXPECT_FALSE(log.open_record().valid());
 }
 
