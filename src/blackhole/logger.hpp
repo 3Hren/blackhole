@@ -109,6 +109,10 @@ private:
     log::attributes_t get_thread_attributes() const;
 };
 
+//!@todo: Develop ImmutableLogger class, which provides almost immutable
+//!       internal state (filter, exception handler, frontends).
+//!       This class won't require any synchronization mechanizm.
+
 // NOTE: It's not movable to avoid moving to another thread.
 class scoped_attributes_concept_t {
     BLACKHOLE_DECLARE_NONCOPYABLE(scoped_attributes_concept_t);
