@@ -6,6 +6,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "blackhole/utils/actions/empty.hpp"
+
 namespace blackhole {
 
 namespace aux {
