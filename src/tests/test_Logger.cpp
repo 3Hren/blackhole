@@ -37,13 +37,13 @@ TEST(logger_base_t, Swap) {
     l.enabled(false);
     l.tracked(true);
 
-    EXPECT_FALSE(l.enabled());
-    EXPECT_TRUE(r.enabled());
-
     std::swap(l, r);
 
-    EXPECT_TRUE(l.enabled());
+    EXPECT_TRUE (l.enabled());
+    EXPECT_FALSE(l.tracked());
+
     EXPECT_FALSE(r.enabled());
+    EXPECT_TRUE (r.tracked());
 }
 
 TEST(logger_base_t, CanBeEnabled) {

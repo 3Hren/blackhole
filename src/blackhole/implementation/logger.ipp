@@ -210,7 +210,6 @@ BLACKHOLE_DECL
 void
 swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT {
     rhs.state.enabled = lhs.state.enabled.exchange(rhs.state.enabled);
-    //!@todo: Test - is swapped.
     rhs.state.tracked = lhs.state.tracked.exchange(rhs.state.tracked);
 
     using std::swap;
