@@ -17,9 +17,10 @@
 namespace blackhole {
 
 class repository_t {
-    mutable std::mutex mutex;
     external_factory_t factory;
     std::unordered_map<std::string, log_config_t> configs;
+
+    mutable std::mutex mutex;
 
 public:
     static repository_t& instance() {
