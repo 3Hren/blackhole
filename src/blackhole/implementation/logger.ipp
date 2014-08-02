@@ -209,6 +209,7 @@ scoped_attributes_concept_t::parent() const {
 BLACKHOLE_DECL
 void
 swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT {
+    //!@todo: This is wrong!
     rhs.state.enabled = lhs.state.enabled.exchange(rhs.state.enabled);
     rhs.state.tracked = lhs.state.tracked.exchange(rhs.state.tracked);
 
