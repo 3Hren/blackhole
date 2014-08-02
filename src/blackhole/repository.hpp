@@ -57,6 +57,8 @@ public:
         }
     }
 
+    //!@todo: Cause the repository is no longer templatized by level parameter,
+    //!       it can be useful to specify logger return type explicitly.
     template<typename Level>
     verbose_logger_t<Level> create(const std::string& name) const {
         std::lock_guard<std::mutex> lock(mutex);
