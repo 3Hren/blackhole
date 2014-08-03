@@ -1,6 +1,6 @@
 Source: blackhole
 Priority: extra
-Maintainer: Evgenyi Safronov <division494@gmail.com>
+Maintainer: Evgeny Safronov <division494@gmail.com>
 Build-Depends: debhelper (>= 7), cmake, cdbs
 Standards-Version: 3.9.1
 Section: libs
