@@ -156,6 +156,7 @@ public:
 
     verbose_logger_t& operator=(verbose_logger_t&& other) BLACKHOLE_NOEXCEPT {
         logger_base_t::operator=(std::move(other));
+        level = other.level;
         return *this;
     }
 
