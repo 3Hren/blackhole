@@ -4,7 +4,7 @@ blackhole (0.2.0-0rc3) unstable; urgency=low
   * Other: moving `BLACKHOLE_HEADER_ONLY` declaration to the config file.
   * Other: disable tests and examples by default.
 
- -- Evgeny Safronov <division494@gmail.com>  Sun, 03 Aug 2014 18:07:01 GMT
+ -- Evgeny Safronov <division494@gmail.com>  Sun, 03 Aug 2014 18:07:01 +0400
 
 blackhole (0.2.0-0rc2) unstable; urgency=low
 
