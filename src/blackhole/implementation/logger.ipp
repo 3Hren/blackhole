@@ -21,7 +21,7 @@ inline void no_deleter(scoped_attributes_concept_t*) { }
 
 } //namespace detail
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 logger_base_t::state_t::state_t() :
     enabled(true),
     tracked(false),
@@ -30,88 +30,88 @@ logger_base_t::state_t::state_t() :
     exception(log::default_exception_handler_t())
 {}
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 logger_base_t::logger_base_t()
 {}
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 logger_base_t::logger_base_t(logger_base_t&& other) BLACKHOLE_NOEXCEPT
 {
     *this = std::move(other);
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 logger_base_t&
 logger_base_t::operator=(logger_base_t&& other) BLACKHOLE_NOEXCEPT {
     swap(*this, other);
     return *this;
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 bool
 logger_base_t::enabled() const {
     return state.enabled;
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 void
 logger_base_t::enabled(bool enable) {
     state.enabled = enable;
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 bool
 logger_base_t::tracked() const {
     return state.tracked;
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 void
 logger_base_t::tracked(bool enable) {
     state.tracked = enable;
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 void
 logger_base_t::set_filter(filter_t&& filter) {
     writer_lock_type lock(state.lock.open);
     state.filter = std::move(filter);
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 void
 logger_base_t::add_attribute(const log::attribute_pair_t& attribute) {
     writer_lock_type lock(state.lock.open);
     state.attributes.global.insert(attribute);
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 void
 logger_base_t::add_frontend(std::unique_ptr<base_frontend_t> frontend) {
     writer_lock_type lock(state.lock.push);
     state.frontends.push_back(std::move(frontend));
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 void
 logger_base_t::set_exception_handler(log::exception_handler_t&& handler) {
     writer_lock_type lock(state.lock.push);
     state.exception = std::move(handler);
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 log::record_t
 logger_base_t::open_record() const {
     return open_record(log::attributes_t());
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 log::record_t
 logger_base_t::open_record(log::attribute_pair_t local_attribute) const {
     return open_record(log::attributes_t({ std::move(local_attribute) }));
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 log::record_t
 logger_base_t::open_record(log::attributes_t local_attributes) const {
     if (enabled() && !state.frontends.empty()) {
@@ -144,7 +144,7 @@ logger_base_t::open_record(log::attributes_t local_attributes) const {
     return log::record_t();
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 void
 logger_base_t::push(log::record_t&& record) const {
     writer_lock_type lock(state.lock.push);
@@ -158,7 +158,7 @@ logger_base_t::push(log::record_t&& record) const {
     }
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 log::attributes_t
 logger_base_t::get_event_attributes() const {
     timeval tv;
@@ -169,7 +169,7 @@ logger_base_t::get_event_attributes() const {
     return attributes;
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 log::attributes_t
 logger_base_t::get_thread_attributes() const {
     log::attributes_t attributes = {
@@ -182,7 +182,7 @@ logger_base_t::get_thread_attributes() const {
     return attributes;
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 scoped_attributes_concept_t::scoped_attributes_concept_t(logger_base_t& log) :
     m_logger(&log),
     m_previous(log.state.attributes.scoped.get())
@@ -190,26 +190,26 @@ scoped_attributes_concept_t::scoped_attributes_concept_t(logger_base_t& log) :
     log.state.attributes.scoped.reset(this);
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 scoped_attributes_concept_t::~scoped_attributes_concept_t() {
     BOOST_ASSERT(m_logger);
     BOOST_ASSERT(m_logger->state.attributes.scoped.get() == this);
     m_logger->state.attributes.scoped.reset(m_previous);
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 bool
 scoped_attributes_concept_t::has_parent() const {
     return m_previous;
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 const scoped_attributes_concept_t&
 scoped_attributes_concept_t::parent() const {
     return *m_previous;
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 void
 swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT {
     rhs.state.enabled = lhs.state.enabled.exchange(rhs.state.enabled);

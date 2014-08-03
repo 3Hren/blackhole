@@ -238,55 +238,55 @@ safe_cast(Actual actual) {
 
 } // namespace dynamic
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 dynamic_t::dynamic_t() :
     value(null_t())
 {}
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 dynamic_t::dynamic_t(const dynamic_t& other) :
     value(other.value)
 {}
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 dynamic_t::dynamic_t(dynamic_t&& other) BLACKHOLE_NOEXCEPT :
     value(std::move(other.value))
 {
     other.value = null_t();
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 dynamic_t::dynamic_t(bool value) :
     value(value)
 {}
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 dynamic_t::dynamic_t(double value) :
     value(value)
 {}
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 dynamic_t::dynamic_t(const char *value) :
     value(std::string(value))
 {}
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 dynamic_t::dynamic_t(std::string value) :
     value(std::move(value))
 {}
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 dynamic_t::dynamic_t(dynamic_t::array_t value) :
     value(std::move(value))
 {}
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 dynamic_t::dynamic_t(dynamic_t::object_t value) :
     value(std::move(value))
 {}
 
 template<typename T>
-BLACKHOLE_DECL
+BLACKHOLE_API
 dynamic_t::dynamic_t(T&& from,
                      typename std::enable_if<
                         type_traits::is_integer<typename std::decay<T>::type
@@ -298,36 +298,36 @@ dynamic_t::dynamic_t(T&& from,
     )
 {}
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 dynamic_t& dynamic_t::operator=(const dynamic_t& other) {
     this->value = other.value;
     return *this;
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 dynamic_t& dynamic_t::operator=(dynamic_t&& other) BLACKHOLE_NOEXCEPT {
     this->value = std::move(other.value);
     other.value = null_t();
     return *this;
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 bool dynamic_t::operator==(const dynamic_t& other) const {
     return value == other.value;
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 bool dynamic_t::invalid() const {
     return is<null_t>();
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 bool dynamic_t::contains(const std::string& key) const {
     auto object = to<object_t>();
     return object.find(key) != object.end();
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 dynamic_t& dynamic_t::operator[](array_t::size_type key) {
     if (auto container = boost::get<array_t>(&value)) {
        if (key >= container->size()) {
@@ -344,7 +344,7 @@ dynamic_t& dynamic_t::operator[](array_t::size_type key) {
     throw dynamic::bad_cast(value);
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 const dynamic_t& dynamic_t::operator[](array_t::size_type key) const {
     if (auto container = boost::get<array_t>(&value)) {
        return container->at(key);
@@ -353,7 +353,7 @@ const dynamic_t& dynamic_t::operator[](array_t::size_type key) const {
     throw dynamic::bad_cast(value);
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 dynamic_t& dynamic_t::operator[](const std::string& key) {
     if (auto map = boost::get<object_t>(&value)) {
         return (*map)[key];
@@ -367,7 +367,7 @@ dynamic_t& dynamic_t::operator[](const std::string& key) {
     throw dynamic::bad_cast(value);
 }
 
-BLACKHOLE_DECL
+BLACKHOLE_API
 const dynamic_t& dynamic_t::operator[](const std::string &key) const {
     if (auto map = boost::get<object_t>(&value)) {
         return map->at(key);
@@ -377,7 +377,7 @@ const dynamic_t& dynamic_t::operator[](const std::string &key) const {
 }
 
 template<typename T>
-BLACKHOLE_DECL
+BLACKHOLE_API
 typename std::enable_if<
     dynamic_t::is_convertible<T>::value,
     bool
@@ -387,7 +387,7 @@ dynamic_t::is() const {
 }
 
 template<typename T>
-BLACKHOLE_DECL
+BLACKHOLE_API
 typename std::enable_if<
     dynamic_t::is_convertible<T>::value && !type_traits::is_integer<T>::value,
     T
@@ -401,7 +401,7 @@ dynamic_t::to() const {
 }
 
 template<typename T>
-BLACKHOLE_DECL
+BLACKHOLE_API
 typename std::enable_if<
     dynamic_t::is_convertible<T>::value && type_traits::is_integer<T>::value,
     T

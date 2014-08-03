@@ -7,12 +7,12 @@
 #cmakedefine BLACKHOLE_DEBUG
 
 #if defined(BLACKHOLE_HEADER_ONLY)
-    #define BLACKHOLE_DECL inline
+    #define BLACKHOLE_API inline
 #endif
 
-// If BLACKHOLE_DECL isn't defined yet define it now.
-#if !defined(BLACKHOLE_DECL)
-    #define BLACKHOLE_DECL
+// If BLACKHOLE_API isn't defined yet define it now.
+#if !defined(BLACKHOLE_API)
+    #define BLACKHOLE_API
 #endif
 
 #endif // CONFIG_H
