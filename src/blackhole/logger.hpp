@@ -61,8 +61,8 @@ protected:
             {}
         } attributes;
 
-        log::exception_handler_t exception;
         std::vector<std::unique_ptr<base_frontend_t>> frontends;
+        log::exception_handler_t exception;
 
         struct {
             mutable rw_mutex_type open;

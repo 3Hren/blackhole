@@ -217,9 +217,10 @@ swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT {
 
     using std::swap;
     swap(lhs.state.filter, rhs.state.filter);
-    swap(lhs.state.exception, rhs.state.exception);
-    swap(lhs.state.frontends, rhs.state.frontends);
     swap(lhs.state.attributes.global, rhs.state.attributes.global);
+
+    swap(lhs.state.frontends, rhs.state.frontends);
+    swap(lhs.state.exception, rhs.state.exception);
 
     auto lhs_operation_attributes = lhs.state.attributes.scoped.get();
     lhs.state.attributes.scoped.reset(rhs.state.attributes.scoped.get());
