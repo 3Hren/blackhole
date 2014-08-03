@@ -44,11 +44,15 @@ struct logger_verbosity_traits {
 
 class logger_base_t {
 protected:
+    typedef boost::shared_mutex rw_mutex_type;
+    typedef boost::shared_lock<rw_mutex_type> reader_lock_type;
+    typedef boost::unique_lock<rw_mutex_type> writer_lock_type;
+
     struct state_t {
         std::atomic<bool> enabled;
         std::atomic<bool> tracked;
 
-        filter_t filter; // used in open_record.
+        filter_t filter;
         struct attrbutes_t {
             log::attributes_t global;
             boost::thread_specific_ptr<scoped_attributes_concept_t> scoped;
@@ -56,23 +60,19 @@ protected:
             attrbutes_t(void(*deleter)(scoped_attributes_concept_t*)) :
                 scoped(deleter)
             {}
-        } attributes; // used in open_record.
+        } attributes;
 
-        log::exception_handler_t exception; // used in push.
-        std::vector<std::unique_ptr<base_frontend_t>> frontends; // used in push.
+        log::exception_handler_t exception;
+        std::vector<std::unique_ptr<base_frontend_t>> frontends;
+
+        struct {
+            mutable rw_mutex_type open;
+            mutable rw_mutex_type push;
+        } lock;
 
         state_t();
     };
     state_t state;
-
-    filter_t m_filter;
-    log::exception_handler_t m_exception_handler;
-
-    std::vector<std::unique_ptr<base_frontend_t>> m_frontends;
-
-    log::attributes_t m_global_attributes;
-
-    boost::thread_specific_ptr<scoped_attributes_concept_t> m_scoped_attributes;
 
     friend class scoped_attributes_concept_t;
 
@@ -198,11 +198,16 @@ public:
             auto it = local.find(keyword::tracebit().name());
             if (it != local.end()) {
                 trace = boost::get<keyword::tag::tracebit_t::type>(it->second.value);
-            } else if (m_scoped_attributes.get()) {
-                const auto& scoped = m_scoped_attributes->attributes();
-                auto scoped_it = scoped.find(keyword::tracebit().name());
-                if (scoped_it != scoped.end()) {
-                    trace = boost::get<keyword::tag::tracebit_t::type>(scoped_it->second.value);
+            } else {
+                reader_lock_type lock(state.lock.open);
+                if (state.attributes.scoped.get()) {
+                    const auto& scoped = state.attributes.scoped->attributes();
+                    auto scoped_it = scoped.find(keyword::tracebit().name());
+                    if (scoped_it != scoped.end()) {
+                        trace = boost::get<keyword::tag::tracebit_t::type>(
+                            scoped_it->second.value
+                        );
+                    }
                 }
             }
         }

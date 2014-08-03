@@ -31,15 +31,11 @@ logger_base_t::state_t::state_t() :
 {}
 
 BLACKHOLE_DECL
-logger_base_t::logger_base_t() :
-    m_filter(default_filter_t::instance()),
-    m_exception_handler(log::default_exception_handler_t()),
-    m_scoped_attributes(&aux::guard::no_deleter)
+logger_base_t::logger_base_t()
 {}
 
 BLACKHOLE_DECL
-logger_base_t::logger_base_t(logger_base_t&& other) BLACKHOLE_NOEXCEPT :
-    m_scoped_attributes(&aux::guard::no_deleter)
+logger_base_t::logger_base_t(logger_base_t&& other) BLACKHOLE_NOEXCEPT
 {
     *this = std::move(other);
 }
@@ -72,31 +68,35 @@ logger_base_t::tracked() const {
 BLACKHOLE_DECL
 void
 logger_base_t::tracked(bool enable) {
-    this->state.tracked = enable;
+    state.tracked = enable;
 }
 
 BLACKHOLE_DECL
 void
 logger_base_t::set_filter(filter_t&& filter) {
-    m_filter = std::move(filter);
+    writer_lock_type lock(state.lock.open);
+    state.filter = std::move(filter);
 }
 
 BLACKHOLE_DECL
 void
 logger_base_t::add_attribute(const log::attribute_pair_t& attribute) {
-    m_global_attributes.insert(attribute);
+    writer_lock_type lock(state.lock.open);
+    state.attributes.global.insert(attribute);
 }
 
 BLACKHOLE_DECL
 void
 logger_base_t::add_frontend(std::unique_ptr<base_frontend_t> frontend) {
-    m_frontends.push_back(std::move(frontend));
+    writer_lock_type lock(state.lock.push);
+    state.frontends.push_back(std::move(frontend));
 }
 
 BLACKHOLE_DECL
 void
 logger_base_t::set_exception_handler(log::exception_handler_t&& handler) {
-    m_exception_handler = std::move(handler);
+    writer_lock_type lock(state.lock.push);
+    state.exception = std::move(handler);
 }
 
 BLACKHOLE_DECL
@@ -114,25 +114,27 @@ logger_base_t::open_record(log::attribute_pair_t local_attribute) const {
 BLACKHOLE_DECL
 log::record_t
 logger_base_t::open_record(log::attributes_t local_attributes) const {
-    if (enabled() && !m_frontends.empty()) {
-        log::attributes_t trace_attributes;
-        if (state.tracked) {
-            trace_attributes.insert(
-                attribute::make("trace", ::this_thread::current_span().trace)
-            );
-        }
+    if (enabled() && !state.frontends.empty()) {
+        reader_lock_type lock(state.lock.open);
 
         log::attributes_t attributes = merge({
             universe_storage_t::instance().dump(),  // Program global.
             get_thread_attributes(),                // Thread local.
-            m_global_attributes,                    // Logger object specific.
+            state.attributes.global,                // Logger object specific.
             get_event_attributes(),                 // Event specific, e.g. timestamp.
             std::move(local_attributes),            // Any user attributes.
-            m_scoped_attributes.get() ? m_scoped_attributes->attributes() : log::attributes_t(),
-            trace_attributes
+            state.attributes.scoped.get() ?
+                state.attributes.scoped->attributes() :
+                log::attributes_t()
         });
 
-        if (m_filter(attributes)) {
+        if (state.tracked) {
+            attributes.insert(
+                attribute::make("trace", ::this_thread::current_span().trace)
+            );
+        }
+
+        if (state.filter(attributes)) {
             log::record_t record;
             record.attributes = std::move(attributes);
             return record;
@@ -145,12 +147,13 @@ logger_base_t::open_record(log::attributes_t local_attributes) const {
 BLACKHOLE_DECL
 void
 logger_base_t::push(log::record_t&& record) const {
-    for (auto it = m_frontends.begin(); it != m_frontends.end(); ++it) {
+    writer_lock_type lock(state.lock.push);
+    for (auto it = state.frontends.begin(); it != state.frontends.end(); ++it) {
         try {
             const std::unique_ptr<base_frontend_t>& frontend = *it;
             frontend->handle(record);
         } catch (...) {
-            m_exception_handler();
+            state.exception();
         }
     }
 }
@@ -182,16 +185,16 @@ logger_base_t::get_thread_attributes() const {
 BLACKHOLE_DECL
 scoped_attributes_concept_t::scoped_attributes_concept_t(logger_base_t& log) :
     m_logger(&log),
-    m_previous(log.m_scoped_attributes.get())
+    m_previous(log.state.attributes.scoped.get())
 {
-    log.m_scoped_attributes.reset(this);
+    log.state.attributes.scoped.reset(this);
 }
 
 BLACKHOLE_DECL
 scoped_attributes_concept_t::~scoped_attributes_concept_t() {
     BOOST_ASSERT(m_logger);
-    BOOST_ASSERT(m_logger->m_scoped_attributes.get() == this);
-    m_logger->m_scoped_attributes.reset(m_previous);
+    BOOST_ASSERT(m_logger->state.attributes.scoped.get() == this);
+    m_logger->state.attributes.scoped.reset(m_previous);
 }
 
 BLACKHOLE_DECL
@@ -209,26 +212,25 @@ scoped_attributes_concept_t::parent() const {
 BLACKHOLE_DECL
 void
 swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT {
-    //!@todo: This is wrong!
     rhs.state.enabled = lhs.state.enabled.exchange(rhs.state.enabled);
     rhs.state.tracked = lhs.state.tracked.exchange(rhs.state.tracked);
 
     using std::swap;
-    swap(lhs.m_filter, rhs.m_filter);
-    swap(lhs.m_exception_handler, rhs.m_exception_handler);
-    swap(lhs.m_frontends, rhs.m_frontends);
-    swap(lhs.m_global_attributes, rhs.m_global_attributes);
+    swap(lhs.state.filter, rhs.state.filter);
+    swap(lhs.state.exception, rhs.state.exception);
+    swap(lhs.state.frontends, rhs.state.frontends);
+    swap(lhs.state.attributes.global, rhs.state.attributes.global);
 
-    auto lhs_operation_attributes = lhs.m_scoped_attributes.get();
-    lhs.m_scoped_attributes.reset(rhs.m_scoped_attributes.get());
-    rhs.m_scoped_attributes.reset(lhs_operation_attributes);
+    auto lhs_operation_attributes = lhs.state.attributes.scoped.get();
+    lhs.state.attributes.scoped.reset(rhs.state.attributes.scoped.get());
+    rhs.state.attributes.scoped.reset(lhs_operation_attributes);
 
-    if (lhs.m_scoped_attributes.get()) {
-        lhs.m_scoped_attributes->m_logger = &lhs;
+    if (lhs.state.attributes.scoped.get()) {
+        lhs.state.attributes.scoped->m_logger = &lhs;
     }
 
-    if (rhs.m_scoped_attributes.get()) {
-        rhs.m_scoped_attributes->m_logger = &rhs;
+    if (rhs.state.attributes.scoped.get()) {
+        rhs.state.attributes.scoped->m_logger = &rhs;
     }
 }
 
