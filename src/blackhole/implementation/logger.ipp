@@ -24,7 +24,7 @@ inline void no_deleter(scoped_attributes_concept_t*) { }
 BLACKHOLE_DECL
 logger_base_t::state_t::state_t() :
     enabled(true),
-    tracked(false), //!@todo: Test - is false dy default.
+    tracked(false),
     filter(default_filter_t::instance()),
     attributes(&aux::guard::no_deleter),
     exception(log::default_exception_handler_t())

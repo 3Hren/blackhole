@@ -63,6 +63,11 @@ TEST(logger_base_t, EnabledByDefault) {
     EXPECT_TRUE(log.enabled());
 }
 
+TEST(logger_base_t, TrackingIsDisabledByDefault) {
+    logger_base_t log;
+    EXPECT_FALSE(log.tracked());
+}
+
 TEST(logger_base_t, OpenRecordByDefault) {
     std::unique_ptr<mock::frontend_t> frontend;
 
