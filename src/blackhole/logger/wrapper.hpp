@@ -16,18 +16,24 @@ private:
     logger_type* log_;
     log::attributes_t attributes;
 
+    mutable std::mutex mutex;
+
 public:
     wrapper_t(logger_type& log, log::attributes_t attributes);
     wrapper_t(wrapper_t& wrapper, log::attributes_t attributes);
 
     //!@todo: Test.
     wrapper_t(wrapper_t&& other) {
+        std::lock_guard<std::mutex> lock(mutex);
         *this = std::move(other);
     }
 
     //!@todo: Test.
     wrapper_t& operator=(wrapper_t&& other) {
         if (this != &other) {
+            boost::lock(mutex, other.mutex);
+            boost::lock_guard<std::mutex> lock(mutex, boost::adopt_lock);
+            boost::lock_guard<std::mutex> other_lock(other.mutex, boost::adopt_lock);
             log_ = other.log_;
             other.log_ = nullptr;
             attributes = std::move(other.attributes);
