@@ -21,7 +21,6 @@
 #include "utils/noncopyable.hpp"
 #include "utils/unique.hpp"
 
-#include "blackhole/detail/utils/synchronized.hpp"
 #include "blackhole/utils/atomic.hpp"
 
 namespace blackhole {
