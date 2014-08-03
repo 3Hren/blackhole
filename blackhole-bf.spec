@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
 Version:	0.2.0
-Release:	0r2%{?dist}
+Release:	0r3%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
@@ -67,15 +67,48 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Sun Aug 03 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-0rc3
+- Feature: logger object's internal state is now thread-safe.
+- Other: moving `BLACKHOLE_HEADER_ONLY` declaration to the config file.
+- Other: disable tests and examples by default.
+
 * Fri Aug 01 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-0rc2
-- Logger frontends are now thread-aware.
-- Will be filled later.
+- Feature: logger frontends are now thread-aware.
+- Feature: streaming sink now allows to use custom `std::ostream`.
+- Bug fix: tcp write handler will now block until the message is completely sent.
+- Other: disable trace collecting by default.
+- Other: use lightweight process id (LWP) on Linux instead of thread id.
+- Other: logger can now provide its tracking state outside.
+- Testing: open access to `backend` variables for mocking purpose.
 
 * Tue Jul 29 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-0rc1
 - Much-much more changes are pending. This field will be filled later.
+- Feature: Elasticsearch sink - allows to send logging events directly to that storage.
+- Feature: scoped attributes holder - automatically adds specified attributes to the logger while in its scope.
+- Feature: logger adaptor - keeps some attributes until lives.
+- Feature: tracing framework - closely integrates with the logging system.
+- Feature: configuration parser can properly handle arrays.
+- Bug fix: long and unsigned long values can now be used as attributes.
+- Bug fix: fixed misleading error message when failed to instantiate formatter.
+- Bug fix: fixed undefined behaviour in syslog sink.
+- Bug fix: some conditional memory jumps fixed.
+- Other: changed license to MIT.
+- Other: relax local attributes transition to the record.
+- Other: opening verbose logger's level type.
+- Other: added macro variable to determine if the platform has c++11 random library.
+- Other: start using implementation files (ipp), which allows to build library in the future.
+- Other: verbose logger now can keep bound verbosity level and filter by it.
+- Other: no longer use `boost::filesystem` deprecated API.
+- Other: let the compiler deduce `swap` function it needs to use.
+- Other: migrated from `boost::any` to `boost::variant` configuration.
+- Other: more forwards added.
+- Example: added example using Elasticsearch sink.
+- Testing: testing frameworks are now included as submodules.
+- Testing: continious integration is used more widely, tests and examples should now be built separately.
+- Testing: benchmark added to measure full logger event lifecycle.
 
 * Fri Apr 25 2014 Evgeny Safronov <division494@gmail.com> - 0.1.0-3
-- Bug Fix: added forgotten include.
+- Bug fix: added forgotten include.
 
 * Mon Mar 31 2014 Evgeny Safronov <division494@gmail.com> - 0.1.0-1
 - Initial release.
