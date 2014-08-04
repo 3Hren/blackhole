@@ -1,3 +1,9 @@
+blackhole (0.2.0-0rc4) unstable; urgency=low
+
+  * Feature: added default severity and its mapping function.
+
+ -- Evgeny Safronov <division494@gmail.com>  Mon, 04 Aug 2014 12:11:32 +0400
+
 blackhole (0.2.0-0rc3) unstable; urgency=low
 
   * Feature: logger object's internal state is now thread-safe.
