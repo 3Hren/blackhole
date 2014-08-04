@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
 Version:	0.2.0
-Release:	0r4%{?dist}
+Release:	0r5%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
@@ -67,6 +67,9 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Mon Aug 04 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-0rc5
+- Bug fix: fixed deadlock while invoking move assigning in logger wrapper.
+
 * Mon Aug 04 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-0rc4
 - Feature: added default severity and its mapping function.
 

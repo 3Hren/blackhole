@@ -24,7 +24,6 @@ public:
 
     //!@todo: Test.
     wrapper_t(wrapper_t&& other) {
-        std::lock_guard<std::mutex> lock(mutex);
         *this = std::move(other);
     }
 

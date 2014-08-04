@@ -1,3 +1,9 @@
+blackhole (0.2.0-0rc5) unstable; urgency=low
+
+  * Bug fix: fixed deadlock while invoking move assigning in logger wrapper.
+
+ -- Evgeny Safronov <division494@gmail.com>  Mon, 04 Aug 2014 12:19:00 +0400
+
 blackhole (0.2.0-0rc4) unstable; urgency=low
 
   * Feature: added default severity and its mapping function.
