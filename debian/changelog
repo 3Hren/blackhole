@@ -1,3 +1,9 @@
+blackhole (0.2.0-0rc6) unstable; urgency=low
+
+  * Bug fix: fixed linker error.
+
+ -- Evgeny Safronov <division494@gmail.com>  Mon, 04 Aug 2014 17:51:00 +0400
+
 blackhole (0.2.0-0rc5) unstable; urgency=low
 
   * Bug fix: fixed deadlock while invoking move assigning in logger wrapper.

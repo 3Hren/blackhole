@@ -67,6 +67,9 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Mon Aug 04 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-0rc6
+- Bug fix: fixed linker error.
+
 * Mon Aug 04 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-0rc5
 - Bug fix: fixed deadlock while invoking move assigning in logger wrapper.
 
