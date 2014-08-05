@@ -39,11 +39,32 @@ public:
 } // namespace
 
 TEST(Wrapper, Class) {
-    verbose_logger_t<testing::level> log;
-    wrapper_t<verbose_logger_t<testing::level>> wrapper(log, log::attributes_t({
+    typedef verbose_logger_t<testing::level> logger_type;
+    logger_type log;
+    wrapper_t<logger_type> wrapper(log, log::attributes_t({
         attribute::make("answer", 42)
     }));
     UNUSED(wrapper);
+}
+
+TEST(Wrapper, MoveConstructor) {
+    /*!
+     * This test checks wrapper move constructor.
+     * After moving, first wrapper becomes invalid. Any action done with it
+     * results in assertion.
+     * Attached attributes should migrate to the new parent.
+     */
+    typedef verbose_logger_t<testing::level> logger_type;
+    logger_type log = logger_factory_t::create<logger_type>();
+    wrapper_t<logger_type> wrapper(log, log::attributes_t({
+        attribute::make("answer", 42)
+    }));
+
+    wrapper_t<logger_type> other(std::move(wrapper));
+
+    auto record = other.open_record();
+    ASSERT_EQ(1, record.attributes.count("answer"));
+    EXPECT_EQ(log::attribute_value_t(42), record.attributes["answer"].value);
 }
 
 TEST(Wrapper, Usage) {

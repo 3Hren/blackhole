@@ -31,7 +31,6 @@ public:
         attributes(merge({ wrapper.attributes, std::move(attributes) }))
     {}
 
-    //!@todo: Test.
     wrapper_t(wrapper_t&& other) {
         *this = std::move(other);
     }
