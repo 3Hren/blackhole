@@ -1,4 +1,33 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+SET(PROJECT blackhole-benchmark)
 
-ADD_SUBDIRECTORY(performance)
-ADD_SUBDIRECTORY(vsboost)
+ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/foreign/ticktack ${CMAKE_BINARY_DIR}/ticktack)
+
+SET(CMAKE_BUILD_TYPE "Release")
+
+SET(HEADERS
+)
+
+SET(SOURCES
+    String
+)
+
+PROJECT(${PROJECT})
+
+INCLUDE_DIRECTORIES(
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/foreign/ticktack/include
+)
+
+LINK_DIRECTORIES(
+    ${CMAKE_BINARY_DIR}/ticktack
+)
+
+ADD_EXECUTABLE(${PROJECT} ${HEADERS} ${SOURCES})
+
+TARGET_LINK_LIBRARIES(${PROJECT}
+    ticktack
+    ticktack-main
+)
+
+ADD_DEFINITIONS(-std=c++0x)
