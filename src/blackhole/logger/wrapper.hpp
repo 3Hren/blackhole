@@ -3,6 +3,7 @@
 #include "blackhole/config.hpp"
 #include "blackhole/record.hpp"
 #include "blackhole/utils/noncopyable.hpp"
+#include "blackhole/config.hpp"
 
 namespace blackhole {
 
