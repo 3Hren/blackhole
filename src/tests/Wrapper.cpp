@@ -228,3 +228,33 @@ TEST(Wrapper, NestedWrappers) {
         EXPECT_EQ(0, record.attributes.count("result"));
     }
 }
+
+TEST(Wrapper, UnderlyingLogger) {
+    typedef verbose_logger_t<testing::level> logger_type;
+    typedef wrapper_t<logger_type> wrapper_type;
+    static_assert(
+        std::is_same<logger_type, wrapper_type::logger_type>::value,
+        "error in extracting underlying logger type"
+    );
+}
+
+TEST(Wrapper, UnderlyingNestedLogger) {
+    typedef verbose_logger_t<testing::level> logger_type;
+    typedef wrapper_t<logger_type> wrapper_type;
+    typedef wrapper_t<wrapper_type> nested_wrapper_type;
+    static_assert(
+        std::is_same<logger_type, nested_wrapper_type::logger_type>::value,
+        "error in extracting underlying logger type"
+    );
+}
+
+TEST(Wrapper, UnderlyingTwoLevelNestedLogger) {
+    typedef verbose_logger_t<testing::level> logger_type;
+    typedef wrapper_t<logger_type> wrapper_type;
+    typedef wrapper_t<wrapper_type> nested_wrapper_type;
+    typedef wrapper_t<nested_wrapper_type> deep_wrapper_type;
+    static_assert(
+        std::is_same<logger_type, deep_wrapper_type::logger_type>::value,
+        "error in extracting underlying logger type"
+    );
+}

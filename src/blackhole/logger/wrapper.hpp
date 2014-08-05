@@ -1,27 +1,46 @@
 #pragma once
 
 #include "blackhole/config.hpp"
+#include "blackhole/forwards.hpp"
 #include "blackhole/record.hpp"
 #include "blackhole/utils/noncopyable.hpp"
 #include "blackhole/config.hpp"
 
 namespace blackhole {
 
-template<class Logger>
+template<class Wrapper>
+struct unwrap {
+    typedef typename unwrap<
+        typename Wrapper::underlying_type
+    >::logger_type logger_type;
+};
+
+template<>
+struct unwrap<logger_base_t> {
+    typedef logger_base_t logger_type;
+};
+
+template<typename Level>
+struct unwrap<verbose_logger_t<Level>> {
+    typedef verbose_logger_t<Level> logger_type;
+};
+
+template<class Wrapped>
 class wrapper_t {
-    BLACKHOLE_DECLARE_NONCOPYABLE(wrapper_t<Logger>);
+    BLACKHOLE_DECLARE_NONCOPYABLE(wrapper_t);
 
 public:
-    typedef Logger logger_type;
+    typedef Wrapped underlying_type;
+    typedef typename unwrap<underlying_type>::logger_type logger_type;
 
 private:
-    logger_type* log_;
+    underlying_type* log_;
     log::attributes_t attributes;
 
     mutable std::mutex mutex;
 
 public:
-    wrapper_t(logger_type& log, log::attributes_t attributes) :
+    wrapper_t(underlying_type& log, log::attributes_t attributes) :
         log_(&log),
         attributes(std::move(attributes))
     {}
@@ -48,7 +67,7 @@ public:
         return *this;
     }
 
-    logger_type& log() {
+    underlying_type& log() {
         return *log_;
     }
 
