@@ -1,5 +1,6 @@
 #pragma once
 
+#include "blackhole/config.hpp"
 #include "blackhole/record.hpp"
 #include "blackhole/utils/noncopyable.hpp"
 

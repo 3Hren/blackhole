@@ -17,11 +17,12 @@
 #include "keyword/timestamp.hpp"
 #include "keyword/tracebit.hpp"
 #include "universe.hpp"
-#include "blackhole/utils/noexcept.hpp"
 #include "utils/noncopyable.hpp"
 #include "utils/unique.hpp"
 
+#include "blackhole/config.hpp"
 #include "blackhole/utils/atomic.hpp"
+#include "blackhole/utils/noexcept.hpp"
 
 namespace blackhole {
 
