@@ -13,7 +13,7 @@ wrapper_t<Logger>::wrapper_t(logger_type& log, log::attributes_t attributes) :
 {}
 
 template<class Logger>
-wrapper_t<Logger>::wrapper_t(wrapper_t& wrapper, log::attributes_t attributes) :
+wrapper_t<Logger>::wrapper_t(const wrapper_t& wrapper, log::attributes_t attributes) :
     log_(wrapper.log_),
     attributes(merge({ wrapper.attributes, std::move(attributes) }))
 {}

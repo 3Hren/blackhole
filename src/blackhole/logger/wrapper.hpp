@@ -21,7 +21,7 @@ private:
 
 public:
     wrapper_t(logger_type& log, log::attributes_t attributes);
-    wrapper_t(wrapper_t& wrapper, log::attributes_t attributes);
+    wrapper_t(const wrapper_t& wrapper, log::attributes_t attributes);
 
     //!@todo: Test.
     wrapper_t(wrapper_t&& other) {
