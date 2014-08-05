@@ -92,8 +92,8 @@ TEST(logger_base_t, OpensRecordWhenAttributeFilterSucceed) {
 
     logger_base_t log;
     log.add_frontend(std::move(frontend));
-    log.set_filter(expr::has_attr(keyword::urgent()));
-    log.add_attribute(keyword::urgent() = 1);
+    log.set_filter(expr::has_attr(::keyword::urgent()));
+    log.add_attribute(::keyword::urgent() = 1);
     EXPECT_TRUE(log.open_record().valid());
 }
 
@@ -102,7 +102,7 @@ TEST(logger_base_t, DoNotOpenRecordWhenAttributeFilterFailed) {
 
     logger_base_t log;
     log.add_frontend(std::move(frontend));
-    log.set_filter(expr::has_attr(keyword::urgent()));
+    log.set_filter(expr::has_attr(::keyword::urgent()));
     EXPECT_FALSE(log.open_record().valid());
 }
 
@@ -111,8 +111,8 @@ TEST(logger_base_t, OpenRecordWhenComplexFilterSucceed) {
 
     logger_base_t log;
     log.add_frontend(std::move(frontend));
-    log.set_filter(expr::has_attr(keyword::urgent()) && keyword::urgent() == 1);
-    log.add_attribute(keyword::urgent() = 1);
+    log.set_filter(expr::has_attr(::keyword::urgent()) && ::keyword::urgent() == 1);
+    log.add_attribute(::keyword::urgent() = 1);
     EXPECT_TRUE(log.open_record().valid());
 }
 
@@ -121,8 +121,8 @@ TEST(logger_base_t, DoNotOpenRecordWhenComplexFilterFailed) {
 
     logger_base_t log;
     log.add_frontend(std::move(frontend));
-    log.set_filter(expr::has_attr(keyword::urgent()) && keyword::urgent() == 1);
-    log.add_attribute(keyword::urgent() = 2);
+    log.set_filter(expr::has_attr(::keyword::urgent()) && ::keyword::urgent() == 1);
+    log.add_attribute(::keyword::urgent() = 2);
     EXPECT_FALSE(log.open_record().valid());
 }
 
