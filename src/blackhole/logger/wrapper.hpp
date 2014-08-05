@@ -21,8 +21,15 @@ private:
     mutable std::mutex mutex;
 
 public:
-    wrapper_t(logger_type& log, log::attributes_t attributes);
-    wrapper_t(const wrapper_t& wrapper, log::attributes_t attributes);
+    wrapper_t(logger_type& log, log::attributes_t attributes) :
+        log_(&log),
+        attributes(std::move(attributes))
+    {}
+
+    wrapper_t(wrapper_t& wrapper, log::attributes_t attributes) :
+        log_(wrapper.log_),
+        attributes(merge({ wrapper.attributes, std::move(attributes) }))
+    {}
 
     //!@todo: Test.
     wrapper_t(wrapper_t&& other) {
@@ -47,9 +54,21 @@ public:
         return *log_;
     }
 
-    log::record_t open_record() const;
-    log::record_t open_record(log::attribute_pair_t attribute) const;
-    log::record_t open_record(log::attributes_t attributes) const;
+    log::record_t open_record() const {
+        return log_->open_record(attributes);
+    }
+
+    log::record_t open_record(log::attribute_pair_t attribute) const {
+        log::attributes_t attributes = this->attributes;
+        attributes.insert(attribute);
+        return log_->open_record(std::move(attributes));
+    }
+
+    log::record_t open_record(log::attributes_t attributes) const {
+        log::attributes_t attributes_ = this->attributes;
+        attributes_.insert(attributes.begin(), attributes.end());
+        return log_->open_record(std::move(attributes_));
+    }
 
     //!@todo: Add more gentle concept check.
     template<typename Level>
@@ -61,11 +80,9 @@ public:
         return log_->open_record(level, std::move(attributes));
     }
 
-    void push(log::record_t&& record) const;
+    void push(log::record_t&& record) const {
+        log_->push(std::move(record));
+    }
 };
 
 } // namespace blackhole
-
-#if defined(BLACKHOLE_HEADER_ONLY)
-#include "blackhole/implementation/logger/wrapper.ipp"
-#endif
