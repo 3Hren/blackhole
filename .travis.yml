@@ -5,6 +5,7 @@ os:
 env:
     - SUITE=tests
     - SUITE=examples
+    - SUITE=benchmarks
 
 language:
     - cpp
