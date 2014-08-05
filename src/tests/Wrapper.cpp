@@ -67,6 +67,27 @@ TEST(Wrapper, MoveConstructor) {
     EXPECT_EQ(log::attribute_value_t(42), record.attributes["answer"].value);
 }
 
+TEST(Wrapper, MoveAssignment) {
+    /*!
+     * This test checks wrapper move assignment operator.
+     * Behaviour should be the same as with move constructor.
+     */
+    typedef verbose_logger_t<testing::level> logger_type;
+    logger_type log = logger_factory_t::create<logger_type>();
+    wrapper_t<logger_type> wrapper(log, log::attributes_t({
+        attribute::make("answer", 42)
+    }));
+
+    wrapper_t<logger_type> other(log, log::attributes_t({
+        attribute::make("answer", 43)
+    }));
+    other = std::move(wrapper);
+
+    auto record = other.open_record();
+    ASSERT_EQ(1, record.attributes.count("answer"));
+    EXPECT_EQ(log::attribute_value_t(42), record.attributes["answer"].value);
+}
+
 TEST(Wrapper, Usage) {
     auto log = logger_factory_t::create<logger_base_t>();
     log.add_attribute(attribute::make("id", 100500));

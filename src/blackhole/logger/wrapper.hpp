@@ -35,7 +35,6 @@ public:
         *this = std::move(other);
     }
 
-    //!@todo: Test.
     wrapper_t& operator=(wrapper_t&& other) {
         if (this != &other) {
             boost::lock(mutex, other.mutex);
