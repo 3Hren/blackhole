@@ -22,7 +22,7 @@ map_severity(aux::attachable_ostringstream& stream, const severity& level) {
         "DEBUG",
         "NOTICE",
         "INFO",
-        "WARNING",
+        "WARN",
         "ERROR"
     };
 
