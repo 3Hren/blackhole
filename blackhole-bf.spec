@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
 Version:	0.2.0
-Release:	0r7%{?dist}
+Release:	0r8%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
@@ -67,6 +67,10 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Wed Aug 06 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-0rc8
+- Other: default mapping from default severity to syslog one.
+- Other: default warning severity mapping to string has been slightly changed.
+
 * Wed Aug 06 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-0rc7
 - Feature: logger wrapper now provides underlying logger type.
 - Bug fix: forgotten configuration include added.

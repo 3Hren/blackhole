@@ -1,3 +1,10 @@
+blackhole (0.2.0-0rc8) unstable; urgency=low
+
+  * Other: default mapping from default severity to syslog one.
+  * Other: default warning severity mapping to string has been slightly changed.
+
+ -- Evgeny Safronov <division494@gmail.com>  Wed, 06 Aug 2014 16:09:20 +0400
+
 blackhole (0.2.0-0rc7) unstable; urgency=low
 
   * Feature: logger wrapper now provides underlying logger type.
