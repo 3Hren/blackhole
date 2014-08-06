@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
 Version:	0.2.0
-Release:	0r5%{?dist}
+Release:	0r7%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
@@ -67,6 +67,15 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Wed Aug 06 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-0rc7
+- Feature: logger wrapper now provides underlying logger type.
+- Bug fix: forgotten configuration include added.
+- Other: logger wrapper's constructor overload now accepts other const
+  wrapper's reference instead of non-const one.
+- Other: changed namespace of DECLARE_EVENT_KEYWORD.
+- Other: using new benchmarking framework for regression tests.
+- Testing: more tests for wrapper.
+
 * Mon Aug 04 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-0rc6
 - Bug fix: fixed linker error.
 

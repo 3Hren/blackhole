@@ -1,3 +1,15 @@
+blackhole (0.2.0-0rc7) unstable; urgency=low
+
+  * Feature: logger wrapper now provides underlying logger type.
+  * Bug fix: forgotten configuration include added.
+  * Other: logger wrapper's constructor overload now accepts other const
+    wrapper's reference instead of non-const one.
+  * Other: changed namespace of DECLARE_EVENT_KEYWORD.
+  * Other: using new benchmarking framework for regression tests.
+  * Testing: more tests for wrapper.
+
+ -- Evgeny Safronov <division494@gmail.com>  Wed, 06 Aug 2014 14:53:16 +0400
+
 blackhole (0.2.0-0rc6) unstable; urgency=low
 
   * Bug fix: fixed linker error.
