@@ -1,6 +1,7 @@
 #pragma once
 
 #include "blackhole/detail/stream/stream.hpp"
+#include "blackhole/sink/syslog.hpp"
 #include "blackhole/utils/underlying.hpp"
 
 namespace blackhole {
@@ -37,5 +38,30 @@ map_severity(aux::attachable_ostringstream& stream, const severity& level) {
 }
 
 } // namespace defaults
+
+namespace sink {
+
+template<>
+struct priority_traits<defaults::severity> {
+    static inline
+    priority_t map(defaults::severity lvl) {
+        switch (lvl) {
+        case defaults::severity::debug:
+            return priority_t::debug;
+        case defaults::severity::notice:
+            return priority_t::info;
+        case defaults::severity::info:
+            return priority_t::info;
+        case defaults::severity::warning:
+            return priority_t::warning;
+        case defaults::severity::error:
+            return priority_t::err;
+        }
+
+        return priority_t::debug;
+    }
+};
+
+} // namespace sink
 
 } // namespace blackhole
