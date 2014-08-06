@@ -2,3 +2,4 @@ _site
 
 #[IDE specific]
 .idea
+*.user*
