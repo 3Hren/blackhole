@@ -229,7 +229,7 @@ TEST(Wrapper, NestedWrappers) {
     }
 }
 
-TEST(Wrapper, UnderlyingLogger) {
+TEST(Wrapper, UnderlyingLoggerType) {
     typedef verbose_logger_t<testing::level> logger_type;
     typedef wrapper_t<logger_type> wrapper_type;
     static_assert(
@@ -238,7 +238,7 @@ TEST(Wrapper, UnderlyingLogger) {
     );
 }
 
-TEST(Wrapper, UnderlyingNestedLogger) {
+TEST(Wrapper, UnderlyingNestedLoggerType) {
     typedef verbose_logger_t<testing::level> logger_type;
     typedef wrapper_t<logger_type> wrapper_type;
     typedef wrapper_t<wrapper_type> deep_wrapper_type;
@@ -248,7 +248,7 @@ TEST(Wrapper, UnderlyingNestedLogger) {
     );
 }
 
-TEST(Wrapper, UnderlyingTwoLevelNestedLogger) {
+TEST(Wrapper, UnderlyingTwoLevelNestedLoggerType) {
     typedef verbose_logger_t<testing::level> logger_type;
     typedef wrapper_t<logger_type> wrapper_type;
     typedef wrapper_t<wrapper_type> deep_wrapper_type;
@@ -257,4 +257,48 @@ TEST(Wrapper, UnderlyingTwoLevelNestedLogger) {
         std::is_same<logger_type, deepest_wrapper_type::logger_type>::value,
         "error in extracting underlying logger type"
     );
+}
+
+TEST(Wrapper, UnderlyingLogger) {
+    /*!
+     * Check underlying logger getter for wrapper object.
+     * Opening record with this logger should result in valid record, but it
+     * shouldn't contain wrapper's attributes.
+     */
+    typedef verbose_logger_t<testing::level> logger_type;
+    typedef wrapper_t<logger_type> wrapper_type;
+    logger_type log = logger_factory_t::create<logger_type>();
+    log.add_attribute(attribute::make("a", 100500));
+
+    wrapper_type wrapper(log, log::attributes_t({attribute::make("b", 42)}));
+
+    logger_type& initial = wrapper.log();
+    auto record = initial.open_record();
+    ASSERT_EQ(1, record.attributes.count("a"));
+    EXPECT_EQ(log::attribute_value_t(100500), record.attributes["a"].value);
+    EXPECT_EQ(0, record.attributes.count("b"));
+}
+
+TEST(Wrapper, UnderlyingNestedLogger) {
+    /*!
+     * Check initial underlying logger getter for wrapper object wrapped with
+     * another wrapper (2-level wrapper).
+     * Opening record with this logger should result in valid record, but it
+     * should contain none of both wrapper's attributes.
+     */
+    typedef verbose_logger_t<testing::level> logger_type;
+    typedef wrapper_t<logger_type> wrapper_type;
+    typedef wrapper_t<wrapper_type> deep_wrapper_type;
+    logger_type log = logger_factory_t::create<logger_type>();
+    log.add_attribute(attribute::make("a", 100500));
+
+    wrapper_type wrapper(log, log::attributes_t({attribute::make("b", 42)}));
+    deep_wrapper_type deep_wrapper(wrapper, log::attributes_t({attribute::make("c", 5)}));
+
+    logger_type& initial = deep_wrapper.log();
+    auto record = initial.open_record();
+    ASSERT_EQ(1, record.attributes.count("a"));
+    EXPECT_EQ(log::attribute_value_t(100500), record.attributes["a"].value);
+    EXPECT_EQ(0, record.attributes.count("b"));
+    EXPECT_EQ(0, record.attributes.count("c"));
 }

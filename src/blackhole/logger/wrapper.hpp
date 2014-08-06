@@ -10,43 +10,63 @@ namespace blackhole {
 
 template<class Wrapper>
 struct unwrap {
+    typedef Wrapper wrapper_type;
+
     typedef typename unwrap<
-        typename Wrapper::underlying_type
+        typename wrapper_type::underlying_type
     >::logger_type logger_type;
+
+    static logger_type& log(Wrapper& wrapper) {
+        return unwrap<
+            typename wrapper_type::underlying_type
+        >::log(*wrapper.wrapped);
+    }
 };
 
 template<>
 struct unwrap<logger_base_t> {
+    typedef logger_base_t wrapper_type;
     typedef logger_base_t logger_type;
+
+    static logger_type& log(logger_type& log) {
+        return log;
+    }
 };
 
 template<typename Level>
 struct unwrap<verbose_logger_t<Level>> {
+    typedef verbose_logger_t<Level> wrapper_type;
     typedef verbose_logger_t<Level> logger_type;
+
+    static logger_type& log(logger_type& log) {
+        return log;
+    }
 };
 
 template<class Wrapped>
 class wrapper_t {
     BLACKHOLE_DECLARE_NONCOPYABLE(wrapper_t);
 
+    template<class> friend struct unwrap;
+
 public:
     typedef Wrapped underlying_type;
     typedef typename unwrap<underlying_type>::logger_type logger_type;
 
 private:
-    underlying_type* log_;
+    underlying_type* wrapped;
     log::attributes_t attributes;
 
     mutable std::mutex mutex;
 
 public:
-    wrapper_t(underlying_type& log, log::attributes_t attributes) :
-        log_(&log),
+    wrapper_t(underlying_type& wrapped, log::attributes_t attributes) :
+        wrapped(&wrapped),
         attributes(std::move(attributes))
     {}
 
     wrapper_t(const wrapper_t& wrapper, log::attributes_t attributes) :
-        log_(wrapper.log_),
+        wrapped(wrapper.wrapped),
         attributes(merge({ wrapper.attributes, std::move(attributes) }))
     {}
 
@@ -59,32 +79,35 @@ public:
             boost::lock(mutex, other.mutex);
             boost::lock_guard<std::mutex> lock(mutex, boost::adopt_lock);
             boost::lock_guard<std::mutex> other_lock(other.mutex, boost::adopt_lock);
-            log_ = other.log_;
-            other.log_ = nullptr;
+            wrapped = other.wrapped;
+            other.wrapped = nullptr;
             attributes = std::move(other.attributes);
         }
 
         return *this;
     }
 
-    underlying_type& log() {
-        return *log_;
+    /*!
+     * Return non-const reference to the underlying logger.
+     */
+    logger_type& log() {
+        return unwrap<wrapper_t>::log(*this);
     }
 
     log::record_t open_record() const {
-        return log_->open_record(attributes);
+        return wrapped->open_record(attributes);
     }
 
     log::record_t open_record(log::attribute_pair_t attribute) const {
         log::attributes_t attributes = this->attributes;
         attributes.insert(attribute);
-        return log_->open_record(std::move(attributes));
+        return wrapped->open_record(std::move(attributes));
     }
 
     log::record_t open_record(log::attributes_t attributes) const {
         log::attributes_t attributes_ = this->attributes;
         attributes_.insert(attributes.begin(), attributes.end());
-        return log_->open_record(std::move(attributes_));
+        return wrapped->open_record(std::move(attributes_));
     }
 
     //!@todo: Add more gentle concept check.
@@ -94,11 +117,11 @@ public:
                 log::attributes_t attributes = log::attributes_t()) const
     {
         attributes.insert(this->attributes.begin(), this->attributes.end());
-        return log_->open_record(level, std::move(attributes));
+        return wrapped->open_record(level, std::move(attributes));
     }
 
     void push(log::record_t&& record) const {
-        log_->push(std::move(record));
+        wrapped->push(std::move(record));
     }
 };
 
