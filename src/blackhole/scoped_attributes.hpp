@@ -20,7 +20,13 @@ public:
 
     //!@todo: Make logger concept.
     template<class Wrapper>
-    scoped_attributes_t(Wrapper& wrapper, log::attributes_t&& attributes) :
+    scoped_attributes_t(
+        Wrapper& wrapper,
+        log::attributes_t&& attributes,
+        typename std::enable_if<
+            !std::is_base_of<logger_base_t, Wrapper>::value
+        >::type* = 0
+    ) :
         scoped_attributes_concept_t(wrapper.log()),
         m_guard_attributes(std::move(attributes))
     {}
