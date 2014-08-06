@@ -3,6 +3,7 @@
 #include "blackhole/config.hpp"
 #include "blackhole/record.hpp"
 #include "blackhole/utils/noncopyable.hpp"
+#include "blackhole/config.hpp"
 
 namespace blackhole {
 
@@ -21,7 +22,7 @@ private:
 
 public:
     wrapper_t(logger_type& log, log::attributes_t attributes);
-    wrapper_t(wrapper_t& wrapper, log::attributes_t attributes);
+    wrapper_t(const wrapper_t& wrapper, log::attributes_t attributes);
 
     //!@todo: Test.
     wrapper_t(wrapper_t&& other) {

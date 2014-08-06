@@ -4,7 +4,6 @@
 #include "filter.hpp"
 
 #define DECLARE_KEYWORD_IMPL(Name, Scope, T) \
-    namespace blackhole { \
     namespace keyword { \
     namespace tag { \
         struct Name##_t { \
@@ -12,10 +11,9 @@
             static const char* name() { return #Name; } \
         }; \
     } \
-    static inline blackhole::keyword::keyword_t<T, tag::Name##_t, log::attribute::scope::Scope>& Name() { \
-        static blackhole::keyword::keyword_t<T, tag::Name##_t, log::attribute::scope::Scope> self; \
+    static inline ::blackhole::keyword::keyword_t<T, tag::Name##_t, ::blackhole::log::attribute::scope::Scope>& Name() { \
+        static ::blackhole::keyword::keyword_t<T, tag::Name##_t, ::blackhole::log::attribute::scope::Scope> self; \
         return self; \
-    } \
     } \
     }
 
