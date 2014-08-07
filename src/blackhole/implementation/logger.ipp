@@ -216,6 +216,7 @@ swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT {
     rhs.state.tracked = lhs.state.tracked.exchange(rhs.state.tracked);
 
     using std::swap;
+    //!@todo: Lock.
     swap(lhs.state.filter, rhs.state.filter);
     swap(lhs.state.attributes.global, rhs.state.attributes.global);
 
