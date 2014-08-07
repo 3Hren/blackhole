@@ -9,8 +9,8 @@ SET(HEADERS
 )
 
 SET(SOURCES
-    AttributeSet
-    Datetime
+    attribute_set
+    datetime
     formatter/string
     logger/logger
 )
