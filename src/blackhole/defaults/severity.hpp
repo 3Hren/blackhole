@@ -30,7 +30,7 @@ map_severity(aux::attachable_ostringstream& stream, const severity& level) {
     typedef blackhole::aux::underlying_type<severity>::type level_type;
 
     auto value = static_cast<level_type>(level);
-    if(value < static_cast<level_type>(sizeof(describe) / sizeof(describe[0])) && value > 0) {
+    if(value < static_cast<level_type>(sizeof(describe) / sizeof(describe[0])) && value >= 0) {
         stream << describe[value];
     } else {
         stream << value;
