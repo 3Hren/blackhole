@@ -9,7 +9,10 @@ SET(HEADERS
 )
 
 SET(SOURCES
-    String
+    AttributeSet
+    Datetime
+    formatter/string
+    logger/logger
 )
 
 PROJECT(${PROJECT})
@@ -23,9 +26,19 @@ LINK_DIRECTORIES(
     ${CMAKE_BINARY_DIR}/ticktack
 )
 
+SET(Boost_USE_MULTITHREADED ON)
+
+SET(BOOST_COMPONENTS
+    system
+    thread
+)
+
+FIND_PACKAGE(Boost COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
+
 ADD_EXECUTABLE(${PROJECT} ${HEADERS} ${SOURCES})
 
 TARGET_LINK_LIBRARIES(${PROJECT}
+    ${Boost_LIBRARIES}
     ticktack
     ticktack-main
 )
