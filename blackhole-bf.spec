@@ -21,8 +21,7 @@ BuildRequires:	cmake
 Obsoletes: srw
 
 %description
-Elliptics network is a fault tolerant distributed hash table
-object storage.
+Blackhole is a common logging library.
 
 
 %package devel
@@ -33,7 +32,7 @@ Requires: %{name} = %{version}-%{release}
 
 %description devel
 This package contains libraries, header files and developer documentation
-needed for developing software which uses the cairo graphics library.
+needed for developing software which uses the Blackhole logging library.
 
 %prep
 %setup -q
