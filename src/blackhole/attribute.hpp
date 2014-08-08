@@ -10,6 +10,7 @@
 #include <boost/mpl/vector.hpp>
 #include <boost/variant.hpp>
 
+#include "blackhole/platform/initializer_list.hpp"
 #include "utils/timeval.hpp"
 #include "utils/types.hpp"
 #include "utils/underlying.hpp"
@@ -124,9 +125,16 @@ typedef std::unordered_map<
 inline
 log::attributes_t
 merge(const std::initializer_list<log::attributes_t>& args) {
-    typedef std::reverse_iterator<
-        std::initializer_list<log::attributes_t>::const_iterator
-    > iterator;
+    typedef log::attributes_t value_type;
+
+    //!@compat: Sadly, but std::initializer_list in GCC.4.4 has no typedefs.
+#ifdef BH_INITIALIZER_LIST_HAS_TYPEDEFS
+    typedef std::initializer_list<value_type>::const_iterator const_iterator;
+#else
+    typedef const value_type* const_iterator;
+#endif
+
+    typedef std::reverse_iterator<const_iterator> iterator;
 
     log::attributes_t summary;
     for (auto it = iterator(args.end()); it != iterator(args.begin()); ++it) {
