@@ -128,7 +128,7 @@ merge(const std::initializer_list<log::attributes_t>& args) {
     typedef log::attributes_t value_type;
 
     //!@compat: Sadly, but std::initializer_list in GCC.4.4 has no typedefs.
-#ifdef BH_INITIALIZER_LIST_HAS_TYPEDEFS
+#ifdef BLACKHOLE_INITIALIZER_LIST_HAS_TYPEDEFS
     typedef std::initializer_list<value_type>::const_iterator const_iterator;
 #else
     typedef const value_type* const_iterator;

@@ -5,7 +5,7 @@
 
 #include "blackhole/platform/random.hpp"
 
-#if !defined(HAS_CXX11_RANDOM)
+#if !defined(BLACKHOLE_HAS_CXX11_RANDOM)
 #include <time.h>
 #endif
 
@@ -13,7 +13,7 @@ template<typename Value>
 struct distribution_t {
     typedef Value value_type;
 
-#if defined(HAS_CXX11_RANDOM)
+#if defined(BLACKHOLE_HAS_CXX11_RANDOM)
 private:
     std::random_device device;
     std::mt19937 generator;
