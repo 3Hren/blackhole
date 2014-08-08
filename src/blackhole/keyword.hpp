@@ -17,6 +17,9 @@
     } \
     }
 
+#define DECLARE_LOCAL_KEYWORD(Name, T) \
+    DECLARE_KEYWORD_IMPL(Name, local, T)
+
 #define DECLARE_EVENT_KEYWORD(Name, T) \
     DECLARE_KEYWORD_IMPL(Name, event, T)
 

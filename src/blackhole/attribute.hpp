@@ -4,6 +4,7 @@
 #include <ctime>
 #include <initializer_list>
 #include <unordered_map>
+#include <iterator>
 
 #include <boost/mpl/contains.hpp>
 #include <boost/mpl/vector.hpp>
@@ -120,7 +121,11 @@ typedef std::unordered_map<
 
 inline log::attributes_t merge(const std::initializer_list<log::attributes_t>& args) {
     log::attributes_t summary;
-    for (auto it = args.begin(); it != args.end(); ++it) {
+
+    typedef std::reverse_iterator<std::initializer_list<log::attributes_t>::const_iterator> iterator;
+    auto it = iterator(args.end());
+    auto endit = iterator(args.begin());
+    for (; it != endit; ++it) {
         summary.insert(it->begin(), it->end());
     }
 
