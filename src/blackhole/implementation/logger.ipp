@@ -147,7 +147,7 @@ logger_base_t::open_record(log::attributes_t local_attributes) const {
 BLACKHOLE_API
 void
 logger_base_t::push(log::record_t&& record) const {
-    writer_lock_type lock(state.lock.push);
+    reader_lock_type lock(state.lock.push);
     for (auto it = state.frontends.begin(); it != state.frontends.end(); ++it) {
         try {
             const std::unique_ptr<base_frontend_t>& frontend = *it;
