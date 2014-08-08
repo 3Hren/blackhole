@@ -25,6 +25,8 @@ file(GLOB_RECURSE BLACKHOLE_HEADERS . ../blackhole/*.[hi]pp)
 file(GLOB_RECURSE BLACKHOLE_TESTING_HEADERS . *.hpp)
 
 SET(HEADERS
+    ${CMAKE_SOURCE_DIR}/debian/changelog
+    ${CMAKE_SOURCE_DIR}/blackhole-bf.spec
     ${BLACKHOLE_HEADERS}
     ${BLACKHOLE_TESTING_HEADERS}
 )
