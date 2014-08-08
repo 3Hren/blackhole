@@ -1,3 +1,9 @@
+blackhole (0.2.0-0rc10) unstable; urgency=low
+
+  * Compatibility: fixed compatibility with GCC 4.4.
+
+ -- Evgeny Safronov <division494@gmail.com>  Fri, 08 Aug 2014 13:41:04 +0400
+
 blackhole (0.2.0-0rc9) unstable; urgency=low
 
   * Bug fix: fixed mapping of debug severity to string.
