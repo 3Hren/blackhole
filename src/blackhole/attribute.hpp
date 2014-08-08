@@ -121,13 +121,15 @@ typedef std::unordered_map<
 
 } // namespace log
 
-inline log::attributes_t merge(const std::initializer_list<log::attributes_t>& args) {
-    log::attributes_t summary;
+inline
+log::attributes_t
+merge(const std::initializer_list<log::attributes_t>& args) {
+    typedef std::reverse_iterator<
+        std::initializer_list<log::attributes_t>::const_iterator
+    > iterator;
 
-    typedef std::reverse_iterator<std::initializer_list<log::attributes_t>::const_iterator> iterator;
-    auto it = iterator(args.end());
-    auto endit = iterator(args.begin());
-    for (; it != endit; ++it) {
+    log::attributes_t summary;
+    for (auto it = iterator(args.end()); it != iterator(args.begin()); ++it) {
         summary.insert(it->begin(), it->end());
     }
 
