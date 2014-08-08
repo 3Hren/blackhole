@@ -1,3 +1,14 @@
+blackhole (0.2.0-0rc9) unstable; urgency=low
+
+  * Bug fix: fixed mapping of debug severity to string.
+  * Other: change priority of attribute sets while merging.
+  * Other: scoped attributes constructor now has more strictly wrapper concept check.
+  * Other: added DECLARE_LOCAL_KEYWORD macro.
+  * Testing: added datetime generator, string formatter and other benchmarks.
+  * Testing: added tests to check priority of categorized attribute sets.
+
+ -- Evgeny Safronov <division494@gmail.com>  Fri, 08 Aug 2014 12:54:21 +0400
+
 blackhole (0.2.0-0rc8) unstable; urgency=low
 
   * Other: default mapping from default severity to syslog one.

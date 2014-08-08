@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
 Version:	0.2.0
-Release:	0r8%{?dist}
+Release:	0r9%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
@@ -67,6 +67,14 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Fri Aug 08 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-0rc9
+- Bug fix: fixed mapping of debug severity to string.
+- Other: change priority of attribute sets while merging.
+- Other: scoped attributes constructor now has more strictly wrapper concept check.
+- Other: added DECLARE_LOCAL_KEYWORD macro.
+- Testing: added datetime generator, string formatter and other benchmarks.
+- Testing: added tests to check priority of categorized attribute sets.
+
 * Wed Aug 06 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-0rc8
 - Other: default mapping from default severity to syslog one.
 - Other: default warning severity mapping to string has been slightly changed.
