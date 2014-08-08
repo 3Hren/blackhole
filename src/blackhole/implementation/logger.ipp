@@ -1,6 +1,8 @@
 #pragma once
 
 #include "blackhole/config.hpp"
+#include "blackhole/detail/thread/lock.hpp"
+#include "blackhole/platform.hpp"
 #include "blackhole/trace/context.hpp"
 #include "blackhole/utils/noexcept.hpp"
 
@@ -215,8 +217,14 @@ swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT {
     rhs.state.enabled = lhs.state.enabled.exchange(rhs.state.enabled);
     rhs.state.tracked = lhs.state.tracked.exchange(rhs.state.tracked);
 
+    auto lock = detail::thread::make_multi_lock_t(
+        lhs.state.lock.open,
+        lhs.state.lock.push,
+        rhs.state.lock.open,
+        rhs.state.lock.push
+    );
+
     using std::swap;
-    //!@todo: Lock.
     swap(lhs.state.filter, rhs.state.filter);
     swap(lhs.state.attributes.global, rhs.state.attributes.global);
 

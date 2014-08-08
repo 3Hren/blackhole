@@ -1,6 +1,7 @@
 #pragma once
 
 #include "blackhole/config.hpp"
+#include "blackhole/detail/thread/lock.hpp"
 #include "blackhole/forwards.hpp"
 #include "blackhole/record.hpp"
 #include "blackhole/utils/noncopyable.hpp"
@@ -76,9 +77,7 @@ public:
 
     wrapper_t& operator=(wrapper_t&& other) {
         if (this != &other) {
-            boost::lock(mutex, other.mutex);
-            boost::lock_guard<std::mutex> lock(mutex, boost::adopt_lock);
-            boost::lock_guard<std::mutex> other_lock(other.mutex, boost::adopt_lock);
+            auto lock = detail::thread::make_multi_lock_t(mutex, other.mutex);
             wrapped = other.wrapped;
             other.wrapped = nullptr;
             attributes = std::move(other.attributes);
