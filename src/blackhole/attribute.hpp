@@ -107,8 +107,10 @@ struct attribute_t {
     {}
 };
 
+typedef std::string attribute_name_t;
+
 typedef std::pair<
-    std::string,
+    attribute_name_t,
     attribute_t
 > attribute_pair_t;
 
