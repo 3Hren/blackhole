@@ -152,3 +152,31 @@ TEST(logger_base_t, FilteringUsingDynamicAttributes) {
 
     EXPECT_TRUE(record.valid());
 }
+
+TEST(logger_base_t, LocalAttributesIsMoreSpecificThanGlobal) {
+    std::unique_ptr<mock::frontend_t> frontend;
+    logger_base_t log;
+    log.add_attribute(attribute::make("answer", 42));
+    log.add_frontend(std::move(frontend));
+
+    auto record = log.open_record(attribute::make("answer", 100500));
+
+    EXPECT_EQ(100500, record.extract<int>("answer"));
+}
+
+#include <blackhole/scoped_attributes.hpp>
+TEST(logger_base_t, LocalAttributesIsMoreSpecificThanScoped) {
+    std::unique_ptr<mock::frontend_t> frontend;
+
+    logger_base_t log;
+    log.add_frontend(std::move(frontend));
+
+    scoped_attributes_t guard(
+        log,
+        log::attributes_t({attribute::make("answer", 42)})
+    );
+
+    auto record = log.open_record(attribute::make("answer", 100500));
+
+    EXPECT_EQ(100500, record.extract<int>("answer"));
+}
