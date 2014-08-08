@@ -122,10 +122,10 @@ logger_base_t::open_record(log::attributes_t local_attributes) const {
             get_thread_attributes(),                // Thread local.
             state.attributes.global,                // Logger object specific.
             get_event_attributes(),                 // Event specific, e.g. timestamp.
-            std::move(local_attributes),            // Any user attributes.
             state.attributes.scoped.get() ?
                 state.attributes.scoped->attributes() :
-                log::attributes_t()
+                log::attributes_t(),                // Scoped attributes.
+            std::move(local_attributes)             // Any user attributes.
         });
 
         if (state.tracked) {
