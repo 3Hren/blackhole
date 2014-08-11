@@ -93,6 +93,8 @@ public:
         return unwrap<wrapper_t>::log(*this);
     }
 
+    //!@todo: Make const reference getter.
+
     log::record_t open_record() const {
         return wrapped->open_record(attributes);
     }
