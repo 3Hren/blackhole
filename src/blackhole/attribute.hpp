@@ -106,6 +106,10 @@ struct attribute_t {
         value(static_cast<typename aux::underlying_type<T>::type>(value)),
         scope(type)
     {}
+
+    bool operator==(const attribute_t& other) const {
+        return value == other.value && scope == other.scope;
+    }
 };
 
 typedef std::string attribute_name_t;
