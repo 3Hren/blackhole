@@ -17,7 +17,13 @@ struct unwrap {
         typename wrapper_type::underlying_type
     >::logger_type logger_type;
 
-    static logger_type& log(Wrapper& wrapper) {
+    static logger_type& log(wrapper_type& wrapper) {
+        return unwrap<
+            typename wrapper_type::underlying_type
+        >::log(*wrapper.wrapped);
+    }
+
+    static const logger_type& log(const wrapper_type& wrapper) {
         return unwrap<
             typename wrapper_type::underlying_type
         >::log(*wrapper.wrapped);
@@ -32,6 +38,10 @@ struct unwrap<logger_base_t> {
     static logger_type& log(logger_type& log) {
         return log;
     }
+
+    static const logger_type& log(const logger_type& log) {
+        return log;
+    }
 };
 
 template<typename Level>
@@ -40,6 +50,10 @@ struct unwrap<verbose_logger_t<Level>> {
     typedef verbose_logger_t<Level> logger_type;
 
     static logger_type& log(logger_type& log) {
+        return log;
+    }
+
+    static const logger_type& log(const logger_type& log) {
         return log;
     }
 };
@@ -93,7 +107,12 @@ public:
         return unwrap<wrapper_t>::log(*this);
     }
 
-    //!@todo: Make const reference getter.
+    /*!
+     * Return const reference to the underlying logger.
+     */
+    const logger_type& log() const {
+        return unwrap<wrapper_t>::log(*this);
+    }
 
     log::record_t open_record() const {
         return wrapped->open_record(attributes);
