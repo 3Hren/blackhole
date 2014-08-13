@@ -13,7 +13,7 @@ class scoped_attributes_t : public scoped_attributes_concept_t {
     mutable log::attributes_t m_merged_attributes;
 
 public:
-    scoped_attributes_t(logger_base_t& logger, log::attributes_t&& attributes) :
+    scoped_attributes_t(logger_base_t& logger, log::attributes_t attributes) :
         scoped_attributes_concept_t(logger),
         m_guard_attributes(std::move(attributes))
     {}
@@ -22,7 +22,7 @@ public:
     template<class Wrapper>
     scoped_attributes_t(
         Wrapper& wrapper,
-        log::attributes_t&& attributes,
+        log::attributes_t attributes,
         typename std::enable_if<
             !std::is_base_of<logger_base_t, Wrapper>::value
         >::type* = 0

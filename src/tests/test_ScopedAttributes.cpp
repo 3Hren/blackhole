@@ -7,6 +7,9 @@
 
 #include "global.hpp"
 
+#define TEST_SCOPED_ATTRIBUTES(Suite, Test) \
+    TEST(scoped_attributes_t, Suite##_##Test)
+
 using namespace blackhole;
 
 namespace {
@@ -94,6 +97,23 @@ TEST(ScopedAttributes, BasicUsage) {
     EXPECT_EQ(0, record4.attributes.count("att1"));
     EXPECT_EQ(0, record4.attributes.count("att2"));
     EXPECT_EQ(0, record4.attributes.count("att3"));
+}
+
+TEST_SCOPED_ATTRIBUTES(Cons, ViaCopyingAttributes) {
+    auto log = logger_factory_t::create();
+    log::attributes_t attributes({
+        attribute::make("att1", 1),
+        attribute::make("att2", 2)
+    });
+
+    scoped_attributes_t guard(log, attributes);
+    auto record = log.open_record();
+
+    ASSERT_TRUE(record.attributes.count("att1") > 0);
+    EXPECT_EQ(1, record.extract<int>("att1"));
+
+    ASSERT_TRUE(record.attributes.count("att2") > 0);
+    EXPECT_EQ(2, record.extract<int>("att2"));
 }
 
 TEST(ScopedAttributes, SwapLoggers) {
@@ -207,7 +227,7 @@ TEST(ScopedAttributes, ThreadLocality) {
 
 #include <blackhole/logger/wrapper.hpp>
 
-TEST(ScopedAttrbutes, CompatibleWithWrapper) {
+TEST(ScopedAttrbutes, CompatibleWithWrapperViaMovingAttributes) {
     auto log = logger_factory_t::create();
     wrapper_t<logger_base_t> wrapper(log, log::attributes_t({
         attribute::make("answer", 42)
@@ -220,6 +240,35 @@ TEST(ScopedAttrbutes, CompatibleWithWrapper) {
                 attribute::make("piece of", "shit")
             })
         );
+
+        auto record = wrapper.open_record();
+
+        ASSERT_TRUE(record.attributes.count("answer") > 0);
+        EXPECT_EQ(log::attribute_value_t(42), record.attributes["answer"].value);
+
+        ASSERT_TRUE(record.attributes.count("piece of") > 0);
+        EXPECT_EQ(log::attribute_value_t("shit"), record.attributes["piece of"].value);
+    }
+
+    auto record = wrapper.open_record();
+
+    ASSERT_TRUE(record.attributes.count("answer") > 0);
+    EXPECT_EQ(log::attribute_value_t(42), record.attributes["answer"].value);
+
+    EXPECT_EQ(0, record.attributes.count("piece of"));
+}
+
+TEST(ScopedAttrbutes, CompatibleWithWrapperViaCopyingAttributes) {
+    auto log = logger_factory_t::create();
+    wrapper_t<logger_base_t> wrapper(log, log::attributes_t({
+        attribute::make("answer", 42)
+    }));
+
+    {
+        log::attributes_t attributes({
+            attribute::make("piece of", "shit")
+        });
+        scoped_attributes_t guard(wrapper, attributes);
 
         auto record = wrapper.open_record();
 
