@@ -151,22 +151,4 @@ TEST(mapping, DatetimeMapping) {
     EXPECT_EQ("1970-01-02 03:55:00", result);
 }
 
-//!@todo: Extended string formatter spec:
-/*!
-    Tests:
-        1. One attribute.
-        2. Two attributes.
-        3. Zero attributes.
-        4. Throws if array.size <= variadics.
-
-    Sample config:
-[
-    {
-        "pattern": "%(key)s : %(value)s",
-        "guard": {"key": "'", "value": "smart", "escape": ['"', '=']}
-        "open": "[",
-        "close": "]",
-        "separator": ","
-    }
-]
-*/
+//!@todo: Extended string formatter spec.
