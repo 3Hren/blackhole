@@ -44,7 +44,7 @@ template<>
 struct pack_feeder<emplace_pack_tag_t> {
     template<class T, class... Args>
     static void feed(log::record_t& record, const char* name, T&& value, Args&&... args) {
-        record.attributes.insert(std::make_pair(name, log::attribute_t(conv<T>::from(std::forward<T>(value)))));
+        record.insert(std::make_pair(name, log::attribute_t(conv<T>::from(std::forward<T>(value)))));
         feed(record, std::forward<Args>(args)...);
     }
 

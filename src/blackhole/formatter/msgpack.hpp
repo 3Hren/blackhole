@@ -37,8 +37,8 @@ public:
         msgpack::packer<msgpack::sbuffer> packer(&buffer);
         msgpack_visitor<msgpack::sbuffer> visitor(&packer);
 
-        packer.pack_map(record.attributes.size());
-        for (auto it = record.attributes.begin(); it != record.attributes.end(); ++it) {
+        packer.pack_map(record.attributes().size());
+        for (auto it = record.attributes().begin(); it != record.attributes().end(); ++it) {
             const std::string& name = it->first;
             const log::attribute_t& attribute = it->second;
             packer.pack(name);

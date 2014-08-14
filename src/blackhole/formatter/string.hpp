@@ -47,7 +47,7 @@ public:
         try {
             for (auto it = formatters.begin(); it != formatters.end(); ++it) {
                 const string::builder::type& formatter = *it;
-                formatter(stream, mapper, record.attributes);
+                formatter(stream, mapper, record.attributes());
                 stream.flush();
             }
             return buffer;

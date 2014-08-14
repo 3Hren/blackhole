@@ -13,9 +13,7 @@ TEST(json_t, Class) {
 
 TEST(json_t, FormatSingleAttribute) {
     log::record_t record;
-    record.attributes = {
-        keyword::message() = "le message"
-    };
+    record.insert(keyword::message() = "le message");
 
     formatter::json_t fmt;
     std::string expected = "{\"message\":\"le message\"}";
@@ -23,11 +21,10 @@ TEST(json_t, FormatSingleAttribute) {
 }
 
 TEST(json_t, FormatMultipleAttributes) {
-    log::record_t record;
-    record.attributes = {
+    log::record_t record(log::attributes_t({
         keyword::message() = "le message",
         keyword::timestamp() = timeval{ 100500, 0 }
-    };
+    }));
 
     formatter::json_t fmt;
     std::string actual = fmt.format(record);
@@ -39,15 +36,14 @@ TEST(json_t, FormatMultipleAttributes) {
 }
 
 TEST(json_t, FormatMultipleComplexAttributes) {
-    log::record_t record;
-    record.attributes = {
+    log::record_t record(log::attributes_t({
         keyword::message() = "le message",
         keyword::timestamp() = timeval{ 100500, 0 },
         attribute::make("@source", "udp://127.0.0.1"),
         attribute::make("@source_host", "dhcp-218-248-wifi.yandex"),
         attribute::make("@source_path", "service/storage"),
         attribute::make("@uuid", "550e8400-e29b-41d4-a716-446655440000")
-    };
+    }));
 
     formatter::json_t fmt;
     std::string actual = fmt.format(record);
@@ -63,11 +59,10 @@ TEST(json_t, FormatMultipleComplexAttributes) {
 }
 
 TEST(json_t, SingleAttributeMapping) {
-    log::record_t record;
-    record.attributes = {
+    log::record_t record(log::attributes_t({
         keyword::message() = "le message",
         keyword::timestamp() = timeval{ 100500, 0 }
-    };
+    }));
 
     formatter::json_t::config_type config;
     config.naming["message"] = "@message";
@@ -85,8 +80,7 @@ TEST(json_t, SingleAttributeMapping) {
 }
 
 TEST(json_t, MultipleAttributeMapping) {
-    log::record_t record;
-    record.attributes = {
+    log::record_t record = {
         keyword::message() = "le message",
         keyword::timestamp() = timeval{ 100500, 0 }
     };
@@ -108,8 +102,7 @@ TEST(json_t, MultipleAttributeMapping) {
 }
 
 TEST(json_t, AddsNewlineIfSpecified) {
-    log::record_t record;
-    record.attributes = {
+    log::record_t record = {
         keyword::message() = "le message",
     };
 
@@ -125,8 +118,7 @@ TEST(json_t, AddsNewlineIfSpecified) {
 }
 
 TEST(json_t, FieldMapping) {
-    log::record_t record;
-    record.attributes = {
+    log::record_t record = {
         keyword::message() = "le message",
         keyword::timestamp() = timeval{ 100500, 0 }
     };
@@ -148,8 +140,7 @@ TEST(json_t, FieldMapping) {
 }
 
 TEST(json_t, ComplexFieldMapping) {
-    log::record_t record;
-    record.attributes = {
+    log::record_t record = {
         keyword::message() = "le message",
         keyword::timestamp() = timeval{ 100500, 0 }
     };
@@ -174,8 +165,7 @@ TEST(json_t, ComplexFieldMapping) {
 }
 
 TEST(json_t, UnspecifiedPositionalMapping) {
-    log::record_t record;
-    record.attributes = {
+    log::record_t record = {
         keyword::message() = "le message",
         keyword::timestamp() = timeval{ 100500, 0 }
     };
@@ -210,8 +200,7 @@ TEST(json_t, AttributeMappingIsDeterminedByItsBaseNames) {
     mapping::value_t mapper;
     mapper.add<std::uint32_t>("secret", &testing::map_secret_value);
 
-    log::record_t record;
-    record.attributes = {
+    log::record_t record = {
         keyword::message() = "le message",
         attribute::make<std::uint32_t>("secret", 42)
     };

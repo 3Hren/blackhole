@@ -7,8 +7,7 @@
 using namespace blackhole;
 
 TEST(string_t, FormatSingleAttribute) {
-    log::record_t record;
-    record.attributes = {
+    log::record_t record = {
         keyword::message() = "le message"
     };
     std::string pattern("[%(message)s]");
@@ -17,8 +16,7 @@ TEST(string_t, FormatSingleAttribute) {
 }
 
 TEST(string_t, FormatMultipleAttributes) {
-    log::record_t record;
-    record.attributes = {
+    log::record_t record = {
         keyword::message() = "le message",
         { "timestamp", log::attribute_t("le timestamp") }
     };
@@ -28,8 +26,7 @@ TEST(string_t, FormatMultipleAttributes) {
 }
 
 TEST(string_t, FormatMultipleAttributesMoreThanExists) {
-    log::record_t record;
-    record.attributes = {
+    log::record_t record = {
         keyword::message() = "le message",
         { "timestamp", log::attribute_t("le timestamp") },
         { "source", log::attribute_t("le source") }
@@ -40,8 +37,7 @@ TEST(string_t, FormatMultipleAttributesMoreThanExists) {
 }
 
 TEST(string_t, ThrowsExceptionWhenAttributeNameNotProvided) {
-    log::record_t record;
-    record.attributes = {
+    log::record_t record = {
         keyword::message() = "le message"
     };
     std::string pattern("[%(timestamp)s]: %(message)s");
@@ -50,8 +46,7 @@ TEST(string_t, ThrowsExceptionWhenAttributeNameNotProvided) {
 }
 
 TEST(string_t, FormatOtherLocalAttribute) {
-    log::record_t record;
-    record.attributes = {
+    log::record_t record = {
         { "uuid", log::attribute_t("123-456") },
     };
     std::string pattern("[%(...L)s]");
@@ -60,8 +55,7 @@ TEST(string_t, FormatOtherLocalAttribute) {
 }
 
 TEST(string_t, FormatOtherLocalAttributes) {
-    log::record_t record;
-    record.attributes = {
+    log::record_t record = {
         { "uuid", log::attribute_t("123-456") },
         { "answer to life the universe and everything", log::attribute_t(42) }
     };
@@ -73,8 +67,7 @@ TEST(string_t, FormatOtherLocalAttributes) {
 }
 
 TEST(string_t, ComplexFormatWithOtherLocalAttributes) {
-    log::record_t record;
-    record.attributes = {
+    log::record_t record = {
         { "timestamp", log::attribute_t("1960-01-01 00:00:00", log::attribute::scope::event) },
         { "level", log::attribute_t("INFO", log::attribute::scope::event) },
         keyword::message() = "le message",
@@ -111,8 +104,7 @@ TEST(string_t, CustomMapping) {
     mapping::value_t mapper;
     mapper.add<timeval>("timestamp", &testing::map_timestamp);
 
-    log::record_t record;
-    record.attributes = {
+    log::record_t record = {
         keyword::timestamp() = timeval { 100500, 0 },
         keyword::message() = "le message",
     };
@@ -127,8 +119,7 @@ TEST(string_t, CustomMappingWithKeyword) {
     mapping::value_t mapper;
     mapper.add<keyword::tag::timestamp_t>(&testing::map_timestamp);
 
-    log::record_t record;
-    record.attributes = {
+    log::record_t record = {
         keyword::timestamp() = timeval { 100500, 0 },
         keyword::message() = "le message",
     };

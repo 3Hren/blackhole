@@ -38,13 +38,11 @@ BENCHMARK(PureStringFormatter, Baseline) {
     ticktack::compiler::do_not_optimize(initializer);
 
     blackhole::log::record_t record;
-    record.attributes.insert(
-        blackhole::keyword::message() = MESSAGE_LONG
-    );
+    record.insert(blackhole::keyword::message() = MESSAGE_LONG);
 
     timeval tv;
     gettimeofday(&tv, nullptr);
-    record.attributes.insert(blackhole::keyword::timestamp() = tv);
-    record.attributes.insert(blackhole::keyword::severity<level_t>() = level_t::info);
+    record.insert(blackhole::keyword::timestamp() = tv);
+    record.insert(blackhole::keyword::severity<level_t>() = level_t::info);
     ticktack::compiler::do_not_optimize(formatter.format(record));
 }

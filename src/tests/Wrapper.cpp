@@ -63,8 +63,8 @@ TEST(Wrapper, MoveConstructor) {
     wrapper_t<logger_type> other(std::move(wrapper));
 
     auto record = other.open_record();
-    ASSERT_EQ(1, record.attributes.count("answer"));
-    EXPECT_EQ(log::attribute_value_t(42), record.attributes["answer"].value);
+    ASSERT_EQ(1, record.attributes().count("answer"));
+    EXPECT_EQ(42, record.extract<int>("answer"));
 }
 
 TEST(Wrapper, MoveAssignment) {
@@ -84,8 +84,8 @@ TEST(Wrapper, MoveAssignment) {
     other = std::move(wrapper);
 
     auto record = other.open_record();
-    ASSERT_EQ(1, record.attributes.count("answer"));
-    EXPECT_EQ(log::attribute_value_t(42), record.attributes["answer"].value);
+    ASSERT_EQ(1, record.attributes().count("answer"));
+    EXPECT_EQ(42, record.extract<int>("answer"));
 }
 
 TEST(Wrapper, Usage) {
@@ -98,21 +98,21 @@ TEST(Wrapper, Usage) {
         }));
 
         auto record = log.open_record();
-        ASSERT_EQ(1, record.attributes.count("id"));
-        EXPECT_EQ(log::attribute_value_t(100500), record.attributes["id"].value);
-        EXPECT_EQ(0, record.attributes.count("answer"));
+        ASSERT_EQ(1, record.attributes().count("id"));
+        EXPECT_EQ(100500, record.extract<int>("id"));
+        EXPECT_EQ(0, record.attributes().count("answer"));
 
         record = wrapper.open_record();
-        ASSERT_EQ(1, record.attributes.count("id"));
-        EXPECT_EQ(log::attribute_value_t(100500), record.attributes["id"].value);
-        ASSERT_EQ(1, record.attributes.count("answer"));
-        EXPECT_EQ(log::attribute_value_t(42), record.attributes["answer"].value);
+        ASSERT_EQ(1, record.attributes().count("id"));
+        EXPECT_EQ(100500, record.extract<int>("id"));
+        ASSERT_EQ(1, record.attributes().count("answer"));
+        EXPECT_EQ(42, record.extract<int>("answer"));
     }
 
     auto record = log.open_record();
-    ASSERT_EQ(1, record.attributes.count("id"));
-    EXPECT_EQ(log::attribute_value_t(100500), record.attributes["id"].value);
-    EXPECT_EQ(0, record.attributes.count("answer"));
+    ASSERT_EQ(1, record.attributes().count("id"));
+    EXPECT_EQ(100500, record.extract<int>("id"));
+    EXPECT_EQ(0, record.attributes().count("answer"));
 }
 
 TEST(Wrapper, UsageWithVerboseLogger) {
@@ -128,45 +128,48 @@ TEST(Wrapper, UsageWithVerboseLogger) {
         );
 
         auto record = log.open_record(testing::info);
-        ASSERT_EQ(1, record.attributes.count("id"));
-        EXPECT_EQ(log::attribute_value_t(100500), record.attributes["id"].value);
+        ASSERT_EQ(1, record.attributes().count("id"));
+        EXPECT_EQ(100500, record.extract<int>("id"));
 
-        ASSERT_EQ(1, record.attributes.count("severity"));
-        EXPECT_EQ(testing::info,
-                  boost::get<
-                        aux::underlying_type<testing::level>::type
-                  >(record.attributes["severity"].value)
-                );
+        ASSERT_EQ(1, record.attributes().count("severity"));
+        EXPECT_EQ(
+            testing::info,
+            record.extract<
+                aux::underlying_type<testing::level>::type
+            >("severity")
+        );
 
-        EXPECT_EQ(0, record.attributes.count("answer"));
+        EXPECT_EQ(0, record.attributes().count("answer"));
 
         record = wrapper.open_record(testing::info);
-        ASSERT_EQ(1, record.attributes.count("id"));
-        EXPECT_EQ(log::attribute_value_t(100500), record.attributes["id"].value);
+        ASSERT_EQ(1, record.attributes().count("id"));
+        EXPECT_EQ(100500, record.extract<int>("id"));
 
-        ASSERT_EQ(1, record.attributes.count("severity"));
-        EXPECT_EQ(testing::info,
-                  boost::get<
-                        aux::underlying_type<testing::level>::type
-                  >(record.attributes["severity"].value)
-                );
+        ASSERT_EQ(1, record.attributes().count("severity"));
+        EXPECT_EQ(
+            testing::info,
+            record.extract<
+                aux::underlying_type<testing::level>::type
+            >("severity")
+        );
 
-        ASSERT_EQ(1, record.attributes.count("answer"));
-        EXPECT_EQ(log::attribute_value_t(42), record.attributes["answer"].value);
+        ASSERT_EQ(1, record.attributes().count("answer"));
+        EXPECT_EQ(42, record.extract<int>("answer"));
     }
 
     auto record = log.open_record(testing::info);
-    ASSERT_EQ(1, record.attributes.count("id"));
-    EXPECT_EQ(log::attribute_value_t(100500), record.attributes["id"].value);
+    ASSERT_EQ(1, record.attributes().count("id"));
+    EXPECT_EQ(100500, record.extract<int>("id"));
 
-    ASSERT_EQ(1, record.attributes.count("severity"));
-    EXPECT_EQ(testing::info,
-              boost::get<
-                    aux::underlying_type<testing::level>::type
-              >(record.attributes["severity"].value)
-            );
+    ASSERT_EQ(1, record.attributes().count("severity"));
+    EXPECT_EQ(
+        testing::info,
+        record.extract<
+            aux::underlying_type<testing::level>::type
+        >("severity")
+    );
 
-    EXPECT_EQ(0, record.attributes.count("answer"));
+    EXPECT_EQ(0, record.attributes().count("answer"));
 }
 
 TEST(Wrapper, MacroUsage) {
@@ -198,11 +201,11 @@ TEST(Wrapper, NestedWrappers) {
         );
 
         auto record = wrapper.open_record();
-        ASSERT_EQ(1, record.attributes.count("id"));
-        EXPECT_EQ(log::attribute_value_t(100500), record.attributes["id"].value);
-        ASSERT_EQ(1, record.attributes.count("answer"));
-        EXPECT_EQ(log::attribute_value_t(42), record.attributes["answer"].value);
-        EXPECT_EQ(0, record.attributes.count("result"));
+        ASSERT_EQ(1, record.attributes().count("id"));
+        EXPECT_EQ(100500, record.extract<int>("id"));
+        ASSERT_EQ(1, record.attributes().count("answer"));
+        EXPECT_EQ(42, record.extract<int>("answer"));
+        EXPECT_EQ(0, record.attributes().count("result"));
 
         {
             wrapper_t<verbose_logger_t<testing::level>> nested(
@@ -212,20 +215,20 @@ TEST(Wrapper, NestedWrappers) {
                 })
             );
             auto record = nested.open_record();
-            ASSERT_EQ(1, record.attributes.count("id"));
-            EXPECT_EQ(log::attribute_value_t(100500), record.attributes["id"].value);
-            ASSERT_EQ(1, record.attributes.count("answer"));
-            EXPECT_EQ(log::attribute_value_t(42), record.attributes["answer"].value);
-            EXPECT_EQ(1, record.attributes.count("result"));
-            EXPECT_EQ(log::attribute_value_t(300), record.attributes["result"].value);
+            ASSERT_EQ(1, record.attributes().count("id"));
+            EXPECT_EQ(100500, record.extract<int>("id"));
+            ASSERT_EQ(1, record.attributes().count("answer"));
+            EXPECT_EQ(42, record.extract<int>("answer"));
+            EXPECT_EQ(1, record.attributes().count("result"));
+            EXPECT_EQ(300, record.extract<int>("result"));
         }
 
         record = wrapper.open_record();
-        ASSERT_EQ(1, record.attributes.count("id"));
-        EXPECT_EQ(log::attribute_value_t(100500), record.attributes["id"].value);
-        ASSERT_EQ(1, record.attributes.count("answer"));
-        EXPECT_EQ(log::attribute_value_t(42), record.attributes["answer"].value);
-        EXPECT_EQ(0, record.attributes.count("result"));
+        ASSERT_EQ(1, record.attributes().count("id"));
+        EXPECT_EQ(100500, record.extract<int>("id"));
+        ASSERT_EQ(1, record.attributes().count("answer"));
+        EXPECT_EQ(42, record.extract<int>("answer"));
+        EXPECT_EQ(0, record.attributes().count("result"));
     }
 }
 
@@ -274,9 +277,9 @@ TEST(Wrapper, UnderlyingLogger) {
 
     logger_type& initial = wrapper.log();
     auto record = initial.open_record();
-    ASSERT_EQ(1, record.attributes.count("a"));
-    EXPECT_EQ(log::attribute_value_t(100500), record.attributes["a"].value);
-    EXPECT_EQ(0, record.attributes.count("b"));
+    ASSERT_EQ(1, record.attributes().count("a"));
+    EXPECT_EQ(100500, record.extract<int>("a"));
+    EXPECT_EQ(0, record.attributes().count("b"));
 }
 
 TEST(Wrapper, ConstUnderlyingLogger) {
@@ -294,9 +297,9 @@ TEST(Wrapper, ConstUnderlyingLogger) {
 
     const logger_type& initial = wrapper.log();
     auto record = initial.open_record();
-    ASSERT_EQ(1, record.attributes.count("a"));
-    EXPECT_EQ(log::attribute_value_t(100500), record.attributes["a"].value);
-    EXPECT_EQ(0, record.attributes.count("b"));
+    ASSERT_EQ(1, record.attributes().count("a"));
+    EXPECT_EQ(100500, record.extract<int>("a"));
+    EXPECT_EQ(0, record.attributes().count("b"));
 }
 
 TEST(Wrapper, UnderlyingNestedLogger) {
@@ -317,10 +320,10 @@ TEST(Wrapper, UnderlyingNestedLogger) {
 
     logger_type& initial = deep_wrapper.log();
     auto record = initial.open_record();
-    ASSERT_EQ(1, record.attributes.count("a"));
-    EXPECT_EQ(log::attribute_value_t(100500), record.attributes["a"].value);
-    EXPECT_EQ(0, record.attributes.count("b"));
-    EXPECT_EQ(0, record.attributes.count("c"));
+    ASSERT_EQ(1, record.attributes().count("a"));
+    EXPECT_EQ(100500, record.extract<int>("a"));
+    EXPECT_EQ(0, record.attributes().count("b"));
+    EXPECT_EQ(0, record.attributes().count("c"));
 }
 
 TEST(Wrapper, ConstUnderlyingNestedLogger) {
@@ -341,8 +344,8 @@ TEST(Wrapper, ConstUnderlyingNestedLogger) {
 
     const logger_type& initial = deep_wrapper.log();
     auto record = initial.open_record();
-    ASSERT_EQ(1, record.attributes.count("a"));
-    EXPECT_EQ(log::attribute_value_t(100500), record.attributes["a"].value);
-    EXPECT_EQ(0, record.attributes.count("b"));
-    EXPECT_EQ(0, record.attributes.count("c"));
+    ASSERT_EQ(1, record.attributes().count("a"));
+    EXPECT_EQ(100500, record.extract<int>("a"));
+    EXPECT_EQ(0, record.attributes().count("b"));
+    EXPECT_EQ(0, record.attributes().count("c"));
 }

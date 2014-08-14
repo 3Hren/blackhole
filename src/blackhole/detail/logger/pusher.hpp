@@ -32,9 +32,9 @@ public:
         record(record)
     {
         //!@todo: Catch exceptions from message inline formatting.
-        record.attributes.insert(
+        record.insert(
             keyword::message() =
-                aux::format(record.attributes, std::forward<Args>(args)...)
+                aux::format(record.attributes(), std::forward<Args>(args)...)
         );
     }
 
@@ -57,7 +57,7 @@ public:
                >&& args)
     {
         for (auto it = args.begin(); it != args.end(); ++it) {
-            record.attributes.insert(
+            record.insert(
                 std::make_pair(it->first, log::attribute_t(it->second))
             );
         }

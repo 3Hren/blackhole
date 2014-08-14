@@ -22,7 +22,7 @@ public:
     {}
 
     void handle(const log::record_t& record) {
-        this->sink.consume(this->formatter.format(record), record.attributes);
+        this->sink.consume(this->formatter.format(record), record.attributes());
     }
 };
 

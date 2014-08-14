@@ -13,9 +13,7 @@ TEST(msgpack_t, Class) {
 
 TEST(msgpack_t, FormatSingleAttribute) {
     log::record_t record;
-    record.attributes = {
-        keyword::message() = "le message"
-    };
+    record.insert(keyword::message() = "le message");
 
     formatter::msgpack_t fmt;
     std::string actual = fmt.format(record);
@@ -30,10 +28,8 @@ TEST(msgpack_t, FormatSingleAttribute) {
 
 TEST(msgpack_t, FormatMultipleAttributes) {
     log::record_t record;
-    record.attributes = {
-        keyword::message() = "le message",
-        keyword::timestamp() = timeval{ 100500, 0 }
-    };
+    record.insert(keyword::message() = "le message");
+    record.insert(keyword::timestamp() = timeval{ 100500, 0 });
 
     formatter::msgpack_t fmt;
     std::string actual = fmt.format(record);

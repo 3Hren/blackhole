@@ -137,9 +137,7 @@ logger_base_t::open_record(log::attributes_t local_attributes) const {
         }
 
         if (state.filter(attributes)) {
-            log::record_t record;
-            record.attributes = std::move(attributes);
-            return record;
+            return log::record_t(std::move(attributes));
         }
     }
 
