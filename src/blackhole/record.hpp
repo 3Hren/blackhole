@@ -8,17 +8,20 @@ namespace blackhole {
 namespace log {
 
 class record_t {
+    //!@todo: Here will be non-const `attribute_set_view_t`.
     attributes_t attributes_;
 
 public:
+    /*!
+     * Default constructor.
+     * Creates an empty record that is equivalent to the invalid record handle.
+     * @todo: Test post condition: this->valid() == false
+     */
     record_t() = default;
 
+    //!@todo: Instead of `attributes_t` move `attribute_set_view_t`.
     record_t(attributes_t&& attributes) :
         attributes_(std::move(attributes))
-    {}
-
-    record_t(std::initializer_list<log::attribute_pair_t> list) :
-        attributes_(list.begin(), list.end())
     {}
 
     operator bool() const noexcept {
@@ -29,6 +32,10 @@ public:
         return !attributes_.empty();
     }
 
+    /*!
+     * Return a const reference to the view of attribute set attached to this
+     * record.
+     */
     const log::attributes_t& attributes() const noexcept {
         return attributes_;
     }

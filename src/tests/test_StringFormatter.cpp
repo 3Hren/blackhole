@@ -7,58 +7,57 @@
 using namespace blackhole;
 
 TEST(string_t, FormatSingleAttribute) {
-    log::record_t record = {
-        keyword::message() = "le message"
-    };
+    log::record_t record;
+    record.insert(keyword::message() = "le message");
+
     std::string pattern("[%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("[le message]", fmt.format(record));
 }
 
 TEST(string_t, FormatMultipleAttributes) {
-    log::record_t record = {
-        keyword::message() = "le message",
-        { "timestamp", log::attribute_t("le timestamp") }
-    };
+    log::record_t record;
+    record.insert(keyword::message() = "le message");
+    record.insert({ "timestamp", log::attribute_t("le timestamp") });
+
     std::string pattern("[%(timestamp)s]: %(message)s");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("[le timestamp]: le message", fmt.format(record));
 }
 
 TEST(string_t, FormatMultipleAttributesMoreThanExists) {
-    log::record_t record = {
-        keyword::message() = "le message",
-        { "timestamp", log::attribute_t("le timestamp") },
-        { "source", log::attribute_t("le source") }
-    };
+    log::record_t record;
+    record.insert(keyword::message() = "le message");
+    record.insert({ "timestamp", log::attribute_t("le timestamp") });
+    record.insert({ "source", log::attribute_t("le source") });
+
     std::string pattern("[%(timestamp)s]: %(message)s");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("[le timestamp]: le message", fmt.format(record));
 }
 
 TEST(string_t, ThrowsExceptionWhenAttributeNameNotProvided) {
-    log::record_t record = {
-        keyword::message() = "le message"
-    };
+    log::record_t record;
+    record.insert(keyword::message() = "le message");
+
     std::string pattern("[%(timestamp)s]: %(message)s");
     formatter::string_t fmt(pattern);
     EXPECT_THROW(fmt.format(record), blackhole::error_t);
 }
 
 TEST(string_t, FormatOtherLocalAttribute) {
-    log::record_t record = {
-        { "uuid", log::attribute_t("123-456") },
-    };
+    log::record_t record;
+    record.insert({ "uuid", log::attribute_t("123-456") });
+
     std::string pattern("[%(...L)s]");
     formatter::string_t formatter(pattern);
     EXPECT_EQ("['uuid': '123-456']", formatter.format(record));
 }
 
 TEST(string_t, FormatOtherLocalAttributes) {
-    log::record_t record = {
-        { "uuid", log::attribute_t("123-456") },
-        { "answer to life the universe and everything", log::attribute_t(42) }
-    };
+    log::record_t record;
+    record.insert({ "uuid", log::attribute_t("123-456") });
+    record.insert({ "answer to life the universe and everything", log::attribute_t(42) });
     std::string pattern("[%(...L)s]");
     formatter::string_t formatter(pattern);
     std::string actual = formatter.format(record);
@@ -67,13 +66,13 @@ TEST(string_t, FormatOtherLocalAttributes) {
 }
 
 TEST(string_t, ComplexFormatWithOtherLocalAttributes) {
-    log::record_t record = {
-        { "timestamp", log::attribute_t("1960-01-01 00:00:00", log::attribute::scope::event) },
-        { "level", log::attribute_t("INFO", log::attribute::scope::event) },
-        keyword::message() = "le message",
-        { "uuid", log::attribute_t("123-456") },
-        { "answer to life the universe and everything", log::attribute_t(42) }
-    };
+    log::record_t record;
+    record.insert({ "timestamp", log::attribute_t("1960-01-01 00:00:00", log::attribute::scope::event) });
+    record.insert({ "level", log::attribute_t("INFO", log::attribute::scope::event) });
+    record.insert(keyword::message() = "le message");
+    record.insert({ "uuid", log::attribute_t("123-456") });
+    record.insert({ "answer to life the universe and everything", log::attribute_t(42) });
+
     std::string pattern("[%(timestamp)s] [%(level)s]: %(message)s [%(...L)s]");
     formatter::string_t formatter(pattern);
     std::string actual = formatter.format(record);
@@ -104,10 +103,10 @@ TEST(string_t, CustomMapping) {
     mapping::value_t mapper;
     mapper.add<timeval>("timestamp", &testing::map_timestamp);
 
-    log::record_t record = {
-        keyword::timestamp() = timeval { 100500, 0 },
-        keyword::message() = "le message",
-    };
+    log::record_t record;
+    record.insert(keyword::timestamp() = timeval { 100500, 0 });
+    record.insert(keyword::message() = "le message");
+
     std::string pattern("[%(timestamp)s]: %(message)s");
     formatter::string_t formatter(pattern);
     formatter.set_mapper(std::move(mapper));
@@ -119,10 +118,10 @@ TEST(string_t, CustomMappingWithKeyword) {
     mapping::value_t mapper;
     mapper.add<keyword::tag::timestamp_t>(&testing::map_timestamp);
 
-    log::record_t record = {
-        keyword::timestamp() = timeval { 100500, 0 },
-        keyword::message() = "le message",
-    };
+    log::record_t record;
+    record.insert(keyword::timestamp() = timeval { 100500, 0 });
+    record.insert(keyword::message() = "le message");
+
     std::string pattern("[%(timestamp)s]: %(message)s");
     formatter::string_t formatter(pattern);
     formatter.set_mapper(std::move(mapper));
