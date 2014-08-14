@@ -8,15 +8,15 @@ namespace blackhole {
 namespace log {
 
 class record_t {
-    typedef log::attribute_pair_t pair_type;
-
     attributes_t attributes_;
 
 public:
     record_t() = default;
+
     record_t(attributes_t&& attributes) :
         attributes_(std::move(attributes))
     {}
+
     record_t(std::initializer_list<log::attribute_pair_t> list) :
         attributes_(list.begin(), list.end())
     {}
@@ -42,11 +42,11 @@ public:
 
     inline void fill() {}
 
-    void insert(const pair_type& pair) {
+    void insert(const attribute_pair_t& pair) {
         attributes_.insert(pair);
     }
 
-    void insert(pair_type&& pair) {
+    void insert(attribute_pair_t&& pair) {
         attributes_.insert(std::move(pair));
     }
 
