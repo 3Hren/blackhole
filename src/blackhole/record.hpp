@@ -19,15 +19,28 @@ public:
      */
     record_t() = default;
 
-    //!@todo: Instead of `attributes_t` move `attribute_set_view_t`.
+    /*!
+     * Conversion constructor.
+     * Creates a record with specified attribute set.
+     * @todo: Test post condition: this->attributes() == prev attributes.
+     * @todo: Instead of `attributes_t` move `attribute_set_view_t`.
+     */
     record_t(attributes_t&& attributes) :
         attributes_(std::move(attributes))
     {}
 
+    /*!
+     * Conversion to an unspecified boolean type.
+     * Return true if the record is valid.
+     */
     operator bool() const noexcept {
         return valid();
     }
 
+    /*!
+     * Check if the record is valid.
+     * A record is considered valid if it contains at least one attribute.
+     */
     bool valid() const noexcept {
         return !attributes_.empty();
     }
@@ -40,6 +53,9 @@ public:
         return attributes_;
     }
 
+    /*!
+     * Insert attribute pair into the record.
+     */
     void insert(attribute_pair_t pair) {
         attributes_.insert(std::move(pair));
     }
