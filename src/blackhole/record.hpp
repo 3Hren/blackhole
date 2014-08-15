@@ -8,8 +8,7 @@ namespace blackhole {
 namespace log {
 
 class record_t {
-    //!@todo: Here will be non-const `attribute_set_view_t`.
-    attributes_t attributes_;
+    attribute_set_view_t view;
 
 public:
     /*!
@@ -25,8 +24,8 @@ public:
      * @todo: Test post condition: this->attributes() == prev attributes.
      * @todo: Instead of `attributes_t` move `attribute_set_view_t`.
      */
-    record_t(attributes_t&& attributes) :
-        attributes_(std::move(attributes))
+    record_t(attribute_set_view_t&& view) :
+        view(std::move(view))
     {}
 
     /*!
@@ -44,7 +43,7 @@ public:
      * @todo: Test.
      */
     bool valid() const noexcept {
-        return !attributes_.empty();
+        return !view.empty();
     }
 
     /*!
@@ -52,8 +51,8 @@ public:
      * record.
      * @todo: Test.
      */
-    const log::attributes_t& attributes() const noexcept {
-        return attributes_;
+    const attribute_set_view_t& attributes() const noexcept {
+        return view;
     }
 
     /*!
@@ -61,7 +60,7 @@ public:
      * @todo: Test.
      */
     void insert(attribute_pair_t pair) {
-        attributes_.insert(std::move(pair));
+        view.insert(std::move(pair));
     }
 
     /*!
@@ -70,7 +69,7 @@ public:
      */
     template<typename T>
     inline T extract(const std::string& name) const {
-        return blackhole::attribute::traits<T>::extract(attributes_, name);
+        return blackhole::attribute::traits<T>::extract(view, name);
     }
 };
 

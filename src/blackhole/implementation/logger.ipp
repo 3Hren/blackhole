@@ -115,29 +115,39 @@ logger_base_t::open_record(log::attribute_pair_t local_attribute) const {
 
 BLACKHOLE_API
 log::record_t
-logger_base_t::open_record(log::attributes_t local_attributes) const {
+logger_base_t::open_record(log::attributes_t attributes) const {
     if (enabled() && !state.frontends.empty()) {
         reader_lock_type lock(state.lock.open);
 
-        log::attributes_t attributes = merge({
-            universe_storage_t::instance().dump(),  // Program global.
-            get_thread_attributes(),                // Thread local.
-            state.attributes.global,                // Logger object specific.
-            get_event_attributes(),                 // Event specific, e.g. timestamp.
+        log::attribute_set_view_t set(
+            state.attributes.global,
             state.attributes.scoped.get() ?
                 state.attributes.scoped->attributes() :
-                log::attributes_t(),                // Scoped attributes.
-            std::move(local_attributes)             // Any user attributes.
-        });
+                log::attributes_t(),
+            std::move(attributes)
+        );
+
+        // universe_storage_t::instance().dump(),  // Program global.
+        set.insert(
+#ifdef BLACKHOLE_HAS_LWP
+            keyword::lwp() = syscall(SYS_gettid)
+#else
+            keyword::tid() = this_thread::get_id<std::string>()
+#endif
+        );
+
+        timeval tv;
+        gettimeofday(&tv, nullptr);
+        set.insert(keyword::timestamp() = tv);
 
         if (state.tracked) {
-            attributes.insert(
+            set.insert(
                 attribute::make("trace", ::this_thread::current_span().trace)
             );
         }
 
-        if (state.filter(attributes)) {
-            return log::record_t(std::move(attributes));
+        if (state.filter(set)) {
+            return log::record_t(std::move(set));
         }
     }
 
@@ -156,30 +166,6 @@ logger_base_t::push(log::record_t&& record) const {
             state.exception();
         }
     }
-}
-
-BLACKHOLE_API
-log::attributes_t
-logger_base_t::get_event_attributes() const {
-    timeval tv;
-    gettimeofday(&tv, nullptr);
-    log::attributes_t attributes = {
-        keyword::timestamp() = tv
-    };
-    return attributes;
-}
-
-BLACKHOLE_API
-log::attributes_t
-logger_base_t::get_thread_attributes() const {
-    log::attributes_t attributes = {
-#ifdef BLACKHOLE_HAS_LWP
-        keyword::lwp() = syscall(SYS_gettid)
-#else
-        keyword::tid() = this_thread::get_id<std::string>()
-#endif
-    };
-    return attributes;
 }
 
 BLACKHOLE_API

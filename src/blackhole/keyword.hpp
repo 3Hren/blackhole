@@ -52,7 +52,7 @@ struct keyword_t {
     struct extracter_t {
         typedef typename blackhole::aux::underlying_type<T>::type result_type;
 
-        result_type operator()(const log::attributes_t& attributes) const {
+        result_type operator()(const log::attribute_set_view_t& attributes) const {
             return static_cast<result_type>(attribute::traits<T>::extract(attributes, name()));
         }
     };

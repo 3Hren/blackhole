@@ -18,7 +18,9 @@ namespace builder {
 struct literal_t {
     const std::string literal;
 
-    void operator ()(blackhole::aux::attachable_ostringstream& stream, const mapping::value_t&, const log::attributes_t&) const {
+    void operator()(blackhole::aux::attachable_ostringstream& stream,
+                    const mapping::value_t&,
+                    const log::attribute_set_view_t&) const {
         stream.rdbuf()->storage()->append(literal);
     }
 };

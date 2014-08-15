@@ -43,20 +43,20 @@ struct variadic_t {
 
     const std::string placeholder;
 
-    void operator ()(blackhole::aux::attachable_ostringstream& stream, const mapping::value_t&, const log::attributes_t& attributes) const {
+    void operator()(blackhole::aux::attachable_ostringstream& stream, const mapping::value_t&, const log::attribute_set_view_t& attributes) const {
         std::vector<std::string> passed;
         passed.reserve(attributes.size());
 
         for (auto pit = placeholder.begin() + string::VARIADIC_KEY_PRFFIX_LENGTH; pit != placeholder.end(); ++pit) {
             const scope_underlying_type scope = *pit - '0';
 
-            for (auto it = attributes.begin(); it != attributes.end(); it++) {
+            for (auto it = attributes.begin(); it.valid(); ++it) {
                 const std::string& name = it->first;
                 const log::attribute_t& attribute = it->second;
                 if (static_cast<scope_underlying_type>(attribute.scope) & scope) {
                     std::ostringstream stream;
-                    variadic_visitor_t visitor(stream);
                     stream << "'" << name << "': ";
+                    variadic_visitor_t visitor(stream);
                     boost::apply_visitor(visitor, attribute.value);
                     passed.push_back(stream.str());
                 }

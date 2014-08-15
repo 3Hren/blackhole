@@ -21,48 +21,67 @@ TEST(json_t, FormatSingleAttribute) {
 }
 
 TEST(json_t, FormatMultipleAttributes) {
-    log::record_t record(log::attributes_t({
-        keyword::message() = "le message",
-        keyword::timestamp() = timeval{ 100500, 0 }
-    }));
+    log::record_t record;
+    record.insert(keyword::message() = "le message");
+    record.insert(keyword::timestamp() = timeval{ 100500, 0 });
 
     formatter::json_t fmt;
     std::string actual = fmt.format(record);
 
     rapidjson::Document doc;
     doc.Parse<0>(actual.c_str());
+    ASSERT_TRUE(doc.HasMember("message"));
+    ASSERT_TRUE(doc["message"].IsString());
     EXPECT_STREQ("le message", doc["message"].GetString());
+
+    ASSERT_TRUE(doc.HasMember("timestamp"));
+    ASSERT_TRUE(doc["timestamp"].IsInt());
     EXPECT_EQ(100500, doc["timestamp"].GetInt());
 }
 
 TEST(json_t, FormatMultipleComplexAttributes) {
-    log::record_t record(log::attributes_t({
-        keyword::message() = "le message",
-        keyword::timestamp() = timeval{ 100500, 0 },
-        attribute::make("@source", "udp://127.0.0.1"),
-        attribute::make("@source_host", "dhcp-218-248-wifi.yandex"),
-        attribute::make("@source_path", "service/storage"),
-        attribute::make("@uuid", "550e8400-e29b-41d4-a716-446655440000")
-    }));
+    log::record_t record;
+    record.insert(keyword::message() = "le message");
+    record.insert(keyword::timestamp() = timeval{ 100500, 0 });
+    record.insert(attribute::make("@source", "udp://127.0.0.1"));
+    record.insert(attribute::make("@source_host", "dhcp-218-248-wifi.yandex"));
+    record.insert(attribute::make("@source_path", "service/storage"));
+    record.insert(attribute::make("@uuid", "550e8400-e29b-41d4-a716-446655440000"));
 
     formatter::json_t fmt;
     std::string actual = fmt.format(record);
 
     rapidjson::Document doc;
     doc.Parse<0>(actual.c_str());
+    ASSERT_TRUE(doc.HasMember("message"));
+    ASSERT_TRUE(doc["message"].IsString());
     EXPECT_STREQ("le message", doc["message"].GetString());
+
+    ASSERT_TRUE(doc.HasMember("timestamp"));
+    ASSERT_TRUE(doc["timestamp"].IsInt());
     EXPECT_EQ(100500, doc["timestamp"].GetInt());
+
+    ASSERT_TRUE(doc.HasMember("@source"));
+    ASSERT_TRUE(doc["@source"].IsString());
     EXPECT_STREQ("udp://127.0.0.1", doc["@source"].GetString());
+
+    ASSERT_TRUE(doc.HasMember("@source_host"));
+    ASSERT_TRUE(doc["@source_host"].IsString());
     EXPECT_STREQ("dhcp-218-248-wifi.yandex", doc["@source_host"].GetString());
+
+    ASSERT_TRUE(doc.HasMember("@source_path"));
+    ASSERT_TRUE(doc["@source_path"].IsString());
     EXPECT_STREQ("service/storage", doc["@source_path"].GetString());
+
+    ASSERT_TRUE(doc.HasMember("@uuid"));
+    ASSERT_TRUE(doc["@uuid"].IsString());
     EXPECT_STREQ("550e8400-e29b-41d4-a716-446655440000", doc["@uuid"].GetString());
 }
 
 TEST(json_t, SingleAttributeMapping) {
-    log::record_t record(log::attributes_t({
-        keyword::message() = "le message",
-        keyword::timestamp() = timeval{ 100500, 0 }
-    }));
+    log::record_t record;
+    record.insert(keyword::message() = "le message");
+    record.insert(keyword::timestamp() = timeval{ 100500, 0 });
 
     formatter::json_t::config_type config;
     config.naming["message"] = "@message";
@@ -73,9 +92,11 @@ TEST(json_t, SingleAttributeMapping) {
     rapidjson::Document doc;
     doc.Parse<0>(actual.c_str());
     ASSERT_TRUE(doc.HasMember("@message"));
+    ASSERT_TRUE(doc["@message"].IsString());
     EXPECT_STREQ("le message", doc["@message"].GetString());
 
     ASSERT_TRUE(doc.HasMember("timestamp"));
+    ASSERT_TRUE(doc["timestamp"].IsInt());
     EXPECT_EQ(100500, doc["timestamp"].GetInt());
 }
 
