@@ -40,20 +40,7 @@ public:
         return attributes_;
     }
 
-    //!@todo: Refactor.
-    template<typename T, typename... Args>
-    inline void fill(T pair, Args&&... args) {
-        insert(pair);
-        fill(std::forward<Args>(args)...);
-    }
-
-    inline void fill() {}
-
-    void insert(const attribute_pair_t& pair) {
-        attributes_.insert(pair);
-    }
-
-    void insert(attribute_pair_t&& pair) {
+    void insert(attribute_pair_t pair) {
         attributes_.insert(std::move(pair));
     }
 
