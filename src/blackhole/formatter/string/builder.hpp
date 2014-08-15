@@ -19,7 +19,7 @@ namespace builder {
 typedef std::function<
     void(blackhole::aux::attachable_ostringstream&,
          const mapping::value_t&,
-         const log::attribute_set_view_t&)
+         const attribute_set_view_t&)
 > type;
 
 } // namespace builder
@@ -27,29 +27,29 @@ typedef std::function<
 namespace aux {
 
 //! Simple factory function that maps scope character to its enumeration type.
-inline log::attribute::scope map_to_scope(const char ch) {
+inline attribute::scope map_to_scope(const char ch) {
     switch (ch) {
     case 'L':
-        return log::attribute::scope::local;
+        return attribute::scope::local;
     case 'E':
-        return log::attribute::scope::event;
+        return attribute::scope::event;
     case 'G':
-        return log::attribute::scope::global;
+        return attribute::scope::global;
     case 'T':
-        return log::attribute::scope::thread;
+        return attribute::scope::thread;
     case 'U':
-        return log::attribute::scope::universe;
+        return attribute::scope::universe;
     }
-    return log::attribute::scope::local;
+    return attribute::scope::local;
 }
 
 inline void handle_variadic_key(std::string* key) {
-    typedef log::attribute::scope_underlying_type scope_underlying_type;
+    typedef attribute::scope_underlying_type scope_underlying_type;
 
     scope_underlying_type result = 0;
     for (auto it = key->begin() + VARIADIC_KEY_PRFFIX_LENGTH; it != key->end(); ++it) {
         const char ch = *it;
-        const log::attribute::scope scope = map_to_scope(ch);
+        const attribute::scope scope = map_to_scope(ch);
         result |= static_cast<scope_underlying_type>(scope);
     }
     // Explicit cast to long long resolves GCC 4.4 ambiguity bug.

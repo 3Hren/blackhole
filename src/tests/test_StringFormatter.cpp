@@ -18,7 +18,7 @@ TEST(string_t, FormatSingleAttribute) {
 TEST(string_t, FormatMultipleAttributes) {
     log::record_t record;
     record.insert(keyword::message() = "le message");
-    record.insert({ "timestamp", log::attribute_t("le timestamp") });
+    record.insert({ "timestamp", attribute_t("le timestamp") });
 
     std::string pattern("[%(timestamp)s]: %(message)s");
     formatter::string_t fmt(pattern);
@@ -28,8 +28,8 @@ TEST(string_t, FormatMultipleAttributes) {
 TEST(string_t, FormatMultipleAttributesMoreThanExists) {
     log::record_t record;
     record.insert(keyword::message() = "le message");
-    record.insert({ "timestamp", log::attribute_t("le timestamp") });
-    record.insert({ "source", log::attribute_t("le source") });
+    record.insert({ "timestamp", attribute_t("le timestamp") });
+    record.insert({ "source", attribute_t("le source") });
 
     std::string pattern("[%(timestamp)s]: %(message)s");
     formatter::string_t fmt(pattern);
@@ -47,7 +47,7 @@ TEST(string_t, ThrowsExceptionWhenAttributeNameNotProvided) {
 
 TEST(string_t, FormatOtherLocalAttribute) {
     log::record_t record;
-    record.insert({ "uuid", log::attribute_t("123-456") });
+    record.insert({ "uuid", attribute_t("123-456") });
 
     std::string pattern("[%(...L)s]");
     formatter::string_t formatter(pattern);
@@ -56,8 +56,8 @@ TEST(string_t, FormatOtherLocalAttribute) {
 
 TEST(string_t, FormatOtherLocalAttributes) {
     log::record_t record;
-    record.insert({ "uuid", log::attribute_t("123-456") });
-    record.insert({ "answer to life the universe and everything", log::attribute_t(42) });
+    record.insert({ "uuid", attribute_t("123-456") });
+    record.insert({ "answer to life the universe and everything", attribute_t(42) });
     std::string pattern("[%(...L)s]");
     formatter::string_t formatter(pattern);
     std::string actual = formatter.format(record);
@@ -67,11 +67,11 @@ TEST(string_t, FormatOtherLocalAttributes) {
 
 TEST(string_t, ComplexFormatWithOtherLocalAttributes) {
     log::record_t record;
-    record.insert({ "timestamp", log::attribute_t("1960-01-01 00:00:00", log::attribute::scope::event) });
-    record.insert({ "level", log::attribute_t("INFO", log::attribute::scope::event) });
+    record.insert({ "timestamp", attribute_t("1960-01-01 00:00:00", attribute::scope::event) });
+    record.insert({ "level", attribute_t("INFO", attribute::scope::event) });
     record.insert(keyword::message() = "le message");
-    record.insert({ "uuid", log::attribute_t("123-456") });
-    record.insert({ "answer to life the universe and everything", log::attribute_t(42) });
+    record.insert({ "uuid", attribute_t("123-456") });
+    record.insert({ "answer to life the universe and everything", attribute_t(42) });
 
     std::string pattern("[%(timestamp)s] [%(level)s]: %(message)s [%(...L)s]");
     formatter::string_t formatter(pattern);

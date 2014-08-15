@@ -40,7 +40,7 @@ public:
         packer.pack_map(record.attributes().size());
         for (auto it = record.attributes().begin(); it.valid(); ++it) {
             const std::string& name = it->first;
-            const log::attribute_t& attribute = it->second;
+            const attribute_t& attribute = it->second;
             packer.pack(name);
             boost::apply_visitor(visitor, attribute.value);
         }

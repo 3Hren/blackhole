@@ -32,12 +32,12 @@ struct has_attr_action_t : public aux::LogicMixin<has_attr_action_t<T>> {
 
     has_attr_action_t(const std::string& name) : name(name) {}
 
-    bool operator()(const log::attribute_set_view_t& attributes) const {
+    bool operator()(const attribute_set_view_t& attributes) const {
         auto it = attributes.find(name);
         if (it == attributes.end()) {
             return false;
         }
-        const log::attribute_t& attribute = it->second;
+        const attribute_t& attribute = it->second;
         typedef typename blackhole::aux::underlying_type<T>::type underlying_type;
         return boost::apply_visitor(has_attribute_visitor<underlying_type>(), attribute.value);
     }

@@ -175,7 +175,7 @@ public:
         json_visitor_t visitor(&root, config, mapper);
         for (auto it = record.attributes().begin(); it.valid(); ++it) {
             const std::string& name = it->first;
-            const log::attribute_t& attribute = it->second;
+            const attribute_t& attribute = it->second;
             aux::apply_visitor(visitor, name, attribute.value);
         }
 

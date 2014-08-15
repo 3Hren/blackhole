@@ -11,8 +11,8 @@
             static const char* name() { return #Name; } \
         }; \
     } \
-    static inline ::blackhole::keyword::keyword_t<T, tag::Name##_t, ::blackhole::log::attribute::scope::Scope>& Name() { \
-        static ::blackhole::keyword::keyword_t<T, tag::Name##_t, ::blackhole::log::attribute::scope::Scope> self; \
+    static inline ::blackhole::keyword::keyword_t<T, tag::Name##_t, ::blackhole::attribute::scope::Scope>& Name() { \
+        static ::blackhole::keyword::keyword_t<T, tag::Name##_t, ::blackhole::attribute::scope::Scope> self; \
         return self; \
     } \
     }
@@ -38,10 +38,10 @@ namespace blackhole {
 
 namespace keyword {
 
-template<typename T, typename NameProvider, log::attribute::scope Scope = log::attribute::DEFAULT_SCOPE>
+template<typename T, typename NameProvider, attribute::scope Scope = attribute::DEFAULT_SCOPE>
 struct keyword_t {
     typedef T type;
-    static_assert(log::attribute::is_supported<
+    static_assert(attribute::is_supported<
         typename blackhole::aux::underlying_type<T>::type
     >::value, "invalid attribute type");
 
@@ -52,16 +52,16 @@ struct keyword_t {
     struct extracter_t {
         typedef typename blackhole::aux::underlying_type<T>::type result_type;
 
-        result_type operator()(const log::attribute_set_view_t& attributes) const {
+        result_type operator()(const attribute_set_view_t& attributes) const {
             return static_cast<result_type>(attribute::traits<T>::extract(attributes, name()));
         }
     };
 
-    log::attribute_pair_t operator=(const T& value) const {
+    attribute_pair_t operator=(const T& value) const {
         return attribute::make(name(), attribute::traits<T>::pack(value), Scope);
     }
 
-    log::attribute_pair_t operator=(T&& value) const {
+    attribute_pair_t operator=(T&& value) const {
         return attribute::make(name(), attribute::traits<T>::pack(std::forward<T>(value)), Scope);
     }
 

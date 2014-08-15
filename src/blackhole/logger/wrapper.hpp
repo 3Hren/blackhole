@@ -70,17 +70,17 @@ public:
 
 private:
     underlying_type* wrapped;
-    log::attributes_t attributes;
+    attributes_t attributes;
 
     mutable std::mutex mutex;
 
 public:
-    wrapper_t(underlying_type& wrapped, log::attributes_t attributes) :
+    wrapper_t(underlying_type& wrapped, attributes_t attributes) :
         wrapped(&wrapped),
         attributes(std::move(attributes))
     {}
 
-    wrapper_t(const wrapper_t& wrapper, const log::attributes_t& attributes) :
+    wrapper_t(const wrapper_t& wrapper, const attributes_t& attributes) :
         wrapped(wrapper.wrapped),
         attributes(wrapper.attributes)
     {
@@ -120,14 +120,14 @@ public:
         return wrapped->open_record(attributes);
     }
 
-    log::record_t open_record(log::attribute_pair_t attribute) const {
-        log::attributes_t attributes = this->attributes;
+    log::record_t open_record(attribute_pair_t attribute) const {
+        attributes_t attributes = this->attributes;
         attributes.insert(attribute);
         return wrapped->open_record(std::move(attributes));
     }
 
-    log::record_t open_record(log::attributes_t attributes) const {
-        log::attributes_t attributes_ = this->attributes;
+    log::record_t open_record(attributes_t attributes) const {
+        attributes_t attributes_ = this->attributes;
         attributes_.insert(attributes.begin(), attributes.end());
         return wrapped->open_record(std::move(attributes_));
     }
@@ -136,7 +136,7 @@ public:
     template<typename Level>
     log::record_t
     open_record(Level level,
-                log::attributes_t attributes = log::attributes_t()) const
+                attributes_t attributes = attributes_t()) const
     {
         attributes.insert(this->attributes.begin(), this->attributes.end());
         return wrapped->open_record(level, std::move(attributes));

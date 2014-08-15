@@ -39,11 +39,11 @@ public:
 };
 
 struct variadic_t {
-    typedef log::attribute::scope_underlying_type scope_underlying_type;
+    typedef attribute::scope_underlying_type scope_underlying_type;
 
     const std::string placeholder;
 
-    void operator()(blackhole::aux::attachable_ostringstream& stream, const mapping::value_t&, const log::attribute_set_view_t& attributes) const {
+    void operator()(blackhole::aux::attachable_ostringstream& stream, const mapping::value_t&, const attribute_set_view_t& attributes) const {
         std::vector<std::string> passed;
         passed.reserve(attributes.size());
 
@@ -52,7 +52,7 @@ struct variadic_t {
 
             for (auto it = attributes.begin(); it.valid(); ++it) {
                 const std::string& name = it->first;
-                const log::attribute_t& attribute = it->second;
+                const attribute_t& attribute = it->second;
                 if (static_cast<scope_underlying_type>(attribute.scope) & scope) {
                     std::ostringstream stream;
                     stream << "'" << name << "': ";

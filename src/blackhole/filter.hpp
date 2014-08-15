@@ -6,7 +6,7 @@
 
 namespace blackhole {
 
-typedef std::function<bool(const log::attribute_set_view_t& attributes)> filter_t;
+typedef std::function<bool(const attribute_set_view_t& attributes)> filter_t;
 
 struct default_filter_t {
     static default_filter_t& instance() {
@@ -14,7 +14,7 @@ struct default_filter_t {
         return filter;
     }
 
-    bool operator()(const log::attribute_set_view_t&) {
+    bool operator()(const attribute_set_view_t&) {
         return true;
     }
 

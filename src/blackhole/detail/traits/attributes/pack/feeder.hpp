@@ -62,7 +62,7 @@ struct pack_feeder<emplace_pack_tag_t> {
         record.insert(
             std::make_pair(
                 name,
-                log::attribute_t(conv<T>::from(std::forward<T>(value)))
+                attribute_t(conv<T>::from(std::forward<T>(value)))
             )
         );
     }

@@ -173,7 +173,7 @@ TEST(logger_base_t, LocalAttributesIsMoreSpecificThanScoped) {
 
     scoped_attributes_t guard(
         log,
-        log::attributes_t({attribute::make("answer", 42)})
+        attributes_t({attribute::make("answer", 42)})
     );
 
     auto record = log.open_record(attribute::make("answer", 100500));

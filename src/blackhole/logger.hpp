@@ -54,7 +54,7 @@ protected:
 
         filter_t filter;
         struct attrbutes_t {
-            log::attributes_t global;
+            attributes_t global;
             boost::thread_specific_ptr<scoped_attributes_concept_t> scoped;
 
             attrbutes_t(void(*deleter)(scoped_attributes_concept_t*)) :
@@ -94,19 +94,19 @@ public:
     void tracked(bool enable);
 
     void set_filter(filter_t&& filter);
-    void add_attribute(const log::attribute_pair_t& attribute);
+    void add_attribute(const attribute_pair_t& attribute);
     void add_frontend(std::unique_ptr<base_frontend_t> frontend);
     void set_exception_handler(log::exception_handler_t&& handler);
 
     log::record_t open_record() const;
-    log::record_t open_record(log::attribute_pair_t local_attribute) const;
-    log::record_t open_record(log::attributes_t local_attributes) const;
+    log::record_t open_record(attribute_pair_t local_attribute) const;
+    log::record_t open_record(attributes_t local_attributes) const;
 
     void push(log::record_t&& record) const;
 
 private:
-    log::attributes_t get_event_attributes() const;
-    log::attributes_t get_thread_attributes() const;
+    attributes_t get_event_attributes() const;
+    attributes_t get_thread_attributes() const;
 };
 
 //!@todo: Develop ImmutableLogger class, which provides almost immutable
@@ -126,7 +126,7 @@ public:
     scoped_attributes_concept_t(logger_base_t& log);
     virtual ~scoped_attributes_concept_t();
 
-    virtual const log::attributes_t& attributes() const = 0;
+    virtual const attributes_t& attributes() const = 0;
 
 protected:
     bool has_parent() const;
@@ -189,7 +189,7 @@ public:
      */
     log::record_t
     open_record(level_type level,
-                log::attributes_t local = log::attributes_t()) const
+                attributes_t local = attributes_t()) const
     {
         typedef logger_verbosity_traits<level_type> verbosity_traits;
         const bool passed = verbosity_traits::passed(this->level, level);
@@ -214,7 +214,7 @@ public:
         }
 
         if (passed || trace) {
-            log::attributes_t attributes = { keyword::severity<Level>() = level };
+            attributes_t attributes = { keyword::severity<Level>() = level };
             attributes.insert(local.begin(), local.end());
             return logger_base_t::open_record(std::move(attributes));
         }

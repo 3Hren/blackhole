@@ -82,7 +82,7 @@ logger_base_t::set_filter(filter_t&& filter) {
 
 BLACKHOLE_API
 void
-logger_base_t::add_attribute(const log::attribute_pair_t& attribute) {
+logger_base_t::add_attribute(const attribute_pair_t& attribute) {
     writer_lock_type lock(state.lock.open);
     state.attributes.global.insert(attribute);
 }
@@ -104,26 +104,26 @@ logger_base_t::set_exception_handler(log::exception_handler_t&& handler) {
 BLACKHOLE_API
 log::record_t
 logger_base_t::open_record() const {
-    return open_record(log::attributes_t());
+    return open_record(attributes_t());
 }
 
 BLACKHOLE_API
 log::record_t
-logger_base_t::open_record(log::attribute_pair_t local_attribute) const {
-    return open_record(log::attributes_t({ std::move(local_attribute) }));
+logger_base_t::open_record(attribute_pair_t local_attribute) const {
+    return open_record(attributes_t({ std::move(local_attribute) }));
 }
 
 BLACKHOLE_API
 log::record_t
-logger_base_t::open_record(log::attributes_t attributes) const {
+logger_base_t::open_record(attributes_t attributes) const {
     if (enabled() && !state.frontends.empty()) {
         reader_lock_type lock(state.lock.open);
 
-        log::attribute_set_view_t set(
+        attribute_set_view_t set(
             state.attributes.global,
             state.attributes.scoped.get() ?
                 state.attributes.scoped->attributes() :
-                log::attributes_t(),
+                attributes_t(),
             std::move(attributes)
         );
 

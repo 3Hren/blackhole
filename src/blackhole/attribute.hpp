@@ -11,6 +11,8 @@
 #include <boost/mpl/vector.hpp>
 #include <boost/variant.hpp>
 
+#include "blackhole/attribute/scope.hpp"
+
 #include "blackhole/platform/initializer_list.hpp"
 #include "utils/timeval.hpp"
 #include "utils/types.hpp"
@@ -18,8 +20,6 @@
 #include "blackhole/utils/noexcept.hpp"
 
 namespace blackhole {
-
-namespace log {
 
 typedef boost::variant<
     std::int32_t,
@@ -35,18 +35,6 @@ typedef boost::variant<
 
 namespace attribute {
 
-enum class scope : std::uint8_t {
-    local       = 1 << 0,   /* user-defined event attributes */
-    event       = 1 << 1,   /* not user-defined event attributes, like timestamp or message */
-    global      = 1 << 2,   /* logger object attributes */
-    thread      = 1 << 3,   /* thread attributes */
-    universe    = 1 << 4    /* singleton attributes for entire application */
-};
-
-typedef aux::underlying_type<scope>::type scope_underlying_type;
-
-static const scope DEFAULT_SCOPE = scope::local;
-
 //! Helper metafunction that checks if the type `T` is compatible with attribute
 //! internal implementation, i.e. `attribute_value_t` variant can be constructed
 //! using type `T`.
@@ -54,7 +42,7 @@ static const scope DEFAULT_SCOPE = scope::local;
 template<typename T>
 struct is_supported :
     public boost::mpl::contains<
-        log::attribute_value_t::types,
+        attribute_value_t::types,
         typename std::decay<T>::type
     >
 {};
@@ -125,10 +113,6 @@ typedef std::unordered_map<
     attribute_pair_t::first_type,
     attribute_pair_t::second_type
 > attributes_t;
-
-} // namespace log
-
-namespace log {
 
 template<class Container, bool Const>
 class iterator_t {
@@ -313,22 +297,20 @@ public:
     }
 };
 
-}
-
 namespace attribute {
 
 // Simple typedef for attributes initializer list. Useful when specifying local attributes.
-typedef std::initializer_list<std::pair<std::string, log::attribute_value_t>> list;
+typedef std::initializer_list<std::pair<std::string, attribute_value_t>> list;
 
 // Dynamic attribute factory function.
 template<typename T>
-inline log::attribute_pair_t make(const std::string& name, const T& value, log::attribute::scope scope = log::attribute::DEFAULT_SCOPE) {
-    return std::make_pair(name, log::attribute_t(value, scope));
+inline attribute_pair_t make(const std::string& name, const T& value, attribute::scope scope = attribute::DEFAULT_SCOPE) {
+    return std::make_pair(name, attribute_t(value, scope));
 }
 
 template<typename T>
-inline log::attribute_pair_t make(const std::string& name, T&& value, log::attribute::scope scope = log::attribute::DEFAULT_SCOPE) {
-    return std::make_pair(name, log::attribute_t(std::move(value), scope));
+inline attribute_pair_t make(const std::string& name, T&& value, attribute::scope scope = attribute::DEFAULT_SCOPE) {
+    return std::make_pair(name, attribute_t(std::move(value), scope));
 }
 
 // Attribute packing/unpacking/extracting.
@@ -338,7 +320,7 @@ struct traits {
         return value;
     }
 
-    static inline T extract(const log::attribute_set_view_t& attributes, const std::string& name) {
+    static inline T extract(const attribute_set_view_t& attributes, const std::string& name) {
         return boost::get<T>(attributes.at(name).value);
     }
 };
@@ -351,7 +333,7 @@ struct traits<T, typename std::enable_if<std::is_enum<T>::value>::type> {
         return static_cast<underlying_type>(value);
     }
 
-    static inline T extract(const log::attribute_set_view_t& attributes, const std::string& name) {
+    static inline T extract(const attribute_set_view_t& attributes, const std::string& name) {
         return static_cast<T>(boost::get<underlying_type>(attributes.at(name).value));
     }
 };

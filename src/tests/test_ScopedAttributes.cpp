@@ -46,7 +46,7 @@ TEST(ScopedAttributes, BasicUsage) {
     {
         scoped_attributes_t guard1(
             logger,
-            log::attributes_t({
+            attributes_t({
                 attribute::make("att1", 1),
                 attribute::make("att2", 2)
             })
@@ -63,7 +63,7 @@ TEST(ScopedAttributes, BasicUsage) {
         {
             scoped_attributes_t guard2(
                 logger,
-                log::attributes_t({
+                attributes_t({
                     attribute::make("att1", 10),
                     attribute::make("att3", 3)
                 })
@@ -101,7 +101,7 @@ TEST(ScopedAttributes, BasicUsage) {
 
 TEST_SCOPED_ATTRIBUTES(Cons, ViaCopyingAttributes) {
     auto log = logger_factory_t::create();
-    log::attributes_t attributes({
+    attributes_t attributes({
         attribute::make("att1", 1),
         attribute::make("att2", 2)
     });
@@ -122,7 +122,7 @@ TEST(ScopedAttributes, SwapLoggers) {
 
     scoped_attributes_t guard1(
         logger1,
-        log::attributes_t({
+        attributes_t({
             attribute::make("att1", 1),
             attribute::make("att2", 2)
         })
@@ -130,7 +130,7 @@ TEST(ScopedAttributes, SwapLoggers) {
 
     scoped_attributes_t guard2(
         logger2,
-        log::attributes_t({
+        attributes_t({
             attribute::make("att3", 3),
             attribute::make("att4", 4)
         })
@@ -193,7 +193,7 @@ struct thread_tester_t {
     void run() {
         scoped_attributes_t guard(
             *logger,
-            log::attributes_t({
+            attributes_t({
                 attribute::make("attr", value)
             })
         );
@@ -229,14 +229,14 @@ TEST(ScopedAttributes, ThreadLocality) {
 
 TEST(ScopedAttrbutes, CompatibleWithWrapperViaMovingAttributes) {
     auto log = logger_factory_t::create();
-    wrapper_t<logger_base_t> wrapper(log, log::attributes_t({
+    wrapper_t<logger_base_t> wrapper(log, attributes_t({
         attribute::make("answer", 42)
     }));
 
     {
         scoped_attributes_t guard(
             wrapper,
-            log::attributes_t({
+            attributes_t({
                 attribute::make("piece of", "shit")
             })
         );
@@ -260,12 +260,12 @@ TEST(ScopedAttrbutes, CompatibleWithWrapperViaMovingAttributes) {
 
 TEST(ScopedAttrbutes, CompatibleWithWrapperViaCopyingAttributes) {
     auto log = logger_factory_t::create();
-    wrapper_t<logger_base_t> wrapper(log, log::attributes_t({
+    wrapper_t<logger_base_t> wrapper(log, attributes_t({
         attribute::make("answer", 42)
     }));
 
     {
-        log::attributes_t attributes({
+        attributes_t attributes({
             attribute::make("piece of", "shit")
         });
         scoped_attributes_t guard(wrapper, attributes);
@@ -294,5 +294,5 @@ TEST(ScopedAttributes, CorrectlyBehavesOnMovedLogger) {
     // function for thread local scoped attributes.
     auto other = std::move(log);
 
-    scoped_attributes_t guard(other, log::attributes_t());
+    scoped_attributes_t guard(other, attributes_t());
 }

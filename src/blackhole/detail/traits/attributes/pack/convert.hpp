@@ -26,36 +26,36 @@ struct conv;
 
 template<typename T>
 struct conv<T, typename std::enable_if<
-        log::attribute::is_constructible<T>::value>::type
+        attribute::is_constructible<T>::value>::type
     >
 {
-    static log::attribute_value_t from(T&& value) {
-        return log::attribute_value_t(std::forward<T>(value));
+    static attribute_value_t from(T&& value) {
+        return attribute_value_t(std::forward<T>(value));
     }
 };
 
 template<typename T>
 struct conv<T, typename std::enable_if<
-        !log::attribute::is_constructible<T>::value &&
+        !attribute::is_constructible<T>::value &&
         traits::supports::stream_push<T>::value>::type
     >
 {
-    static log::attribute_value_t from(T&& value) {
+    static attribute_value_t from(T&& value) {
         std::ostringstream stream;
         stream << value;
-        return log::attribute_value_t(stream.str());
+        return attribute_value_t(stream.str());
     }
 };
 
 template<typename T>
 struct conv<T, typename std::enable_if<
-        !log::attribute::is_constructible<T>::value &&
+        !attribute::is_constructible<T>::value &&
         !traits::supports::stream_push<T>::value>::type
     >
 {
-    static log::attribute_value_t from(T&&) {
+    static attribute_value_t from(T&&) {
         static_assert(lazy_false<T>::value, "stream operator<< is not defined for type `T`");
-        return log::attribute_value_t();
+        return attribute_value_t();
     }
 };
 

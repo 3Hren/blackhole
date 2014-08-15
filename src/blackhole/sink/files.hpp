@@ -76,7 +76,7 @@ public:
 };
 
 struct substitute_attribute_t {
-    const log::attribute_set_view_t& attributes;
+    const attribute_set_view_t& attributes;
 
     void operator()(aux::attachable_ostringstream& stream, const std::string& placeholder) const {
         auto it = attributes.find(placeholder);
@@ -109,7 +109,7 @@ public:
         formatter(config.path)
     {}
 
-    void consume(const std::string& message, const log::attribute_set_view_t& attributes) {
+    void consume(const std::string& message, const attribute_set_view_t& attributes) {
         auto filename = make_filename(attributes);
         auto it = m_handlers.find(filename);
         if (it == m_handlers.end()) {
@@ -124,7 +124,7 @@ public:
         return m_handlers;
     }
 
-    std::string make_filename(const log::attribute_set_view_t& attributes) const {
+    std::string make_filename(const attribute_set_view_t& attributes) const {
         return formatter.execute(substitute_attribute_t { attributes });
     }
 };
