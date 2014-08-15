@@ -128,28 +128,6 @@ typedef std::unordered_map<
 
 } // namespace log
 
-inline
-log::attributes_t
-merge(const std::initializer_list<log::attributes_t>& args) {
-    typedef log::attributes_t value_type;
-
-    //!@compat: Sadly, but std::initializer_list in GCC.4.4 has no typedefs.
-#ifdef BLACKHOLE_INITIALIZER_LIST_HAS_TYPEDEFS
-    typedef std::initializer_list<value_type>::const_iterator const_iterator;
-#else
-    typedef const value_type* const_iterator;
-#endif
-
-    typedef std::reverse_iterator<const_iterator> iterator;
-
-    log::attributes_t summary;
-    for (auto it = iterator(args.end()); it != iterator(args.begin()); ++it) {
-        summary.insert(it->begin(), it->end());
-    }
-
-    return summary;
-}
-
 namespace log {
 
 template<class Container, bool Const>

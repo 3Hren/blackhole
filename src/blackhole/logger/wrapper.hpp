@@ -80,10 +80,12 @@ public:
         attributes(std::move(attributes))
     {}
 
-    wrapper_t(const wrapper_t& wrapper, log::attributes_t attributes) :
+    wrapper_t(const wrapper_t& wrapper, const log::attributes_t& attributes) :
         wrapped(wrapper.wrapped),
-        attributes(merge({ wrapper.attributes, std::move(attributes) }))
-    {}
+        attributes(wrapper.attributes)
+    {
+        this->attributes.insert(attributes.begin(), attributes.end());
+    }
 
     wrapper_t(wrapper_t&& other) {
         *this = std::move(other);
