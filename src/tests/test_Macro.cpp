@@ -19,7 +19,7 @@ TEST(Macro, OpensInvalidLogRecordAndNotPush) {
 struct ExtractMessageAttributeAction {
     std::string& actual;
 
-    void operator ()(log::record_t record) const {
+    void operator()(log::record_t record) const {
         actual = record.extract<std::string>("message");
     }
 };
