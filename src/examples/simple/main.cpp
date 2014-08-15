@@ -40,9 +40,7 @@ void handle(Log& log, level lvl, const char* message) {
         // Manually insert message attribute into log record attributes set using keyword API.
         // Formatter will break up if some attributes it needed don't exist where formatting
         // occures.
-        record.attributes.insert({
-            keyword::message() = message
-        });
+        record.insert(keyword::message() = message);
         log.push(std::move(record));
     }
 }

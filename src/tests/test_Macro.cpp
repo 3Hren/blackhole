@@ -26,7 +26,7 @@ struct ExtractMessageAttributeAction {
 
 TEST(Macro, OpensValidRecordAndPush) {
     log::record_t record;
-    record.insert({ "attr1", {"value1"} });
+    record.insert(attribute::make("attr1", "value1"));
 
     mock::verbose_log_t<level> log;
     EXPECT_CALL(log, open_record(level::debug))
@@ -45,7 +45,7 @@ TEST(Macro, OpensValidRecordAndPush) {
 
 TEST(Macro, FormatMessageWithPrintfStyle) {
     log::record_t record;
-    record.insert({ "attr1", {"value1"}});
+    record.insert(attribute::make("attr1", "value1"));
 
     mock::verbose_log_t<level> log;
     EXPECT_CALL(log, open_record(level::debug))
@@ -82,7 +82,7 @@ struct ExtractAttributesAction {
 
 TEST(Macro, FormatMessageWithAttributes) {
     log::record_t record;
-    record.insert({ "attr1", {"value1"}});
+    record.insert(attribute::make("attr1", "value1"));
 
     mock::verbose_log_t<level> log;
     EXPECT_CALL(log, open_record(level::debug))
@@ -109,7 +109,7 @@ TEST(Macro, FormatMessageWithAttributes) {
 
 TEST(Macro, FormatMessageWithPrintfStyleWithAttributes) {
     log::record_t record;
-    record.insert({ "attr1", {"value1"}});
+    record.insert(attribute::make("attr1", "value1"));
 
     mock::verbose_log_t<level> log;
     EXPECT_CALL(log, open_record(level::debug))
@@ -204,7 +204,7 @@ struct EmplaceCheckExtractAttributesAction {
 
 TEST(Macro, EmplaceAttributes) {
     log::record_t record;
-    record.insert({ "attr1", {"value1"}});
+    record.insert(attribute::make("attr1", "value1"));
 
     mock::verbose_log_t<level> log;
     EXPECT_CALL(log, open_record(level::debug))
@@ -262,7 +262,7 @@ TEST(Macro, UsingStreamOperatorIfNoImplicitConversionAvailable) {
     streamable_value_t value = { "42", 42 };
 
     log::record_t record;
-    record.insert({ "attr1", {"value1"}});
+    record.insert(attribute::make("attr1", "value1"));
 
     mock::verbose_log_t<level> log;
     EXPECT_CALL(log, open_record(level::debug))
@@ -283,7 +283,7 @@ TEST(Macro, UsingStreamOperatorIfNoImplicitConversionAvailable) {
 
 TEST(Macro, InitializerListAttributes) {
     log::record_t record;
-    record.insert({ "attr1", {"value1"}});
+    record.insert(attribute::make("attr1", "value1"));
 
     mock::verbose_log_t<level> log;
     EXPECT_CALL(log, open_record(level::debug))
@@ -326,7 +326,7 @@ struct action_t {
 
 TEST(Macro, RecursiveAttributeFeeders) {
     log::record_t record;
-    record.insert({ "attr1", {"value1"}});
+    record.insert(attribute::make("attr1", "value1"));
 
     mock::verbose_log_t<level> log;
     EXPECT_CALL(log, open_record(level::debug))

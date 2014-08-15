@@ -33,7 +33,7 @@ public:
      * Return true if the record is valid.
      * @todo: Test.
      */
-    operator bool() const noexcept {
+    operator bool() const BLACKHOLE_NOEXCEPT {
         return valid();
     }
 
@@ -42,7 +42,7 @@ public:
      * A record is considered valid if it contains at least one attribute.
      * @todo: Test.
      */
-    bool valid() const noexcept {
+    bool valid() const BLACKHOLE_NOEXCEPT {
         return !view.empty();
     }
 
@@ -51,7 +51,7 @@ public:
      * record.
      * @todo: Test.
      */
-    const attribute_set_view_t& attributes() const noexcept {
+    const attribute_set_view_t& attributes() const BLACKHOLE_NOEXCEPT {
         return view;
     }
 

@@ -5,6 +5,7 @@
 #include <initializer_list>
 #include <unordered_map>
 #include <iterator>
+#include <stdexcept>
 
 #include <boost/mpl/contains.hpp>
 #include <boost/mpl/vector.hpp>
@@ -14,6 +15,7 @@
 #include "utils/timeval.hpp"
 #include "utils/types.hpp"
 #include "utils/underlying.hpp"
+#include "blackhole/utils/noexcept.hpp"
 
 namespace blackhole {
 
@@ -193,7 +195,7 @@ public:
     typedef std::forward_iterator_tag iterator_category;
 
 public:
-    iterator_t(c c1, c c2, c c3, c c4) BOOST_NOEXCEPT :
+    iterator_t(c c1, c c2, c c3, c c4) BLACKHOLE_NOEXCEPT :
         stage(0),
         it(c1.begin()),
         b1(c1.begin()), e1(c1.end()),
@@ -202,7 +204,7 @@ public:
         b4(c4.begin()), e4(c4.end())
     {}
 
-    iterator_t& operator++() BOOST_NOEXCEPT {
+    iterator_t& operator++() BLACKHOLE_NOEXCEPT {
         it++;
         switch (stage) {
         case 0:
@@ -224,11 +226,11 @@ public:
         return *this;
     }
 
-    pointer operator->() const BOOST_NOEXCEPT {
+    pointer operator->() const BLACKHOLE_NOEXCEPT {
         return it.operator->();
     }
 
-    reference operator*() const BOOST_NOEXCEPT {
+    reference operator*() const BLACKHOLE_NOEXCEPT {
         return *it;
     }
 
@@ -237,6 +239,8 @@ public:
     }
 };
 
+// Provide get/set access.
+// Can be iterated only forwardly.
 class attribute_set_view_t {
 public:
     typedef attributes_t::iterator       iterator;
@@ -257,19 +261,19 @@ public:
         global(std::move(global)),
         local(std::move(local))
     {
-        other.reserve(8);
+        //!@compat GCC > 4.4: other.reserve(8);
     }
 
-    bool empty() const noexcept {
+    bool empty() const BLACKHOLE_NOEXCEPT {
         return other.empty() && local.empty() && scoped.empty() && global.empty();
     }
 
-    size_t count(const std::string& name) const noexcept {
+    size_t count(const std::string& name) const BLACKHOLE_NOEXCEPT {
         return other.count(name) + local.count(name) + scoped.count(name) + global.count(name);
     }
 
     //!@todo: Rename to `upper_size()` or something else.
-    size_t size() const noexcept {
+    size_t size() const BLACKHOLE_NOEXCEPT {
         return other.size() + local.size() + scoped.size() + global.size();
     }
 
@@ -282,19 +286,19 @@ public:
         other.insert(first, last);
     }
 
-    iterator_t<attribute_set_view_t, true> begin() const noexcept {
+    iterator_t<attribute_set_view_t, true> begin() const BLACKHOLE_NOEXCEPT {
         return iterator_t<attribute_set_view_t, true>(other, local, scoped, global);
     }
 
-    iterator end() noexcept {
+    iterator end() BLACKHOLE_NOEXCEPT {
         return other.end();
     }
 
-    const_iterator end() const noexcept {
+    const_iterator end() const BLACKHOLE_NOEXCEPT {
         return other.end();
     }
 
-    iterator find(const std::string& name) noexcept {
+    iterator find(const std::string& name) BLACKHOLE_NOEXCEPT {
         auto it = other.find(name);
         if (it != other.end()) {
             return it;
@@ -318,7 +322,7 @@ public:
         return end();
     }
 
-    const_iterator find(const std::string& name) const noexcept {
+    const_iterator find(const std::string& name) const BLACKHOLE_NOEXCEPT {
         return const_iterator(const_cast<attribute_set_view_t*>(this)->find(name));
     }
 
