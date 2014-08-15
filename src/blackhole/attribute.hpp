@@ -9,8 +9,6 @@
 #include <boost/mpl/contains.hpp>
 #include <boost/mpl/vector.hpp>
 #include <boost/variant.hpp>
-#include <boost/iterator.hpp>
-#include <boost/iterator/zip_iterator.hpp>
 
 #include "blackhole/platform/initializer_list.hpp"
 #include "utils/timeval.hpp"
