@@ -32,6 +32,7 @@ public:
     /*!
      * Conversion to an unspecified boolean type.
      * Return true if the record is valid.
+     * @todo: Test.
      */
     operator bool() const noexcept {
         return valid();
@@ -40,6 +41,7 @@ public:
     /*!
      * Check if the record is valid.
      * A record is considered valid if it contains at least one attribute.
+     * @todo: Test.
      */
     bool valid() const noexcept {
         return !attributes_.empty();
@@ -48,6 +50,7 @@ public:
     /*!
      * Return a const reference to the view of attribute set attached to this
      * record.
+     * @todo: Test.
      */
     const log::attributes_t& attributes() const noexcept {
         return attributes_;
@@ -55,11 +58,16 @@ public:
 
     /*!
      * Insert attribute pair into the record.
+     * @todo: Test.
      */
     void insert(attribute_pair_t pair) {
         attributes_.insert(std::move(pair));
     }
 
+    /*!
+     * Try to extract attribute with specified name and convert it to type T.
+     * @todo: What throws? Test invalid name and invalid type.
+     */
     template<typename T>
     inline T extract(const std::string& name) const {
         return blackhole::attribute::traits<T>::extract(attributes_, name);
