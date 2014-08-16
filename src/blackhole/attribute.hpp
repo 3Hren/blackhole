@@ -12,6 +12,7 @@
 #include <boost/variant.hpp>
 
 #include "blackhole/attribute/scope.hpp"
+#include "blackhole/attribute/value.hpp"
 
 #include "blackhole/platform/initializer_list.hpp"
 #include "utils/timeval.hpp"
@@ -20,18 +21,6 @@
 #include "blackhole/utils/noexcept.hpp"
 
 namespace blackhole {
-
-typedef boost::variant<
-    std::int32_t,
-    std::uint32_t,
-    long,
-    unsigned long,
-    std::int64_t,
-    std::uint64_t,
-    std::double_t,
-    std::string,
-    timeval
-> attribute_value_t;
 
 namespace attribute {
 
