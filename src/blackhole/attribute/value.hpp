@@ -16,7 +16,7 @@ typedef boost::variant<
     unsigned long,
     std::int64_t,
     std::uint64_t,
-    std::double_t,
+    double,
     std::string,
     timeval
 > value_t;
