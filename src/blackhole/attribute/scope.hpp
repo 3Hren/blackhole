@@ -24,9 +24,15 @@ static const scope_t DEFAULT_SCOPE = scope_t::local;
 
 } // namespace attribute
 
-namespace log { namespace attribute {
+namespace log {
+
+namespace attribute {
+
 typedef blackhole::attribute::scope_t scope
     BLACKHOLE_DEPRECATED("Use `attribute::scope_t` instead.");
-} } // namespace log::attribute
+
+} // namespace attribute
+
+} // namespace log
 
 } // namespace blackhole
