@@ -1,15 +1,7 @@
 #pragma once
 
-#include <cstdint>
 #include <ctime>
 #include <initializer_list>
-#include <unordered_map>
-#include <iterator>
-#include <stdexcept>
-
-#include <boost/mpl/contains.hpp>
-#include <boost/mpl/vector.hpp>
-#include <boost/variant.hpp>
 
 #include "blackhole/attribute/name.hpp"
 #include "blackhole/attribute/scope.hpp"
@@ -18,10 +10,9 @@
 #include "blackhole/attribute/traits.hpp"
 #include "blackhole/attribute/value.hpp"
 
-#include "blackhole/platform/initializer_list.hpp"
-#include "utils/timeval.hpp"
-#include "utils/types.hpp"
-#include "utils/underlying.hpp"
+#include "blackhole/utils/timeval.hpp"
+#include "blackhole/utils/types.hpp"
+#include "blackhole/utils/underlying.hpp"
 #include "blackhole/utils/noexcept.hpp"
 
 namespace blackhole {
