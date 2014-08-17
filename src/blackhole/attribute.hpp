@@ -2,6 +2,7 @@
 
 #include <ctime>
 #include <initializer_list>
+#include <utility>
 
 #include "blackhole/attribute/name.hpp"
 #include "blackhole/attribute/scope.hpp"
@@ -18,17 +19,24 @@ namespace blackhole {
 
 namespace attribute {
 
-// Simple typedef for attributes initializer list. Useful when specifying local attributes.
-typedef std::initializer_list<std::pair<std::string, attribute::value_t>> list;
+/*!
+ * Simple typedef for attributes initializer list.
+ * Useful when specifying local attributes.
+ */
+typedef std::initializer_list<std::pair<name_t, value_t>> list;
 
 // Dynamic attribute factory function.
 template<typename T>
-inline attribute::pair_t make(const std::string& name, const T& value, attribute::scope_t scope = attribute::DEFAULT_SCOPE) {
+inline
+pair_t
+make(const name_t& name, const T& value, scope_t scope = DEFAULT_SCOPE) {
     return std::make_pair(name, attribute_t(value, scope));
 }
 
 template<typename T>
-inline attribute::pair_t make(const std::string& name, T&& value, attribute::scope_t scope = attribute::DEFAULT_SCOPE) {
+inline
+pair_t
+make(const name_t& name, T&& value, scope_t scope = DEFAULT_SCOPE) {
     return std::make_pair(name, attribute_t(std::move(value), scope));
 }
 
@@ -39,7 +47,7 @@ struct traits {
         return value;
     }
 
-    static inline T extract(const attribute::set_view_t& attributes, const std::string& name) {
+    static inline T extract(const set_view_t& attributes, const name_t& name) {
         return boost::get<T>(attributes.at(name).value);
     }
 };
@@ -52,7 +60,7 @@ struct traits<T, typename std::enable_if<std::is_enum<T>::value>::type> {
         return static_cast<underlying_type>(value);
     }
 
-    static inline T extract(const attribute::set_view_t& attributes, const std::string& name) {
+    static inline T extract(const set_view_t& attributes, const name_t& name) {
         return static_cast<T>(boost::get<underlying_type>(attributes.at(name).value));
     }
 };
