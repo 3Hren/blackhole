@@ -26,7 +26,8 @@ typedef boost::variant<
 
 } // namespace attribute
 
-typedef attribute::value_t attribute_value_t BLACKHOLE_DEPRECATED("Use `attribute::value_t` instead.");
+typedef attribute::value_t attribute_value_t
+    BLACKHOLE_DEPRECATED("Use `attribute::value_t` instead.");
 
 //!@todo: Now I keep multiple attribute sets in single view class. Seems, there
 //!       is no need for this class anymore, cause attribute groups can be

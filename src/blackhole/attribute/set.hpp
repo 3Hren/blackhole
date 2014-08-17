@@ -23,7 +23,10 @@ typedef std::unordered_map<
 } // namespace attribute
 
 namespace log {
-typedef blackhole::attribute::set_t attributes_t BLACKHOLE_DEPRECATED("Use `attribute::set_t` instead.");
+
+typedef blackhole::attribute::set_t attributes_t
+    BLACKHOLE_DEPRECATED("Use `attribute::set_t` instead.");
+
 } // namespace log
 
 } // namespace blackhole
