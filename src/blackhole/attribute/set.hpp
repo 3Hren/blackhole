@@ -24,6 +24,9 @@ typedef std::unordered_map<
 
 namespace log {
 
+typedef blackhole::attribute::pair_t attribute_pair_t
+    BLACKHOLE_DEPRECATED("Use `attribute::pair_t` instead.");
+
 typedef blackhole::attribute::set_t attributes_t
     BLACKHOLE_DEPRECATED("Use `attribute::set_t` instead.");
 
