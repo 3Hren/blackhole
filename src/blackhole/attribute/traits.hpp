@@ -26,8 +26,9 @@ struct is_supported :
 {};
 
 /*!
- * Helper metafunction that checks if `attribute_value_t` can be constructed
+ * Helper metafunction that checks if `attribute::value_t` can be constructed
  * using type `T`.
+ * @todo: I don't like it.
  */
 template<typename T>
 struct is_constructible {
