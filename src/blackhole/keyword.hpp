@@ -11,8 +11,8 @@
             static const char* name() { return #Name; } \
         }; \
     } \
-    static inline ::blackhole::keyword::keyword_t<T, tag::Name##_t, ::blackhole::attribute::scope::Scope>& Name() { \
-        static ::blackhole::keyword::keyword_t<T, tag::Name##_t, ::blackhole::attribute::scope::Scope> self; \
+    static inline ::blackhole::keyword::keyword_t<T, tag::Name##_t, ::blackhole::attribute::scope_t::Scope>& Name() { \
+        static ::blackhole::keyword::keyword_t<T, tag::Name##_t, ::blackhole::attribute::scope_t::Scope> self; \
         return self; \
     } \
     }
@@ -38,7 +38,7 @@ namespace blackhole {
 
 namespace keyword {
 
-template<typename T, typename NameProvider, attribute::scope Scope = attribute::DEFAULT_SCOPE>
+template<typename T, typename NameProvider, attribute::scope_t Scope = attribute::DEFAULT_SCOPE>
 struct keyword_t {
     typedef T type;
     static_assert(attribute::is_supported<

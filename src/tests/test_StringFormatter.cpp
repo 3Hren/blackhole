@@ -67,8 +67,8 @@ TEST(string_t, FormatOtherLocalAttributes) {
 
 TEST(string_t, ComplexFormatWithOtherLocalAttributes) {
     log::record_t record;
-    record.insert({ "timestamp", attribute_t("1960-01-01 00:00:00", attribute::scope::event) });
-    record.insert({ "level", attribute_t("INFO", attribute::scope::event) });
+    record.insert({ "timestamp", attribute_t("1960-01-01 00:00:00", attribute::scope_t::event) });
+    record.insert({ "level", attribute_t("INFO", attribute::scope_t::event) });
     record.insert(keyword::message() = "le message");
     record.insert({ "uuid", attribute_t("123-456") });
     record.insert({ "answer to life the universe and everything", attribute_t(42) });

@@ -15,15 +15,15 @@ TEST(Attribute, CanMakeCustomAttribute) {
 
 TEST(Attribute, TimestampIsEventAttribute) {
     attribute_pair_t pair = (keyword::timestamp() = timeval{ 0, 0 });
-    EXPECT_EQ(attribute::scope::event, pair.second.scope);
+    EXPECT_EQ(attribute::scope_t::event, pair.second.scope);
 }
 
 TEST(Attribute, SeverityIsEventAttribute) {
     attribute_pair_t pair = (keyword::severity<testing::level>() = testing::level::debug);
-    EXPECT_EQ(attribute::scope::event, pair.second.scope);
+    EXPECT_EQ(attribute::scope_t::event, pair.second.scope);
 }
 
 TEST(Attribute, MessageIsEventAttribute) {
     attribute_pair_t pair = (keyword::message() = "le message");
-    EXPECT_EQ(attribute::scope::event, pair.second.scope);
+    EXPECT_EQ(attribute::scope_t::event, pair.second.scope);
 }

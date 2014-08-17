@@ -27,20 +27,20 @@ typedef std::function<
 namespace aux {
 
 //! Simple factory function that maps scope character to its enumeration type.
-inline attribute::scope map_to_scope(const char ch) {
+inline attribute::scope_t map_to_scope(const char ch) {
     switch (ch) {
     case 'L':
-        return attribute::scope::local;
+        return attribute::scope_t::local;
     case 'E':
-        return attribute::scope::event;
+        return attribute::scope_t::event;
     case 'G':
-        return attribute::scope::global;
+        return attribute::scope_t::global;
     case 'T':
-        return attribute::scope::thread;
+        return attribute::scope_t::thread;
     case 'U':
-        return attribute::scope::universe;
+        return attribute::scope_t::universe;
     }
-    return attribute::scope::local;
+    return attribute::scope_t::local;
 }
 
 inline void handle_variadic_key(std::string* key) {
@@ -49,7 +49,7 @@ inline void handle_variadic_key(std::string* key) {
     scope_underlying_type result = 0;
     for (auto it = key->begin() + VARIADIC_KEY_PRFFIX_LENGTH; it != key->end(); ++it) {
         const char ch = *it;
-        const attribute::scope scope = map_to_scope(ch);
+        const attribute::scope_t scope = map_to_scope(ch);
         result |= static_cast<scope_underlying_type>(scope);
     }
     // Explicit cast to long long resolves GCC 4.4 ambiguity bug.

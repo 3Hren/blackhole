@@ -224,12 +224,12 @@ typedef std::initializer_list<std::pair<std::string, attribute::value_t>> list;
 
 // Dynamic attribute factory function.
 template<typename T>
-inline attribute_pair_t make(const std::string& name, const T& value, attribute::scope scope = attribute::DEFAULT_SCOPE) {
+inline attribute_pair_t make(const std::string& name, const T& value, attribute::scope_t scope = attribute::DEFAULT_SCOPE) {
     return std::make_pair(name, attribute_t(value, scope));
 }
 
 template<typename T>
-inline attribute_pair_t make(const std::string& name, T&& value, attribute::scope scope = attribute::DEFAULT_SCOPE) {
+inline attribute_pair_t make(const std::string& name, T&& value, attribute::scope_t scope = attribute::DEFAULT_SCOPE) {
     return std::make_pair(name, attribute_t(std::move(value), scope));
 }
 

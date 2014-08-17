@@ -32,7 +32,7 @@ substitute(const attribute_set_view_t& attributes, boost::format&& message, cons
     return substitute(attributes, std::move(message % argument), args...);
 }
 
-template<typename T, typename Tag, attribute::scope Scope, typename... Args>
+template<typename T, typename Tag, attribute::scope_t Scope, typename... Args>
 static inline
 std::string
 substitute(const attribute_set_view_t& attributes, boost::format&& message, const keyword::keyword_t<T, Tag, Scope>&, const Args&... args) {

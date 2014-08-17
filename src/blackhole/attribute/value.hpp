@@ -34,19 +34,19 @@ typedef attribute::value_t attribute_value_t BLACKHOLE_DEPRECATED("Use `attribut
 //!       over ALL attributes).
 struct attribute_t {
     attribute::value_t value;
-    attribute::scope scope;
+    attribute::scope_t scope;
 
     attribute_t() :
         value(std::uint8_t(0)),
         scope(attribute::DEFAULT_SCOPE)
     {}
 
-    attribute_t(const attribute::value_t& value, attribute::scope type = attribute::DEFAULT_SCOPE) :
+    attribute_t(const attribute::value_t& value, attribute::scope_t type = attribute::DEFAULT_SCOPE) :
         value(value),
         scope(type)
     {}
 
-    attribute_t(attribute::value_t&& value, attribute::scope type = attribute::DEFAULT_SCOPE) :
+    attribute_t(attribute::value_t&& value, attribute::scope_t type = attribute::DEFAULT_SCOPE) :
         value(std::move(value)),
         scope(type)
     {}
@@ -55,7 +55,7 @@ struct attribute_t {
     // It is needed, cause for weakly-typed enums its underlying type and its values underlying
     // types may vary, which leads to exception while extracting from variant.
     template<typename T, class = typename std::enable_if<std::is_enum<T>::value>::type>
-    attribute_t(T value, attribute::scope type = attribute::DEFAULT_SCOPE) :
+    attribute_t(T value, attribute::scope_t type = attribute::DEFAULT_SCOPE) :
         value(static_cast<typename aux::underlying_type<T>::type>(value)),
         scope(type)
     {}
