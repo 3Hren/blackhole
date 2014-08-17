@@ -19,7 +19,7 @@ namespace builder {
 typedef std::function<
     void(blackhole::aux::attachable_ostringstream&,
          const mapping::value_t&,
-         const attribute_set_view_t&)
+         const attribute::set_view_t&)
 > type;
 
 } // namespace builder

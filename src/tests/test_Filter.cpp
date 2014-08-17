@@ -11,9 +11,9 @@ using namespace blackhole;
 namespace testing {
 
 inline
-attribute_set_view_t
+attribute::set_view_t
 convert(const attribute::set_t& attributes) {
-    attribute_set_view_t converted;
+    attribute::set_view_t converted;
     converted.insert(attributes.begin(), attributes.end());
     return converted;
 }
@@ -23,35 +23,35 @@ convert(const attribute::set_t& attributes) {
 TEST(HasAttribute, ReturnsTrueIfDynamicAttributeExists) {
     auto filter = expression::has_attr<std::int32_t>("custom");
     attribute::set_t attributes = {{"custom", attribute_t(42)}};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 }
 
 TEST(HasAttribute, ReturnsFalseIfDynamicAttributeNotExists) {
     auto filter = expression::has_attr<std::int32_t>("non-existing-attribute");
     attribute::set_t attributes = {{"custom", attribute_t(42)}};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_FALSE(filter(c));
 }
 
 TEST(HasAttribute, ReturnsFalseIfDynamicAttributeExistsButTypeMismatched) {
     auto filter = expression::has_attr<std::int32_t>("custom");
     attribute::set_t attributes = {{"custom", attribute_t(3.1415)}};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_FALSE(filter(c));
 }
 
 TEST(HasAttribute, ReturnsTrueIfBothDynamicAttributeNotExistsAndTypeMismatched) {
     auto filter = expression::has_attr<std::int32_t>("non-existing-attribute");
     attribute::set_t attributes = {{"custom", attribute_t(3.1415)}};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_FALSE(filter(c));
 }
 
 TEST(FilterCustomAttribute, CanExtractDynamicAttribute) {
     auto filter = expression::get_attr<std::int32_t>("custom");
     attribute::set_t attributes = {{"custom", attribute_t(42)}};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_EQ(42, filter(c));
 }
 
@@ -64,35 +64,35 @@ TEST(FilterCustomAttribute, ThrowsExceptionIfNameMismatch) {
      */
     auto filter = expression::get_attr<std::int32_t>("non-existing-attribute");
     attribute::set_t attributes = {{"custom", attribute_t(42)}};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_THROW(filter(c), std::logic_error);
 }
 
 TEST(FilterCustomAttribute, ThrowsExceptionIfTypeMismatch) {
     auto filter = expression::get_attr<std::int32_t>("custom");
     attribute::set_t attributes = {{"custom", attribute_t(3.1415)}};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_THROW(filter(c), boost::bad_get);
 }
 
 TEST(FilterCustomAttribute, Get) {
     auto filter = expression::get_attr<std::int32_t>("custom") == 42;
     attribute::set_t attributes = {{"custom", attribute_t(42)}};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 }
 
 TEST(FilterCustomAttribute, FailsIfDeferredlyAttributeComparingFails) {
     auto filter = expression::get_attr<std::int32_t>("custom") == 666;
     attribute::set_t attributes = {{"custom", attribute_t(42)}};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_FALSE(filter(c));
 }
 
 TEST(FilterCustomAttribute, HasAndGetEq) {
     auto filter = expression::has_attr<std::int32_t>("custom") && expression::get_attr<std::int32_t>("custom") == 42;
     attribute::set_t attributes = {{"custom", attribute_t(42)}};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 }
 
@@ -100,7 +100,7 @@ TEST(FilterCustomAttribute, HasAndGetLess) {
     auto filter = expression::has_attr<std::int32_t>("custom")
             && expression::get_attr<std::int32_t>("custom") < 42;
     attribute::set_t attributes = {{"custom", attribute_t(42)}};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_FALSE(filter(c));
 
     attributes = {{"custom", attribute_t(41)}};
@@ -113,7 +113,7 @@ TEST(FilterCustomAttribute, HasAndGetLessEq) {
         expression::has_attr<std::int32_t>("custom")
         && expression::get_attr<std::int32_t>("custom") <= 42;
     attribute::set_t attributes = {{"custom", attribute_t(42)}};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 
     attributes = {{"custom", attribute_t(41)}};
@@ -128,7 +128,7 @@ TEST(FilterCustomAttribute, HasAndGetLessEq) {
 TEST(FilterKeywordAttribute, Get) {
     auto filter = expression::get_attr(keyword::timestamp()) == timeval{ 100500, 0 };
     attribute::set_t attributes = {{"timestamp", attribute_t(timeval{ 100500, 0 })}};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 }
 
@@ -144,14 +144,14 @@ enum weak_enum {
 TEST(FilterWeaklyTypedEnumAttribute, Has) {
     auto filter = expression::has_attr<testing::weak_enum>("weak_enum");
     attribute::set_t attributes = {{ "weak_enum", attribute_t(testing::high) }};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 }
 
 TEST(FilterWeaklyTypedEnumAttribute, Get) {
     auto filter = expression::get_attr<testing::weak_enum>("weak_enum") == testing::high;
     attribute::set_t attributes = {{ "weak_enum", attribute_t(testing::high) }};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 }
 
@@ -159,7 +159,7 @@ TEST(FilterWeaklyTypedEnumAttribute, HasAndGetLess) {
     auto filter = expression::has_attr<testing::weak_enum>("weak_enum")
             && expression::get_attr<testing::weak_enum>("weak_enum") < testing::high;
     attribute::set_t attributes = {{ "weak_enum", attribute_t(testing::high) }};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_FALSE(filter(c));
 
     attributes = {{ "weak_enum", attribute_t(testing::low) }};
@@ -171,7 +171,7 @@ TEST(FilterWeaklyTypedEnumAttribute, HasAndGetLessEq) {
     auto filter = expression::has_attr<testing::weak_enum>("weak_enum")
             && expression::get_attr<testing::weak_enum>("weak_enum") <= testing::high;
     attribute::set_t attributes = {{ "weak_enum", attribute_t(testing::high) }};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 
     attributes = {{ "weak_enum", attribute_t(testing::low) }};
@@ -191,14 +191,14 @@ enum class strong_enum {
 TEST(FilterStronglyTypedEnumAttribute, Has) {
     auto filter = expression::has_attr<testing::strong_enum>("strong_enum");
     attribute::set_t attributes = {{ "strong_enum", attribute_t(testing::strong_enum::high) }};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 }
 
 TEST(FilterStronglyTypedEnumAttribute, Get) {
     auto filter = expression::get_attr<testing::strong_enum>("strong_enum") == testing::strong_enum::high;
     attribute::set_t attributes = {{ "strong_enum", attribute_t(testing::strong_enum::high) }};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 }
 
@@ -206,7 +206,7 @@ TEST(FilterStronglyTypedEnumAttribute, HasAndGetLess) {
     auto filter = expression::has_attr<testing::strong_enum>("strong_enum")
             && expression::get_attr<testing::strong_enum>("strong_enum") < testing::strong_enum::high;
     attribute::set_t attributes = {{ "strong_enum", attribute_t(testing::strong_enum::high) }};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_FALSE(filter(c));
 
     attributes = {{ "strong_enum", attribute_t(testing::strong_enum::low) }};
@@ -218,7 +218,7 @@ TEST(FilterStronglyTypedEnumAttribute, HasAndGetLessEq) {
     auto filter = expression::has_attr<testing::strong_enum>("strong_enum")
             && expression::get_attr<testing::strong_enum>("strong_enum") <= testing::strong_enum::high;
     attribute::set_t attributes = {{ "strong_enum", attribute_t(testing::strong_enum::high) }};
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 
     attributes = {{ "strong_enum", attribute_t(testing::strong_enum::low) }};
@@ -240,14 +240,14 @@ enum class severity {
 TEST(FilterSeverity, Has) {
     auto filter = expression::has_attr(keyword::severity<ts::severity>());
     attribute::set_t attributes = { keyword::severity<ts::severity>() = ts::severity::info };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 }
 
 TEST(FilterSeverity, GetEq) {
     auto filter = expression::get_attr(keyword::severity<ts::severity>()) == ts::severity::info;
     attribute::set_t attributes = { keyword::severity<ts::severity>() = ts::severity::info };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 }
 
@@ -255,7 +255,7 @@ TEST(FilterSeverity, HasAndGetLess) {
     auto filter = expression::has_attr(keyword::severity<ts::severity>())
             && expression::get_attr(keyword::severity<ts::severity>()) < ts::severity::info;
     attribute::set_t attributes = { keyword::severity<ts::severity>() = ts::severity::info };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_FALSE(filter(c));
 
     attributes = { keyword::severity<ts::severity>() = ts::severity::debug };
@@ -267,7 +267,7 @@ TEST(FilterSeverity, HasAndGetLessEq) {
     auto filter = expression::has_attr(keyword::severity<ts::severity>())
             && expression::get_attr(keyword::severity<ts::severity>()) <= ts::severity::info;
     attribute::set_t attributes = { keyword::severity<ts::severity>() = ts::severity::info };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 
     attributes = { keyword::severity<ts::severity>() = ts::severity::debug };
@@ -283,7 +283,7 @@ TEST(FilterSeverity, HasAndGetGt) {
     auto filter = expression::has_attr(keyword::severity<ts::severity>())
             && expression::get_attr(keyword::severity<ts::severity>()) > ts::severity::info;
     attribute::set_t attributes = { keyword::severity<ts::severity>() = ts::severity::info };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_FALSE(filter(c));
 
     attributes = { keyword::severity<ts::severity>() = ts::severity::debug };
@@ -299,7 +299,7 @@ TEST(FilterSeverity, HasAndGetGtEq) {
     auto filter = expression::has_attr(keyword::severity<ts::severity>())
             && expression::get_attr(keyword::severity<ts::severity>()) >= ts::severity::info;
     attribute::set_t attributes = { keyword::severity<ts::severity>() = ts::severity::info };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 
     attributes = { keyword::severity<ts::severity>() = ts::severity::debug };
@@ -317,7 +317,7 @@ TEST(FilterCustomAttribute, HasOrHas) {
         {"custom-1", attribute_t(41)},
         {"custom-2", attribute_t(100501)}
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 
     attributes = {
@@ -342,7 +342,7 @@ TEST(FilterCustomAttribute, GetEqAndGetEq) {
         {"custom-1", attribute_t(42)},
         {"custom-2", attribute_t(100500)}
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 
     attributes = {
@@ -367,7 +367,7 @@ TEST(FilterCustomAttribute, GetEqOrGetEq) {
         {"custom-1", attribute_t(42)},
         {"custom-2", attribute_t(100500)}
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 
     attributes = {
@@ -399,7 +399,7 @@ TEST(FilterCustomAttribute, GetLessAndGetLess) {
         {"custom-1", attribute_t(42)},
         {"custom-2", attribute_t(100500)}
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_FALSE(filter(c));
 
     attributes = {
@@ -431,7 +431,7 @@ TEST(FilterCustomAttribute, GetLessOrGetLess) {
         {"custom-1", attribute_t(42)},
         {"custom-2", attribute_t(100500)}
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_FALSE(filter(c));
 
     attributes = {
@@ -463,7 +463,7 @@ TEST(FilterCustomAttribute, GetLessEqAndGetLessEq) {
         {"custom-1", attribute_t(42)},
         {"custom-2", attribute_t(100500)}
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 
     attributes = {
@@ -495,7 +495,7 @@ TEST(FilterCustomAttribute, GetGtAndGetGt) {
         {"custom-1", attribute_t(42)},
         {"custom-2", attribute_t(100500)}
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_FALSE(filter(c));
 
     attributes = {
@@ -534,7 +534,7 @@ TEST(FilterCustomAttribute, GetGtEqAndGetGtEq) {
         {"custom-1", attribute_t(42)},
         {"custom-2", attribute_t(100500)}
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 
     attributes = {
@@ -576,7 +576,7 @@ TEST(FilterCustomAttribute, TripleAndOperatorWithEqFilter) {
         {"custom-2", attribute_t(100500)},
         {"custom-3", attribute_t(666)},
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 
     attributes = {
@@ -614,7 +614,7 @@ TEST(FilterCustomAttribute, TripleOrOperatorWithEqFilter) {
         {"custom-2", attribute_t(100500)},
         {"custom-3", attribute_t(666)},
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 
     attributes = {
@@ -660,7 +660,7 @@ TEST(FilterCustomAttribute, CombinationOfLogicOperatorsWithEqFilter) {
         {"custom-2", attribute_t(100500)},
         {"custom-3", attribute_t(666)},
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 
     attributes = {
@@ -714,7 +714,7 @@ TEST(FilterCustomAttribute, ReversedCombinationOfLogicOperatorsWithEqFilter) {
         {"custom-2", attribute_t(100500)},
         {"custom-3", attribute_t(666)},
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 
     attributes = {
@@ -764,7 +764,7 @@ TEST(FilterKeyword, LessThan) {
     attribute::set_t attributes = {
         {keyword::severity<level>() = level::debug}
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 
     attributes = {
@@ -792,7 +792,7 @@ TEST(FilterKeyword, LessEqThan) {
     attribute::set_t attributes = {
         {keyword::severity<level>() = level::debug}
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 
     attributes = {
@@ -820,7 +820,7 @@ TEST(FilterKeyword, GreaterThan) {
     attribute::set_t attributes = {
         {keyword::severity<level>() = level::debug}
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_FALSE(filter(c));
 
     attributes = {
@@ -848,7 +848,7 @@ TEST(FilterKeyword, GreaterEqThan) {
     attribute::set_t attributes = {
         {keyword::severity<level>() = level::debug}
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_FALSE(filter(c));
 
     attributes = {
@@ -876,7 +876,7 @@ TEST(FilterKeyword, Eq) {
     attribute::set_t attributes = {
         {keyword::severity<level>() = level::debug}
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_FALSE(filter(c));
 
     attributes = {
@@ -906,7 +906,7 @@ TEST(FilterKeyword, AndComplex) {
     attribute::set_t attributes = {
         {keyword::severity<level>() = level::debug}
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_FALSE(filter(c));
 
     attributes = {
@@ -936,7 +936,7 @@ TEST(FilterKeyword, OrComplex) {
     attribute::set_t attributes = {
         {keyword::severity<level>() = level::debug}
     };
-    attribute_set_view_t c = convert(attributes);
+    attribute::set_view_t c = convert(attributes);
     EXPECT_TRUE(filter(c));
 
     attributes = {

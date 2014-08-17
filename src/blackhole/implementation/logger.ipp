@@ -119,7 +119,7 @@ logger_base_t::open_record(attribute::set_t attributes) const {
     if (enabled() && !state.frontends.empty()) {
         reader_lock_type lock(state.lock.open);
 
-        attribute_set_view_t set(
+        attribute::set_view_t set(
             state.attributes.global,
             state.attributes.scoped.get() ?
                 state.attributes.scoped->attributes() :

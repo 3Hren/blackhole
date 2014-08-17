@@ -19,7 +19,7 @@ namespace builder {
 struct placeholder_t {
     const std::string placeholder;
 
-    void operator ()(blackhole::aux::attachable_ostringstream& stream, const mapping::value_t& mapper, const attribute_set_view_t& attributes) const {
+    void operator ()(blackhole::aux::attachable_ostringstream& stream, const mapping::value_t& mapper, const attribute::set_view_t& attributes) const {
         auto it = attributes.find(placeholder);
         if (it == attributes.end()) {
             throw error_t("key '%s' was not provided", placeholder);

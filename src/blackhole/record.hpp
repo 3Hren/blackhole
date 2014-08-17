@@ -8,7 +8,7 @@ namespace blackhole {
 namespace log {
 
 class record_t {
-    attribute_set_view_t view;
+    blackhole::attribute::set_view_t view;
 
 public:
     /*!
@@ -22,9 +22,9 @@ public:
      * Conversion constructor.
      * Creates a record with specified attribute set.
      * @todo: Test post condition: this->attributes() == prev attributes.
-     * @todo: Instead of `attribute::set_t` move `attribute_set_view_t`.
+     * @todo: Instead of `attribute::set_t` move `attribute::set_view_t`.
      */
-    record_t(attribute_set_view_t&& view) :
+    record_t(blackhole::attribute::set_view_t&& view) :
         view(std::move(view))
     {}
 
@@ -51,7 +51,7 @@ public:
      * record.
      * @todo: Test.
      */
-    const attribute_set_view_t& attributes() const BLACKHOLE_NOEXCEPT {
+    const blackhole::attribute::set_view_t& attributes() const BLACKHOLE_NOEXCEPT {
         return view;
     }
 

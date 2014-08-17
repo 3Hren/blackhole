@@ -21,21 +21,21 @@ namespace aux {
 //!@todo: Consider migrating to something more faster than boost::format.
 static inline
 std::string
-substitute(const attribute_set_view_t&, boost::format&& message) {
+substitute(const attribute::set_view_t&, boost::format&& message) {
     return message.str();
 }
 
 template<typename T, typename... Args>
 static inline
 std::string
-substitute(const attribute_set_view_t& attributes, boost::format&& message, const T& argument, const Args&... args) {
+substitute(const attribute::set_view_t& attributes, boost::format&& message, const T& argument, const Args&... args) {
     return substitute(attributes, std::move(message % argument), args...);
 }
 
 template<typename T, typename Tag, attribute::scope_t Scope, typename... Args>
 static inline
 std::string
-substitute(const attribute_set_view_t& attributes, boost::format&& message, const keyword::keyword_t<T, Tag, Scope>&, const Args&... args) {
+substitute(const attribute::set_view_t& attributes, boost::format&& message, const keyword::keyword_t<T, Tag, Scope>&, const Args&... args) {
     const T& arg = attribute::traits<T>::extract(attributes, keyword::keyword_t<T, Tag, Scope>::name());
     std::ostringstream stream;
     format::message::insitu<Tag>::execute(stream, arg);
@@ -43,7 +43,7 @@ substitute(const attribute_set_view_t& attributes, boost::format&& message, cons
 }
 
 template<typename... Args>
-static std::string format(const attribute_set_view_t& attributes, const std::string& fmt, Args&&... args) {
+static std::string format(const attribute::set_view_t& attributes, const std::string& fmt, Args&&... args) {
     return substitute(attributes, boost::format(fmt), args...);
 }
 
