@@ -11,6 +11,7 @@
 #include <boost/mpl/vector.hpp>
 #include <boost/variant.hpp>
 
+#include "blackhole/attribute/name.hpp"
 #include "blackhole/attribute/scope.hpp"
 #include "blackhole/attribute/traits.hpp"
 #include "blackhole/attribute/value.hpp"
@@ -55,8 +56,6 @@ struct attribute_t {
         return value == other.value && scope == other.scope;
     }
 };
-
-typedef std::string attribute_name_t;
 
 typedef std::pair<
     attribute_name_t,
