@@ -12,6 +12,7 @@
 #include <boost/variant.hpp>
 
 #include "blackhole/attribute/scope.hpp"
+#include "blackhole/attribute/traits.hpp"
 #include "blackhole/attribute/value.hpp"
 
 #include "blackhole/platform/initializer_list.hpp"
@@ -21,42 +22,6 @@
 #include "blackhole/utils/noexcept.hpp"
 
 namespace blackhole {
-
-namespace attribute {
-
-//! Helper metafunction that checks if the type `T` is compatible with attribute
-//! internal implementation, i.e. `attribute_value_t` variant can be constructed
-//! using type `T`.
-//! @note: This metafunction ignores implicit type conversion.
-template<typename T>
-struct is_supported :
-    public boost::mpl::contains<
-        attribute_value_t::types,
-        typename std::decay<T>::type
-    >
-{};
-
-// Helper metafunction that checks if `attribute_value_t` can be constructed using type `T`.
-template<typename T>
-struct is_constructible {
-    typedef boost::mpl::vector<
-        const char*,    // Implicit literal to string conversion.
-        char,
-        unsigned char,
-        short,
-        unsigned short
-    > additional_types;
-
-    typedef typename std::conditional<
-        boost::mpl::contains<additional_types, typename std::decay<T>::type>::value || is_supported<T>::value,
-        std::true_type,
-        std::false_type
-    >::type type;
-
-    static const bool value = type::value;
-};
-
-} // namespace attribute
 
 struct attribute_t {
     attribute_value_t value;
