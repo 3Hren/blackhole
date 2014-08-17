@@ -9,7 +9,6 @@
 #include "blackhole/attribute/view.hpp"
 #include "blackhole/attribute/traits.hpp"
 #include "blackhole/attribute/value.hpp"
-
 #include "blackhole/utils/timeval.hpp"
 #include "blackhole/utils/types.hpp"
 #include "blackhole/utils/underlying.hpp"
