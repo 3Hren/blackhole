@@ -10,7 +10,6 @@
 #include <blackhole/logger.hpp>
 #include <blackhole/sink/stream.hpp>
 #include <blackhole/sink/thread.hpp>
-#include <blackhole/synchronized.hpp>
 #include <blackhole/utils/atomic.hpp>
 #include <blackhole/utils/format.hpp>
 
@@ -42,7 +41,7 @@ struct config_t {
 
 class worker_t {
 public:
-    typedef synchronized<logger_base_t> logger_type;
+    typedef logger_base_t logger_type;
     typedef boost::asio::io_service loop_type;
     typedef elasticsearch::result_t<
         elasticsearch::response::bulk_write_t
@@ -152,7 +151,7 @@ public:
     typedef elasticsearch_::config_t config_type;
 
 private:
-    synchronized<logger_base_t> log;
+    logger_base_t log;
 
     boost::posix_time::milliseconds interval;
 

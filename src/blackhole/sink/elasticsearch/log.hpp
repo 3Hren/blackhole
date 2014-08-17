@@ -4,7 +4,6 @@
 #include "blackhole/formatter/string.hpp"
 #include "blackhole/logger.hpp"
 #include "blackhole/sink/stream.hpp"
-#include "blackhole/synchronized.hpp"
 #include "blackhole/utils/unused.hpp"
 
 #ifdef ENABLE_ELASTICSEARCH_DEBUG

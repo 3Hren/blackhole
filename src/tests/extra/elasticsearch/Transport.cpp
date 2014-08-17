@@ -69,7 +69,7 @@ void post_sniff(boost::asio::io_service& loop,
 
 namespace stub {
 
-synchronized<logger_base_t> log(logger_factory_t::create());
+logger_base_t log(logger_factory_t::create());
 
 } // namespace stub
 

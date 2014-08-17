@@ -58,7 +58,6 @@ SET(BASE_SOURCES
     test_JsonFormatter
     test_Keyword
     test_Logger
-    test_LoggerSynchronized
     test_Macro
     test_Manual
     test_MsgpackFormatter

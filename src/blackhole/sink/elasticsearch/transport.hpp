@@ -36,7 +36,7 @@ template<
 >
 class http_transport_t {
 public:
-    typedef blackhole::synchronized<blackhole::logger_base_t> logger_type;
+    typedef blackhole::logger_base_t logger_type;
 
     typedef boost::asio::io_service loop_type;
     typedef Connection connection_type;

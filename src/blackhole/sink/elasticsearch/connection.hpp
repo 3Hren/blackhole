@@ -26,7 +26,7 @@ struct callback {
 template<class Action, class Connection>
 class response_handler_t {
 public:
-    typedef blackhole::synchronized<blackhole::logger_base_t> logger_type;
+    typedef blackhole::logger_base_t logger_type;
 
     typedef Action action_type;
     typedef Connection connection_type;
@@ -94,7 +94,7 @@ public:
 
 class http_connection_t {
 public:
-    typedef blackhole::synchronized<blackhole::logger_base_t> logger_type;
+    typedef blackhole::logger_base_t logger_type;
 
     typedef boost::asio::io_service loop_type;
     typedef boost::asio::ip::tcp protocol_type;
