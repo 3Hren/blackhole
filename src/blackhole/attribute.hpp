@@ -25,7 +25,9 @@ namespace attribute {
  */
 typedef std::initializer_list<std::pair<name_t, value_t>> list;
 
-// Dynamic attribute factory function.
+/*!
+ * Dynamic attribute factory function.
+ */
 template<typename T>
 inline
 pair_t
