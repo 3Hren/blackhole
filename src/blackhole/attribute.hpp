@@ -58,7 +58,7 @@ struct attribute_t {
 };
 
 typedef std::pair<
-    attribute_name_t,
+    attribute::name_t,
     attribute_t
 > attribute_pair_t;
 
