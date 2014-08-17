@@ -5,6 +5,7 @@
 #include "blackhole/attribute.hpp"
 #include "blackhole/utils/noncopyable.hpp"
 
+//!@todo: Drop this shit.
 namespace blackhole {
 
 template<class T>
