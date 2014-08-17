@@ -2,6 +2,7 @@
 
 #include <cstdint>
 
+#include "blackhole/platform/deprecated.hpp"
 #include "blackhole/utils/underlying.hpp"
 
 namespace blackhole {
@@ -21,5 +22,9 @@ typedef aux::underlying_type<scope>::type scope_underlying_type;
 static const scope DEFAULT_SCOPE = scope::local;
 
 } // namespace attribute
+
+namespace log { namespace attribute {
+typedef blackhole::attribute::scope scope BLACKHOLE_DEPRECATED("Use `attribute::scope_t` instead.");
+} }
 
 } // namespace blackhole
