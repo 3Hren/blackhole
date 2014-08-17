@@ -26,9 +26,6 @@ typedef boost::variant<
 
 } // namespace attribute
 
-typedef attribute::value_t attribute_value_t
-    BLACKHOLE_DEPRECATED("Use `attribute::value_t` instead.");
-
 //!@todo: Now I keep multiple attribute sets in single view class. Seems, there
 //!       is no need for this class anymore, cause attribute groups can be
 //!       received from view class explicitly (without that freaking iterate
@@ -65,5 +62,15 @@ struct attribute_t {
         return value == other.value && scope == other.scope;
     }
 };
+
+namespace log {
+
+typedef blackhole::attribute::value_t attribute_value_t
+    BLACKHOLE_DEPRECATED("Use `attribute::value_t` instead.");
+
+typedef blackhole::attribute_t attribute_t
+    BLACKHOLE_DEPRECATED("Use `blackhole::attribute_t` instead.");
+
+} // namespace log
 
 } // namespace blackhole
