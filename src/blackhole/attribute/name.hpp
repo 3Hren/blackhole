@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "blackhole/platform/compiler.hpp"
+#include "blackhole/platform/deprecated.hpp"
 
 namespace blackhole {
 
@@ -12,10 +12,6 @@ typedef std::string name_t;
 
 } // namespace attribute
 
-#if defined(BLACKHOLE_HAVE_CLANG) || defined(BLACKHOLE_HAVE_AT_LEAST_GCC46)
-typedef attribute::name_t attribute_name_t __attribute__((deprecated("Use `attribute::name_t` instead.")));
-#else
-typedef attribute::name_t attribute_name_t __attribute__((deprecated));
-#endif
+typedef attribute::name_t attribute_name_t BLACKHOLE_DEPRECATED("Use `attribute::name_t` instead.");
 
 } // namespace blackhole
