@@ -9,6 +9,7 @@ namespace blackhole {
 
 namespace attribute {
 
+//! @deprecated: It's very likely, that attribute scope will be dropped soon.
 enum class scope_t : std::uint8_t {
     local       = 1 << 0,   /* user-defined event attributes */
     event       = 1 << 1,   /* not user-defined event attributes, like timestamp or message */
