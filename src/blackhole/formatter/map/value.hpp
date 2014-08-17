@@ -25,14 +25,14 @@ struct extracter {
         func(func)
     {}
 
-    void operator()(aux::attachable_ostringstream& stream, const attribute_value_t& value) const {
+    void operator()(aux::attachable_ostringstream& stream, const attribute::value_t& value) const {
         typedef typename aux::underlying_type<T>::type underlying_type;
         func(stream, static_cast<T>(boost::get<underlying_type>(value)));
     }
 };
 
 class value_t {
-    typedef std::function<void(aux::attachable_ostringstream&, const attribute_value_t&)> mapping_t;
+    typedef std::function<void(aux::attachable_ostringstream&, const attribute::value_t&)> mapping_t;
     std::unordered_map<std::string, mapping_t> m_mappings;
 
 public:

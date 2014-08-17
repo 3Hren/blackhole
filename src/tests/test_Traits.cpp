@@ -31,37 +31,37 @@ TEST(Traits, StringIsConvertibleToAttribute) {
 TEST(Traits, AnyShortIsImplicitConvertible) {
     static_assert(attribute::is_constructible<short>::value,
                   "`short` must be convertible");
-    attribute_value_t(static_cast<short>(42));
+    attribute::value_t(static_cast<short>(42));
 
     static_assert(attribute::is_constructible<unsigned short>::value,
                   "`unsigned short` must be convertible");
-    attribute_value_t(static_cast<unsigned short>(42));
+    attribute::value_t(static_cast<unsigned short>(42));
 
     static_assert(attribute::is_constructible<const short>::value,
                   "`const short` must be convertible");
-    attribute_value_t(static_cast<const short>(42));
+    attribute::value_t(static_cast<const short>(42));
 
     static_assert(attribute::is_constructible<const unsigned short>::value,
                   "`const unsigned short` must be convertible");
-    attribute_value_t(static_cast<const unsigned short>(42));
+    attribute::value_t(static_cast<const unsigned short>(42));
 }
 
 TEST(Traits, AnyIntIsImplicitConvertible) {
     static_assert(attribute::is_constructible<int>::value,
                   "`int` must be convertible");
-    attribute_value_t(static_cast<int>(42));
+    attribute::value_t(static_cast<int>(42));
 
     static_assert(attribute::is_constructible<unsigned int>::value,
                   "`unsigned int` must be convertible");
-    attribute_value_t(static_cast<unsigned int>(42));
+    attribute::value_t(static_cast<unsigned int>(42));
 
     static_assert(attribute::is_constructible<const int>::value,
                   "`const int` must be convertible");
-    attribute_value_t(static_cast<const int>(42));
+    attribute::value_t(static_cast<const int>(42));
 
     static_assert(attribute::is_constructible<const unsigned int>::value,
                   "`const unsigned int` must be convertible");
-    attribute_value_t(static_cast<const unsigned int>(42));
+    attribute::value_t(static_cast<const unsigned int>(42));
 }
 
 TEST(Traits, AnyLongIsImplicitConvertible) {
@@ -69,25 +69,25 @@ TEST(Traits, AnyLongIsImplicitConvertible) {
         attribute::is_constructible<long>::value,
         "`long` must be convertible"
     );
-    attribute_value_t(42L);
+    attribute::value_t(42L);
 
     static_assert(
         attribute::is_constructible<unsigned long>::value,
         "`unsigned long` must be convertible"
     );
-    attribute_value_t(42UL);
+    attribute::value_t(42UL);
 
     static_assert(
         attribute::is_constructible<const long>::value,
         "`const long` must be convertible"
     );
-    attribute_value_t(static_cast<const long>(42));
+    attribute::value_t(static_cast<const long>(42));
 
     static_assert(
         attribute::is_constructible<const unsigned long>::value,
         "`const unsigned long` must be convertible"
     );
-    attribute_value_t(static_cast<const unsigned long>(42));
+    attribute::value_t(static_cast<const unsigned long>(42));
 }
 
 TEST(Traits, AreSame) {

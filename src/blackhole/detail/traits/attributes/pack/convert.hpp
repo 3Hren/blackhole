@@ -16,7 +16,7 @@ namespace aux {
  *  defined classes as attribute in main logging macro. To make this possible,
  *  user defined class must have fully defined stream push `operator<<`.
  *  The logic is as follows: if the object can be implicitly converted to the
- *  `attribute_value_t` object, then that convertion is used.
+ *  `attribute::value_t` object, then that convertion is used.
  *  Otherwise the library would check via SFINAE if the custom class has defined
  *  stream push `operator<<` and, if yes - uses it.
  *  Otherwise static assert with human-readable message is triggered.
@@ -29,8 +29,8 @@ struct conv<T, typename std::enable_if<
         attribute::is_constructible<T>::value>::type
     >
 {
-    static attribute_value_t from(T&& value) {
-        return attribute_value_t(std::forward<T>(value));
+    static attribute::value_t from(T&& value) {
+        return attribute::value_t(std::forward<T>(value));
     }
 };
 
@@ -40,10 +40,10 @@ struct conv<T, typename std::enable_if<
         traits::supports::stream_push<T>::value>::type
     >
 {
-    static attribute_value_t from(T&& value) {
+    static attribute::value_t from(T&& value) {
         std::ostringstream stream;
         stream << value;
-        return attribute_value_t(stream.str());
+        return attribute::value_t(stream.str());
     }
 };
 
@@ -53,9 +53,9 @@ struct conv<T, typename std::enable_if<
         !traits::supports::stream_push<T>::value>::type
     >
 {
-    static attribute_value_t from(T&&) {
+    static attribute::value_t from(T&&) {
         static_assert(lazy_false<T>::value, "stream operator<< is not defined for type `T`");
-        return attribute_value_t();
+        return attribute::value_t();
     }
 };
 

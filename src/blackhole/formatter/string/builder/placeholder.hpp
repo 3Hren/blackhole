@@ -25,7 +25,7 @@ struct placeholder_t {
             throw error_t("key '%s' was not provided", placeholder);
         }
 
-        const attribute_value_t& value = it->second.value;
+        const attribute::value_t& value = it->second.value;
         mapper(stream, placeholder, value);
     }
 };

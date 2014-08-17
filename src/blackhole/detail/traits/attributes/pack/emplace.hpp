@@ -30,7 +30,7 @@ struct all_first_string_literal {
     >::value;
 };
 
-//! Helper metafunction that determines if all odd arguments is convertible to `attribute_value_t`.
+//! Helper metafunction that determines if all odd arguments is convertible to `attribute::value_t`.
 //! It is used when determining if argument pack is emplace pack.
 template<class... Args>
 struct all_second_constructible {

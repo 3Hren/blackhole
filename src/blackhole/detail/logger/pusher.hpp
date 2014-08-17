@@ -53,7 +53,7 @@ public:
      */
     pusher_t&
     operator()(std::initializer_list<
-                   std::pair<std::string, attribute_value_t>
+                   std::pair<std::string, attribute::value_t>
                >&& args)
     {
         for (auto it = args.begin(); it != args.end(); ++it) {
