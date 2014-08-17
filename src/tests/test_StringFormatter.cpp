@@ -7,7 +7,7 @@
 using namespace blackhole;
 
 TEST(string_t, FormatSingleAttribute) {
-    log::record_t record;
+    record_t record;
     record.insert(keyword::message() = "le message");
 
     std::string pattern("[%(message)s]");
@@ -16,7 +16,7 @@ TEST(string_t, FormatSingleAttribute) {
 }
 
 TEST(string_t, FormatMultipleAttributes) {
-    log::record_t record;
+    record_t record;
     record.insert(keyword::message() = "le message");
     record.insert({ "timestamp", attribute_t("le timestamp") });
 
@@ -26,7 +26,7 @@ TEST(string_t, FormatMultipleAttributes) {
 }
 
 TEST(string_t, FormatMultipleAttributesMoreThanExists) {
-    log::record_t record;
+    record_t record;
     record.insert(keyword::message() = "le message");
     record.insert({ "timestamp", attribute_t("le timestamp") });
     record.insert({ "source", attribute_t("le source") });
@@ -37,7 +37,7 @@ TEST(string_t, FormatMultipleAttributesMoreThanExists) {
 }
 
 TEST(string_t, ThrowsExceptionWhenAttributeNameNotProvided) {
-    log::record_t record;
+    record_t record;
     record.insert(keyword::message() = "le message");
 
     std::string pattern("[%(timestamp)s]: %(message)s");
@@ -46,7 +46,7 @@ TEST(string_t, ThrowsExceptionWhenAttributeNameNotProvided) {
 }
 
 TEST(string_t, FormatOtherLocalAttribute) {
-    log::record_t record;
+    record_t record;
     record.insert({ "uuid", attribute_t("123-456") });
 
     std::string pattern("[%(...L)s]");
@@ -55,7 +55,7 @@ TEST(string_t, FormatOtherLocalAttribute) {
 }
 
 TEST(string_t, FormatOtherLocalAttributes) {
-    log::record_t record;
+    record_t record;
     record.insert({ "uuid", attribute_t("123-456") });
     record.insert({ "answer to life the universe and everything", attribute_t(42) });
     std::string pattern("[%(...L)s]");
@@ -66,7 +66,7 @@ TEST(string_t, FormatOtherLocalAttributes) {
 }
 
 TEST(string_t, ComplexFormatWithOtherLocalAttributes) {
-    log::record_t record;
+    record_t record;
     record.insert({ "timestamp", attribute_t("1960-01-01 00:00:00", attribute::scope_t::event) });
     record.insert({ "level", attribute_t("INFO", attribute::scope_t::event) });
     record.insert(keyword::message() = "le message");
@@ -103,7 +103,7 @@ TEST(string_t, CustomMapping) {
     mapping::value_t mapper;
     mapper.add<timeval>("timestamp", &testing::map_timestamp);
 
-    log::record_t record;
+    record_t record;
     record.insert(keyword::timestamp() = timeval { 100500, 0 });
     record.insert(keyword::message() = "le message");
 
@@ -118,7 +118,7 @@ TEST(string_t, CustomMappingWithKeyword) {
     mapping::value_t mapper;
     mapper.add<keyword::tag::timestamp_t>(&testing::map_timestamp);
 
-    log::record_t record;
+    record_t record;
     record.insert(keyword::timestamp() = timeval { 100500, 0 });
     record.insert(keyword::message() = "le message");
 

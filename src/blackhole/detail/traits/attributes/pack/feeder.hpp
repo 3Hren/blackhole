@@ -38,7 +38,7 @@ struct pack_feeder<keyword_pack_tag_t> {
     static
     inline
     void
-    feed(log::record_t& record, T&& arg) {
+    feed(record_t& record, T&& arg) {
         record.insert(std::forward<T>(arg));
     }
 
@@ -46,7 +46,7 @@ struct pack_feeder<keyword_pack_tag_t> {
     static
     inline
     void
-    feed(log::record_t& record, Arg&& arg, Args&&... args) {
+    feed(record_t& record, Arg&& arg, Args&&... args) {
         feed(record, arg);
         feed(record, std::forward<Args>(args)...);
     }
@@ -58,7 +58,7 @@ struct pack_feeder<emplace_pack_tag_t> {
     static
     inline
     void
-    feed(log::record_t& record, const char* name, T&& value) {
+    feed(record_t& record, const char* name, T&& value) {
         record.insert(
             std::make_pair(
                 name,
@@ -71,7 +71,7 @@ struct pack_feeder<emplace_pack_tag_t> {
     static
     inline
     void
-    feed(log::record_t& record, const char* name, T&& value, Args&&... args) {
+    feed(record_t& record, const char* name, T&& value, Args&&... args) {
         feed(record, name, std::forward<T>(value));
         feed(record, std::forward<Args>(args)...);
     }

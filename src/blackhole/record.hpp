@@ -5,10 +5,8 @@
 
 namespace blackhole {
 
-namespace log {
-
 class record_t {
-    blackhole::attribute::set_view_t view;
+    attribute::set_view_t view;
 
 public:
     /*!
@@ -24,7 +22,7 @@ public:
      * @todo: Test post condition: this->attributes() == prev attributes.
      * @todo: Instead of `attribute::set_t` move `attribute::set_view_t`.
      */
-    record_t(blackhole::attribute::set_view_t&& view) :
+    record_t(attribute::set_view_t&& view) :
         view(std::move(view))
     {}
 
@@ -51,7 +49,7 @@ public:
      * record.
      * @todo: Test.
      */
-    const blackhole::attribute::set_view_t& attributes() const BLACKHOLE_NOEXCEPT {
+    const attribute::set_view_t& attributes() const BLACKHOLE_NOEXCEPT {
         return view;
     }
 
@@ -59,7 +57,7 @@ public:
      * Insert attribute pair into the record.
      * @todo: Test.
      */
-    void insert(blackhole::attribute::pair_t pair) {
+    void insert(attribute::pair_t pair) {
         view.insert(std::move(pair));
     }
 
@@ -69,9 +67,13 @@ public:
      */
     template<typename T>
     inline T extract(const std::string& name) const {
-        return blackhole::attribute::traits<T>::extract(view, name);
+        return attribute::traits<T>::extract(view, name);
     }
 };
+
+namespace log {
+
+typedef blackhole::record_t record_t BLACKHOLE_DEPRECATED("Use `record_t` instead.");
 
 } // namespace log
 

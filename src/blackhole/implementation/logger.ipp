@@ -102,19 +102,19 @@ logger_base_t::set_exception_handler(log::exception_handler_t&& handler) {
 }
 
 BLACKHOLE_API
-log::record_t
+record_t
 logger_base_t::open_record() const {
     return open_record(attribute::set_t());
 }
 
 BLACKHOLE_API
-log::record_t
+record_t
 logger_base_t::open_record(attribute::pair_t local_attribute) const {
     return open_record(attribute::set_t({ std::move(local_attribute) }));
 }
 
 BLACKHOLE_API
-log::record_t
+record_t
 logger_base_t::open_record(attribute::set_t attributes) const {
     if (enabled() && !state.frontends.empty()) {
         reader_lock_type lock(state.lock.open);
@@ -147,16 +147,16 @@ logger_base_t::open_record(attribute::set_t attributes) const {
         }
 
         if (state.filter(set)) {
-            return log::record_t(std::move(set));
+            return record_t(std::move(set));
         }
     }
 
-    return log::record_t();
+    return record_t();
 }
 
 BLACKHOLE_API
 void
-logger_base_t::push(log::record_t&& record) const {
+logger_base_t::push(record_t&& record) const {
     reader_lock_type lock(state.lock.push);
     for (auto it = state.frontends.begin(); it != state.frontends.end(); ++it) {
         try {

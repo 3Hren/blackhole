@@ -116,17 +116,17 @@ public:
         return unwrap<wrapper_t>::log(*this);
     }
 
-    log::record_t open_record() const {
+    record_t open_record() const {
         return wrapped->open_record(attributes);
     }
 
-    log::record_t open_record(attribute::pair_t attribute) const {
+    record_t open_record(attribute::pair_t attribute) const {
         attribute::set_t attributes = this->attributes;
         attributes.insert(attribute);
         return wrapped->open_record(std::move(attributes));
     }
 
-    log::record_t open_record(attribute::set_t attributes) const {
+    record_t open_record(attribute::set_t attributes) const {
         attribute::set_t attributes_ = this->attributes;
         attributes_.insert(attributes.begin(), attributes.end());
         return wrapped->open_record(std::move(attributes_));
@@ -134,7 +134,7 @@ public:
 
     //!@todo: Add more gentle concept check.
     template<typename Level>
-    log::record_t
+    record_t
     open_record(Level level,
                 attribute::set_t attributes = attribute::set_t()) const
     {
@@ -142,7 +142,7 @@ public:
         return wrapped->open_record(level, std::move(attributes));
     }
 
-    void push(log::record_t&& record) const {
+    void push(record_t&& record) const {
         wrapped->push(std::move(record));
     }
 };

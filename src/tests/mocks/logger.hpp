@@ -11,8 +11,8 @@ class verbose_log_t {
 public:
     typedef Level level_type;
 
-    MOCK_CONST_METHOD1_T(open_record, blackhole::log::record_t(Level));
-    MOCK_CONST_METHOD1_T(push, void(blackhole::log::record_t));
+    MOCK_CONST_METHOD1_T(open_record, blackhole::record_t(Level));
+    MOCK_CONST_METHOD1_T(push, void(blackhole::record_t));
 };
 
 } // namespace mock

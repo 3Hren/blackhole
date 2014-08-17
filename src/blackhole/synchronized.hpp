@@ -92,12 +92,12 @@ public:
     }
 
     template<typename... Args>
-    log::record_t open_record(Args&&... args) const {
+    record_t open_record(Args&&... args) const {
         std::lock_guard<mutex_type> lock(mutex);
         return log_.open_record(std::forward<Args>(args)...);
     }
 
-    void push(log::record_t&& record) const {
+    void push(record_t&& record) const {
         std::lock_guard<mutex_type> lock(mutex);
         log_.push(std::move(record));
     }

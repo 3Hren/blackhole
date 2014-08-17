@@ -23,11 +23,11 @@ public:
 
 private:
     const logger_type& log;
-    log::record_t& record;
+    record_t& record;
 
 public:
     template<typename... Args>
-    pusher_t(const logger_type& log, log::record_t& record, Args&&... args) :
+    pusher_t(const logger_type& log, record_t& record, Args&&... args) :
         log(log),
         record(record)
     {
@@ -81,7 +81,7 @@ public:
 
 template<typename Log, typename... Args>
 pusher_t<Log>
-make_pusher(Log& log, log::record_t& record, Args&&... args) {
+make_pusher(Log& log, record_t& record, Args&&... args) {
     return pusher_t<Log>(log, record, std::forward<Args>(args)...);
 }
 

@@ -32,7 +32,7 @@ public:
 
 class msgpack_t : public base_t {
 public:
-    std::string format(const log::record_t& record) const {
+    std::string format(const record_t& record) const {
         msgpack::sbuffer buffer;
         msgpack::packer<msgpack::sbuffer> packer(&buffer);
         msgpack_visitor<msgpack::sbuffer> visitor(&packer);

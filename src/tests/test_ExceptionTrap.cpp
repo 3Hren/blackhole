@@ -24,7 +24,7 @@ TEST(exception_trap_t, SimpleExceptionHandler) {
     logger_base_t log;
     log.add_frontend(std::move(frontend));
     log.set_exception_handler(testing::simple_handler_t());
-    log::record_t record;
+    record_t record;
     log.push(std::move(record));
 }
 
@@ -49,7 +49,7 @@ TEST(exception_trap_t, TypedExceptionHandler) {
     logger_base_t log;
     log.add_frontend(std::move(frontend));
     log.set_exception_handler(handler);
-    log::record_t record;
+    record_t record;
     log.push(std::move(record));
 }
 
@@ -77,7 +77,7 @@ TEST(exception_trap_t, StrongSequencedTypedExceptionHandler) {
     logger_base_t log;
     log.add_frontend(std::move(frontend));
     log.set_exception_handler(handler);
-    log::record_t record;
+    record_t record;
     log.push(std::move(record));
 }
 

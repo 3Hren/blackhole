@@ -12,7 +12,7 @@ TEST(json_t, Class) {
 }
 
 TEST(json_t, FormatSingleAttribute) {
-    log::record_t record;
+    record_t record;
     record.insert(keyword::message() = "le message");
 
     formatter::json_t fmt;
@@ -21,7 +21,7 @@ TEST(json_t, FormatSingleAttribute) {
 }
 
 TEST(json_t, FormatMultipleAttributes) {
-    log::record_t record;
+    record_t record;
     record.insert(keyword::message() = "le message");
     record.insert(keyword::timestamp() = timeval{ 100500, 0 });
 
@@ -40,7 +40,7 @@ TEST(json_t, FormatMultipleAttributes) {
 }
 
 TEST(json_t, FormatMultipleComplexAttributes) {
-    log::record_t record;
+    record_t record;
     record.insert(keyword::message() = "le message");
     record.insert(keyword::timestamp() = timeval{ 100500, 0 });
     record.insert(attribute::make("@source", "udp://127.0.0.1"));
@@ -79,7 +79,7 @@ TEST(json_t, FormatMultipleComplexAttributes) {
 }
 
 TEST(json_t, SingleAttributeMapping) {
-    log::record_t record;
+    record_t record;
     record.insert(keyword::message() = "le message");
     record.insert(keyword::timestamp() = timeval{ 100500, 0 });
 
@@ -101,7 +101,7 @@ TEST(json_t, SingleAttributeMapping) {
 }
 
 TEST(json_t, MultipleAttributeMapping) {
-    log::record_t record;
+    record_t record;
     record.insert(keyword::message() = "le message");
     record.insert(keyword::timestamp() = timeval{ 100500, 0 });
 
@@ -122,7 +122,7 @@ TEST(json_t, MultipleAttributeMapping) {
 }
 
 TEST(json_t, AddsNewlineIfSpecified) {
-    log::record_t record;
+    record_t record;
     record.insert(keyword::message() = "le message");
 
     formatter::json_t::config_type config;
@@ -137,7 +137,7 @@ TEST(json_t, AddsNewlineIfSpecified) {
 }
 
 TEST(json_t, FieldMapping) {
-    log::record_t record;
+    record_t record;
     record.insert(keyword::message() = "le message");
     record.insert(keyword::timestamp() = timeval{ 100500, 0 });
 
@@ -158,7 +158,7 @@ TEST(json_t, FieldMapping) {
 }
 
 TEST(json_t, ComplexFieldMapping) {
-    log::record_t record;
+    record_t record;
     record.insert(keyword::message() = "le message");
     record.insert(keyword::timestamp() = timeval{ 100500, 0 });
 
@@ -182,7 +182,7 @@ TEST(json_t, ComplexFieldMapping) {
 }
 
 TEST(json_t, UnspecifiedPositionalMapping) {
-    log::record_t record;
+    record_t record;
     record.insert(keyword::message() = "le message");
     record.insert(keyword::timestamp() = timeval{ 100500, 0 });
 
@@ -216,7 +216,7 @@ TEST(json_t, AttributeMappingIsDeterminedByItsBaseNames) {
     mapping::value_t mapper;
     mapper.add<std::uint32_t>("secret", &testing::map_secret_value);
 
-    log::record_t record;
+    record_t record;
     record.insert(keyword::message() = "le message");
     record.insert(attribute::make<std::uint32_t>("secret", 42));
 

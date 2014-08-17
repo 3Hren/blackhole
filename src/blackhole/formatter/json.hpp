@@ -168,7 +168,7 @@ public:
         config(config)
     {}
 
-    std::string format(const log::record_t& record) const {
+    std::string format(const record_t& record) const {
         rapidjson::Document root;
         root.SetObject();
 

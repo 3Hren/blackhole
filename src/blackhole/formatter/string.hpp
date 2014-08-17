@@ -40,7 +40,7 @@ public:
         formatters(string::formatter_builder_t::build(config.pattern))
     {}
 
-    std::string format(const log::record_t& record) const {
+    std::string format(const record_t& record) const {
         std::string buffer;
         blackhole::aux::attachable_ostringstream stream;
         stream.attach(buffer);

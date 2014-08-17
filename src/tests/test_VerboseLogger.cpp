@@ -35,7 +35,7 @@ TEST(verbose_logger_t, OpenRecordByDefault) {
 
     verbose_logger_t<testing::level> log;
     log.add_frontend(std::move(frontend));
-    log::record_t record = log.open_record(testing::level::debug);
+    record_t record = log.open_record(testing::level::debug);
     EXPECT_TRUE(record.valid());
 }
 
@@ -69,7 +69,7 @@ TEST(verbose_logger_t, Manual) {
     log.add_frontend(std::move(frontend));
 
     //!@note: Next lines can be hidden via macro: LOG(log, debug, "Message %s", "Hell")(keyword::answer = 42, keyword::blah = "WAT?", keyword::make("urgent", 1));
-    log::record_t record = log.open_record(testing::level::error);
+    record_t record = log.open_record(testing::level::error);
     if (record.valid()) {
         record.insert(keyword::message() = utils::format("Some message from: '%s'!", "Hell"));
         // Add another attributes.

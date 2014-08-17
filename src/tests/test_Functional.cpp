@@ -41,7 +41,7 @@ TEST(Functional, SyslogConfiguredVerboseLogger) {
     auto frontend = utils::make_unique<frontend_t<formatter_type, sink_type>>(std::move(formatter), std::move(sink));
     log.add_frontend(std::move(frontend));
 
-    log::record_t record = log.open_record(level::error);
+    record_t record = log.open_record(level::error);
     if (record.valid()) {
         record.insert(keyword::message() = utils::format("Some message from: '%s'!", "Hell"));
         log.push(std::move(record));

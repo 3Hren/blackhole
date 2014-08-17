@@ -12,7 +12,7 @@ TEST(msgpack_t, Class) {
 }
 
 TEST(msgpack_t, FormatSingleAttribute) {
-    log::record_t record;
+    record_t record;
     record.insert(keyword::message() = "le message");
 
     formatter::msgpack_t fmt;
@@ -27,7 +27,7 @@ TEST(msgpack_t, FormatSingleAttribute) {
 }
 
 TEST(msgpack_t, FormatMultipleAttributes) {
-    log::record_t record;
+    record_t record;
     record.insert(keyword::message() = "le message");
     record.insert(keyword::timestamp() = timeval{ 100500, 0 });
 

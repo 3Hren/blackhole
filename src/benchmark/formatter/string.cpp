@@ -37,7 +37,7 @@ BENCHMARK(PureStringFormatter, Baseline) {
     static int initializer = initialize(formatter);
     ticktack::compiler::do_not_optimize(initializer);
 
-    blackhole::log::record_t record;
+    blackhole::record_t record;
     record.insert(blackhole::keyword::message() = MESSAGE_LONG);
 
     timeval tv;

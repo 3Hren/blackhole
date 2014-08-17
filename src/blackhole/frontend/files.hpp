@@ -21,7 +21,7 @@ public:
         base_type(std::move(formatter), std::move(sink))
     {}
 
-    void handle(const log::record_t& record) {
+    void handle(const record_t& record) {
         this->sink.consume(this->formatter.format(record), record.attributes());
     }
 };

@@ -98,11 +98,11 @@ public:
     void add_frontend(std::unique_ptr<base_frontend_t> frontend);
     void set_exception_handler(log::exception_handler_t&& handler);
 
-    log::record_t open_record() const;
-    log::record_t open_record(attribute::pair_t local_attribute) const;
-    log::record_t open_record(attribute::set_t local_attributes) const;
+    record_t open_record() const;
+    record_t open_record(attribute::pair_t local_attribute) const;
+    record_t open_record(attribute::set_t local_attributes) const;
 
-    void push(log::record_t&& record) const;
+    void push(record_t&& record) const;
 
 private:
     attribute::set_t get_event_attributes() const;
@@ -185,9 +185,9 @@ public:
      * Internally this method compares desired verbosity level with the upper
      * one. Can return invalid log record if some conditions are not met.
      * @param[in] level - Desired verbosity level.
-     * @return valid or invalid `log::record_t` object.
+     * @return valid or invalid `record_t` object.
      */
-    log::record_t
+    record_t
     open_record(level_type level,
                 attribute::set_t local = attribute::set_t()) const
     {
@@ -219,7 +219,7 @@ public:
             return logger_base_t::open_record(std::move(attributes));
         }
 
-        return log::record_t();
+        return record_t();
     }
 };
 

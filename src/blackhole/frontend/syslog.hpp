@@ -20,7 +20,7 @@ public:
         base_type(std::move(formatter), std::move(sink))
     {}
 
-    void handle(const log::record_t& record) {
+    void handle(const record_t& record) {
         const Level level = record.extract<Level>(keyword::severity<Level>().name());
         this->sink.consume(level, this->formatter.format(record));
     }

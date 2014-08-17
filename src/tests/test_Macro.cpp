@@ -6,7 +6,7 @@
 using namespace blackhole;
 
 TEST(Macro, OpensInvalidLogRecordAndNotPush) {
-    log::record_t record;
+    record_t record;
     mock::verbose_log_t<level> log;
     EXPECT_CALL(log, open_record(level::debug))
             .Times(1)
@@ -19,13 +19,13 @@ TEST(Macro, OpensInvalidLogRecordAndNotPush) {
 struct ExtractMessageAttributeAction {
     std::string& actual;
 
-    void operator()(log::record_t record) const {
+    void operator()(record_t record) const {
         actual = record.extract<std::string>("message");
     }
 };
 
 TEST(Macro, OpensValidRecordAndPush) {
-    log::record_t record;
+    record_t record;
     record.insert(attribute::make("attr1", "value1"));
 
     mock::verbose_log_t<level> log;
@@ -44,7 +44,7 @@ TEST(Macro, OpensValidRecordAndPush) {
 }
 
 TEST(Macro, FormatMessageWithPrintfStyle) {
-    log::record_t record;
+    record_t record;
     record.insert(attribute::make("attr1", "value1"));
 
     mock::verbose_log_t<level> log;
@@ -72,7 +72,7 @@ struct ExtractAttributesAction {
 
     pack_t& actual;
 
-    void operator ()(log::record_t record) const {
+    void operator ()(record_t record) const {
         actual.message = record.extract<std::string>("message");
         actual.value = record.extract<int>("value");
         actual.reason = record.extract<std::string>("reason");
@@ -81,7 +81,7 @@ struct ExtractAttributesAction {
 };
 
 TEST(Macro, FormatMessageWithAttributes) {
-    log::record_t record;
+    record_t record;
     record.insert(attribute::make("attr1", "value1"));
 
     mock::verbose_log_t<level> log;
@@ -108,7 +108,7 @@ TEST(Macro, FormatMessageWithAttributes) {
 }
 
 TEST(Macro, FormatMessageWithPrintfStyleWithAttributes) {
-    log::record_t record;
+    record_t record;
     record.insert(attribute::make("attr1", "value1"));
 
     mock::verbose_log_t<level> log;
@@ -168,7 +168,7 @@ struct insitu<keyword::tag::severity_t<level>> {
 } // namespace blackhole
 
 TEST(Macro, SpecificKeywordMessageFormatting) {
-    log::record_t record;
+    record_t record;
     record.insert(keyword::severity<level>() = level::debug);
 
     mock::verbose_log_t<level> log;
@@ -195,7 +195,7 @@ struct EmplaceCheckExtractAttributesAction {
 
     pack_t& actual;
 
-    void operator ()(log::record_t record) const {
+    void operator ()(record_t record) const {
         actual.message = record.extract<std::string>("message");
         actual.value = record.extract<int>("value");
         actual.reason = record.extract<std::string>("reason");
@@ -203,7 +203,7 @@ struct EmplaceCheckExtractAttributesAction {
 };
 
 TEST(Macro, EmplaceAttributes) {
-    log::record_t record;
+    record_t record;
     record.insert(attribute::make("attr1", "value1"));
 
     mock::verbose_log_t<level> log;
@@ -249,7 +249,7 @@ struct ExtractStreamableValueAttributesAction {
 
     pack_t& actual;
 
-    void operator()(const log::record_t& record) const {
+    void operator()(const record_t& record) const {
         actual.message = record.extract<std::string>("message");
         actual.value = record.extract<std::string>("value");
     }
@@ -261,7 +261,7 @@ TEST(Macro, UsingStreamOperatorIfNoImplicitConversionAvailable) {
 
     streamable_value_t value = { "42", 42 };
 
-    log::record_t record;
+    record_t record;
     record.insert(attribute::make("attr1", "value1"));
 
     mock::verbose_log_t<level> log;
@@ -282,7 +282,7 @@ TEST(Macro, UsingStreamOperatorIfNoImplicitConversionAvailable) {
 }
 
 TEST(Macro, InitializerListAttributes) {
-    log::record_t record;
+    record_t record;
     record.insert(attribute::make("attr1", "value1"));
 
     mock::verbose_log_t<level> log;
@@ -315,7 +315,7 @@ struct action_t {
 
     pack_t& actual;
 
-    void operator()(const log::record_t& record) const {
+    void operator()(const record_t& record) const {
         actual.message = record.extract<std::string>("message");
         actual.value = record.extract<std::string>("value");
         actual.nested = record.extract<int>("nested");
@@ -325,7 +325,7 @@ struct action_t {
 } // namespace RecursiveAttributeFeeders
 
 TEST(Macro, RecursiveAttributeFeeders) {
-    log::record_t record;
+    record_t record;
     record.insert(attribute::make("attr1", "value1"));
 
     mock::verbose_log_t<level> log;
