@@ -13,6 +13,7 @@
 
 #include "blackhole/attribute/name.hpp"
 #include "blackhole/attribute/scope.hpp"
+#include "blackhole/attribute/set.hpp"
 #include "blackhole/attribute/traits.hpp"
 #include "blackhole/attribute/value.hpp"
 
@@ -24,30 +25,20 @@
 
 namespace blackhole {
 
-typedef std::pair<
-    attribute::name_t,
-    attribute_t
-> attribute_pair_t;
-
-typedef std::unordered_map<
-    attribute_pair_t::first_type,
-    attribute_pair_t::second_type
-> attributes_t;
-
 template<class Container, bool Const>
 class iterator_t {
     friend class iterator_t<Container, !Const>;
 
     typedef typename std::conditional<
         Const,
-        typename attributes_t::const_iterator,
-        typename attributes_t::iterator
+        typename attribute::set_t::const_iterator,
+        typename attribute::set_t::iterator
     >::type underlying_iterator;
 
     typedef typename std::conditional<
         Const,
-        const attributes_t&,
-        attributes_t&
+        const attribute::set_t&,
+        attribute::set_t&
     >::type c;
 
     int stage;
@@ -59,19 +50,19 @@ class iterator_t {
 
 public:
     typedef Container container_type;
-    typedef typename attributes_t::difference_type difference_type;
-    typedef typename attributes_t::value_type value_type;
+    typedef typename attribute::set_t::difference_type difference_type;
+    typedef typename attribute::set_t::value_type value_type;
 
     typedef typename std::conditional<
         Const,
-        typename attributes_t::const_reference,
-        typename attributes_t::reference
+        typename attribute::set_t::const_reference,
+        typename attribute::set_t::reference
     >::type reference;
 
     typedef typename std::conditional<
         Const,
-        typename attributes_t::const_pointer,
-        typename attributes_t::pointer
+        typename attribute::set_t::const_pointer,
+        typename attribute::set_t::pointer
     >::type pointer;
 
     typedef std::forward_iterator_tag iterator_category;
@@ -125,20 +116,20 @@ public:
 // Can be iterated only forwardly.
 class attribute_set_view_t {
 public:
-    typedef attributes_t::iterator       iterator;
-    typedef attributes_t::const_iterator const_iterator;
+    typedef attribute::set_t::iterator       iterator;
+    typedef attribute::set_t::const_iterator const_iterator;
 
 private:
-    attributes_t scoped; // likely empty
-    attributes_t global; // likely empty
-    attributes_t local;  // 1-2
-    attributes_t other;  // most filled.
+    attribute::set_t scoped; // likely empty
+    attribute::set_t global; // likely empty
+    attribute::set_t local;  // 1-2
+    attribute::set_t other;  // most filled.
 
 public:
     attribute_set_view_t() = default;
-    attribute_set_view_t(attributes_t global,
-                         attributes_t scoped,
-                         attributes_t&& local) :
+    attribute_set_view_t(attribute::set_t global,
+                         attribute::set_t scoped,
+                         attribute::set_t&& local) :
         scoped(std::move(scoped)),
         global(std::move(global)),
         local(std::move(local))
@@ -159,7 +150,7 @@ public:
         return other.size() + local.size() + scoped.size() + global.size();
     }
 
-    void insert(attribute_pair_t pair) {
+    void insert(attribute::pair_t pair) {
         other.insert(std::move(pair));
     }
 
@@ -224,12 +215,12 @@ typedef std::initializer_list<std::pair<std::string, attribute::value_t>> list;
 
 // Dynamic attribute factory function.
 template<typename T>
-inline attribute_pair_t make(const std::string& name, const T& value, attribute::scope_t scope = attribute::DEFAULT_SCOPE) {
+inline attribute::pair_t make(const std::string& name, const T& value, attribute::scope_t scope = attribute::DEFAULT_SCOPE) {
     return std::make_pair(name, attribute_t(value, scope));
 }
 
 template<typename T>
-inline attribute_pair_t make(const std::string& name, T&& value, attribute::scope_t scope = attribute::DEFAULT_SCOPE) {
+inline attribute::pair_t make(const std::string& name, T&& value, attribute::scope_t scope = attribute::DEFAULT_SCOPE) {
     return std::make_pair(name, attribute_t(std::move(value), scope));
 }
 

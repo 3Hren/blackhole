@@ -57,11 +57,11 @@ struct keyword_t {
         }
     };
 
-    attribute_pair_t operator=(const T& value) const {
+    attribute::pair_t operator=(const T& value) const {
         return attribute::make(name(), attribute::traits<T>::pack(value), Scope);
     }
 
-    attribute_pair_t operator=(T&& value) const {
+    attribute::pair_t operator=(T&& value) const {
         return attribute::make(name(), attribute::traits<T>::pack(std::forward<T>(value)), Scope);
     }
 

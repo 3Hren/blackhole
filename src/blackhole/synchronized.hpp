@@ -76,7 +76,7 @@ public:
         log_.set_filter(std::move(filter));
     }
 
-    void add_attribute(const attribute_pair_t& attr) {
+    void add_attribute(const attribute::pair_t& attr) {
         std::lock_guard<mutex_type> lock(mutex);
         log_.add_attribute(attr);
     }

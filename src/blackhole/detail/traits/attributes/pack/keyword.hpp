@@ -8,7 +8,7 @@ namespace blackhole {
 namespace aux {
 
 template<class... Args>
-struct is_keyword_pack : public are_same<attribute_pair_t, Args...> {};
+struct is_keyword_pack : public are_same<attribute::pair_t, Args...> {};
 
 } // namespace aux
 

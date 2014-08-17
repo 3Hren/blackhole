@@ -27,7 +27,7 @@ class universe_storage_t : public singleton_mixin<universe_storage_t> {
 
     typedef boost::shared_mutex mutex_type;
 
-    attributes_t attributes;
+    attribute::set_t attributes;
     mutable mutex_type mutex;
 public:
     void add(const std::string& key, const attribute_t& value) {
@@ -35,7 +35,7 @@ public:
         attributes[key] = value;
     }
 
-    void add(const attribute_pair_t& pair) {
+    void add(const attribute::pair_t& pair) {
         boost::unique_lock<mutex_type> lock(mutex);
         attributes.insert(pair);
     }
@@ -45,7 +45,7 @@ public:
         return attributes.at(key);
     }
 
-    attributes_t dump() const {
+    attribute::set_t dump() const {
         boost::shared_lock<mutex_type> lock(mutex);
         return attributes;
     }

@@ -41,7 +41,7 @@ public:
 TEST(Wrapper, Class) {
     typedef verbose_logger_t<testing::level> logger_type;
     logger_type log;
-    wrapper_t<logger_type> wrapper(log, attributes_t({
+    wrapper_t<logger_type> wrapper(log, attribute::set_t({
         attribute::make("answer", 42)
     }));
     UNUSED(wrapper);
@@ -56,7 +56,7 @@ TEST(Wrapper, MoveConstructor) {
      */
     typedef verbose_logger_t<testing::level> logger_type;
     logger_type log = logger_factory_t::create<logger_type>();
-    wrapper_t<logger_type> wrapper(log, attributes_t({
+    wrapper_t<logger_type> wrapper(log, attribute::set_t({
         attribute::make("answer", 42)
     }));
 
@@ -74,11 +74,11 @@ TEST(Wrapper, MoveAssignment) {
      */
     typedef verbose_logger_t<testing::level> logger_type;
     logger_type log = logger_factory_t::create<logger_type>();
-    wrapper_t<logger_type> wrapper(log, attributes_t({
+    wrapper_t<logger_type> wrapper(log, attribute::set_t({
         attribute::make("answer", 42)
     }));
 
-    wrapper_t<logger_type> other(log, attributes_t({
+    wrapper_t<logger_type> other(log, attribute::set_t({
         attribute::make("answer", 43)
     }));
     other = std::move(wrapper);
@@ -93,7 +93,7 @@ TEST(Wrapper, Usage) {
     log.add_attribute(attribute::make("id", 100500));
 
     {
-        wrapper_t<logger_base_t> wrapper(log, attributes_t({
+        wrapper_t<logger_base_t> wrapper(log, attribute::set_t({
             attribute::make("answer", 42)
         }));
 
@@ -122,7 +122,7 @@ TEST(Wrapper, UsageWithVerboseLogger) {
     {
         wrapper_t<verbose_logger_t<testing::level>> wrapper(
             log,
-            attributes_t({
+            attribute::set_t({
                 attribute::make("answer", 42)
             })
         );
@@ -179,7 +179,7 @@ TEST(Wrapper, MacroUsage) {
     {
         wrapper_t<verbose_logger_t<testing::level>> wrapper(
             log,
-            attributes_t({
+            attribute::set_t({
                 attribute::make("answer", 42)
             })
         );
@@ -195,7 +195,7 @@ TEST(Wrapper, NestedWrappers) {
     {
         wrapper_t<verbose_logger_t<testing::level>> wrapper(
             log,
-            attributes_t({
+            attribute::set_t({
                 attribute::make("answer", 42)
             })
         );
@@ -210,7 +210,7 @@ TEST(Wrapper, NestedWrappers) {
         {
             wrapper_t<verbose_logger_t<testing::level>> nested(
                 wrapper,
-                attributes_t({
+                attribute::set_t({
                     attribute::make("result", 300)
                 })
             );
@@ -273,7 +273,7 @@ TEST(Wrapper, UnderlyingLogger) {
     logger_type log = logger_factory_t::create<logger_type>();
     log.add_attribute(attribute::make("a", 100500));
 
-    wrapper_type wrapper(log, attributes_t({attribute::make("b", 42)}));
+    wrapper_type wrapper(log, attribute::set_t({attribute::make("b", 42)}));
 
     logger_type& initial = wrapper.log();
     auto record = initial.open_record();
@@ -293,7 +293,7 @@ TEST(Wrapper, ConstUnderlyingLogger) {
     logger_type log = logger_factory_t::create<logger_type>();
     log.add_attribute(attribute::make("a", 100500));
 
-    const wrapper_type wrapper(log, attributes_t({attribute::make("b", 42)}));
+    const wrapper_type wrapper(log, attribute::set_t({attribute::make("b", 42)}));
 
     const logger_type& initial = wrapper.log();
     auto record = initial.open_record();
@@ -315,8 +315,8 @@ TEST(Wrapper, UnderlyingNestedLogger) {
     logger_type log = logger_factory_t::create<logger_type>();
     log.add_attribute(attribute::make("a", 100500));
 
-    wrapper_type wrapper(log, attributes_t({attribute::make("b", 42)}));
-    deep_wrapper_type deep_wrapper(wrapper, attributes_t({attribute::make("c", 5)}));
+    wrapper_type wrapper(log, attribute::set_t({attribute::make("b", 42)}));
+    deep_wrapper_type deep_wrapper(wrapper, attribute::set_t({attribute::make("c", 5)}));
 
     logger_type& initial = deep_wrapper.log();
     auto record = initial.open_record();
@@ -339,8 +339,8 @@ TEST(Wrapper, ConstUnderlyingNestedLogger) {
     logger_type log = logger_factory_t::create<logger_type>();
     log.add_attribute(attribute::make("a", 100500));
 
-    wrapper_type wrapper(log, attributes_t({attribute::make("b", 42)}));
-    const deep_wrapper_type deep_wrapper(wrapper, attributes_t({attribute::make("c", 5)}));
+    wrapper_type wrapper(log, attribute::set_t({attribute::make("b", 42)}));
+    const deep_wrapper_type deep_wrapper(wrapper, attribute::set_t({attribute::make("c", 5)}));
 
     const logger_type& initial = deep_wrapper.log();
     auto record = initial.open_record();

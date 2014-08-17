@@ -22,7 +22,7 @@ public:
      * Conversion constructor.
      * Creates a record with specified attribute set.
      * @todo: Test post condition: this->attributes() == prev attributes.
-     * @todo: Instead of `attributes_t` move `attribute_set_view_t`.
+     * @todo: Instead of `attribute::set_t` move `attribute_set_view_t`.
      */
     record_t(attribute_set_view_t&& view) :
         view(std::move(view))
@@ -59,7 +59,7 @@ public:
      * Insert attribute pair into the record.
      * @todo: Test.
      */
-    void insert(attribute_pair_t pair) {
+    void insert(blackhole::attribute::pair_t pair) {
         view.insert(std::move(pair));
     }
 
