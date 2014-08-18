@@ -16,30 +16,32 @@ namespace expression {
 template<typename T>
 class has_attribute_visitor : public boost::static_visitor<bool>{
 public:
-    bool operator ()(const T&) const {
+    bool operator()(const T&) const {
         return true;
     }
 
     template<typename Other>
-    bool operator ()(const Other&) const {
+    bool operator()(const Other&) const {
         return false;
     }
 };
 
 template<typename T>
 struct has_attr_action_t : public aux::LogicMixin<has_attr_action_t<T>> {
+    typedef typename blackhole::aux::underlying_type<T>::type underlying_type;
+
     const std::string name;
 
     has_attr_action_t(const std::string& name) : name(name) {}
 
     bool operator()(const attribute::set_view_t& attributes) const {
-        auto it = attributes.find(name);
-        if (it == attributes.end()) {
-            return false;
+        static has_attribute_visitor<underlying_type> visitor;
+
+        if (auto attribute = attributes.find(name)) {
+            return boost::apply_visitor(visitor, attribute->value);
         }
-        const attribute_t& attribute = it->second;
-        typedef typename blackhole::aux::underlying_type<T>::type underlying_type;
-        return boost::apply_visitor(has_attribute_visitor<underlying_type>(), attribute.value);
+
+        return false;
     }
 };
 
