@@ -94,11 +94,7 @@ public:
 class set_view_t {
 public:
     typedef set_t underlying_container;
-
-    typedef underlying_container::reference reference;
-    typedef underlying_container::pointer   pointer;
-
-    typedef iterator_t<set_view_t>          const_iterator;
+    typedef iterator_t<set_view_t> const_iterator;
 
 private:
     set_t global; // likely empty
