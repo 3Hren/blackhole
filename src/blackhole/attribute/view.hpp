@@ -97,10 +97,10 @@ public:
     typedef iterator_t<set_view_t> const_iterator;
 
 private:
-    set_t global; // likely empty
-    set_t scoped; // likely empty (4-5)
-    set_t local;  // 1-2 + message + tid + timestamp (4-5)
-    set_t other;  // most filled. (user attributes)
+    set_t global; // Likely empty.
+    set_t scoped; // Likely empty, but can be filled with scope attributes (4-5).
+    set_t local;  // About 1-2 + message + tid + timestamp (4-5).
+    set_t other;  // The most filled (user attributes).
 
 public:
     set_view_t() = default;
