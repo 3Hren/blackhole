@@ -13,7 +13,7 @@ namespace {
 blackhole::verbose_logger_t<level_t> initialize() {
     auto formatter = blackhole::utils::make_unique<
         blackhole::formatter::string_t
-    >("%(message)s");
+    >("[%(timestamp)s] [%(severity)s]: %(message)s");
 
     auto sink = blackhole::utils::make_unique<
         blackhole::sink::null_t
