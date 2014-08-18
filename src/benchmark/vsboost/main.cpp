@@ -1,11 +1,8 @@
-#include <fstream>
-#include <memory>
-
-#include "celero/Celero.h"
+//#include <ticktack/benchmark.hpp>
+#include <celero/Celero.h>
 
 #include <blackhole/blackhole.hpp>
 #include <blackhole/frontend/files.hpp>
-#include <blackhole/synchronized.hpp>
 
 #include <boost/log/core.hpp>
 #include <boost/log/expressions.hpp>
@@ -38,7 +35,7 @@ static const char* DESCRIPTION[] = {
 //! Severity mapping functions.
 //!     - for boost ...
 std::ostream& operator<<(std::ostream& stream, level lvl) {
-    if (static_cast< std::size_t >(lvl) < sizeof(DESCRIPTION) / sizeof(*DESCRIPTION)) {
+    if (static_cast<std::size_t>(lvl) < sizeof(DESCRIPTION) / sizeof(*DESCRIPTION)) {
         stream << DESCRIPTION[lvl];
     } else {
         stream << static_cast<int>(lvl);
@@ -49,7 +46,7 @@ std::ostream& operator<<(std::ostream& stream, level lvl) {
 
 //!     - and for blackhole ...
 void map_severity(blackhole::aux::attachable_ostringstream& stream, level lvl) {
-    if (static_cast< std::size_t >(lvl) < sizeof(DESCRIPTION) / sizeof(*DESCRIPTION)) {
+    if (static_cast<std::size_t>(lvl) < sizeof(DESCRIPTION) / sizeof(*DESCRIPTION)) {
         stream << DESCRIPTION[lvl];
     } else {
         stream << static_cast<int>(lvl);
@@ -99,7 +96,7 @@ void init_blackhole_log() {
 }
 
 //! Create logger objects.
-boost::log::sources::severity_logger<level> boost_log;
+boost::log::sources::severity_logger_mt<level> boost_log;
 verbose_logger_t<level> blackhole_log;
 
 int main(int argc, char** argv) {
@@ -113,7 +110,7 @@ int main(int argc, char** argv) {
 }
 
 static const int SAMPLES = 30;
-static const int CALLS = 50000;
+static const int CALLS = 100000;
 
 BASELINE(Benchmark, BoostLog, SAMPLES, CALLS) {
     BOOST_LOG_SEV(boost_log, warning) << "Something bad is going on but I can handle it";
