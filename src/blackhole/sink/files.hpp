@@ -79,11 +79,10 @@ struct substitute_attribute_t {
     const attribute::set_view_t& attributes;
 
     void operator()(aux::attachable_ostringstream& stream, const std::string& placeholder) const {
-        auto it = attributes.find(placeholder);
-        if (it == attributes.end()) {
-            stream.rdbuf()->storage()->append(placeholder);
+        if (auto attribute = attributes.find(placeholder)) {
+            stream << attribute->value;
         } else {
-            stream << it->second.value;
+            stream.rdbuf()->storage()->append(placeholder);
         }
     }
 };

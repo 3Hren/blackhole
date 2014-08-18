@@ -7,6 +7,8 @@
 #include <type_traits>
 #include <vector>
 
+#include <boost/optional.hpp>
+
 #include "blackhole/attribute/set.hpp"
 #include "blackhole/utils/noexcept.hpp"
 
@@ -61,6 +63,8 @@ private:
             begin(container.begin()),
             end(container.end())
         {}
+
+        iterator_pair_t(const iterator_pair_t& other) = default;
     };
 
     uint stage;
@@ -75,6 +79,16 @@ public:
         stage(0),
         iterators({ c1, c2, c3, c4 }),
         current(iterators.at(0).begin)
+    {}
+
+    iterator_t(container_reference_type c1,
+               container_reference_type c2,
+               container_reference_type c3,
+               container_reference_type c4,
+               underlying_iterator it) :
+        stage(0),
+        iterators({ c1, c2, c3, c4 }),
+        current(it)
     {}
 
     iterator_t& operator++() BLACKHOLE_NOEXCEPT {
@@ -103,6 +117,13 @@ public:
         BOOST_ASSERT(iterators.size());
         return current != iterators.back().end;
     }
+
+    template<bool F>
+    bool operator==(const iterator_t<Container, F>& other) const {
+        return stage == other.stage &&
+                iterators == other.iterators &&
+                current == other.current;
+    }
 };
 
 // Provide get/set access.
@@ -111,11 +132,11 @@ class set_view_t {
 public:
     typedef set_t underlying_container;
 
-    typedef underlying_container::reference      reference;
-    typedef underlying_container::pointer        pointer;
+    typedef underlying_container::reference reference;
+    typedef underlying_container::pointer   pointer;
 
-    typedef underlying_container::iterator       iterator;
-    typedef underlying_container::const_iterator const_iterator;
+    typedef iterator_t<set_view_t, false>   iterator;
+    typedef iterator_t<set_view_t, true>    const_iterator;
 
 private:
     set_t scoped; // likely empty
@@ -155,52 +176,53 @@ public:
         other.insert(first, last);
     }
 
-    iterator_t<set_view_t, true> begin() const BLACKHOLE_NOEXCEPT {
-        return iterator_t<set_view_t, true>(other, local, scoped, global);
+    iterator
+    begin() BLACKHOLE_NOEXCEPT {
+        return iterator(other, local, scoped, global);
     }
 
-    iterator end() BLACKHOLE_NOEXCEPT {
-        return other.end();
+    const_iterator
+    begin() const BLACKHOLE_NOEXCEPT {
+        return const_iterator(other, local, scoped, global);
     }
 
-    const_iterator end() const BLACKHOLE_NOEXCEPT {
-        return other.end();
-    }
-
-    iterator find(const std::string& name) BLACKHOLE_NOEXCEPT {
+    boost::optional<attribute_t&>
+    find(const std::string& name) BLACKHOLE_NOEXCEPT {
         auto it = other.find(name);
         if (it != other.end()) {
-            return it;
+            return it->second;
         }
 
         it = local.find(name);
         if (it != local.end()) {
-            return it;
+            return it->second;
         }
 
         it = scoped.find(name);
         if (it != scoped.end()) {
-            return it;
+            return it->second;
         }
 
         it = global.find(name);
         if (it != global.end()) {
-            return it;
+            return it->second;
         }
 
-        return end();
+        return boost::optional<attribute_t&>();
     }
 
-    const_iterator find(const std::string& name) const BLACKHOLE_NOEXCEPT {
-        return const_iterator(const_cast<set_view_t*>(this)->find(name));
+    boost::optional<const attribute_t&>
+    find(const std::string& name) const BLACKHOLE_NOEXCEPT {
+        return boost::optional<const attribute_t&>(const_cast<set_view_t*>(this)->find(name));
     }
 
     const attribute_t& at(const std::string& name) const {
-        auto it = find(name);
-        if (it == end()) {
+        auto value = find(name);
+        if (!value) {
             throw std::out_of_range(name);
         }
-        return it->second;
+
+        return *value;
     }
 };
 
