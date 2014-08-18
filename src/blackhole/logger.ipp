@@ -116,18 +116,8 @@ BLACKHOLE_API
 record_t
 logger_base_t::open_record(attribute::set_t attributes) const {
     if (enabled() && !state.frontends.empty()) {
-        reader_lock_type lock(state.lock.open);
-
-        attribute::set_view_t set(
-            state.attributes.global,
-            state.attributes.scoped.get() ?
-                state.attributes.scoped->attributes() :
-                attribute::set_t(),
-            std::move(attributes)
-        );
-
-        // universe_storage_t::instance().dump(),  // Program global.
-        set.insert(
+        // attributes.insert(universe_storage_t::instance().dump()); // Program global.
+        attributes.insert(
 #ifdef BLACKHOLE_HAS_LWP
             keyword::lwp() = syscall(SYS_gettid)
 #else
@@ -137,13 +127,22 @@ logger_base_t::open_record(attribute::set_t attributes) const {
 
         timeval tv;
         gettimeofday(&tv, nullptr);
-        set.insert(keyword::timestamp() = tv);
+        attributes.insert(keyword::timestamp() = tv);
 
         if (state.tracked) {
-            set.insert(
+            attributes.insert(
                 attribute::make("trace", ::this_thread::current_span().trace)
             );
         }
+
+        reader_lock_type lock(state.lock.open);
+        attribute::set_view_t set(
+            state.attributes.global,
+            state.attributes.scoped.get() ?
+                state.attributes.scoped->attributes() :
+                attribute::set_t(),
+            std::move(attributes)
+        );
 
         if (state.filter(set)) {
             return record_t(std::move(set));
