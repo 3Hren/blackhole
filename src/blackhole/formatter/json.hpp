@@ -173,7 +173,7 @@ public:
         root.SetObject();
 
         json_visitor_t visitor(&root, config, mapper);
-        for (auto it = record.attributes().begin(); it.valid(); ++it) {
+        for (auto it = record.attributes().iters(); it.valid(); ++it) {
             const std::string& name = it->first;
             const attribute_t& attribute = it->second;
             aux::apply_visitor(visitor, name, attribute.value);

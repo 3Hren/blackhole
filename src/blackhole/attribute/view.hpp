@@ -81,16 +81,6 @@ public:
         current(iterators.at(0).begin)
     {}
 
-    iterator_t(container_reference_type c1,
-               container_reference_type c2,
-               container_reference_type c3,
-               container_reference_type c4,
-               underlying_iterator it) :
-        stage(0),
-        iterators({ c1, c2, c3, c4 }),
-        current(it)
-    {}
-
     iterator_t& operator++() BLACKHOLE_NOEXCEPT {
         BOOST_ASSERT(stage <= iterators.size());
         current++;
@@ -116,13 +106,6 @@ public:
     bool valid() const BLACKHOLE_NOEXCEPT {
         BOOST_ASSERT(iterators.size());
         return current != iterators.back().end;
-    }
-
-    template<bool F>
-    bool operator==(const iterator_t<Container, F>& other) const {
-        return stage == other.stage &&
-                iterators == other.iterators &&
-                current == other.current;
     }
 };
 
@@ -177,12 +160,12 @@ public:
     }
 
     iterator
-    begin() BLACKHOLE_NOEXCEPT {
+    iters() BLACKHOLE_NOEXCEPT {
         return iterator(other, local, scoped, global);
     }
 
     const_iterator
-    begin() const BLACKHOLE_NOEXCEPT {
+    iters() const BLACKHOLE_NOEXCEPT {
         return const_iterator(other, local, scoped, global);
     }
 
