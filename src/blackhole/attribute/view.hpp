@@ -16,7 +16,7 @@ namespace blackhole {
 
 namespace attribute {
 
-template<class Container, bool Const>
+template<class Container>
 class iterator_t {
 public:
     typedef Container container_type;
@@ -26,35 +26,15 @@ public:
     typedef typename underlying_container::difference_type difference_type;
     typedef typename underlying_container::value_type value_type;
 
-    typedef typename std::conditional<
-        Const,
-        typename underlying_container::const_reference,
-        typename underlying_container::reference
-    >::type reference;
+    typedef typename underlying_container::const_reference reference;
+    typedef typename underlying_container::const_pointer pointer;
+    typedef typename underlying_container::const_iterator underlying_iterator;
 
-    typedef typename std::conditional<
-        Const,
-        typename underlying_container::const_pointer,
-        typename underlying_container::pointer
-    >::type pointer;
-
-    typedef typename std::conditional<
-        Const,
-        typename underlying_container::const_iterator,
-        typename underlying_container::iterator
-    >::type underlying_iterator;
-
-    typedef typename std::conditional<
-        Const,
-        const underlying_container&,
-        underlying_container&
-    >::type container_reference_type;
+    typedef const underlying_container& container_reference_type;
 
     typedef std::forward_iterator_tag iterator_category;
 
 private:
-    friend class iterator_t<Container, !Const>;
-
     struct iterator_pair_t {
         underlying_iterator begin;
         underlying_iterator end;
@@ -118,23 +98,22 @@ public:
     typedef underlying_container::reference reference;
     typedef underlying_container::pointer   pointer;
 
-    typedef iterator_t<set_view_t, false>   iterator;
-    typedef iterator_t<set_view_t, true>    const_iterator;
+    typedef iterator_t<set_view_t>          const_iterator;
 
 private:
-    set_t scoped; // likely empty
     set_t global; // likely empty
-    set_t local;  // 1-2
-    set_t other;  // most filled.
+    set_t scoped; // likely empty (4-5)
+    set_t local;  // 1-2 + message + tid + timestamp (4-5)
+    set_t other;  // most filled. (user attributes)
 
 public:
     set_view_t() = default;
     set_view_t(set_t global, set_t scoped, set_t&& local) :
-        scoped(std::move(scoped)),
         global(std::move(global)),
+        scoped(std::move(scoped)),
         local(std::move(local))
     {
-        //!@compat GCC > 4.4: other.reserve(8);
+//        other.reserve(8);
     }
 
     bool empty() const BLACKHOLE_NOEXCEPT {
@@ -159,18 +138,13 @@ public:
         other.insert(first, last);
     }
 
-    iterator
-    iters() BLACKHOLE_NOEXCEPT {
-        return iterator(other, local, scoped, global);
-    }
-
     const_iterator
     iters() const BLACKHOLE_NOEXCEPT {
         return const_iterator(other, local, scoped, global);
     }
 
-    boost::optional<attribute_t&>
-    find(const std::string& name) BLACKHOLE_NOEXCEPT {
+    boost::optional<const attribute_t&>
+    find(const std::string& name) const BLACKHOLE_NOEXCEPT {
         auto it = other.find(name);
         if (it != other.end()) {
             return it->second;
@@ -191,12 +165,7 @@ public:
             return it->second;
         }
 
-        return boost::optional<attribute_t&>();
-    }
-
-    boost::optional<const attribute_t&>
-    find(const std::string& name) const BLACKHOLE_NOEXCEPT {
-        return boost::optional<const attribute_t&>(const_cast<set_view_t*>(this)->find(name));
+        return boost::optional<const attribute_t&>();
     }
 
     const attribute_t& at(const std::string& name) const {
