@@ -112,6 +112,7 @@ public:
     typedef set_t underlying_container;
 
     typedef underlying_container::reference      reference;
+    typedef underlying_container::pointer        pointer;
 
     typedef underlying_container::iterator       iterator;
     typedef underlying_container::const_iterator const_iterator;
