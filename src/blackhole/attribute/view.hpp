@@ -109,9 +109,7 @@ public:
         global(std::move(global)),
         scoped(std::move(scoped)),
         local(std::move(local))
-    {
-//        other.reserve(8);
-    }
+    {}
 
     bool empty() const BLACKHOLE_NOEXCEPT {
         return other.empty() && local.empty() && scoped.empty() && global.empty();
