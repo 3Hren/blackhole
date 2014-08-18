@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <initializer_list>
 #include <iterator>
 #include <stdexcept>
@@ -47,7 +48,7 @@ private:
         iterator_pair_t(const iterator_pair_t& other) = default;
     };
 
-    uint stage;
+    std::uint32_t stage;
     std::vector<iterator_pair_t> iterators;
     underlying_iterator current;
 
