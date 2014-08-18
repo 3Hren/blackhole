@@ -214,9 +214,8 @@ public:
         }
 
         if (passed || trace) {
-            attribute::set_t attributes = { keyword::severity<Level>() = level };
-            attributes.insert(local.begin(), local.end());
-            return logger_base_t::open_record(std::move(attributes));
+            local.insert(keyword::severity<Level>() = level);
+            return logger_base_t::open_record(std::move(local));
         }
 
         return record_t();
