@@ -99,8 +99,8 @@ public:
     void set_exception_handler(log::exception_handler_t&& handler);
 
     record_t open_record() const;
-    record_t open_record(attribute::pair_t local_attribute) const;
-    record_t open_record(attribute::set_t local_attributes) const;
+    record_t open_record(attribute::pair_t attribute) const;
+    record_t open_record(attribute::set_t attributes) const;
 
     void push(record_t&& record) const;
 

@@ -108,8 +108,8 @@ logger_base_t::open_record() const {
 
 BLACKHOLE_API
 record_t
-logger_base_t::open_record(attribute::pair_t local_attribute) const {
-    return open_record(attribute::set_t({ std::move(local_attribute) }));
+logger_base_t::open_record(attribute::pair_t attribute) const {
+    return open_record(attribute::set_t({ std::move(attribute) }));
 }
 
 BLACKHOLE_API
