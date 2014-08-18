@@ -226,5 +226,5 @@ public:
 } // namespace blackhole
 
 #if defined(BLACKHOLE_HEADER_ONLY)
-#include "blackhole/implementation/logger.ipp"
+#include "blackhole/logger.ipp"
 #endif

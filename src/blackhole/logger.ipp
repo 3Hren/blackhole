@@ -1,7 +1,6 @@
-#pragma once
-
 #include "blackhole/config.hpp"
 #include "blackhole/detail/thread/lock.hpp"
+#include "blackhole/logger.hpp"
 #include "blackhole/platform.hpp"
 #include "blackhole/trace/context.hpp"
 #include "blackhole/utils/noexcept.hpp"
@@ -17,11 +16,11 @@ namespace aux {
 
 namespace guard {
 
-inline void no_deleter(scoped_attributes_concept_t*) { }
+inline void no_deleter(scoped_attributes_concept_t*) {}
 
 } // namespace guard
 
-} //namespace detail
+} //namespace aux
 
 BLACKHOLE_API
 logger_base_t::state_t::state_t() :
