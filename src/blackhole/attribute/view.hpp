@@ -68,10 +68,12 @@ private:
     underlying_iterator current;
 
 public:
-    template<class... Containers>
-    iterator_t(Containers&&... list) :
+    iterator_t(container_reference_type c1,
+               container_reference_type c2,
+               container_reference_type c3,
+               container_reference_type c4) :
         stage(0),
-        iterators(transform(std::forward<Containers>(list)...)),
+        iterators({ c1, c2, c3, c4 }),
         current(iterators.at(0).begin)
     {}
 
@@ -100,35 +102,6 @@ public:
     bool valid() const BLACKHOLE_NOEXCEPT {
         BOOST_ASSERT(iterators.size());
         return current != iterators.back().end;
-    }
-
-private:
-    template<class... Containers>
-    static
-    std::vector<iterator_pair_t>
-    transform(Containers&&... args) {
-        std::vector<iterator_pair_t> result;
-        transform(result, std::forward<Containers>(args)...);
-        return result;
-    }
-
-    static
-    void
-    transform(std::vector<iterator_pair_t>& r,
-              container_reference_type arg)
-    {
-        r.push_back(iterator_pair_t(arg));
-    }
-
-    template<class... Containers>
-    static
-    void
-    transform(std::vector<iterator_pair_t>& r,
-              container_reference_type arg,
-              Containers&&... args)
-    {
-        transform(r, arg);
-        transform(r, std::forward<Containers>(args)...);
     }
 };
 
