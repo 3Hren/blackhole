@@ -66,6 +66,11 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Mon Aug 18 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-1
+- Release version.
+- Bug fix: replaced accidentally left writer lock by the reader one.
+- Bug fix: logger object now get locked while swapping.
+
 * Fri Aug 08 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-0rc10
 - Compatibility: fixed compatibility with GCC 4.4.
 
