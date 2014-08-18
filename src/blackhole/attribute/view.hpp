@@ -1,9 +1,11 @@
 #pragma once
 
+#include <initializer_list>
 #include <iterator>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 #include "blackhole/attribute/set.hpp"
 #include "blackhole/utils/noexcept.hpp"
@@ -14,88 +16,119 @@ namespace attribute {
 
 template<class Container, bool Const>
 class iterator_t {
-    friend class iterator_t<Container, !Const>;
-
-    typedef typename std::conditional<
-        Const,
-        typename set_t::const_iterator,
-        typename set_t::iterator
-    >::type underlying_iterator;
-
-    typedef typename std::conditional<
-        Const,
-        const set_t&,
-        set_t&
-    >::type c;
-
-    int stage;
-    underlying_iterator it;
-    underlying_iterator b1, e1;
-    underlying_iterator b2, e2;
-    underlying_iterator b3, e3;
-    underlying_iterator b4, e4;
-
 public:
     typedef Container container_type;
-    typedef typename attribute::set_t::difference_type difference_type;
-    typedef typename attribute::set_t::value_type value_type;
+
+    typedef typename container_type::underlying_container underlying_container;
+
+    typedef typename underlying_container::difference_type difference_type;
+    typedef typename underlying_container::value_type value_type;
 
     typedef typename std::conditional<
         Const,
-        typename attribute::set_t::const_reference,
-        typename attribute::set_t::reference
+        typename underlying_container::const_reference,
+        typename underlying_container::reference
     >::type reference;
 
     typedef typename std::conditional<
         Const,
-        typename set_t::const_pointer,
-        typename set_t::pointer
+        typename underlying_container::const_pointer,
+        typename underlying_container::pointer
     >::type pointer;
+
+    typedef typename std::conditional<
+        Const,
+        typename underlying_container::const_iterator,
+        typename underlying_container::iterator
+    >::type underlying_iterator;
+
+    typedef typename std::conditional<
+        Const,
+        const underlying_container&,
+        underlying_container&
+    >::type container_reference_type;
 
     typedef std::forward_iterator_tag iterator_category;
 
+private:
+    friend class iterator_t<Container, !Const>;
+
+    struct iterator_pair_t {
+        underlying_iterator begin;
+        underlying_iterator end;
+
+        iterator_pair_t(container_reference_type container) :
+            begin(container.begin()),
+            end(container.end())
+        {}
+    };
+
+    uint stage;
+    std::vector<iterator_pair_t> iterators;
+    underlying_iterator current;
+
 public:
-    iterator_t(c c1, c c2, c c3, c c4) BLACKHOLE_NOEXCEPT :
+    template<class... Containers>
+    iterator_t(Containers&&... list) :
         stage(0),
-        it(c1.begin()),
-        b1(c1.begin()), e1(c1.end()),
-        b2(c2.begin()), e2(c2.end()),
-        b3(c3.begin()), e3(c3.end()),
-        b4(c4.begin()), e4(c4.end())
+        iterators(transform(std::forward<Containers>(list)...)),
+        current(iterators.at(0).begin)
     {}
 
     iterator_t& operator++() BLACKHOLE_NOEXCEPT {
-        it++;
-        switch (stage) {
-        case 0:
-            if (it == e1) { it = b2; stage++; }
-            break;
-        case 1:
-            if (it == e2) { it = b3; stage++; }
-            break;
-        case 2:
-            if (it == e3) { it = b4; stage++; }
-            break;
-        case 3:
-            if (it == e4) { stage++; }
-            break;
-        default:
-            BOOST_ASSERT(false);
+        BOOST_ASSERT(stage <= iterators.size());
+        current++;
+        if (current == iterators.at(stage).end) {
+            if (stage != iterators.size() - 1) {
+                current = iterators.at(stage + 1).begin;
+            }
+
+            stage++;
         }
 
         return *this;
     }
 
     pointer operator->() const BLACKHOLE_NOEXCEPT {
-        return it.operator->();
+        return current.operator->();
     }
 
     reference operator*() const BLACKHOLE_NOEXCEPT {
-        return *it;
+        return *current;
     }
 
-    bool valid() const {
-        return it != e4;
+    bool valid() const BLACKHOLE_NOEXCEPT {
+        BOOST_ASSERT(iterators.size());
+        return current != iterators.back().end;
+    }
+
+private:
+    template<class... Containers>
+    static
+    std::vector<iterator_pair_t>
+    transform(Containers&&... args) {
+        std::vector<iterator_pair_t> result;
+        transform(result, std::forward<Containers>(args)...);
+        return result;
+    }
+
+    static
+    void
+    transform(std::vector<iterator_pair_t>& r,
+              container_reference_type arg)
+    {
+        r.push_back(iterator_pair_t(arg));
+    }
+
+    template<class... Containers>
+    static
+    void
+    transform(std::vector<iterator_pair_t>& r,
+              container_reference_type arg,
+              Containers&&... args)
+    {
+        transform(r, arg);
+        transform(r, std::forward<Containers>(args)...);
     }
 };
 
@@ -103,8 +136,12 @@ public:
 // Can be iterated only forwardly.
 class set_view_t {
 public:
-    typedef set_t::iterator       iterator;
-    typedef set_t::const_iterator const_iterator;
+    typedef set_t underlying_container;
+
+    typedef underlying_container::reference      reference;
+
+    typedef underlying_container::iterator       iterator;
+    typedef underlying_container::const_iterator const_iterator;
 
 private:
     set_t scoped; // likely empty
