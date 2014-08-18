@@ -31,8 +31,9 @@ SET(HEADERS
     ${BLACKHOLE_TESTING_HEADERS}
 )
 
+SET(MAIN_SOURCES main)
+
 SET(BASE_SOURCES
-    main
     datetime/test_DayOfYear
     datetime/test_DayOfMonth
     datetime/test_DayOfWeek
@@ -91,6 +92,7 @@ IF(ENABLE_ELASTICSEARCH)
 ENDIF()
 
 SET(SOURCES
+    ${MAIN_SOURCES}
     ${BASE_SOURCES}
     ${ES_SOURCES}
 )
