@@ -119,8 +119,7 @@ public:
         return other.count(name) + local.count(name) + scoped.count(name) + global.count(name);
     }
 
-    //!@todo: Rename to `upper_size()` or something else.
-    size_t size() const BLACKHOLE_NOEXCEPT {
+    size_t upper_size() const BLACKHOLE_NOEXCEPT {
         return other.size() + local.size() + scoped.size() + global.size();
     }
 

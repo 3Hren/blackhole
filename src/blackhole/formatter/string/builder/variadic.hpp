@@ -45,7 +45,7 @@ struct variadic_t {
 
     void operator()(blackhole::aux::attachable_ostringstream& stream, const mapping::value_t&, const attribute::set_view_t& attributes) const {
         std::vector<std::string> passed;
-        passed.reserve(attributes.size());
+        passed.reserve(attributes.upper_size());
 
         for (auto pit = placeholder.begin() + string::VARIADIC_KEY_PRFFIX_LENGTH; pit != placeholder.end(); ++pit) {
             const scope_underlying_type scope = *pit - '0';
