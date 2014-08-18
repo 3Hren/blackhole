@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <cstdint>
 #include <initializer_list>
 #include <iterator>
@@ -17,57 +18,30 @@ namespace blackhole {
 
 namespace attribute {
 
-template<class Container>
 class iterator_t {
 public:
-    typedef Container container_type;
-
-    typedef typename container_type::underlying_container underlying_container;
-
-    typedef typename underlying_container::difference_type difference_type;
-    typedef typename underlying_container::value_type value_type;
-
-    typedef typename underlying_container::const_reference reference;
-    typedef typename underlying_container::const_pointer pointer;
-    typedef typename underlying_container::const_iterator underlying_iterator;
-
-    typedef const underlying_container& container_reference_type;
-
     typedef std::forward_iterator_tag iterator_category;
 
 private:
-    struct iterator_pair_t {
-        underlying_iterator begin;
-        underlying_iterator end;
-
-        iterator_pair_t(container_reference_type container) :
-            begin(container.begin()),
-            end(container.end())
-        {}
-
-        iterator_pair_t(const iterator_pair_t& other) = default;
-    };
-
-    std::uint32_t stage;
-    std::vector<iterator_pair_t> iterators;
-    underlying_iterator current;
+    mutable const set_t* cc;
+    mutable size_t stage;
+    mutable set_t::const_iterator ci;
+    std::vector<const set_t*> cs;
 
 public:
-    iterator_t(container_reference_type c1,
-               container_reference_type c2,
-               container_reference_type c3,
-               container_reference_type c4) :
+    iterator_t(const set_t* c1, const set_t* c2, const set_t* c3) :
+        cc(c1),
         stage(0),
-        iterators({ c1, c2, c3, c4 }),
-        current(iterators.at(0).begin)
+        ci(c1->begin()),
+        cs({ c1, c2, c3 })
     {}
 
     iterator_t& operator++() BLACKHOLE_NOEXCEPT {
-        BOOST_ASSERT(stage <= iterators.size());
-        current++;
-        if (current == iterators.at(stage).end) {
-            if (stage != iterators.size() - 1) {
-                current = iterators.at(stage + 1).begin;
+        ci++;
+        if (ci == cc->end()) {
+            if (stage < cs.size() - 1) {
+                cc = cs[stage + 1];
+                ci = cc->begin();
             }
 
             stage++;
@@ -76,51 +50,51 @@ public:
         return *this;
     }
 
-    pointer operator->() const BLACKHOLE_NOEXCEPT {
-        return current.operator->();
+    set_t::const_pointer operator->() const BLACKHOLE_NOEXCEPT {
+        return ci.operator->();
     }
 
-    reference operator*() const BLACKHOLE_NOEXCEPT {
-        return *current;
+    set_t::const_reference operator*() const BLACKHOLE_NOEXCEPT {
+        return *ci;
     }
 
     bool valid() const BLACKHOLE_NOEXCEPT {
-        BOOST_ASSERT(iterators.size());
-        return current != iterators.back().end;
+        if (ci == cc->end()) {
+            if (cc == cs.back()) {
+                return false;
+            }
+
+            cc = cs[++stage];
+            ci = cc->begin();
+        }
+
+        return true;
     }
 };
 
-// Provide get/set access.
-// Can be iterated only forwardly.
 class set_view_t {
-public:
-    typedef set_t underlying_container;
-    typedef iterator_t<set_view_t> const_iterator;
-
-private:
     set_t global; // Likely empty.
-    set_t scoped; // Likely empty, but can be filled with scope attributes (4-5).
     set_t local;  // About 1-2 + message + tid + timestamp (4-5).
-    set_t other;  // The most filled (user attributes).
+    set_t other;  // The most filled (scoped + user attributes)
 
 public:
     set_view_t() = default;
     set_view_t(set_t global, set_t scoped, set_t&& local) :
         global(std::move(global)),
-        scoped(std::move(scoped)),
-        local(std::move(local))
+        local(std::move(local)),
+        other(std::move(scoped))
     {}
 
     bool empty() const BLACKHOLE_NOEXCEPT {
-        return other.empty() && local.empty() && scoped.empty() && global.empty();
+        return local.empty() && other.empty() && global.empty();
     }
 
     size_t count(const std::string& name) const BLACKHOLE_NOEXCEPT {
-        return other.count(name) + local.count(name) + scoped.count(name) + global.count(name);
+        return local.count(name) + other.count(name) + global.count(name);
     }
 
     size_t upper_size() const BLACKHOLE_NOEXCEPT {
-        return other.size() + local.size() + scoped.size() + global.size();
+        return local.size() + other.size() + global.size();
     }
 
     void insert(pair_t pair) {
@@ -132,25 +106,20 @@ public:
         other.insert(first, last);
     }
 
-    const_iterator
+    iterator_t
     iters() const BLACKHOLE_NOEXCEPT {
-        return const_iterator(other, local, scoped, global);
+        return iterator_t(&local, &other, &global);
     }
 
     boost::optional<const attribute_t&>
     find(const std::string& name) const BLACKHOLE_NOEXCEPT {
-        auto it = other.find(name);
-        if (it != other.end()) {
-            return it->second;
-        }
-
-        it = local.find(name);
+        auto it = local.find(name);
         if (it != local.end()) {
             return it->second;
         }
 
-        it = scoped.find(name);
-        if (it != scoped.end()) {
+        it = other.find(name);
+        if (it != other.end()) {
             return it->second;
         }
 
