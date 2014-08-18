@@ -1,3 +1,12 @@
+blackhole (0.2.0-1) unstable; urgency=low
+
+  * Release version.
+  * Bug fix: replaced accidentally left writer lock by the reader one.
+  * Bug fix: logger object now get locked while swapping.
+
+ -- Evgeny Safronov <division494@gmail.com>  Mon, 18 Aug 2014 15:27:44 +0400
+
+
 blackhole (0.2.0-0rc10) unstable; urgency=low
 
   * Compatibility: fixed compatibility with GCC 4.4.
