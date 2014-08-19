@@ -141,7 +141,7 @@ private:
 
         if (!containers.empty()) {
             current = containers.front();
-            it = current->begin();
+            this->it = current->begin();
         }
     }
 
