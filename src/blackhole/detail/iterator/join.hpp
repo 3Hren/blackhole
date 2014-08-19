@@ -66,11 +66,6 @@ private:
     size_t pos;
 
 public:
-    BLACKHOLE_CONSTEXPR join_t() :
-        current(nullptr),
-        pos(0)
-    {}
-
     join_t(std::initializer_list<container_pointer> list) :
         current(nullptr),
         pos(0)
