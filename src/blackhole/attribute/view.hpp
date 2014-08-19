@@ -13,66 +13,150 @@
 
 #include "blackhole/attribute/set.hpp"
 #include "blackhole/utils/noexcept.hpp"
+#include "blackhole/utils/timeval.hpp"
 
 namespace blackhole {
 
 namespace attribute {
 
-class iterator_t {
+struct invalidate_tag_t {};
+static invalidate_tag_t invalidate_tag;
+
+template<class Container, bool Const>
+class join_iterator_t {
+    friend class join_iterator_t<Container, !Const>;
+
 public:
-    typedef std::forward_iterator_tag iterator_category;
+    typedef Container container_type;
+    typedef typename container_type::value_type             value_type;
+    typedef typename container_type::difference_type        difference_type;
+    typedef const container_type* container_pointer;
+
+    typedef typename std::conditional<
+        Const,
+        typename container_type::const_pointer,
+        typename container_type::pointer
+    >::type pointer;
+
+    typedef typename std::conditional<
+        Const,
+        typename container_type::const_iterator,
+        typename container_type::iterator
+    >::type iterator;
+
+    typedef typename std::conditional<
+        Const,
+        typename container_type::const_reference,
+        typename container_type::reference
+    >::type reference;
+
+    typedef typename std::iterator_traits<
+        iterator
+    >::iterator_category iterator_category;
+
+    static_assert(
+        (std::is_base_of<std::forward_iterator_tag, iterator_category>::value),
+        "only forward iterators are supported"
+    );
 
 private:
-    mutable const set_t* cc;
-    mutable size_t stage;
-    mutable set_t::const_iterator ci;
-    std::vector<const set_t*> cs;
+    std::vector<container_pointer> containers;
+    container_pointer current;
+    iterator it;
+    size_t pos;
 
 public:
-    iterator_t(const set_t* c1, const set_t* c2, const set_t* c3) :
-        cc(c1),
-        stage(0),
-        ci(c1->begin()),
-        cs({ c1, c2, c3 })
+    constexpr join_iterator_t() :
+        current(nullptr),
+        pos(0)
     {}
 
-    iterator_t& operator++() BLACKHOLE_NOEXCEPT {
-        ci++;
-        if (ci == cc->end()) {
-            if (stage < cs.size() - 1) {
-                cc = cs[stage + 1];
-                ci = cc->begin();
-            }
+    join_iterator_t(std::initializer_list<container_pointer> list) :
+        current(nullptr),
+        pos(0)
+    {
+        init(list);
+    }
 
-            stage++;
+    join_iterator_t(std::initializer_list<container_pointer> list, const invalidate_tag_t&) :
+        current(nullptr),
+        pos(0)
+    {
+        init(list);
+        if (!containers.empty()) {
+            current = containers.back();
+            it = current->end();
         }
+    }
 
+    join_iterator_t& operator++() noexcept {
+        ++it;
+        maybe_advance_stage();
         return *this;
     }
 
-    set_t::const_pointer operator->() const BLACKHOLE_NOEXCEPT {
-        return ci.operator->();
+    join_iterator_t operator++(int) noexcept {
+        join_iterator_t tmp(*this);
+        it++;
+        maybe_advance_stage();
+        return tmp;
     }
 
-    set_t::const_reference operator*() const BLACKHOLE_NOEXCEPT {
-        return *ci;
+    pointer operator->() const noexcept {
+        return it.operator->();
     }
 
-    bool valid() const BLACKHOLE_NOEXCEPT {
-        if (ci == cc->end()) {
-            if (cc == cs.back()) {
-                return false;
-            }
+    reference operator*() const noexcept {
+        return *it;
+    }
 
-            cc = cs[++stage];
-            ci = cc->begin();
+    template<bool flag>
+    bool operator==(const join_iterator_t<container_type, flag>& other) const {
+        if (containers.empty() && other.containers.empty()) {
+            // Both iterators are invalid.
+            return true;
         }
 
-        return true;
+        return containers == other.containers && current == other.current && it == other.it;
+    }
+
+    template<bool flag>
+    bool operator!=(const join_iterator_t<container_type, flag>& other) const {
+        return !operator==(other);
+    }
+
+private:
+    void init(const std::initializer_list<container_pointer>& list) {
+        for (auto it = list.begin(); it != list.end(); ++it) {
+            if (!(*it)->empty()) {
+                containers.push_back(*it);
+            }
+        }
+
+        if (!containers.empty()) {
+            current = containers.front();
+            it = current->begin();
+        }
+    }
+
+    void maybe_advance_stage() noexcept {
+        if (it == current->end()) {
+            if (current != containers.back()) {
+                current = containers[pos + 1];
+                it = current->begin();
+            }
+
+            pos++;
+        }
     }
 };
 
 class set_view_t {
+public:
+    typedef join_iterator_t<set_t, true>  const_iterator;
+    typedef join_iterator_t<set_t, false> iterator;
+
+private:
     set_t global; // Likely empty.
     set_t local;  // About 1-2 + message + tid + timestamp (4-5).
     set_t other;  // The most filled (scoped + user attributes)
@@ -106,9 +190,14 @@ public:
         other.insert(first, last);
     }
 
-    iterator_t
-    iters() const BLACKHOLE_NOEXCEPT {
-        return iterator_t(&local, &other, &global);
+    const_iterator
+    begin() const BLACKHOLE_NOEXCEPT {
+        return const_iterator({ &local, &other, &global });
+    }
+
+    const_iterator
+    end() const BLACKHOLE_NOEXCEPT {
+        return const_iterator({ &local, &other, &global }, invalidate_tag);
     }
 
     boost::optional<const attribute_t&>

@@ -50,7 +50,7 @@ struct variadic_t {
         for (auto pit = placeholder.begin() + string::VARIADIC_KEY_PRFFIX_LENGTH; pit != placeholder.end(); ++pit) {
             const scope_underlying_type scope = *pit - '0';
 
-            for (auto it = attributes.iters(); it.valid(); ++it) {
+            for (auto it = attributes.begin(); it != attributes.end(); ++it) {
                 const std::string& name = it->first;
                 const attribute_t& attribute = it->second;
                 if (static_cast<scope_underlying_type>(attribute.scope) & scope) {
