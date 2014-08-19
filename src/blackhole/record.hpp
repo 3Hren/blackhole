@@ -18,8 +18,6 @@ public:
     /*!
      * Conversion constructor.
      * Creates a record with specified attribute set.
-     * @todo: Test post condition: this->attributes() == prev attributes.
-     * @todo: Instead of `attribute::set_t` move `attribute::set_view_t`.
      */
     record_t(attribute::set_view_t&& view) :
         view(std::move(view))
@@ -28,7 +26,6 @@ public:
     /*!
      * Conversion to an unspecified boolean type.
      * Return true if the record is valid.
-     * @todo: Test.
      */
     operator bool() const BLACKHOLE_NOEXCEPT {
         return valid();
@@ -37,7 +34,6 @@ public:
     /*!
      * Check if the record is valid.
      * A record is considered valid if it contains at least one attribute.
-     * @todo: Test.
      */
     bool valid() const BLACKHOLE_NOEXCEPT {
         return !view.empty();
@@ -46,7 +42,6 @@ public:
     /*!
      * Return a const reference to the view of attribute set attached to this
      * record.
-     * @todo: Test.
      */
     const attribute::set_view_t& attributes() const BLACKHOLE_NOEXCEPT {
         return view;
@@ -54,7 +49,6 @@ public:
 
     /*!
      * Insert attribute pair into the record.
-     * @todo: Test.
      */
     void insert(attribute::pair_t pair) {
         view.insert(std::move(pair));
@@ -62,10 +56,13 @@ public:
 
     /*!
      * Try to extract attribute with specified name and convert it to type T.
-     * @todo: What throws? Test invalid name and invalid type.
+     * @throw: std::out_of_range - if attribute with specified name was not
+     *         found in the record.
+     * @throw: boost::bad_get - if attribute with specified name was found in
+     *         the record, but it has other underlying type than specified one.
      */
     template<typename T>
-    inline T extract(const std::string& name) const {
+    T extract(const std::string& name) const {
         return attribute::traits<T>::extract(view, name);
     }
 };

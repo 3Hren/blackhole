@@ -92,6 +92,7 @@ IF(ENABLE_ELASTICSEARCH)
 ENDIF()
 
 SET(DEVELOP_SOURCES
+    Record
     View
 )
 
