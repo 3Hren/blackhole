@@ -1,9 +1,5 @@
-#include <tuple>
 #include <vector>
 #include <unordered_map>
-
-#include <boost/assert.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include <blackhole/attribute/view.hpp>
 
