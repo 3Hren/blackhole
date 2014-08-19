@@ -11,16 +11,19 @@ namespace blackhole {
 
 namespace aux {
 
-//! \brief Converts various types to log event attributes.
-/*! Helper hierarchy of template classes that allows to pass objects of user
- *  defined classes as attribute in main logging macro. To make this possible,
- *  user defined class must have fully defined stream push `operator<<`.
- *  The logic is as follows: if the object can be implicitly converted to the
- *  `attribute::value_t` object, then that convertion is used.
- *  Otherwise the library would check via SFINAE if the custom class has defined
- *  stream push `operator<<` and, if yes - uses it.
- *  Otherwise static assert with human-readable message is triggered.
-*/
+/*!
+ * Converts various types to log event attributes.
+ *
+ * Helper hierarchy of template classes that allows to pass objects of user
+ * defined classes as attribute in tha main logging macro.
+ * To make this possible, user defined class must have fully defined stream
+ * push `operator<<`.
+ * The logic is as follows: if the object can be implicitly converted to
+ * the `attribute::value_t` object, then that convertion is used.
+ * Otherwise the library would check via SFINAE if the custom class has defined
+ * stream push `operator<<` and, if yes - uses it.
+ * Otherwise static assert with human-readable message is triggered.
+ */
 template<typename T, class = void>
 struct conv;
 
