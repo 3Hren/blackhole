@@ -1,3 +1,4 @@
 #pragma once
 
-#include "utils/nullptr.hpp"
+#include "blackhole/detail/config/constexpr.hpp"
+#include "blackhole/utils/nullptr.hpp"
