@@ -12,7 +12,6 @@ public:
     /*!
      * Default constructor.
      * Creates an empty record that is equivalent to the invalid record handle.
-     * @todo: Test post condition: this->valid() == false
      */
     record_t() = default;
 
