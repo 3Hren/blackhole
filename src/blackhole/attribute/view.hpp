@@ -11,6 +11,7 @@
 
 #include <boost/optional.hpp>
 
+#include "blackhole/common.hpp"
 #include "blackhole/attribute/set.hpp"
 #include "blackhole/utils/noexcept.hpp"
 #include "blackhole/utils/timeval.hpp"
@@ -71,7 +72,7 @@ private:
     size_t pos;
 
 public:
-    constexpr join_iterator_t() :
+    BLACKHOLE_CONSTEXPR join_iterator_t() :
         current(nullptr),
         pos(0)
     {}
@@ -94,24 +95,24 @@ public:
         }
     }
 
-    join_iterator_t& operator++() noexcept {
+    join_iterator_t& operator++() BLACKHOLE_NOEXCEPT {
         ++it;
         maybe_advance_stage();
         return *this;
     }
 
-    join_iterator_t operator++(int) noexcept {
+    join_iterator_t operator++(int) BLACKHOLE_NOEXCEPT {
         join_iterator_t tmp(*this);
         it++;
         maybe_advance_stage();
         return tmp;
     }
 
-    pointer operator->() const noexcept {
+    pointer operator->() const BLACKHOLE_NOEXCEPT {
         return it.operator->();
     }
 
-    reference operator*() const noexcept {
+    reference operator*() const BLACKHOLE_NOEXCEPT {
         return *it;
     }
 
@@ -144,7 +145,7 @@ private:
         }
     }
 
-    void maybe_advance_stage() noexcept {
+    void maybe_advance_stage() BLACKHOLE_NOEXCEPT {
         if (it == current->end()) {
             if (current != containers.back()) {
                 current = containers[pos + 1];
