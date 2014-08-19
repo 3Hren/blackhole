@@ -3,7 +3,7 @@
 #include <limits>
 #include <random>
 
-#include "blackhole/platform/random.hpp"
+#include "blackhole/detail/config/platform/random.hpp"
 
 #if !defined(BLACKHOLE_HAS_CXX11_RANDOM)
 #include <time.h>

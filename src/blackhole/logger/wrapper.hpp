@@ -2,9 +2,9 @@
 
 #include "blackhole/config.hpp"
 #include "blackhole/detail/thread/lock.hpp"
+#include "blackhole/detail/config/noncopyable.hpp"
 #include "blackhole/forwards.hpp"
 #include "blackhole/record.hpp"
-#include "blackhole/utils/noncopyable.hpp"
 #include "blackhole/config.hpp"
 
 namespace blackhole {

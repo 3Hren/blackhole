@@ -7,8 +7,6 @@
 #include <boost/assert.hpp>
 #include <boost/utility/addressof.hpp>
 
-#include "blackhole/utils/nullptr.hpp"
-
 namespace blackhole {
 
 namespace aux {

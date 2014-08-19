@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-#include "blackhole/platform/underlying.hpp"
+#include "blackhole/detail/config/platform/underlying.hpp"
 
 namespace blackhole {
 

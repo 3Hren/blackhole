@@ -11,10 +11,10 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #include "blackhole/config.hpp"
+#include "blackhole/detail/config/noexcept.hpp"
+#include "blackhole/detail/config/nullptr.hpp"
 #include "blackhole/detail/traits/integer.hpp"
 #include "blackhole/utils/format.hpp"
-#include "blackhole/utils/noexcept.hpp"
-#include "blackhole/utils/nullptr.hpp"
 
 namespace blackhole {
 

@@ -5,12 +5,12 @@
 #include <boost/asio.hpp>
 #include <boost/thread/barrier.hpp>
 
+#include <blackhole/detail/config/atomic.hpp>
 #include <blackhole/detail/logger/pusher.hpp>
 #include <blackhole/formatter/string.hpp>
 #include <blackhole/logger.hpp>
 #include <blackhole/sink/stream.hpp>
 #include <blackhole/sink/thread.hpp>
-#include <blackhole/utils/atomic.hpp>
 #include <blackhole/utils/format.hpp>
 
 #include "elasticsearch/client.hpp"

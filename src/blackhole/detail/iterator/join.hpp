@@ -4,7 +4,9 @@
 #include <type_traits>
 #include <vector>
 
-#include "blackhole/common.hpp"
+#include "blackhole/detail/config/constexpr.hpp"
+#include "blackhole/detail/config/noexcept.hpp"
+#include "blackhole/detail/config/nullptr.hpp"
 
 namespace blackhole {
 

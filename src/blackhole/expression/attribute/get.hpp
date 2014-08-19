@@ -3,9 +3,9 @@
 #include <string>
 
 #include "blackhole/attribute.hpp"
+#include "blackhole/detail/config/underlying.hpp"
 #include "blackhole/expression/helper.hpp"
 #include "blackhole/filter.hpp"
-#include "blackhole/utils/underlying.hpp"
 
 namespace blackhole {
 

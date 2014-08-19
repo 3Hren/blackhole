@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "blackhole/platform/deprecated.hpp"
+#include "blackhole/detail/config/platform/deprecated.hpp"
 
 namespace blackhole {
 

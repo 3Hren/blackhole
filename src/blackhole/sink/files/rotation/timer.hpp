@@ -2,7 +2,7 @@
 
 #include <ctime>
 
-#include "blackhole/utils/nullptr.hpp"
+#include "blackhole/detail/config/nullptr.hpp"
 
 namespace blackhole {
 

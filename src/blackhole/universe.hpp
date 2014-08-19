@@ -3,7 +3,7 @@
 #include <boost/thread/shared_mutex.hpp>
 
 #include "blackhole/attribute.hpp"
-#include "blackhole/utils/noncopyable.hpp"
+#include "blackhole/detail/config/noncopyable.hpp"
 
 //!@todo: Drop this shit.
 namespace blackhole {

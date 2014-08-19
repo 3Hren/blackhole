@@ -7,7 +7,7 @@
 #include <urdl/option_set.hpp>
 #include <urdl/read_stream.hpp>
 
-#include <blackhole/utils/atomic.hpp>
+#include <blackhole/detail/config/atomic.hpp>
 
 namespace urlfetch {
 

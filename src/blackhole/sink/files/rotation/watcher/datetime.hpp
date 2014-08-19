@@ -2,8 +2,8 @@
 
 #include <ctime>
 
+#include "blackhole/detail/config/nullptr.hpp"
 #include "blackhole/sink/files/rotation/watcher/config.hpp"
-#include "blackhole/utils/nullptr.hpp"
 
 namespace blackhole {
 

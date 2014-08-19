@@ -2,8 +2,8 @@
 
 #include <boost/asio.hpp>
 
+#include <blackhole/detail/config/atomic.hpp>
 #include <blackhole/trace.hpp>
-#include <blackhole/utils/atomic.hpp>
 
 #include "global.hpp"
 #include "mocks/trace.hpp"

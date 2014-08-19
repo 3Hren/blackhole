@@ -2,8 +2,8 @@
 
 #include <cstdint>
 
-#include "blackhole/platform/deprecated.hpp"
-#include "blackhole/utils/underlying.hpp"
+#include "blackhole/detail/config/platform/deprecated.hpp"
+#include "blackhole/detail/config/underlying.hpp"
 
 namespace blackhole {
 

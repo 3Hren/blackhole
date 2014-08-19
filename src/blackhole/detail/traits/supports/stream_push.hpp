@@ -3,8 +3,6 @@
 #include <ostream>
 #include <type_traits>
 
-#include "blackhole/platform.hpp"
-
 namespace blackhole {
 
 namespace support {

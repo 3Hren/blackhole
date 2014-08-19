@@ -1,6 +1,6 @@
 #pragma once
 
-#include "blackhole/platform/constexpr.hpp"
+#include "platform/constexpr.hpp"
 
 #if defined(BLACKHOLE_HAS_FEATURE_CONSTEXPR)
     #define BLACKHOLE_CONSTEXPR constexpr

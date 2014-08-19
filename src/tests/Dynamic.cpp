@@ -186,8 +186,8 @@ TEST(Dynamic, LikeDictBool) {
     base["input"] = true;
     base["output"] = false;
 
-    EXPECT_EQ(true, base["input"].to<bool>());
-    EXPECT_EQ(false, base["output"].to<bool>());
+    EXPECT_TRUE(true == base["input"].to<bool>());
+    EXPECT_TRUE(false == base["output"].to<bool>());
 }
 
 TEST(Dynamic, LikeDictUint8) {

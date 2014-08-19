@@ -1,5 +1,5 @@
+#include <blackhole/detail/config/atomic.hpp>
 #include <blackhole/sink/elasticsearch/transport.hpp>
-#include <blackhole/utils/atomic.hpp>
 
 #include "../../global.hpp"
 #include "../../mocks/elasticsearch.hpp"

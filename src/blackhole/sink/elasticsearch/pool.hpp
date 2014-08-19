@@ -4,7 +4,7 @@
 
 #include <boost/asio.hpp>
 
-#include "blackhole/utils/noexcept.hpp"
+#include "blackhole/detail/config/noexcept.hpp"
 
 namespace std {
 

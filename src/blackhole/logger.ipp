@@ -1,9 +1,8 @@
 #include "blackhole/config.hpp"
+#include "blackhole/detail/config/nullptr.hpp"
 #include "blackhole/detail/thread/lock.hpp"
 #include "blackhole/logger.hpp"
-#include "blackhole/platform.hpp"
 #include "blackhole/trace/context.hpp"
-#include "blackhole/utils/noexcept.hpp"
 
 #ifdef __linux__
 # define BLACKHOLE_HAS_LWP

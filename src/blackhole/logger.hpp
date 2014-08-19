@@ -5,8 +5,10 @@
 
 #include <boost/thread/tss.hpp>
 
-#include "attribute.hpp"
-#include "common.hpp"
+#include "blackhole/attribute.hpp"
+#include "blackhole/detail/config/atomic.hpp"
+#include "blackhole/detail/config/noncopyable.hpp"
+#include "blackhole/detail/config/nullptr.hpp"
 #include "error/handler.hpp"
 #include "filter.hpp"
 #include "frontend.hpp"
@@ -17,12 +19,9 @@
 #include "keyword/timestamp.hpp"
 #include "keyword/tracebit.hpp"
 #include "universe.hpp"
-#include "utils/noncopyable.hpp"
 #include "utils/unique.hpp"
 
 #include "blackhole/config.hpp"
-#include "blackhole/utils/atomic.hpp"
-#include "blackhole/utils/noexcept.hpp"
 
 namespace blackhole {
 

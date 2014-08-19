@@ -6,11 +6,20 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "blackhole/utils/actions/empty.hpp"
-
 namespace blackhole {
 
 namespace aux {
+
+namespace action {
+
+struct empty {
+    template<typename T>
+    bool operator()(const T& value) const {
+        return value.empty();
+    }
+};
+
+} // namespace action
 
 inline std::vector<std::string> split(const std::string& input, const std::string& separator) {
     std::vector<std::string> result;

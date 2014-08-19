@@ -2,7 +2,7 @@
 
 #include <boost/thread.hpp>
 
-#include "blackhole/utils/nullptr.hpp"
+#include "blackhole/detail/config/nullptr.hpp"
 
 #include "forwards.hpp"
 

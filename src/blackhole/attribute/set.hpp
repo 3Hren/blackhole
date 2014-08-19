@@ -4,7 +4,7 @@
 
 #include "blackhole/attribute/name.hpp"
 #include "blackhole/attribute/value.hpp"
-#include "blackhole/platform/deprecated.hpp"
+#include "blackhole/detail/config/platform/deprecated.hpp"
 
 namespace blackhole {
 

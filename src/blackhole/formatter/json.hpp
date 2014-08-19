@@ -10,15 +10,13 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
+#include "blackhole/detail/string/split.hpp"
 #include "blackhole/error.hpp"
 #include "blackhole/formatter/base.hpp"
 #include "blackhole/formatter/json/config.hpp"
 #include "blackhole/formatter/map/value.hpp"
 #include "blackhole/record.hpp"
 #include "blackhole/repository/factory/traits.hpp"
-#include "blackhole/utils/actions/empty.hpp"
-#include "blackhole/utils/nullptr.hpp"
-#include "blackhole/utils/split.hpp"
 
 namespace blackhole {
 

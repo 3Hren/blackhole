@@ -7,6 +7,7 @@
 #include <boost/assert.hpp>
 #include <boost/config.hpp>
 
+#include "blackhole/detail/config/nullptr.hpp"
 #include "blackhole/detail/support/char.hpp"
 
 #include "streambuf.hpp"
