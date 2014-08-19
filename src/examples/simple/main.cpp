@@ -35,7 +35,7 @@ void handle(Log& log, level lvl, const char* message) {
     // Tries to create log record. Returns invalid record object if created log record couldn't
     // pass filtering stage.
     // For our case it will be created anyway, because we don't have any filters registered now.
-    log::record_t record = log.open_record(lvl);
+    record_t record = log.open_record(lvl);
     if (record.valid()) {
         // Manually insert message attribute into log record attributes set using keyword API.
         // Formatter will break up if some attributes it needed don't exist where formatting
