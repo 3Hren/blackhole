@@ -28,9 +28,14 @@ class join_iterator_t {
 
 public:
     typedef Container container_type;
-    typedef typename container_type::value_type             value_type;
-    typedef typename container_type::difference_type        difference_type;
-    typedef const container_type* container_pointer;
+    typedef typename container_type::value_type value_type;
+    typedef typename container_type::difference_type difference_type;
+
+    typedef typename std::conditional<
+        Const,
+        const container_type*,
+        container_type*
+    >::type container_pointer;
 
     typedef typename std::conditional<
         Const,
