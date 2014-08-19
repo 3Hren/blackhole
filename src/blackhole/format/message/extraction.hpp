@@ -14,36 +14,59 @@ namespace blackhole {
 
 namespace aux {
 
-// Specialization of utils::format function for extracting and replacing `in situ` keyword arguments.
-// For example actual level attribute string representation is substituted:
-// BH_LOG(log, level::debug, "level = %s", keyword::severity_t<level>());
+/*!
+ * Specialization of utils::format function for extracting and
+ * replacing `in situ` keyword arguments.
+ * For example actual level attribute string representation is substituted:
+ * BH_LOG(log, level::debug, "level = %s", keyword::severity_t<level>());
+ */
 
 //!@todo: Consider migrating to something more faster than boost::format.
-static inline
+static
+inline
 std::string
 substitute(const attribute::set_view_t&, boost::format&& message) {
     return message.str();
 }
 
 template<typename T, typename... Args>
-static inline
+static
+inline
 std::string
-substitute(const attribute::set_view_t& attributes, boost::format&& message, const T& argument, const Args&... args) {
+substitute(const attribute::set_view_t& attributes,
+           boost::format&& message,
+           const T& argument,
+           const Args&... args)
+{
     return substitute(attributes, std::move(message % argument), args...);
 }
 
 template<typename T, typename Tag, attribute::scope_t Scope, typename... Args>
-static inline
+static
+inline
 std::string
-substitute(const attribute::set_view_t& attributes, boost::format&& message, const keyword::keyword_t<T, Tag, Scope>&, const Args&... args) {
-    const T& arg = attribute::traits<T>::extract(attributes, keyword::keyword_t<T, Tag, Scope>::name());
+substitute(const attribute::set_view_t& attributes,
+           boost::format&& message,
+           const keyword::keyword_t<T, Tag, Scope>&,
+           const Args&... args)
+{
+    const T& arg = attribute::traits<T>::extract(
+        attributes,
+        keyword::keyword_t<T, Tag, Scope>::name()
+    );
     std::ostringstream stream;
     format::message::insitu<Tag>::execute(stream, arg);
     return substitute(attributes, std::move(message % stream.str()), args...);
 }
 
 template<typename... Args>
-static std::string format(const attribute::set_view_t& attributes, const std::string& fmt, Args&&... args) {
+static
+inline
+std::string
+format(const attribute::set_view_t& attributes,
+       const std::string& fmt,
+       Args&&... args)
+{
     return substitute(attributes, boost::format(fmt), args...);
 }
 
