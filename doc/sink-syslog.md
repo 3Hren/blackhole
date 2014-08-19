@@ -3,7 +3,9 @@
 This example is all about syslog sink, which writes all incoming log messages to \*nix syslog. It's not so large as previous tutorial, but therefore contains one important feature I'd like to describe more in detail.
 
 For a start, as usual, include all necessary header files and define severity enumeration:
-{% highlight c++ %}
+
+
+```
 #include <blackhole/blackhole.hpp>
 #include <blackhole/frontend/syslog.hpp>
 
@@ -12,14 +14,15 @@ enum class level {
     warning,
     error
 };
-{% endhighlight %}
+```
 
 As you can see, as like in the previous example, additional header file is required - syslog frontend.
 
 The fact that syslog has own severity level definition as it described in **RFC5424** and we need to properly map from user defined severity enumeration to the syslog's one. But there is no other way to pass additional parameter (current log event's severity) to the sink except implementing frontend's template specialization. That's why we need additional header file.
 
 Okay, now we know that it is necessary to map severity levels, but how to do that? Blackhole provides you way to do that via implementing additional template specialization. The code will looks like this:
-{% highlight c++ %}
+
+```
 namespace blackhole {
 
 namespace sink {
@@ -45,19 +48,21 @@ struct priority_traits<level> {
 } // namespace sink
 
 } // namespace blackhole
-{% endhighlight %}
+```
 
 We just implement `priority_traits` template specialization with single static method `map` that accepts single parameter - user-defined severity (`level` in our case) and returns syslog's one - `priority_t`. Mapping itself is a user's responsibility.
 
 Remaining part of the example shouldn't be hard to understand if you are familiar with the previous example.
 
 As always register necessary formatter and sink. Note that syslog sink requires user-defined severity enumeration symbol as template parameter. This information is needed for severity level mapping.
-{% highlight c++ %}
+
+```
 repository_t::instance().configure<sink::syslog_t<level>, formatter::string_t>();
-{% endhighlight %}
+```
 
 Further configuration also shouldn't cause difficulties.
-{% highlight c++ %}
+
+```
 // Formatter is configured as usual, except we don't need anything than message.
 formatter_config_t formatter("string");
 formatter["pattern"] = "%(message)s";
@@ -70,10 +75,10 @@ frontend_config_t frontend = { formatter, sink };
 log_config_t config{ "root", { frontend } };
 
 repository_t::instance().add_config(config);
-{% endhighlight %}
+```
 
 Full example code is:
-{% highlight c++ linenos %}
+```
 #include <blackhole/blackhole.hpp>
 #include <blackhole/frontend/syslog.hpp>
 
@@ -148,9 +153,9 @@ int main(int, char**) {
 
     return 0;
 }
-{% endhighlight %}
+```
 
 After executing the next messages should be displayed in your syslog (depending on your syslog's configuration):
-![Output after executing the example](images/docs/syslog-1.png)
+![Output after executing the example](images/syslog-1.png)
 
 *Note that debug message in my case was ignored by syslog itself, not by Blackhole.*
