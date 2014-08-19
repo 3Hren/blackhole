@@ -5,8 +5,9 @@
 
 #include "global.hpp"
 
-using blackhole::aux::iterator::join_t;
-using blackhole::aux::iterator::invalidate_tag;
+using namespace blackhole;
+using aux::iterator::join_t;
+using aux::iterator::invalidate_tag;
 
 #define TEST_JOIN_ITERATOR(Suite, Case) \
     TEST(join_t##_##Suite, Case)
@@ -158,4 +159,9 @@ TEST_JOIN_ITERATOR(Forward, Map) {
     for (auto it = begin; it != end; ++it) {
         EXPECT_TRUE(expected.find(it->first)->second == it->second);
     }
+}
+
+TEST(set_view_t, DefaultConstructor) {
+    attribute::set_view_t view;
+    EXPECT_TRUE(view.empty());
 }
