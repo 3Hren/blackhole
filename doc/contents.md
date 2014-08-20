@@ -1,5 +1,5 @@
   * [Tutorial](tutorial.md)
-  * Common usage
+  * [Common usage](common-usage.md)
   * [Architecture](architecture.md)
   * [Sinks](sinks.md)
     * Null
