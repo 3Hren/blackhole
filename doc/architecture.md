@@ -100,3 +100,6 @@ Here lifetime of log event ends.
 Class apart is the repository singleton, which is responsible for the registration of all possible types of loggers that will be used in your application, adding typical configurations and, surprisingly, creating logger objects.
 
 It should be considered just as a large factory.
+
+
+[Back to contents](contents.md)

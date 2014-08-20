@@ -159,3 +159,5 @@ After executing the next messages should be displayed in your syslog (depending 
 ![Output after executing the example](images/syslog-1.png)
 
 *Note that debug message in my case was ignored by syslog itself, not by Blackhole.*
+
+[Back to contents](contents.md)

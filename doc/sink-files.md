@@ -295,3 +295,5 @@ Althought not covered here it's also worth mentioning that files can be also rot
 
 Instead of conclusions note that Blackhole provides wide support of file logging including rotating, naming and complex formatting. For this example, resulted file will look like:
 ![Final result](images/files-rotation-3.png)
+
+[Back to contents](contents.md)
