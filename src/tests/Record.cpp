@@ -29,9 +29,6 @@ TEST(record_t, MoveConstructor) {
     record_t record(std::move(view));
     record_t other(std::move(record));
 
-    EXPECT_FALSE(record);
-    EXPECT_FALSE(record.valid());
-
     EXPECT_TRUE(other);
     EXPECT_TRUE(other.valid());
     EXPECT_EQ("value", other.extract<std::string>("key"));
