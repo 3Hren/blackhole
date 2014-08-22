@@ -92,15 +92,14 @@ IF(ENABLE_ELASTICSEARCH)
 ENDIF()
 
 SET(DEVELOP_SOURCES
-#    Record
-#    View
-    test_StringFormatter
+    Record
+    View
 )
 
 SET(SOURCES
     ${MAIN_SOURCES}
-#    ${BASE_SOURCES}
-#    ${ES_SOURCES}
+    ${BASE_SOURCES}
+    ${ES_SOURCES}
     ${DEVELOP_SOURCES}
 )
 
