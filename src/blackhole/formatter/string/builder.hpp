@@ -24,6 +24,12 @@ typedef std::function<
 
 } // namespace builder
 
+enum placeholder_type_t {
+    required,
+    optional,
+    variadic
+};
+
 namespace aux {
 
 //! Simple factory function that maps scope character to its enumeration type.
@@ -56,32 +62,54 @@ inline void handle_variadic_key(std::string* key) {
     *key = std::string("...") + std::to_string(static_cast<long long>(result));
 }
 
-inline bool begin_key(std::string::const_iterator it, std::string::const_iterator end) {
+inline
+bool
+begin_key(std::string::const_iterator it, std::string::const_iterator end) {
     return (*it == '%') && (it + 1 != end) && (*(it + 1) == '(');
 }
 
-inline bool end_key(std::string::const_iterator it, std::string::const_iterator end) {
+inline
+bool
+end_required_key(std::string::const_iterator it, std::string::const_iterator end) {
     return (*it == ')') && (it + 1 != end) && (*(it + 1) == 's');
 }
 
-inline std::string extract_key(std::string::const_iterator& it, std::string::const_iterator end) {
+inline
+bool
+end_optional_key(std::string::const_iterator it, std::string::const_iterator end) {
+    return (*it == ')') &&
+            (it + 1 != end) && (*(it + 1) == '?') &&
+            (it + 2 != end) && (*(it + 2) == 's');
+}
+
+inline
+std::tuple<std::string, placeholder_type_t>
+extract_key(std::string::const_iterator& it, std::string::const_iterator end) {
     it += 2;
+    placeholder_type_t type;
     std::string key;
     while (it != end) {
-        if (end_key(it, end)) {
+        if (end_required_key(it, end)) {
             it++;
+            type = required;
+            break;
+        } else if (end_optional_key(it, end)) {
+            it += 2;
+            type = optional;
             break;
         } else {
             key.push_back(*it);
         }
+
         it++;
     }
 
     if (boost::starts_with(key, VARIADIC_KEY_PREFIX)) {
+        type = variadic;
         handle_variadic_key(&key);
     }
 
-    return key;
+    return std::make_tuple(key, type);
 }
 
 } // namespace aux
@@ -101,11 +129,21 @@ struct formatter_builder_t {
                     literal.clear();
                 }
 
-                const std::string& key = aux::extract_key(current, end);
-                if (boost::starts_with(key, VARIADIC_KEY_PREFIX)) {
-                    formatters.push_back(builder::variadic_t{ key });
-                } else {
+                std::string key;
+                placeholder_type_t type;
+                std::tie(key, type) = aux::extract_key(current, end);
+                switch (type) {
+                case required:
                     formatters.push_back(builder::placeholder_t{ key });
+                    break;
+                case optional:
+                    formatters.push_back(builder::optional_placeholder_t{ key });
+                    break;
+                case variadic:
+                    formatters.push_back(builder::variadic_t{ key });
+                    break;
+                default:
+                    BOOST_ASSERT(false);
                 }
             } else {
                 literal.push_back(*current);

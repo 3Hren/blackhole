@@ -32,6 +32,21 @@ struct placeholder_t {
     }
 };
 
+struct optional_placeholder_t {
+    const std::string placeholder;
+
+    void operator()(blackhole::aux::attachable_ostringstream& stream,
+                    const mapping::value_t& mapper,
+                    const attribute::set_view_t& attributes) const
+    {
+        if (auto attribute = attributes.find(placeholder)) {
+            mapper(stream, placeholder, attribute->value);
+            return;
+        } else {
+        }
+    }
+};
+
 } // namespace builder
 
 } // namespace string
