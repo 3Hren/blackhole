@@ -146,7 +146,7 @@ TEST(string_t, OptionalKeywordIsPresent) {
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
 
-    std::string pattern("<%(id)?s>: [%(message)s]");
+    std::string pattern("<%([id])?s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<42>: [le message]", fmt.format(record));
 }
@@ -155,22 +155,140 @@ TEST(string_t, OptionalKeywordIsNotPresent) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
-    std::string pattern("<%(id)?s>: [%(message)s]");
+    std::string pattern("<%([id])?s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
 
-//!@todo: Extended string formatter spec.
-// +has 0%(<|request_id)?s2: %(message)s" -> 0<12: le message
-// -has 0%(<|request_id)?s2: %(message)s" -> 02: le message
+TEST(string_t, OptionalKeywordWithPrefixIsPresent) {
+    record_t record;
+    record.insert(attribute::make("message", "le message"));
+    record.insert(attribute::make("id", 42));
 
-// +has 0%(request_id|>)?s2: %(message)s" -> 01>2: le message
-// -has 0%(request_id|>)?s2: %(message)s" -> 02: le message
+    std::string pattern("<%(.[id])?s>: [%(message)s]");
+    formatter::string_t fmt(pattern);
+    EXPECT_EQ("<.42>: [le message]", fmt.format(record));
+}
 
-// +has 0%(<|request_id|>)?s2: %(message)s" -> 0<1>2: le message
-// -has 0%(<|request_id|>)?s2: %(message)s" -> 02: le message
+TEST(string_t, OptionalKeywordWithPrefixIsNotPresent) {
+    record_t record;
+    record.insert(attribute::make("message", "le message"));
 
-// +has 0%((|request_id|))?s2: %(message)s" -> 0(1)2: le message
-// +has 0%()|request_id|()?s2: %(message)s" -> 0)1(2: le message
-// +has 0%(\||request_id|\|)?s2: %(message)s" -> 0|1|2: le message
+    std::string pattern("<%(.[id])?s>: [%(message)s]");
+    formatter::string_t fmt(pattern);
+    EXPECT_EQ("<>: [le message]", fmt.format(record));
+}
 
+TEST(string_t, OptionalKeywordWithSuffixIsPresent) {
+    record_t record;
+    record.insert(attribute::make("message", "le message"));
+    record.insert(attribute::make("id", 42));
+
+    std::string pattern("<%([id].)?s>: [%(message)s]");
+    formatter::string_t fmt(pattern);
+    EXPECT_EQ("<42.>: [le message]", fmt.format(record));
+}
+
+TEST(string_t, OptionalKeywordWithSuffixIsNotPresent) {
+    record_t record;
+    record.insert(attribute::make("message", "le message"));
+
+    std::string pattern("<%([id].)?s>: [%(message)s]");
+    formatter::string_t fmt(pattern);
+    EXPECT_EQ("<>: [le message]", fmt.format(record));
+}
+
+TEST(string_t, OptionalKeywordWithPrefixSuffixIsPresent) {
+    record_t record;
+    record.insert(attribute::make("message", "le message"));
+    record.insert(attribute::make("id", 42));
+
+    std::string pattern("<%(.[id].)?s>: [%(message)s]");
+    formatter::string_t fmt(pattern);
+    EXPECT_EQ("<.42.>: [le message]", fmt.format(record));
+}
+
+TEST(string_t, OptionalKeywordWithPrefixSuffixIsNotPresent) {
+    record_t record;
+    record.insert(attribute::make("message", "le message"));
+
+    std::string pattern("<%(.[id].)?s>: [%(message)s]");
+    formatter::string_t fmt(pattern);
+    EXPECT_EQ("<>: [le message]", fmt.format(record));
+}
+
+TEST(string_t, OptionalKeywordIsPresentWithPrefixSuffixParentheses) {
+    record_t record;
+    record.insert(attribute::make("message", "le message"));
+    record.insert(attribute::make("id", 42));
+
+    std::string pattern("<%(([id]))?s>: [%(message)s]");
+    formatter::string_t fmt(pattern);
+    EXPECT_EQ("<(42)>: [le message]", fmt.format(record));
+}
+
+TEST(string_t, OptionalKeywordIsNotPresentWithPrefixSuffixParentheses) {
+    record_t record;
+    record.insert(attribute::make("message", "le message"));
+
+    std::string pattern("<%(([id]))?s>: [%(message)s]");
+    formatter::string_t fmt(pattern);
+    EXPECT_EQ("<>: [le message]", fmt.format(record));
+}
+
+TEST(string_t, OptionalKeywordIsPresentWithPrefixSuffixReverseParentheses) {
+    record_t record;
+    record.insert(attribute::make("message", "le message"));
+    record.insert(attribute::make("id", 42));
+
+    std::string pattern("<%()[id]()?s>: [%(message)s]");
+    formatter::string_t fmt(pattern);
+    EXPECT_EQ("<)42(>: [le message]", fmt.format(record));
+}
+
+TEST(string_t, OptionalKeywordIsNotPresentWithPrefixSuffixReverseParentheses) {
+    record_t record;
+    record.insert(attribute::make("message", "le message"));
+
+    std::string pattern("<%()[id]()?s>: [%(message)s]");
+    formatter::string_t fmt(pattern);
+    EXPECT_EQ("<>: [le message]", fmt.format(record));
+}
+
+TEST(string_t, OptionalKeywordIsPresentWithPrefixSuffixSquareBrackets) {
+    record_t record;
+    record.insert(attribute::make("message", "le message"));
+    record.insert(attribute::make("id", 42));
+
+    std::string pattern("<%(\\[[id]\\])?s>: [%(message)s]");
+    formatter::string_t fmt(pattern);
+    EXPECT_EQ("<[42]>: [le message]", fmt.format(record));
+}
+
+TEST(string_t, OptionalKeywordIsNotPresentWithPrefixSuffixSquareBrackets) {
+    record_t record;
+    record.insert(attribute::make("message", "le message"));
+
+    std::string pattern("<%(\\[[id]\\])?s>: [%(message)s]");
+    formatter::string_t fmt(pattern);
+    EXPECT_EQ("<>: [le message]", fmt.format(record));
+}
+
+TEST(string_t, OptionalKeywordIsPresentWithPrefixSuffixSquareBracketsReversed) {
+    record_t record;
+    record.insert(attribute::make("message", "le message"));
+    record.insert(attribute::make("id", 42));
+
+    std::string pattern("<%(\\][id]\\[)?s>: [%(message)s]");
+    formatter::string_t fmt(pattern);
+    EXPECT_EQ("<]42[>: [le message]", fmt.format(record));
+}
+
+TEST(string_t, OptionalKeywordIsNotPresentWithPrefixSuffixSquareBracketsReversed) {
+    record_t record;
+    record.insert(attribute::make("message", "le message"));
+
+    std::string pattern("<%(\\][id]\\[)?s>: [%(message)s]");
+    formatter::string_t fmt(pattern);
+    EXPECT_EQ("<>: [le message]", fmt.format(record));
+}
