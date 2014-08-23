@@ -141,7 +141,10 @@ TEST(mapping, DatetimeMapping) {
     EXPECT_EQ("1970-01-02 03:55:00", result);
 }
 
-TEST(string_t, OptionalKeywordIsPresent) {
+#define TEST_STRING_FORMATTER(Suite, Case) \
+    TEST(string_t##_##Suite, Case)
+
+TEST_STRING_FORMATTER(Optional, Keyword) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
@@ -151,7 +154,7 @@ TEST(string_t, OptionalKeywordIsPresent) {
     EXPECT_EQ("<42>: [le message]", fmt.format(record));
 }
 
-TEST(string_t, OptionalKeywordIsNotPresent) {
+TEST_STRING_FORMATTER(Optional, AbsentKeyword) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
@@ -160,7 +163,7 @@ TEST(string_t, OptionalKeywordIsNotPresent) {
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
 
-TEST(string_t, OptionalKeywordWithPrefixIsPresent) {
+TEST_STRING_FORMATTER(Optional, WithPrefix) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
@@ -170,7 +173,7 @@ TEST(string_t, OptionalKeywordWithPrefixIsPresent) {
     EXPECT_EQ("<.42>: [le message]", fmt.format(record));
 }
 
-TEST(string_t, OptionalKeywordWithPrefixIsNotPresent) {
+TEST_STRING_FORMATTER(Optional, AbsentWithPrefix) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
@@ -179,7 +182,7 @@ TEST(string_t, OptionalKeywordWithPrefixIsNotPresent) {
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
 
-TEST(string_t, OptionalKeywordWithSuffixIsPresent) {
+TEST_STRING_FORMATTER(Optional, WithSuffix) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
@@ -189,7 +192,7 @@ TEST(string_t, OptionalKeywordWithSuffixIsPresent) {
     EXPECT_EQ("<42.>: [le message]", fmt.format(record));
 }
 
-TEST(string_t, OptionalKeywordWithSuffixIsNotPresent) {
+TEST_STRING_FORMATTER(Optional, AbsentWithSuffix) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
@@ -198,7 +201,7 @@ TEST(string_t, OptionalKeywordWithSuffixIsNotPresent) {
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
 
-TEST(string_t, OptionalKeywordWithPrefixSuffixIsPresent) {
+TEST_STRING_FORMATTER(Optional, WithPrefixSuffix) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
@@ -208,7 +211,7 @@ TEST(string_t, OptionalKeywordWithPrefixSuffixIsPresent) {
     EXPECT_EQ("<.42.>: [le message]", fmt.format(record));
 }
 
-TEST(string_t, OptionalKeywordWithPrefixSuffixIsNotPresent) {
+TEST_STRING_FORMATTER(Optional, AbsentWithPrefixSuffix) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
@@ -217,7 +220,7 @@ TEST(string_t, OptionalKeywordWithPrefixSuffixIsNotPresent) {
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
 
-TEST(string_t, OptionalKeywordIsPresentWithPrefixSuffixParentheses) {
+TEST_STRING_FORMATTER(Optional, WithPrefixSuffixParentheses) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
@@ -227,7 +230,7 @@ TEST(string_t, OptionalKeywordIsPresentWithPrefixSuffixParentheses) {
     EXPECT_EQ("<(42)>: [le message]", fmt.format(record));
 }
 
-TEST(string_t, OptionalKeywordIsNotPresentWithPrefixSuffixParentheses) {
+TEST_STRING_FORMATTER(Optional, AbsentWithPrefixSuffixParentheses) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
@@ -236,7 +239,7 @@ TEST(string_t, OptionalKeywordIsNotPresentWithPrefixSuffixParentheses) {
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
 
-TEST(string_t, OptionalKeywordIsPresentWithPrefixSuffixReverseParentheses) {
+TEST_STRING_FORMATTER(Optional, WithPrefixSuffixReverseParentheses) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
@@ -246,7 +249,7 @@ TEST(string_t, OptionalKeywordIsPresentWithPrefixSuffixReverseParentheses) {
     EXPECT_EQ("<)42(>: [le message]", fmt.format(record));
 }
 
-TEST(string_t, OptionalKeywordIsNotPresentWithPrefixSuffixReverseParentheses) {
+TEST_STRING_FORMATTER(Optional, AbsentWithPrefixSuffixReverseParentheses) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
@@ -255,7 +258,7 @@ TEST(string_t, OptionalKeywordIsNotPresentWithPrefixSuffixReverseParentheses) {
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
 
-TEST(string_t, OptionalKeywordIsPresentWithPrefixSuffixSquareBrackets) {
+TEST_STRING_FORMATTER(Optional, WithPrefixSuffixSquareBrackets) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
@@ -265,7 +268,7 @@ TEST(string_t, OptionalKeywordIsPresentWithPrefixSuffixSquareBrackets) {
     EXPECT_EQ("<[42]>: [le message]", fmt.format(record));
 }
 
-TEST(string_t, OptionalKeywordIsNotPresentWithPrefixSuffixSquareBrackets) {
+TEST_STRING_FORMATTER(Optional, AbsentWithPrefixSuffixSquareBrackets) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
@@ -274,7 +277,7 @@ TEST(string_t, OptionalKeywordIsNotPresentWithPrefixSuffixSquareBrackets) {
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
 
-TEST(string_t, OptionalKeywordIsPresentWithPrefixSuffixSquareBracketsReversed) {
+TEST_STRING_FORMATTER(Optional, WithPrefixSuffixSquareBracketsReversed) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
@@ -284,7 +287,7 @@ TEST(string_t, OptionalKeywordIsPresentWithPrefixSuffixSquareBracketsReversed) {
     EXPECT_EQ("<]42[>: [le message]", fmt.format(record));
 }
 
-TEST(string_t, OptionalKeywordIsNotPresentWithPrefixSuffixSquareBracketsReversed) {
+TEST_STRING_FORMATTER(Optional, AbsentWithPrefixSuffixSquareBracketsReversed) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
