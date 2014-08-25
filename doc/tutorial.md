@@ -1,7 +1,7 @@
 # Tutorial
 
   * [The simpliest example](#the-simpliest-example)
-  * [Deeper in configuration](#deeper-in-configuration)
+  * [Log into the file with rotation](#log-into-the-file-with-rotation)
 
 ## The simpliest example
 Writing to log with the default settings of Blackhole.
@@ -9,7 +9,7 @@ Writing to log with the default settings of Blackhole.
 By default, Blackhole initializes and configures logger `root` with single frontend, configured like this:
 
 * Formatter: string with pattern `[%(timestamp)s] [%(severity)s]: %(message)s`;
-* Sink: stream with stdout output.
+* Sink: `stream` with `stdout` output.
 
 The complete example code:
 
@@ -25,8 +25,27 @@ enum class level {
     error
 };
 
+
+void init(){
+    formatter_config_t formatter("string");
+    formatter["pattern"] = "[%(timestamp)s] [%(severity)s]: %(message)s";
+
+    sink_config_t sink("stream");
+    sink["output"] = "stdout";
+
+    frontend_config_t frontend = { formatter, sink };
+    log_config_t config{ "stdout_log", { frontend } }; //"stdout_log" is a name of our config
+
+    repository_t::instance().add_config(config);
+}
+
+
 int main(int, char**) {
-    verbose_logger_t<level> log = repository_t::instance().root<level>();
+    
+    init();
+
+    //Do you remember what "stdout_log" it is? (Check the "init" function above)
+    verbose_logger_t<level> log = repository_t::instance().create<level>("stdout_log"); 
 
     BH_LOG(log, level::debug,   "[%d] %s - done", 0, "debug");
     BH_LOG(log, level::info,    "[%d] %s - done", 1, "info");
@@ -36,12 +55,14 @@ int main(int, char**) {
 }
 ```
 
+In Ubuntu you can compile it with the command `g++ simple_example.cpp -osimple_example -std=c++0x -lboost_thread-mt`.
+
 `enum class level` is a declaration of severity levels for our logger. Blackhole supports both loggers with severity separation and without it. But, seriously, what is the logger without separated severity levels?
 
-All logger objects in Blackhole are got from `repository_t` object. It is a singleton. Consider it as a large factory, that can register possible types of formatters and sinks, configure it different ways and to create logger objects using registered configurations. As I mentioned before, there is already registered configuration for `root` logger, and we are going to use it:
+All logger objects in Blackhole are got from `repository_t` object. It is a singleton that can store all possible frontends configurations. We need to create configuration (formatter and sink pair) and add it to the `repository_t` object as in `void init()` function. After that you can create logger object as follows:
 
 ```
-    verbose_logger_t<level> log = repository_t::instance().root<level>();
+verbose_logger_t<level> log = repository_t::instance().create<level>("stdout_log"); //"stdout_log" is a name of previousely created config
 ```
 
 Having the logger object we can pass in to the main logging macro which has the next signature:
@@ -61,7 +82,146 @@ As a result of our example, we see the following in the console:
     [1396259922.307020] [3]: [3] error - done
 ```
 
-## Deeper in configuration
+Using of other sinks and formatters may be specific. Before use of them read the corresponding parts of documentation:
+  * [Sinks](sinks.md);
+  * [Fomatters](formatters.md).
+
+The most common words on Blackhole usage you can find in ["Common usage"](common-usage.md) article. Also there you can find some information on opaque methods of logger usage.
+
+Now we recommend you to examine our next example on logging to the files.
+
+## Log into the files with rotation
+
+This example is about using file logger.
+We consider how to register complex file sink with rotation support and how to configure it to have multiple files which names will be chosen depending on log event attributes.
+
+The complete example code:
+
+```(c++)
+#include <blackhole/blackhole.hpp>
+#include <blackhole/frontend/files.hpp>
+
+using namespace blackhole;
+
+enum class level {
+    debug,
+    error
+};
+
+void init(){
+    repository_t::instance().configure<
+        sink::files_t<
+            sink::files::boost_backend_t,
+            sink::rotator_t<
+                sink::files::boost_backend_t,
+                sink::rotation::watcher::size_t
+            >
+        >,
+        formatter::string_t
+    >();
+
+
+    formatter_config_t formatter("string");
+    formatter["pattern"] = "[%(timestamp)s] - <%(severity)s>:%(message)s:Issue - %(issue)s";
+
+    sink_config_t sink("files");
+    sink["path"] = "./logs/blackhole-%(host)s.log";
+    sink["autoflush"] = true;
+    sink["rotation"]["pattern"] = "%(filename)s.%N";
+    sink["rotation"]["backups"] = std::uint16_t(10);
+    sink["rotation"]["size"] = std::uint64_t(4*1024);
+
+    frontend_config_t frontend = { formatter, sink };
+    log_config_t config{ "rotating_file_log", { frontend } };
+
+    repository_t::instance().add_config(config);
+}
+
+int main(int, char**) {
+
+    init();
+    
+    verbose_logger_t<level> log = repository_t::instance().create<level>("rotating_file_log");
+
+    for (int i = 0; i < 64; ++i) {
+        BH_LOG(log, level::debug, "debug event")("host", "127.0.0.1", "issue", "The Ultimate Question of Life, the Universe, and Everything.");
+        BH_LOG(log, level::error, "error event")("host", "localhost", "issue", "To be, or not to be: that is the question.");
+    }
+
+    return 0;
+}
+
+```
+
+In Ubuntu you can compile it with the command `g++ rotating_files.cpp -ofiles -std=c++0x -lboost_thread-mt -lboost_filesystem -lboost_system`.
+
+The first difference you can see is a new header:
+
+```
+#include <blackhole/sink/files.hpp>
+```
+
+The next difference contained in the next piece of code:
+
+```
+repository_t::instance().configure<
+        sink::files_t<
+            sink::files::boost_backend_t,
+            sink::rotator_t<
+                sink::files::boost_backend_t,
+                sink::rotation::watcher::size_t
+            >
+        >,
+        formatter::string_t
+    >();
+```
+
+This is a registration code of `files`-sink. It may look frustrating and smells like dark template magic. This is an architectural solution that is discussed in "Architecture" part of documentation.
+
+Required logger's object can be properly created only after registering frontend with corresponding configuration. Without registration an exception will be thrown.
+
+Formatter configuration has no any surprises, just an `%(issue)s` attribute that is not supported with our `BH_LOG` macro from the starting point of view. We will discuss it a bit later.
+
+Configuration of `files`-sink with rotation support looks more intresting then in the first example:
+
+```(c++)
+sink_config_t sink("files");
+sink["path"] = "./logs/blackhole-%(host)s.log";
+sink["autoflush"] = true;                           //Dump messages to the file immediately
+sink["rotation"]["pattern"] = "%(filename)s.%N";    //Pattern for backup file name
+sink["rotation"]["backups"] = std::uint16_t(10);    //Number of backups
+sink["rotation"]["size"] = std::uint64_t(4*1024);   //Size of log file
+```
+
+Rotation works in the next manner. Blackhole writes logs into the log file (`path`) until it exceeds `size`. At that moment log file is renamed according to `pattern` and a new log file is started. Number of renamed files equals to `backups`. When last `backups` number exceeded cycle is repeated.
+
+`%(host)s` placeholder in an attribute of log event, but the `%(filename)s.%N` is not. `%(filename)s.%N` pattern leads to creation of backup filenames from the active log file substituting `%N` number of backup (from 1 to `backups`).
+
+More about `files` sink you can find in [detailed description](sink-files.md).
+
+
+*Note that also date-time rotation can be specified, e.g. each day or each hour, but not now. More detailed it will be discussed in reference documentation.*
+
+Next steps should be already familiar for people who passes previous tutorial. We just create frontend and logger configuration objects and push the last one into the repository.
+
+```
+frontend_config_t frontend = { formatter, sink };
+log_config_t config{ "rotating_file_log", { frontend } };
+
+repository_t::instance().add_config(config);
+```
+
+Only remaining to record a message to log in the `main`-function:
+
+```
+BH_LOG(log, level::error, "error event")("host", "localhost", "issue", "To be, or not to be: that is the question.");
+```
+
+What do you think about the second braces near our macro?
+
+Welcome to the **dynamic attributes** setting into the log event! Every log event can transport any number of additional attributes, which will participate in all subsequent operations associated with it (look at the architecture diagram, if you forgot). `%(hosts)s` and `%(issue)s` placeholders in code contain the names of this attributes which should be passed to `BH_LOG` in the second parentesses. You can pass this attributes in different manner, read the ["Common usage"](common-usage.md) artricle.
+
+====================================================================================================================
 
 This tutorial describes how to configure formatters and sinks more deeply. Also it will be shown how to use logger API directly and what's hidden under that macro's hood.
 
