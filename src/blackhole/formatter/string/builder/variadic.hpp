@@ -38,6 +38,8 @@ public:
     }
 };
 
+namespace placeholder {
+
 struct variadic_t {
     typedef attribute::scope_underlying_type scope_underlying_type;
 
@@ -65,6 +67,8 @@ struct variadic_t {
         stream.rdbuf()->storage()->append(boost::algorithm::join(passed, ", "));
     }
 };
+
+} // namespace placeholder
 
 } // namespace builder
 

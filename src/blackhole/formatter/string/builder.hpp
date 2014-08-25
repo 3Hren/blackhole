@@ -140,7 +140,7 @@ struct formatter_builder_t {
                     formatters.push_back(builder::placeholder::optional_t{ key });
                     break;
                 case variadic:
-                    formatters.push_back(builder::variadic_t{ key });
+                    formatters.push_back(builder::placeholder::variadic_t{ key });
                     break;
                 default:
                     BOOST_ASSERT(false);
