@@ -247,15 +247,14 @@ TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredFormatter) {
 }
 
 TEST(Repository, StreamSinkWithStringFormatterIsAvailableByDefault) {
-    auto& repository = repository_t::instance();
+    repository_t repository;
     bool available = repository.available<sink::stream_t, formatter::string_t>();
     EXPECT_TRUE(available);
-    repository.clear();
 }
 
 TEST(Repository, PairConfiguring) {
     bool available = false;
-    auto& repository = repository_t::instance();
+    repository_t repository;
 
     available = repository.available<sink::syslog_t<level>, formatter::string_t>();
     EXPECT_FALSE(available);
@@ -264,7 +263,6 @@ TEST(Repository, PairConfiguring) {
 
     available = repository.available<sink::syslog_t<level>, formatter::string_t>();
     EXPECT_TRUE(available);
-    repository.clear();
 }
 
 TEST(Repository, GroupConfiguring) {
@@ -274,7 +272,7 @@ TEST(Repository, GroupConfiguring) {
     > formatters_t;
 
     bool available = false;
-    auto& repository = repository_t::instance();
+    repository_t repository;
 
     available = repository.available<sink::files_t<>, formatter::json_t>();
     EXPECT_FALSE(available);
@@ -283,7 +281,6 @@ TEST(Repository, GroupConfiguring) {
 
     available = repository.available<sink::files_t<>, formatter::json_t>();
     EXPECT_TRUE(available);
-    repository.clear();
 }
 
 TEST(Repository, CombinationConfiguring) {
@@ -298,7 +295,7 @@ TEST(Repository, CombinationConfiguring) {
     > formatters_t;
 
     bool available = false;
-    auto& repository = repository_t::instance();
+    repository_t repository;
 
     available = repository.available<sink::files_t<>, formatter::json_t>();
     ASSERT_FALSE(available);
@@ -315,11 +312,10 @@ TEST(Repository, CombinationConfiguring) {
     EXPECT_TRUE(available);
     available = repository.available<sink::syslog_t<level>, formatter::json_t>();
     EXPECT_TRUE(available);
-    repository.clear();
 }
 
 TEST(Repository, ThrowsExceptionWhenSinkIsRegisteredButItsUniqueNameIsDifferent) {
-    auto& repo = repository_t::instance();
+    repository_t repository;
 
     formatter_config_t formatter("string");
     formatter["pattern"] = "[%(timestamp)s]: %(message)s";
@@ -332,7 +328,7 @@ TEST(Repository, ThrowsExceptionWhenSinkIsRegisteredButItsUniqueNameIsDifferent)
     frontend_config_t frontend = { formatter, sink };
     log_config_t config = { "root", { frontend } };
 
-    repo.configure<
+    repository.configure<
         sink::files_t<
             sink::files::boost_backend_t,
             sink::rotator_t<
@@ -342,8 +338,7 @@ TEST(Repository, ThrowsExceptionWhenSinkIsRegisteredButItsUniqueNameIsDifferent)
         >,
         formatter::string_t
     >();
-    repo.add_config(config);
+    repository.add_config(config);
 
-    EXPECT_THROW(repo.create<level>("root"), blackhole::error_t);
-    repo.clear();
+    EXPECT_THROW(repository.create<level>("root"), blackhole::error_t);
 }
