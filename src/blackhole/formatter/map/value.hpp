@@ -18,50 +18,90 @@ namespace mapping {
 
 template<typename T>
 struct extracter {
-    typedef std::function<void(aux::attachable_ostringstream&, const T&)> function_type;
+    typedef std::function<
+        void(aux::attachable_ostringstream&, const T&)
+    > function_type;
+
     function_type func;
 
-    extracter(std::function<void(aux::attachable_ostringstream&, const T&)> func) :
+    extracter(function_type func) :
         func(func)
     {}
 
-    void operator()(aux::attachable_ostringstream& stream, const attribute::value_t& value) const {
+    void
+    operator()(aux::attachable_ostringstream& stream,
+               const attribute::value_t& value) const
+    {
         typedef typename aux::underlying_type<T>::type underlying_type;
         func(stream, static_cast<T>(boost::get<underlying_type>(value)));
     }
 };
 
 class value_t {
-    typedef std::function<void(aux::attachable_ostringstream&, const attribute::value_t&)> mapping_t;
+    typedef std::function<
+        void(aux::attachable_ostringstream&, const attribute::value_t&)
+    > mapping_t;
+
     std::unordered_map<std::string, mapping_t> m_mappings;
 
 public:
-    // Generic overload for attributes, which has no keywords defined for them.
+    /*!
+     * Generic overload for attributes, which has no keywords defined for them.
+     */
     template<typename T>
-    void add(const std::string& key, typename extracter<T>::function_type handler) {
+    void
+    add(const std::string& key, typename extracter<T>::function_type handler) {
         m_mappings[key] = extracter<T>(handler);
     }
 
-    // Overload for registered keywords. There is no need to provide attribute's name,
-    // because it is already known.
+    /*!
+     * Overload for registered keywords. There is no need to provide
+     * attribute's name, because it is already known.
+     */
     template<typename Keyword>
-    void add(typename extracter<typename Keyword::type>::function_type handler) {
+    void
+    add(typename extracter<typename Keyword::type>::function_type handler) {
         add<typename Keyword::type>(Keyword::name(), handler);
     }
 
-    // Overload for timestamp keyword. Fast datetime formatter will be used in that way.
-    template<typename Keyword, class = typename std::enable_if<std::is_same<Keyword, keyword::tag::timestamp_t>::value>::type>
-    void add(const std::string& format) {
-        add<Keyword>(datetime_formatter_action_t(format));
+    /*!
+     * Overload for timestamp attribute. Fast datetime formatter will be used
+     * for that case.
+     */
+    template<
+        typename Keyword,
+        class = typename std::enable_if<
+            std::is_same<Keyword, keyword::tag::timestamp_t>::value
+        >::type
+    >
+    void
+    add(std::string format) {
+        add<Keyword>(datetime_formatter_action_t(std::move(format)));
     }
 
-    template<typename Keyword, class = typename std::enable_if<std::is_same<Keyword, keyword::tag::timestamp_t>::value>::type>
-    void add(const char* format) {
+    /*!
+     * Overload for timestamp attribute. Fast datetime formatter will be used
+     * for that case.
+     * @compat GCC4.6
+     * For some reason GCC 4.6 requires it for ambiguity resolution.
+     */
+    template<
+        typename Keyword,
+        class = typename std::enable_if<
+            std::is_same<Keyword, keyword::tag::timestamp_t>::value
+        >::type
+    >
+    void
+    add(const char* format) {
         add<Keyword>(datetime_formatter_action_t(format));
     }
 
     template<typename T>
-    void operator()(aux::attachable_ostringstream& stream, const std::string& key, T&& value) const {
+    void
+    operator()(aux::attachable_ostringstream& stream,
+               const std::string& key,
+               T&& value) const
+    {
         auto it = m_mappings.find(key);
         if (it != m_mappings.end()) {
             const mapping_t& action = it->second;
@@ -72,7 +112,8 @@ public:
     }
 
     template<typename T>
-    boost::optional<std::string> operator()(const std::string& key, T&& value) const {
+    boost::optional<std::string>
+    operator()(const std::string& key, T&& value) const {
         auto it = m_mappings.find(key);
         if (it != m_mappings.end()) {
             const mapping_t& action = it->second;
