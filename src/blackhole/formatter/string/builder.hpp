@@ -134,10 +134,10 @@ struct formatter_builder_t {
                 std::tie(key, type) = aux::extract_key(current, end);
                 switch (type) {
                 case required:
-                    formatters.push_back(builder::placeholder_t{ key });
+                    formatters.push_back(builder::placeholder::required_t{ key });
                     break;
                 case optional:
-                    formatters.push_back(builder::optional_placeholder_t{ key });
+                    formatters.push_back(builder::placeholder::optional_t{ key });
                     break;
                 case variadic:
                     formatters.push_back(builder::variadic_t{ key });
