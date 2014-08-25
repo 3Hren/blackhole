@@ -62,29 +62,45 @@ public:
         }
     }
 
-    //!@todo: Cause the repository is no longer templatized by level parameter,
-    //!       it can be useful to specify logger return type explicitly.
     template<typename Level>
-    verbose_logger_t<Level> create(const std::string& name) const {
-        std::lock_guard<std::mutex> lock(mutex);
-        log_config_t config = configs.at(name);
-        verbose_logger_t<Level> logger;
-        for (auto it = config.frontends.begin(); it != config.frontends.end(); ++it) {
-            const frontend_config_t& frontend_config = *it;
-            auto frontend = factory.create(frontend_config.formatter, frontend_config.sink);
-            logger.add_frontend(std::move(frontend));
-        }
-        return logger;
-    }
-
-    template<typename Level>
-    verbose_logger_t<Level> root() const {
+    typename std::enable_if<
+        std::is_enum<Level>::value,
+        verbose_logger_t<Level>
+    >::type
+    root() const {
         return create<Level>("root");
     }
-private:
-    repository_t() {
-        configure<sink::stream_t, formatter::string_t>();
-        add_config(repository::config::trivial());
+
+    /*!
+     * @deprecated[soft]: since 0.3.
+     * @deprecated[hard]: will be removed since 0.4.
+     */
+    template<typename Level>
+    typename std::enable_if<
+        std::is_enum<Level>::value,
+        verbose_logger_t<Level>
+    >::type
+    create(const std::string& name) const {
+        return create<verbose_logger_t<Level>>(name);
+    }
+
+    /*!
+     * @since: 0.3
+     */
+    template<class Logger>
+    typename std::enable_if<
+        std::is_base_of<logger_base_t, Logger>::value,
+        Logger
+    >::type
+    create(const std::string& name) const {
+        std::lock_guard<std::mutex> lock(mutex);
+
+        const auto& frontends = configs.at(name).frontends;
+        Logger logger;
+        for (auto it = frontends.begin(); it != frontends.end(); ++it) {
+            logger.add_frontend(factory.create(it->formatter, it->sink));
+        }
+        return logger;
     }
 };
 

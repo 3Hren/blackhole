@@ -201,6 +201,12 @@ TEST(Repository, InitializationFromSettings) {
     static_assert(condition, "repository should return `verbose_logger_t` object");
 }
 
+TEST(Repository, CreateBaseLogger) {
+    //!@todo: Write description and expectations.
+    repository_t repository;
+    repository.create<logger_base_t>("root");
+}
+
 TEST(Repository, ThrowsExceptionIfLoggerWithSpecifiedNameNotFound) {
     log_config_t config = create_valid_config();
     repository_t::instance().add_config(config);
