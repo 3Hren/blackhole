@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
 Version:	0.2.0
-Release:	0rc10%{?dist}
+Release:	1%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
