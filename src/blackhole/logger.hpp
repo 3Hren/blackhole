@@ -18,7 +18,6 @@
 #include "keyword/thread.hpp"
 #include "keyword/timestamp.hpp"
 #include "keyword/tracebit.hpp"
-#include "universe.hpp"
 #include "utils/unique.hpp"
 
 #include "blackhole/config.hpp"
