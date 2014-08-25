@@ -59,6 +59,7 @@ struct variadic_t {
                 const std::string& name = it->first;
                 const attribute_t& attribute = it->second;
                 if (static_cast<scope_underlying_type>(attribute.scope) & scope) {
+                    //!@todo: This code needs some optimization love.
                     std::ostringstream stream;
                     stream << "'" << name << "': ";
                     variadic_visitor_t visitor(stream);
