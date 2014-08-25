@@ -5,8 +5,9 @@
 #include <boost/algorithm/string.hpp>
 
 #include "builder/literal.hpp"
-#include "builder/placeholder.hpp"
-#include "builder/variadic.hpp"
+#include "builder/placeholder/required.hpp"
+#include "builder/placeholder/optional.hpp"
+#include "builder/placeholder/variadic.hpp"
 
 namespace blackhole {
 
