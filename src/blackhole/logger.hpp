@@ -145,7 +145,7 @@ public:
         level(static_cast<level_type>(0))
     {}
 
-    //! @compat GCC4.4
+    //! @compat: GCC4.4
     //! GCC 4.4 doesn't create default copy/move constructor for derived
     //! classes. It's a bug.
     verbose_logger_t(verbose_logger_t&& other) BLACKHOLE_NOEXCEPT :
