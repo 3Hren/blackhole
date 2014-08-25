@@ -45,7 +45,10 @@ struct variadic_t {
 
     const std::string placeholder;
 
-    void operator()(blackhole::aux::attachable_ostringstream& stream, const mapping::value_t&, const attribute::set_view_t& attributes) const {
+    void operator()(blackhole::aux::attachable_ostringstream& stream,
+                    const mapping::value_t&,
+                    const attribute::set_view_t& attributes) const
+    {
         std::vector<std::string> passed;
         passed.reserve(attributes.upper_size());
 
