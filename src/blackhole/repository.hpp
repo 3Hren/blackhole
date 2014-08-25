@@ -22,6 +22,15 @@ class repository_t {
     mutable std::mutex mutex;
 
 public:
+    /*!
+     * Default constructor.
+     * After creation registeres string/stream frontend, which makes possible
+     * to create logger with that frontend type.
+     * Also adds trivial logger configuration.
+     * @post: available<sink::stream_t, formatter::string_t>() == true.
+     * @post: create<T>("root") - creates valid logger.
+     * @todo: Check post conditions.
+     */
     repository_t() {
         configure<sink::stream_t, formatter::string_t>();
         add_config(repository::config::trivial());
