@@ -22,6 +22,11 @@ class repository_t {
     mutable std::mutex mutex;
 
 public:
+    repository_t() {
+        configure<sink::stream_t, formatter::string_t>();
+        add_config(repository::config::trivial());
+    }
+
     static repository_t& instance() {
         static repository_t self;
         return self;
