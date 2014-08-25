@@ -32,15 +32,11 @@ struct optional_t {
             }
 
             if (*it == '[' && it != placeholder.begin() && *(it - 1) != '\\') {
-                boost::algorithm::replace_all(token, "\\[", "[");
-                boost::algorithm::replace_all(token, "\\]", "]");
-                prefix = token;
+                prefix = unescaped(token);
                 token.clear();
                 continue;
             } else if (*it == ']' && it != placeholder.begin() && *(it - 1) != '\\') {
-                boost::algorithm::replace_all(token, "\\[", "[");
-                boost::algorithm::replace_all(token, "\\]", "]");
-                name = token;
+                name = unescaped(token);
                 token.clear();
                 continue;
             }
@@ -48,9 +44,7 @@ struct optional_t {
             token.push_back(*it);
         }
 
-        boost::algorithm::replace_all(token, "\\[", "[");
-        boost::algorithm::replace_all(token, "\\]", "]");
-        suffix = token;
+        suffix = unescaped(token);
     }
 
     void operator()(blackhole::aux::attachable_ostringstream& stream,
@@ -62,6 +56,15 @@ struct optional_t {
             mapper(stream, name, attribute->value);
             stream.rdbuf()->storage()->append(suffix);
         }
+    }
+
+private:
+    static
+    std::string
+    unescaped(std::string token) {
+        boost::algorithm::replace_all(token, "\\[", "[");
+        boost::algorithm::replace_all(token, "\\]", "]");
+        return token;
     }
 };
 
