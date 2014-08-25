@@ -70,13 +70,18 @@ public:
      */
     template<
         typename Keyword,
+        typename TimePicker = timepicker_t<timezone_t::gmtime>,
         class = typename std::enable_if<
             std::is_same<Keyword, keyword::tag::timestamp_t>::value
         >::type
     >
     void
     add(std::string format) {
-        add<Keyword>(datetime_formatter_action_t(std::move(format)));
+        add<Keyword>(
+            datetime_formatter_action_t<
+                TimePicker
+            >(std::move(format))
+        );
     }
 
     /*!
@@ -87,13 +92,14 @@ public:
      */
     template<
         typename Keyword,
+        typename TimePicker = timepicker_t<timezone_t::gmtime>,
         class = typename std::enable_if<
             std::is_same<Keyword, keyword::tag::timestamp_t>::value
         >::type
     >
     void
     add(const char* format) {
-        add<Keyword>(datetime_formatter_action_t(format));
+        add<Keyword, TimePicker>(std::string(format));
     }
 
     template<typename T>

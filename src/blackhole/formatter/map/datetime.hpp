@@ -6,7 +6,38 @@ namespace blackhole {
 
 namespace mapping {
 
+enum class timezone_t {
+    gmtime,
+    localtime
+};
+
+template<timezone_t>
+class timepicker_t;
+
+template<>
+class timepicker_t<timezone_t::localtime> {
+public:
+    static inline std::tm pick(const timeval& time) {
+        std::tm tm;
+        localtime_r(&time.tv_sec, &tm);
+        return tm;
+    }
+};
+
+template<>
+class timepicker_t<timezone_t::gmtime> {
+public:
+    static inline std::tm pick(const timeval& time) {
+        std::tm tm;
+        gmtime_r(&time.tv_sec, &tm);
+        return tm;
+    }
+};
+
+template<class TimePicker = timepicker_t<timezone_t::gmtime>>
 struct datetime_formatter_action_t {
+    typedef TimePicker picker_type;
+
     aux::datetime::generator_t generator;
 
     datetime_formatter_action_t(const std::string& format) :
@@ -15,9 +46,7 @@ struct datetime_formatter_action_t {
 
     void
     operator()(aux::attachable_ostringstream& stream, const timeval& value) const {
-        std::tm tm;
-        gmtime_r(&value.tv_sec, &tm);
-        generator(stream, tm, value.tv_usec);
+        generator(stream, picker_type::pick(value), value.tv_usec);
     }
 };
 
