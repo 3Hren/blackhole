@@ -13,7 +13,8 @@ struct datetime_formatter_action_t {
         generator(aux::datetime::generator_factory_t::make(format))
     {}
 
-    void operator()(aux::attachable_ostringstream& stream, const timeval& value) const {
+    void
+    operator()(aux::attachable_ostringstream& stream, const timeval& value) const {
         std::tm tm;
         gmtime_r(&value.tv_sec, &tm);
         generator(stream, tm, value.tv_usec);
