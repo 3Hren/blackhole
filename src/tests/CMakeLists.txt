@@ -73,9 +73,11 @@ SET(BASE_SOURCES
     test_VerboseLogger
     utils/test_GenericStringFormatter
     Dynamic
+    Record
     TcpSink
     Trace
     UdpSink
+    View
     Wrapper
 )
 
@@ -92,8 +94,6 @@ IF(ENABLE_ELASTICSEARCH)
 ENDIF()
 
 SET(DEVELOP_SOURCES
-    Record
-    View
 )
 
 SET(SOURCES
