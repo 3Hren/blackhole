@@ -54,9 +54,24 @@ public:
     template<typename Sink, typename Formatter>
     bool available() const BLACKHOLE_DEPRECATED("use 'registered' instead");
 
+    /*!
+     * Register sink-formatter pair (which is a frontend itself) with the
+     * repository.
+     * Registered frontends can be injected inside the logger while its
+     * creation stage if the logger's configuration requires them.
+     * @note: there is a better name - 'register'. Sadly, but it's C++'s
+     *        keyword.
+     * @post: registered<Sink, Formatter>() == true.
+     */
     template<typename Sink, typename Formatter>
     void registrate();
 
+    /*!
+     * Alias for 'registrate' method.
+     * @see: repository_t::registrate().
+     * @deprecated[soft]: since 0.3.
+     * @deprecated[hard]: since 0.4.
+     */
     template<typename Sink, typename Formatter>
     void configure() BLACKHOLE_DEPRECATED("use 'registrate' instead");
 
