@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
 Version:	0.2.0
-Release:	1%{?dist}
+Release:	2%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
@@ -18,7 +18,6 @@ BuildRequires:	gcc44 gcc44-c++
 BuildRequires:	boost%{boost_ver}-devel, boost%{boost_ver}-iostreams, boost%{boost_ver}-system, boost%{boost_ver}-thread
 BuildRequires:	cmake
 
-Obsoletes: srw
 
 %description
 Blackhole is a common logging library.
@@ -66,6 +65,9 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Mon Aug 26 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-2
+- Bug fix: fixed dependencies in both debian/control and spec.
+
 * Mon Aug 18 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-1
 - Release version.
 - Bug fix: replaced accidentally left writer lock by the reader one.
