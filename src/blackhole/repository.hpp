@@ -100,9 +100,6 @@ public:
 
     /*!
      * Create logger from configuration named 'root', obviously.
-     * To successfull logger creation its configuration named 'root' should be
-     * added previously into the repository as like as its frontends must be
-     * registered with.
      * @deprecated[soft]: since 0.3.
      * @deprecated[hard]: will be removed since 0.4.
      */
@@ -115,9 +112,6 @@ public:
 
     /*!
      * Create verbose logger with specified configuration name.
-     * To successfull logger creation its configuration named 'root' should be
-     * added previously into the repository as like as its frontends must be
-     * registered with.
      * @deprecated[soft]: since 0.3.
      * @deprecated[hard]: will be removed since 0.4.
      */
@@ -130,6 +124,10 @@ public:
     create(const std::string& name) const;
 
     /*!
+     * Create typed logger with specified configuration name.
+     * To successfull logger creation its configuration named 'root' should be
+     * added previously into the repository as like as its frontends must be
+     * registered with.
      * @since: 0.3.
      */
     template<class Logger>
@@ -137,16 +135,7 @@ public:
         std::is_base_of<logger_base_t, Logger>::value,
         Logger
     >::type
-    create(const std::string& name) const {
-        std::lock_guard<std::mutex> lock(mutex);
-
-        const auto& frontends = configs.at(name).frontends;
-        Logger logger;
-        for (auto it = frontends.begin(); it != frontends.end(); ++it) {
-            logger.add_frontend(factory.create(it->formatter, it->sink));
-        }
-        return logger;
-    }
+    create(const std::string& name) const;
 };
 
 BLACKHOLE_API
@@ -234,6 +223,23 @@ typename std::enable_if<
 >::type
 repository_t::create(const std::string& name) const {
     return create<verbose_logger_t<Level>>(name);
+}
+
+template<class Logger>
+BLACKHOLE_API
+typename std::enable_if<
+    std::is_base_of<logger_base_t, Logger>::value,
+    Logger
+>::type
+repository_t::create(const std::string& name) const {
+    std::lock_guard<std::mutex> lock(mutex);
+
+    const auto& frontends = configs.at(name).frontends;
+    Logger logger;
+    for (auto it = frontends.begin(); it != frontends.end(); ++it) {
+        logger.add_frontend(factory.create(it->formatter, it->sink));
+    }
+    return logger;
 }
 
 } // namespace blackhole
