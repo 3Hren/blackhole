@@ -49,7 +49,7 @@ public:
      * Alias for 'registered' method.
      * @see: repository_t::registered().
      * @deprecated[soft]: since 0.3.
-     * @deprecated[hard]: since 0.4.
+     * @deprecated[hard]: will be removed since 0.4.
      */
     template<typename Sink, typename Formatter>
     bool available() const BLACKHOLE_DEPRECATED("use 'registered' instead");
@@ -62,6 +62,7 @@ public:
      * @note: there is a better name - 'register'. Sadly, but it's C++'s
      *        keyword.
      * @post: registered<Sink, Formatter>() == true.
+     * @todo: Test post condition.
      */
     template<typename Sink, typename Formatter>
     void registrate();
@@ -70,16 +71,19 @@ public:
      * Alias for 'registrate' method.
      * @see: repository_t::registrate().
      * @deprecated[soft]: since 0.3.
-     * @deprecated[hard]: since 0.4.
+     * @deprecated[hard]: will be removed since 0.4.
      */
     template<typename Sink, typename Formatter>
     void configure() BLACKHOLE_DEPRECATED("use 'registrate' instead");
 
-    void clear() {
-        std::lock_guard<std::mutex> lock(mutex);
-        factory.clear();
-        configs.clear();
-    }
+    /*!
+     * Clear all registered frontend configurations as like as logger configs.
+     * @post: registered<Sink, Formatter>() == false on any combinations of
+     *        sinks and formatters.
+     * @deprecated[soft]: since 0.3.
+     * @deprecated[hard]: will be removed since 0.4.
+     */
+    void clear() BLACKHOLE_DEPRECATED("there is no need for this method");
 
     void add_config(const log_config_t& config) {
         std::lock_guard<std::mutex> lock(mutex);
@@ -176,6 +180,14 @@ BLACKHOLE_API
 void
 repository_t::configure() {
     registrate<Sink, Formatter>();
+}
+
+BLACKHOLE_API
+void
+repository_t::clear() {
+    std::lock_guard<std::mutex> lock(mutex);
+    factory.clear();
+    configs.clear();
 }
 
 } // namespace blackhole
