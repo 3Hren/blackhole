@@ -259,7 +259,7 @@ TEST(Repository, PairConfiguring) {
     >();
     EXPECT_FALSE(registered);
 
-    repository.configure<sink::syslog_t<level>, formatter::string_t>();
+    repository.registrate<sink::syslog_t<level>, formatter::string_t>();
 
     registered = repository.registered<
         sink::syslog_t<level>,
@@ -280,7 +280,7 @@ TEST(Repository, GroupConfiguring) {
     registered = repository.registered<sink::files_t<>, formatter::json_t>();
     EXPECT_FALSE(registered);
 
-    repository.configure<sink::files_t<>, formatters_t>();
+    repository.registrate<sink::files_t<>, formatters_t>();
 
     registered = repository.registered<sink::files_t<>, formatter::json_t>();
     EXPECT_TRUE(registered);
@@ -307,7 +307,7 @@ TEST(Repository, CombinationConfiguring) {
     registered = repository.registered<sink::syslog_t<level>, formatter::json_t>();
     ASSERT_FALSE(registered);
 
-    repository.configure<sinks_t, formatters_t>();
+    repository.registrate<sinks_t, formatters_t>();
 
     registered = repository.registered<sink::files_t<>, formatter::json_t>();
     EXPECT_TRUE(registered);
@@ -331,7 +331,7 @@ TEST(Repository, ThrowsExceptionWhenSinkIsRegisteredButItsUniqueNameIsDifferent)
     frontend_config_t frontend = { formatter, sink };
     log_config_t config = { "root", { frontend } };
 
-    repository.configure<
+    repository.registrate<
         sink::files_t<
             sink::files::boost_backend_t,
             sink::rotator_t<

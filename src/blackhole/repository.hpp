@@ -52,12 +52,11 @@ public:
     template<typename Sink, typename Formatter>
     bool available() const BLACKHOLE_DEPRECATED("use 'registered' instead");
 
+    template<typename Sink, typename Formatter>
+    void registrate();
 
     template<typename Sink, typename Formatter>
-    void configure() {
-        std::lock_guard<std::mutex> lock(mutex);
-        external_inserter<Sink, Formatter>::insert(factory);
-    }
+    void configure() BLACKHOLE_DEPRECATED("use 'registrate' instead");
 
     void clear() {
         std::lock_guard<std::mutex> lock(mutex);
@@ -121,7 +120,7 @@ public:
 
 BLACKHOLE_API
 repository_t::repository_t() {
-    configure<sink::stream_t, formatter::string_t>();
+    registrate<sink::stream_t, formatter::string_t>();
     add_config(repository::config::trivial());
 }
 
@@ -145,6 +144,21 @@ BLACKHOLE_API
 bool
 repository_t::available() const {
     return registered<Sink, Formatter>();
+}
+
+template<typename Sink, typename Formatter>
+BLACKHOLE_API
+void
+repository_t::registrate() {
+    std::lock_guard<std::mutex> lock(mutex);
+    external_inserter<Sink, Formatter>::insert(factory);
+}
+
+template<typename Sink, typename Formatter>
+BLACKHOLE_API
+void
+repository_t::configure() {
+    registrate<Sink, Formatter>();
 }
 
 } // namespace blackhole
