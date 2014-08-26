@@ -1,3 +1,9 @@
+blackhole (0.2.0-2) unstable; urgency=low
+
+  * Bug fix: fixed dependencies in both debian/control and spec.
+
+ -- Evgeny Safronov <division494@gmail.com>  Tue, 26 Aug 2014 22:46:59 +0400
+
 blackhole (0.2.0-1) unstable; urgency=low
 
   * Release version.
@@ -5,7 +11,6 @@ blackhole (0.2.0-1) unstable; urgency=low
   * Bug fix: logger object now get locked while swapping.
 
  -- Evgeny Safronov <division494@gmail.com>  Mon, 18 Aug 2014 15:27:44 +0400
-
 
 blackhole (0.2.0-0rc10) unstable; urgency=low
 
