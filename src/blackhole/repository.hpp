@@ -120,11 +120,13 @@ public:
     }
 };
 
+BLACKHOLE_API
 repository_t::repository_t() {
     configure<sink::stream_t, formatter::string_t>();
     add_config(repository::config::trivial());
 }
 
+BLACKHOLE_API
 repository_t&
 repository_t::instance() {
     static repository_t self;
@@ -132,6 +134,7 @@ repository_t::instance() {
 }
 
 template<typename Sink, typename Formatter>
+BLACKHOLE_API
 bool
 repository_t::registered() const {
     std::lock_guard<std::mutex> lock(mutex);
@@ -139,6 +142,7 @@ repository_t::registered() const {
 }
 
 template<typename Sink, typename Formatter>
+BLACKHOLE_API
 bool
 repository_t::available() const {
     return registered<Sink, Formatter>();
