@@ -38,9 +38,8 @@ public:
      * Check whether some sink-formatter pair is registered with this
      * repository.
      * Registered sink-formatter pair composes into a frontend, which can be
-     * potentially injected inside the logger.
-     * Trying to create a logger with unregistered frontend results in
-     * exception.
+     * potentially injected inside the logger. Trying to create a logger with
+     * unregistered frontend results in exception.
      * @since: 0.3.
      */
     template<typename Sink, typename Formatter>
