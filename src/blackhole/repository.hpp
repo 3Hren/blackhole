@@ -69,7 +69,7 @@ public:
 
     /*!
      * Alias for 'registrate' method.
-     * @see: repository_t::registrate().
+     * @see: repository_t::registrate.
      * @deprecated[soft]: since 0.3.
      * @deprecated[hard]: will be removed since 0.4.
      */
@@ -85,28 +85,24 @@ public:
      */
     void clear() BLACKHOLE_DEPRECATED("there is no need for this method");
 
-    void add_config(const log_config_t& config) {
-        std::lock_guard<std::mutex> lock(mutex);
-        configs[config.name] = config;
-    }
-
-    void add_configs(const std::vector<log_config_t>& configs) {
-        std::lock_guard<std::mutex> lock(mutex);
-        for (auto it = configs.begin(); it != configs.end(); ++it) {
-            this->configs[it->name] = *it;
-        }
-    }
-
-    template<typename Level>
-    typename std::enable_if<
-        std::is_enum<Level>::value,
-        verbose_logger_t<Level>
-    >::type
-    root() const {
-        return create<Level>("root");
-    }
+    /*!
+     * Add generic logger configuration into the repository.
+     * After that logger with name 'config.name' can be created using 'create'
+     * method.
+     * By default 'root' logger is registered with string-stream frontend.
+     */
+    void add_config(const log_config_t& config);
 
     /*!
+     * Add several generic logger configurations into the repository.
+     */
+    void add_configs(const std::vector<log_config_t>& configs);
+
+    /*!
+     * Create logger from configuration named 'root', obviously.
+     * To successfull logger creation its configuration named 'root' should be
+     * added previously into the repository as like as its frontends must be
+     * registered with.
      * @deprecated[soft]: since 0.3.
      * @deprecated[hard]: will be removed since 0.4.
      */
@@ -115,9 +111,23 @@ public:
         std::is_enum<Level>::value,
         verbose_logger_t<Level>
     >::type
-    create(const std::string& name) const {
-        return create<verbose_logger_t<Level>>(name);
-    }
+    root() const BLACKHOLE_DEPRECATED("use 'create<T>(\"root\")' instead");
+
+    /*!
+     * Create verbose logger with specified configuration name.
+     * To successfull logger creation its configuration named 'root' should be
+     * added previously into the repository as like as its frontends must be
+     * registered with.
+     * @deprecated[soft]: since 0.3.
+     * @deprecated[hard]: will be removed since 0.4.
+     */
+    template<typename Level>
+    typename std::enable_if<
+        std::is_enum<Level>::value,
+        verbose_logger_t<Level>
+    >::type
+    BLACKHOLE_DEPRECATED("use 'create<T>(name)' instead")
+    create(const std::string& name) const;
 
     /*!
      * @since: 0.3.
@@ -188,6 +198,42 @@ repository_t::clear() {
     std::lock_guard<std::mutex> lock(mutex);
     factory.clear();
     configs.clear();
+}
+
+BLACKHOLE_API
+void
+repository_t::add_config(const log_config_t& config) {
+    std::lock_guard<std::mutex> lock(mutex);
+    configs[config.name] = config;
+}
+
+BLACKHOLE_API
+void
+repository_t::add_configs(const std::vector<log_config_t>& configs) {
+    std::lock_guard<std::mutex> lock(mutex);
+    for (auto it = configs.begin(); it != configs.end(); ++it) {
+        this->configs[it->name] = *it;
+    }
+}
+
+template<typename Level>
+BLACKHOLE_API
+typename std::enable_if<
+    std::is_enum<Level>::value,
+    verbose_logger_t<Level>
+>::type
+repository_t::root() const {
+    return create<verbose_logger_t<Level>>("root");
+}
+
+template<typename Level>
+BLACKHOLE_API
+typename std::enable_if<
+    std::is_enum<Level>::value,
+    verbose_logger_t<Level>
+>::type
+repository_t::create(const std::string& name) const {
+    return create<verbose_logger_t<Level>>(name);
 }
 
 } // namespace blackhole

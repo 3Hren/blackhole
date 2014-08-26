@@ -195,22 +195,27 @@ log_config_t create_valid_config() {
 }
 
 TEST(Repository, InitializationFromSettings) {
-    log_config_t config = create_valid_config();
-    repository_t::instance().add_config(config);
-    const bool condition = std::is_same<verbose_logger_t<testing::level>, decltype(repository_t::instance().create<testing::level>("root"))>::value;
+    repository_t repository;
+    repository.add_config(create_valid_config());
+
+    const bool condition = std::is_same<
+        verbose_logger_t<testing::level>,
+        decltype(repository.create<verbose_logger_t<testing::level>>("root"))
+    >::value;
     static_assert(condition, "repository should return `verbose_logger_t` object");
 }
 
 TEST(Repository, ThrowsExceptionIfLoggerWithSpecifiedNameNotFound) {
-    log_config_t config = create_valid_config();
-    repository_t::instance().add_config(config);
-    EXPECT_THROW(repository_t::instance().create<testing::level>("log"), std::out_of_range);
+    repository_t repository;
+    repository.add_config(create_valid_config());
+    EXPECT_THROW(repository.create<verbose_logger_t<testing::level>>("log"),
+                 std::out_of_range);
 }
 
 TEST(Repository, CreatesDuplicateOfRootLoggerByDefault) {
     log_config_t config = create_valid_config();
     repository_t::instance().add_config(config);
-    repository_t::instance().root<testing::level>();
+    repository_t::instance().create<verbose_logger_t<testing::level>>("root");
 }
 
 TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredSink) {
@@ -343,5 +348,6 @@ TEST(Repository, ThrowsExceptionWhenSinkIsRegisteredButItsUniqueNameIsDifferent)
     >();
     repository.add_config(config);
 
-    EXPECT_THROW(repository.create<level>("root"), blackhole::error_t);
+    EXPECT_THROW(repository.create<verbose_logger_t<level>>("root"),
+                 blackhole::error_t);
 }
