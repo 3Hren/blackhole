@@ -242,21 +242,30 @@ TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredFormatter) {
 
 TEST(Repository, StreamSinkWithStringFormatterIsAvailableByDefault) {
     repository_t repository;
-    bool available = repository.available<sink::stream_t, formatter::string_t>();
-    EXPECT_TRUE(available);
+    bool registered = repository.registered<
+        sink::stream_t,
+        formatter::string_t
+    >();
+    EXPECT_TRUE(registered);
 }
 
 TEST(Repository, PairConfiguring) {
-    bool available = false;
+    bool registered = false;
     repository_t repository;
 
-    available = repository.available<sink::syslog_t<level>, formatter::string_t>();
-    EXPECT_FALSE(available);
+    registered = repository.registered<
+        sink::syslog_t<level>,
+        formatter::string_t
+    >();
+    EXPECT_FALSE(registered);
 
     repository.configure<sink::syslog_t<level>, formatter::string_t>();
 
-    available = repository.available<sink::syslog_t<level>, formatter::string_t>();
-    EXPECT_TRUE(available);
+    registered = repository.registered<
+        sink::syslog_t<level>,
+        formatter::string_t
+    >();
+    EXPECT_TRUE(registered);
 }
 
 TEST(Repository, GroupConfiguring) {
@@ -265,16 +274,16 @@ TEST(Repository, GroupConfiguring) {
         formatter::json_t
     > formatters_t;
 
-    bool available = false;
+    bool registered = false;
     repository_t repository;
 
-    available = repository.available<sink::files_t<>, formatter::json_t>();
-    EXPECT_FALSE(available);
+    registered = repository.registered<sink::files_t<>, formatter::json_t>();
+    EXPECT_FALSE(registered);
 
     repository.configure<sink::files_t<>, formatters_t>();
 
-    available = repository.available<sink::files_t<>, formatter::json_t>();
-    EXPECT_TRUE(available);
+    registered = repository.registered<sink::files_t<>, formatter::json_t>();
+    EXPECT_TRUE(registered);
 }
 
 TEST(Repository, CombinationConfiguring) {
@@ -288,24 +297,24 @@ TEST(Repository, CombinationConfiguring) {
         formatter::json_t
     > formatters_t;
 
-    bool available = false;
+    bool registered = false;
     repository_t repository;
 
-    available = repository.available<sink::files_t<>, formatter::json_t>();
-    ASSERT_FALSE(available);
-    available = repository.available<sink::syslog_t<level>, formatter::string_t>();
-    ASSERT_FALSE(available);
-    available = repository.available<sink::syslog_t<level>, formatter::json_t>();
-    ASSERT_FALSE(available);
+    registered = repository.registered<sink::files_t<>, formatter::json_t>();
+    ASSERT_FALSE(registered);
+    registered = repository.registered<sink::syslog_t<level>, formatter::string_t>();
+    ASSERT_FALSE(registered);
+    registered = repository.registered<sink::syslog_t<level>, formatter::json_t>();
+    ASSERT_FALSE(registered);
 
     repository.configure<sinks_t, formatters_t>();
 
-    available = repository.available<sink::files_t<>, formatter::json_t>();
-    EXPECT_TRUE(available);
-    available = repository.available<sink::syslog_t<level>, formatter::string_t>();
-    EXPECT_TRUE(available);
-    available = repository.available<sink::syslog_t<level>, formatter::json_t>();
-    EXPECT_TRUE(available);
+    registered = repository.registered<sink::files_t<>, formatter::json_t>();
+    EXPECT_TRUE(registered);
+    registered = repository.registered<sink::syslog_t<level>, formatter::string_t>();
+    EXPECT_TRUE(registered);
+    registered = repository.registered<sink::syslog_t<level>, formatter::json_t>();
+    EXPECT_TRUE(registered);
 }
 
 TEST(Repository, ThrowsExceptionWhenSinkIsRegisteredButItsUniqueNameIsDifferent) {
