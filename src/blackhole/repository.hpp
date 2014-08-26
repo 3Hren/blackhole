@@ -30,21 +30,29 @@ public:
      * @post: registered<sink::stream_t, formatter::string_t>() == true.
      * @post: create<T>("root") - should create valid logger.
      */
-    repository_t() {
-        configure<sink::stream_t, formatter::string_t>();
-        add_config(repository::config::trivial());
-    }
+    repository_t();
 
-    static repository_t& instance() {
-        static repository_t self;
-        return self;
-    }
+    static repository_t& instance();
 
+    /*!
+     * Check whether some sink-formatter pair is registered with this
+     * repository.
+     * Registered sink-formatter pair composes into a frontend, which can be
+     * potentially injected inside the logger.
+     * Trying to create a logger with unregistered frontend results in
+     * exception.
+     * @since: 0.3.
+     */
     template<typename Sink, typename Formatter>
-    bool available() const {
-        std::lock_guard<std::mutex> lock(mutex);
-        return factory.has<Sink, Formatter>();
-    }
+    bool registered() const;
+
+    /*!
+     * @deprecated[soft]: since 0.3.
+     * @deprecated[hard]: since 0.4.
+     */
+    template<typename Sink, typename Formatter>
+    bool available() const BLACKHOLE_DEPRECATED("use 'registered' instead");
+
 
     template<typename Sink, typename Formatter>
     void configure() {
@@ -93,7 +101,7 @@ public:
     }
 
     /*!
-     * @since: 0.3
+     * @since: 0.3.
      */
     template<class Logger>
     typename std::enable_if<
@@ -111,5 +119,29 @@ public:
         return logger;
     }
 };
+
+repository_t::repository_t() {
+    configure<sink::stream_t, formatter::string_t>();
+    add_config(repository::config::trivial());
+}
+
+repository_t&
+repository_t::instance() {
+    static repository_t self;
+    return self;
+}
+
+template<typename Sink, typename Formatter>
+bool
+repository_t::registered() const {
+    std::lock_guard<std::mutex> lock(mutex);
+    return factory.has<Sink, Formatter>();
+}
+
+template<typename Sink, typename Formatter>
+bool
+repository_t::available() const {
+    return registered<Sink, Formatter>();
+}
 
 } // namespace blackhole
