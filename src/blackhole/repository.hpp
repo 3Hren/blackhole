@@ -27,9 +27,8 @@ public:
      * After creation registeres string/stream frontend, which makes possible
      * to create logger with that frontend type.
      * Also adds trivial logger configuration.
-     * @post: available<sink::stream_t, formatter::string_t>() == true.
-     * @post: create<T>("root") - creates valid logger.
-     * @todo: Check post conditions.
+     * @post: registered<sink::stream_t, formatter::string_t>() == true.
+     * @post: create<T>("root") - should create valid logger.
      */
     repository_t() {
         configure<sink::stream_t, formatter::string_t>();
