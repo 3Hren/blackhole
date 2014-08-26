@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+
 namespace blackhole {
 
 namespace sink {
