@@ -46,6 +46,8 @@ public:
     bool registered() const;
 
     /*!
+     * Alias for 'registered' method.
+     * @see: repository_t::registered().
      * @deprecated[soft]: since 0.3.
      * @deprecated[hard]: since 0.4.
      */
