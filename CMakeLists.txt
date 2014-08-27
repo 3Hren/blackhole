@@ -15,10 +15,11 @@ OPTION(ENABLE_EXAMPLES "Enable examples" OFF)
 OPTION(ENABLE_BENCHMARKING "Enable benchmarking" OFF)
 OPTION(ENABLE_ELASTICSEARCH "Enable elasticsearch sink" OFF)
 OPTION(ENABLE_ELASTICSEARCH_DEBUG "Enable elasticsearch debug" OFF)
+OPTION(ENABLE_DOCUMENTATION_GENERATION "Generate documentation by Doxygen" OFF)
 
 CONFIGURE_FILE(
-    "${PROJECT_SOURCE_DIR}/config.hpp.in"
-    "${PROJECT_SOURCE_DIR}/src/blackhole/config.hpp"
+    ${PROJECT_SOURCE_DIR}/config.hpp.in
+    ${PROJECT_SOURCE_DIR}/src/blackhole/config.hpp
 )
 
 IF(ENABLE_TESTING)
@@ -27,3 +28,24 @@ ENDIF()
 
 ADD_SUBDIRECTORY(src)
 
+IF(ENABLE_DOCUMENTATION_GENERATION)
+    MESSAGE("-- Checking for Doxygen ...")
+    FIND_PACKAGE(Doxygen)
+endif()
+
+IF(DOXYGEN_FOUND)
+    SET(DOC_TARGET "doc")
+
+    ADD_SUBDIRECTORY(doc)
+    CONFIGURE_FILE(
+        doc/Doxyfile.in
+        ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile
+        @ONLY
+    )
+
+    ADD_CUSTOM_TARGET(${DOC_TARGET}
+        ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile
+        COMMENT "Building documentation"
+        SOURCE doc/Doxyfile.in
+    )
+endif()
