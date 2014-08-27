@@ -6,7 +6,10 @@
 
 using namespace blackhole;
 
-TEST(string_t, FormatSingleAttribute) {
+#define TEST_STRING_FORMATTER(Suite, Case) \
+    TEST(string_t##_##Suite, Case)
+
+TEST_STRING_FORMATTER(Required, SinglePlaceholder) {
     record_t record;
     record.insert(keyword::message() = "le message");
 
@@ -15,7 +18,7 @@ TEST(string_t, FormatSingleAttribute) {
     EXPECT_EQ("[le message]", fmt.format(record));
 }
 
-TEST(string_t, FormatMultipleAttributes) {
+TEST_STRING_FORMATTER(Required, TwoPlaceholders) {
     record_t record;
     record.insert(keyword::message() = "le message");
     record.insert({ "timestamp", attribute_t("le timestamp") });
@@ -25,7 +28,7 @@ TEST(string_t, FormatMultipleAttributes) {
     EXPECT_EQ("[le timestamp]: le message", fmt.format(record));
 }
 
-TEST(string_t, FormatMultipleAttributesMoreThanExists) {
+TEST_STRING_FORMATTER(Required, TwoPlaceholdersThreeAttributes) {
     record_t record;
     record.insert(keyword::message() = "le message");
     record.insert({ "timestamp", attribute_t("le timestamp") });
@@ -36,7 +39,7 @@ TEST(string_t, FormatMultipleAttributesMoreThanExists) {
     EXPECT_EQ("[le timestamp]: le message", fmt.format(record));
 }
 
-TEST(string_t, ThrowsExceptionWhenAttributeNameNotProvided) {
+TEST_STRING_FORMATTER(Required, ThrowsExceptionWhenAttributeNotFound) {
     record_t record;
     record.insert(keyword::message() = "le message");
 
@@ -140,9 +143,6 @@ TEST(mapping, DatetimeMapping) {
     mapper(stream, "timestamp", tv);
     EXPECT_EQ("1970-01-02 03:55:00", result);
 }
-
-#define TEST_STRING_FORMATTER(Suite, Case) \
-    TEST(string_t##_##Suite, Case)
 
 TEST_STRING_FORMATTER(Optional, Keyword) {
     record_t record;
