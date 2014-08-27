@@ -59,8 +59,6 @@ public:
      * repository.
      * Registered frontends can be injected inside the logger while its
      * creation stage if the logger's configuration requires them.
-     * @note: there is a better name - 'register'. Sadly, but it's C++'s
-     *        keyword.
      * @post: registered<Sink, Formatter>() == true.
      * @todo: Test post condition.
      */
