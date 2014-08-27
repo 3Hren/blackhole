@@ -16,7 +16,7 @@ namespace blackhole {
 
 namespace aux {
 
-template<typename Char, class Traits = std::char_traits<Char>, class Allocator = std::allocator<Char> >
+template<typename Char, class Traits = std::char_traits<Char>, class Allocator = std::allocator<Char>>
 class attachable_basic_ostringstream : public std::basic_ostream<Char, Traits> {
 public:
     typedef Char char_type;
@@ -56,7 +56,7 @@ public:
         initialize();
     }
 
-    attachable_basic_ostringstream(const attachable_basic_ostringstream & other) = delete;
+    attachable_basic_ostringstream(const attachable_basic_ostringstream& other) = delete;
     attachable_basic_ostringstream& operator=(const attachable_basic_ostringstream& other) = delete;
 
     ~attachable_basic_ostringstream() {
