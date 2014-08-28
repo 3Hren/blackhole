@@ -2,16 +2,17 @@
   * [Common usage](common-usage.md)
   * [Architecture](architecture.md)
   * [Sinks](sinks.md)
-    * Null
+    * [Null](sink-null.md)
     * [Files](sink-files.md)
     * [Syslog](sink-syslog.md)
-    * Elasticsearch
-    * Socket
-    * Stream
-    * Thread
-  * Formatters
-    * string
-    * JSON
-    * msgpack
-  * Configuration
-    * [Tutorial. Configuration from file.](tutorial-config-from-file.md)
+    * [Elasticsearch](sink-elasticsearch.md)
+    * [Socket](sink-socket.md)
+    * [Stream](sink-stream.md)
+  * [Formatters](formatters.md)
+    * [string](formatter-string.md)
+    * [JSON](formatter-string.md)
+    * [msgpack](formatter-msgpack.md)
+  * [Configuration from file.](tutorial-config-from-file.md)
+  * [Registration of sinks and formatters](registration-rules.md)
+  * [Passing attributes to the macro](passing-attributes.md)
+  * [Writing logs to Logstash](logstash-logging.md)

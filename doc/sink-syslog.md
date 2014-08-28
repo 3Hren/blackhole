@@ -1,22 +1,46 @@
-## Writing to syslog
+# `Syslog`-sink
+It writes log messages to \*nix syslog.
 
-This example is all about syslog sink, which writes all incoming log messages to \*nix syslog. It's not so large as previous tutorial, but therefore contains one important feature I'd like to describe more in detail.
+`syslog`-sink is thread-safe.
 
-For a start, as usual, include all necessary header files and define severity enumeration:
-
+The first you need to do is to include special header:
 
 ```
-#include <blackhole/blackhole.hpp>
 #include <blackhole/frontend/syslog.hpp>
+```
 
+##Registration
+You should register this sink before use. To do it include the following code into your program:
+
+```
+repository_t::instance().configure<sink::syslog_t<level>, formatter::string_t>();
+```
+
+The code above register `syslog`-sink and `string`-formatter pair. How to register another combinations of sinks and formatters check the ["Registration rules" article](registration-rules.md).
+
+After the registration this pair can be configured and used.
+
+##Configuration
+
+Example:
+
+```
+sink_config_t sink("syslog");
+sink["identity"] = "test-application";
+```
+
+`identity` is an app name that \*nix syslog needs.
+
+###Severity levels
+As usual you need to define severity levels for app. For example:
+
+```
 enum class level {
     debug,
     warning,
     error
 };
 ```
-
-As you can see, as like in the previous example, additional header file is required - syslog frontend.
 
 The fact that syslog has own severity level definition as it described in **RFC5424** and we need to properly map from user defined severity enumeration to the syslog's one. But there is no other way to pass additional parameter (current log event's severity) to the sink except implementing frontend's template specialization. That's why we need additional header file.
 
@@ -52,32 +76,9 @@ struct priority_traits<level> {
 
 We just implement `priority_traits` template specialization with single static method `map` that accepts single parameter - user-defined severity (`level` in our case) and returns syslog's one - `priority_t`. Mapping itself is a user's responsibility.
 
-Remaining part of the example shouldn't be hard to understand if you are familiar with the previous example.
 
-As always register necessary formatter and sink. Note that syslog sink requires user-defined severity enumeration symbol as template parameter. This information is needed for severity level mapping.
+##Example
 
-```
-repository_t::instance().configure<sink::syslog_t<level>, formatter::string_t>();
-```
-
-Further configuration also shouldn't cause difficulties.
-
-```
-// Formatter is configured as usual, except we don't need anything than message.
-formatter_config_t formatter("string");
-formatter["pattern"] = "%(message)s";
-
-// Syslog sink in its current implementation also hasn't large amount of options.
-sink_config_t sink("syslog");
-sink["identity"] = "test-application";
-
-frontend_config_t frontend = { formatter, sink };
-log_config_t config{ "root", { frontend } };
-
-repository_t::instance().add_config(config);
-```
-
-Full example code is:
 ```
 #include <blackhole/blackhole.hpp>
 #include <blackhole/frontend/syslog.hpp>
@@ -138,14 +139,14 @@ void init() {
     sink["identity"] = "test-application";
 
     frontend_config_t frontend = { formatter, sink };
-    log_config_t config{ "root", { frontend } };
+    log_config_t config{ "syslog_string", { frontend } };
 
     repository_t::instance().add_config(config);
 }
 
 int main(int, char**) {
     init();
-    verbose_logger_t<level> log = repository_t::instance().root<level>();
+    verbose_logger_t<level> log = repository_t::instance().create<level>("syslog_string");
 
     BH_LOG(log, level::debug, "debug message");
     BH_LOG(log, level::warning, "warning message");
@@ -155,9 +156,16 @@ int main(int, char**) {
 }
 ```
 
+Compile and run it:
+
+```
+$ g++ syslog.cpp -osyslog-string-sink -std=c++0x -lboost_thread-mt
+$ ./syslog-string-sink
+```
+
 After executing the next messages should be displayed in your syslog (depending on your syslog's configuration):
 ![Output after executing the example](images/syslog-1.png)
 
-*Note that debug message in my case was ignored by syslog itself, not by Blackhole.*
+*Note that debug message in this case was ignored by syslog itself, not by Blackhole.*
 
 [Back to contents](contents.md)
