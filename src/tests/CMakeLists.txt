@@ -31,9 +31,9 @@ SET(HEADERS
     ${BLACKHOLE_TESTING_HEADERS}
 )
 
-SET(MAIN_SOURCES main)
+SET(SOURCE_MAIN main)
 
-SET(BASE_SOURCES
+SET(SOURCES_BASE
     datetime/test_DayOfYear
     datetime/test_DayOfMonth
     datetime/test_DayOfWeek
@@ -86,7 +86,7 @@ SET(SOURCES_FORMATTER
 )
 
 IF(ENABLE_ELASTICSEARCH)
-    SET(ES_SOURCES
+    SET(SOURCES_ES
         extra/ElasticsearchSink
         extra/elasticsearch/Factory
         extra/elasticsearch/Transport
@@ -97,15 +97,15 @@ IF(ENABLE_ELASTICSEARCH)
     )
 ENDIF()
 
-SET(DEVELOP_SOURCES
+SET(SOURCES_DEVELOP
 )
 
 SET(SOURCES
-    ${MAIN_SOURCES}
-#    ${BASE_SOURCES}
-#    ${ES_SOURCES}
-    ${DEVELOP_SOURCES}
+    ${SOURCE_MAIN}
+    ${SOURCES_BASE}
     ${SOURCES_FORMATTER}
+    ${SOURCES_ES}
+    ${SOURCES_DEVELOP}
 )
 
 SET(Boost_USE_MULTITHREADED ON)
