@@ -2,14 +2,14 @@
 #include <blackhole/keyword/message.hpp>
 #include <blackhole/keyword/timestamp.hpp>
 
-#include "global.hpp"
+#include "../global.hpp"
 
 using namespace blackhole;
 
-#define TEST_STRING_FORMATTER(Suite, Case) \
+#define TEST_STRING(Suite, Case) \
     TEST(string_t##_##Suite, Case)
 
-TEST_STRING_FORMATTER(Required, SinglePlaceholder) {
+TEST_STRING(Required, SinglePlaceholder) {
     record_t record;
     record.insert(keyword::message() = "le message");
 
@@ -18,7 +18,7 @@ TEST_STRING_FORMATTER(Required, SinglePlaceholder) {
     EXPECT_EQ("[le message]", fmt.format(record));
 }
 
-TEST_STRING_FORMATTER(Required, TwoPlaceholders) {
+TEST_STRING(Required, TwoPlaceholders) {
     record_t record;
     record.insert(keyword::message() = "le message");
     record.insert({ "timestamp", attribute_t("le timestamp") });
@@ -28,7 +28,7 @@ TEST_STRING_FORMATTER(Required, TwoPlaceholders) {
     EXPECT_EQ("[le timestamp]: le message", fmt.format(record));
 }
 
-TEST_STRING_FORMATTER(Required, TwoPlaceholdersThreeAttributes) {
+TEST_STRING(Required, TwoPlaceholdersThreeAttributes) {
     record_t record;
     record.insert(keyword::message() = "le message");
     record.insert({ "timestamp", attribute_t("le timestamp") });
@@ -39,7 +39,7 @@ TEST_STRING_FORMATTER(Required, TwoPlaceholdersThreeAttributes) {
     EXPECT_EQ("[le timestamp]: le message", fmt.format(record));
 }
 
-TEST_STRING_FORMATTER(Required, ThrowsExceptionWhenAttributeNotFound) {
+TEST_STRING(Required, ThrowsExceptionWhenAttributeNotFound) {
     record_t record;
     record.insert(keyword::message() = "le message");
 
@@ -144,7 +144,7 @@ TEST(mapping, DatetimeMapping) {
     EXPECT_EQ("1970-01-02 03:55:00", result);
 }
 
-TEST_STRING_FORMATTER(Optional, Keyword) {
+TEST_STRING(Optional, Keyword) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
@@ -154,7 +154,7 @@ TEST_STRING_FORMATTER(Optional, Keyword) {
     EXPECT_EQ("<42>: [le message]", fmt.format(record));
 }
 
-TEST_STRING_FORMATTER(Optional, AbsentKeyword) {
+TEST_STRING(Optional, AbsentKeyword) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
@@ -163,7 +163,7 @@ TEST_STRING_FORMATTER(Optional, AbsentKeyword) {
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
 
-TEST_STRING_FORMATTER(Optional, WithPrefix) {
+TEST_STRING(Optional, WithPrefix) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
@@ -173,7 +173,7 @@ TEST_STRING_FORMATTER(Optional, WithPrefix) {
     EXPECT_EQ("<.42>: [le message]", fmt.format(record));
 }
 
-TEST_STRING_FORMATTER(Optional, AbsentWithPrefix) {
+TEST_STRING(Optional, AbsentWithPrefix) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
@@ -182,7 +182,7 @@ TEST_STRING_FORMATTER(Optional, AbsentWithPrefix) {
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
 
-TEST_STRING_FORMATTER(Optional, WithSuffix) {
+TEST_STRING(Optional, WithSuffix) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
@@ -192,7 +192,7 @@ TEST_STRING_FORMATTER(Optional, WithSuffix) {
     EXPECT_EQ("<42.>: [le message]", fmt.format(record));
 }
 
-TEST_STRING_FORMATTER(Optional, AbsentWithSuffix) {
+TEST_STRING(Optional, AbsentWithSuffix) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
@@ -201,7 +201,7 @@ TEST_STRING_FORMATTER(Optional, AbsentWithSuffix) {
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
 
-TEST_STRING_FORMATTER(Optional, WithPrefixSuffix) {
+TEST_STRING(Optional, WithPrefixSuffix) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
@@ -211,7 +211,7 @@ TEST_STRING_FORMATTER(Optional, WithPrefixSuffix) {
     EXPECT_EQ("<.42.>: [le message]", fmt.format(record));
 }
 
-TEST_STRING_FORMATTER(Optional, AbsentWithPrefixSuffix) {
+TEST_STRING(Optional, AbsentWithPrefixSuffix) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
@@ -220,7 +220,7 @@ TEST_STRING_FORMATTER(Optional, AbsentWithPrefixSuffix) {
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
 
-TEST_STRING_FORMATTER(Optional, WithPrefixSuffixParentheses) {
+TEST_STRING(Optional, WithPrefixSuffixParentheses) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
@@ -230,7 +230,7 @@ TEST_STRING_FORMATTER(Optional, WithPrefixSuffixParentheses) {
     EXPECT_EQ("<(42)>: [le message]", fmt.format(record));
 }
 
-TEST_STRING_FORMATTER(Optional, AbsentWithPrefixSuffixParentheses) {
+TEST_STRING(Optional, AbsentWithPrefixSuffixParentheses) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
@@ -239,7 +239,7 @@ TEST_STRING_FORMATTER(Optional, AbsentWithPrefixSuffixParentheses) {
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
 
-TEST_STRING_FORMATTER(Optional, WithPrefixSuffixReverseParentheses) {
+TEST_STRING(Optional, WithPrefixSuffixReverseParentheses) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
@@ -249,7 +249,7 @@ TEST_STRING_FORMATTER(Optional, WithPrefixSuffixReverseParentheses) {
     EXPECT_EQ("<)42(>: [le message]", fmt.format(record));
 }
 
-TEST_STRING_FORMATTER(Optional, AbsentWithPrefixSuffixReverseParentheses) {
+TEST_STRING(Optional, AbsentWithPrefixSuffixReverseParentheses) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
@@ -258,7 +258,7 @@ TEST_STRING_FORMATTER(Optional, AbsentWithPrefixSuffixReverseParentheses) {
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
 
-TEST_STRING_FORMATTER(Optional, WithPrefixSuffixSquareBrackets) {
+TEST_STRING(Optional, WithPrefixSuffixSquareBrackets) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
@@ -268,7 +268,7 @@ TEST_STRING_FORMATTER(Optional, WithPrefixSuffixSquareBrackets) {
     EXPECT_EQ("<[42]>: [le message]", fmt.format(record));
 }
 
-TEST_STRING_FORMATTER(Optional, AbsentWithPrefixSuffixSquareBrackets) {
+TEST_STRING(Optional, AbsentWithPrefixSuffixSquareBrackets) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
@@ -277,7 +277,7 @@ TEST_STRING_FORMATTER(Optional, AbsentWithPrefixSuffixSquareBrackets) {
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
 
-TEST_STRING_FORMATTER(Optional, WithPrefixSuffixSquareBracketsReversed) {
+TEST_STRING(Optional, WithPrefixSuffixSquareBracketsReversed) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
@@ -287,11 +287,15 @@ TEST_STRING_FORMATTER(Optional, WithPrefixSuffixSquareBracketsReversed) {
     EXPECT_EQ("<]42[>: [le message]", fmt.format(record));
 }
 
-TEST_STRING_FORMATTER(Optional, AbsentWithPrefixSuffixSquareBracketsReversed) {
+TEST_STRING(Optional, AbsentWithPrefixSuffixSquareBracketsReversed) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
     std::string pattern("<%(\\][id]\\[)?s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<>: [le message]", fmt.format(record));
+}
+
+TEST_STRING(Variadic, _) {
+
 }

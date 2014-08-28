@@ -65,7 +65,6 @@ SET(BASE_SOURCES
     test_NullSink
     test_ScopedAttributes
     test_StreamSink
-    test_StringFormatter
     test_StringPatternParser
     test_SyslogSink
     test_Traits
@@ -74,11 +73,16 @@ SET(BASE_SOURCES
     utils/test_GenericStringFormatter
     Dynamic
     Record
+    Repository
     TcpSink
     Trace
     UdpSink
     View
     Wrapper
+)
+
+SET(SOURCES_FORMATTER
+    formatter/string
 )
 
 IF(ENABLE_ELASTICSEARCH)
@@ -94,14 +98,14 @@ IF(ENABLE_ELASTICSEARCH)
 ENDIF()
 
 SET(DEVELOP_SOURCES
-    Repository
 )
 
 SET(SOURCES
     ${MAIN_SOURCES}
-    ${BASE_SOURCES}
-    ${ES_SOURCES}
+#    ${BASE_SOURCES}
+#    ${ES_SOURCES}
     ${DEVELOP_SOURCES}
+    ${SOURCES_FORMATTER}
 )
 
 SET(Boost_USE_MULTITHREADED ON)
