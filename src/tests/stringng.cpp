@@ -251,8 +251,7 @@ private:
             return placeholder::variadic_t();
         }
 
-        state = broken;
-        throw parser::error_t(0, "@todo");
+        throw_<parser::illformed_t>();
     }
 
     std::tuple<std::string, std::string>
@@ -541,9 +540,8 @@ TEST(parser_t, VariadicPlaceholder) {
 }
 
 TEST(parser_t, InvalidVariadicPlaceholder) {
-    parser_t parser("%(...");
-
-    EXPECT_THROW(parser.next(), parser::illformed_t);
+    EXPECT_THROW(parser_t("%(...").next(), parser::illformed_t);
+    EXPECT_THROW(parser_t("%(....").next(), parser::illformed_t);
 }
 
 TEST(parser_t, VariadicPlaceholderWithPrefix) {
