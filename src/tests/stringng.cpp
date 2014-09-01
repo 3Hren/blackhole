@@ -210,34 +210,36 @@ private:
     parse_variadic() {
         if (pos == end) {
             throw_<parser::illformed_t>();
-        } else if (*pos == '[') {
-            pos++;
-
+        } else {
             placeholder::variadic_t ph;
-            std::tie(ph.pattern, std::ignore) = parse({ "]" });
-            if (startswith(pos, end, PH_END)) {
-                pos += PH_END.size();
-                state = whatever;
-                return ph;
+            if (*pos == '[') {
+                pos++;
+
+                std::tie(ph.pattern, std::ignore) = parse({ "]" });
+                if (startswith(pos, end, PH_END)) {
+                    pos += PH_END.size();
+                    state = whatever;
+                    return ph;
+                } else if (*pos == ':') {
+                    pos++;
+                    parse_variadic_options(ph);
+                    state = whatever;
+                    return ph;
+                } else {
+                    state = broken;
+                    throw parser::error_t(0, "@todo");
+                }
             } else if (*pos == ':') {
                 pos++;
+                placeholder::variadic_t ph;
                 parse_variadic_options(ph);
                 state = whatever;
                 return ph;
-            } else {
-                state = broken;
-                throw parser::error_t(0, "@todo");
+            } else if (startswith(pos, end, PH_END)) {
+                pos += PH_END.size();
+                state = whatever;
+                return placeholder::variadic_t();
             }
-        } else if (*pos == ':') {
-            pos++;
-            placeholder::variadic_t ph;
-            parse_variadic_options(ph);
-            state = whatever;
-            return ph;
-        } else if (startswith(pos, end, PH_END)) {
-            pos += PH_END.size();
-            state = whatever;
-            return placeholder::variadic_t();
         }
 
         throw_<parser::illformed_t>();
