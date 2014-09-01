@@ -159,7 +159,7 @@ public:
 private:
     token_t
     parse_whatever() {
-        if (startswith(pos, end, PH_BEGIN)) {
+        if (starts_with(pos, end, PH_BEGIN)) {
             pos += PH_BEGIN.size();
             state = placeholder;
         } else {
@@ -174,7 +174,7 @@ private:
         literal_t literal;
 
         while (pos != end) {
-            if (startswith(pos, end, PH_BEGIN)) {
+            if (starts_with(pos, end, PH_BEGIN)) {
                 pos += PH_BEGIN.size();
                 state = placeholder;
                 return literal;
@@ -189,7 +189,7 @@ private:
 
     token_t
     parse_placeholder() {
-        if (startswith(pos, end, PH_VARIADIC)) {
+        if (starts_with(pos, end, PH_VARIADIC)) {
             pos += PH_VARIADIC.size();
             return parse_variadic();
         }
@@ -204,7 +204,7 @@ private:
                 if (ch == ':') {
                     pos++;
                     return parse_optional(name);
-                } else if (startswith(pos, end, PH_END)) {
+                } else if (starts_with(pos, end, PH_END)) {
                     pos += PH_END.size();
                     state = whatever;
                     return placeholder::required_t { name };
@@ -240,7 +240,7 @@ private:
                 pos++;
 
                 std::tie(ph.pattern, std::ignore) = parse({ "]" });
-                if (startswith(pos, end, PH_END)) {
+                if (starts_with(pos, end, PH_END)) {
                     pos += PH_END.size();
                     state = whatever;
                     return ph;
@@ -258,7 +258,7 @@ private:
                 parse_variadic_options(ph);
                 state = whatever;
                 return ph;
-            } else if (startswith(pos, end, PH_END)) {
+            } else if (starts_with(pos, end, PH_END)) {
                 pos += PH_END.size();
                 state = whatever;
                 return placeholder::variadic_t();
@@ -298,7 +298,7 @@ private:
             bool matched = false;
             std::string breaker;
             for (auto it = breakers.begin(); it != breakers.end(); ++it) {
-                if (startswith(pos, end, *it)) {
+                if (starts_with(pos, end, *it)) {
                     matched = true;
                     breaker = *it;
                     break;
@@ -334,7 +334,7 @@ private:
     static
     inline
     bool
-    startswith(Iterator first, Iterator last, const Range& range) {
+    starts_with(Iterator first, Iterator last, const Range& range) {
         return boost::starts_with(
             boost::make_iterator_range(first, last),
             range
