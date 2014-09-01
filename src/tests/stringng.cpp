@@ -2,6 +2,8 @@
 #include <ctime>
 #include <stdexcept>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/optional.hpp>
 #include <boost/variant.hpp>
 
 #include "global.hpp"
@@ -22,16 +24,30 @@ struct optional_t {
     std::string suffix;
 };
 
+struct variadic_t {
+    std::string prefix;
+    std::string suffix;
+    std::string pattern;
+    std::string separator;
+
+    variadic_t() :
+        pattern("%k: %v"),
+        separator(", ")
+    {}
+};
+
 }
 
 typedef boost::variant<
     literal_t,
     placeholder::required_t,
-    placeholder::optional_t
+    placeholder::optional_t,
+    placeholder::variadic_t
 > token_t;
 
 static const std::array<char, 2> PLACEHOLDER_BEGIN = {{ '%', '(' }};
 static const std::array<char, 2> PLACEHOLDER_END   = {{ ')', 's' }};
+static const std::array<char, 3> PLACEHOLDER_VARIADIC = {{ '.', '.', '.' }};
 
 class parser_t {
     enum state_t {
@@ -54,20 +70,15 @@ public:
         state(unknown)
     {}
 
-    token_t next() {
+    token_t
+    next() {
         if (pos == end) {
-            throw std::runtime_error("end");
+            throw std::runtime_error("EOF");
         }
 
         switch (state) {
         case unknown:
-            if (equal(pos, end, PLACEHOLDER_BEGIN.begin(), PLACEHOLDER_BEGIN.end())) {
-                pos += PLACEHOLDER_BEGIN.size();
-                state = placeholder;
-            } else {
-                state = literal;
-            }
-            return next();
+            return parse_unknown();
         case literal:
             return parse_literal();
         case placeholder:
@@ -79,11 +90,24 @@ public:
         }
     }
 
-    literal_t parse_literal() {
+    token_t
+    parse_unknown() {
+        if (boost::starts_with(boost::make_iterator_range(pos, end), PLACEHOLDER_BEGIN)) {
+            pos += PLACEHOLDER_BEGIN.size();
+            state = placeholder;
+        } else {
+            state = literal;
+        }
+
+        return next();
+    }
+
+    literal_t
+    parse_literal() {
         literal_t literal;
 
         while (pos != end) {
-            if (equal(pos, end, PLACEHOLDER_BEGIN.begin(), PLACEHOLDER_BEGIN.end())) {
+            if (boost::starts_with(boost::make_iterator_range(pos, end), PLACEHOLDER_BEGIN)) {
                 pos += PLACEHOLDER_BEGIN.size();
                 state = placeholder;
                 return literal;
@@ -98,36 +122,32 @@ public:
 
     token_t
     parse_placeholder() {
-        // test for variadic, otherwise either required or optional.
+        if (boost::starts_with(boost::make_iterator_range(pos, end), PLACEHOLDER_VARIADIC)) {
+            pos += PLACEHOLDER_VARIADIC.size();
+            return parse_variadic();
+        }
 
         std::string name;
         while (pos != end) {
             const char ch = *pos;
-            std::cout << ":=" << ch << std::endl;
+
             if (std::isalpha(ch) || std::isdigit(ch)) {
                 name.push_back(ch);
             } else {
                 if (ch == ':') {
+                    pos++;
+
                     placeholder::optional_t placeholder;
                     placeholder.name = name;
-
-                    pos++;
-                    placeholder.prefix = parse_prefix();
-                    placeholder.suffix = parse_suffix();
-
-                    // maybe format
-                    if (!equal(pos, end, PLACEHOLDER_END.begin(), PLACEHOLDER_END.end())) {
-                        throw std::runtime_error("!");
-                    }
-                    pos += PLACEHOLDER_END.size();
+                    std::tie(placeholder.prefix, std::ignore) = parse({ ":" });
+                    std::tie(placeholder.suffix, std::ignore) = parse({ ")s" });
                     state = unknown;
                     return placeholder;
-                } else if (equal(pos, end, PLACEHOLDER_END.begin(), PLACEHOLDER_END.end())) {
+                } else if (boost::starts_with(boost::make_iterator_range(pos, end), PLACEHOLDER_END)) {
                     pos += PLACEHOLDER_END.size();
                     state = unknown;
                     return token_t(placeholder::required_t { name });
                 } else {
-                    // throw
                     state = broken;
                     throw std::runtime_error("invalid placeholder name");
                 }
@@ -139,64 +159,92 @@ public:
         return token_t(placeholder::required_t { name });
     }
 
-    std::string parse_prefix() {
-        std::string prefix;
+    placeholder::variadic_t
+    parse_variadic() {
+        if (pos == end) {
+            state = broken;
+            throw std::runtime_error("invalid format");
+        } else if (*pos == '[') {
+            pos++;
+
+            placeholder::variadic_t ph;
+            std::tie(ph.pattern, std::ignore) = parse({ "]" });
+            if (boost::starts_with(boost::make_iterator_range(pos, end), PLACEHOLDER_END)) {
+                pos += PLACEHOLDER_END.size();
+                state = unknown;
+                return ph;
+            } else if (*pos == ':') {
+                pos++;
+                std::tie(ph.prefix, std::ignore) = parse({ ":" });
+                std::string breaker;
+                std::tie(ph.suffix, breaker) = parse({ ":", ")s" });
+                if (breaker == ":") {
+                    std::tie(ph.separator, std::ignore) = parse({ ")s" });
+                }
+                state = unknown;
+                return ph;
+            } else {
+                state = broken;
+                throw std::runtime_error("invalid format");
+            }
+        } else if (*pos == ':') {
+            pos++;
+
+            placeholder::variadic_t ph;
+            std::tie(ph.prefix, std::ignore) = parse({ ":" });
+            std::string breaker;
+            std::tie(ph.suffix, breaker) = parse({ ":", ")s" });
+            if (breaker == ":") {
+                std::tie(ph.separator, std::ignore) = parse({ ")s" });
+            }
+
+            state = unknown;
+            return ph;
+        } else if (boost::starts_with(boost::make_iterator_range(pos, end), PLACEHOLDER_END)) {
+            pos += PLACEHOLDER_END.size();
+            return placeholder::variadic_t();
+        }
+
+        state = broken;
+        throw std::runtime_error("invalid format");
+    }
+
+    std::tuple<std::string, std::string>
+    parse(std::initializer_list<std::string> breakers) {
+        std::string result;
         bool escaped = false;
         while (pos != end) {
             const char ch = *pos;
             if (ch == '\\') {
-                escaped = true;
                 pos++;
+                escaped = true;
                 continue;
             }
 
-            if (ch == ':' && !escaped) {
-                pos++;
-                return prefix;
+            bool matched = false;
+            std::string breaker;
+            for (auto it = breakers.begin(); it != breakers.end(); ++it) {
+                if (boost::starts_with(boost::make_iterator_range(pos, end),
+                                       boost::make_iterator_range(it->begin(), it->end())))
+                {
+                    matched = true;
+                    breaker = *it;
+                    break;
+                }
             }
 
-            prefix.push_back(ch);
+            if (matched && !escaped) {
+                pos += breaker.size();
+                return std::make_tuple(result, breaker);
+            }
+
+            result.push_back(ch);
             escaped = false;
             pos++;
         }
 
-        return prefix;
-    }
-
-    std::string parse_suffix() {
-        std::string suffix;
-        bool escaped = false;
-        while (pos != end) {
-            const char ch = *pos;
-            if (ch == '\\') {
-                escaped = true;
-                pos++;
-                continue;
-            }
-
-            if (ch == ')') {
-                return suffix;
-            }
-
-            suffix.push_back(ch);
-            escaped = false;
-            pos++;
-        }
-
-        return suffix;
-    }
-
-    template<class InputIterator, class OtherIterator>
-    static
-    bool
-    equal(InputIterator first1, InputIterator last1, OtherIterator first2, OtherIterator last2) {
-        for (; first1 != last1 && first2 != last2; ++first1, ++first2) {
-            if (*first1 != *first2) {
-                return false;
-            }
-        }
-
-        return true;
+        state = broken;
+        throw std::runtime_error("invalid format");
     }
 };
 
@@ -386,14 +434,148 @@ TEST(parser_t, OptionalPlaceholderAny) {
     EXPECT_THROW(parser.next(), std::runtime_error);
 }
 
-// %(id)s -> "42" | throw
-// id=%(id)s -> "id=42" | throw
+TEST(parser_t, VariadicPlaceholder) {
+    parser_t parser("%(...)s");
 
-// %(id::)s -> "42" | ""
-// %(id:/:/)s -> "/42/" | ""
-// %(id:\::\:)s -> ":42:" | ""
-// %(id:id=:)s -> "id=42" | ""
+    auto token = parser.next();
+    auto placeholder = boost::get<placeholder::variadic_t>(token);
 
-// %(...)s -> "id: 42" | ""
-// %(...:(:))s -> "(id: 42, message: le message)" | ""
-// %(...[%k=%v]:(:):,)s -> "(id=42,message=le message)" |""
+    EXPECT_EQ("", placeholder.prefix);
+    EXPECT_EQ("", placeholder.suffix);
+    EXPECT_EQ("%k: %v", placeholder.pattern);
+    EXPECT_EQ(", ", placeholder.separator);
+
+    EXPECT_THROW(parser.next(), std::runtime_error);
+}
+
+TEST(parser_t, InvalidVariadicPlaceholder) {
+    parser_t parser("%(...");
+
+    EXPECT_THROW(parser.next(), std::runtime_error);
+}
+
+TEST(parser_t, VariadicPlaceholderWithPrefix) {
+    parser_t parser("%(...:/:)s");
+
+    auto token = parser.next();
+    auto placeholder = boost::get<placeholder::variadic_t>(token);
+
+    EXPECT_EQ("/", placeholder.prefix);
+    EXPECT_EQ("", placeholder.suffix);
+    EXPECT_EQ("%k: %v", placeholder.pattern);
+    EXPECT_EQ(", ", placeholder.separator);
+
+    EXPECT_THROW(parser.next(), std::runtime_error);
+}
+
+TEST(parser_t, VariadicPlaceholderWithSuffix) {
+    parser_t parser("%(...::/)s");
+
+    auto token = parser.next();
+    auto placeholder = boost::get<placeholder::variadic_t>(token);
+
+    EXPECT_EQ("", placeholder.prefix);
+    EXPECT_EQ("/", placeholder.suffix);
+    EXPECT_EQ("%k: %v", placeholder.pattern);
+    EXPECT_EQ(", ", placeholder.separator);
+
+    EXPECT_THROW(parser.next(), std::runtime_error);
+}
+
+TEST(parser_t, VariadicPlaceholderWithPrefixSuffix) {
+    parser_t parser("%(...:/:/)s");
+
+    auto token = parser.next();
+    auto placeholder = boost::get<placeholder::variadic_t>(token);
+
+    EXPECT_EQ("/", placeholder.prefix);
+    EXPECT_EQ("/", placeholder.suffix);
+    EXPECT_EQ("%k: %v", placeholder.pattern);
+    EXPECT_EQ(", ", placeholder.separator);
+
+    EXPECT_THROW(parser.next(), std::runtime_error);
+}
+
+TEST(parser_t, VariadicPlaceholderWithSeparator) {
+    parser_t parser("%(...:::.)s");
+
+    auto token = parser.next();
+    auto placeholder = boost::get<placeholder::variadic_t>(token);
+
+    EXPECT_EQ("", placeholder.prefix);
+    EXPECT_EQ("", placeholder.suffix);
+    EXPECT_EQ("%k: %v", placeholder.pattern);
+    EXPECT_EQ(".", placeholder.separator);
+
+    EXPECT_THROW(parser.next(), std::runtime_error);
+}
+
+TEST(parser_t, VariadicPlaceholderWithPrefixSuffixSeparator) {
+    parser_t parser("%(...:/:/: )s");
+
+    auto token = parser.next();
+    auto placeholder = boost::get<placeholder::variadic_t>(token);
+
+    EXPECT_EQ("/", placeholder.prefix);
+    EXPECT_EQ("/", placeholder.suffix);
+    EXPECT_EQ("%k: %v", placeholder.pattern);
+    EXPECT_EQ(" ", placeholder.separator);
+
+    EXPECT_THROW(parser.next(), std::runtime_error);
+}
+
+TEST(parser_t, VariadicPlaceholderWithPrefixSuffixBraceAndSeparator) {
+    parser_t parser("%(...:(:):, )s");
+
+    auto token = parser.next();
+    auto placeholder = boost::get<placeholder::variadic_t>(token);
+
+    EXPECT_EQ("(", placeholder.prefix);
+    EXPECT_EQ(")", placeholder.suffix);
+    EXPECT_EQ("%k: %v", placeholder.pattern);
+    EXPECT_EQ(", ", placeholder.separator);
+
+    EXPECT_THROW(parser.next(), std::runtime_error);
+}
+
+TEST(parser_t, VariadicPlaceholderWithPattern) {
+    parser_t parser("%(...[%k=%v])s");
+
+    auto token = parser.next();
+    auto placeholder = boost::get<placeholder::variadic_t>(token);
+
+    EXPECT_EQ("", placeholder.prefix);
+    EXPECT_EQ("", placeholder.suffix);
+    EXPECT_EQ("%k=%v", placeholder.pattern);
+    EXPECT_EQ(", ", placeholder.separator);
+
+    EXPECT_THROW(parser.next(), std::runtime_error);
+}
+
+TEST(parser_t, VariadicPlaceholderWithPatternPrefixSuffix) {
+    parser_t parser("%(...[%k=%v]:/:/)s");
+
+    auto token = parser.next();
+    auto placeholder = boost::get<placeholder::variadic_t>(token);
+
+    EXPECT_EQ("/", placeholder.prefix);
+    EXPECT_EQ("/", placeholder.suffix);
+    EXPECT_EQ("%k=%v", placeholder.pattern);
+    EXPECT_EQ(", ", placeholder.separator);
+
+    EXPECT_THROW(parser.next(), std::runtime_error);
+}
+
+TEST(parser_t, VariadicPlaceholderWithPatternPrefixSuffixSeparator) {
+    parser_t parser("%(...[%k=%v]:/:/: )s");
+
+    auto token = parser.next();
+    auto placeholder = boost::get<placeholder::variadic_t>(token);
+
+    EXPECT_EQ("/", placeholder.prefix);
+    EXPECT_EQ("/", placeholder.suffix);
+    EXPECT_EQ("%k=%v", placeholder.pattern);
+    EXPECT_EQ(" ", placeholder.separator);
+
+    EXPECT_THROW(parser.next(), std::runtime_error);
+}
