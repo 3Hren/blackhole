@@ -275,7 +275,7 @@ private:
             bool matched = false;
             std::string breaker;
             for (auto it = breakers.begin(); it != breakers.end(); ++it) {
-                if (startswith(pos, end, boost::make_iterator_range(it->begin(), it->end()))) {
+                if (startswith(pos, end, *it)) {
                     matched = true;
                     breaker = *it;
                     break;
