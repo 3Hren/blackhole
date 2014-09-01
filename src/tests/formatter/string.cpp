@@ -113,7 +113,7 @@ TEST_STRING(Optional, Keyword) {
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
 
-    std::string pattern("<%([id])?s>: [%(message)s]");
+    std::string pattern("<%(id::)s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<42>: [le message]", fmt.format(record));
 }
@@ -122,7 +122,7 @@ TEST_STRING(Optional, AbsentKeyword) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
-    std::string pattern("<%([id])?s>: [%(message)s]");
+    std::string pattern("<%(id::)s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
@@ -132,7 +132,7 @@ TEST_STRING(Optional, WithPrefix) {
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
 
-    std::string pattern("<%(.[id])?s>: [%(message)s]");
+    std::string pattern("<%(id:.:)s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<.42>: [le message]", fmt.format(record));
 }
@@ -141,7 +141,7 @@ TEST_STRING(Optional, AbsentWithPrefix) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
-    std::string pattern("<%(.[id])?s>: [%(message)s]");
+    std::string pattern("<%(id:.:)s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
@@ -151,7 +151,7 @@ TEST_STRING(Optional, WithSuffix) {
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
 
-    std::string pattern("<%([id].)?s>: [%(message)s]");
+    std::string pattern("<%(id::.)s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<42.>: [le message]", fmt.format(record));
 }
@@ -160,7 +160,7 @@ TEST_STRING(Optional, AbsentWithSuffix) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
-    std::string pattern("<%([id].)?s>: [%(message)s]");
+    std::string pattern("<%(id::.)s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
@@ -170,7 +170,7 @@ TEST_STRING(Optional, WithPrefixSuffix) {
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
 
-    std::string pattern("<%(.[id].)?s>: [%(message)s]");
+    std::string pattern("<%(id:.:.)s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<.42.>: [le message]", fmt.format(record));
 }
@@ -179,7 +179,7 @@ TEST_STRING(Optional, AbsentWithPrefixSuffix) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
-    std::string pattern("<%(.[id].)?s>: [%(message)s]");
+    std::string pattern("<%(id:.:.)s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
@@ -189,7 +189,7 @@ TEST_STRING(Optional, WithPrefixSuffixParentheses) {
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
 
-    std::string pattern("<%(([id]))?s>: [%(message)s]");
+    std::string pattern("<%(id:(:))s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<(42)>: [le message]", fmt.format(record));
 }
@@ -198,7 +198,7 @@ TEST_STRING(Optional, AbsentWithPrefixSuffixParentheses) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
-    std::string pattern("<%(([id]))?s>: [%(message)s]");
+    std::string pattern("<%(id:(:))s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
@@ -208,7 +208,7 @@ TEST_STRING(Optional, WithPrefixSuffixReverseParentheses) {
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
 
-    std::string pattern("<%()[id]()?s>: [%(message)s]");
+    std::string pattern("<%(id:):()s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<)42(>: [le message]", fmt.format(record));
 }
@@ -217,7 +217,7 @@ TEST_STRING(Optional, AbsentWithPrefixSuffixReverseParentheses) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
-    std::string pattern("<%()[id]()?s>: [%(message)s]");
+    std::string pattern("<%(id:):()s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
@@ -227,7 +227,7 @@ TEST_STRING(Optional, WithPrefixSuffixSquareBrackets) {
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
 
-    std::string pattern("<%(\\[[id]\\])?s>: [%(message)s]");
+    std::string pattern("<%(id:[:])s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<[42]>: [le message]", fmt.format(record));
 }
@@ -236,7 +236,7 @@ TEST_STRING(Optional, AbsentWithPrefixSuffixSquareBrackets) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
-    std::string pattern("<%(\\[[id]\\])?s>: [%(message)s]");
+    std::string pattern("<%(id:[:])s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
@@ -246,7 +246,7 @@ TEST_STRING(Optional, WithPrefixSuffixSquareBracketsReversed) {
     record.insert(attribute::make("message", "le message"));
     record.insert(attribute::make("id", 42));
 
-    std::string pattern("<%(\\][id]\\[)?s>: [%(message)s]");
+    std::string pattern("<%(id:]:[)s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<]42[>: [le message]", fmt.format(record));
 }
@@ -255,7 +255,7 @@ TEST_STRING(Optional, AbsentWithPrefixSuffixSquareBracketsReversed) {
     record_t record;
     record.insert(attribute::make("message", "le message"));
 
-    std::string pattern("<%(\\][id]\\[)?s>: [%(message)s]");
+    std::string pattern("<%(id:]:[)s>: [%(message)s]");
     formatter::string_t fmt(pattern);
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
