@@ -81,9 +81,9 @@ typedef boost::variant<
     placeholder::variadic_t
 > token_t;
 
-static const std::array<char, 2> PLACEHOLDER_BEGIN = {{ '%', '(' }};
-static const std::array<char, 2> PLACEHOLDER_END   = {{ ')', 's' }};
-static const std::array<char, 3> PLACEHOLDER_VARIADIC = {{ '.', '.', '.' }};
+static const std::array<char, 2> PH_BEGIN = {{ '%', '(' }};
+static const std::array<char, 2> PH_END   = {{ ')', 's' }};
+static const std::array<char, 3> PH_VARIADIC = {{ '.', '.', '.' }};
 
 class parser_t {
     enum state_t {
@@ -134,8 +134,8 @@ public:
 
     token_t
     parse_unknown() {
-        if (boost::starts_with(boost::make_iterator_range(pos, end), PLACEHOLDER_BEGIN)) {
-            pos += PLACEHOLDER_BEGIN.size();
+        if (startswith(pos, end, PH_BEGIN)) {
+            pos += PH_BEGIN.size();
             state = placeholder;
         } else {
             state = literal;
@@ -149,8 +149,8 @@ public:
         literal_t literal;
 
         while (pos != end) {
-            if (boost::starts_with(boost::make_iterator_range(pos, end), PLACEHOLDER_BEGIN)) {
-                pos += PLACEHOLDER_BEGIN.size();
+            if (startswith(pos, end, PH_BEGIN)) {
+                pos += PH_BEGIN.size();
                 state = placeholder;
                 return literal;
             }
@@ -164,11 +164,8 @@ public:
 
     token_t
     parse_placeholder() {
-        if (boost::starts_with(
-                boost::make_iterator_range(pos, end),
-                PLACEHOLDER_VARIADIC))
-        {
-            pos += PLACEHOLDER_VARIADIC.size();
+        if (startswith(pos, end, PH_VARIADIC)) {
+            pos += PH_VARIADIC.size();
             return parse_variadic();
         }
 
@@ -182,11 +179,8 @@ public:
                 if (ch == ':') {
                     pos++;
                     return parse_optional(name);
-                } else if (boost::starts_with(
-                               boost::make_iterator_range(pos, end),
-                               PLACEHOLDER_END))
-                {
-                    pos += PLACEHOLDER_END.size();
+                } else if (startswith(pos, end, PH_END)) {
+                    pos += PH_END.size();
                     state = unknown;
                     return placeholder::required_t { name };
                 } else if (ch == ')' && std::next(pos) == end) {
@@ -220,8 +214,8 @@ public:
 
             placeholder::variadic_t ph;
             std::tie(ph.pattern, std::ignore) = parse({"]"});
-            if (boost::starts_with(boost::make_iterator_range(pos, end), PLACEHOLDER_END)) {
-                pos += PLACEHOLDER_END.size();
+            if (startswith(pos, end, PH_END)) {
+                pos += PH_END.size();
                 state = unknown;
                 return ph;
             } else if (*pos == ':') {
@@ -251,8 +245,8 @@ public:
 
             state = unknown;
             return ph;
-        } else if (boost::starts_with(boost::make_iterator_range(pos, end), PLACEHOLDER_END)) {
-            pos += PLACEHOLDER_END.size();
+        } else if (startswith(pos, end, PH_END)) {
+            pos += PH_END.size();
             return placeholder::variadic_t();
         }
 
@@ -280,10 +274,7 @@ public:
             bool matched = false;
             std::string breaker;
             for (auto it = breakers.begin(); it != breakers.end(); ++it) {
-                if (boost::starts_with(
-                        boost::make_iterator_range(pos, end),
-                        boost::make_iterator_range(it->begin(), it->end())))
-                {
+                if (startswith(pos, end, boost::make_iterator_range(it->begin(), it->end()))) {
                     matched = true;
                     breaker = *it;
                     break;
@@ -316,6 +307,17 @@ private:
             << std::string(err.pos, '~') << "^" << std::endl;
 
         throw Exception(std::distance(begin, pos), std::forward<Args>(args)...);
+    }
+
+    template<typename Iterator, class Range>
+    static
+    inline
+    bool
+    startswith(Iterator first, Iterator last, const Range& range) {
+        return boost::starts_with(
+            boost::make_iterator_range(first, last),
+            range
+        );
     }
 };
 
