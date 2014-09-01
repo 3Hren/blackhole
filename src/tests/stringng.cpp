@@ -200,8 +200,8 @@ private:
     placeholder::optional_t
     parse_optional(std::string name) {
         placeholder::optional_t ph { std::move(name), "", "" };
-        std::tie(ph.prefix, std::ignore) = parse({":"});
-        std::tie(ph.suffix, std::ignore) = parse({")s"});
+        std::tie(ph.prefix, std::ignore) = parse({ ":" });
+        std::tie(ph.suffix, std::ignore) = parse({ ")s" });
         state = whatever;
         return ph;
     }
@@ -214,18 +214,18 @@ private:
             pos++;
 
             placeholder::variadic_t ph;
-            std::tie(ph.pattern, std::ignore) = parse({"]"});
+            std::tie(ph.pattern, std::ignore) = parse({ "]" });
             if (startswith(pos, end, PH_END)) {
                 pos += PH_END.size();
                 state = whatever;
                 return ph;
             } else if (*pos == ':') {
                 pos++;
-                std::tie(ph.prefix, std::ignore) = parse({":"});
+                std::tie(ph.prefix, std::ignore) = parse({ ":" });
                 std::string breaker;
-                std::tie(ph.suffix, breaker) = parse({":", ")s"});
+                std::tie(ph.suffix, breaker) = parse({ ":", ")s" });
                 if (breaker == ":") {
-                    std::tie(ph.separator, std::ignore) = parse({")s"});
+                    std::tie(ph.separator, std::ignore) = parse({ ")s" });
                 }
                 state = whatever;
                 return ph;
@@ -237,11 +237,11 @@ private:
             pos++;
 
             placeholder::variadic_t ph;
-            std::tie(ph.prefix, std::ignore) = parse({":"});
+            std::tie(ph.prefix, std::ignore) = parse({ ":" });
             std::string breaker;
-            std::tie(ph.suffix, breaker) = parse({":", ")s"});
+            std::tie(ph.suffix, breaker) = parse({ ":", ")s" });
             if (breaker == ":") {
-                std::tie(ph.separator, std::ignore) = parse({")s"});
+                std::tie(ph.separator, std::ignore) = parse({ ")s" });
             }
 
             state = whatever;
