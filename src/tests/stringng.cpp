@@ -37,7 +37,9 @@ public:
 
 class invalid_placeholder_t : public error_t {
 public:
-    invalid_placeholder_t(uint pos) : error_t(pos, "invalid placeholder name") {}
+    invalid_placeholder_t(uint pos) :
+        error_t(pos, "invalid placeholder name (only [a-zA-Z0-9] allowed)")
+    {}
 };
 
 }
