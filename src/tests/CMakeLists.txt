@@ -83,6 +83,8 @@ SET(SOURCES_BASE
 
 SET(SOURCES_FORMATTER
     formatter/string
+    formatter/stringng
+    test_StringPatternParser
 )
 
 IF(ENABLE_ELASTICSEARCH)
@@ -98,13 +100,12 @@ IF(ENABLE_ELASTICSEARCH)
 ENDIF()
 
 SET(SOURCES_DEVELOP
-    stringng
 )
 
 SET(SOURCES
     ${SOURCE_MAIN}
 #    ${SOURCES_BASE}
-#    ${SOURCES_FORMATTER}
+    ${SOURCES_FORMATTER}
 #    ${SOURCES_ES}
     ${SOURCES_DEVELOP}
 )

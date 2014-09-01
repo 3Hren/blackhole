@@ -1,6 +1,6 @@
 #include <blackhole/formatter/string/parser.hpp>
 
-#include "global.hpp"
+#include "../global.hpp"
 
 using namespace blackhole::formatter::string;
 
