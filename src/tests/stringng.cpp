@@ -8,6 +8,12 @@
 
 #include "global.hpp"
 
+namespace blackhole {
+
+namespace formatter {
+
+namespace string  {
+
 namespace parser {
 
 class error_t : public std::runtime_error {
@@ -15,7 +21,6 @@ class error_t : public std::runtime_error {
     std::string inspect;
 
 public:
-
     error_t(uint pos, const std::string& pattern, const std::string& reason) :
         std::runtime_error("parser error: " + reason),
         pos(pos),
@@ -336,6 +341,14 @@ private:
         );
     }
 };
+
+} // namespace string
+
+} // namespace formatter
+
+} // namespace blackhole
+
+using namespace blackhole::formatter::string;
 
 TEST(parser_t, Literal) {
     parser_t parser("literal");
