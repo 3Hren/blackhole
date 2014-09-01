@@ -437,25 +437,31 @@ TEST(parser_t, OptionalPlaceholder) {
     EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
+namespace testing {
+
+struct optional_helper_t {
+    std::string pattern;
+    placeholder::optional_t expected;
+};
+
+}
+
 TEST(parser_t, OptionalPlaceholderWithPrefix) {
-    static const struct {
-        std::string pattern;
-        placeholder::optional_t expected;
-    } FIXTURES[] = {
+    const std::vector<testing::optional_helper_t> fixtures = {
         { "%(id:/:)s", { "id", "/", "" } },
         { "%(id://:)s", { "id", "//", "" } },
     };
 
-    for (auto fixture : FIXTURES) {
-        parser_t parser(fixture.pattern);
+    for (auto it = fixtures.begin(); it != fixtures.end(); ++it) {
+        parser_t parser(it->pattern);
 
         auto token = parser.next();
 
         ASSERT_NO_THROW(boost::get<placeholder::optional_t>(token));
         auto placeholder = boost::get<placeholder::optional_t>(token);
-        EXPECT_EQ(fixture.expected.name, placeholder.name);
-        EXPECT_EQ(fixture.expected.prefix, placeholder.prefix);
-        EXPECT_EQ(fixture.expected.suffix, placeholder.suffix);
+        EXPECT_EQ(it->expected.name, placeholder.name);
+        EXPECT_EQ(it->expected.prefix, placeholder.prefix);
+        EXPECT_EQ(it->expected.suffix, placeholder.suffix);
 
         EXPECT_THROW(parser.next(), parser::exhausted_t);
     }
