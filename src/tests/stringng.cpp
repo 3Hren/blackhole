@@ -236,7 +236,7 @@ private:
             return ph;
         } else if (startswith(pos, end, PH_END)) {
             pos += PH_END.size();
-//            state = whatever;
+            state = whatever;
             return placeholder::variadic_t();
         }
 
@@ -534,6 +534,24 @@ TEST(parser_t, VariadicPlaceholder) {
     EXPECT_EQ("", placeholder.suffix);
     EXPECT_EQ("%k: %v", placeholder.pattern);
     EXPECT_EQ(", ", placeholder.separator);
+
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
+}
+
+TEST(parser_t, VariadicPlaceholderFollowedByLiteral) {
+    parser_t parser("%(...)s is great!");
+
+    auto token = parser.next();
+    auto placeholder = boost::get<placeholder::variadic_t>(token);
+
+    EXPECT_EQ("", placeholder.prefix);
+    EXPECT_EQ("", placeholder.suffix);
+    EXPECT_EQ("%k: %v", placeholder.pattern);
+    EXPECT_EQ(", ", placeholder.separator);
+
+    token = parser.next();
+    ASSERT_NO_THROW(boost::get<literal_t>(token));
+    EXPECT_EQ(" is great!", boost::get<literal_t>(token).value);
 
     EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
