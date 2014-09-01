@@ -8,6 +8,25 @@
 
 #include "global.hpp"
 
+namespace parser {
+
+class error_t : public std::runtime_error {
+public:
+    const uint pos;
+
+    error_t(uint pos, const std::string& reason) :
+        std::runtime_error("parser error: " + reason),
+        pos(pos)
+    {}
+};
+
+class exhausted_t : public error_t {
+public:
+    exhausted_t(uint pos) : error_t(pos, "exhausted state") {}
+};
+
+}
+
 struct literal_t {
     std::string value;
 };
@@ -59,13 +78,15 @@ class parser_t {
 
     std::string pattern;
     std::string::const_iterator pos;
-    std::string::const_iterator end;
+    const std::string::const_iterator begin;
+    const std::string::const_iterator end;
     state_t state;
 
 public:
     parser_t(std::string pattern) :
         pattern(std::move(pattern)),
         pos(this->pattern.begin()),
+        begin(this->pattern.begin()),
         end(this->pattern.end()),
         state(unknown)
     {}
@@ -73,7 +94,7 @@ public:
     token_t
     next() {
         if (pos == end) {
-            throw std::runtime_error("EOF");
+            throw_<parser::exhausted_t>();
         }
 
         switch (state) {
@@ -84,7 +105,7 @@ public:
         case placeholder:
             return parse_placeholder();
         case broken:
-            throw std::runtime_error("broken parser");
+            throw parser::error_t(0, "@todo");
         default:
             BOOST_ASSERT(false);
         }
@@ -122,7 +143,10 @@ public:
 
     token_t
     parse_placeholder() {
-        if (boost::starts_with(boost::make_iterator_range(pos, end), PLACEHOLDER_VARIADIC)) {
+        if (boost::starts_with(
+                boost::make_iterator_range(pos, end),
+                PLACEHOLDER_VARIADIC))
+        {
             pos += PLACEHOLDER_VARIADIC.size();
             return parse_variadic();
         }
@@ -137,26 +161,27 @@ public:
                 if (ch == ':') {
                     pos++;
 
-                    placeholder::optional_t placeholder;
-                    placeholder.name = name;
-                    std::tie(placeholder.prefix, std::ignore) = parse({ ":" });
-                    std::tie(placeholder.suffix, std::ignore) = parse({ ")s" });
+                    placeholder::optional_t ph;
+                    ph.name = name;
+                    std::tie(ph.prefix, std::ignore) = parse({":"});
+                    std::tie(ph.suffix, std::ignore) = parse({")s"});
                     state = unknown;
-                    return placeholder;
+                    return ph;
                 } else if (boost::starts_with(boost::make_iterator_range(pos, end), PLACEHOLDER_END)) {
                     pos += PLACEHOLDER_END.size();
                     state = unknown;
-                    return token_t(placeholder::required_t { name });
+                    return placeholder::required_t { name };
                 } else {
                     state = broken;
-                    throw std::runtime_error("invalid placeholder name");
+                    throw parser::error_t(0, "@todo");
                 }
             }
 
             pos++;
         }
 
-        return token_t(placeholder::required_t { name });
+        state = broken;
+        throw parser::error_t(0, "@todo");
     }
 
     placeholder::variadic_t
@@ -168,34 +193,34 @@ public:
             pos++;
 
             placeholder::variadic_t ph;
-            std::tie(ph.pattern, std::ignore) = parse({ "]" });
+            std::tie(ph.pattern, std::ignore) = parse({"]"});
             if (boost::starts_with(boost::make_iterator_range(pos, end), PLACEHOLDER_END)) {
                 pos += PLACEHOLDER_END.size();
                 state = unknown;
                 return ph;
             } else if (*pos == ':') {
                 pos++;
-                std::tie(ph.prefix, std::ignore) = parse({ ":" });
+                std::tie(ph.prefix, std::ignore) = parse({":"});
                 std::string breaker;
-                std::tie(ph.suffix, breaker) = parse({ ":", ")s" });
+                std::tie(ph.suffix, breaker) = parse({":", ")s"});
                 if (breaker == ":") {
-                    std::tie(ph.separator, std::ignore) = parse({ ")s" });
+                    std::tie(ph.separator, std::ignore) = parse({")s"});
                 }
                 state = unknown;
                 return ph;
             } else {
                 state = broken;
-                throw std::runtime_error("invalid format");
+                throw parser::error_t(0, "@todo");
             }
         } else if (*pos == ':') {
             pos++;
 
             placeholder::variadic_t ph;
-            std::tie(ph.prefix, std::ignore) = parse({ ":" });
+            std::tie(ph.prefix, std::ignore) = parse({":"});
             std::string breaker;
-            std::tie(ph.suffix, breaker) = parse({ ":", ")s" });
+            std::tie(ph.suffix, breaker) = parse({":", ")s"});
             if (breaker == ":") {
-                std::tie(ph.separator, std::ignore) = parse({ ")s" });
+                std::tie(ph.separator, std::ignore) = parse({")s"});
             }
 
             state = unknown;
@@ -206,15 +231,20 @@ public:
         }
 
         state = broken;
-        throw std::runtime_error("invalid format");
+        throw parser::error_t(0, "@todo");
     }
 
     std::tuple<std::string, std::string>
-    parse(std::initializer_list<std::string> breakers) {
+    parse(std::initializer_list<std::string> breakers,
+          std::function<int(int)> match = ::isprint) {
         std::string result;
         bool escaped = false;
         while (pos != end) {
             const char ch = *pos;
+            if (!match(ch)) {
+                throw parser::error_t(0, "@todo");
+            }
+
             if (ch == '\\') {
                 pos++;
                 escaped = true;
@@ -224,8 +254,9 @@ public:
             bool matched = false;
             std::string breaker;
             for (auto it = breakers.begin(); it != breakers.end(); ++it) {
-                if (boost::starts_with(boost::make_iterator_range(pos, end),
-                                       boost::make_iterator_range(it->begin(), it->end())))
+                if (boost::starts_with(
+                        boost::make_iterator_range(pos, end),
+                        boost::make_iterator_range(it->begin(), it->end())))
                 {
                     matched = true;
                     breaker = *it;
@@ -246,6 +277,18 @@ public:
         state = broken;
         throw std::runtime_error("invalid format");
     }
+
+private:
+    template<class Exception, class... Args>
+    void throw_(Args&&... args) {
+        auto err = Exception(std::distance(begin, pos), std::forward<Args>(args)...);
+        std::cout
+            << err.what() << std::endl
+            << std::string(begin, end) << std::endl
+            << std::string(err.pos, '~') << "^" << std::endl;
+
+        throw Exception(std::distance(begin, pos), std::forward<Args>(args)...);
+    }
 };
 
 TEST(parser_t, Literal) {
@@ -256,7 +299,7 @@ TEST(parser_t, Literal) {
     ASSERT_NO_THROW(boost::get<literal_t>(token));
     EXPECT_EQ("literal", boost::get<literal_t>(token).value);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, RequiredPlaceholder) {
@@ -268,6 +311,20 @@ TEST(parser_t, RequiredPlaceholder) {
     EXPECT_EQ("id", boost::get<placeholder::required_t>(token).name);
 
     EXPECT_THROW(parser.next(), std::runtime_error);
+}
+
+TEST(parser_t, ThrowsExceptionIfRequiredPlaceholderIsNotFullyClosed) {
+    parser_t parser("%(id");
+    EXPECT_THROW(parser.next(), parser::error_t);
+    EXPECT_THROW(parser.next(), parser::error_t);
+}
+
+TEST(parser_t, ThrowsExceptionIfRequiredPlaceholderIsNotPartiallyClosed) {
+    parser_t parser("%(id)");
+    parser.next();
+    parser.next();
+//    EXPECT_THROW(parser.next(), parser::error::invalid_format_t);
+//    EXPECT_THROW(parser.next(), parser::error::out_of_range_t);
 }
 
 TEST(parser_t, ThrowsExceptionIfRequiredPlaceholderHasInvalidSymbols) {
@@ -282,8 +339,8 @@ TEST(parser_t, ThrowsExceptionIfRequiredPlaceholderHasInvalidSymbols) {
     for (auto it = invalid.begin(); it != invalid.end(); ++it) {
         parser_t parser(*it);
 
-        EXPECT_THROW(parser.next(), std::runtime_error);
-        EXPECT_THROW(parser.next(), std::runtime_error);
+        EXPECT_THROW(parser.next(), parser::error_t);
+        EXPECT_THROW(parser.next(), parser::error_t);
     }
 }
 
