@@ -558,7 +558,7 @@ TEST(parser_t, VariadicPlaceholderFollowedByLiteral) {
     EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
-TEST(parser_t, InvalidVariadicPlaceholder) {
+TEST(parser_t, ThrowsExceptionOnIllformedVariadicPlaceholder) {
     EXPECT_THROW(parser_t("%(...").next(), parser::illformed_t);
     EXPECT_THROW(parser_t("%(....").next(), parser::illformed_t);
 }
