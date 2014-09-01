@@ -4,12 +4,7 @@
   * [Log into the file with rotation](#log-into-the-files-with-rotation)
 
 ## The simplest example
-Writing to log with the default settings of Blackhole.
-
-By default, Blackhole initializes and configures logger `root` with single frontend, configured like this:
-
-* Formatter: string with pattern `[%(timestamp)s] [%(severity)s]: %(message)s`;
-* Sink: `stream` with `stdout` output.
+Writing log to `stdout` with minimal settings.
 
 The complete example code:
 

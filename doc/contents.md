@@ -16,3 +16,4 @@
   * [Registration of sinks and formatters](registration-rules.md)
   * [Passing attributes to the macro](passing-attributes.md)
   * [Writing logs to Logstash](logstash-logging.md)
+  * [Messages filtering](messages-filtering.md)
