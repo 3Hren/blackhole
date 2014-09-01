@@ -10,7 +10,6 @@
 #include "blackhole/detail/stream/stream.hpp"
 #include "blackhole/formatter/base.hpp"
 #include "blackhole/formatter/map/value.hpp"
-#include "blackhole/formatter/string/builder.hpp"
 #include "blackhole/formatter/string/config.hpp"
 #include "blackhole/formatter/string/parser.hpp"
 #include "blackhole/record.hpp"
@@ -20,14 +19,32 @@ namespace blackhole {
 
 namespace formatter {
 
-class visitor_t : public boost::static_visitor<> {
-    typedef aux::attachable_ostringstream stickystream_t;
+class variadic_visitor_t : public boost::static_visitor<> {
+    std::ostringstream& stream;
 
-    stickystream_t& stream;
+public:
+    variadic_visitor_t(std::ostringstream& stream) :
+        stream(stream)
+    {}
+
+    template<typename T>
+    void operator()(const T& value) const {
+        stream << value;
+    }
+
+    void operator()(const std::string& value) const {
+        stream << "'" << value << "'";
+    }
+};
+
+
+class visitor_t : public boost::static_visitor<> {
+    blackhole::aux::attachable_ostringstream& stream;
     const mapping::value_t& mapper;
     const attribute::set_view_t& view;
+
 public:
-    visitor_t(stickystream_t& stream,
+    visitor_t(blackhole::aux::attachable_ostringstream& stream,
               const mapping::value_t& mapper,
               const attribute::set_view_t& view) :
         stream(stream),
@@ -67,7 +84,7 @@ public:
             //!@todo: This code needs some optimization love.
             std::ostringstream stream;
             stream << "'" << name << "': ";
-            string::builder::variadic_visitor_t visitor(stream);
+            variadic_visitor_t visitor(stream);
             boost::apply_visitor(visitor, attribute.value);
             passed.push_back(stream.str());
         }
@@ -135,7 +152,7 @@ struct factory_traits<formatter::string_t> {
     typedef formatter::string_t::config_type config_type;
 
     static void map_config(const aux::extractor<formatter::string_t>& ex, config_type& cfg) {
-        cfg.pattern = ex["pattern"].get<std::string>();
+        ex["pattern"].to(cfg.pattern);
     }
 };
 

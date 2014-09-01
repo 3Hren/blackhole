@@ -65,7 +65,6 @@ SET(SOURCES_BASE
     test_NullSink
     test_ScopedAttributes
     test_StreamSink
-    test_StringPatternParser
     test_SyslogSink
     test_Traits
     test_Utils
@@ -82,9 +81,8 @@ SET(SOURCES_BASE
 )
 
 SET(SOURCES_FORMATTER
+    formatter/parser
     formatter/string
-    formatter/stringng
-    test_StringPatternParser
 )
 
 IF(ENABLE_ELASTICSEARCH)
@@ -104,9 +102,9 @@ SET(SOURCES_DEVELOP
 
 SET(SOURCES
     ${SOURCE_MAIN}
-#    ${SOURCES_BASE}
+    ${SOURCES_BASE}
     ${SOURCES_FORMATTER}
-#    ${SOURCES_ES}
+    ${SOURCES_ES}
     ${SOURCES_DEVELOP}
 )
 
