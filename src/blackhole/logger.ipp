@@ -115,7 +115,7 @@ BLACKHOLE_API
 record_t
 logger_base_t::open_record(attribute::set_t attributes) const {
     if (enabled() && !state.frontends.empty()) {
-        // attributes.insert(this_process::get_pid());
+        //!@todo: attributes.insert(this_process::get_pid());
         attributes.insert(
 #ifdef BLACKHOLE_HAS_LWP
             keyword::lwp() = syscall(SYS_gettid)
