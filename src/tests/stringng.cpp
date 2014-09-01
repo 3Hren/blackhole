@@ -20,9 +20,24 @@ public:
     {}
 };
 
+class broken_t : public error_t {
+public:
+    broken_t(uint pos) : error_t(pos, "broken parser") {}
+};
+
 class exhausted_t : public error_t {
 public:
     exhausted_t(uint pos) : error_t(pos, "exhausted state") {}
+};
+
+class illformed_t : public error_t {
+public:
+    illformed_t(uint pos) : error_t(pos, "illformed pattern") {}
+};
+
+class invalid_placeholder_t : public error_t {
+public:
+    invalid_placeholder_t(uint pos) : error_t(pos, "invalid placeholder name") {}
 };
 
 }
@@ -93,6 +108,10 @@ public:
 
     token_t
     next() {
+        if (state == broken) {
+            throw_<parser::broken_t>();
+        }
+
         if (pos == end) {
             throw_<parser::exhausted_t>();
         }
@@ -105,7 +124,7 @@ public:
         case placeholder:
             return parse_placeholder();
         case broken:
-            throw parser::error_t(0, "@todo");
+            throw_<parser::broken_t>();
         default:
             BOOST_ASSERT(false);
         }
@@ -160,28 +179,30 @@ public:
             } else {
                 if (ch == ':') {
                     pos++;
-
-                    placeholder::optional_t ph;
-                    ph.name = name;
-                    std::tie(ph.prefix, std::ignore) = parse({":"});
-                    std::tie(ph.suffix, std::ignore) = parse({")s"});
-                    state = unknown;
-                    return ph;
+                    return parse_optional(name);
                 } else if (boost::starts_with(boost::make_iterator_range(pos, end), PLACEHOLDER_END)) {
                     pos += PLACEHOLDER_END.size();
                     state = unknown;
                     return placeholder::required_t { name };
                 } else {
                     state = broken;
-                    throw parser::error_t(0, "@todo");
+                    throw_<parser::invalid_placeholder_t>();
                 }
             }
 
             pos++;
         }
 
-        state = broken;
-        throw parser::error_t(0, "@todo");
+        throw_<parser::illformed_t>();
+    }
+
+    placeholder::optional_t
+    parse_optional(std::string name) {
+        placeholder::optional_t ph { std::move(name), "", "" };
+        std::tie(ph.prefix, std::ignore) = parse({":"});
+        std::tie(ph.suffix, std::ignore) = parse({")s"});
+        state = unknown;
+        return ph;
     }
 
     placeholder::variadic_t
@@ -280,7 +301,8 @@ public:
 
 private:
     template<class Exception, class... Args>
-    void throw_(Args&&... args) {
+    void throw_(Args&&... args) __attribute__((noreturn)) {
+        state = broken;
         auto err = Exception(std::distance(begin, pos), std::forward<Args>(args)...);
         std::cout
             << err.what() << std::endl
@@ -310,21 +332,19 @@ TEST(parser_t, RequiredPlaceholder) {
     ASSERT_NO_THROW(boost::get<placeholder::required_t>(token));
     EXPECT_EQ("id", boost::get<placeholder::required_t>(token).name);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, ThrowsExceptionIfRequiredPlaceholderIsNotFullyClosed) {
     parser_t parser("%(id");
-    EXPECT_THROW(parser.next(), parser::error_t);
-    EXPECT_THROW(parser.next(), parser::error_t);
+    EXPECT_THROW(parser.next(), parser::illformed_t);
+    EXPECT_THROW(parser.next(), parser::broken_t);
 }
 
 TEST(parser_t, ThrowsExceptionIfRequiredPlaceholderIsNotPartiallyClosed) {
     parser_t parser("%(id)");
-    parser.next();
-    parser.next();
-//    EXPECT_THROW(parser.next(), parser::error::invalid_format_t);
-//    EXPECT_THROW(parser.next(), parser::error::out_of_range_t);
+    EXPECT_THROW(parser.next(), parser::invalid_placeholder_t);
+    EXPECT_THROW(parser.next(), parser::broken_t);
 }
 
 TEST(parser_t, ThrowsExceptionIfRequiredPlaceholderHasInvalidSymbols) {
