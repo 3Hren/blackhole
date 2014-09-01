@@ -78,8 +78,7 @@ public:
 
 class string_t : public base_t {
     const std::string pattern;
-    const std::vector<string::builder::type> formatters;
-    std::vector<string::token_t> tokens;
+    const std::vector<string::token_t> tokens;
 
 public:
     typedef string::config_t config_type;
@@ -90,23 +89,13 @@ public:
 
     string_t(const std::string& pattern) :
         pattern(pattern),
-        formatters(string::formatter_builder_t::build(pattern))
-    {
-        string::parser_t parser(pattern);
-        while (auto token = parser.next()) {
-            tokens.push_back(token.get());
-        }
-    }
+        tokens(tokenize(pattern))
+    {}
 
     string_t(const config_type& config) :
         pattern(config.pattern),
-        formatters(string::formatter_builder_t::build(config.pattern))
-    {
-        string::parser_t parser(pattern);
-        while (auto token = parser.next()) {
-            tokens.push_back(token.get());
-        }
-    }
+        tokens(tokenize(config.pattern))
+    {}
 
     std::string format(const record_t& record) const {
         std::string buffer;
@@ -122,6 +111,20 @@ public:
         } catch (const error_t& err) {
             throw error_t("bad format string '%s': %s", pattern, err.what());
         }
+    }
+
+private:
+    static
+    std::vector<string::token_t>
+    tokenize(const std::string& pattern) {
+        std::vector<string::token_t> tokens;
+
+        string::parser_t parser(pattern);
+        while (auto token = parser.next()) {
+            tokens.push_back(token.get());
+        }
+
+        return tokens;
     }
 };
 
