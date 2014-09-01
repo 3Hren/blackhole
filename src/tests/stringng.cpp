@@ -306,7 +306,8 @@ public:
 
 private:
     template<class Exception, class... Args>
-    void throw_(Args&&... args) __attribute__((noreturn)) {
+    __attribute__((noreturn))
+    void throw_(Args&&... args) {
         state = broken;
         auto err = Exception(std::distance(begin, pos), std::forward<Args>(args)...);
         std::cout
