@@ -180,12 +180,16 @@ public:
                 if (ch == ':') {
                     pos++;
                     return parse_optional(name);
-                } else if (boost::starts_with(boost::make_iterator_range(pos, end), PLACEHOLDER_END)) {
+                } else if (boost::starts_with(
+                               boost::make_iterator_range(pos, end),
+                               PLACEHOLDER_END))
+                {
                     pos += PLACEHOLDER_END.size();
                     state = unknown;
                     return placeholder::required_t { name };
+                } else if (ch == ')' && std::next(pos) == end) {
+                    throw_<parser::illformed_t>();
                 } else {
-                    state = broken;
                     throw_<parser::invalid_placeholder_t>();
                 }
             }
@@ -343,7 +347,7 @@ TEST(parser_t, ThrowsExceptionIfRequiredPlaceholderIsNotFullyClosed) {
 
 TEST(parser_t, ThrowsExceptionIfRequiredPlaceholderIsNotPartiallyClosed) {
     parser_t parser("%(id)");
-    EXPECT_THROW(parser.next(), parser::invalid_placeholder_t);
+    EXPECT_THROW(parser.next(), parser::illformed_t);
     EXPECT_THROW(parser.next(), parser::broken_t);
 }
 
