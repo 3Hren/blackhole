@@ -6,6 +6,7 @@
 #include <string>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/optional.hpp>
 #include <boost/variant.hpp>
 
 #include <blackhole/detail/config/noexcept.hpp>
@@ -134,14 +135,14 @@ public:
         state(whatever)
     {}
 
-    token_t
+    boost::optional<token_t>
     next() {
         if (state == broken) {
             throw_<parser::broken_t>();
         }
 
         if (pos == end) {
-            throw_<parser::exhausted_t>();
+            return boost::optional<token_t>();
         }
 
         switch (state) {
@@ -159,7 +160,7 @@ public:
     }
 
 private:
-    token_t
+    boost::optional<token_t>
     parse_whatever() {
         if (starts_with(pos, end, PH_BEGIN)) {
             pos += PH_BEGIN.size();
@@ -171,7 +172,7 @@ private:
         return next();
     }
 
-    literal_t
+    token_t
     parse_literal() {
         literal_t literal;
 

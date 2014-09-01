@@ -92,12 +92,9 @@ public:
         pattern(pattern),
         formatters(string::formatter_builder_t::build(pattern))
     {
-        try {
-            string::parser_t parser(pattern);
-            while (true) {
-                tokens.push_back(parser.next());
-            }
-        } catch (const string::parser::exhausted_t&) {
+        string::parser_t parser(pattern);
+        while (auto token = parser.next()) {
+            tokens.push_back(token.get());
         }
     }
 
@@ -105,12 +102,9 @@ public:
         pattern(config.pattern),
         formatters(string::formatter_builder_t::build(config.pattern))
     {
-        try {
-            string::parser_t parser(pattern);
-            while (true) {
-                tokens.push_back(parser.next());
-            }
-        } catch (const string::parser::exhausted_t&) {
+        string::parser_t parser(pattern);
+        while (auto token = parser.next()) {
+            tokens.push_back(token.get());
         }
     }
 
