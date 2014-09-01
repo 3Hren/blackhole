@@ -365,8 +365,8 @@ TEST(parser_t, ThrowsExceptionIfRequiredPlaceholderHasInvalidSymbols) {
     for (auto it = invalid.begin(); it != invalid.end(); ++it) {
         parser_t parser(*it);
 
-        EXPECT_THROW(parser.next(), parser::error_t);
-        EXPECT_THROW(parser.next(), parser::error_t);
+        EXPECT_THROW(parser.next(), parser::invalid_placeholder_t);
+        EXPECT_THROW(parser.next(), parser::broken_t);
     }
 }
 
