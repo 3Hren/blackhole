@@ -11,34 +11,53 @@
 namespace parser {
 
 class error_t : public std::runtime_error {
-public:
     const uint pos;
+    std::string inspect;
 
-    error_t(uint pos, const std::string& reason) :
+public:
+
+    error_t(uint pos, const std::string& pattern, const std::string& reason) :
         std::runtime_error("parser error: " + reason),
-        pos(pos)
-    {}
+        pos(pos),
+        inspect("parser error: " + reason)
+    {
+        inspect.append("\n");
+        inspect.append(pattern);
+        inspect.append("\n");
+        inspect.append(std::string(pos, '~'));
+        inspect.append("^");
+    }
+
+    std::string detail() const {
+        return inspect;
+    }
 };
 
 class broken_t : public error_t {
 public:
-    broken_t(uint pos) : error_t(pos, "broken parser") {}
+    broken_t(uint pos, const std::string& pattern) :
+        error_t(pos, pattern, "broken parser")
+    {}
 };
 
 class exhausted_t : public error_t {
 public:
-    exhausted_t(uint pos) : error_t(pos, "exhausted state") {}
+    exhausted_t(uint pos, const std::string& pattern) :
+        error_t(pos, pattern, "exhausted state")
+    {}
 };
 
 class illformed_t : public error_t {
 public:
-    illformed_t(uint pos) : error_t(pos, "illformed pattern") {}
+    illformed_t(uint pos, const std::string& pattern) :
+        error_t(pos, pattern, "illformed pattern")
+    {}
 };
 
 class invalid_placeholder_t : public error_t {
 public:
-    invalid_placeholder_t(uint pos) :
-        error_t(pos, "invalid placeholder name (only [a-zA-Z0-9] allowed)")
+    invalid_placeholder_t(uint pos, const std::string& pattern) :
+        error_t(pos, pattern, "invalid placeholder name (only [a-zA-Z0-9] allowed)")
     {}
 };
 
@@ -226,8 +245,7 @@ private:
                     state = whatever;
                     return ph;
                 } else {
-                    state = broken;
-                    throw parser::error_t(0, "@todo");
+                    throw_<parser::illformed_t>();
                 }
             } else if (*pos == ':') {
                 pos++;
@@ -263,7 +281,7 @@ private:
         while (pos != end) {
             const char ch = *pos;
             if (!match(ch)) {
-                throw parser::error_t(0, "@todo");
+                throw_<parser::illformed_t>();
             }
 
             if (ch == '\\') {
@@ -292,8 +310,7 @@ private:
             pos++;
         }
 
-        state = broken;
-        throw std::runtime_error("invalid format");
+        throw_<parser::illformed_t>();
     }
 
 private:
@@ -301,13 +318,11 @@ private:
     __attribute__((noreturn))
     void throw_(Args&&... args) {
         state = broken;
-        auto err = Exception(std::distance(begin, pos), std::forward<Args>(args)...);
-        std::cout
-            << err.what() << std::endl
-            << std::string(begin, end) << std::endl
-            << std::string(err.pos, '~') << "^" << std::endl;
-
-        throw Exception(std::distance(begin, pos), std::forward<Args>(args)...);
+        throw Exception(
+            std::distance(begin, pos),
+            std::string(begin, end),
+            std::forward<Args>(args)...
+        );
     }
 
     template<typename Iterator, class Range>
@@ -484,6 +499,11 @@ TEST(parser_t, OptionalPlaceholderWithSuffix) {
     EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
+TEST(parser_t, ThrowsWhenOptionalPlaceholderIsIllformed) {
+    EXPECT_THROW(parser_t("%(id::").next(), parser::illformed_t);
+}
+
+
 TEST(parser_t, OptionalPlaceholderWithPrefixAndSuffix) {
     parser_t parser("%(id:/:/)s");
 
@@ -659,6 +679,13 @@ TEST(parser_t, VariadicPlaceholderWithPattern) {
     EXPECT_EQ(", ", placeholder.separator);
 
     EXPECT_THROW(parser.next(), parser::exhausted_t);
+}
+
+TEST(parser_t, ThrowsExceptionWhenVariadicPlaceholderIllformedAfterPattern) {
+    parser_t parser("%(...[%k=%v].)s");
+
+    EXPECT_THROW(parser.next(), parser::illformed_t);
+    EXPECT_THROW(parser.next(), parser::broken_t);
 }
 
 TEST(parser_t, VariadicPlaceholderWithPatternPrefixSuffix) {
