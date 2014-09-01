@@ -221,12 +221,7 @@ private:
                 return ph;
             } else if (*pos == ':') {
                 pos++;
-                std::tie(ph.prefix, std::ignore) = parse({ ":" });
-                std::string breaker;
-                std::tie(ph.suffix, breaker) = parse({ ":", ")s" });
-                if (breaker == ":") {
-                    std::tie(ph.separator, std::ignore) = parse({ ")s" });
-                }
+                parse_variadic_options(ph);
                 state = whatever;
                 return ph;
             } else {
@@ -235,23 +230,27 @@ private:
             }
         } else if (*pos == ':') {
             pos++;
-
             placeholder::variadic_t ph;
-            std::tie(ph.prefix, std::ignore) = parse({ ":" });
-            std::string breaker;
-            std::tie(ph.suffix, breaker) = parse({ ":", ")s" });
-            if (breaker == ":") {
-                std::tie(ph.separator, std::ignore) = parse({ ")s" });
-            }
-
+            parse_variadic_options(ph);
             state = whatever;
             return ph;
         } else if (startswith(pos, end, PH_END)) {
             pos += PH_END.size();
+//            state = whatever;
             return placeholder::variadic_t();
         }
 
         throw_<parser::illformed_t>();
+    }
+
+    void
+    parse_variadic_options(placeholder::variadic_t& ph) {
+        std::tie(ph.prefix, std::ignore) = parse({ ":" });
+        std::string breaker;
+        std::tie(ph.suffix, breaker) = parse({ ":", ")s" });
+        if (breaker == ":") {
+            std::tie(ph.separator, std::ignore) = parse({ ")s" });
+        }
     }
 
     std::tuple<std::string, std::string>
