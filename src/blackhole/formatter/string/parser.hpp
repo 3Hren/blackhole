@@ -259,10 +259,34 @@ private:
                 pos += PH_END.size();
                 state = whatever;
                 return placeholder::variadic_t();
+            } else if (is_variadic_legacy(*pos)) {
+                std::cout << "Warning: using legacy '"
+                          << *pos
+                          << "' character in variadic placeholder is deprecated"
+                          << std::endl;
+
+                while (is_variadic_legacy(*pos)) {
+                    pos++;
+                }
+
+                if (starts_with(pos, end, PH_END)) {
+                    pos += PH_END.size();
+                    ph.pattern = "'%k': %v";
+                    state = whatever;
+                    return ph;
+                } else {
+                    throw_<parser::illformed_t>();
+                }
             }
         }
 
         throw_<parser::illformed_t>();
+    }
+
+    static
+    bool
+    is_variadic_legacy(char ch) {
+        return ch == 'L' || ch == 'E' || ch == 'G' || ch == 'T' || ch == 'U';
     }
 
     void

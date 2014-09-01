@@ -382,3 +382,24 @@ TEST(parser_t, VariadicPlaceholderWithPatternPrefixSuffixSeparator) {
 
     EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
+
+TEST(parser_t, VariadicPlaceholderLegacy) {
+    parser_t parser("%(...L)s");
+
+    auto token = parser.next();
+    auto placeholder = boost::get<placeholder::variadic_t>(token);
+
+    EXPECT_EQ("", placeholder.prefix);
+    EXPECT_EQ("", placeholder.suffix);
+    EXPECT_EQ("'%k': %v", placeholder.pattern);
+    EXPECT_EQ(", ", placeholder.separator);
+
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
+}
+
+TEST(parser_t, ThrowsExceptionWhenVariadicPlaceholderLegacyIllformed) {
+    parser_t parser("%(...L");
+
+    EXPECT_THROW(parser.next(), parser::illformed_t);
+    EXPECT_THROW(parser.next(), parser::broken_t);
+}
