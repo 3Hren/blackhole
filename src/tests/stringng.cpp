@@ -18,20 +18,18 @@ namespace parser {
 
 class error_t : public std::runtime_error {
     const uint pos;
-    std::string inspect;
+    const std::string inspect;
 
 public:
     error_t(uint pos, const std::string& pattern, const std::string& reason) :
         std::runtime_error("parser error: " + reason),
         pos(pos),
-        inspect("parser error: " + reason)
-    {
-        inspect.append("\n");
-        inspect.append(pattern);
-        inspect.append("\n");
-        inspect.append(std::string(pos, '~'));
-        inspect.append("^");
-    }
+        inspect(
+            "parser error: " +  reason + "\n" +
+            pattern + "\n" +
+            std::string(pos, '~') + "^"
+        )
+    {}
 
     std::string detail() const {
         return inspect;
