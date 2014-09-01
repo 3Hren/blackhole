@@ -87,7 +87,7 @@ static const std::array<char, 3> PH_VARIADIC = {{ '.', '.', '.' }};
 
 class parser_t {
     enum state_t {
-        unknown,
+        whatever,
         literal,
         placeholder,
         broken
@@ -105,7 +105,7 @@ public:
         pos(this->pattern.begin()),
         begin(this->pattern.begin()),
         end(this->pattern.end()),
-        state(unknown)
+        state(whatever)
     {}
 
     token_t
@@ -119,8 +119,8 @@ public:
         }
 
         switch (state) {
-        case unknown:
-            return parse_unknown();
+        case whatever:
+            return parse_whatever();
         case literal:
             return parse_literal();
         case placeholder:
@@ -132,8 +132,9 @@ public:
         }
     }
 
+private:
     token_t
-    parse_unknown() {
+    parse_whatever() {
         if (startswith(pos, end, PH_BEGIN)) {
             pos += PH_BEGIN.size();
             state = placeholder;
@@ -181,7 +182,7 @@ public:
                     return parse_optional(name);
                 } else if (startswith(pos, end, PH_END)) {
                     pos += PH_END.size();
-                    state = unknown;
+                    state = whatever;
                     return placeholder::required_t { name };
                 } else if (ch == ')' && std::next(pos) == end) {
                     throw_<parser::illformed_t>();
@@ -201,7 +202,7 @@ public:
         placeholder::optional_t ph { std::move(name), "", "" };
         std::tie(ph.prefix, std::ignore) = parse({":"});
         std::tie(ph.suffix, std::ignore) = parse({")s"});
-        state = unknown;
+        state = whatever;
         return ph;
     }
 
@@ -216,7 +217,7 @@ public:
             std::tie(ph.pattern, std::ignore) = parse({"]"});
             if (startswith(pos, end, PH_END)) {
                 pos += PH_END.size();
-                state = unknown;
+                state = whatever;
                 return ph;
             } else if (*pos == ':') {
                 pos++;
@@ -226,7 +227,7 @@ public:
                 if (breaker == ":") {
                     std::tie(ph.separator, std::ignore) = parse({")s"});
                 }
-                state = unknown;
+                state = whatever;
                 return ph;
             } else {
                 state = broken;
@@ -243,7 +244,7 @@ public:
                 std::tie(ph.separator, std::ignore) = parse({")s"});
             }
 
-            state = unknown;
+            state = whatever;
             return ph;
         } else if (startswith(pos, end, PH_END)) {
             pos += PH_END.size();
