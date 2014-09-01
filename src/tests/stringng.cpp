@@ -214,8 +214,7 @@ public:
     placeholder::variadic_t
     parse_variadic() {
         if (pos == end) {
-            state = broken;
-            throw std::runtime_error("invalid format");
+            throw_<parser::illformed_t>();
         } else if (*pos == '[') {
             pos++;
 
@@ -383,7 +382,7 @@ TEST(parser_t, LiteralFollowedByRequiredPlaceholder) {
     ASSERT_NO_THROW(boost::get<placeholder::required_t>(token));
     EXPECT_EQ("id", boost::get<placeholder::required_t>(token).name);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, RequiredPlaceholderFollowedByLiteral) {
@@ -399,7 +398,7 @@ TEST(parser_t, RequiredPlaceholderFollowedByLiteral) {
     ASSERT_NO_THROW(boost::get<literal_t>(token));
     EXPECT_EQ(" == id", boost::get<literal_t>(token).value);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, RequiredPlaceholderSurroundedByLiterals) {
@@ -420,7 +419,7 @@ TEST(parser_t, RequiredPlaceholderSurroundedByLiterals) {
     ASSERT_NO_THROW(boost::get<literal_t>(token));
     EXPECT_EQ(" definitely an id", boost::get<literal_t>(token).value);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, OptionalPlaceholder) {
@@ -434,7 +433,7 @@ TEST(parser_t, OptionalPlaceholder) {
     EXPECT_EQ("", placeholder.prefix);
     EXPECT_EQ("", placeholder.suffix);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, OptionalPlaceholderWithPrefix) {
@@ -457,7 +456,7 @@ TEST(parser_t, OptionalPlaceholderWithPrefix) {
         EXPECT_EQ(fixture.expected.prefix, placeholder.prefix);
         EXPECT_EQ(fixture.expected.suffix, placeholder.suffix);
 
-        EXPECT_THROW(parser.next(), std::runtime_error);
+        EXPECT_THROW(parser.next(), parser::exhausted_t);
     }
 }
 
@@ -472,7 +471,7 @@ TEST(parser_t, OptionalPlaceholderWithSuffix) {
     EXPECT_EQ("", placeholder.prefix);
     EXPECT_EQ("/", placeholder.suffix);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, OptionalPlaceholderWithPrefixAndSuffix) {
@@ -486,7 +485,7 @@ TEST(parser_t, OptionalPlaceholderWithPrefixAndSuffix) {
     EXPECT_EQ("/", placeholder.prefix);
     EXPECT_EQ("/", placeholder.suffix);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, OptionalPlaceholderWithPrefixAndSuffixEscaped) {
@@ -500,7 +499,7 @@ TEST(parser_t, OptionalPlaceholderWithPrefixAndSuffixEscaped) {
     EXPECT_EQ(":", placeholder.prefix);
     EXPECT_EQ(":", placeholder.suffix);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, OptionalPlaceholderAny) {
@@ -514,7 +513,7 @@ TEST(parser_t, OptionalPlaceholderAny) {
     EXPECT_EQ("id=", placeholder.prefix);
     EXPECT_EQ("", placeholder.suffix);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, VariadicPlaceholder) {
@@ -528,13 +527,13 @@ TEST(parser_t, VariadicPlaceholder) {
     EXPECT_EQ("%k: %v", placeholder.pattern);
     EXPECT_EQ(", ", placeholder.separator);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, InvalidVariadicPlaceholder) {
     parser_t parser("%(...");
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::illformed_t);
 }
 
 TEST(parser_t, VariadicPlaceholderWithPrefix) {
@@ -548,7 +547,7 @@ TEST(parser_t, VariadicPlaceholderWithPrefix) {
     EXPECT_EQ("%k: %v", placeholder.pattern);
     EXPECT_EQ(", ", placeholder.separator);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, VariadicPlaceholderWithSuffix) {
@@ -562,7 +561,7 @@ TEST(parser_t, VariadicPlaceholderWithSuffix) {
     EXPECT_EQ("%k: %v", placeholder.pattern);
     EXPECT_EQ(", ", placeholder.separator);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, VariadicPlaceholderWithPrefixSuffix) {
@@ -576,7 +575,7 @@ TEST(parser_t, VariadicPlaceholderWithPrefixSuffix) {
     EXPECT_EQ("%k: %v", placeholder.pattern);
     EXPECT_EQ(", ", placeholder.separator);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, VariadicPlaceholderWithSeparator) {
@@ -590,7 +589,7 @@ TEST(parser_t, VariadicPlaceholderWithSeparator) {
     EXPECT_EQ("%k: %v", placeholder.pattern);
     EXPECT_EQ(".", placeholder.separator);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, VariadicPlaceholderWithPrefixSuffixSeparator) {
@@ -604,7 +603,7 @@ TEST(parser_t, VariadicPlaceholderWithPrefixSuffixSeparator) {
     EXPECT_EQ("%k: %v", placeholder.pattern);
     EXPECT_EQ(" ", placeholder.separator);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, VariadicPlaceholderWithPrefixSuffixBraceAndSeparator) {
@@ -618,7 +617,7 @@ TEST(parser_t, VariadicPlaceholderWithPrefixSuffixBraceAndSeparator) {
     EXPECT_EQ("%k: %v", placeholder.pattern);
     EXPECT_EQ(", ", placeholder.separator);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, VariadicPlaceholderWithPattern) {
@@ -632,7 +631,7 @@ TEST(parser_t, VariadicPlaceholderWithPattern) {
     EXPECT_EQ("%k=%v", placeholder.pattern);
     EXPECT_EQ(", ", placeholder.separator);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, VariadicPlaceholderWithPatternPrefixSuffix) {
@@ -646,7 +645,7 @@ TEST(parser_t, VariadicPlaceholderWithPatternPrefixSuffix) {
     EXPECT_EQ("%k=%v", placeholder.pattern);
     EXPECT_EQ(", ", placeholder.separator);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
 
 TEST(parser_t, VariadicPlaceholderWithPatternPrefixSuffixSeparator) {
@@ -660,5 +659,5 @@ TEST(parser_t, VariadicPlaceholderWithPatternPrefixSuffixSeparator) {
     EXPECT_EQ("%k=%v", placeholder.pattern);
     EXPECT_EQ(" ", placeholder.separator);
 
-    EXPECT_THROW(parser.next(), std::runtime_error);
+    EXPECT_THROW(parser.next(), parser::exhausted_t);
 }
