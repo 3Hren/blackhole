@@ -8,6 +8,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/variant.hpp>
 
+#include <blackhole/detail/config/noexcept.hpp>
+
 namespace blackhole {
 
 namespace formatter {
@@ -30,6 +32,8 @@ public:
             std::string(pos, '~') + "^"
         )
     {}
+
+    ~error_t() BLACKHOLE_NOEXCEPT {}
 
     std::string detail() const {
         return inspect;
