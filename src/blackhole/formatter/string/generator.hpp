@@ -90,7 +90,9 @@ public:
 
         if (!passed.empty()) {
             stream.rdbuf()->storage()->append(ph.prefix);
-            stream.rdbuf()->storage()->append(boost::algorithm::join(passed, ", "));
+            stream.rdbuf()->storage()->append(
+                boost::algorithm::join(passed, ph.separator)
+            );
             stream.rdbuf()->storage()->append(ph.suffix);
         }
     }

@@ -354,3 +354,34 @@ TEST(string_t, FormatVariadicEmptyWithPrefixSuffix) {
     formatter::string_t formatter(pattern);
     EXPECT_EQ("", formatter.format(record));
 }
+
+TEST(string_t, FormatVariadicEmptySeparator) {
+    record_t record;
+
+    std::string pattern("%(...::: | )s");
+    formatter::string_t formatter(pattern);
+    EXPECT_EQ("", formatter.format(record));
+}
+
+TEST(string_t, FormatVariadicSingleSeparator) {
+    record_t record;
+    record.insert({ "uuid", attribute_t("123-456") });
+
+    std::string pattern("%(...::: | )s");
+    formatter::string_t formatter(pattern);
+    EXPECT_EQ("'uuid': '123-456'", formatter.format(record));
+}
+
+TEST(string_t, FormatVariadicMultipleSeparator) {
+    record_t record;
+    record.insert({ "uuid", attribute_t("123-456") });
+    record.insert({ "message", attribute_t("le message") });
+
+    std::string pattern("%(...::: | )s");
+    formatter::string_t formatter(pattern);
+    auto actual = formatter.format(record);
+    EXPECT_TRUE(
+        "'uuid': '123-456' | 'message': 'le message'" == actual ||
+        "'message': 'le message' | 'uuid': '123-456'" == actual
+    );
+}
