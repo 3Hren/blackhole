@@ -19,20 +19,29 @@ namespace formatter {
 namespace string {
 
 class variadic_visitor_t : public boost::static_visitor<> {
+    const attribute::name_t& name;
+    const attribute::value_t& value;
     std::ostringstream& stream;
 
 public:
-    variadic_visitor_t(std::ostringstream& stream) :
+    variadic_visitor_t(const attribute::name_t& name,
+                       const attribute::value_t& value,
+                       std::ostringstream& stream) :
+        name(name),
+        value(value),
         stream(stream)
     {}
 
-    template<typename T>
-    void operator()(const T& value) const {
-        stream << value;
+    void operator()(const literal_t& literal) {
+        stream << literal.value;
     }
 
-    void operator()(const std::string& value) const {
-        stream << "'" << value << "'";
+    void operator()(const placeholder::variadic_t::key_t&) {
+        stream << name;
+    }
+
+    void operator()(const placeholder::variadic_t::value_t) {
+        stream << value;
     }
 };
 
@@ -78,14 +87,13 @@ public:
 
         //!@todo: 3. Call begin() & end() with parameter.
         for (auto it = view.begin(); it != view.end(); ++it) {
-            const std::string& name = it->first;
-            const attribute_t& attribute = it->second;
-
             //!@todo: 2. This code needs some optimization love.
             std::ostringstream stream;
-            stream << "'" << name << "': ";
-            variadic_visitor_t visitor(stream);
-            boost::apply_visitor(visitor, attribute.value);
+            variadic_visitor_t visitor(it->first, it->second.value, stream);
+            for (auto t = ph.pattern.begin(); t != ph.pattern.end(); ++t) {
+                boost::apply_visitor(visitor, *t);
+            }
+
             passed.push_back(stream.str());
         }
 

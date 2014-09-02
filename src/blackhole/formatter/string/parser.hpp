@@ -326,7 +326,6 @@ private:
             if (starts_with(it, end, "%k")) {
                 it++;
 
-                std::cout << "l=\"" << literal << "\", k" << std::endl;
                 if (!literal.empty()) {
                     ph.pattern.push_back(literal_t{ literal });
                     literal.clear();
@@ -336,7 +335,6 @@ private:
             } else if (starts_with(it, end, "%v")) {
                 it++;
 
-                std::cout << "l=\"" << literal << "\", v" << std::endl;
                 if (!literal.empty()) {
                     ph.pattern.push_back(literal_t{ literal });
                     literal.clear();
@@ -348,7 +346,6 @@ private:
         }
 
         if (!literal.empty()) {
-            std::cout << "l=" << literal << std::endl;
             ph.pattern.push_back(literal_t{ literal });
         }
     }
