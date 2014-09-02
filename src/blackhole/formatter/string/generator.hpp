@@ -21,12 +21,12 @@ namespace string {
 class variadic_visitor_t : public boost::static_visitor<> {
     const attribute::name_t& name;
     const attribute::value_t& value;
-    std::ostringstream& stream;
+    stickystream_t& stream;
 
 public:
     variadic_visitor_t(const attribute::name_t& name,
                        const attribute::value_t& value,
-                       std::ostringstream& stream) :
+                       stickystream_t& stream) :
         name(name),
         value(value),
         stream(stream)
@@ -81,27 +81,38 @@ public:
     }
 
     void operator()(const placeholder::variadic_t& ph) {
-        std::vector<std::string> passed;
-        passed.reserve(view.upper_size());
-
         //!@todo: 3. Call begin() & end() with parameter.
-        for (auto it = view.begin(); it != view.end(); ++it) {
-            //!@todo: 2. This code needs some optimization love.
-            std::ostringstream stream;
-            variadic_visitor_t visitor(it->first, it->second.value, stream);
-            for (auto t = ph.pattern.begin(); t != ph.pattern.end(); ++t) {
-                boost::apply_visitor(visitor, *t);
-            }
-
-            passed.push_back(stream.str());
+        if (view.empty()) {
+            return;
         }
 
-        if (!passed.empty()) {
-            stream.rdbuf()->storage()->append(ph.prefix);
-            stream.rdbuf()->storage()->append(
-                boost::algorithm::join(passed, ph.separator)
-            );
-            stream.rdbuf()->storage()->append(ph.suffix);
+        stream.rdbuf()->storage()->append(ph.prefix);
+
+        auto it = view.begin();
+        visit_variadic_pattern(it->first, it->second.value, ph, stream);
+        it++;
+
+        for (; it != view.end(); ++it) {
+            stream.rdbuf()->storage()->append(ph.separator);
+            visit_variadic_pattern(it->first, it->second.value, ph, stream);
+        }
+
+        stream.rdbuf()->storage()->append(ph.suffix);
+    }
+
+private:
+    static
+    inline
+    void
+    visit_variadic_pattern(const attribute::name_t& name,
+                           const attribute::value_t& value,
+                           const placeholder::variadic_t& ph,
+                           stickystream_t& stream)
+    {
+        variadic_visitor_t visitor(name, value, stream);
+        for (auto it = ph.pattern.begin(); it != ph.pattern.end(); ++it) {
+            boost::apply_visitor(visitor, *it);
+            stream.flush();
         }
     }
 };
