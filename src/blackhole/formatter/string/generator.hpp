@@ -70,17 +70,17 @@ public:
         }
     }
 
-    //!@todo: Test separator/pattern.
+    //!@todo: 1. Test pattern.
     void operator()(const placeholder::variadic_t& ph) {
         std::vector<std::string> passed;
         passed.reserve(view.upper_size());
 
-        //!@todo: Call begin() & end() with parameter.
+        //!@todo: 3. Call begin() & end() with parameter.
         for (auto it = view.begin(); it != view.end(); ++it) {
             const std::string& name = it->first;
             const attribute_t& attribute = it->second;
 
-            //!@todo: This code needs some optimization love.
+            //!@todo: 2. This code needs some optimization love.
             std::ostringstream stream;
             stream << "'" << name << "': ";
             variadic_visitor_t visitor(stream);
