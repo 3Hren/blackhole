@@ -78,7 +78,7 @@ public:
 struct substitute_attribute_t {
     const attribute::set_view_t& attributes;
 
-    void operator()(aux::attachable_ostringstream& stream, const std::string& placeholder) const {
+    void operator()(stickystream_t& stream, const std::string& placeholder) const {
         if (auto attribute = attributes.find(placeholder)) {
             stream << attribute->value;
         } else {

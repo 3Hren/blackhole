@@ -18,7 +18,7 @@ enum class severity {
 
 inline
 void
-map_severity(aux::attachable_ostringstream& stream, const severity& level) {
+map_severity(stickystream_t& stream, const severity& level) {
     static const char* describe[] = {
         "DEBUG",
         "NOTICE",

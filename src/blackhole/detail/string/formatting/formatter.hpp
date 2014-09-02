@@ -12,13 +12,13 @@ namespace aux {
 
 namespace action {
 
-typedef std::function<void(attachable_ostringstream&, const std::string&)> callback_t;
-typedef std::function<void(attachable_ostringstream&, const callback_t&)> bound_callback_t;
+typedef std::function<void(stickystream_t&, const std::string&)> callback_t;
+typedef std::function<void(stickystream_t&, const callback_t&)> bound_callback_t;
 
 struct literal_t {
     std::string literal;
 
-    void operator()(attachable_ostringstream& stream, const callback_t&) const {
+    void operator()(stickystream_t& stream, const callback_t&) const {
         stream.flush();
         stream.rdbuf()->storage()->append(literal);
     }
@@ -27,7 +27,7 @@ struct literal_t {
 struct placeholder_t {
     std::string placeholder;
 
-    void operator()(attachable_ostringstream& stream, const callback_t& callback) const {
+    void operator()(stickystream_t& stream, const callback_t& callback) const {
         stream.flush();
         callback(stream, placeholder);
     }
@@ -59,7 +59,7 @@ public:
 
     std::string execute(const action::callback_t& callback) const {
         std::string buffer;
-        attachable_ostringstream stream;
+        stickystream_t stream;
         stream.attach(buffer);
         for (auto it = actions.begin(); it != actions.end(); ++it) {
             const action::bound_callback_t& action = *it;

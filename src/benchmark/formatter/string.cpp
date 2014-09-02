@@ -9,7 +9,7 @@ namespace { enum level_t { info }; }
 
 namespace {
 
-void map_severity(blackhole::aux::attachable_ostringstream& stream, level_t level) {
+void map_severity(blackhole::stickystream_t& stream, level_t level) {
     static const char* descriptions[] = { "INFO" };
     if (static_cast<std::size_t>(level) < sizeof(descriptions) / sizeof(*descriptions) && level >= 0) {
         stream << descriptions[level];

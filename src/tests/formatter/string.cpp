@@ -50,7 +50,7 @@ TEST_STRING(Required, ThrowsExceptionWhenAttributeNotFound) {
 
 namespace testing {
 
-void map_timestamp(blackhole::aux::attachable_ostringstream& stream, const timeval& tv) {
+void map_timestamp(blackhole::stickystream_t& stream, const timeval& tv) {
     char str[64];
 
     struct tm tm;
@@ -101,7 +101,7 @@ TEST(mapping, DatetimeMapping) {
     mapper.add<keyword::tag::timestamp_t>("%Y-%m-%d %H:%M:%S");
 
     std::string result;
-    aux::attachable_ostringstream stream;
+    stickystream_t stream;
     stream.attach(result);
     timeval tv{ 100500, 0 };
     mapper(stream, "timestamp", tv);

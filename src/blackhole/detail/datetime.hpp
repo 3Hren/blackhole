@@ -21,7 +21,7 @@ namespace blackhole {
 namespace aux {
 
 struct context_t {
-    attachable_ostringstream& stream;
+    stickystream_t& stream;
     std::string& str;
     const std::tm tm;
     const suseconds_t usec;

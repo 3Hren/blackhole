@@ -12,7 +12,7 @@ TEST(formatter_t, Class) {
 namespace testing {
 
 struct placeholder_action_t {
-    void operator()(blackhole::aux::attachable_ostringstream& stream, const std::string& placeholder) const {
+    void operator()(blackhole::stickystream_t& stream, const std::string& placeholder) const {
         if (placeholder == "level") {
             stream << "WARNING";
         }

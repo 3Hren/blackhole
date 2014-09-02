@@ -36,12 +36,12 @@ public:
 };
 
 class visitor_t : public boost::static_visitor<> {
-    blackhole::aux::attachable_ostringstream& stream;
+    stickystream_t& stream;
     const mapping::value_t& mapper;
     const attribute::set_view_t& view;
 
 public:
-    visitor_t(blackhole::aux::attachable_ostringstream& stream,
+    visitor_t(stickystream_t& stream,
               const mapping::value_t& mapper,
               const attribute::set_view_t& view) :
         stream(stream),

@@ -45,7 +45,7 @@ struct datetime_formatter_action_t {
     {}
 
     void
-    operator()(aux::attachable_ostringstream& stream, const timeval& value) const {
+    operator()(stickystream_t& stream, const timeval& value) const {
         generator(stream, picker_type::pick(value), value.tv_usec);
     }
 };

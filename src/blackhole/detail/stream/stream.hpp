@@ -247,4 +247,6 @@ typedef attachable_basic_ostringstream<char> attachable_ostringstream;
 
 } // namespace aux
 
+typedef aux::attachable_ostringstream stickystream_t;
+
 } // namespace blackhole

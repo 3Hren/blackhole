@@ -206,7 +206,7 @@ TEST(json_t, UnspecifiedPositionalMapping) {
 
 namespace testing {
 
-void map_secret_value(blackhole::aux::attachable_ostringstream& stream, std::uint32_t value) {
+void map_secret_value(blackhole::stickystream_t& stream, std::uint32_t value) {
     stream << "(" << value << ")";
 }
 

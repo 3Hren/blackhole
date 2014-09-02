@@ -18,9 +18,7 @@ namespace mapping {
 
 template<typename T>
 struct extracter {
-    typedef std::function<
-        void(aux::attachable_ostringstream&, const T&)
-    > function_type;
+    typedef std::function<void(stickystream_t&, const T&)> function_type;
 
     function_type func;
 
@@ -29,7 +27,7 @@ struct extracter {
     {}
 
     void
-    operator()(aux::attachable_ostringstream& stream,
+    operator()(stickystream_t& stream,
                const attribute::value_t& value) const
     {
         typedef typename aux::underlying_type<T>::type underlying_type;
@@ -39,7 +37,7 @@ struct extracter {
 
 class value_t {
     typedef std::function<
-        void(aux::attachable_ostringstream&, const attribute::value_t&)
+        void(stickystream_t&, const attribute::value_t&)
     > mapping_t;
 
     std::unordered_map<std::string, mapping_t> m_mappings;
@@ -104,7 +102,7 @@ public:
 
     template<typename T>
     void
-    operator()(aux::attachable_ostringstream& stream,
+    operator()(stickystream_t& stream,
                const std::string& key,
                T&& value) const
     {
@@ -124,7 +122,7 @@ public:
         if (it != m_mappings.end()) {
             const mapping_t& action = it->second;
             std::string buffer;
-            aux::attachable_ostringstream stream;
+            stickystream_t stream;
             stream.attach(buffer);
             action(stream, std::forward<T>(value));
             stream.flush();

@@ -43,7 +43,7 @@ public:
 
     std::string format(const record_t& record) const {
         std::string buffer;
-        blackhole::aux::attachable_ostringstream stream;
+        stickystream_t stream;
         stream.attach(buffer);
         try {
             string::visitor_t visitor(stream, mapper, record.attributes());
