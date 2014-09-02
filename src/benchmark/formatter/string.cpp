@@ -46,3 +46,27 @@ BENCHMARK(PureStringFormatter, Baseline) {
     record.insert(blackhole::keyword::severity<level_t>() = level_t::info);
     ticktack::compiler::do_not_optimize(formatter.format(record));
 }
+
+BENCHMARK(VariadicStringFormatter, Baseline) {
+    static blackhole::formatter::string_t formatter(
+        "[%(timestamp)s] [%(severity)s]: %(message)s %(...:(:))s"
+    );
+    static int initializer = initialize(formatter);
+    ticktack::compiler::do_not_optimize(initializer);
+
+    blackhole::attribute::set_t global;
+    blackhole::attribute::set_t scoped;
+    scoped.insert(blackhole::attribute::make("id", 42));
+    scoped.insert(blackhole::attribute::make("source", "app/benchmark"));
+
+    blackhole::attribute::set_t local;
+    timeval tv;
+    gettimeofday(&tv, nullptr);
+    local.insert(blackhole::keyword::timestamp() = tv);
+    local.insert(blackhole::keyword::severity<level_t>() = level_t::info);
+    local.insert(blackhole::keyword::message() = MESSAGE_LONG);
+
+    blackhole::attribute::set_view_t view(global, scoped, std::move(local));
+    blackhole::record_t record(std::move(view));
+    ticktack::compiler::do_not_optimize(formatter.format(record));
+}
