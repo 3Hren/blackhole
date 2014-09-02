@@ -87,8 +87,10 @@ public:
             passed.push_back(stream.str());
         }
 
-        stream.rdbuf()->storage()->append(ph.prefix);
-        stream.rdbuf()->storage()->append(boost::algorithm::join(passed, ", "));
+        if (!passed.empty()) {
+            stream.rdbuf()->storage()->append(ph.prefix);
+            stream.rdbuf()->storage()->append(boost::algorithm::join(passed, ", "));
+        }
     }
 };
 
