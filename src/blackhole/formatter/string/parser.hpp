@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/optional.hpp>
@@ -88,15 +89,31 @@ struct optional_t {
 };
 
 struct variadic_t {
+    struct key_t {};
+    struct value_t {};
+
+    typedef boost::variant<
+        literal_t,
+        key_t,
+        value_t
+    > pattern_t;
+
     std::string prefix;
     std::string suffix;
-    std::string pattern;
+    std::vector<pattern_t> pattern;
     std::string separator;
 
     variadic_t() :
-        pattern("%k: %v"),
+        pattern(default_pattern()),
         separator(", ")
     {}
+
+private:
+    static
+    std::vector<pattern_t>
+    default_pattern() {
+        return { key_t(), literal_t{ ": " }, value_t() };
+    }
 };
 
 }
@@ -242,7 +259,9 @@ private:
             if (*pos == '[') {
                 pos++;
 
-                std::tie(ph.pattern, std::ignore) = parse({ "]" });
+                std::string pattern;
+                std::tie(pattern, std::ignore) = parse({ "]" });
+                parse_variadic_pattern(ph, pattern);
                 if (starts_with(pos, end, PH_END)) {
                     pos += PH_END.size();
                     state = whatever;
@@ -277,7 +296,7 @@ private:
 
                 if (starts_with(pos, end, PH_END)) {
                     pos += PH_END.size();
-                    ph.pattern = "'%k': %v";
+                    parse_variadic_pattern(ph, "'%k': %v");
                     state = whatever;
                     return ph;
                 } else {
@@ -293,6 +312,45 @@ private:
     bool
     is_variadic_legacy(char ch) {
         return ch == 'L' || ch == 'E' || ch == 'G' || ch == 'T' || ch == 'U';
+    }
+
+    static
+    void
+    parse_variadic_pattern(placeholder::variadic_t& ph, const std::string& pattern) {
+        ph.pattern.clear();
+
+        std::string literal;
+        auto it = pattern.begin();
+        auto end = pattern.end();
+        for (; it != end; ++it) {
+            if (starts_with(it, end, "%k")) {
+                it++;
+
+                std::cout << "l=\"" << literal << "\", k" << std::endl;
+                if (!literal.empty()) {
+                    ph.pattern.push_back(literal_t{ literal });
+                    literal.clear();
+                }
+                ph.pattern.push_back(placeholder::variadic_t::key_t());
+                continue;
+            } else if (starts_with(it, end, "%v")) {
+                it++;
+
+                std::cout << "l=\"" << literal << "\", v" << std::endl;
+                if (!literal.empty()) {
+                    ph.pattern.push_back(literal_t{ literal });
+                    literal.clear();
+                }
+                ph.pattern.push_back(placeholder::variadic_t::value_t());
+                continue;
+            }
+            literal.push_back(*it);
+        }
+
+        if (!literal.empty()) {
+            std::cout << "l=" << literal << std::endl;
+            ph.pattern.push_back(literal_t{ literal });
+        }
     }
 
     void
