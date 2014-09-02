@@ -15,7 +15,7 @@ namespace blackhole {
 
 namespace formatter {
 
-namespace string  {
+namespace string {
 
 namespace parser {
 
