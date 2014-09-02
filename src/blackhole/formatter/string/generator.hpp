@@ -70,11 +70,12 @@ public:
         }
     }
 
-    //!@todo: Test prefix/suffix/separator/pattern.
+    //!@todo: Test separator/pattern.
     void operator()(const placeholder::variadic_t& ph) {
         std::vector<std::string> passed;
         passed.reserve(view.upper_size());
 
+        //!@todo: Call begin() & end() with parameter.
         for (auto it = view.begin(); it != view.end(); ++it) {
             const std::string& name = it->first;
             const attribute_t& attribute = it->second;
@@ -90,6 +91,7 @@ public:
         if (!passed.empty()) {
             stream.rdbuf()->storage()->append(ph.prefix);
             stream.rdbuf()->storage()->append(boost::algorithm::join(passed, ", "));
+            stream.rdbuf()->storage()->append(ph.suffix);
         }
     }
 };
