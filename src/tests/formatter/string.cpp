@@ -425,3 +425,17 @@ TEST(string_t, FormatVariadicSinglePattern) {
     formatter::string_t formatter(pattern);
     EXPECT_EQ("uuid=123-456", formatter.format(record));
 }
+
+TEST(string_t, FormatVariadicMultiplePrefixSuffixSeparatorPattern) {
+    record_t record;
+    record.insert({ "uuid", attribute_t("123-456") });
+    record.insert({ "message", attribute_t("le message") });
+
+    std::string pattern("%(...[%k=%v]:[:]: | )s");
+    formatter::string_t formatter(pattern);
+    auto actual = formatter.format(record);
+    EXPECT_TRUE(
+        "[uuid=123-456 | message=le message]" == actual ||
+        "[message=le message | uuid=123-456]" == actual
+    );
+}
