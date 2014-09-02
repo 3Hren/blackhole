@@ -260,7 +260,7 @@ TEST_STRING(Optional, AbsentWithPrefixSuffixSquareBracketsReversed) {
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
 
-TEST(string_t, FormatOtherLocalAttribute) {
+TEST(string_t, FormatVariadicSingle) {
     record_t record;
     record.insert({ "uuid", attribute_t("123-456") });
 
@@ -269,7 +269,7 @@ TEST(string_t, FormatOtherLocalAttribute) {
     EXPECT_EQ("['uuid': '123-456']", formatter.format(record));
 }
 
-TEST(string_t, FormatOtherLocalAttributes) {
+TEST(string_t, FormatVariadicMultiple) {
     record_t record;
     record.insert({ "uuid", attribute_t("123-456") });
     record.insert({ "answer to life the universe and everything", attribute_t(42) });
@@ -280,7 +280,7 @@ TEST(string_t, FormatOtherLocalAttributes) {
     EXPECT_TRUE(actual.find("'uuid': '123-456'") != std::string::npos);
 }
 
-TEST(string_t, ComplexFormatWithOtherLocalAttributes) {
+TEST(string_t, ComplexFormatVariadicMultiple) {
     record_t record;
     record.insert({ "timestamp", attribute_t("1960-01-01 00:00:00", attribute::scope_t::event) });
     record.insert({ "level", attribute_t("INFO", attribute::scope_t::event) });
@@ -294,4 +294,13 @@ TEST(string_t, ComplexFormatWithOtherLocalAttributes) {
     EXPECT_TRUE(boost::starts_with(actual, "[1960-01-01 00:00:00] [INFO]: le message ["));
     EXPECT_TRUE(actual.find("'answer to life the universe and everything': 42") != std::string::npos);
     EXPECT_TRUE(actual.find("'uuid': '123-456'") != std::string::npos);
+}
+
+TEST(string_t, FormatVariadicSingleWithPrefix) {
+    record_t record;
+    record.insert({ "uuid", attribute_t("123-456") });
+
+    std::string pattern("%(...:args=:)s");
+    formatter::string_t formatter(pattern);
+    EXPECT_EQ("args='uuid': '123-456'", formatter.format(record));
 }

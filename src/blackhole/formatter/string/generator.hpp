@@ -71,7 +71,7 @@ public:
     }
 
     //!@todo: Test prefix/suffix/separator/pattern.
-    void operator()(const placeholder::variadic_t& /*ph*/) {
+    void operator()(const placeholder::variadic_t& ph) {
         std::vector<std::string> passed;
         passed.reserve(view.upper_size());
 
@@ -87,6 +87,7 @@ public:
             passed.push_back(stream.str());
         }
 
+        stream.rdbuf()->storage()->append(ph.prefix);
         stream.rdbuf()->storage()->append(boost::algorithm::join(passed, ", "));
     }
 };
