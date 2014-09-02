@@ -112,7 +112,7 @@ private:
     static
     std::vector<pattern_t>
     default_pattern() {
-        return { key_t(), literal_t{ ": " }, value_t() };
+        return std::vector<pattern_t>({ key_t(), literal_t{ ": " }, value_t() });
     }
 };
 
