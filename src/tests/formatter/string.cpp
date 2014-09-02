@@ -337,3 +337,20 @@ TEST(string_t, FormatVariadicEmptyWithSuffix) {
     formatter::string_t formatter(pattern);
     EXPECT_EQ("", formatter.format(record));
 }
+
+TEST(string_t, FormatVariadicSingleWithPrefixSuffix) {
+    record_t record;
+    record.insert({ "uuid", attribute_t("123-456") });
+
+    std::string pattern("%(...:[:])s");
+    formatter::string_t formatter(pattern);
+    EXPECT_EQ("['uuid': '123-456']", formatter.format(record));
+}
+
+TEST(string_t, FormatVariadicEmptyWithPrefixSuffix) {
+    record_t record;
+
+    std::string pattern("%(...:[:])s");
+    formatter::string_t formatter(pattern);
+    EXPECT_EQ("", formatter.format(record));
+}
