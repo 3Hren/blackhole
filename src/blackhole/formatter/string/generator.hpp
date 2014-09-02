@@ -80,7 +80,6 @@ public:
         }
     }
 
-    //!@todo: 1. Test pattern.
     void operator()(const placeholder::variadic_t& ph) {
         std::vector<std::string> passed;
         passed.reserve(view.upper_size());
