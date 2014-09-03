@@ -23,11 +23,15 @@ namespace blackhole {
 
 namespace attribute {
 
+namespace set_view {
+
 template<class... T>
-struct pvex;
+struct tuple_extractor_t;
+
+} // namespace set_view
 
 class set_view_t {
-    template<class... T> friend struct pvex;
+    template<class... T> friend struct set_view::tuple_extractor_t;
 
 public:
     typedef aux::iterator::join_t<set_t, true> const_iterator;
@@ -37,9 +41,9 @@ public:
     struct external_set_t { set_t v; };
 
 private:
-    attached_set_t attached_;  // Likely empty.
-    internal_set_t internal_;  // About level + message + pid + tid + timestamp (4-5).
-    external_set_t external_;  // The most filled (scoped + user attributes)
+    attached_set_t attached;  // Likely empty.
+    internal_set_t internal;  // About level + message + pid + tid + timestamp (4-5).
+    external_set_t external;  // The most filled (scoped + user attributes)
 
 public:
     set_view_t() = default;
@@ -78,77 +82,70 @@ public:
     const attribute_t& at(const std::string& name) const;
 };
 
+namespace set_view {
+
 template<>
-struct pvex<set_view_t::attached_set_t> {
+struct tuple_extractor_t<set_view_t::attached_set_t> {
     static
     std::tuple<set_view_t::attached_set_t>
-    init(const set_view_t& view) {
-        return std::make_tuple(view.attached_);
+    extract(const set_view_t& view) {
+        return std::make_tuple(view.attached);
     }
 };
 
 template<>
-struct pvex<set_view_t::internal_set_t> {
+struct tuple_extractor_t<set_view_t::internal_set_t> {
     static
     std::tuple<set_view_t::internal_set_t>
-    init(const set_view_t& view) {
-        return std::make_tuple(view.internal_);
+    extract(const set_view_t& view) {
+        return std::make_tuple(view.internal);
     }
 };
 
 template<>
-struct pvex<set_view_t::external_set_t> {
+struct tuple_extractor_t<set_view_t::external_set_t> {
     static
     std::tuple<set_view_t::external_set_t>
-    init(const set_view_t& view) {
-        return std::make_tuple(view.external_);
+    extract(const set_view_t& view) {
+        return std::make_tuple(view.external);
     }
 };
 
 template<class T, class Arg, class... Args>
-struct pvex<T, Arg, Args...> {
+struct tuple_extractor_t<T, Arg, Args...> {
     static
     std::tuple<T, Arg, Args...>
-    init(const set_view_t& view) {
-        return std::tuple_cat(pvex<T>::init(view), pvex<Arg, Args...>::init(view));
+    extract(const set_view_t& view) {
+        return std::tuple_cat(
+            tuple_extractor_t<T>::extract(view),
+            tuple_extractor_t<Arg, Args...>::extract(view)
+        );
     }
 };
 
-typedef set_view_t::const_iterator::container_pointer container_pointer;
+} // namespace set_view
 
 /// A type that represents a parameter pack of zero or more integers.
-template<unsigned... Indices>
+template<unsigned... indices>
 struct index_tuple {
     /// Generate an index_tuple with an additional element.
     template<unsigned N>
     struct append {
-        typedef index_tuple<Indices..., N> type;
+        typedef index_tuple<indices..., N> type;
     };
 };
 
 /// Unary metafunction that generates an index_tuple containing [0, Size)
-template<unsigned Size>
+template<unsigned size>
 struct make_index_tuple {
-    typedef typename make_index_tuple<Size - 1>::type::template append<Size - 1>::type type;
+    typedef typename make_index_tuple<size - 1>::type::template append<size - 1>::type type;
 };
 
-// Terminal case of the recursive metafunction.
+/// Terminal case of the recursive metafunction.
 template<>
 struct make_index_tuple<0u> {
     typedef index_tuple<> type;
 };
-
-template<typename... U>
-struct array_t {
-    typedef std::array<const set_t*, sizeof...(U) +  1> type;
-};
-
-template<typename T, typename... U, unsigned... I>
-inline
-typename array_t<U...>::type
-toa(const std::tuple<T, U...>& t, index_tuple<I...>) {
-    return typename array_t<U...>::type{{ &(std::get<I>(t).v)... }};
-}
 
 template<class T, unsigned size>
 struct all_empty_t {
@@ -164,105 +161,137 @@ struct all_empty_t<T, 0u> {
     }
 };
 
-template<class... U>
+template<class T>
+struct tuple_empty {
+    static bool empty(const T& tuple) {
+        return all_empty_t<T, std::tuple_size<T>::value - 1>::empty(tuple);
+    }
+};
+
+template<class... T>
 class partial_view_t {
-    std::tuple<U...> tuple;
+public:
+    typedef std::tuple<T...> tuple_type;
+    typedef std::integral_constant<
+        typename std::tuple_size<tuple_type>::value_type,
+        std::tuple_size<tuple_type>::value
+    > tuple_size;
+
+    typedef set_view_t::const_iterator const_iterator;
+
+private:
+    typedef std::array<const set_t*, tuple_size::value> array_type;
+    typedef typename make_index_tuple<tuple_size::value>::type index_tuple_type;
+
+    const tuple_type tuple;
 
 public:
     partial_view_t(const set_view_t& view) :
-        tuple(pvex<U...>::init(view))
+        tuple(set_view::tuple_extractor_t<T...>::extract(view))
     {}
 
     bool
     empty() const BLACKHOLE_NOEXCEPT {
-        return all_empty_t<std::tuple<U...>, sizeof...(U) - 1>::empty(tuple);
+        return empty(tuple);
     }
 
-    set_view_t::const_iterator
-    begin() {
-        typedef typename make_index_tuple<sizeof...(U)>::type IndexTuple;
-        auto a = toa(tuple, IndexTuple());
-        return set_view_t::const_iterator(a);
+    const_iterator
+    begin() const BLACKHOLE_NOEXCEPT {
+        return const_iterator(to_array(tuple, index_tuple_type()));
     }
 
-    set_view_t::const_iterator
-    end() {
-        typedef typename make_index_tuple<sizeof...(U)>::type IndexTuple;
-        auto list = toa(tuple, IndexTuple());
-        return set_view_t::const_iterator(list, aux::iterator::invalidate_tag);
+    const_iterator
+    end() const BLACKHOLE_NOEXCEPT {
+        return const_iterator(to_array(tuple, index_tuple_type()), aux::iterator::invalidate_tag);
+    }
+
+private:
+    template<unsigned... I>
+    static
+    inline
+    array_type
+    to_array(const tuple_type& tuple, index_tuple<I...>) {
+        return array_type {{ &std::get<I>(tuple).v... }};
+    }
+
+    static
+    inline
+    bool
+    empty(const tuple_type& tuple) {
+        return tuple_empty<tuple_type>::empty(tuple);
     }
 };
 
 BLACKHOLE_API
 set_view_t::set_view_t(set_t attached, set_t external, set_t&& internal) :
-    attached_({ std::move(attached) }),
-    internal_({ std::move(internal) }),
-    external_({ std::move(external) })
+    attached({ std::move(attached) }),
+    internal({ std::move(internal) }),
+    external({ std::move(external) })
 {}
 
 template<>
 BLACKHOLE_API
 bool
 set_view_t::empty<set_view_t::attached_set_t>() const BLACKHOLE_NOEXCEPT {
-    return attached_.v.empty();
+    return attached.v.empty();
 }
 
 template<>
 BLACKHOLE_API
 bool
 set_view_t::empty<set_view_t::internal_set_t>() const BLACKHOLE_NOEXCEPT {
-    return internal_.v.empty();
+    return internal.v.empty();
 }
 
 template<>
 BLACKHOLE_API
 bool
 set_view_t::empty<set_view_t::external_set_t>() const BLACKHOLE_NOEXCEPT {
-    return external_.v.empty();
+    return external.v.empty();
 }
 
 BLACKHOLE_API
 void
 set_view_t::insert(pair_t pair) {
-    external_.v.insert(std::move(pair));
+    external.v.insert(std::move(pair));
 }
 
 template<typename InputIterator>
 BLACKHOLE_API
 void
 set_view_t::insert(InputIterator first, InputIterator last) {
-    external_.v.insert(first, last);
+    external.v.insert(first, last);
 }
 
 BLACKHOLE_API
 set_view_t::const_iterator
 set_view_t::begin() const BLACKHOLE_NOEXCEPT {
-    std::array<set_t const*, 3> a{{ &internal_.v, &external_.v, &attached_.v }};
+    std::array<set_t const*, 3> a{{ &internal.v, &external.v, &attached.v }};
     return const_iterator(a);
 }
 
 BLACKHOLE_API
 set_view_t::const_iterator
 set_view_t::end() const BLACKHOLE_NOEXCEPT {
-    std::array<set_t const*, 3> a{{ &internal_.v, &external_.v, &attached_.v }};
+    std::array<set_t const*, 3> a{{ &internal.v, &external.v, &attached.v }};
     return const_iterator(a, aux::iterator::invalidate_tag);
 }
 
 BLACKHOLE_API
 boost::optional<const attribute_t&>
 set_view_t::find(const std::string& name) const BLACKHOLE_NOEXCEPT {
-    auto it = internal_.v.find(name);
-    if (it != internal_.v.end()) {
+    auto it = internal.v.find(name);
+    if (it != internal.v.end()) {
         return it->second;
     }
 
-    it = external_.v.find(name);
-    if (it != external_.v.end()) {
+    it = external.v.find(name);
+    if (it != external.v.end()) {
         return it->second;
     }
 
-    it = attached_.v.find(name);
-    if (it != attached_.v.end()) {
+    it = attached.v.find(name);
+    if (it != attached.v.end()) {
         return it->second;
     }
 
