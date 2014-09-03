@@ -66,18 +66,20 @@ private:
     size_t pos;
 
 public:
-    join_t(std::initializer_list<container_pointer> list) :
+    template<class T>
+    join_t(const T& array) :
         current(nullptr),
         pos(0)
     {
-        init(list);
+        init(array);
     }
 
-    join_t(std::initializer_list<container_pointer> list, const invalidate_tag_t&) :
+    template<class T>
+    join_t(const T& array, const invalidate_tag_t&) :
         current(nullptr),
         pos(0)
     {
-        init(list);
+        init(array);
         if (!containers.empty()) {
             current = containers.back();
             it = current->end();
@@ -121,7 +123,8 @@ public:
     }
 
 private:
-    void init(const std::initializer_list<container_pointer>& list) {
+    template<class T>
+    void init(const T& list) {
         for (auto it = list.begin(); it != list.end(); ++it) {
             if (!(*it)->empty()) {
                 containers.push_back(*it);

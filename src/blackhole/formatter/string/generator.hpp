@@ -83,19 +83,22 @@ public:
     void operator()(const placeholder::variadic_t& ph) {
         typedef attribute::set_view_t::attached_set_t attached_type;
         typedef attribute::set_view_t::external_set_t external_type;
+        auto view = attribute::partial_view_t<
+            external_type,
+            attached_type
+        >(this->view);
 
-        const attribute::set_t& external = view.external();
-        if (view.empty<attached_type, external_type>()) {
+        if (view.empty()) {
             return;
         }
 
         stream.rdbuf()->storage()->append(ph.prefix);
-
-        auto it = external.begin();
+        std::cout << std::boolalpha << view.empty() << std::endl;
+        auto it = view.begin();
         traverse(ph.pattern, it->first, it->second.value, stream);
         it++;
 
-        for (; it != external.end(); ++it) {
+        for (; it != view.end(); ++it) {
             stream.rdbuf()->storage()->append(ph.separator);
             traverse(ph.pattern, it->first, it->second.value, stream);
         }
