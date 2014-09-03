@@ -210,15 +210,15 @@ set_view_t::insert(InputIterator first, InputIterator last) {
 BLACKHOLE_API
 set_view_t::const_iterator
 set_view_t::begin() const BLACKHOLE_NOEXCEPT {
-    std::array<set_t const*, 3> a{{ &internal.v, &external.v, &attached.v }};
-    return const_iterator(a);
+    std::array<set_t const*, 3> array {{ &internal.v, &external.v, &attached.v }};
+    return const_iterator(array);
 }
 
 BLACKHOLE_API
 set_view_t::const_iterator
 set_view_t::end() const BLACKHOLE_NOEXCEPT {
-    std::array<set_t const*, 3> a{{ &internal.v, &external.v, &attached.v }};
-    return const_iterator(a, aux::iterator::invalidate_tag);
+    std::array<set_t const*, 3> array {{ &internal.v, &external.v, &attached.v }};
+    return const_iterator(array, aux::iterator::invalidate_tag);
 }
 
 BLACKHOLE_API
