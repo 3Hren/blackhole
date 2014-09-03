@@ -135,7 +135,7 @@ logger_base_t::open_record(attribute::set_t attributes) const {
         }
 
         reader_lock_type lock(state.lock.open);
-        attribute::set_view_t set(
+        attribute::set_view_t view(
             state.attributes.global,
             state.attributes.scoped.get() ?
                 state.attributes.scoped->attributes() :
@@ -143,8 +143,8 @@ logger_base_t::open_record(attribute::set_t attributes) const {
             std::move(attributes)
         );
 
-        if (state.filter(set)) {
-            return record_t(std::move(set));
+        if (state.filter(view)) {
+            return record_t(std::move(view));
         }
     }
 
