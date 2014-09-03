@@ -279,12 +279,12 @@ TEST(string_t, FormatVariadicEmpty) {
 
 TEST(string_t, FormatVariadicMultiple) {
     record_t record;
+    record.insert({ "id", attribute_t(42) });
     record.insert({ "uuid", attribute_t("123-456") });
-    record.insert({ "answer to life the universe and everything", attribute_t(42) });
     std::string pattern("[%(...L)s]");
     formatter::string_t formatter(pattern);
     std::string actual = formatter.format(record);
-    EXPECT_TRUE(actual.find("'answer to life the universe and everything': 42") != std::string::npos);
+    EXPECT_TRUE(actual.find("'id': 42") != std::string::npos);
     EXPECT_TRUE(actual.find("'uuid': 123-456") != std::string::npos);
 }
 
