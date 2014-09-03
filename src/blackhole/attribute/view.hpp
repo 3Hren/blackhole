@@ -46,6 +46,10 @@ public:
     const_iterator begin() const BLACKHOLE_NOEXCEPT;
     const_iterator end() const BLACKHOLE_NOEXCEPT;
 
+    const set_t& external() const BLACKHOLE_NOEXCEPT {
+        return other;
+    }
+
     boost::optional<const attribute_t&>
     find(const std::string& name) const BLACKHOLE_NOEXCEPT;
 

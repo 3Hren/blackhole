@@ -81,18 +81,18 @@ public:
     }
 
     void operator()(const placeholder::variadic_t& ph) {
-        //!@todo: 3. Call begin() & end() with parameter.
-        if (view.empty()) {
+        const attribute::set_t& external = view.external();
+        if (external.empty()) {
             return;
         }
 
         stream.rdbuf()->storage()->append(ph.prefix);
 
-        auto it = view.begin();
+        auto it = external.begin();
         traverse(ph.pattern, it->first, it->second.value, stream);
         it++;
 
-        for (; it != view.end(); ++it) {
+        for (; it != external.end(); ++it) {
             stream.rdbuf()->storage()->append(ph.separator);
             traverse(ph.pattern, it->first, it->second.value, stream);
         }
