@@ -28,12 +28,6 @@ public:
 
     typedef typename std::conditional<
         Const,
-        const container_type*,
-        container_type*
-    >::type container_pointer;
-
-    typedef typename std::conditional<
-        Const,
         typename container_type::const_pointer,
         typename container_type::pointer
     >::type pointer;
@@ -60,6 +54,12 @@ public:
     );
 
 private:
+    typedef typename std::conditional<
+        Const,
+        const container_type*,
+        container_type*
+    >::type container_pointer;
+
     std::vector<container_pointer> containers;
     container_pointer current;
     iterator it;
