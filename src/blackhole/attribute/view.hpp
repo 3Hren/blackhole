@@ -59,11 +59,12 @@ public:
         return internal.v.empty() && external.v.empty() && attached.v.empty();
     }
 
-    //! Intentionally allow to insert only to external attribute set.
+    //! Intentionally allow to insert only into external attribute set.
     void insert(pair_t pair) {
         external.v.insert(std::move(pair));
     }
 
+    //! Intentionally allow to insert only into external attribute set.
     template<typename InputIterator>
     void insert(InputIterator first, InputIterator last) {
         external.v.insert(first, last);
