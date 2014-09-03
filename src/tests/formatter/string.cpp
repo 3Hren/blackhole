@@ -289,19 +289,26 @@ TEST(string_t, FormatVariadicMultiple) {
 }
 
 TEST(string_t, ComplexFormatVariadicMultiple) {
-    record_t record;
-    record.insert({ "timestamp", attribute_t("1960-01-01 00:00:00", attribute::scope_t::event) });
-    record.insert({ "level", attribute_t("INFO", attribute::scope_t::event) });
-    record.insert(keyword::message() = "le message");
-    record.insert({ "uuid", attribute_t("123-456") });
-    record.insert({ "answer to life the universe and everything", attribute_t(42) });
+    attribute::set_t global;
+    attribute::set_t external;
+    external.insert({ "uuid", attribute_t("123-456") });
+    external.insert({ "answer", attribute_t(42) });
+
+    blackhole::attribute::set_t internal;
+    internal.insert({ "timestamp", attribute_t("1960-01-01 00:00:00") });
+    internal.insert({ "level", attribute_t("INFO") });
+    internal.insert(keyword::message() = "le message");
+
+    attribute::set_view_t view(global, external, std::move(internal));
+    record_t record(std::move(view));
 
     std::string pattern("[%(timestamp)s] [%(level)s]: %(message)s [%(...L)s]");
     formatter::string_t formatter(pattern);
     std::string actual = formatter.format(record);
-    EXPECT_TRUE(boost::starts_with(actual, "[1960-01-01 00:00:00] [INFO]: le message ["));
-    EXPECT_TRUE(actual.find("'answer to life the universe and everything': 42") != std::string::npos);
-    EXPECT_TRUE(actual.find("'uuid': 123-456") != std::string::npos);
+    EXPECT_TRUE(
+        "[1960-01-01 00:00:00] [INFO]: le message ['uuid': 123-456, 'answer': 42]" == actual ||
+        "[1960-01-01 00:00:00] [INFO]: le message ['answer': 42, 'uuid': 123-456]" == actual
+    );
 }
 
 TEST(string_t, FormatVariadicSingleWithPrefix) {
