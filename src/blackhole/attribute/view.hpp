@@ -74,34 +74,34 @@ namespace set_view {
 template<>
 struct tuple_extractor_t<set_view_t::attached_set_t> {
     static
-    std::tuple<set_view_t::attached_set_t>
+    std::tuple<const set_view_t::attached_set_t*>
     extract(const set_view_t& view) {
-        return std::make_tuple(view.attached);
+        return std::make_tuple(&view.attached);
     }
 };
 
 template<>
 struct tuple_extractor_t<set_view_t::internal_set_t> {
     static
-    std::tuple<set_view_t::internal_set_t>
+    std::tuple<const set_view_t::internal_set_t*>
     extract(const set_view_t& view) {
-        return std::make_tuple(view.internal);
+        return std::make_tuple(&view.internal);
     }
 };
 
 template<>
 struct tuple_extractor_t<set_view_t::external_set_t> {
     static
-    std::tuple<set_view_t::external_set_t>
+    std::tuple<const set_view_t::external_set_t*>
     extract(const set_view_t& view) {
-        return std::make_tuple(view.external);
+        return std::make_tuple(&view.external);
     }
 };
 
 template<class T, class Arg, class... Args>
 struct tuple_extractor_t<T, Arg, Args...> {
     static
-    std::tuple<T, Arg, Args...>
+    std::tuple<const T*, const Arg*, const Args*...>
     extract(const set_view_t& view) {
         return std::tuple_cat(
             tuple_extractor_t<T>::extract(view),
@@ -115,14 +115,14 @@ struct tuple_extractor_t<T, Arg, Args...> {
 template<class T, unsigned size>
 struct all_empty {
     static bool empty(const T& tuple) {
-        return std::get<size>(tuple).v.empty() && all_empty<T, size - 1>::empty(tuple);
+        return std::get<size>(tuple)->v.empty() && all_empty<T, size - 1>::empty(tuple);
     }
 };
 
 template<class T>
 struct all_empty<T, 0u> {
     static bool empty(const T& tuple) {
-        return std::get<0>(tuple).v.empty();
+        return std::get<0>(tuple)->v.empty();
     }
 };
 
@@ -136,9 +136,9 @@ struct tuple_empty {
 template<class... T>
 class partial_view_t {
 public:
-    typedef std::tuple<T...> tuple_type;
+    typedef std::tuple<const T*...> tuple_type;
     typedef std::integral_constant<
-        typename std::tuple_size<tuple_type>::value_type,
+        std::size_t,
         std::tuple_size<tuple_type>::value
     > tuple_size;
 
@@ -176,7 +176,7 @@ private:
     inline
     array_type
     to_array(const tuple_type& tuple, index_tuple<I...>) {
-        return array_type {{ &std::get<I>(tuple).v... }};
+        return array_type {{ &std::get<I>(tuple)->v... }};
     }
 
     static
