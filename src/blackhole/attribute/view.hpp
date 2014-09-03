@@ -113,14 +113,14 @@ struct tuple_extractor_t<T, Arg, Args...> {
 } // namespace set_view
 
 template<class T, unsigned size>
-struct all_empty_t {
+struct all_empty {
     static bool empty(const T& tuple) {
-        return std::get<size>(tuple).v.empty() && all_empty_t<T, size - 1>::empty(tuple);
+        return std::get<size>(tuple).v.empty() && all_empty<T, size - 1>::empty(tuple);
     }
 };
 
 template<class T>
-struct all_empty_t<T, 0u> {
+struct all_empty<T, 0u> {
     static bool empty(const T& tuple) {
         return std::get<0>(tuple).v.empty();
     }
@@ -129,7 +129,7 @@ struct all_empty_t<T, 0u> {
 template<class T>
 struct tuple_empty {
     static bool empty(const T& tuple) {
-        return all_empty_t<T, std::tuple_size<T>::value - 1>::empty(tuple);
+        return all_empty<T, std::tuple_size<T>::value - 1>::empty(tuple);
     }
 };
 
