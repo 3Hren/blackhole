@@ -51,20 +51,7 @@ public:
 
     bool
     empty() const BLACKHOLE_NOEXCEPT {
-        return empty<attached_set_t, internal_set_t, external_set_t>();
-    }
-
-    template<class T>
-    bool
-    empty() const BLACKHOLE_NOEXCEPT;
-
-    template<class T, class... Args>
-    typename std::enable_if<
-        sizeof...(Args) != 0 && sizeof...(Args) <= 3,
-        bool
-    >::type
-    empty() const BLACKHOLE_NOEXCEPT {
-        return empty<T>() && empty<Args...>();
+        return internal.v.empty() && external.v.empty() && attached.v.empty();
     }
 
     //! Intentionally allow to insert only to external attribute set.
@@ -206,27 +193,6 @@ set_view_t::set_view_t(set_t attached, set_t external, set_t&& internal) :
     internal({ std::move(internal) }),
     external({ std::move(external) })
 {}
-
-template<>
-BLACKHOLE_API
-bool
-set_view_t::empty<set_view_t::attached_set_t>() const BLACKHOLE_NOEXCEPT {
-    return attached.v.empty();
-}
-
-template<>
-BLACKHOLE_API
-bool
-set_view_t::empty<set_view_t::internal_set_t>() const BLACKHOLE_NOEXCEPT {
-    return internal.v.empty();
-}
-
-template<>
-BLACKHOLE_API
-bool
-set_view_t::empty<set_view_t::external_set_t>() const BLACKHOLE_NOEXCEPT {
-    return external.v.empty();
-}
 
 BLACKHOLE_API
 void
