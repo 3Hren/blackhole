@@ -11,7 +11,7 @@ Registration code looks like follows:
 repository_t::instance().configure<sink::null_t, formatter::string_t>();
 ```
 
-The code above register `null`-sink and `string`-formatter pair. How to register another combinations of sinks and formatters check the ["Registration rules" article](registration-rules.md).
+The code above register `null`-sink and `string`-formatter pair. How to register another combinations of sinks and formatters check the ["Registration rules"](registration-rules.md) article.
 
 ##Configuration
 
@@ -22,5 +22,6 @@ sink_config_t sink("null");
 ```
 
 ##Example
+In development.
 
 [Back to contents](contents.md)

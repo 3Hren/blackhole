@@ -1,9 +1,14 @@
-# Tutorial
+# Coding tutorial
+
+Before start this topic you should read the ["Main contepts"](main-concepts.md) part of documentation if you are not yet.
+
+It this topic we will consider two examples that designed to quickly put you into the Blackhole workflow.
 
   * [The simplest example](#the-simplest-example)
   * [Log into the file with rotation](#log-into-the-files-with-rotation)
 
 ## The simplest example
+
 Writing log to `stdout` with minimal settings.
 
 The complete example code:
@@ -56,9 +61,11 @@ In Ubuntu you can compile it with the command
 g++ simple_example.cpp -osimple_example -std=c++0x -lboost_thread-mt`
 ```
 
-`enum class level` is a declaration of severity levels for our logger. Blackhole supports both loggers with severity separation and without it. But, seriously, what is the logger without separated severity levels?
+`enum class level` is a declaration of severity levels for our logger. You are absolutely free in this process. You can specify so much levels as you need. You can even not to specify any levels. Blackhole supports both strongly and weakly typed enumerations for severity and it's better to use strongly-typed one. You should be carefull with [`syslog` sink](sink-syslog.md) to be consistent with the system severity levels.
 
-All logger objects in Blackhole are got from `repository_t` object. It is a singleton that can store all possible frontends configurations. We need to create configuration (formatter and sink pair) and add it to the `repository_t` object as in `void init()` function. After that you can create logger object as follows:
+All logger objects in Blackhole are got from `repository_t` object. It is a singleton that can store all possible frontends configurations. We need to create configuration (formatter and sink pair) and add it to the `repository_t` object as in `init()` function. 
+
+Now you should create logger object as follows:
 
 ```
 verbose_logger_t<level> log = repository_t::instance().create<level>("stdout_log"); //"stdout_log" is a name of previously created config
@@ -85,8 +92,6 @@ Using of other sinks and formatters may be specific. Before use of them read the
   * [Sinks](sinks.md);
   * [Formatters](formatters.md).
 
-The most common words on Blackhole usage you can find in ["Common usage"](common-usage.md) article. Also there you can find some information on opaque methods of logger usage.
-
 Now we recommend you to examine our next example on logging to the files.
 
 ## Log into the files with rotation
@@ -108,6 +113,7 @@ enum class level {
 };
 
 void init() {
+    //Registering of frontend
     repository_t::instance().configure<
         sink::files_t<
             sink::files::boost_backend_t,
@@ -158,13 +164,13 @@ In Ubuntu you can compile it with the command
 g++ rotating_files.cpp -ofiles -std=c++0x -lboost_thread-mt -lboost_filesystem -lboost_system
 ```
 
-The first difference you can see is a new header:
+The first difference from the first example you can see is a new header:
 
 ```
 #include <blackhole/sink/files.hpp>
 ```
 
-The next difference contained in the next piece of code:
+The next difference contained in the following piece of code:
 
 ```
 repository_t::instance().configure<
@@ -179,13 +185,13 @@ repository_t::instance().configure<
     >();
 ```
 
-This is a registration code of `files`-sink. It may look frustrating and smells like dark template magic. This is an architectural solution that is discussed in "Architecture" part of documentation.
+This is a registration code of `files`-sink. It may look frustrating and smells like dark template magic. We are discussing on how to register frontends in the ["Registration rules"](registration-rules.md) part of the documentation.
 
 Required logger's object can be properly created only after registering frontend with corresponding configuration. Without registration an exception will be thrown.
 
 Formatter configuration has no any surprises, just an `%(issue)s` attribute that is not supported with our `BH_LOG` macro from the starting point of view. We will discuss it a bit later.
 
-Configuration of `files`-sink with rotation support looks more interesting than in the first example:
+Configuration of `files`-sink with rotation support looks more interesting than the same for the `stream`-sink in the first example:
 
 ```
 sink_config_t sink("files");
@@ -198,10 +204,7 @@ sink["rotation"]["size"] = std::uint64_t(4*1024);   //Size of log file
 
 `%(host)s` placeholder in an attribute of log event, but the `%(filename)s.%N` is not. `%(filename)s.%N` pattern leads to creation of backup filenames from the active log file substituting `%N` number of backup (from 1 to `backups`).
 
-More about `files` sink you can find in [detailed description](sink-files.md).
-
-
-*Note that also date-time rotation can be specified, e.g. each day or each hour, but not now. More detailed it will be discussed in reference documentation.*
+More about `files` sink you can find in [detailed description](sink-files.md) of sink.
 
 Next steps should be already familiar for people who passes previous tutorial. We just create frontend and logger configuration objects and push the last one into the repository.
 
@@ -220,6 +223,6 @@ BH_LOG(log, level::error, "error event")("host", "localhost", "issue", "To be, o
 
 What do you think about the second braces near our macro?
 
-Welcome to the **dynamic attributes** setting into the log event! Every log event can transport any number of additional attributes, which will participate in all subsequent operations associated with it (look at the architecture diagram, if you forgot). `%(hosts)s` and `%(issue)s` placeholders in code contain the names of this attributes which should be passed to `BH_LOG` in the second parentheses. You can pass this attributes in different manner, read the ["Common usage"](common-usage.md) article.
+Welcome to the **dynamic attributes** setting into the log event! Every log event can transport any number of additional attributes, which will participate in all subsequent operations associated with it (look at the architecture diagram, if you forgot). `%(hosts)s` and `%(issue)s` placeholders in code contain the names of this attributes which should be passed to `BH_LOG` in the second parentheses. You can pass this attributes in different manner, read the ["Passing attributes to the macro"](passing-attributes.md) article.
 
 [Back to contents](contents.md)

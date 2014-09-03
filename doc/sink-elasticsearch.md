@@ -18,7 +18,7 @@ Registration code looks like follows:
 repository_t::instance().configure<sink::elasticsearch_t, formatter::json_t>();
 ```
 
-The code above register `elasticsearch`-sink and `JSON`-formatter pair. How to register another combinations of sinks and formatters check the ["Registration rules" article](registration-rules.md).
+The code above register `elasticsearch`-sink and `JSON`-formatter pair. How to register another combinations of sinks and formatters check the ["Registration rules"](registration-rules.md) article.
 
 ##Configuration
 
@@ -54,9 +54,11 @@ sink["timeout"] = 1000;
 ||* `["when"]["start"]` - Get the state of cluster at start of sink if `true`.|
 ||* `["when"]["error"]` - Get the state of cluster on error if `true`. Error can be any, for example error of writing data to the Elasticsearch node.|
 ||* `["interval"] ` - Interval (milliseconds) of polling of Elasticsearch cluster status. It doesn't depend on `when` properties.|
-|connections|Maximum number of connections to one Elasticsearch node. Each bulk request create a connection to node. When Elasticseach is under high load it may have a delay while request processing or it can be just fail on any reason. With this option we can create a queue of bulk requests to the cluster.|
+|connections|Maximum number of connections to one Elasticsearch node. Each bulk request create a connection to node. When Elasticseach is under high load it may have a delay while request processing and new request can be ready before node answer the previous. In this case sink create one more connection to node for bulk request.|
 |retries|If sink couldn't send bulk request for any reason it will try to send it again for `retries` times. Retries can be performed to different nodes, depending on nodes availability. After retries number exceeded request is dropped with the message to `stdout`.|
 |timeout|Interval (millisecond) of waiting for the replay from Elasticsearch. In node doesn't reply in `timeout` request is treated as failed.|
 
 ##Example
 In development.
+
+[Back to contents](contents.md)

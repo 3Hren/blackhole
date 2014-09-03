@@ -23,6 +23,13 @@ produce
    * Rename parameters;
    * Construct hierarchical tree.
 
+
+Include the special header
+
+```
+#include <blackhole/formatter/json.hpp>
+```
+
 ##Registration
 When we register `json`-formatter with some sink `json_t` should be used. For example
 
@@ -30,7 +37,7 @@ When we register `json`-formatter with some sink `json_t` should be used. For ex
 repository_t::instance().configure<sink::syslog_t<level>, formatter::json_t>();
 ```
 
-This code register `syslog`-sink and `json`-formatter pair. How to register another combinations of sinks and formatters check the ["Registration rules" article](registration-rules.md).
+This code register `syslog`-sink and `json`-formatter pair. How to register another combinations of sinks and formatters check the ["Registration rules"](registration-rules.md) article.
 
 ##Configuration
 
@@ -45,11 +52,11 @@ formatter["routing"]["/"] = dynamic_t::array_t { "message", "timestamp" };
 formatter["routing"]["/fields"] = "*";
 ```
 
-  * `newline` - The newline symbol will be added to the end of document if `true`.
+  * `newline` - The newline symbol will be added to the end of final string if `true`.
   * `mapping` - This property is used to rename attributes. For example setting `formatter["mapping"]["message"] = "@message";` leads to object {"@message":"text"} istead of {"message":"text"}.
   * `routing` - This property is used for tree formatting.
 
-If we will call
+If we will call `BH_LOG` with the settings as shown above
 
 ```
 BH_LOG(log, level::debug, "debug event")("host", "127.0.0.1", "issue", "training");

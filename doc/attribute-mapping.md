@@ -2,7 +2,7 @@
 
 If you want to change representation of attribute value in the final string (after the formatter) you can configure attribute mapping.
 
-For example you can want to see levels of severity in your logs as srings "DEBUG", "INFO" and so on instead of numbers '0', '1' which you are use in the program. For this purpose you can use the followin code:
+For example you can want to see levels of severity in your logs as srings like "DEBUG" instead of numbers '0' which you are use in the program. For this purpose you can use the followin code:
 
 ```
 namespace {
@@ -55,3 +55,5 @@ mapper.add<keyword::tag::timestamp_t>("%FT%T.%f");
 
 ##Example
 In development
+
+[Back to contents](contenst.md)

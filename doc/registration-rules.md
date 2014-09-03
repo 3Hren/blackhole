@@ -1,12 +1,27 @@
-#Why the registration is needed
+#Why the frontends registration is needed
 
-What? Why so complicated? To fully understand why I've made so strange architecture decision, let's look deeper inside the library.
+The registration of frontend (formatter-sink pair) looks obsqure and in case of `file`-sink even intimidating.
+
+```
+repository_t::instance().configure<
+    sink::files_t<
+        sink::files::boost_backend_t,
+        sink::rotator_t<
+            sink::files::boost_backend_t,
+            sink::rotation::watcher::size_t
+        >
+    >,
+    formatter::string_t
+>();
+```
+
+Why so complicated? To fully understand why I've made so strange architecture decision, let's look deeper inside the library.
 
 Internally Blackhole has very few dynamicly coupled components. In other words, there are very few classes with *virtual* methods. That decision were made for two reasons.
 
 The first one was an attempt to minimize virtual methods invocation overhead. Blackhole was initially planned as high-performance solution for logging and the main requirement was the fastest log processing .
 
-The second reason was to have an ability to test separate components of the library, replacing others by mock-objects by the power of TDD. The alternative solution would require interface definition for every subcomponent. For example, files sink executes only basic operations with internal backend's interface and it is the backend who handles files itself. Also as a separate component of files sink there is so-called rotator, an interface which determines whether rotation should occur and which handles file rotation. 
+The second reason was to have an ability to test separate components of the library, replacing others by mock-objects by the power of TDD. The alternative solution would require interface definition for every subcomponent. For example, `files` sink executes only basic operations with internal backend's interface and it is the backend who handles files itself. Also as a separate component of files sink there is so-called rotator, an interface which determines whether rotation should occur and which handles file rotation. 
 
 To simplify the testing of all this zoo Alexandrescu's [Policy Based Design](http://en.wikipedia.org/wiki/Policy-based_design) was chosen, but it fits this case perfectly.
 
@@ -16,17 +31,13 @@ So why to register the components used statically? Some library components (form
 
 Just in case, repository's register method's signature is:
 
-
-
 ```
 template<typename Level>
 template<class Sink, class Formatter>
 void repository_t<Level>::instance().configure();
 ```
 
-Required logger's object can be properly created only after registering frontend with corresponding configuration. Without registration an exception will be thrown.
-
-========
+Required logger's object can be properly created only after registering frontend with corresponding configuration. Without registration Blackhole user gets a message to console.
 
 As we register sink-formatter pair of definite types the following configuration of them is predefined too. Let's register `syslog`-sink with the `string`-formatter:
 
@@ -44,7 +55,7 @@ Above registration means that we should configure exactly `syslog` with the `str
     sink["identity"] = "test-application";
 ```
 
-Otherwise (with another types of sink and/or formatter) repository method `add_config` will rise an exception
+Otherwise (with another types of sink and/or formatter) repository method `add_config` will rise an exception and you will see message in the console.
 
 ```
     frontend_config_t frontend = { formatter, sink };
@@ -52,5 +63,3 @@ Otherwise (with another types of sink and/or formatter) repository method `add_c
 
     repository_t::instance().add_config(config);
 ```
-
-========

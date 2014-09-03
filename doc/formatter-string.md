@@ -8,7 +8,7 @@ When we register `string`-formatter with some sink `string_t` should be used. Fo
 repository_t::instance().configure<sink::syslog_t<level>, formatter::string_t>();
 ```
 
-This code register `syslog`-sink and `string`-formatter pair. How to register another combinations of sinks and formatters check the ["Registration rules" article](registration-rules.md).
+This code register `syslog`-sink and `string`-formatter pair. How to register another combinations of sinks and formatters check the ["Registration rules"](registration-rules.md) article.
 
 ##Configuration
 
@@ -38,7 +38,7 @@ num      ::= ‘0’ | ‘1’ | ‘2’ | ‘3’ | ‘4’ | ‘5’ | ‘6’
 
 `rph`, `oph` and `vph` are the placeholders of three types which are processed in different manner.
 
-###Placeholders of type `rph`. Required placeholders
+###Placeholders of `rph`-type. Required placeholders
 
 Syntax:
 ```
@@ -56,14 +56,14 @@ BH_LOG(log, severity, "message");
 Logger doesn't rise an exception on missing attributes while `BH_LOG` call, it send message to `stdout`.
 
 
-###Placeholders of type 'oph'. Optional placeholders
+###Placeholders of 'oph'-type. Optional placeholders
 
 Syntax:
 ```
 %(' [char]* '[' alnum+ ']' [char]* ')?s
 ```
 
-This placeholder doesn't require attribute in log message. If log message doesn't containe nesessary attribute all of the content inside braces will be skipped.
+This placeholder doesn't require attribute in log message. If log message doesn't containe nesessary attribute all of the content inside parenthesis will be skipped.
 
 Let's consider the next pattern
 
@@ -93,7 +93,7 @@ will produce the next output string
 outer_symbols-inner_symbols<attr_value>inner_symbols-outer_symbols
 ```
 
-###Placeholders of type `vph`. Variadic placeholders
+###Placeholders of `vph`-type. Variadic placeholders
 
 Syntax:
 

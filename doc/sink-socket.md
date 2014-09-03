@@ -2,11 +2,11 @@
 
 This sink transport log messages through the network to specified address by TCP or UDP protocol.
 
-When sink works in TCP mode connection can be broken on some reasons. In this case sink will try to restart connection once and rise an exeption in case of unsuccess. The next connection attempt will be with the next log message.
+In TCP mode connection can be broken on some reasons. Sink attempts to restart connection once and rise an exeption in case of unsuccess. Blackhole catches this exeption and print message to the `stdout`. The successive connection attempt will be performed with the next log message sending.
 
-It is not thread-safe.
+Sink is not thread-safe.
 
-You need additional header
+To use sink you need to include additional header
 
 ```
 #include <blackhole/sink/socket.hpp>
@@ -18,11 +18,11 @@ Since `socket` sink has two different  hypostasis `tcp` and `udp` you can regist
 
 ```
 repository_t::instance().configure<sink::socket_t<boost::asio::ip::tcp>, formatter::string_t>();
-//and
+//or
 repository_t::instance().configure<sink::socket_t<boost::asio::ip::udp>, formatter::string_t>();
 ```
 
-The code above register `tcp/udp socket`-sink and `string`-formatter pair. How to register another combinations of sinks and formatters check the ["Registration rules" article](registration-rules.md).
+The code above register `tcp/udp socket`-sink and `string`-formatter pair. How to register another combinations of sinks and formatters check the ["Registration rules"](registration-rules.md) article.
 
 ##Configuration
 
@@ -34,7 +34,7 @@ sink["host"] = "localhost";
 sink["port"] = 50030;
 ```
 
-You can create sink with "tcp" and "udp" properties according to registered type.
+You should configure sink with "tcp" and "udp" properties according to registered type.
 
   * `host` is the host name of IP-address.
   * `port` is the port (suddenly).
@@ -44,3 +44,5 @@ Blackhole connects to `host`:`port` (in case of `tcp`) and send messages to that
 ##Example
 
 In development.
+
+[Back to contents](contents.md)

@@ -8,7 +8,7 @@ Unlike other sinks this one has the default registration in pair with `string` f
 repository_t::instance().configure<sink::stream_t, formatter::json_t>();
 ```
 
-The code above register `stream`-sink and `json`-formatter pair. How to register another combinations of sinks and formatters check the ["Registration rules" article](registration-rules.md).
+The code above register `stream`-sink and `json`-formatter pair. How to register another combinations of sinks and formatters check the ["Registration rules"](registration-rules.md) article.
 
 ##Configuration
 
@@ -18,9 +18,10 @@ sink_config_t sink("stream");
 sink["output"] = "stdout";
 ```
 
-`output`-field controls which stream on known by Blackhole can be used. Only 2 values are available `stdout` and `stderr`.
-
+`output`-field controls which stream from known by Blackhole can be used. Only 2 values are available `stdout` and `stderr`.
 
 ##Example
 
 The simplest example of `stream`-sink usage you can find in [Tutotial](tutorial.md).
+
+[Back to contents](contents.md)

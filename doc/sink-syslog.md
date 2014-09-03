@@ -16,7 +16,7 @@ You should register this sink before use. To do it include the following code in
 repository_t::instance().configure<sink::syslog_t<level>, formatter::string_t>();
 ```
 
-The code above register `syslog`-sink and `string`-formatter pair. How to register another combinations of sinks and formatters check the ["Registration rules" article](registration-rules.md).
+The code above register `syslog`-sink and `string`-formatter pair. How to register another combinations of sinks and formatters check the ["Registration rules"](registration-rules.md) article.
 
 After the registration this pair can be configured and used.
 
@@ -42,9 +42,7 @@ enum class level {
 };
 ```
 
-The fact that syslog has own severity level definition as it described in **RFC5424** and we need to properly map from user defined severity enumeration to the syslog's one. But there is no other way to pass additional parameter (current log event's severity) to the sink except implementing frontend's template specialization. That's why we need additional header file.
-
-Okay, now we know that it is necessary to map severity levels, but how to do that? Blackhole provides you way to do that via implementing additional template specialization. The code will looks like this:
+The fact that syslog has own severity level definition as it described in **RFC5424** and we need to properly map from user defined severity enumeration to the syslog's one. The mapping code will looks like this:
 
 ```
 namespace blackhole {

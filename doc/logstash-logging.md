@@ -1,5 +1,7 @@
 #Writing logs to Logstash
 
+Here just and example of code that writes messages to [Logstash](http://logstash.net/).
+
 ```
 #include <blackhole/blackhole.hpp>
 #include <blackhole/formatter/json.hpp>
@@ -113,3 +115,5 @@ int main(int, char**) {
     return 0;
 }
 ```
+
+[Back to contents](contents.md)

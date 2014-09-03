@@ -1,4 +1,5 @@
 #`Files`-sink
+
 This sink is designed for local logging to the files. It provides:
   * Simple logging into the one file;
   * Logging into different files simultaneousely according to the log event attributes;
@@ -11,8 +12,6 @@ The first you need to do is to include special header:
 ```
 #include <blackhole/sink/files.hpp>
 ```
-
-Why not to include it? Well, the need for special frontend is explained by fact, that files sink requires additional arguments in its `consume` method. In other words, files sink needs extended contract with underlying formatter. That's why frontends needed - to couple various formatters and sinks in one entity. If the existing contract doesn't satisfied with external requirements, there is always possibility to implement additional frontend specialization.
 
 ##Registration
 You should register this sink before use. To do it include the following code into your program:
@@ -30,7 +29,7 @@ repository_t::instance().configure<
 >();
 ```
 
-The code above register `files`-sink and `string`-formatter pair. How to register another combinations of sinks and formatters check the ["Registration rules" article](registration-rules.md).
+The code above register `files`-sink and `string`-formatter pair. How to register another combinations of sinks and formatters check the ["Registration rules"](registration-rules.md) article.
 
 After the registration this pair can be configured and used.
 
@@ -51,7 +50,7 @@ Example:
   * `autoflush` - Autoflush determines whether logs are dumped in the file immediately (`true`-value), or accumulated in the internal buffer (`false`);
   * `rotation` - Set of rotation logic properties.
 
-Below we will describe configuration entities in details.
+Below we will describe configuration entities `path` and `rotation` in details.
 
 ###path
 Path to the log file can contain placeholers in the next manner:
@@ -68,10 +67,10 @@ In our example there will be different files created with names depending on `lo
 BH_LOG(log, severity, "trace message")("log_event_attribute", "trace");
 ```
 
-Using placeholders is not necessary, so if you want to write all logs in one file (say, blackhole.log), just don't use them.
+Using of placeholders is not necessary, so if you want to write all logs in one file (say, blackhole.log), just don't use them.
 
 ###Rotation
-Here come several rotation options, that determines file rotation settings. If something defined in this section, Blackhole will create files sink with rotation support, otherwise without one.
+Here come several rotation options, that determines file rotation settings. If something defined in this section, Blackhole will create `files` sink with rotation support, otherwise without one.
 
 * Option `pattern` specifies pattern for backup files. Any name can be used here, if you want to keep your backup names differently than the active file name. For convenience the next placeholders can be also used:        
     * Filename `%(filename)s` placeholder substitutes active file name.
@@ -82,7 +81,9 @@ Here come several rotation options, that determines file rotation settings. If s
 
 Rotation works in the next manner. Blackhole writes logs into the log file (`path`) until it exceeds `size`. At that moment log file is renamed according to `pattern` and a new log file is started. Number of renamed files equals to `backups`. When last `backups` number exceeded cycle is repeated.
 
+?????????????????????????
 *Note that also date-time rotation can be specified, e.g. each day or each hour, but not now. More detailed it will be discussed in reference documentation.*
+?????????????????????????
 
 ##Example
 Example of `files`-sink usage you can find in the [tutorial](tutorial.md#log-into-the-files-with-rotation).
