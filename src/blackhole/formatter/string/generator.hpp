@@ -89,12 +89,12 @@ public:
         stream.rdbuf()->storage()->append(ph.prefix);
 
         auto it = view.begin();
-        visit(ph.pattern, it->first, it->second.value, stream);
+        traverse(ph.pattern, it->first, it->second.value, stream);
         it++;
 
         for (; it != view.end(); ++it) {
             stream.rdbuf()->storage()->append(ph.separator);
-            visit(ph.pattern, it->first, it->second.value, stream);
+            traverse(ph.pattern, it->first, it->second.value, stream);
         }
 
         stream.rdbuf()->storage()->append(ph.suffix);
@@ -104,10 +104,10 @@ private:
     static
     inline
     void
-    visit(const std::vector<placeholder::variadic_t::pattern_t>& pattern,
-          const attribute::name_t& name,
-          const attribute::value_t& value,
-          stickystream_t& stream)
+    traverse(const std::vector<placeholder::variadic_t::pattern_t>& pattern,
+             const attribute::name_t& name,
+             const attribute::value_t& value,
+             stickystream_t& stream)
     {
         variadic_visitor_t visitor(name, value, stream);
         for (auto it = pattern.begin(); it != pattern.end(); ++it) {
