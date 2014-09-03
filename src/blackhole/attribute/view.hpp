@@ -47,7 +47,12 @@ private:
 
 public:
     set_view_t() = default;
-    set_view_t(set_t attached, set_t external, set_t&& internal);
+
+    set_view_t(set_t attached, set_t external, set_t&& internal) :
+        attached({ std::move(attached) }),
+        internal({ std::move(internal) }),
+        external({ std::move(external) })
+    {}
 
     bool
     empty() const BLACKHOLE_NOEXCEPT {
@@ -55,18 +60,53 @@ public:
     }
 
     //! Intentionally allow to insert only to external attribute set.
-    void insert(pair_t pair);
+    void insert(pair_t pair) {
+        external.v.insert(std::move(pair));
+    }
 
     template<typename InputIterator>
-    void insert(InputIterator first, InputIterator last);
+    void insert(InputIterator first, InputIterator last) {
+        external.v.insert(first, last);
+    }
 
-    const_iterator begin() const BLACKHOLE_NOEXCEPT;
-    const_iterator end() const BLACKHOLE_NOEXCEPT;
+    const_iterator begin() const BLACKHOLE_NOEXCEPT {
+        std::array<set_t const*, 3> array {{ &internal.v, &external.v, &attached.v }};
+        return const_iterator(array);
+    }
+
+    const_iterator end() const BLACKHOLE_NOEXCEPT {
+        std::array<set_t const*, 3> array {{ &internal.v, &external.v, &attached.v }};
+        return const_iterator(array, aux::iterator::invalidate_tag);
+    }
 
     boost::optional<const attribute_t&>
-    find(const std::string& name) const BLACKHOLE_NOEXCEPT;
+    find(const std::string& name) const BLACKHOLE_NOEXCEPT {
+        auto it = internal.v.find(name);
+        if (it != internal.v.end()) {
+            return it->second;
+        }
 
-    const attribute_t& at(const std::string& name) const;
+        it = external.v.find(name);
+        if (it != external.v.end()) {
+            return it->second;
+        }
+
+        it = attached.v.find(name);
+        if (it != attached.v.end()) {
+            return it->second;
+        }
+
+        return boost::optional<const attribute_t&>();
+    }
+
+    const attribute_t& at(const std::string& name) const {
+        auto value = find(name);
+        if (!value) {
+            throw std::out_of_range(name);
+        }
+
+        return *value;
+    }
 };
 
 namespace set_view {
@@ -186,72 +226,6 @@ private:
         return tuple_empty<tuple_type>::empty(tuple);
     }
 };
-
-BLACKHOLE_API
-set_view_t::set_view_t(set_t attached, set_t external, set_t&& internal) :
-    attached({ std::move(attached) }),
-    internal({ std::move(internal) }),
-    external({ std::move(external) })
-{}
-
-BLACKHOLE_API
-void
-set_view_t::insert(pair_t pair) {
-    external.v.insert(std::move(pair));
-}
-
-template<typename InputIterator>
-BLACKHOLE_API
-void
-set_view_t::insert(InputIterator first, InputIterator last) {
-    external.v.insert(first, last);
-}
-
-BLACKHOLE_API
-set_view_t::const_iterator
-set_view_t::begin() const BLACKHOLE_NOEXCEPT {
-    std::array<set_t const*, 3> array {{ &internal.v, &external.v, &attached.v }};
-    return const_iterator(array);
-}
-
-BLACKHOLE_API
-set_view_t::const_iterator
-set_view_t::end() const BLACKHOLE_NOEXCEPT {
-    std::array<set_t const*, 3> array {{ &internal.v, &external.v, &attached.v }};
-    return const_iterator(array, aux::iterator::invalidate_tag);
-}
-
-BLACKHOLE_API
-boost::optional<const attribute_t&>
-set_view_t::find(const std::string& name) const BLACKHOLE_NOEXCEPT {
-    auto it = internal.v.find(name);
-    if (it != internal.v.end()) {
-        return it->second;
-    }
-
-    it = external.v.find(name);
-    if (it != external.v.end()) {
-        return it->second;
-    }
-
-    it = attached.v.find(name);
-    if (it != attached.v.end()) {
-        return it->second;
-    }
-
-    return boost::optional<const attribute_t&>();
-}
-
-BLACKHOLE_API
-const attribute_t&
-set_view_t::at(const std::string &name) const {
-    auto value = find(name);
-    if (!value) {
-        throw std::out_of_range(name);
-    }
-
-    return *value;
-}
 
 } // namespace attribute
 
