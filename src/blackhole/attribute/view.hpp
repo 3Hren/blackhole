@@ -198,7 +198,7 @@ public:
 
     bool
     empty() const BLACKHOLE_NOEXCEPT {
-        return empty(tuple);
+        return tuple_empty<tuple_type>::empty(tuple);
     }
 
     const_iterator
@@ -218,13 +218,6 @@ private:
     array_type
     to_array(const tuple_type& tuple, index_tuple<I...>) {
         return array_type {{ &std::get<I>(tuple)->v... }};
-    }
-
-    static
-    inline
-    bool
-    empty(const tuple_type& tuple) {
-        return tuple_empty<tuple_type>::empty(tuple);
     }
 };
 
