@@ -93,7 +93,6 @@ public:
         }
 
         stream.rdbuf()->storage()->append(ph.prefix);
-        std::cout << std::boolalpha << view.empty() << std::endl;
         auto it = view.begin();
         traverse(ph.pattern, it->first, it->second.value, stream);
         it++;
