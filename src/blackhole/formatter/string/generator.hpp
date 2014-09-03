@@ -81,8 +81,11 @@ public:
     }
 
     void operator()(const placeholder::variadic_t& ph) {
+        typedef attribute::set_view_t::attached_set_t attached_type;
+        typedef attribute::set_view_t::external_set_t external_type;
+
         const attribute::set_t& external = view.external();
-        if (external.empty()) {
+        if (view.empty<attached_type, external_type>()) {
             return;
         }
 

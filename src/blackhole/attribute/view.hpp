@@ -21,21 +21,40 @@ namespace attribute {
 
 class set_view_t {
 public:
-    typedef aux::iterator::join_t<set_t, true>  const_iterator;
-    typedef set_t::size_type size_type;
+    typedef aux::iterator::join_t<set_t, true> const_iterator;
+
+    struct attached_set_t { set_t v; };
+    struct internal_set_t { set_t v; };
+    struct external_set_t { set_t v; };
 
 private:
-    set_t global;     // Likely empty.
-    set_t internal;   // About level + message + pid + tid + timestamp (4-5).
-    set_t external_;  // The most filled (scoped + user attributes)
+    attached_set_t attached_;  // Likely empty.
+    internal_set_t internal_;  // About level + message + pid + tid + timestamp (4-5).
+    external_set_t external_;  // The most filled (scoped + user attributes)
 
 public:
     set_view_t() = default;
-    set_view_t(set_t global, set_t scoped, set_t&& internal);
+    set_view_t(set_t attached, set_t external, set_t&& internal);
 
-    bool empty() const BLACKHOLE_NOEXCEPT;
-    size_type upper_size() const BLACKHOLE_NOEXCEPT;
-    size_type count(const std::string& name) const BLACKHOLE_NOEXCEPT;
+    bool
+    empty() const BLACKHOLE_NOEXCEPT {
+        return empty<attached_set_t, internal_set_t, external_set_t>();
+    }
+
+    template<class T>
+    bool
+    empty() const BLACKHOLE_NOEXCEPT {
+        return empty<T>();
+    }
+
+    template<class T, class... Args>
+    typename std::enable_if<
+        sizeof...(Args) != 0 && sizeof...(Args) <= 3,
+        bool
+    >::type
+    empty() const BLACKHOLE_NOEXCEPT {
+        return empty<T>() && empty<Args...>();
+    }
 
     void insert(pair_t pair);
 
@@ -46,7 +65,7 @@ public:
     const_iterator end() const BLACKHOLE_NOEXCEPT;
 
     const set_t& external() const BLACKHOLE_NOEXCEPT {
-        return external_;
+        return external_.v;
     }
 
     boost::optional<const attribute_t&>
@@ -56,70 +75,73 @@ public:
 };
 
 BLACKHOLE_API
-set_view_t::set_view_t(set_t global, set_t external, set_t&& internal) :
-    global(std::move(global)),
-    internal(std::move(internal)),
-    external_(std::move(external))
+set_view_t::set_view_t(set_t attached, set_t external, set_t&& internal) :
+    attached_({ std::move(attached) }),
+    internal_({ std::move(internal) }),
+    external_({ std::move(external) })
 {}
 
+template<>
 BLACKHOLE_API
 bool
-set_view_t::empty() const BLACKHOLE_NOEXCEPT {
-    return internal.empty() && external_.empty() && global.empty();
+set_view_t::empty<set_view_t::attached_set_t>() const BLACKHOLE_NOEXCEPT {
+    return attached_.v.empty();
 }
 
+template<>
 BLACKHOLE_API
-set_view_t::size_type
-set_view_t::upper_size() const BLACKHOLE_NOEXCEPT {
-    return internal.size() + external_.size() + global.size();
+bool
+set_view_t::empty<set_view_t::internal_set_t>() const BLACKHOLE_NOEXCEPT {
+    return internal_.v.empty();
 }
 
+template<>
 BLACKHOLE_API
-set_view_t::size_type
-set_view_t::count(const std::string& name) const BLACKHOLE_NOEXCEPT {
-    return internal.count(name) + external_.count(name) + global.count(name);
+bool
+set_view_t::empty<set_view_t::external_set_t>() const BLACKHOLE_NOEXCEPT {
+    return external_.v.empty();
 }
 
 BLACKHOLE_API
 void
 set_view_t::insert(pair_t pair) {
-    external_.insert(std::move(pair));
+    external_.v.insert(std::move(pair));
 }
 
 template<typename InputIterator>
 BLACKHOLE_API
 void
 set_view_t::insert(InputIterator first, InputIterator last) {
-    external_.insert(first, last);
+    external_.v.insert(first, last);
 }
 
 BLACKHOLE_API
 set_view_t::const_iterator
 set_view_t::begin() const BLACKHOLE_NOEXCEPT {
-    return const_iterator({ &internal, &external_, &global });
+    return const_iterator({ &internal_.v, &external_.v, &attached_.v });
 }
 
 BLACKHOLE_API
 set_view_t::const_iterator
 set_view_t::end() const BLACKHOLE_NOEXCEPT {
-    return const_iterator({ &internal, &external_, &global }, aux::iterator::invalidate_tag);
+    return const_iterator({ &internal_.v, &external_.v, &attached_.v }, aux::iterator::invalidate_tag);
 }
 
 BLACKHOLE_API
 boost::optional<const attribute_t&>
 set_view_t::find(const std::string& name) const BLACKHOLE_NOEXCEPT {
-    auto it = internal.find(name);
-    if (it != internal.end()) {
+    auto it = internal_.v.find(name);
+    if (it != internal_.v.end()) {
         return it->second;
     }
 
-    it = external_.find(name);
-    if (it != external_.end()) {
+    it = external_.v.find(name);
+    if (it != external_.v.end()) {
         return it->second;
     }
 
-    it = global.find(name);
-    if (it != global.end()) {
+    it = attached_.v.find(name);
+    if (it != attached_.v.end()) {
         return it->second;
     }
 
