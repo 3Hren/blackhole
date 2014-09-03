@@ -381,15 +381,15 @@ TEST(string_t, FormatVariadicSingleSeparator) {
 
 TEST(string_t, FormatVariadicMultipleSeparator) {
     record_t record;
+    record.insert({ "id", attribute_t(42) });
     record.insert({ "uuid", attribute_t("123-456") });
-    record.insert({ "message", attribute_t("le message") });
 
     std::string pattern("%(...::: | )s");
     formatter::string_t formatter(pattern);
     auto actual = formatter.format(record);
     EXPECT_TRUE(
-        "uuid: 123-456 | message: le message" == actual ||
-        "message: le message | uuid: 123-456" == actual
+        "uuid: 123-456 | id: 42" == actual ||
+        "id: 42 | uuid: 123-456" == actual
     );
 }
 
@@ -412,15 +412,15 @@ TEST(string_t, FormatVariadicSinglePrefixSuffixSeparator) {
 
 TEST(string_t, FormatVariadicMultiplePrefixSuffixSeparator) {
     record_t record;
+    record.insert({ "id", attribute_t(42) });
     record.insert({ "uuid", attribute_t("123-456") });
-    record.insert({ "message", attribute_t("le message") });
 
     std::string pattern("%(...:[:]: | )s");
     formatter::string_t formatter(pattern);
     auto actual = formatter.format(record);
     EXPECT_TRUE(
-        "[uuid: 123-456 | message: le message]" == actual ||
-        "[message: le message | uuid: 123-456]" == actual
+        "[uuid: 123-456 | id: 42]" == actual ||
+        "[id: 42 | uuid: 123-456]" == actual
     );
 }
 
@@ -435,14 +435,14 @@ TEST(string_t, FormatVariadicSinglePattern) {
 
 TEST(string_t, FormatVariadicMultiplePrefixSuffixSeparatorPattern) {
     record_t record;
+    record.insert({ "id", attribute_t(42) });
     record.insert({ "uuid", attribute_t("123-456") });
-    record.insert({ "message", attribute_t("le message") });
 
     std::string pattern("%(...[%k=%v]:[:]: | )s");
     formatter::string_t formatter(pattern);
     auto actual = formatter.format(record);
     EXPECT_TRUE(
-        "[uuid=123-456 | message=le message]" == actual ||
-        "[message=le message | uuid=123-456]" == actual
+        "[uuid=123-456 | id=42]" == actual ||
+        "[id=42 | uuid=123-456]" == actual
     );
 }
