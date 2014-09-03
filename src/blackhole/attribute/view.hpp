@@ -25,6 +25,7 @@ public:
     typedef set_t::size_type size_type;
 
 private:
+    //!@todo: Rename to '?', 'internal' 'external'.
     set_t global; // Likely empty.
     set_t local;  // About 1-2 + message + tid + timestamp (4-5).
     set_t other;  // The most filled (scoped + user attributes)
