@@ -1,8 +1,8 @@
 # Main concepts
 
-[Architecture](#architecture)
-[Attributes](#attributes)
-[Filtering](#filtering)
+  * [Architecture](#architecture)
+  * [Attributes](#attributes)
+  * [Filtering](#filtering)
 
 ##Architecture
 Blackhole was originally conceived as project with clearly separated entities, or modules. Mainly this decision was made because the project can be easily tested and expanded if it consists of independent entities than with the coupled ones.

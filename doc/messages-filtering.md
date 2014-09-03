@@ -19,4 +19,4 @@ How it can be used? For example you can implement filtering by severity.  Assumi
 ##Example
 In development.
 
-[Back to contents][contents.md]
+[Back to contents](contents.md)

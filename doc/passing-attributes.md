@@ -6,7 +6,7 @@ How is it imlemented?
 
 Actually, `BH_LOG` macro returns functional object, which accepts variadic pack. You can set this pack in four ways.
 
-**`Attribute::make` way**
+**Attribute::make way**
 
 Explicitly create attributes objects using helper `attributes::make` function:
 
@@ -35,7 +35,7 @@ BH_LOG(log, level::debug, "debug event")(attribute::make("host", "localhost",'G'
 *All additional (in the second parenthesis) attributes have type `L` by default.*
 
 
-**`Keywords` way** 
+**Keywords way** 
 
 You can use registered **keywords**:
 ```
@@ -103,3 +103,5 @@ BH_LOG(log, level::debug, "debug event")({
 *Actually, only GCC 4.6 doesn't allow you to write like this, because it violates the C++11 Standard (see '-fno-deduce-init-list' extension for more details).*
 
 Which of the following methods to choose - is your decision, depending on what you prefer.
+
+[Back to contents](contents.md)
