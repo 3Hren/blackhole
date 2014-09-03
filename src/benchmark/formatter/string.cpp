@@ -54,19 +54,19 @@ BENCHMARK(VariadicStringFormatter, Baseline) {
     static int initializer = initialize(formatter);
     ticktack::compiler::do_not_optimize(initializer);
 
-    blackhole::attribute::set_t global;
-    blackhole::attribute::set_t scoped;
-    scoped.insert(blackhole::attribute::make("id", 42));
-    scoped.insert(blackhole::attribute::make("source", "app/benchmark"));
+    blackhole::attribute::set_t attached;
+    blackhole::attribute::set_t external;
+    external.insert(blackhole::attribute::make("id", 42));
+    external.insert(blackhole::attribute::make("source", "app/benchmark"));
 
-    blackhole::attribute::set_t local;
+    blackhole::attribute::set_t internal;
     timeval tv;
     gettimeofday(&tv, nullptr);
-    local.insert(blackhole::keyword::timestamp() = tv);
-    local.insert(blackhole::keyword::severity<level_t>() = level_t::info);
-    local.insert(blackhole::keyword::message() = MESSAGE_LONG);
+    internal.insert(blackhole::keyword::timestamp() = tv);
+    internal.insert(blackhole::keyword::severity<level_t>() = level_t::info);
+    internal.insert(blackhole::keyword::message() = MESSAGE_LONG);
 
-    blackhole::attribute::set_view_t view(global, scoped, std::move(local));
+    blackhole::attribute::set_view_t view(attached, external, std::move(internal));
     blackhole::record_t record(std::move(view));
     ticktack::compiler::do_not_optimize(formatter.format(record));
 }
