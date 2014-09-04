@@ -29,7 +29,7 @@ make(const name_t& name, T&& value) {
     return std::make_pair(name, attribute_t(std::forward<T>(value)));
 }
 
-/// Attribute packing/unpacking/extracting traits.
+/// Attribute packing/extracting traits.
 template<typename T, class = void>
 struct traits {
     static inline T pack(const T& value) {
@@ -41,6 +41,7 @@ struct traits {
     }
 };
 
+/// Attribute packing/extracting trait specialization for enumeration types.
 template<typename T>
 struct traits<T, typename std::enable_if<std::is_enum<T>::value>::type> {
     typedef typename aux::underlying_type<T>::type underlying_type;
