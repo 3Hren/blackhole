@@ -14,9 +14,6 @@ namespace aux {
 
 namespace iterator {
 
-struct invalidate_tag_t {};
-static invalidate_tag_t invalidate_tag;
-
 template<class Container, bool Const>
 class join_t {
     friend class join_t<Container, !Const>;
@@ -75,15 +72,15 @@ public:
     }
 
     template<class T>
-    join_t(const T& array, const invalidate_tag_t&) :
-        current(nullptr),
-        pos(0)
-    {
-        init(array);
-        if (!containers.empty()) {
-            current = containers.back();
-            it = current->end();
+    static
+    join_t
+    invalid(const T& array) {
+        auto result = join_t(array);
+        if (!result.containers.empty()) {
+            result.current = result.containers.back();
+            result.it = result.current->end();
         }
+        return result;
     }
 
     join_t& operator++() BLACKHOLE_NOEXCEPT {

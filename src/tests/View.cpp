@@ -7,7 +7,6 @@
 
 using namespace blackhole;
 using aux::iterator::join_t;
-using aux::iterator::invalidate_tag;
 
 #define TEST_JOIN_ITERATOR(Suite, Case) \
     TEST(join_t##_##Suite, Case)
@@ -26,7 +25,7 @@ TEST_JOIN_ITERATOR(Cons, Invalidation) {
     container_type c1, c2;
     std::array<const container_type*, 2> array {{ &c1, &c2 }};
 
-    join_t<container_type, true> it(array, invalidate_tag);
+    auto it = join_t<container_type, true>::invalid(array);
     UNUSED(it);
 }
 
@@ -134,7 +133,7 @@ TEST_JOIN_ITERATOR(Forward, Loop) {
     std::array<const container_type*, 2> array {{ &c1, &c2 }};
 
     join_t<container_type, true> begin(array);
-    join_t<container_type, true> end(array, invalidate_tag);
+    auto end = join_t<container_type, true>::invalid(array);
     container_type expected = { 0, 1, 2, 3, 4, 5 };
     size_t s = 0;
     for (auto it = begin; it != end; ++it) {
@@ -149,7 +148,7 @@ TEST_JOIN_ITERATOR(Forward, LoopPostIncrement) {
     std::array<const container_type*, 2> array {{ &c1, &c2 }};
 
     join_t<container_type, true> begin(array);
-    join_t<container_type, true> end(array, invalidate_tag);
+    auto end = join_t<container_type, true>::invalid(array);
     container_type expected = { 0, 1, 2, 3, 4, 5 };
     size_t s = 0;
     for (auto it = begin; it != end; it++) {
@@ -164,7 +163,7 @@ TEST_JOIN_ITERATOR(Forward, Map) {
     std::array<const container_type*, 2> array {{ &c1, &c2 }};
 
     const join_t<container_type, true> begin(array);
-    join_t<container_type, true> end(array, invalidate_tag);
+    auto end = join_t<container_type, true>::invalid(array);
     container_type expected = {
         {"0", 0}, {"1", 1}, {"2", 2}, {"3", 0}, {"4", 1}, {"5", 2}
     };

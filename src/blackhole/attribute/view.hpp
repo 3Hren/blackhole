@@ -78,9 +78,8 @@ public:
     }
 
     const_iterator end() const BLACKHOLE_NOEXCEPT {
-        return const_iterator(
-            aux::make_array(&internal.v, &external.v, &attached.v),
-            aux::iterator::invalidate_tag
+        return const_iterator::invalid(
+            aux::make_array(&internal.v, &external.v, &attached.v)
         );
     }
 
@@ -209,9 +208,8 @@ public:
 
     const_iterator
     end() const BLACKHOLE_NOEXCEPT {
-        return const_iterator(
-            array_type {{ extractor<T>::extract(view)... }},
-            aux::iterator::invalidate_tag
+        return const_iterator::invalid(
+            array_type {{ extractor<T>::extract(view)... }}
         );
     }
 };
