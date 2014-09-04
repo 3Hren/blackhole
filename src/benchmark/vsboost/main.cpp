@@ -77,7 +77,7 @@ void init_boost_log() {
 
 //! Initialialize blackhole logger.
 void init_blackhole_log() {
-    repository_t::instance().configure<sink::files_t<>, formatter::string_t>();
+    repository_t::instance().registrate<sink::files_t<>, formatter::string_t>();
 
     mapping::value_t mapper;
     mapper.add<level>("severity", &map_severity);
@@ -102,7 +102,7 @@ verbose_logger_t<level> blackhole_log;
 int main(int argc, char** argv) {
     init_boost_log();
     init_blackhole_log();
-    auto log = repository_t::instance().root<level>();
+    auto log = repository_t::instance().create<verbose_logger_t<level>>("root");
     blackhole_log = std::move(log);
 
     celero::Run(argc, argv);
