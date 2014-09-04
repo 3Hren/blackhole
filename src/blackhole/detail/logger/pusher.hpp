@@ -100,6 +100,7 @@ private:
                 std::forward<Args>(args)...
             );
         } catch (const boost::io::format_error& err) {
+            //!@todo: I don't really sure, it's proper behaviour.
             return err.what();
         }
     }
