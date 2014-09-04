@@ -60,7 +60,6 @@ public:
      * Registered frontends can be injected inside the logger while its
      * creation stage if the logger's configuration requires them.
      * @post: registered<Sink, Formatter>() == true.
-     * @todo: Test post condition.
      */
     template<typename Sink, typename Formatter>
     void registrate();
