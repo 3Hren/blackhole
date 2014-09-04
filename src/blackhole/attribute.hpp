@@ -27,13 +27,6 @@ typedef std::initializer_list<std::pair<name_t, value_t>> list;
 template<typename T>
 inline
 pair_t
-make(const name_t& name, const T& value) {
-    return std::make_pair(name, attribute_t(value));
-}
-
-template<typename T>
-inline
-pair_t
 make(const name_t& name, T&& value) {
     return std::make_pair(name, attribute_t(std::forward<T>(value)));
 }
