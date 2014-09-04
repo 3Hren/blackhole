@@ -15,10 +15,7 @@ namespace blackhole {
 
 namespace attribute {
 
-/*!
- * Simple typedef for attributes initializer list.
- * Useful when specifying local attributes.
- */
+/// Simple typedef for simplifying attributes initialization.
 typedef std::initializer_list<std::pair<name_t, value_t>> list;
 
 /// Dynamic attribute factory function.
