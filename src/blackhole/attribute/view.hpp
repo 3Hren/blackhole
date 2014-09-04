@@ -47,12 +47,6 @@ private:
     external_set_t external;  // The most filled (scoped + user attributes)
 
 public:
-    //!@todo: Cases:
-    //! - iterate over all
-    //! - iterate over external+attached
-    //! - empty all
-    //! - empty external+attached
-    //! partial_view_t - save only const reference to this object.
     set_view_t() = default;
 
     set_view_t(set_t attached, set_t external, set_t&& internal) :
