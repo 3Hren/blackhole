@@ -42,10 +42,6 @@ typedef boost::variant<
 
 } // namespace attribute
 
-//!@todo: Now I keep multiple attribute sets in single view class. Seems, there
-//!       is no need for this class anymore, cause attribute groups can be
-//!       received from view class explicitly (without that freaking iterate
-//!       over ALL attributes).
 struct attribute_t {
     attribute::value_t value;
 
