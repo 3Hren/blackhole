@@ -8,7 +8,7 @@
 
 namespace blackhole {
 
-/// Metafunction, that determines whether a parameter pack has duplicate items.
+/// Metafunction, that detects whether a parameter pack has duplicate items.
 template<typename... Args>
 struct unique :
     public std::conditional<
