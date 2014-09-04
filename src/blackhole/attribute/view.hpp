@@ -16,6 +16,7 @@
 
 #include "blackhole/attribute/set.hpp"
 #include "blackhole/config.hpp"
+#include "blackhole/detail/array.hpp"
 #include "blackhole/detail/iterator/join.hpp"
 #include "blackhole/detail/traits/tuple.hpp"
 
@@ -77,13 +78,16 @@ public:
     }
 
     const_iterator begin() const BLACKHOLE_NOEXCEPT {
-        std::array<set_t const*, 3> array {{ &internal.v, &external.v, &attached.v }};
-        return const_iterator(array);
+        return const_iterator(
+            aux::make_array(&internal.v, &external.v, &attached.v)
+        );
     }
 
     const_iterator end() const BLACKHOLE_NOEXCEPT {
-        std::array<set_t const*, 3> array {{ &internal.v, &external.v, &attached.v }};
-        return const_iterator(array, aux::iterator::invalidate_tag);
+        return const_iterator(
+            aux::make_array(&internal.v, &external.v, &attached.v),
+            aux::iterator::invalidate_tag
+        );
     }
 
     boost::optional<const attribute_t&>
