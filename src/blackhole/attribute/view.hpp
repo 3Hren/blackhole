@@ -19,6 +19,7 @@
 #include "blackhole/detail/array.hpp"
 #include "blackhole/detail/iterator/join.hpp"
 #include "blackhole/detail/traits/tuple.hpp"
+#include "blackhole/detail/traits/unique.hpp"
 
 namespace blackhole {
 
@@ -181,12 +182,14 @@ struct extractor<set_view_t::external_set_t> {
 
 template<class... T>
 class partial_view_t {
+    static_assert(unique<T...>::value, "all attribute set types must be unique");
+
+    typedef std::array<const set_t*, sizeof...(T)> array_type;
+
 public:
     typedef set_view_t::const_iterator const_iterator;
 
 private:
-    typedef std::array<const set_t*, sizeof...(T)> array_type;
-
     const set_view_t& view;
 
 public:
