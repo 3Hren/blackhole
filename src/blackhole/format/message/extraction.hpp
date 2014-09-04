@@ -41,18 +41,18 @@ substitute(const attribute::set_view_t& attributes,
     return substitute(attributes, std::move(message % argument), args...);
 }
 
-template<typename T, typename Tag, attribute::scope_t Scope, typename... Args>
+template<typename T, typename Tag, typename... Args>
 static
 inline
 std::string
 substitute(const attribute::set_view_t& attributes,
            boost::format&& message,
-           const keyword::keyword_t<T, Tag, Scope>&,
+           const keyword::keyword_t<T, Tag>&,
            const Args&... args)
 {
     const T& arg = attribute::traits<T>::extract(
         attributes,
-        keyword::keyword_t<T, Tag, Scope>::name()
+        keyword::keyword_t<T, Tag>::name()
     );
     std::ostringstream stream;
     format::message::insitu<Tag>::execute(stream, arg);

@@ -12,18 +12,3 @@ TEST(Attribute, CanMakeCustomAttribute) {
     EXPECT_EQ("custom", attr.first);
     EXPECT_EQ(42, boost::get<std::int32_t>(attr.second.value));
 }
-
-TEST(Attribute, TimestampIsEventAttribute) {
-    attribute::pair_t pair = (keyword::timestamp() = timeval{ 0, 0 });
-    EXPECT_EQ(attribute::scope_t::event, pair.second.scope);
-}
-
-TEST(Attribute, SeverityIsEventAttribute) {
-    attribute::pair_t pair = (keyword::severity<testing::level>() = testing::level::debug);
-    EXPECT_EQ(attribute::scope_t::event, pair.second.scope);
-}
-
-TEST(Attribute, MessageIsEventAttribute) {
-    attribute::pair_t pair = (keyword::message() = "le message");
-    EXPECT_EQ(attribute::scope_t::event, pair.second.scope);
-}

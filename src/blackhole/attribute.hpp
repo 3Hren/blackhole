@@ -5,7 +5,6 @@
 #include <utility>
 
 #include "blackhole/attribute/name.hpp"
-#include "blackhole/attribute/scope.hpp"
 #include "blackhole/attribute/set.hpp"
 #include "blackhole/attribute/view.hpp"
 #include "blackhole/attribute/traits.hpp"
@@ -28,15 +27,15 @@ typedef std::initializer_list<std::pair<name_t, value_t>> list;
 template<typename T>
 inline
 pair_t
-make(const name_t& name, const T& value, scope_t scope = DEFAULT_SCOPE) {
-    return std::make_pair(name, attribute_t(value, scope));
+make(const name_t& name, const T& value) {
+    return std::make_pair(name, attribute_t(value));
 }
 
 template<typename T>
 inline
 pair_t
-make(const name_t& name, T&& value, scope_t scope = DEFAULT_SCOPE) {
-    return std::make_pair(name, attribute_t(std::move(value), scope));
+make(const name_t& name, T&& value) {
+    return std::make_pair(name, attribute_t(std::forward<T>(value)));
 }
 
 // Attribute packing/unpacking/extracting.

@@ -3,7 +3,7 @@
 #include "attribute.hpp"
 #include "filter.hpp"
 
-#define DECLARE_KEYWORD_IMPL(Name, Scope, T) \
+#define DECLARE_KEYWORD_IMPL(Name, T) \
     namespace keyword { \
     namespace tag { \
         struct Name##_t { \
@@ -11,26 +11,26 @@
             static const char* name() { return #Name; } \
         }; \
     } \
-    static inline ::blackhole::keyword::keyword_t<T, tag::Name##_t, ::blackhole::attribute::scope_t::Scope>& Name() { \
-        static ::blackhole::keyword::keyword_t<T, tag::Name##_t, ::blackhole::attribute::scope_t::Scope> self; \
+    static inline ::blackhole::keyword::keyword_t<T, tag::Name##_t>& Name() { \
+        static ::blackhole::keyword::keyword_t<T, tag::Name##_t> self; \
         return self; \
     } \
     }
 
 #define DECLARE_LOCAL_KEYWORD(Name, T) \
-    DECLARE_KEYWORD_IMPL(Name, local, T)
+    DECLARE_KEYWORD_IMPL(Name, T)
 
 #define DECLARE_EVENT_KEYWORD(Name, T) \
-    DECLARE_KEYWORD_IMPL(Name, event, T)
+    DECLARE_KEYWORD_IMPL(Name, T)
 
 #define DECLARE_KEYWORD(Name, T) \
-    DECLARE_KEYWORD_IMPL(Name, global, T)
+    DECLARE_KEYWORD_IMPL(Name, T)
 
 #define DECLARE_THREAD_KEYWORD(Name, T) \
-    DECLARE_KEYWORD_IMPL(Name, thread, T)
+    DECLARE_KEYWORD_IMPL(Name, T)
 
 #define DECLARE_UNIVERSE_KEYWORD(Name, T) \
-    DECLARE_KEYWORD_IMPL(Name, universe, T)
+    DECLARE_KEYWORD_IMPL(Name, T)
 
 #include "blackhole/expression/helper.hpp"
 
@@ -38,7 +38,7 @@ namespace blackhole {
 
 namespace keyword {
 
-template<typename T, typename NameProvider, attribute::scope_t Scope = attribute::DEFAULT_SCOPE>
+template<typename T, typename NameProvider>
 struct keyword_t {
     typedef T type;
     static_assert(attribute::is_supported<
@@ -58,11 +58,11 @@ struct keyword_t {
     };
 
     attribute::pair_t operator=(const T& value) const {
-        return attribute::make(name(), attribute::traits<T>::pack(value), Scope);
+        return attribute::make(name(), attribute::traits<T>::pack(value));
     }
 
     attribute::pair_t operator=(T&& value) const {
-        return attribute::make(name(), attribute::traits<T>::pack(std::forward<T>(value)), Scope);
+        return attribute::make(name(), attribute::traits<T>::pack(std::forward<T>(value)));
     }
 
     template<template<typename> class Operator>
