@@ -26,15 +26,26 @@ private:
     record_t& record;
 
 public:
-    template<typename... Args>
-    pusher_t(const logger_type& log, record_t& record, Args&&... args) :
+    pusher_t(const logger_type& log, record_t& record, const char* message) :
+        log(log),
+        record(record)
+    {
+        record.insert(keyword::message() = message);
+    }
+
+    template<typename T, typename... Args>
+    pusher_t(const logger_type& log, record_t& record, T&& arg, Args&&... args) :
         log(log),
         record(record)
     {
         //!@todo: Catch exceptions from message inline formatting.
         record.insert(
             keyword::message() =
-                aux::format(record.attributes(), std::forward<Args>(args)...)
+                aux::format(
+                    record.attributes(),
+                    std::forward<T>(arg),
+                    std::forward<Args>(args)...
+                )
         );
     }
 
