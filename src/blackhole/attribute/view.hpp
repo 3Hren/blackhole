@@ -117,6 +117,13 @@ public:
 };
 
 template<>
+struct tuple_empty<> {
+    static bool empty(const set_view_t&) {
+        return true;
+    }
+};
+
+template<>
 struct tuple_empty<set_view_t::attached_set_t> {
     static bool empty(const set_view_t& view) {
         return view.attached.v.empty();
@@ -134,13 +141,6 @@ template<>
 struct tuple_empty<set_view_t::external_set_t> {
     static bool empty(const set_view_t& view) {
         return view.external.v.empty();
-    }
-};
-
-template<>
-struct tuple_empty<> {
-    static bool empty(const set_view_t&) {
-        return true;
     }
 };
 
