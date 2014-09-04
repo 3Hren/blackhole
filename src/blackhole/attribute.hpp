@@ -21,9 +21,7 @@ namespace attribute {
  */
 typedef std::initializer_list<std::pair<name_t, value_t>> list;
 
-/*!
- * Dynamic attribute factory function.
- */
+/// Dynamic attribute factory function.
 template<typename T>
 inline
 pair_t
@@ -31,7 +29,7 @@ make(const name_t& name, T&& value) {
     return std::make_pair(name, attribute_t(std::forward<T>(value)));
 }
 
-// Attribute packing/unpacking/extracting.
+/// Attribute packing/unpacking/extracting traits.
 template<typename T, class = void>
 struct traits {
     static inline T pack(const T& value) {
