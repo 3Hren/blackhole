@@ -23,15 +23,15 @@ namespace blackhole {
 
 namespace attribute {
 
-namespace set_view {
+template<class T>
+struct extractor;
 
-template<class... T>
-struct tuple_extractor_t;
-
-} // namespace set_view
+template<class... Args>
+struct tuple_empty;
 
 class set_view_t {
-    template<class... T> friend struct set_view::tuple_extractor_t;
+    template<class... Args> friend struct tuple_empty;
+    template<class T> friend struct extractor;
 
 public:
     typedef aux::iterator::join_t<set_t, true> const_iterator;
@@ -46,6 +46,12 @@ private:
     external_set_t external;  // The most filled (scoped + user attributes)
 
 public:
+    //!@todo: Cases:
+    //! - iterate over all
+    //! - iterate over external+attached
+    //! - empty all
+    //! - empty external+attached
+    //! partial_view_t - save only const reference to this object.
     set_view_t() = default;
 
     set_view_t(set_t attached, set_t external, set_t&& internal) :
@@ -110,114 +116,105 @@ public:
     }
 };
 
-namespace set_view {
-
 template<>
-struct tuple_extractor_t<set_view_t::attached_set_t> {
-    static
-    std::tuple<const set_view_t::attached_set_t*>
-    extract(const set_view_t& view) {
-        return std::make_tuple(&view.attached);
+struct tuple_empty<set_view_t::attached_set_t> {
+    static bool empty(const set_view_t& view) {
+        return view.attached.v.empty();
     }
 };
 
 template<>
-struct tuple_extractor_t<set_view_t::internal_set_t> {
-    static
-    std::tuple<const set_view_t::internal_set_t*>
-    extract(const set_view_t& view) {
-        return std::make_tuple(&view.internal);
+struct tuple_empty<set_view_t::internal_set_t> {
+    static bool empty(const set_view_t& view) {
+        return view.internal.v.empty();
     }
 };
 
 template<>
-struct tuple_extractor_t<set_view_t::external_set_t> {
+struct tuple_empty<set_view_t::external_set_t> {
+    static bool empty(const set_view_t& view) {
+        return view.external.v.empty();
+    }
+};
+
+template<>
+struct tuple_empty<> {
+    static bool empty(const set_view_t&) {
+        return true;
+    }
+};
+
+template<class T, class... Args>
+struct tuple_empty<T, Args...> {
+    static bool empty(const set_view_t& view) {
+        return tuple_empty<T>::empty(view) &&
+                tuple_empty<Args...>::empty(view);
+    }
+};
+
+template<>
+struct extractor<set_view_t::attached_set_t> {
     static
-    std::tuple<const set_view_t::external_set_t*>
+    inline
+    const set_t*
     extract(const set_view_t& view) {
-        return std::make_tuple(&view.external);
+        return &view.attached.v;
     }
 };
 
-template<class T, class Arg, class... Args>
-struct tuple_extractor_t<T, Arg, Args...> {
+template<>
+struct extractor<set_view_t::internal_set_t> {
     static
-    std::tuple<const T*, const Arg*, const Args*...>
+    inline
+    const set_t*
     extract(const set_view_t& view) {
-        return std::tuple_cat(
-            tuple_extractor_t<T>::extract(view),
-            tuple_extractor_t<Arg, Args...>::extract(view)
-        );
+        return &view.internal.v;
     }
 };
 
-} // namespace set_view
-
-template<class T, unsigned size>
-struct all_empty {
-    static bool empty(const T& tuple) {
-        return std::get<size>(tuple)->v.empty() && all_empty<T, size - 1>::empty(tuple);
-    }
-};
-
-template<class T>
-struct all_empty<T, 0u> {
-    static bool empty(const T& tuple) {
-        return std::get<0>(tuple)->v.empty();
-    }
-};
-
-template<class T>
-struct tuple_empty {
-    static bool empty(const T& tuple) {
-        return all_empty<T, std::tuple_size<T>::value - 1>::empty(tuple);
+template<>
+struct extractor<set_view_t::external_set_t> {
+    static
+    inline
+    const set_t*
+    extract(const set_view_t& view) {
+        return &view.external.v;
     }
 };
 
 template<class... T>
 class partial_view_t {
 public:
-    typedef std::tuple<const T*...> tuple_type;
-    typedef std::integral_constant<
-        std::size_t,
-        std::tuple_size<tuple_type>::value
-    > tuple_size;
-
     typedef set_view_t::const_iterator const_iterator;
 
 private:
-    typedef std::array<const set_t*, tuple_size::value> array_type;
-    typedef typename make_index_tuple<tuple_size::value>::type index_tuple_type;
+    typedef std::array<const set_t*, sizeof...(T)> array_type;
 
-    const tuple_type tuple;
+    const set_view_t& view;
 
 public:
     partial_view_t(const set_view_t& view) :
-        tuple(set_view::tuple_extractor_t<T...>::extract(view))
+        view(view)
     {}
 
     bool
     empty() const BLACKHOLE_NOEXCEPT {
-        return tuple_empty<tuple_type>::empty(tuple);
+        return tuple_empty<T...>::empty(view);
     }
 
     const_iterator
     begin() const BLACKHOLE_NOEXCEPT {
-        return const_iterator(to_array(tuple, index_tuple_type()));
+        return const_iterator(
+            array_type {{ extractor<T>::extract(view)... }}
+        );
     }
 
     const_iterator
     end() const BLACKHOLE_NOEXCEPT {
-        return const_iterator(to_array(tuple, index_tuple_type()), aux::iterator::invalidate_tag);
-    }
-
-private:
-    template<unsigned... I>
-    static
-    inline
-    array_type
-    to_array(const tuple_type& tuple, index_tuple<I...>) {
-        return array_type {{ &std::get<I>(tuple)->v... }};
+        return const_iterator(
+            array_type {{ extractor<T>::extract(view)... }},
+            aux::iterator::invalidate_tag
+        );
     }
 };
 
