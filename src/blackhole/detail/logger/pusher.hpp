@@ -38,14 +38,12 @@ public:
         log(log),
         record(record)
     {
-        //!@todo: Catch exceptions from message inline formatting.
         record.insert(
-            keyword::message() =
-                aux::format(
-                    record.attributes(),
-                    std::forward<T>(arg),
-                    std::forward<Args>(args)...
-                )
+            keyword::message() = message(
+                record,
+                std::forward<T>(arg),
+                std::forward<Args>(args)...
+            )
         );
     }
 
@@ -87,6 +85,23 @@ public:
         pack_feeder<pack_type>::feed(record, std::forward<Args>(args)...);
 
         return *this;
+    }
+
+private:
+    template<typename T, typename... Args>
+    static
+    inline
+    std::string
+    message(record_t& record, T&& arg, Args&&... args) {
+        try {
+            return aux::format(
+                record.attributes(),
+                std::forward<T>(arg),
+                std::forward<Args>(args)...
+            );
+        } catch (const boost::io::format_error& err) {
+            return err.what();
+        }
     }
 };
 

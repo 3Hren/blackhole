@@ -345,3 +345,18 @@ TEST(Macro, RecursiveAttributeFeeders) {
     EXPECT_EQ("42", actual.value);
     EXPECT_EQ(42, actual.nested);
 }
+
+TEST(Macro, CatchExceptionsOnFormatArgumentsUnderflow) {
+    record_t record;
+    record.insert(attribute::make("id", "42"));
+
+    mock::verbose_log_t<level> log;
+    EXPECT_CALL(log, open_record(level::debug))
+            .Times(1)
+            .WillOnce(Return(record));
+
+    EXPECT_CALL(log, push(_))
+            .Times(1);
+
+    EXPECT_NO_THROW(BH_LOG(log, level::debug, "id: %d"));
+}
