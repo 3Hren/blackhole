@@ -118,35 +118,35 @@ public:
 
 template<>
 struct tuple_empty<> {
-    static bool empty(const set_view_t&) {
+    static inline bool empty(const set_view_t&) {
         return true;
     }
 };
 
 template<>
 struct tuple_empty<set_view_t::attached_set_t> {
-    static bool empty(const set_view_t& view) {
+    static inline bool empty(const set_view_t& view) {
         return view.attached.v.empty();
     }
 };
 
 template<>
 struct tuple_empty<set_view_t::internal_set_t> {
-    static bool empty(const set_view_t& view) {
+    static inline bool empty(const set_view_t& view) {
         return view.internal.v.empty();
     }
 };
 
 template<>
 struct tuple_empty<set_view_t::external_set_t> {
-    static bool empty(const set_view_t& view) {
+    static inline bool empty(const set_view_t& view) {
         return view.external.v.empty();
     }
 };
 
 template<class T, class... Args>
 struct tuple_empty<T, Args...> {
-    static bool empty(const set_view_t& view) {
+    static inline bool empty(const set_view_t& view) {
         return tuple_empty<T>::empty(view) &&
                 tuple_empty<Args...>::empty(view);
     }
