@@ -1,5 +1,6 @@
 #pragma once
 
+#include "blackhole/detail/concept.hpp"
 #include "logger.hpp"
 #include "logger/wrapper.hpp"
 
@@ -18,13 +19,12 @@ public:
         m_guard_attributes(std::move(attributes))
     {}
 
-    //!@todo: Make logger concept.
     template<class Wrapper>
     scoped_attributes_t(
         Wrapper& wrapper,
         attribute::set_t attributes,
         typename std::enable_if<
-            !std::is_base_of<logger_base_t, Wrapper>::value
+            concept::logger<Wrapper>::value && !std::is_base_of<logger_base_t, Wrapper>::value
         >::type* = 0
     ) :
         scoped_attributes_concept_t(wrapper.log()),
