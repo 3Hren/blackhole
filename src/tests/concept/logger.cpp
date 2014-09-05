@@ -9,28 +9,28 @@ using namespace blackhole;
 TEST(LoggerConcept, AcceptsBaseLogger) {
     static_assert(
         (concept::logger<logger_base_t>::value),
-        "'logger_base_t' should pass concept check"
+        "`logger_base_t` should pass concept check"
     );
 }
 
 TEST(LoggerConcept, AcceptsVerboseLogger) {
     static_assert(
         (concept::logger<verbose_logger_t<testing::level>>::value),
-        "'verbose_logger_t' should pass concept check"
+        "`verbose_logger_t` should pass concept check"
     );
 }
 
 TEST(LoggerConcept, AcceptsWrapper) {
     static_assert(
         (concept::logger<wrapper_t<logger_base_t>>::value),
-        "'wrapper_t' should pass concept check"
+        "`wrapper_t` should pass concept check"
     );
 }
 
 TEST(LoggerConcept, DeclinesString) {
     static_assert(
         (!concept::logger<std::string>::value),
-        "std::string shouldn't pass concept check"
+        "`std::string` shouldn't pass concept check"
     );
 }
 
