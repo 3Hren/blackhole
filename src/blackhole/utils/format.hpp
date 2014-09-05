@@ -26,6 +26,8 @@ substitute(boost::format&& message, const T& argument, const Args&... args) {
 
 } // namespace aux
 
+//!@todo: Use std::nothrow_t tag to control error mechanizm.
+//!@todo: Maybe use snprintf with tls buffer?
 template<typename... Args>
 static inline
 std::string
