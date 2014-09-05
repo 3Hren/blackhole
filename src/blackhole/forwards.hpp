@@ -22,6 +22,8 @@ namespace blackhole {
     class formatter_config_t;
     class sink_config_t;
 
+    class record_t;
+
     class logger_base_t;
 
     template<typename Level>
