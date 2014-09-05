@@ -132,7 +132,6 @@ public:
         return wrapped->open_record(std::move(attributes_));
     }
 
-    //!@todo: Add more gentle concept check.
     template<typename Level>
     record_t
     open_record(Level level,
