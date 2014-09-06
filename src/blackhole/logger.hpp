@@ -181,10 +181,12 @@ public:
         this->level = level;
     }
 
-    /*! @todo: Documentation is @deprecated.
+    /*!
      * Tries to open log record with specific verbosity level.
+     *
      * Internally this method compares desired verbosity level with the upper
-     * one. Can return invalid log record if some conditions are not met.
+     * one and checks for tracebit attribute (temporary until filter redesign).
+     * Can return invalid log record if some conditions are not met.
      * @param[in] level - Desired verbosity level.
      * @return valid or invalid `record_t` object.
      * @todo: Shitcode. Need to fix.
