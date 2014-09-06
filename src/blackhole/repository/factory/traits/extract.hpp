@@ -28,7 +28,6 @@ public:
         try {
             to(map);
         } catch (const std::exception&) {
-            //!@todo: Throw specialized exceptions.
             throw error_t("can't extract '%s': '%s' is not map", name, this->name);
         }
 
@@ -55,8 +54,6 @@ public:
         to(value);
         return value;
     }
-
-private:
 };
 
 } // namespace aux
