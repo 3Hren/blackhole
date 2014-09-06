@@ -294,6 +294,8 @@ TEST(Macro, RecursiveAttributeFeeders) {
     EXPECT_EQ(42, actual.nested);
 }
 
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic push
 TEST(Macro, CatchExceptionsOnFormatArgumentsUnderflow) {
     record_t record;
     record.insert(attribute::make("id", "42"));
@@ -305,8 +307,6 @@ TEST(Macro, CatchExceptionsOnFormatArgumentsUnderflow) {
 
     EXPECT_CALL(log, push(_))
             .Times(1);
-#pragma GCC diagnostic ignored "-Wformat"
-#pragma GCC diagnostic push
     EXPECT_NO_THROW(BH_LOG(log, level::debug, "id: %d"));
-#pragma GCC diagnostic pop
 }
+#pragma GCC diagnostic pop
