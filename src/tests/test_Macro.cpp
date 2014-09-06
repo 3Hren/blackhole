@@ -305,6 +305,8 @@ TEST(Macro, CatchExceptionsOnFormatArgumentsUnderflow) {
 
     EXPECT_CALL(log, push(_))
             .Times(1);
-
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic push
     EXPECT_NO_THROW(BH_LOG(log, level::debug, "id: %d"));
+#pragma GCC diagnostic pop
 }
