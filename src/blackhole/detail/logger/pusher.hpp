@@ -49,6 +49,7 @@ public:
     }
 
     /*!
+     * @compat: GCC 4.6
      * Using initializer lists is problematic, since GCC 4.6 has an extension
      * which can deduce {{ "value", "42" }} expressions in function call to
      * the initializer list without looking at the overload resolution.
