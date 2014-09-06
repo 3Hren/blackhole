@@ -5,8 +5,6 @@
 #include <ostream>
 
 #include "blackhole/detail/traits/attributes/pack/feeder.hpp"
-#include "blackhole/format/message/extraction.hpp"
-#include "blackhole/format/message/insitu.hpp"
 #include "blackhole/keyword/message.hpp"
 #include "blackhole/utils/format.hpp"
 
@@ -40,7 +38,6 @@ public:
     {
         record.insert(
             keyword::message() = message(
-                record,
                 std::forward<T>(arg),
                 std::forward<Args>(args)...
             )
@@ -92,10 +89,9 @@ private:
     static
     inline
     std::string
-    message(record_t& record, T&& arg, Args&&... args) {
+    message(T&& arg, Args&&... args) {
         try {
-            return aux::format(
-                record.attributes(),
+            return utils::format(
                 std::forward<T>(arg),
                 std::forward<Args>(args)...
             );

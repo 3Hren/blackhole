@@ -134,58 +134,6 @@ TEST(Macro, FormatMessageWithPrintfStyleWithAttributes) {
     EXPECT_EQ(100500, actual.timestamp.tv_sec);
 }
 
-namespace blackhole {
-
-namespace format {
-
-namespace message {
-
-template<>
-struct insitu<keyword::tag::severity_t<level>> {
-    static inline std::ostream& execute(std::ostream& stream, level lvl) {
-        static std::string DESCRIPTIONS[] = {
-            "DEBUG",
-            "INFO ",
-            "WARN ",
-            "ERROR"
-        };
-
-        std::size_t lvl_ = static_cast<std::size_t>(lvl);
-        if (lvl_ < sizeof(DESCRIPTIONS) / sizeof(DESCRIPTIONS[0])) {
-            stream << DESCRIPTIONS[lvl_];
-        } else {
-            stream << lvl_;
-        }
-
-        return stream;
-    }
-};
-
-} // namespace message
-
-} // namespace format
-
-} // namespace blackhole
-
-TEST(Macro, SpecificKeywordMessageFormatting) {
-    record_t record;
-    record.insert(keyword::severity<level>() = level::debug);
-
-    mock::verbose_log_t<level> log;
-    EXPECT_CALL(log, open_record(level::debug))
-            .Times(1)
-            .WillOnce(Return(record));
-
-    std::string actual;
-    ExtractMessageAttributeAction action { actual };
-    EXPECT_CALL(log, push(_))
-            .Times(1)
-            .WillOnce(WithArg<0>(Invoke(action)));
-    BH_LOG(log, level::debug, "value: %s", keyword::severity<level>());
-
-    EXPECT_EQ("value: DEBUG", actual);
-}
-
 struct EmplaceCheckExtractAttributesAction {
     struct pack_t {
         std::string message;
