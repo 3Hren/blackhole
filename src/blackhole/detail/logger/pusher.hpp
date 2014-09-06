@@ -31,14 +31,14 @@ public:
         record.insert(keyword::message() = message);
     }
 
-    template<typename T, typename... Args>
-    pusher_t(const logger_type& log, record_t& record, T&& arg, Args&&... args) :
+    template<typename... Args>
+    pusher_t(const logger_type& log, record_t& record, const char* message, Args&&... args) :
         log(log),
         record(record)
     {
         record.insert(
-            keyword::message() = message(
-                std::forward<T>(arg),
+            keyword::message() = this->message(
+                message,
                 std::forward<Args>(args)...
             )
         );
@@ -86,16 +86,13 @@ public:
     }
 
 private:
-    template<typename T, typename... Args>
+    template<typename... Args>
     static
     inline
     std::string
-    message(T&& arg, Args&&... args) {
+    message(const char* message, Args&&... args) {
         try {
-            return utils::format(
-                std::forward<T>(arg),
-                std::forward<Args>(args)...
-            );
+            return utils::format(message, std::forward<Args>(args)...);
         } catch (const boost::io::format_error& err) {
             //!@todo: I don't really sure, it's proper behaviour.
             return err.what();
