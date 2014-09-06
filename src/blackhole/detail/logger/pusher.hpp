@@ -91,12 +91,7 @@ private:
     inline
     std::string
     message(const char* message, Args&&... args) {
-        try {
-            return utils::format(message, std::forward<Args>(args)...);
-        } catch (const boost::io::format_error& err) {
-            //!@todo: I don't really sure, it's proper behaviour.
-            return err.what();
-        }
+        return utils::format(message, std::forward<Args>(args)...);
     }
 };
 
