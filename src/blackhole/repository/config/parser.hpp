@@ -14,6 +14,18 @@ namespace repository {
 
 namespace config {
 
+namespace error {
+
+class invalid_config_t : public error_t {
+public:
+    template<typename... Args>
+    invalid_config_t(Args&&... args) :
+        error_t(std::forward<Args>(args)...)
+    {}
+};
+
+} // namespace error
+
 template<>
 class parser_t<repository::config::base_t> {
 public:
@@ -25,8 +37,10 @@ public:
     >::type
     parse(std::string component, dynamic_t value) {
         if (!value.contains("type")) {
-            //!@todo: Throw specialized exception.
-            throw blackhole::error_t("'type' field is missing for '%s' component", component);
+            throw error::invalid_config_t(
+                "'type' field is missing for '%s' component",
+                component
+            );
         }
 
         std::string type = value["type"].to<std::string>();
@@ -61,8 +75,9 @@ class parser_t<frontend_config_t> {
 public:
     static frontend_config_t parse(dynamic_t value) {
         if (!(value.contains("formatter") && value.contains("sink"))) {
-            //!@todo: Throw specialized exception.
-            throw blackhole::error_t("both 'formatter' and 'sink' sections must be specified");
+            throw error::invalid_config_t(
+                "both 'formatter' and 'sink' sections must be specified"
+            );
         }
 
         auto form = parser_t<formatter_config_t>::parse(value["formatter"]);
