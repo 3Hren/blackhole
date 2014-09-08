@@ -1,10 +1,10 @@
 #pragma once
 
 #include "blackhole/detail/logger/pusher.hpp"
+#include "blackhole/detail/util/unused.hpp"
 #include "blackhole/formatter/string.hpp"
 #include "blackhole/logger.hpp"
 #include "blackhole/sink/stream.hpp"
-#include "blackhole/utils/unused.hpp"
 
 #ifdef ENABLE_ELASTICSEARCH_DEBUG
 #define ES_LOG(__log__, ...) \
@@ -12,7 +12,7 @@
         ::blackhole::aux::make_pusher((__log__), record, __VA_ARGS__)
 #else
 #define ES_LOG(__log__, ...) \
-    ::blackhole::utils::ignore_unused_variable_warning((__log__), __VA_ARGS__)
+    ::blackhole::aux::util::ignore_unused_variable_warning((__log__), __VA_ARGS__)
 #endif
 
 namespace elasticsearch {

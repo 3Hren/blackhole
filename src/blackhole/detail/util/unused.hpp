@@ -2,11 +2,16 @@
 
 namespace blackhole {
 
-namespace utils {
+namespace aux {
+
+namespace util {
 
 template<typename... Args>
+__attribute__((always_inline))
 inline void ignore_unused_variable_warning(const Args&...) {}
 
-} // namespace utils
+} // namespace util
+
+} // namespace aux
 
 } // namespace blackhole
