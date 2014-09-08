@@ -101,10 +101,6 @@ public:
     record_t open_record(attribute::set_t attributes) const;
 
     void push(record_t&& record) const;
-
-private:
-    attribute::set_t get_event_attributes() const;
-    attribute::set_t get_thread_attributes() const;
 };
 
 //!@todo: Develop ImmutableLogger class, which provides almost immutable
