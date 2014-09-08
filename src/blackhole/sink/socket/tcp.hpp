@@ -5,7 +5,7 @@
 
 #include <boost/asio.hpp>
 
-#include "blackhole/utils/unique.hpp"
+#include "blackhole/detail/util/unique.hpp"
 
 #include "backend.hpp"
 #include "connect.hpp"
@@ -63,7 +63,7 @@ private:
                const std::string& host,
                std::uint16_t port)
     {
-        auto socket = utils::make_unique<socket_type>(service);
+        auto socket = aux::util::make_unique<socket_type>(service);
         connect<protocol_type>(service, *socket, host, port);
         return socket;
     }

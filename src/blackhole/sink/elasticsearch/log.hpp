@@ -21,15 +21,15 @@ class logger_factory_t {
 public:
     static blackhole::logger_base_t create() {
         blackhole::logger_base_t logger;
-        auto formatter = blackhole::utils::make_unique<
+        auto formatter = blackhole::aux::util::make_unique<
             blackhole::formatter::string_t
         >("[%(timestamp)s] [%(tid)s]: %(message)s");
 
-        auto sink = blackhole::utils::make_unique<
+        auto sink = blackhole::aux::util::make_unique<
             blackhole::sink::stream_t
         >(blackhole::sink::stream_t::output_t::stdout);
 
-        auto frontend = blackhole::utils::make_unique<
+        auto frontend = blackhole::aux::util::make_unique<
             blackhole::frontend_t<
                 blackhole::formatter::string_t,
                 blackhole::sink::stream_t

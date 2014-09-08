@@ -1,25 +1,25 @@
 #include <ticktack/benchmark.hpp>
 
+#include <blackhole/detail/util/unique.hpp>
 #include <blackhole/formatter/string.hpp>
 #include <blackhole/logger.hpp>
 #include <blackhole/macro.hpp>
 #include <blackhole/sink/null.hpp>
-#include <blackhole/utils/unique.hpp>
 
 namespace { enum level_t { info }; }
 
 namespace {
 
 blackhole::verbose_logger_t<level_t> initialize() {
-    auto formatter = blackhole::utils::make_unique<
+    auto formatter = blackhole::aux::util::make_unique<
         blackhole::formatter::string_t
     >("[%(timestamp)s] [%(severity)s]: %(message)s");
 
-    auto sink = blackhole::utils::make_unique<
+    auto sink = blackhole::aux::util::make_unique<
         blackhole::sink::null_t
     >();
 
-    auto frontend = blackhole::utils::make_unique<
+    auto frontend = blackhole::aux::util::make_unique<
         blackhole::frontend_t<
             blackhole::formatter::string_t,
             blackhole::sink::null_t

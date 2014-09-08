@@ -18,15 +18,15 @@ class logger_factory_t {
 public:
     static logger_base_t create() {
         logger_base_t logger;
-        auto formatter = utils::make_unique<
+        auto formatter = aux::util::make_unique<
             formatter::string_t
         >("[%(timestamp)s]: %(message)s");
 
-        auto sink = utils::make_unique<
+        auto sink = aux::util::make_unique<
             sink::stream_t
         >(sink::stream_t::output_t::stdout);
 
-        auto frontend = utils::make_unique<
+        auto frontend = aux::util::make_unique<
             frontend_t<
                 formatter::string_t,
                 sink::stream_t

@@ -16,15 +16,15 @@ public:
     template<class Logger>
     static Logger create() {
         Logger logger;
-        auto formatter = utils::make_unique<
+        auto formatter = aux::util::make_unique<
             formatter::string_t
         >("[%(timestamp)s]: %(message)s");
 
-        auto sink = utils::make_unique<
+        auto sink = aux::util::make_unique<
             sink::null_t
         >();
 
-        auto frontend = utils::make_unique<
+        auto frontend = aux::util::make_unique<
             frontend_t<
                 formatter::string_t,
                 sink::null_t

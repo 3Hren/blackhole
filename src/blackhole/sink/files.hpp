@@ -4,6 +4,7 @@
 
 #include "blackhole/attribute.hpp"
 #include "blackhole/detail/string/formatting/formatter.hpp"
+#include "blackhole/detail/util/unique.hpp"
 #include "blackhole/repository/factory/traits.hpp"
 #include "blackhole/sink/files/backend.hpp"
 #include "blackhole/sink/files/config.hpp"
@@ -11,7 +12,6 @@
 #include "blackhole/sink/files/rotation.hpp"
 #include "blackhole/sink/files/writer.hpp"
 #include "blackhole/sink/thread.hpp"
-#include "blackhole/utils/unique.hpp"
 
 namespace blackhole {
 

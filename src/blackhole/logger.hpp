@@ -9,6 +9,7 @@
 #include "blackhole/detail/config/atomic.hpp"
 #include "blackhole/detail/config/noncopyable.hpp"
 #include "blackhole/detail/config/nullptr.hpp"
+#include "blackhole/detail/util/unique.hpp"
 #include "error/handler.hpp"
 #include "filter.hpp"
 #include "frontend.hpp"
@@ -18,7 +19,6 @@
 #include "keyword/thread.hpp"
 #include "keyword/timestamp.hpp"
 #include "keyword/tracebit.hpp"
-#include "utils/unique.hpp"
 
 #include "blackhole/config.hpp"
 

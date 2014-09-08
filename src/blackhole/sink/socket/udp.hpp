@@ -5,8 +5,9 @@
 
 #include <boost/asio.hpp>
 
+#include "blackhole/detail/util/unique.hpp"
+
 #include "backend.hpp"
-#include "blackhole/utils/unique.hpp"
 #include "connect.hpp"
 
 namespace blackhole {
@@ -49,7 +50,7 @@ private:
                const std::string& host,
                std::uint16_t port)
     {
-        auto socket = utils::make_unique<protocol_type::socket>(service);
+        auto socket = aux::util::make_unique<protocol_type::socket>(service);
         connect<protocol_type>(service, *socket, host, port);
         return socket;
     }

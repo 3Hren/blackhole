@@ -36,9 +36,9 @@ TEST(Functional, SyslogConfiguredVerboseLogger) {
     typedef formatter::string_t formatter_type;
     typedef sink::syslog_t<level> sink_type;
 
-    auto formatter = utils::make_unique<formatter_type>("%(message)s [%(...L)s]");
-    auto sink = utils::make_unique<sink_type>("testing");
-    auto frontend = utils::make_unique<frontend_t<formatter_type, sink_type>>(std::move(formatter), std::move(sink));
+    auto formatter = aux::util::make_unique<formatter_type>("%(message)s [%(...L)s]");
+    auto sink = aux::util::make_unique<sink_type>("testing");
+    auto frontend = aux::util::make_unique<frontend_t<formatter_type, sink_type>>(std::move(formatter), std::move(sink));
     log.add_frontend(std::move(frontend));
 
     record_t record = log.open_record(level::error);

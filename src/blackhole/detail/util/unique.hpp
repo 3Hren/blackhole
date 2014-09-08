@@ -4,13 +4,17 @@
 
 namespace blackhole {
 
-namespace utils {
+namespace aux {
+
+namespace util {
 
 template<typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args&&... args) {
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
-} // namespace utils
+} // namespace util
+
+} // namespace aux
 
 } // namespace blackhole

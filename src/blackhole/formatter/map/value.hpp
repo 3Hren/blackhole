@@ -8,9 +8,9 @@
 #include "blackhole/attribute.hpp"
 #include "blackhole/detail/config/underlying.hpp"
 #include "blackhole/detail/stream/stream.hpp"
+#include "blackhole/detail/util/unique.hpp"
 #include "blackhole/formatter/map/datetime.hpp"
 #include "blackhole/keyword/timestamp.hpp"
-#include "blackhole/utils/unique.hpp"
 
 namespace blackhole {
 

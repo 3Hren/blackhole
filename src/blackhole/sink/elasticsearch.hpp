@@ -60,7 +60,7 @@ private:
 public:
     worker_t(elasticsearch::settings_t settings, logger_type& log) :
         log(log),
-        work(utils::make_unique<loop_type::work>(loop)),
+        work(aux::util::make_unique<loop_type::work>(loop)),
         client(settings, loop, log),
         stopped(true),
         thread(&worker_t::run, this)
@@ -123,7 +123,7 @@ public:
         current(0)
     {
         for (std::uint8_t i = 0; i < count; ++i) {
-            workers.emplace_back(utils::make_unique<worker_t>(settings, log));
+            workers.emplace_back(aux::util::make_unique<worker_t>(settings, log));
         }
     }
 
@@ -173,7 +173,7 @@ public:
         timer(loop),
         thread(start()),
         queue(bulk, std::bind(&elasticsearch_t::on_bulk, this, std::placeholders::_1)),
-        pool(utils::make_unique<worker_pool_t>(workers, settings, log))
+        pool(aux::util::make_unique<worker_pool_t>(workers, settings, log))
     {}
 
     elasticsearch_t(const elasticsearch_::config_t& config) :
@@ -182,7 +182,7 @@ public:
         timer(loop),
         thread(start()),
         queue(config.bulk, std::bind(&elasticsearch_t::on_bulk, this, std::placeholders::_1)),
-        pool(utils::make_unique<worker_pool_t>(config.workers, config.settings, log))
+        pool(aux::util::make_unique<worker_pool_t>(config.workers, config.settings, log))
     {}
 
     ~elasticsearch_t() {

@@ -16,7 +16,7 @@ struct simple_handler_t {
 } // namespace testing
 
 TEST(exception_trap_t, SimpleExceptionHandler) {
-    auto frontend = utils::make_unique<NiceMock<mock::frontend_t>>();
+    auto frontend = aux::util::make_unique<NiceMock<mock::frontend_t>>();
     EXPECT_CALL(*frontend.get(), handle(_))
             .Times(1)
             .WillOnce(Throw(std::runtime_error("error")));
@@ -37,7 +37,7 @@ struct typed_handler_t {
 } // namespace testing
 
 TEST(exception_trap_t, TypedExceptionHandler) {
-    auto frontend = utils::make_unique<NiceMock<mock::frontend_t>>();
+    auto frontend = aux::util::make_unique<NiceMock<mock::frontend_t>>();
     EXPECT_CALL(*frontend.get(), handle(_))
             .Times(1)
             .WillOnce(Throw(std::runtime_error("error")));
@@ -64,7 +64,7 @@ struct sequenced_typed_handler_t {
 } // namespace testing
 
 TEST(exception_trap_t, StrongSequencedTypedExceptionHandler) {
-    auto frontend = utils::make_unique<NiceMock<mock::frontend_t>>();
+    auto frontend = aux::util::make_unique<NiceMock<mock::frontend_t>>();
     EXPECT_CALL(*frontend.get(), handle(_))
             .Times(1)
             .WillOnce(Throw(std::runtime_error("error")));
