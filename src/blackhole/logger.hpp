@@ -41,6 +41,9 @@ struct logger_verbosity_traits {
 };
 
 class logger_base_t {
+    friend class scoped_attributes_concept_t;
+    friend void swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT;
+
 protected:
     typedef boost::shared_mutex rw_mutex_type;
     typedef boost::shared_lock<rw_mutex_type> reader_lock_type;
@@ -70,11 +73,8 @@ protected:
 
         state_t();
     };
+
     state_t state;
-
-    friend class scoped_attributes_concept_t;
-
-    friend void swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT;
 
 public:
     logger_base_t();
