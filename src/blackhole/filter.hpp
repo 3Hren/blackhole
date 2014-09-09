@@ -8,18 +8,14 @@ namespace blackhole {
 
 typedef std::function<bool(const attribute::set_view_t& attributes)> filter_t;
 
-struct default_filter_t {
-    static default_filter_t& instance() {
-        static default_filter_t filter;
-        return filter;
-    }
+namespace filter {
 
-    bool operator()(const attribute::set_view_t&) {
-        return true;
-    }
+inline
+__attribute__((always_inline))
+bool none(const attribute::set_view_t&) {
+    return true;
+}
 
-private:
-    default_filter_t() {}
-};
+} // namespace filter
 
 } // namespace blackhole

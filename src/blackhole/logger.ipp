@@ -25,7 +25,7 @@ BLACKHOLE_API
 logger_base_t::state_t::state_t() :
     enabled(true),
     tracked(false),
-    filter(default_filter_t::instance()),
+    filter(&filter::none),
     attributes(&aux::guard::no_deleter),
     exception(log::default_exception_handler_t())
 {}
