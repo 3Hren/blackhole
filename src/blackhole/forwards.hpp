@@ -16,6 +16,10 @@ namespace blackhole {
         } // namespace config
     } // namespace repository
 
+    namespace attribute {
+        class set_view_t;
+    } // namespace attribute
+
     class base_frontend_t;
     class frontend_factory_t;
 

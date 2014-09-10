@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "attribute.hpp"
+#include "blackhole/forwards.hpp"
 
 namespace blackhole {
 
