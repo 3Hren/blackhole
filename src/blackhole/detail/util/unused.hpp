@@ -1,5 +1,7 @@
 #pragma once
 
+#include "blackhole/detail/config/inline.hpp"
+
 namespace blackhole {
 
 namespace aux {
@@ -7,7 +9,7 @@ namespace aux {
 namespace util {
 
 template<typename... Args>
-__attribute__((always_inline))
+BLACKHOLE_ALWAYS_INLINE
 inline void ignore_unused_variable_warning(const Args&...) {}
 
 } // namespace util
