@@ -13,7 +13,10 @@ namespace this_thread {
 
 template<typename T>
 inline const T& get_id() {
-    static_assert(lazy_false<T>::value, "Function `get_id` for this type is not implemented.");
+    static_assert(
+        aux::util::lazy_false<T>::value,
+        "function `get_id` for this type is not implemented."
+    );
 }
 
 template<>

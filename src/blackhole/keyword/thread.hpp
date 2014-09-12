@@ -2,8 +2,8 @@
 
 #include <string>
 
+#include "blackhole/detail/util/thread.hpp"
 #include "blackhole/keyword.hpp"
-#include "blackhole/utils/thread.hpp"
 
 namespace blackhole {
 
