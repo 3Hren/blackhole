@@ -8,16 +8,16 @@
 #include "traits/extract.hpp"
 #include "traits/integer.hpp"
 #include "traits/unique.hpp"
+#include "blackhole/detail/util/lazy.hpp"
 #include "blackhole/dynamic.hpp"
 #include "blackhole/error.hpp"
-#include "blackhole/utils/lazy.hpp"
 
 namespace blackhole {
 
 template<class T>
 struct factory_traits {
     static_assert(
-        lazy_false<T>::value,
+        aux::util::lazy_false<T>::value,
         "You should implement 'factory_traits' template specialization for "
         "your type to properly map generic config object on real config."
     );

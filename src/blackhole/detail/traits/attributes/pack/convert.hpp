@@ -5,7 +5,7 @@
 
 #include "blackhole/attribute.hpp"
 #include "blackhole/detail/traits/supports/stream_push.hpp"
-#include "blackhole/utils/lazy.hpp"
+#include "blackhole/detail/util/lazy.hpp"
 
 namespace blackhole {
 
@@ -57,7 +57,10 @@ struct conv<T, typename std::enable_if<
     >
 {
     static attribute::value_t from(T&&) {
-        static_assert(lazy_false<T>::value, "stream operator<< is not defined for type `T`");
+        static_assert(
+            aux::util::lazy_false<T>::value,
+            "stream operator<< is not defined for type `T`"
+        );
         return attribute::value_t();
     }
 };
