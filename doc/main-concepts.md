@@ -74,13 +74,7 @@ Also every attribute has its name, which in summary gives a complete picture of 
 
 ## Filtering
 
-After sending attributes into logger object, they are pre-filtered. Since we have nothing but attributes in the log event, filtering performs on them. For example we can make filter, that only passes log events with severity level more than 3 (INFO) or by presence of some attribute (like urgent tag). Blackhole allows you to configure [filtering](messages-filtering.md) in two ways: by specifying some functional object which accepts attributes set and returns boolean value, determining if the event pass filtering or not; or by using built-in filter DSL.
-
-```
-???????????????????????????????????
-What is it DSL??
-???????????????????????????????????
-```
+After sending attributes into logger object, they are pre-filtered. Since we have nothing but attributes in the log event, filtering performs on them. For example we can make filter, that only passes log events with severity level more than 3 (INFO) or by presence of some attribute (like urgent tag). Blackhole allows you to configure [filtering](messages-filtering.md) it by specifying some functional object which accepts attributes set and returns boolean value, determining if the event pass filtering or not.
 
 Filtered events are sent into the main part of logger - frontends, which can be one or more.
 

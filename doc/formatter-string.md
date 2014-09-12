@@ -103,7 +103,7 @@ Syntax:
 
 'L', 'E', 'G', 'T', 'U' are the types of attritubutes.
 
-Attributes `"timestamp"`, `"severity"` and `"message"` have ??????-type. All other attributes have 'L'-type by default. How to set the type of attribute you can read in the ["Passing of attributes to the macro"](passing-attributes.md) article.
+Attributes `"timestamp"`, `"severity"` and `"message"` have 'E'-type. All other attributes have 'L'-type by default. How to set the type of attribute you can read in the ["Passing of attributes to the macro"](passing-attributes.md) article.
 
 This placeholder get all of the attributes of log message of specified type and insert them into the final string in the next manner
 
