@@ -152,7 +152,7 @@ public:
     //! classes. It's a bug.
     verbose_logger_t(verbose_logger_t&& other) BLACKHOLE_NOEXCEPT :
         logger_base_t(std::move(other)),
-        level(static_cast<level_type>(0))
+        level(static_cast<level_type>(other.level))
     {}
 
     verbose_logger_t& operator=(verbose_logger_t&& other) BLACKHOLE_NOEXCEPT {

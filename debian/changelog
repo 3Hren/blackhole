@@ -1,3 +1,9 @@
+blackhole (0.2.1-1) unstable; urgency=low
+
+  * Bug fix: verbose logger should now properly copy level value when moving.
+
+ -- Evgeny Safronov <division494@gmail.com>  Fri, 12 Sep 2014 14:09:19 +0400
+
 blackhole (0.2.0-2) unstable; urgency=low
 
   * Bug fix: fixed dependencies in both debian/control and spec.
