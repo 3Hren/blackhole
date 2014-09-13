@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 #include "blackhole/config.hpp"
-#include "blackhole/utils/meta.hpp"
+#include "blackhole/detail/util/meta.hpp"
 
 namespace blackhole {
 
@@ -104,7 +104,7 @@ template<typename Handler, typename... Args>
 struct handler_maker {
     typedef exception_handler<
         typename boost::mpl::reverse<
-            typename meta::vector::from_variadic<Args...>::type
+            typename blackhole::aux::util::vector::from_variadic<Args...>::type
         >::type,
         Handler
     > type;

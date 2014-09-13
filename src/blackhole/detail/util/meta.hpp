@@ -4,7 +4,11 @@
 #include <boost/mpl/push_back.hpp>
 #include <boost/mpl/reverse.hpp>
 
-namespace meta {
+namespace blackhole {
+
+namespace aux {
+
+namespace util {
 
 namespace vector {
 
@@ -31,6 +35,10 @@ struct from_variadic<> {
 
 } // namespace vector
 
-template<class T1, class T2> struct holder {};
+template<class T1, class T2> struct metaholder {};
 
-} // namespace meta
+} // namespace util
+
+} // namespace aux
+
+} // namespace blackhole

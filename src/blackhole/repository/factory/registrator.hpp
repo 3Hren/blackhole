@@ -1,6 +1,6 @@
 #pragma once
 
-#include "blackhole/utils/meta.hpp"
+#include "blackhole/detail/util/meta.hpp"
 
 namespace blackhole {
 
@@ -18,7 +18,7 @@ struct group {
     external_factory_t& factory;
 
     template<class Sink, class Formatters>
-    void operator()(meta::holder<Sink, Formatters>) const {
+    void operator()(util::metaholder<Sink, Formatters>) const {
         external_inserter<Sink, Formatters>::insert(factory);
     }
 };
@@ -27,7 +27,7 @@ struct frontend {
     frontend_factory_t& factory;
 
     template<class Sink, class Formatter>
-    void operator()(meta::holder<Sink, Formatter>) const {
+    void operator()(util::metaholder<Sink, Formatter>) const {
         factory.add<Sink, Formatter>();
     }
 };

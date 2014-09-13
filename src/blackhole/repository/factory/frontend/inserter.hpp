@@ -3,9 +3,9 @@
 #include <boost/mpl/for_each.hpp>
 #include <boost/mpl/is_sequence.hpp>
 
+#include "blackhole/detail/util/meta.hpp"
 #include "blackhole/forwards.hpp"
 #include "blackhole/repository/factory/registrator.hpp"
-#include "blackhole/utils/meta.hpp"
 
 namespace blackhole {
 
@@ -26,7 +26,7 @@ struct frontend_inserter<
         aux::registrator::frontend action { factory };
         boost::mpl::for_each<
             Formatters,
-            meta::holder<Sink, boost::mpl::_>
+            aux::util::metaholder<Sink, boost::mpl::_>
         >(action);
     }
 };

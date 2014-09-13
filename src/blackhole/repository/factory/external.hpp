@@ -94,7 +94,10 @@ struct external_inserter<
 > {
     static void insert(external_factory_t& factory) {
         aux::registrator::group action { factory };
-        boost::mpl::for_each<Sinks, meta::holder<boost::mpl::_, Formatters>>(action);
+        boost::mpl::for_each<
+            Sinks,
+            aux::util::metaholder<boost::mpl::_, Formatters>
+        >(action);
     }
 };
 
