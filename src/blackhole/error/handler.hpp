@@ -60,8 +60,10 @@ public:
     intermediate(const handler_type& handler) :
         Base(handler)
     {
-        typedef std::is_base_of<typename Base::exception_type, exception_type> correct_hierarchy;
-        static_assert(!correct_hierarchy::value, "can't build correct exception handling hierarchy");
+        static_assert(
+            (!std::is_base_of<typename Base::exception_type, exception_type>::value),
+            "can't build correct exception handling hierarchy"
+        );
     }
 
     void operator()() {
@@ -78,7 +80,11 @@ struct handler_hierarchy {
     typedef typename boost::mpl::fold<
         TypeList,
         aux::launcher<Handler>,
-        boost::mpl::bind<boost::mpl::quote2<aux::intermediate>, boost::mpl::_2, boost::mpl::_1>
+        boost::mpl::bind<
+            boost::mpl::quote2<aux::intermediate>,
+            boost::mpl::_2,
+            boost::mpl::_1
+        >
     >::type type;
 };
 
