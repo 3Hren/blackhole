@@ -14,20 +14,32 @@ TEST(verbose_logger_t, Class) {
 
 TEST(verbose_logger_t, MoveExplicitConstructor) {
     verbose_logger_t<testing::level> log;
+    log.verbosity(testing::info);
+
     verbose_logger_t<testing::level> other(std::move(log));
-    UNUSED(other);
+
+    EXPECT_EQ(testing::info, other.verbosity());
 }
 
 TEST(verbose_logger_t, MoveImplicitConstructor) {
     verbose_logger_t<testing::level> log;
+    log.verbosity(testing::info);
+    EXPECT_EQ(testing::info, log.verbosity());
+
     verbose_logger_t<testing::level> other = std::move(log);
-    UNUSED(other);
+    EXPECT_EQ(testing::info, other.verbosity());
 }
 
 TEST(verbose_logger_t, MoveAssignment) {
     verbose_logger_t<testing::level> log;
+    log.verbosity(testing::info);
+    EXPECT_EQ(testing::info, log.verbosity());
+
     verbose_logger_t<testing::level> other;
+    EXPECT_EQ(testing::debug, other.verbosity());
+
     other = std::move(log);
+    EXPECT_EQ(testing::info, other.verbosity());
 }
 
 TEST(verbose_logger_t, OpenRecordByDefault) {
