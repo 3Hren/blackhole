@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
-Version:	0.2.0
-Release:	2%{?dist}
+Version:	0.2.1
+Release:	1%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
@@ -65,6 +65,9 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Fri Sep 12 2014 Evgeny Safronov <division494@gmail.com> - 0.2.1-1
+- Bug fix: verbose logger should now properly copy level value when moving.
+
 * Mon Aug 26 2014 Evgeny Safronov <division494@gmail.com> - 0.2.0-2
 - Bug fix: fixed dependencies in both debian/control and spec.
 
