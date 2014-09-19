@@ -2,6 +2,9 @@
 
 Yet another C++ logging library.
 
+Please visit [project site](http://3hren.github.io/blackhole/) for more information, including design overview, tutorials, examples and library reference.
+
+
 Blackhole is designed to be flexible configurable and fast. It supports multiply backends and can write into several of them simultaneusely. It allows to change logging process easily without of big coding and even on the fly with the feature of external configuring.
 
   * [Detailed documentation](doc/contents.md)
