@@ -1,5 +1,5 @@
 _site
 
-#[IDE specific]
+# [IDE specific]
 .idea
 *.user*
