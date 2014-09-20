@@ -46,4 +46,4 @@ Blackhole is designed to be flexible configurable and fast. It supports multiply
 
 
 ## Dependencies
- - Boost (tested on 1.40, 1.46 and 1.53)
+ - Boost (tested on 1.40, 1.46, 1.53 and 1.55)
