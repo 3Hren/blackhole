@@ -47,7 +47,7 @@ void handle(Log& log, level lvl, const char* message) {
 
 int main(int, char**) {
     init();
-    verbose_logger_t<level> log = repository_t::instance().root<level>();
+    auto log = repository_t::instance().create<verbose_logger_t<level>>("root");
 
     BH_LOG(log, level::debug, "log message using macro API");
     handle(log, level::debug, "log message using log object directly");
