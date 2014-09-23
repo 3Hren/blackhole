@@ -20,7 +20,7 @@ void init() {
     // in the repository. After registering new loggers can be created with configuration that uses
     // newly registered formatter's or sink's features.
     // You can look consider this action as some kind of plugin system.
-    repository_t::instance().configure<
+    repository_t::instance().registrate<
         sink::files_t<
             sink::files::boost_backend_t,
             sink::rotator_t<
@@ -51,7 +51,7 @@ void init() {
 
 int main(int, char**) {
     init();
-    verbose_logger_t<level> log = repository_t::instance().root<level>();
+    auto log = repository_t::instance().create<verbose_logger_t<level>>("root");
 
     // See that 'second' invocation after macro? That's how additional attributes are attached to
     // the log event.

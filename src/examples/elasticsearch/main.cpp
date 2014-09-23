@@ -37,7 +37,7 @@ void map_severity(blackhole::aux::attachable_ostringstream& stream, level lvl) {
 //! Initialization stage.
 void init() {
     //! Register required frontend.
-    repository_t::instance().configure<
+    repository_t::instance().registrate<
         sink::elasticsearch_t,
         formatter::json_t
     >();
@@ -75,7 +75,7 @@ void init() {
 
 int main(int, char**) {
     init();
-    auto log = repository_t::instance().root<level>();
+    auto log = repository_t::instance().create<verbose_logger_t<level>>("root");
 
     for (int id = 0; id < 200; ++id) {
         BH_LOG(log, level::debug, "this is a debug message")(attribute::list({

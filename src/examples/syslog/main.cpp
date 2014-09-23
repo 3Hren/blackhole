@@ -46,7 +46,7 @@ void init() {
     // As always register necessary formatter and sink. Note that syslog sink requires
     // user-defined severity enumeration symbol as template parameter.
     // This information is needed for severity level mapping.
-    repository_t::instance().configure<sink::syslog_t<level>, formatter::string_t>();
+    repository_t::instance().registrate<sink::syslog_t<level>, formatter::string_t>();
 
     // Formatter is configured as usual, except we don't need anything than message.
     formatter_config_t formatter("string");
@@ -64,7 +64,7 @@ void init() {
 
 int main(int, char**) {
     init();
-    verbose_logger_t<level> log = repository_t::instance().root<level>();
+    auto log = repository_t::instance().create<verbose_logger_t<level>>("root");
 
     BH_LOG(log, level::debug, "debug message");
     BH_LOG(log, level::warning, "warning message");
