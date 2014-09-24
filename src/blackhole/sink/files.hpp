@@ -154,7 +154,7 @@ struct unique_id_traits<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>
                 return utils::format("%s/%s/%s", sink_type::name(), rotator_type::name(), "datetime");
             }
 
-            throw blackhole::error_t("rotation section not properly configures: no watcher settings found");
+            throw blackhole::error_t("rotation section not properly configured: no watcher settings found");
         }
 
         return sink_type::name();
