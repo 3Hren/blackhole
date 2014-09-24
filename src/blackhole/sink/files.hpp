@@ -143,8 +143,13 @@ struct unique_id_traits<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>
         if (rotation_it != cfg.end()) {
             const dynamic_t::object_t& rotation = rotation_it->second.to<dynamic_t::object_t>();
 
+            const bool has_move_watcher = rotation.find("move") != rotation.end();
             const bool has_size_watcher = rotation.find("size") != rotation.end();
             const bool has_datetime_watcher = rotation.find("period") != rotation.end();
+
+            if (has_move_watcher) {
+                return utils::format("%s/%s/%s", sink_type::name(), rotator_type::name(), "move");
+            }
 
             if (has_size_watcher && has_datetime_watcher) {
                 throw blackhole::error_t("set watcher is not implemented yet");
@@ -206,6 +211,18 @@ struct filler<sink::rotator_t<Backend, Watcher>> {
 template<class Backend>
 struct factory_traits<sink::files_t<Backend>> {
     typedef sink::files_t<Backend> sink_type;
+    typedef typename sink_type::config_type config_type;
+
+    static void map_config(const aux::extractor<sink_type>& ex, config_type& config) {
+        aux::filler<sink_type>::extract_to(ex, config);
+    }
+};
+
+template<class Backend>
+struct factory_traits<sink::files_t<Backend, sink::rotator_t<Backend, sink::rotation::watcher::move_t>>> {
+    typedef sink::rotation::watcher::move_t watcher_type;
+    typedef sink::rotator_t<Backend, watcher_type> rotator_type;
+    typedef sink::files_t<Backend, rotator_type> sink_type;
     typedef typename sink_type::config_type config_type;
 
     static void map_config(const aux::extractor<sink_type>& ex, config_type& config) {

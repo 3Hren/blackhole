@@ -63,6 +63,30 @@ TEST(Factory, FileStringsFrontend) {
     EXPECT_TRUE(bool(factory.create(formatter, sink)));
 }
 
+TEST(Repository, RotationFileStringsFrontendWithMoveWatcher) {
+    external_factory_t factory;
+    factory.add<
+        sink::files_t<
+            sink::files::boost_backend_t,
+            sink::rotator_t<
+                sink::files::boost_backend_t,
+                sink::rotation::watcher::move_t
+            >
+        >,
+        formatter::string_t
+    >();
+
+    formatter_config_t formatter("string");
+    formatter["pattern"] = "[%(timestamp)s]: %(message)s";
+
+    sink_config_t sink("files");
+    sink["path"] = "/dev/stdout";
+    sink["autoflush"] = true;
+    sink["rotation"]["move"] = true;
+
+    EXPECT_TRUE(bool(factory.create(formatter, sink)));
+}
+
 TEST(Repository, RotationFileStringsFrontendWithSizeWatcher) {
     external_factory_t factory;
     factory.add<
