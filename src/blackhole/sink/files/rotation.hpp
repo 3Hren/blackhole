@@ -39,7 +39,15 @@ public:
         config(config),
         backend(backend),
         generator(config.pattern),
-        counter(rotation::counter_t::from_string(boost::algorithm::replace_all_copy(config.pattern, "%(filename)s", backend.filename()))),
+        counter(
+            rotation::counter_t::from_string(
+                boost::algorithm::replace_all_copy(
+                    config.pattern,
+                    "%(filename)s",
+                    backend.filename()
+                )
+            )
+        ),
         watcher(config.watcher)
     {}
 
