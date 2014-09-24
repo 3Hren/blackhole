@@ -17,8 +17,11 @@ namespace blackhole {
 namespace sink {
 
 //! Tag for file sinks with no rotation.
+//!@todo: Drop this. Create rotation::fictive_t instead.
 class NoRotation;
 
+//!@todo: Rename Timer to TimePicker.
+//!@todo: Let TimePicker return string instead of int.
 template<class Backend, class Watcher, class Timer = rotation::timer_t>
 class rotator_t {
     rotation::config_t<Watcher> config;
@@ -27,6 +30,7 @@ class rotator_t {
     rotation::naming::basename_t generator;
     rotation::counter_t counter;
     Watcher watcher;
+
 public:
     static const char* name() {
         return "rotate";
@@ -36,10 +40,19 @@ public:
         config(config),
         backend(backend),
         generator(config.pattern),
-        counter(rotation::counter_t::from_string(boost::algorithm::replace_all_copy(config.pattern, "%(filename)s", backend.filename()))),
+        counter(
+            rotation::counter_t::from_string(
+                boost::algorithm::replace_all_copy(
+                    config.pattern,
+                    "%(filename)s",
+                    backend.filename()
+                )
+            )
+        ),
         watcher(config.watcher)
     {}
 
+    //!@todo: Isolate.
     Timer& timer() {
         return m_timer;
     }
@@ -98,6 +111,34 @@ private:
         }
 
         return std::string(buf);
+    }
+};
+
+template<class Backend>
+class rotator_t<Backend, rotation::watcher::move_t, rotation::timer_t> {
+    rotation::config_t<rotation::watcher::move_t> config;
+    Backend& backend;
+    rotation::watcher::move_t watcher;
+
+public:
+    static const char* name() {
+        return "rotate";
+    }
+
+    rotator_t(const rotation::config_t<rotation::watcher::move_t>& config, Backend& backend) :
+        config(config),
+        backend(backend),
+        watcher(config.watcher)
+    {}
+
+    bool necessary(const std::string& message) const {
+        return watcher(backend, message);
+    }
+
+    void rotate() const {
+        backend.flush();
+        backend.close();
+        backend.open();
     }
 };
 
