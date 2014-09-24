@@ -40,6 +40,7 @@ public:
         watcher(config.watcher)
     {}
 
+    //!@todo: Isolate.
     Timer& timer() {
         return m_timer;
     }
