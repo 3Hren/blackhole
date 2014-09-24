@@ -1,3 +1,10 @@
+blackhole (0.2.2-1) unstable; urgency=low
+
+  * Feature: added file sink which can automatically reopen files after they
+    are moved.
+
+ -- Evgeny Safronov <division494@gmail.com>  Wed, 24 Sep 2014 15:00:21 +0400
+
 blackhole (0.2.1-1) unstable; urgency=low
 
   * Bug fix: verbose logger should now properly copy level value when moving.

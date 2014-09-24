@@ -1,6 +1,6 @@
 Summary:	Blackhole
 Name:		libblackhole
-Version:	0.2.1
+Version:	0.2.2
 Release:	1%{?dist}
 
 License:	MIT
@@ -65,6 +65,9 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Wed Sep 24 2014 Evgeny Safronov <division494@gmail.com> - 0.2.2-1
+- Feature: added file sink which can automatically reopen files after they are moved.
+
 * Fri Sep 12 2014 Evgeny Safronov <division494@gmail.com> - 0.2.1-1
 - Bug fix: verbose logger should now properly copy level value when moving.
 
