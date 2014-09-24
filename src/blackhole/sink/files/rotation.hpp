@@ -114,6 +114,34 @@ private:
     }
 };
 
+template<class Backend>
+class rotator_t<Backend, rotation::watcher::move_t, rotation::timer_t> {
+    rotation::config_t<rotation::watcher::move_t> config;
+    Backend& backend;
+    rotation::watcher::move_t watcher;
+
+public:
+    static const char* name() {
+        return "rotate";
+    }
+
+    rotator_t(const rotation::config_t<rotation::watcher::move_t>& config, Backend& backend) :
+        config(config),
+        backend(backend),
+        watcher(config.watcher)
+    {}
+
+    bool necessary(const std::string& message) const {
+        return watcher(backend, message);
+    }
+
+    void rotate() const {
+        backend.flush();
+        backend.close();
+        backend.open();
+    }
+};
+
 } // namespace sink
 
 } // namespace blackhole
