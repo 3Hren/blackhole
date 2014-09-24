@@ -12,6 +12,7 @@ namespace rotation {
 namespace watcher {
 
 struct size_t;
+struct move_t;
 template<class> struct datetime_t;
 template<class...> struct watcher_set;
 
@@ -26,6 +27,9 @@ struct config_t<watcher::size_t> {
         size(size)
     {}
 };
+
+template<>
+struct config_t<move_t> {};
 
 namespace datetime {
 

@@ -26,6 +26,13 @@ struct config_t {
     {}
 };
 
+template<>
+struct config_t<watcher::move_t> {
+    watcher::config_t<watcher::move_t> watcher;
+
+    config_t() {}
+};
+
 } // namespace rotation
 
 } // namespace sink
