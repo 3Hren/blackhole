@@ -19,6 +19,8 @@ namespace sink {
 //! Tag for file sinks with no rotation.
 class NoRotation;
 
+//!@todo: Rename Timer to TimePicker.
+//!@todo: Let TimePicker return string instead of int.
 template<class Backend, class Watcher, class Timer = rotation::timer_t>
 class rotator_t {
     rotation::config_t<Watcher> config;
