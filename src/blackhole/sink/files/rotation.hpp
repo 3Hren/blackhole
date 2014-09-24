@@ -17,6 +17,7 @@ namespace blackhole {
 namespace sink {
 
 //! Tag for file sinks with no rotation.
+//!@todo: Drop this. Create rotation::fictive_t instead.
 class NoRotation;
 
 //!@todo: Rename Timer to TimePicker.
