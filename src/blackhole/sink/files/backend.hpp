@@ -66,8 +66,8 @@ public:
         const boost::filesystem::path& oldpath = path / oldname;
         const boost::filesystem::path& newpath = path / newname;
 
-        //! Workaround `boost::filesystem::rename`: boost < 1.46.00 throws exception
-        //! if target path exists.
+        //! Workaround `boost::filesystem::rename` on boost < 1.46.00 - it
+        //! throws an exception if the target path exists.
 #if BOOST_VERSION < 104600 || BOOST_FILESYSTEM_VERSION < 3
         if (boost::filesystem::exists(newpath)) {
             boost::filesystem::remove(newpath);
