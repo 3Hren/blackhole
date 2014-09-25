@@ -20,13 +20,16 @@ namespace sink {
 //!@todo: Drop this. Create rotation::fictive_t instead.
 class NoRotation;
 
-//!@todo: Rename Timer to TimePicker.
 //!@todo: Let TimePicker return string instead of int.
-template<class Backend, class Watcher, class Timer = rotation::timer_t>
+template<class Backend, class Watcher, class TimePicker = rotation::timepicker_t>
 class rotator_t {
+public:
+    typedef TimePicker timepicker_type;
+
+private:
     rotation::config_t<Watcher> config;
     Backend& backend;
-    Timer m_timer;
+    timepicker_type timepicker;
     rotation::naming::basename_t generator;
     rotation::counter_t counter;
     Watcher watcher;
@@ -53,8 +56,8 @@ public:
     {}
 
     //!@todo: Isolate.
-    Timer& timer() {
-        return m_timer;
+    timepicker_type& timer() {
+        return timepicker;
     }
 
     bool necessary(const std::string& message) const {
@@ -104,7 +107,7 @@ private:
     std::string backup_filename(const std::string& pattern) const {
         std::string filename = pattern;
         boost::algorithm::replace_all(filename, "%N", "1");
-        std::time_t time = m_timer.current();
+        std::time_t time = timepicker.current();
         char buf[128];
         if (strftime(buf, 128, filename.data(), std::gmtime(&time)) == 0) {
             // Do nothing.
@@ -115,7 +118,7 @@ private:
 };
 
 template<class Backend>
-class rotator_t<Backend, rotation::watcher::move_t, rotation::timer_t> {
+class rotator_t<Backend, rotation::watcher::move_t, rotation::timepicker_t> {
     rotation::config_t<rotation::watcher::move_t> config;
     Backend& backend;
     rotation::watcher::move_t watcher;

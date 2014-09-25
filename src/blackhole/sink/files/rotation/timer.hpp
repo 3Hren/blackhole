@@ -10,7 +10,7 @@ namespace sink {
 
 namespace rotation {
 
-struct timer_t {
+struct timepicker_t {
     std::time_t current() const {
         return std::time(nullptr);
     }
