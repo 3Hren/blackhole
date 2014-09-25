@@ -116,7 +116,7 @@ private:
     }
 };
 
-}
+} // namespace placeholder
 
 typedef boost::variant<
     literal_t,
