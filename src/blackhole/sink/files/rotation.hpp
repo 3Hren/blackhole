@@ -117,19 +117,23 @@ private:
 
 template<class Backend>
 class rotator_t<Backend, rotation::watcher::move_t, rotation::timepicker_t> {
-    rotation::config_t<rotation::watcher::move_t> config;
-    Backend& backend;
-    rotation::watcher::move_t watcher;
+public:
+    typedef Backend backend_type;
+    typedef rotation::watcher::move_t watcher_type;
+    typedef rotation::config_t<watcher_type> config_type;
+
+private:
+    watcher_type watcher;
+    backend_type& backend;
 
 public:
     static const char* name() {
         return "rotate";
     }
 
-    rotator_t(const rotation::config_t<rotation::watcher::move_t>& config, Backend& backend) :
-        config(config),
-        backend(backend),
-        watcher(config.watcher)
+    rotator_t(const config_type& config, Backend& backend) :
+        watcher(config.watcher),
+        backend(backend)
     {}
 
     bool necessary(const std::string& message) const {
