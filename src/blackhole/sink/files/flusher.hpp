@@ -8,10 +8,15 @@ namespace files {
 
 template<class Backend>
 class flusher_t {
-    bool autoflush;
-    Backend& backend;
 public:
-    flusher_t(bool autoflush, Backend& backend) :
+    typedef Backend backend_type;
+
+private:
+    bool autoflush;
+    backend_type& backend;
+
+public:
+    flusher_t(bool autoflush, backend_type& backend) :
         autoflush(autoflush),
         backend(backend)
     {}
