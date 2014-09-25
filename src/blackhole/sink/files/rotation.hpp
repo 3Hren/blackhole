@@ -16,9 +16,8 @@ namespace blackhole {
 
 namespace sink {
 
-//! Tag for file sinks with no rotation.
-//!@todo: Drop this. Create rotation::fictive_t instead.
-class NoRotation;
+//! Tag class for file sinks with no rotation policy.
+class null_rotator_t;
 
 //!@todo: Let TimePicker return string instead of int.
 template<class Backend, class Watcher, class TimePicker = rotation::timepicker_t>

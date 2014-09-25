@@ -10,7 +10,7 @@ namespace sink {
 
 namespace files {
 
-template<class Rotator = NoRotation>
+template<class Rotator = null_rotator_t>
 struct config_t {
     std::string path;
     bool autoflush;

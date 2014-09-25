@@ -45,12 +45,12 @@ public:
 };
 
 template<class Backend>
-class file_handler_t<Backend, NoRotation> {
+class file_handler_t<Backend, null_rotator_t> {
     Backend m_backend;
     files::writer_t<Backend> writer;
     files::flusher_t<Backend> flusher;
 public:
-    file_handler_t(const std::string& path, const files::config_t<NoRotation>& config) :
+    file_handler_t(const std::string& path, const files::config_t<null_rotator_t>& config) :
         m_backend(path),
         writer(m_backend),
         flusher(config.autoflush, m_backend)
@@ -78,7 +78,7 @@ struct substitute_attribute_t {
     }
 };
 
-template<class Backend = files::boost_backend_t, class Rotator = NoRotation>
+template<class Backend = files::boost_backend_t, class Rotator = null_rotator_t>
 class files_t {
     typedef file_handler_t<Backend, Rotator> handler_type;
     typedef std::unordered_map<std::string, std::shared_ptr<handler_type>> handlers_type;
@@ -157,9 +157,9 @@ struct unique_id_traits<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>
 };
 
 template<class Backend>
-struct config_traits<sink::files_t<Backend, sink::NoRotation>> {
+struct config_traits<sink::files_t<Backend, sink::null_rotator_t>> {
     static std::string name() {
-        return sink::files_t<Backend, sink::NoRotation>::name();
+        return sink::files_t<Backend, sink::null_rotator_t>::name();
     }
 };
 
