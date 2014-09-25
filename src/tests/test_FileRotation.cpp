@@ -10,8 +10,6 @@ namespace mocked {
 
 typedef sink::rotator_t<mock::files::backend_t, mock::files::rotation::watcher_t> rotator_t;
 
-typedef sink::rotator_t<mock::files::backend_t, mock::files::rotation::watcher_t, mock::timer_t> rotator_with_timer_t;
-
 }
 
 namespace blackhole {
@@ -212,26 +210,20 @@ TEST(rotator_t, SubstitutesLongFilenamePlaceholder) {
     rotator.rotate();
 }
 
-namespace {
+namespace mocked {
 
-std::time_t to_time_t(const std::string& message, const std::string& format = "%Y%m%d") {
-    std::tm tm;
-    std::memset(&tm, 0, sizeof(tm));
-    strptime(message.c_str(), format.c_str(), &tm);
-    std::time_t time = timegm(&tm);
-    return time;
-}
+typedef sink::rotator_t<mock::files::backend_t, mock::files::rotation::watcher_t, mock::timer_t> rotator_with_timer_t;
 
 }
+
+std::time_t mock::timer_t::time = std::time(nullptr);
 
 TEST(rotator_t, SubstitutesDateTimePlaceholders) {
     sink::rotation::config_t<mock::files::rotation::watcher_t> config = { "test.log.%Y%m%d", 1 };
     NiceMock<mock::files::backend_t> backend;
     mocked::rotator_with_timer_t rotator(config, backend);
 
-    EXPECT_CALL(rotator.timer(), current())
-            .Times(1)
-            .WillOnce(Return(to_time_t("20140127")));
+    mocked::rotator_with_timer_t::timepicker_type::mock("20140127");
 
     EXPECT_CALL(backend, filename())
             .WillOnce(Return("test.log"));
@@ -247,9 +239,7 @@ TEST(rotator_t, RotateWithDateTimePlaceholders) {
     NiceMock<mock::files::backend_t> backend;
     mocked::rotator_with_timer_t rotator(config, backend);
 
-    EXPECT_CALL(rotator.timer(), current())
-            .Times(1)
-            .WillOnce(Return(to_time_t("20140127")));
+    mocked::rotator_with_timer_t::timepicker_type::mock("20140127");
 
     EXPECT_CALL(backend, filename())
             .WillOnce(Return("test.log"));
@@ -265,9 +255,7 @@ TEST(rotator_t, RotateWithDateTimeAndCountPlaceholders) {
     NiceMock<mock::files::backend_t> backend;
     mocked::rotator_with_timer_t rotator(config, backend);
 
-    EXPECT_CALL(rotator.timer(), current())
-            .Times(1)
-            .WillOnce(Return(to_time_t("20140127")));
+    mocked::rotator_with_timer_t::timepicker_type::mock("20140127");
 
     EXPECT_CALL(backend, filename())
             .WillOnce(Return("test.log"));
@@ -288,9 +276,7 @@ TEST(rotator_t, RotateWithDateTimePlaceholderBeforeCounter) {
     NiceMock<mock::files::backend_t> backend;
     mocked::rotator_with_timer_t rotator(config, backend);
 
-    EXPECT_CALL(rotator.timer(), current())
-            .Times(1)
-            .WillOnce(Return(to_time_t("20140127")));
+    mocked::rotator_with_timer_t::timepicker_type::mock("20140127");
 
     EXPECT_CALL(backend, filename())
             .WillOnce(Return("test.log"));
@@ -311,9 +297,7 @@ TEST(rotator_t, RotateWithDateTimePlaceholderAfterCounter) {
     NiceMock<mock::files::backend_t> backend;
     mocked::rotator_with_timer_t rotator(config, backend);
 
-    EXPECT_CALL(rotator.timer(), current())
-            .Times(1)
-            .WillOnce(Return(to_time_t("20140127")));
+    mocked::rotator_with_timer_t::timepicker_type::mock("20140127");
 
     EXPECT_CALL(backend, filename())
             .WillOnce(Return("test.log"));

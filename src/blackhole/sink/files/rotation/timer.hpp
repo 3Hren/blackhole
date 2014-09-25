@@ -11,7 +11,7 @@ namespace sink {
 namespace rotation {
 
 struct timepicker_t {
-    std::time_t current() const {
+    static std::time_t current() {
         return std::time(nullptr);
     }
 };

@@ -24,23 +24,27 @@ class NoRotation;
 template<class Backend, class Watcher, class TimePicker = rotation::timepicker_t>
 class rotator_t {
 public:
+    typedef Backend backend_type;
+    typedef Watcher watcher_type;
     typedef TimePicker timepicker_type;
+    typedef rotation::config_t<watcher_type> config_type;
 
 private:
-    rotation::config_t<Watcher> config;
-    Backend& backend;
-    timepicker_type timepicker;
+    config_type config;
+    watcher_type watcher;
+    backend_type& backend;
+
     rotation::naming::basename_t generator;
     rotation::counter_t counter;
-    Watcher watcher;
 
 public:
     static const char* name() {
         return "rotate";
     }
 
-    rotator_t(const rotation::config_t<Watcher>& config, Backend& backend) :
+    rotator_t(const config_type& config, backend_type& backend) :
         config(config),
+        watcher(config.watcher),
         backend(backend),
         generator(config.pattern),
         counter(
@@ -51,14 +55,8 @@ public:
                     backend.filename()
                 )
             )
-        ),
-        watcher(config.watcher)
+        )
     {}
-
-    //!@todo: Isolate.
-    timepicker_type& timer() {
-        return timepicker;
-    }
 
     bool necessary(const std::string& message) const {
         return watcher(backend, message);
@@ -107,7 +105,7 @@ private:
     std::string backup_filename(const std::string& pattern) const {
         std::string filename = pattern;
         boost::algorithm::replace_all(filename, "%N", "1");
-        std::time_t time = timepicker.current();
+        std::time_t time = timepicker_type::current();
         char buf[128];
         if (strftime(buf, 128, filename.data(), std::gmtime(&time)) == 0) {
             // Do nothing.

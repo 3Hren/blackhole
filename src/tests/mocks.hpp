@@ -8,9 +8,20 @@ namespace testing {
 
 namespace mock {
 
-class timer_t {
-public:
-    MOCK_CONST_METHOD0(current, std::time_t());
+struct timer_t {
+    static void mock(std::string value) {
+        std::tm tm;
+        std::memset(&tm, 0, sizeof(tm));
+        strptime(value.c_str(), "%Y%m%d", &tm);
+        timer_t::time = timegm(&tm);
+    }
+
+    static std::time_t current() {
+        return time;
+    }
+
+private:
+    static std::time_t time;
 };
 
 class time_picker_t {
