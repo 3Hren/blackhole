@@ -15,11 +15,11 @@ namespace files {
 class boost_backend_t {
     const boost::filesystem::path m_path;
     boost::filesystem::ofstream m_file;
+
 public:
     boost_backend_t(const std::string& path) :
         m_path(absolute(path))
-    {
-    }
+    {}
 
     bool opened() const {
         return m_file.is_open();
