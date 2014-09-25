@@ -19,16 +19,23 @@ namespace sink {
 
 template<class Backend, class Rotator>
 class file_handler_t {
-    Backend m_backend;
-    files::writer_t<Backend> writer;
-    files::flusher_t<Backend> flusher;
-    Rotator rotator;
 public:
-    file_handler_t(const std::string& path, const files::config_t<Rotator>& config) :
-        m_backend(path),
-        writer(m_backend),
-        flusher(config.autoflush, m_backend),
-        rotator(config.rotation, m_backend)
+    typedef Backend backend_type;
+    typedef Rotator rotator_type;
+    typedef files::config_t<rotator_type> config_type;
+
+private:
+    backend_type backend_;
+    files::writer_t<backend_type> writer;
+    files::flusher_t<backend_type> flusher;
+    rotator_type rotator;
+
+public:
+    file_handler_t(const std::string& path, const config_type& config) :
+        backend_(path),
+        writer(backend_),
+        flusher(config.autoflush, backend_),
+        rotator(config.rotation, backend_)
     {}
 
     void handle(const std::string& message) {
@@ -39,21 +46,28 @@ public:
         }
     }
 
-    const Backend& backend() {
-        return m_backend;
+    const backend_type& backend() {
+        return backend_;
     }
 };
 
 template<class Backend>
 class file_handler_t<Backend, null_rotator_t> {
-    Backend m_backend;
-    files::writer_t<Backend> writer;
-    files::flusher_t<Backend> flusher;
 public:
-    file_handler_t(const std::string& path, const files::config_t<null_rotator_t>& config) :
-        m_backend(path),
-        writer(m_backend),
-        flusher(config.autoflush, m_backend)
+    typedef Backend backend_type;
+    typedef null_rotator_t rotator_type;
+    typedef files::config_t<rotator_type> config_type;
+
+private:
+    backend_type backend_;
+    files::writer_t<backend_type> writer;
+    files::flusher_t<backend_type> flusher;
+
+public:
+    file_handler_t(const std::string& path, const config_type& config) :
+        backend_(path),
+        writer(backend_),
+        flusher(config.autoflush, backend_)
     {}
 
     void handle(const std::string& message) {
@@ -61,8 +75,8 @@ public:
         flusher.flush();
     }
 
-    const Backend& backend() {
-        return m_backend;
+    const backend_type& backend() {
+        return backend_;
     }
 };
 
