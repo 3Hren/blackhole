@@ -17,39 +17,8 @@ namespace blackhole {
 
 namespace sink {
 
-template<class Backend, class Rotator, class = void>
-class file_handler_t;
-
-template<class Backend>
-class file_handler_t<Backend, NoRotation, void> {
-    Backend m_backend;
-    files::writer_t<Backend> writer;
-    files::flusher_t<Backend> flusher;
-public:
-    file_handler_t(const std::string& path, const files::config_t<NoRotation>& config) :
-        m_backend(path),
-        writer(m_backend),
-        flusher(config.autoflush, m_backend)
-    {}
-
-    void handle(const std::string& message) {
-        writer.write(message);
-        flusher.flush();
-    }
-
-    const Backend& backend() {
-        return m_backend;
-    }
-};
-
 template<class Backend, class Rotator>
-class file_handler_t<
-    Backend,
-    Rotator,
-    typename std::enable_if<
-        !std::is_same<Rotator, NoRotation>::value
-    >::type>
-{
+class file_handler_t {
     Backend m_backend;
     files::writer_t<Backend> writer;
     files::flusher_t<Backend> flusher;
@@ -68,6 +37,28 @@ public:
         if (rotator.necessary(message)) {
             rotator.rotate();
         }
+    }
+
+    const Backend& backend() {
+        return m_backend;
+    }
+};
+
+template<class Backend>
+class file_handler_t<Backend, NoRotation> {
+    Backend m_backend;
+    files::writer_t<Backend> writer;
+    files::flusher_t<Backend> flusher;
+public:
+    file_handler_t(const std::string& path, const files::config_t<NoRotation>& config) :
+        m_backend(path),
+        writer(m_backend),
+        flusher(config.autoflush, m_backend)
+    {}
+
+    void handle(const std::string& message) {
+        writer.write(message);
+        flusher.flush();
     }
 
     const Backend& backend() {
