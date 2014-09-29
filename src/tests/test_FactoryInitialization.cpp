@@ -64,7 +64,11 @@ TEST(Factory, FileStringsFrontend) {
     sink["path"] = "/dev/stdout";
     sink["autoflush"] = true;
 
-    EXPECT_TRUE(bool(factory.create(formatter, sink)));
+    auto result = factory.create(formatter, sink);
+    auto casted = dynamic_cast<
+        frontend_t<formatter::string_t, sink::files_t<>>*
+    >(result.get());
+    EXPECT_TRUE(casted != nullptr);
 }
 
 TEST(Repository, RotationFileStringsFrontendWithMoveWatcher) {
