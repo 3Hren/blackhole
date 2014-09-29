@@ -168,7 +168,7 @@ BLACKHOLE_API
 void
 repository_t::registrate() {
     std::lock_guard<std::mutex> lock(mutex);
-    external_inserter<Sink, Formatter>::insert(factory);
+    factory.add<Sink, Formatter>();
 }
 
 template<typename Sink, typename Formatter>

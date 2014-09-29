@@ -1,6 +1,9 @@
 #pragma once
 
 #include <string>
+#include <typeindex>
+
+#include "blackhole/dynamic.hpp"
 
 namespace blackhole {
 
@@ -13,6 +16,13 @@ struct config_traits {
     */
     static std::string name() {
         return T::name();
+    }
+};
+
+template<typename T>
+struct match_traits {
+    static bool matched(const std::string& type, const dynamic_t&) {
+        return type == T::name();
     }
 };
 
