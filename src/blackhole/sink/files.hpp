@@ -137,26 +137,27 @@ public:
 
 template<class Backend, class Watcher>
 struct match_traits<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
+    typedef type_index_t index_type;
     typedef sink::files_t<
         Backend,
         sink::rotator_t<Backend, Watcher>
     > sink_type;
 
-    static std::type_index type_index(const std::string& type, const dynamic_t& config) {
+    static index_type type_index(const std::string& type, const dynamic_t& config) {
         if (type != sink_type::name()) {
-            return std::type_index(typeid(std::nullptr_t));
+            return index_type(typeid(void));
         }
 
         auto config_ = config.to<dynamic_t::object_t>();
         auto it = config_.find("rotation");
         if (it == config_.end()) {
-            return std::type_index(typeid(sink::files_t<Backend>));
+            return index_type(typeid(sink::files_t<Backend>));
         }
 
         auto rconfig = it->second.to<dynamic_t::object_t>();
 
         if (rconfig.find("move") != rconfig.end()) {
-            return std::type_index(typeid(sink::files_t<
+            return index_type(typeid(sink::files_t<
                 Backend,
                 sink::rotator_t<
                     Backend,
@@ -166,7 +167,7 @@ struct match_traits<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
         }
 
         if (rconfig.find("size") != rconfig.end()) {
-            return std::type_index(typeid(sink::files_t<
+            return index_type(typeid(sink::files_t<
                 Backend,
                 sink::rotator_t<
                     Backend,
@@ -176,7 +177,7 @@ struct match_traits<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
         }
 
         if (rconfig.find("period") != rconfig.end()) {
-            return std::type_index(typeid(sink::files_t<
+            return index_type(typeid(sink::files_t<
                 Backend,
                 sink::rotator_t<
                     Backend,
@@ -185,7 +186,7 @@ struct match_traits<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
             >));
         }
 
-        return std::type_index(typeid(sink::files_t<Backend>));
+        return index_type(typeid(void));
     }
 };
 

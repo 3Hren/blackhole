@@ -1,11 +1,30 @@
 #pragma once
 
+#include <memory>
 #include <string>
-#include <typeindex>
+#include <typeinfo>
 
 #include "blackhole/dynamic.hpp"
 
 namespace blackhole {
+
+class type_index_t {
+    const std::type_info* d;
+
+public:
+    type_index_t(const std::type_info& typeinfo) :
+        d(&typeinfo)
+    {}
+
+    bool operator==(const type_index_t& other) const {
+        return *d == *other.d;
+    }
+
+    size_t hash_code() const {
+        static std::hash<std::string> hash;
+        return hash(d->name());
+    }
+};
 
 template<typename T>
 struct match_traits {
@@ -33,9 +52,21 @@ struct match_traits {
      *
      * By default returns Formatter or Sink typeid;
      */
-    static std::type_index type_index(const std::string&, const dynamic_t&) {
+    static type_index_t type_index(const std::string&, const dynamic_t&) {
         return typeid(T);
     }
 };
 
 } // namespace blackhole
+
+namespace std {
+
+template<>
+struct hash<blackhole::type_index_t> {
+    size_t
+    operator()(const blackhole::type_index_t& value) const BLACKHOLE_NOEXCEPT {
+        return value.hash_code();
+    }
+};
+
+} // namespace std

@@ -15,7 +15,7 @@
 namespace blackhole {
 
 class factory_t {
-    typedef std::type_index index_type;
+    typedef type_index_t index_type;
 
     typedef std::function<
         std::unique_ptr<base_frontend_t>(const frontend_config_t&)
