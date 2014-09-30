@@ -11,6 +11,8 @@ class frontend_t<Formatter, sink::syslog_t<Level>> :
     public abstract_frontend_t<Formatter, sink::syslog_t<Level>> {
 
     typedef abstract_frontend_t<Formatter, sink::syslog_t<Level>> base_type;
+
+public:
     typedef typename base_type::formatter_type formatter_type;
     typedef typename base_type::sink_type sink_type;
 

@@ -12,6 +12,8 @@ class frontend_t<Formatter, sink::files_t<Backend, Rotator>> :
     typedef abstract_frontend_t<
         Formatter, sink::files_t<Backend, Rotator>
     > base_type;
+
+public:
     typedef typename base_type::formatter_type formatter_type;
     typedef typename base_type::sink_type sink_type;
 

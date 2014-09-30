@@ -72,16 +72,21 @@ TEST(Factory, FileStringsFrontend) {
 }
 
 TEST(Repository, RotationFileStringsFrontendWithMoveWatcher) {
-    external_factory_t factory;
-    factory.add<
+    typedef frontend_t<
+        formatter::string_t,
         sink::files_t<
             sink::files::boost_backend_t,
             sink::rotator_t<
                 sink::files::boost_backend_t,
                 sink::rotation::watcher::move_t
             >
-        >,
-        formatter::string_t
+        >
+    > frontend_type;
+
+    external_factory_t factory;
+    factory.add<
+        frontend_type::sink_type,
+        frontend_type::formatter_type
     >();
 
     formatter_config_t formatter("string");
@@ -92,19 +97,9 @@ TEST(Repository, RotationFileStringsFrontendWithMoveWatcher) {
     sink["autoflush"] = true;
     sink["rotation"]["move"] = true;
 
-    auto result = factory.create(formatter, sink);
-    auto casted = dynamic_cast<
-        frontend_t<
-            formatter::string_t,
-            sink::files_t<
-                sink::files::boost_backend_t,
-                sink::rotator_t<
-                    sink::files::boost_backend_t,
-                    sink::rotation::watcher::move_t
-                >
-            >
-        >*
-    >(result.get());
+    auto casted = dynamic_cast<frontend_type*>(
+        factory.create(formatter, sink).get()
+    );
     EXPECT_TRUE(casted != nullptr);
 }
 

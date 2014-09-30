@@ -93,10 +93,11 @@ public:
 
 template<class Formatter, class Sink>
 class abstract_frontend_t : public base_frontend_t {
-protected:
+public:
     typedef Formatter formatter_type;
     typedef Sink sink_type;
 
+protected:
     handler::formatter_t<formatter_type> formatter;
     handler::sink_t<sink_type> sink;
 
@@ -111,6 +112,8 @@ public:
 template<class Formatter, class Sink>
 class frontend_t : public abstract_frontend_t<Formatter, Sink> {
     typedef abstract_frontend_t<Formatter, Sink> base_type;
+
+public:
     typedef typename base_type::formatter_type formatter_type;
     typedef typename base_type::sink_type sink_type;
 
