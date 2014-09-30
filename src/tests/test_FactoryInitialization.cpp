@@ -429,7 +429,7 @@ TEST(Repository, CombinationConfiguring) {
     EXPECT_TRUE(registered);
 }
 
-TEST(Repository, ThrowsExceptionWhenSinkIsRegisteredButItsUniqueNameIsDifferent) {
+TEST(Repository, ThrowsExceptionWhenSinkIsRegisteredTypeIsDifferent) {
     repository_t repository;
 
     formatter_config_t formatter("string");
