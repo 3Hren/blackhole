@@ -24,7 +24,7 @@ class factory_t {
     struct matcher_t {
         std::function<
             index_type(const std::string&, const dynamic_t&)
-        > matcher;
+        > match;
 
         index_type id;
     };
@@ -142,15 +142,22 @@ public:
 
     std::unique_ptr<base_frontend_t>
     create(const frontend_config_t& config) const {
-        auto fid = std::find_if(index.formatter.begin(), index.formatter.end(), [&config](const matcher_t& t) {
-            return t.matcher(config.formatter.type(), config.formatter.config()) == t.id;
-        });
+        auto fit = std::find_if(
+            index.formatter.begin(),
+            index.formatter.end(),
+            std::bind(
+                &match,
+                std::cref(config.formatter.type()),
+                std::cref(config.formatter.config()),
+                std::placeholders::_1
+            )
+        );
 
         auto sid = std::find_if(index.sink.begin(), index.sink.end(), [&config](const matcher_t& t) {
-            return t.matcher(config.sink.type(), config.sink.config()) == t.id;
+            return t.match(config.sink.type(), config.sink.config()) == t.id;
         });
 
-        if (fid == index.formatter.end()) {
+        if (fit == index.formatter.end()) {
             throw blackhole::error_t("formatter not registered");
         }
 
@@ -158,7 +165,7 @@ public:
             throw blackhole::error_t("sink not registered");
         }
 
-        auto it = factories.find(fid->id);
+        auto it = factories.find(fit->id);
         if (it == factories.end()) {
             throw blackhole::error_t("formatter not registered");
         }
@@ -192,6 +199,14 @@ public:
         index.formatter.clear();
         index.sink.clear();
         factories.clear();
+    }
+
+private:
+    static
+    inline
+    bool
+    match(const std::string& type, const dynamic_t& config, const matcher_t& matcher) {
+        return matcher.match(type, config) == matcher.id;
     }
 };
 
