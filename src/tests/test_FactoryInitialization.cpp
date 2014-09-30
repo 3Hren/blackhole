@@ -101,7 +101,6 @@ TEST(Repository, RotationFileStringsFrontendWithMoveWatcher) {
 }
 
 //!@todo: make traits required.
-//!@todo: drop unused stuff.
 //!@todo: compile on lucid
 TEST(Repository, SupportsMultipleFileRotationPolicies) {
     typedef frontend_t<
