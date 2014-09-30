@@ -15,6 +15,14 @@
 namespace blackhole {
 
 class factory_t {
+    struct matcher_t {
+        std::function<
+            std::type_index(const std::string&, const dynamic_t&)
+        > matcher;
+
+        std::type_index id;
+    };
+
     mutable std::mutex mutex;
 
     std::unordered_map<
@@ -25,9 +33,8 @@ class factory_t {
         >
     > map;
 
-    typedef std::tuple<std::function<std::type_index(const std::string&, const dynamic_t&)>, std::type_index> tup;
-    std::vector<tup> findex;
-    std::vector<tup> sindex;
+    std::vector<matcher_t> findex;
+    std::vector<matcher_t> sindex;
 
     template<class Formatter, class Sink>
     static
@@ -104,12 +111,12 @@ public:
     add() {
         auto fid = std::type_index(typeid(Formatter));
         findex.push_back(
-            std::make_tuple(std::bind(&match_traits<Formatter>::ti, std::placeholders::_1, std::placeholders::_2), fid)
+            matcher_t { std::bind(&match_traits<Formatter>::ti, std::placeholders::_1, std::placeholders::_2), fid }
         );
 
         auto sid = std::type_index(typeid(Sink));
         sindex.push_back(
-            std::make_tuple(std::bind(&match_traits<Sink>::ti, std::placeholders::_1, std::placeholders::_2), sid)
+            matcher_t { std::bind(&match_traits<Sink>::ti, std::placeholders::_1, std::placeholders::_2), sid }
         );
 
         map[fid][sid] = std::bind(&create_frontend<Formatter, Sink>, std::placeholders::_1);
@@ -122,12 +129,12 @@ public:
 
     std::unique_ptr<base_frontend_t>
     create(const frontend_config_t& config) const {
-        auto fid = std::find_if(findex.begin(), findex.end(), [&config](const tup& t) {
-            return std::get<0>(t)(config.formatter.type(), config.formatter.config()) == std::get<1>(t);
+        auto fid = std::find_if(findex.begin(), findex.end(), [&config](const matcher_t& t) {
+            return t.matcher(config.formatter.type(), config.formatter.config()) == t.id;
         });
 
-        auto sid = std::find_if(sindex.begin(), sindex.end(), [&config](const tup& t) {
-            return std::get<0>(t)(config.sink.type(), config.sink.config()) == std::get<1>(t);
+        auto sid = std::find_if(sindex.begin(), sindex.end(), [&config](const matcher_t& t) {
+            return t.matcher(config.sink.type(), config.sink.config()) == t.id;
         });
 
         if (fid == findex.end()) {
@@ -138,13 +145,13 @@ public:
             throw blackhole::error_t("sink not registered");
         }
 
-        auto it = map.find(std::get<1>(*fid));
+        auto it = map.find(fid->id);
         if (it == map.end()) {
             throw blackhole::error_t("formatter not registered");
         }
 
         auto map2 = it->second;
-        auto it2 = map2.find(std::get<1>(*sid));
+        auto it2 = map2.find(sid->id);
         if (it2 == map2.end()) {
             throw blackhole::error_t("sink not registered");
         }
@@ -156,12 +163,12 @@ public:
     bool has() const {
         std::lock_guard<std::mutex> lock(mutex);
 
-        auto fid = std::find_if(findex.begin(), findex.end(), [](const tup& t) {
-            return std::get<1>(t) == std::type_index(typeid(Formatter));
+        auto fid = std::find_if(findex.begin(), findex.end(), [](const matcher_t& t) {
+            return t.id == std::type_index(typeid(Formatter));
         });
 
-        auto sid = std::find_if(sindex.begin(), sindex.end(), [](const tup& t) {
-            return std::get<1>(t) == std::type_index(typeid(Sink));
+        auto sid = std::find_if(sindex.begin(), sindex.end(), [](const matcher_t& t) {
+            return t.id == std::type_index(typeid(Sink));
         });
 
         return fid != findex.end() && sid != sindex.end();
