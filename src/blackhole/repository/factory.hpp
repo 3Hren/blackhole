@@ -29,6 +29,15 @@ class factory_t {
         index_type id;
     };
 
+    struct adder_t {
+        factory_t* factory;
+
+        template<class Sink, class Formatter>
+        void operator()(aux::util::metaholder<Sink, Formatter>) const {
+            factory->add<Sink, Formatter>();
+        }
+    };
+
     std::unordered_map<
         index_type,
         std::unordered_map<index_type, frontend_factory_type>
@@ -62,80 +71,65 @@ private:
 public:
     template<class Sink, class Formatter>
     typename std::enable_if<
-        boost::mpl::is_sequence<Sink>::type::value && boost::mpl::is_sequence<Formatter>::type::value
+        boost::mpl::is_sequence<Sink>::type::value &&
+        boost::mpl::is_sequence<Formatter>::type::value
     >::type
     add() {
-        // do double iterations.
-        anarchy action { this };
         boost::mpl::for_each<
             Sink,
             aux::util::metaholder<boost::mpl::_, Formatter>
-        >(action);
+        >(adder_t { this });
     }
 
     template<class Sink, class Formatter>
     typename std::enable_if<
-        boost::mpl::is_sequence<Sink>::type::value && !boost::mpl::is_sequence<Formatter>::type::value
+         boost::mpl::is_sequence<Sink>::type::value &&
+        !boost::mpl::is_sequence<Formatter>::type::value
     >::type
     add() {
-        // do iterations over Sink
-        anarchy action { this };
         boost::mpl::for_each<
             Sink,
             aux::util::metaholder<boost::mpl::_, Formatter>
-        >(action);
+        >(adder_t { this });
     }
-
-    struct anarchy {
-        factory_t* factory;
-
-        template<class Sink, class Formatter>
-        void operator()(aux::util::metaholder<Sink, Formatter>) const {
-            factory->add<Sink, Formatter>();
-        }
-    };
-
 
     template<class Sink, class Formatter>
     typename std::enable_if<
-        !boost::mpl::is_sequence<Sink>::type::value && boost::mpl::is_sequence<Formatter>::type::value
+        !boost::mpl::is_sequence<Sink>::type::value &&
+         boost::mpl::is_sequence<Formatter>::type::value
     >::type
     add() {
-        // do iterations over Formatter
-        anarchy action { this };
         boost::mpl::for_each<
             Formatter,
             aux::util::metaholder<Sink, boost::mpl::_>
-        >(action);
+        >(adder_t { this });
     }
 
-    //!@todo: Swap type parameters.
     template<class Sink, class Formatter>
     typename std::enable_if<
-        !boost::mpl::is_sequence<Sink>::type::value && !boost::mpl::is_sequence<Formatter>::type::value
+        !boost::mpl::is_sequence<Sink>::type::value &&
+        !boost::mpl::is_sequence<Formatter>::type::value
     >::type
     add() {
-        auto fid = std::type_index(typeid(Formatter));
         index.formatter.push_back(matcher_t {
             std::bind(
                 &match_traits<Formatter>::type_index,
                 std::placeholders::_1,
                 std::placeholders::_2
             ),
-            fid
+            index_type(typeid(Formatter))
         });
 
-        auto sid = std::type_index(typeid(Sink));
         index.sink.push_back(matcher_t {
             std::bind(
                 &match_traits<Sink>::type_index,
                 std::placeholders::_1,
                 std::placeholders::_2
             ),
-            sid
+            index_type(typeid(Sink))
         });
 
-        factories[fid][sid] = std::bind(
+        factories[index_type(typeid(Formatter))][index_type(typeid(Sink))] = std::bind(
             &create_frontend<Formatter, Sink>,
             std::placeholders::_1
         );
