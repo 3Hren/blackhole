@@ -189,58 +189,6 @@ struct match_traits<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
     }
 };
 
-template<class Backend, class Watcher>
-struct unique_id_traits<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
-    typedef sink::rotator_t<Backend, Watcher> rotator_type;
-    typedef sink::files_t<Backend, rotator_type> sink_type;
-
-    static std::string generate(const dynamic_t& config) {
-        const dynamic_t::object_t& cfg = config.to<dynamic_t::object_t>();
-
-        auto rotation_it = cfg.find("rotation");
-        if (rotation_it != cfg.end()) {
-            const dynamic_t::object_t& rotation = rotation_it->second.to<dynamic_t::object_t>();
-
-            const bool has_move_watcher = rotation.find("move") != rotation.end();
-            const bool has_size_watcher = rotation.find("size") != rotation.end();
-            const bool has_datetime_watcher = rotation.find("period") != rotation.end();
-
-            if (has_move_watcher) {
-                return utils::format("%s/%s/%s", sink_type::name(), rotator_type::name(), "move");
-            }
-
-            if (has_size_watcher && has_datetime_watcher) {
-                throw blackhole::error_t("set watcher is not implemented yet");
-            } else if (has_size_watcher) {
-                return utils::format("%s/%s/%s", sink_type::name(), rotator_type::name(), "size");
-            } else if (has_datetime_watcher) {
-                return utils::format("%s/%s/%s", sink_type::name(), rotator_type::name(), "datetime");
-            }
-
-            throw blackhole::error_t("rotation section not properly configured: no watcher settings found");
-        }
-
-        return sink_type::name();
-    }
-};
-
-template<class Backend>
-struct config_traits<sink::files_t<Backend, sink::null_rotator_t>> {
-    static std::string name() {
-        return sink::files_t<Backend, sink::null_rotator_t>::name();
-    }
-};
-
-template<class Backend, class Watcher>
-struct config_traits<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
-    typedef sink::rotator_t<Backend, Watcher> rotator_type;
-    typedef sink::files_t<Backend, rotator_type> sink_type;
-
-    static std::string name() {
-        return utils::format("%s/%s/%s", sink_type::name(), rotator_type::name(), Watcher::name());
-    }
-};
-
 namespace aux {
 
 template<class T>
