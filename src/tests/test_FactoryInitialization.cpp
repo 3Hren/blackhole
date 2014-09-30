@@ -108,6 +108,11 @@ TEST(Repository, RotationFileStringsFrontendWithMoveWatcher) {
     EXPECT_TRUE(casted != nullptr);
 }
 
+//!@todo: make in pass.
+//!@todo: make traits required.
+//!@todo: refactor this test.
+//!@todo: drop unused stuff.
+//!@todo: compile on lucid
 TEST(Repository, SupportsMultipleFileRotationPolicies) {
     external_factory_t factory;
     factory.add<
