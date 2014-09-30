@@ -24,6 +24,10 @@ struct match_traits {
     static bool matched(const std::string& type, const dynamic_t&) {
         return type == T::name();
     }
+
+    static std::type_index ti(const std::string&, const dynamic_t&) {
+        return typeid(T);
+    }
 };
 
 } // namespace blackhole

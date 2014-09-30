@@ -136,6 +136,60 @@ public:
 } // namespace sink
 
 template<class Backend, class Watcher>
+struct match_traits<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
+    typedef sink::files_t<
+        Backend,
+        sink::rotator_t<Backend, Watcher>
+    > sink_type;
+
+    static std::type_index ti(const std::string& type, const dynamic_t& config) {
+        if (type != sink_type::name()) {
+            return std::type_index(typeid(std::nullptr_t));
+        }
+
+        auto config_ = config.to<dynamic_t::object_t>();
+        auto it = config_.find("rotation");
+        if (it == config_.end()) {
+            return std::type_index(typeid(sink::files_t<Backend>));
+        }
+
+        auto rconfig = it->second.to<dynamic_t::object_t>();
+
+        if (rconfig.find("move") != rconfig.end()) {
+            return std::type_index(typeid(sink::files_t<
+                Backend,
+                sink::rotator_t<
+                    Backend,
+                    sink::rotation::watcher::move_t
+                >
+            >));
+        }
+
+        if (rconfig.find("size") != rconfig.end()) {
+            return std::type_index(typeid(sink::files_t<
+                Backend,
+                sink::rotator_t<
+                    Backend,
+                    sink::rotation::watcher::size_t
+                >
+            >));
+        }
+
+        if (rconfig.find("period") != rconfig.end()) {
+            return std::type_index(typeid(sink::files_t<
+                Backend,
+                sink::rotator_t<
+                    Backend,
+                    sink::rotation::watcher::datetime_t<>
+                >
+            >));
+        }
+
+        return std::type_index(typeid(sink::files_t<Backend>));
+    }
+};
+
+template<class Backend, class Watcher>
 struct unique_id_traits<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
     typedef sink::rotator_t<Backend, Watcher> rotator_type;
     typedef sink::files_t<Backend, rotator_type> sink_type;

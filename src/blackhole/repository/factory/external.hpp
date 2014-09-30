@@ -38,7 +38,8 @@ class external_factory_t {
         >
     > map;
 
-    typedef std::tuple<std::function<bool(const std::string&, const dynamic_t&)>, std::type_index> tup;
+//    typedef std::tuple<std::function<bool(const std::string&, const dynamic_t&)>, std::type_index> tup;
+    typedef std::tuple<std::function<std::type_index(const std::string&, const dynamic_t&)>, std::type_index> tup;
     std::vector<tup> findex;
     std::vector<tup> sindex;
 
@@ -117,12 +118,12 @@ public:
     add() {
         auto fid = std::type_index(typeid(Formatter));
         findex.push_back(
-            std::make_tuple(std::bind(match_traits<Formatter>::matched, std::placeholders::_1, std::placeholders::_2), fid)
+            std::make_tuple(std::bind(&match_traits<Formatter>::ti, std::placeholders::_1, std::placeholders::_2), fid)
         );
 
         auto sid = std::type_index(typeid(Sink));
         sindex.push_back(
-            std::make_tuple(std::bind(match_traits<Sink>::matched, std::placeholders::_1, std::placeholders::_2), sid)
+            std::make_tuple(std::bind(&match_traits<Sink>::ti, std::placeholders::_1, std::placeholders::_2), sid)
         );
 
         map[fid][sid] = std::bind(&create_frontend<Formatter, Sink>, std::placeholders::_1);
@@ -136,11 +137,11 @@ public:
     std::unique_ptr<base_frontend_t>
     create(const frontend_config_t& config) const {
         auto fid = std::find_if(findex.begin(), findex.end(), [&config](const tup& t) {
-            return std::get<0>(t)(config.formatter.type(), config.formatter.config());
+            return std::get<0>(t)(config.formatter.type(), config.formatter.config()) == std::get<1>(t);
         });
 
         auto sid = std::find_if(sindex.begin(), sindex.end(), [&config](const tup& t) {
-            return std::get<0>(t)(config.sink.type(), config.sink.config());
+            return std::get<0>(t)(config.sink.type(), config.sink.config()) == std::get<1>(t);
         });
 
         if (fid == findex.end()) {
