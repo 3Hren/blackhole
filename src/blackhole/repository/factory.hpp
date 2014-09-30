@@ -129,7 +129,7 @@ public:
             index_type(typeid(Sink))
         });
 
-        factories[index_type(typeid(Formatter))][index_type(typeid(Sink))] = std::bind(
+        factories[typeid(Formatter)][typeid(Sink)] = std::bind(
             &create_frontend<Formatter, Sink>,
             std::placeholders::_1
         );
