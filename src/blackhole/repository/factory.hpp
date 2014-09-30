@@ -118,7 +118,7 @@ public:
         auto fid = std::type_index(typeid(Formatter));
         index.formatter.push_back(matcher_t {
             std::bind(
-                &match_traits<Formatter>::ti,
+                &match_traits<Formatter>::type_index,
                 std::placeholders::_1,
                 std::placeholders::_2
             ),
@@ -128,7 +128,7 @@ public:
         auto sid = std::type_index(typeid(Sink));
         index.sink.push_back(matcher_t {
             std::bind(
-                &match_traits<Sink>::ti,
+                &match_traits<Sink>::type_index,
                 std::placeholders::_1,
                 std::placeholders::_2
             ),

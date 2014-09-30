@@ -142,7 +142,7 @@ struct match_traits<sink::files_t<Backend, sink::rotator_t<Backend, Watcher>>> {
         sink::rotator_t<Backend, Watcher>
     > sink_type;
 
-    static std::type_index ti(const std::string& type, const dynamic_t& config) {
+    static std::type_index type_index(const std::string& type, const dynamic_t& config) {
         if (type != sink_type::name()) {
             return std::type_index(typeid(std::nullptr_t));
         }
