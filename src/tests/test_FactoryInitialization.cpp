@@ -209,7 +209,20 @@ TEST(Repository, RotationFileStringsFrontendWithSizeWatcher) {
     sink["rotation"]["backups"] = 5;
     sink["rotation"]["size"] = 10 * 1024 * 1024;
 
-    EXPECT_TRUE(bool(factory.create(formatter, sink)));
+    auto result = factory.create(formatter, sink);
+    auto casted = dynamic_cast<
+        frontend_t<
+            formatter::string_t,
+            sink::files_t<
+                sink::files::boost_backend_t,
+                sink::rotator_t<
+                    sink::files::boost_backend_t,
+                    sink::rotation::watcher::size_t
+                >
+            >
+        >*
+    >(result.get());
+    EXPECT_TRUE(casted != nullptr);
 }
 
 TEST(Repository, RotationFileStringsFrontendWithDatetimeWatcher) {
