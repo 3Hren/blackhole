@@ -20,15 +20,7 @@
 namespace blackhole {
 
 class external_factory_t {
-    typedef std::unique_ptr<base_frontend_t> return_type;
-    typedef return_type(*factory_type)(const frontend_factory_t&, const formatter_config_t&, const sink_config_t&);
-    typedef std::string(*extractor_type)(const dynamic_t&);
-
     mutable std::mutex mutex;
-    std::unordered_map<std::string, factory_type> sinks;
-    std::unordered_map<std::string, extractor_type> config_id_extractors;
-
-    frontend_factory_t factory;
 
     std::unordered_map<
         std::type_index,
@@ -38,7 +30,6 @@ class external_factory_t {
         >
     > map;
 
-//    typedef std::tuple<std::function<bool(const std::string&, const dynamic_t&)>, std::type_index> tup;
     typedef std::tuple<std::function<std::type_index(const std::string&, const dynamic_t&)>, std::type_index> tup;
     std::vector<tup> findex;
     std::vector<tup> sindex;
@@ -183,40 +174,7 @@ public:
 
     void clear() {
         std::lock_guard<std::mutex> lock(mutex);
-        sinks.clear();
-        factory.clear();
-    }
-};
-
-template<class Sinks, class Formatters>
-struct all_sequence {
-    static const bool value = boost::mpl::is_sequence<Sinks>::type::value &&
-        boost::mpl::is_sequence<Formatters>::type::value;
-};
-
-template<class Sink, class Formatter>
-struct external_inserter<
-    Sink,
-    Formatter,
-    typename std::enable_if<!all_sequence<Sink, Formatter>::value>::type
-> {
-    static void insert(external_factory_t& factory) {
-        factory.add<Sink, Formatter>();
-    }
-};
-
-template<class Sinks, class Formatters>
-struct external_inserter<
-    Sinks,
-    Formatters,
-    typename std::enable_if<all_sequence<Sinks, Formatters>::value>::type
-> {
-    static void insert(external_factory_t& factory) {
-        aux::registrator::group action { factory };
-        boost::mpl::for_each<
-            Sinks,
-            aux::util::metaholder<boost::mpl::_, Formatters>
-        >(action);
+        map.clear();
     }
 };
 
