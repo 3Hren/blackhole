@@ -142,56 +142,50 @@ public:
 
     std::unique_ptr<base_frontend_t>
     create(const frontend_config_t& config) const {
-        auto fit = std::find_if(
-            index.formatter.begin(),
-            index.formatter.end(),
-            std::bind(
-                &match,
-                std::cref(config.formatter.type()),
-                std::cref(config.formatter.config()),
-                std::placeholders::_1
-            )
-        );
-
-        auto sid = std::find_if(index.sink.begin(), index.sink.end(), [&config](const matcher_t& t) {
-            return t.match(config.sink.type(), config.sink.config()) == t.id;
-        });
-
-        if (fit == index.formatter.end()) {
-            throw blackhole::error_t("formatter not registered");
-        }
-
-        if (sid == index.sink.end()) {
-            throw blackhole::error_t("sink not registered");
-        }
-
-        auto it = factories.find(fit->id);
+        auto formatter_id = find_index(index.formatter, config.formatter);
+        auto it = factories.find(formatter_id);
         if (it == factories.end()) {
-            throw blackhole::error_t("formatter not registered");
+            throw blackhole::error_t(
+                "formatter '%s' isn't registered or has different type",
+                config.formatter.type()
+            );
         }
 
-        auto map2 = it->second;
-        auto it2 = map2.find(sid->id);
-        if (it2 == map2.end()) {
-            throw blackhole::error_t("sink not registered");
+        auto sink_id = find_index(index.sink, config.sink);
+        auto frontend_it = it->second.find(sink_id);
+        if (frontend_it == it->second.end()) {
+            throw blackhole::error_t(
+                "sink '%s' isn't registered or has different type",
+                config.sink.type()
+            );
         }
 
-        return it2->second(config);
+        return frontend_it->second(config);
     }
 
     template<class Sink, class Formatter>
     bool has() const {
         std::lock_guard<std::mutex> lock(mutex);
 
-        auto fid = std::find_if(index.formatter.begin(), index.formatter.end(), [](const matcher_t& t) {
-            return t.id == std::type_index(typeid(Formatter));
-        });
+        auto it_formatter = std::find_if(
+            index.formatter.begin(),
+            index.formatter.end(),
+            std::bind(
+                &registered<Formatter>,
+                std::placeholders::_1
+            )
+        );
 
-        auto sid = std::find_if(index.sink.begin(), index.sink.end(), [](const matcher_t& t) {
-            return t.id == std::type_index(typeid(Sink));
-        });
+        auto it_sink = std::find_if(
+            index.sink.begin(),
+            index.sink.end(),
+            std::bind(
+                &registered<Sink>,
+                std::placeholders::_1
+            )
+        );
 
-        return fid != index.formatter.end() && sid != index.sink.end();
+        return it_formatter != index.formatter.end() && it_sink != index.sink.end();
     }
 
     void clear() {
@@ -202,11 +196,47 @@ public:
     }
 
 private:
+    template<class Config>
+    static
+    index_type
+    find_index(const std::vector<matcher_t>& matchers, const Config& config) {
+        auto it = std::find_if(
+            matchers.begin(),
+            matchers.end(),
+            std::bind(
+                &match,
+                std::cref(config.type()),
+                std::cref(config.config()),
+                std::placeholders::_1
+            )
+        );
+
+        if (it == matchers.end()) {
+            throw blackhole::error_t(
+                "component '%s' isn't registered or has different type",
+                config.type()
+            );
+        }
+
+        return it->id;
+    }
+
     static
     inline
     bool
-    match(const std::string& type, const dynamic_t& config, const matcher_t& matcher) {
+    match(const std::string& type,
+          const dynamic_t& config,
+          const matcher_t& matcher)
+    {
         return matcher.match(type, config) == matcher.id;
+    }
+
+    template<class T>
+    static
+    inline
+    bool
+    registered(const matcher_t& matcher) {
+        return matcher.id == index_type(typeid(T));
     }
 };
 
