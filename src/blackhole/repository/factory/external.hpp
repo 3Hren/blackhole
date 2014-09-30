@@ -10,11 +10,6 @@
 
 #include "blackhole/repository/config/formatter.hpp"
 #include "blackhole/repository/config/sink.hpp"
-//!@note: Must be included first to resolve circular depencencies.
-#include "blackhole/repository/factory/frontend/helper.hpp"
-#include "blackhole/repository/factory/frontend.hpp"
-#include "blackhole/repository/factory/frontend/inserter.hpp"
-#include "blackhole/repository/factory/registrator.hpp"
 #include "blackhole/repository/factory/traits.hpp"
 
 namespace blackhole {
