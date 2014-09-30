@@ -10,13 +10,13 @@
 #include "blackhole/logger.hpp"
 #include "blackhole/repository/config/defaults.hpp"
 #include "blackhole/repository/config/log.hpp"
-#include "blackhole/repository/factory/external.hpp"
+#include "blackhole/repository/factory.hpp"
 #include "blackhole/sink/stream.hpp"
 
 namespace blackhole {
 
 class repository_t {
-    external_factory_t factory;
+    factory_t factory;
     std::unordered_map<std::string, log_config_t> configs;
 
     mutable std::mutex mutex;

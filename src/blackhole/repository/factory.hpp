@@ -14,7 +14,7 @@
 
 namespace blackhole {
 
-class external_factory_t {
+class factory_t {
     mutable std::mutex mutex;
 
     std::unordered_map<
@@ -74,7 +74,7 @@ public:
     }
 
     struct anarchy {
-        external_factory_t* factory;
+        factory_t* factory;
 
         template<class Sink, class Formatter>
         void operator()(aux::util::metaholder<Sink, Formatter>) const {
