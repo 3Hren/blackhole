@@ -6,7 +6,7 @@
 using namespace blackhole;
 
 TEST(Factory, ElasticsearchJsonFrontend) {
-    external_factory_t factory;
+    factory_t factory;
     factory.add<sink::elasticsearch_t, formatter::string_t>();
 
     formatter_config_t formatter("string");
@@ -26,5 +26,8 @@ TEST(Factory, ElasticsearchJsonFrontend) {
     sink["retries"] = 3;
     sink["timeout"] = 1000;
 
-    EXPECT_TRUE(bool(factory.create(formatter, sink)));
+    auto casted = dynamic_cast<frontend_t<formatter::string_t, sink::elasticsearch_t>*>(
+        factory.create(formatter, sink).get()
+    );
+    EXPECT_TRUE(casted != nullptr);
 }
