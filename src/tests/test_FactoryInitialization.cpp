@@ -84,10 +84,7 @@ TEST(Repository, RotationFileStringsFrontendWithMoveWatcher) {
     > frontend_type;
 
     external_factory_t factory;
-    factory.add<
-        frontend_type::sink_type,
-        frontend_type::formatter_type
-    >();
+    factory.add<frontend_type::sink_type, frontend_type::formatter_type>();
 
     formatter_config_t formatter("string");
     formatter["pattern"] = "[%(timestamp)s]: %(message)s";
@@ -104,32 +101,34 @@ TEST(Repository, RotationFileStringsFrontendWithMoveWatcher) {
 }
 
 //!@todo: make traits required.
-//!@todo: refactor this test.
 //!@todo: drop unused stuff.
 //!@todo: compile on lucid
 TEST(Repository, SupportsMultipleFileRotationPolicies) {
-    external_factory_t factory;
-    factory.add<
+    typedef frontend_t<
+        formatter::string_t,
         sink::files_t<
             sink::files::boost_backend_t,
             sink::rotator_t<
                 sink::files::boost_backend_t,
                 sink::rotation::watcher::move_t
             >
-        >,
-        formatter::string_t
-    >();
+        >
+    > frontend1_type;
 
-    factory.add<
+    typedef frontend_t<
+        formatter::string_t,
         sink::files_t<
             sink::files::boost_backend_t,
             sink::rotator_t<
                 sink::files::boost_backend_t,
                 sink::rotation::watcher::size_t
             >
-        >,
-        formatter::string_t
-    >();
+        >
+    > frontend2_type;
+
+    external_factory_t factory;
+    factory.add<frontend1_type::sink_type, frontend1_type::formatter_type>();
+    factory.add<frontend2_type::sink_type, frontend2_type::formatter_type>();
 
     formatter_config_t formatter("string");
     formatter["pattern"] = "[%(timestamp)s]: %(message)s";
@@ -140,19 +139,9 @@ TEST(Repository, SupportsMultipleFileRotationPolicies) {
     sink["rotation"]["move"] = true;
 
     {
-        auto result = factory.create(formatter, sink);
-        auto casted = dynamic_cast<
-            frontend_t<
-                formatter::string_t,
-                sink::files_t<
-                    sink::files::boost_backend_t,
-                    sink::rotator_t<
-                        sink::files::boost_backend_t,
-                        sink::rotation::watcher::move_t
-                    >
-                >
-            >*
-        >(result.get());
+        auto casted = dynamic_cast<frontend1_type*>(
+            factory.create(formatter, sink).get()
+        );
         EXPECT_TRUE(casted != nullptr);
     }
 
@@ -164,35 +153,27 @@ TEST(Repository, SupportsMultipleFileRotationPolicies) {
     sink["rotation"]["size"] = 10 * 1024 * 1024;
 
     {
-        auto result = factory.create(formatter, sink);
-        auto casted = dynamic_cast<
-            frontend_t<
-                formatter::string_t,
-                sink::files_t<
-                    sink::files::boost_backend_t,
-                    sink::rotator_t<
-                        sink::files::boost_backend_t,
-                        sink::rotation::watcher::size_t
-                    >
-                >
-            >*
-        >(result.get());
+        auto casted = dynamic_cast<frontend2_type*>(
+            factory.create(formatter, sink).get()
+        );
         EXPECT_TRUE(casted != nullptr);
     }
 }
 
 TEST(Repository, RotationFileStringsFrontendWithSizeWatcher) {
-    external_factory_t factory;
-    factory.add<
+    typedef frontend_t<
+        formatter::string_t,
         sink::files_t<
             sink::files::boost_backend_t,
             sink::rotator_t<
                 sink::files::boost_backend_t,
                 sink::rotation::watcher::size_t
             >
-        >,
-        formatter::string_t
-    >();
+        >
+    > frontend_type;
+
+    external_factory_t factory;
+    factory.add<frontend_type::sink_type, frontend_type::formatter_type>();
 
     formatter_config_t formatter("string");
     formatter["pattern"] = "[%(timestamp)s]: %(message)s";
@@ -204,34 +185,25 @@ TEST(Repository, RotationFileStringsFrontendWithSizeWatcher) {
     sink["rotation"]["backups"] = 5;
     sink["rotation"]["size"] = 10 * 1024 * 1024;
 
-    auto result = factory.create(formatter, sink);
-    auto casted = dynamic_cast<
-        frontend_t<
-            formatter::string_t,
-            sink::files_t<
-                sink::files::boost_backend_t,
-                sink::rotator_t<
-                    sink::files::boost_backend_t,
-                    sink::rotation::watcher::size_t
-                >
-            >
-        >*
-    >(result.get());
+    auto casted = dynamic_cast<frontend_type*>(
+        factory.create(formatter, sink).get()
+    );
     EXPECT_TRUE(casted != nullptr);
 }
 
 TEST(Repository, RotationFileStringsFrontendWithDatetimeWatcher) {
-    external_factory_t factory;
-    factory.add<
+    typedef frontend_t<
+        formatter::string_t,
         sink::files_t<
             sink::files::boost_backend_t,
             sink::rotator_t<
                 sink::files::boost_backend_t,
                 sink::rotation::watcher::datetime_t<>
             >
-        >,
-        formatter::string_t
-    >();
+        >
+    > frontend_type;
+    external_factory_t factory;
+    factory.add<frontend_type::sink_type, frontend_type::formatter_type>();
 
     formatter_config_t formatter("string");
     formatter["pattern"] = "[%(timestamp)s]: %(message)s";
@@ -243,19 +215,9 @@ TEST(Repository, RotationFileStringsFrontendWithDatetimeWatcher) {
     sink["rotation"]["backups"] = 5;
     sink["rotation"]["period"] = "d";
 
-    auto result = factory.create(formatter, sink);
-    auto casted = dynamic_cast<
-        frontend_t<
-            formatter::string_t,
-            sink::files_t<
-                sink::files::boost_backend_t,
-                sink::rotator_t<
-                    sink::files::boost_backend_t,
-                    sink::rotation::watcher::datetime_t<>
-                >
-            >
-        >*
-    >(result.get());
+    auto casted = dynamic_cast<frontend_type*>(
+        factory.create(formatter, sink).get()
+    );
     EXPECT_TRUE(casted != nullptr);
 }
 
@@ -357,9 +319,10 @@ TEST(Repository, ThrowsExceptionIfLoggerWithSpecifiedNameNotFound) {
 }
 
 TEST(Repository, CreatesDuplicateOfRootLoggerByDefault) {
+    repository_t repository;
     log_config_t config = create_valid_config();
-    repository_t::instance().add_config(config);
-    repository_t::instance().create<verbose_logger_t<testing::level>>("root");
+    repository.add_config(config);
+    repository.create<verbose_logger_t<testing::level>>("root");
 }
 
 TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredSink) {
