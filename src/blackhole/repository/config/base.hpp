@@ -21,11 +21,11 @@ public:
         type_(std::move(type))
     {}
 
-    std::string type() const {
+    const std::string& type() const {
         return type_;
     }
 
-    dynamic_t config() const {
+    const dynamic_t::object_t& config() const {
         return config_;
     }
 
