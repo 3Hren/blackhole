@@ -143,7 +143,7 @@ insert them into the final string in the next manner:
 ### Example
 In development.
 
-## JSON formatter
+## JSON
 Maps log event to JSON tree. It takes attributes of log message and represents
 this `attribute_name=attribute_value` pair into JSON objects.
 
@@ -226,12 +226,12 @@ The next output will be produced
         "issue":"training"
     },
 }
-~~~ cpp
+~~~
 
 ### Example
 In development.
 
-## Msgpack formatter
+## Msgpack
 This formatter get pairs of `attribute_name:attribute_value` and convert it to
 the msgpack object.
 
