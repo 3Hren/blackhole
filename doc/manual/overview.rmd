@@ -1,4 +1,4 @@
-# Documentation Overview
+# How To Read This Documentation
 The documentation is oriented to both new and experienced Blackhole users.
 
 However, some experience of C++ programming is needed. Users are expected to be
