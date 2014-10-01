@@ -41,6 +41,7 @@ After the registration this pair can be configured and used.
 ## Configuration
 
 Example:
+
 ~~~ cpp
 sink_config_t sink("files");
 sink["path"] = "./logs/blackhole-%(log_event_attribute)s.log";

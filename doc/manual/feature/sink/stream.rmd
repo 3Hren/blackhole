@@ -18,6 +18,7 @@ register another combinations of sinks and formatters check the
 ## Configuration
 
 Example:
+
 ~~~ cpp
 sink_config_t sink("stream");
 sink["output"] = "stdout";

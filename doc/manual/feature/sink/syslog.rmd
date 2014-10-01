@@ -170,7 +170,7 @@ $ ./syslog-string-sink
 
 After executing the next messages should be displayed in your syslog (depending
 on your syslog's configuration):
-![Output after executing the example](images/syslog-1.png)
+<%= image_tag "example-syslog.png" %>
 
 *Note that debug message in this case was ignored by syslog itself, not by
 Blackhole.*
