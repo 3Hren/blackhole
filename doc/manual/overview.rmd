@@ -1,0 +1,23 @@
+# Documentation Overview
+
+The documentation is oriented to both new and experienced Blackhole users.
+
+However, some experience of C++ programming is needed. Users are expected to be
+familiar with commonly used STL and Boost components like `std::string`,
+`std::vector`, `std::bind` and others. Also it's expected the user to know how
+files, sockets, syslog or other backend components work and their limitations.
+
+If this is your first experience with Blackhole, it is recommended to read the
+[Design]() overview section to be familiar with main Blackhole's architecture,
+concepts and with capabilities.
+
+The [Installation]() and [Tutorial]() sections will help to get started
+experimenting with the library. The tutorial gives an overview of the library
+features with sample code snippets.
+
+There is also a detailed features description chapter. This part describes
+other tools provided by the library that were not covered by the tutorial.
+This chapter is best read on a case by case basis.
+
+At last, but not least, there is a [Reference]() which gives the formal
+description of library components.
