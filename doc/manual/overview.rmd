@@ -1,5 +1,6 @@
 # Documentation Overview
 
+## How To Read The Documentation
 The documentation is oriented to both new and experienced Blackhole users.
 
 However, some experience of C++ programming is needed. Users are expected to be
@@ -11,7 +12,7 @@ If this is your first experience with Blackhole, it is recommended to read the
 [Design]() overview section to be familiar with main Blackhole's architecture,
 concepts and with capabilities.
 
-The [Installation]() and [Tutorial]() sections will help to get started
+The [Installation](#installation) and [Tutorial]() sections will help to get started
 experimenting with the library. The tutorial gives an overview of the library
 features with sample code snippets.
 
@@ -21,3 +22,32 @@ This chapter is best read on a case by case basis.
 
 At last, but not least, there is a [Reference]() which gives the formal
 description of library components.
+
+## Installation
+Blackhole is a header-only library. This means, that no real installation
+required to start using it. Typical installation includes typing (with required
+privileges):
+
+~~~ bash
+cmake && make install
+~~~
+
+However, there are debian and RHEL specifications included to be able to build
+package for that kind of Linux distributives.
+
+## Platforms
+Blackhole was successfully built and tested on the following platforms:
+
+ * Linux with GCC 4.4+.
+ * Linux with clang 3.2+.
+ * OSX with clang 3.3+.
+
+Windows isn't supported yet, but I have plans to support it either.
+
+The library have the following external dependencies:
+
+ * Boost (tested on 1.40, 1.46, 1.53 and 1.55).
+
+## Configure
+Currently there are no meaningful configuration options. This may change in the
+future.
