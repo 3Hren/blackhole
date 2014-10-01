@@ -1,3 +1,11 @@
+# Features
+
+## Core
+
+## Sources
+
+## Filtering
+
 ## Formatters
 
 Formatters are entities that map log event to string. Blackhole supports three
@@ -14,9 +22,23 @@ Sinks are designed for sending formatted message to its final destination.
 
 Blackhole supports the next sinks out of the box:
 
+  * [Null](sink/null). Transports messages to nowhere. Useful for testing or
+  benchmarking.
   * [Elasticsearch](sink/elasticsearch). Client to [Elasticsearch](http://www.elasticsearch.org/) backend.
   * [Files](sink/files). Writes logs to the files. Supports log rotation.
-  * [Null](sink/null). Transports messages to nowhere. Can be useful for testing or benchmarks.
-  * [Socket](sink/socket). Sends messages through the network. Supports TCP and UDP.
+  * [Socket](sink/socket). Sends messages through the network. Supports TCP
+  and UDP.
   * [Stream](sink/stream). Supports `stdout` and `stderr` by default.
   * [Syslog](sink/syslog). Writes logs to `syslog`.
+
+## Attributes
+
+## Wrappers
+
+## Exception Handling
+
+## Mappers
+
+## Repository
+
+## External Initializatio
