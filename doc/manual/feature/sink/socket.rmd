@@ -1,0 +1,60 @@
+# Socket
+
+This sink transport log messages through the network to specified address by
+TCP or UDP protocol.
+
+In TCP mode connection can be broken on some reasons. Sink attempts to restart
+connection once and raise an exeption in case of unsuccess. Blackhole catches
+this exeption and print message to the standard output. The successive
+connection attempt will be performed with the next log message sending.
+
+Sink is internally not thread-safe.
+
+To use sink you need to include additional header
+
+~~~ cpp
+#include <blackhole/sink/socket.hpp>
+~~~
+
+## Registration
+
+Since `socket` sink has two different  hypostasis `tcp` and `udp` you can
+register it as
+
+~~~ cpp
+repository_t::instance().configure<sink::socket_t<boost::asio::ip::tcp>, formatter::string_t>();
+~~~
+
+or
+
+~~~ cpp
+repository_t::instance().configure<sink::socket_t<boost::asio::ip::udp>, formatter::string_t>();
+~~~
+
+The code above register **tcp/udp socket** sink and **string** formatter pair.
+How to register another combinations of sinks and formatters check the
+[registration rules]() article.
+
+## Configuration
+
+Example:
+
+~~~ cpp
+sink_config_t sink("tcp");
+sink["host"] = "localhost";
+sink["port"] = 50030;
+~~~
+
+You should configure sink with "tcp" and "udp" properties according to
+registered type.
+
+  * `host` is the host name of IP-address.
+  * `port` is the port (suddenly).
+
+Blackhole connects to `host`:`port` (in case of `tcp`) and send messages to
+that address (in both `tcp` and `udp` cases).
+
+## Example
+
+In development.
+
