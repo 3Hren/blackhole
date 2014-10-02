@@ -61,7 +61,7 @@ record API and specifications can be read in [reference]() manual.
 
 At last, you can get underlying attribute set's const reference. This is need,
 for example, to iterate over **all** attributes in the record.
-Class `set_view_t` is quite nontrivial itself, this I recommend you to
+Class `set_view_t` is quite nontrivial itself, thus I recommend you to
 familiarize with it in [attributes]() section of just in [reference]() manual.
 
 Library allows log records to be safely copied and moved.
