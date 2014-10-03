@@ -104,10 +104,6 @@ public:
     void push(record_t&& record) const;
 };
 
-//!@todo: Develop ImmutableLogger class, which provides almost immutable
-//!       internal state (filter, exception handler, frontends).
-//!       This class won't require any synchronization mechanizm.
-
 /// Concept form scoped attributes holder.
 /*!
  * @note: It's not movable to avoid moving to another thread.

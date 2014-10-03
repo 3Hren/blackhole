@@ -225,7 +225,3 @@ swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT {
 }
 
 } // namespace blackhole
-
-//!@todo: Concept. AttributeSet - own map with impl to be able to move faster.
-//!       Impl - boost::array<16> + list. Located on shared pool.
-//!       Each node is located on another shared pool.
