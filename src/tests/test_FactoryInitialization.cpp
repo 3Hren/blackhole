@@ -100,7 +100,6 @@ TEST(Repository, RotationFileStringsFrontendWithMoveWatcher) {
     EXPECT_TRUE(casted != nullptr);
 }
 
-//!@todo: make traits required.
 TEST(Repository, SupportsMultipleFileRotationPolicies) {
     typedef frontend_t<
         formatter::string_t,
