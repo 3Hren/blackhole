@@ -31,6 +31,7 @@ struct logger_verbosity_traits {
     typedef Level level_type;
 
     static
+    inline
     bool
     passed(level_type logger_verbosity, level_type record_verbosity) {
         typedef typename aux::underlying_type<Level>::type underlying_type;
