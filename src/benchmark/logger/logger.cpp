@@ -10,10 +10,12 @@ namespace { enum level_t { info }; }
 
 namespace {
 
-blackhole::verbose_logger_t<level_t> initialize() {
+template<class Log>
+Log
+initialize(const std::string& format = "[%(timestamp)s] [%(severity)s]: %(message)s") {
     auto formatter = blackhole::aux::util::make_unique<
         blackhole::formatter::string_t
-    >("[%(timestamp)s] [%(severity)s]: %(message)s");
+    >(format);
 
     auto sink = blackhole::aux::util::make_unique<
         blackhole::sink::null_t
@@ -26,7 +28,7 @@ blackhole::verbose_logger_t<level_t> initialize() {
         >
     >(std::move(formatter), std::move(sink));
 
-    blackhole::verbose_logger_t<level_t> log;
+    Log log;
     log.add_frontend(std::move(frontend));
     return log;
 }
@@ -35,8 +37,31 @@ static const char MESSAGE_LONG[] = "Something bad is going on but I can handle i
 
 } // namespace
 
+#define BH_BASE_LOG(__log__, ...) \
+    if (auto record = (__log__).open_record()) \
+        if (blackhole::aux::syntax_check(__VA_ARGS__)) \
+            blackhole::aux::logger::make_pusher((__log__), record, __VA_ARGS__)
+
 BENCHMARK(LogStringToNull, Baseline) {
-    static auto log = initialize();
+    static auto log = initialize<blackhole::verbose_logger_t<level_t>>();
+
+    BH_LOG(log, level_t::info, MESSAGE_LONG)(
+        "answer", 42,
+        "string", "le string"
+    );
+}
+
+BENCHMARK_BASELINE(Logger, Base) {
+    static auto log = initialize<blackhole::logger_base_t>("[%(timestamp)s]: %(message)s");
+
+    BH_BASE_LOG(log, MESSAGE_LONG)(
+        "answer", 42,
+        "string", "le string"
+    );
+}
+
+BENCHMARK_RELATIVE(Logger, Verbose) {
+    static auto log = initialize<blackhole::verbose_logger_t<level_t>>("[%(timestamp)s]: %(message)s");
 
     BH_LOG(log, level_t::info, MESSAGE_LONG)(
         "answer", 42,
