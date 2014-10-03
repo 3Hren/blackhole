@@ -186,7 +186,7 @@ public:
      * Can return invalid log record if some conditions are not met.
      * @param[in] level - Desired verbosity level.
      * @return valid or invalid `record_t` object.
-     * @todo: Shitcode. Need to fix.
+     * @todo: Replace with custom filter once a time.
      */
     record_t
     open_record(level_type level,
