@@ -26,7 +26,7 @@ namespace blackhole {
 
 class scoped_attributes_concept_t;
 
-template <typename Level>
+template<typename Level>
 struct logger_verbosity_traits {
     typedef Level level_type;
 
