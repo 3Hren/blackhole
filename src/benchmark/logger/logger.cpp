@@ -10,9 +10,13 @@ namespace { enum level_t { info }; }
 
 namespace {
 
+static const char FORMAT[] = "[%(timestamp)s]: %(message)s";
+static const char DEFAULT_FORMAT[] = "[%(timestamp)s] [%(severity)s]: %(message)s";
+static const char MESSAGE_LONG[] = "Something bad is going on but I can handle it";
+
 template<class Log>
 Log
-initialize(const std::string& format = "[%(timestamp)s] [%(severity)s]: %(message)s") {
+initialize(const std::string& format = DEFAULT_FORMAT) {
     auto formatter = blackhole::aux::util::make_unique<
         blackhole::formatter::string_t
     >(format);
@@ -33,8 +37,6 @@ initialize(const std::string& format = "[%(timestamp)s] [%(severity)s]: %(messag
     return log;
 }
 
-static const char MESSAGE_LONG[] = "Something bad is going on but I can handle it";
-
 } // namespace
 
 #define BH_BASE_LOG(__log__, ...) \
@@ -52,7 +54,7 @@ BENCHMARK(LogStringToNull, Baseline) {
 }
 
 BENCHMARK_BASELINE(Logger, Base) {
-    static auto log = initialize<blackhole::logger_base_t>("[%(timestamp)s]: %(message)s");
+    static auto log = initialize<blackhole::logger_base_t>(FORMAT);
 
     BH_BASE_LOG(log, MESSAGE_LONG)(
         "answer", 42,
@@ -61,7 +63,7 @@ BENCHMARK_BASELINE(Logger, Base) {
 }
 
 BENCHMARK_RELATIVE(Logger, Verbose) {
-    static auto log = initialize<blackhole::verbose_logger_t<level_t>>("[%(timestamp)s]: %(message)s");
+    static auto log = initialize<blackhole::verbose_logger_t<level_t>>(FORMAT);
 
     BH_LOG(log, level_t::info, MESSAGE_LONG)(
         "answer", 42,
