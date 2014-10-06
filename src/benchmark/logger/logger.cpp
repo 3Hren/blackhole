@@ -5,6 +5,10 @@
 #include <blackhole/logger.hpp>
 #include <blackhole/macro.hpp>
 #include <blackhole/sink/null.hpp>
+#include <blackhole/sink/stream.hpp>
+
+#define BENCHMARK_BASELINE_X(...) void TT_CONCATENATE(f, __LINE__)()
+#define BENCHMARK_RELATIVE_X(...) void TT_CONCATENATE(f, __LINE__)()
 
 namespace { enum level_t { info }; }
 
@@ -35,6 +39,35 @@ initialize(const std::string& format = DEFAULT_FORMAT) {
     Log log;
     log.add_frontend(std::move(frontend));
     return log;
+}
+
+template<class L, class F, class S>
+struct initializer_t {
+    std::unique_ptr<F> f;
+
+    template<class... Args>
+    L operator()(Args&&... args) {
+        auto sink = blackhole::aux::util::make_unique<
+            S
+        >(std::forward<Args>(args)...);
+
+        auto frontend = blackhole::aux::util::make_unique<
+            blackhole::frontend_t<F, S>
+        >(std::move(f), std::move(sink));
+
+        L log;
+        log.add_frontend(std::move(frontend));
+        return log;
+    }
+};
+
+template<class L, class F, class S, class... Args>
+initializer_t<L, F, S>
+initialize(Args&&... args) {
+    auto formatter = blackhole::aux::util::make_unique<
+        F
+    >(std::forward<Args>(args)...);
+    return initializer_t<L, F, S> { std::move(formatter) };
 }
 
 } // namespace
@@ -69,4 +102,18 @@ BENCHMARK_RELATIVE(Logger, Verbose) {
         "answer", 42,
         "string", "le string"
     );
+}
+
+BENCHMARK_BASELINE_X(Limits, Practical) {
+    static const char MESSAGE[] = "[1412592701.561182]: Something bad is going on but I can handle it";
+    std::cout << MESSAGE << std::endl;
+}
+
+BENCHMARK_RELATIVE_X(Limits, Experimental) {
+    static auto log = initialize<
+        blackhole::verbose_logger_t<level_t>,
+        blackhole::formatter::string_t,
+        blackhole::sink::stream_t
+    >(FORMAT)(blackhole::sink::stream_t::output_t::stdout);
+    BH_LOG(log, level_t::info, MESSAGE_LONG);
 }
