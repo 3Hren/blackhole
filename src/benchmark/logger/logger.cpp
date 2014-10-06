@@ -45,6 +45,14 @@ template<class L, class F, class S>
 struct initializer_t {
     std::unique_ptr<F> f;
 
+    initializer_t(std::unique_ptr<F> f) :
+        f(std::move(f))
+    {}
+
+    initializer_t(initializer_t&& other) :
+        f(std::move(other.f))
+    {}
+
     template<class... Args>
     L operator()(Args&&... args) {
         auto sink = blackhole::aux::util::make_unique<
@@ -67,7 +75,7 @@ initialize(Args&&... args) {
     auto formatter = blackhole::aux::util::make_unique<
         F
     >(std::forward<Args>(args)...);
-    return initializer_t<L, F, S> { std::move(formatter) };
+    return initializer_t<L, F, S>(std::move(formatter));
 }
 
 } // namespace
