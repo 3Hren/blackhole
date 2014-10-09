@@ -11,7 +11,10 @@ Homepage: http://3hren.github.io/blackhole
 Package: blackhole-dev
 Section: libdevel
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libboost-dev | libboost1.48-dev, libboost-thread-dev | libboost-thread1.48-dev, libboo
+Depends: ${shlibs:Depends}, ${misc:Depends},
+ libboost-dev | libboost1.48-dev, 
+ libboost-thread-dev | libboost-thread1.48-dev, 
+ libboost-iostreams-dev | libboost-iostreams1.48-dev
 Description: Blackhole Logger - Development Headers
  Blackhole logger development headers package.
 
