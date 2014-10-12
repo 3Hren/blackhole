@@ -23,8 +23,10 @@ ENDIF()
 
 file(GLOB_RECURSE BLACKHOLE_HEADERS . ../blackhole/*.[hi]pp)
 file(GLOB_RECURSE BLACKHOLE_TESTING_HEADERS . *.hpp)
+file(GLOB_RECURSE BLACKHOLE_DOCS . ../../doc/*md)
 
 SET(HEADERS
+    ${BLACKHOLE_DOCS}
     ${CMAKE_SOURCE_DIR}/debian/changelog
     ${CMAKE_SOURCE_DIR}/blackhole-bf.spec
     ${BLACKHOLE_HEADERS}
