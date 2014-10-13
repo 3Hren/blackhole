@@ -1,3 +1,46 @@
+blackhole (0.3.0-0rc1) unstable; urgency=low
+
+  * Feature: the library now widely uses deprecated attribute feature.
+  * Feature: string formatter now has optional placeholder.
+  * Feature: string formatter now can be configured with prefix, suffix and
+    separator while using variadic placeholders.
+  * Feature: string formatter has learned some convenient error-handling magic
+    and can tell the User where and what type of error has happened.
+  * Feature: it's now possible to represent time value structure in local timezone.
+  * Feature: any logger-compatible type (based on `logger_base_t`) can be created
+    through a repository.
+  * Feature: use compiler extension (cross-platform nonetheless) to check log
+    message format correctness in compile time.
+  * Feature: added logger trait concept.
+  * Bug fix: fixed typo in gcc 4.6 detection macro.
+  * API: log record has been completely refactored.
+  * API: completely dropped all scope-specific stuff.
+  * API: completely dropped blackhole::log::* namespace.
+  * API: logger wrapper can now provide const reference to the underlying logger.
+  * API: dropped 'in situ' substitution mechanism for keyword attributes. This is
+    breaking change.
+  * API: base config objects now return const references instead of copying.
+  * Performance: pack feeder now has overload that accepts string literal, which
+    allows to avoid unnecessary transformations.
+  * Performance: multiple attribute sets is aggregated into single `view` class,
+    so attribute lookup is performed lazily when it is needed by someone.
+  * Performance: string formatter now internally  uses ADT instead of packed
+    functions.
+  * Performance: accelerated variadic placeholder handling in string formatter
+    by approximately 30% via avoiding unnecessary string transformations.
+  * Other: attribute value holders are now comparable.
+  * Other: frontend factory now has more convenient interface.
+  * Other: Blackhole should no longer propagate exception raised from boost::format,
+    while formatting message string. Instead of this an exception reason will
+    be printed as message.
+  * Other: using specialized exception instead of more generic while parsing
+    configuration object.
+  * Other: more forward declarations.
+  * Documentation: more documentation added.
+  * Testing: more unit tests added as like as benchmarks.
+
+ -- Evgeny Safronov <division494@gmail.com>  Mon, 13 Oct 2014 11:56:35 +0300
+
 blackhole (0.2.3-1) unstable; urgency=low
 
   * Misc: fixed debianization for precise, which allows to install package with
