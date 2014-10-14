@@ -58,6 +58,7 @@ private:
         auto formatter = aux::util::make_unique<Formatter>(
             aux::config_mapper<Formatter>::map(config.formatter.config())
         );
+        formatter->set_mapper(config.formatter.mapper);
 
         auto sink = aux::util::make_unique<Sink>(
             aux::config_mapper<Sink>::map(config.sink.config())
