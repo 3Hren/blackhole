@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
 Version:	0.3.0
-Release:	0rc1%{?dist}
+Release:	0rc2%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
@@ -65,6 +65,10 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Mon Oct 13 2014 Evgeny Safronov <division494@gmail.com> - 0.3.0-0rc2
+- Bug fix: message attribute should no longer hangs out with external attributes.
+- Bug fix: fixed forgotten mapper attaching to formatters.
+
 * Mon Oct 13 2014 Evgeny Safronov <division494@gmail.com> - 0.3.0-0rc1
 - Feature: the library now widely uses deprecated attribute feature.
 - Feature: string formatter now has optional placeholder.

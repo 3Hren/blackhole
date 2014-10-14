@@ -1,3 +1,10 @@
+blackhole (0.3.0-0rc2) unstable; urgency=low
+
+  * Bug fix: message attribute should no longer hangs out with external attributes.
+  * Bug fix: fixed forgotten mapper attaching to formatters.
+
+ -- Evgeny Safronov <division494@gmail.com>  Tue, 14 Oct 2014 13:22:19 +0300
+
 blackhole (0.3.0-0rc1) unstable; urgency=low
 
   * Feature: the library now widely uses deprecated attribute feature.
