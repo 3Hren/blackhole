@@ -28,7 +28,7 @@ public:
         log(log),
         record(record)
     {
-        record.insert(keyword::message() = message);
+        record.message(message);
     }
 
     template<typename... Args>
@@ -36,12 +36,7 @@ public:
         log(log),
         record(record)
     {
-        record.insert(
-            keyword::message() = this->message(
-                message,
-                std::forward<Args>(args)...
-            )
-        );
+        record.message(this->message(message, std::forward<Args>(args)...));
     }
 
     ~pusher_t() {
