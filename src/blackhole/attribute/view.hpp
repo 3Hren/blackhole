@@ -43,7 +43,7 @@ public:
     struct external_set_t { set_t v; };
 
 private:
-    attached_set_t attached;  // Likely empty.
+    attached_set_t attached;  // Likely empty (logger attached attributes).
     internal_set_t internal;  // About level + message + pid + tid + timestamp (4-5).
     external_set_t external;  // The most filled (scoped + user attributes)
 
@@ -59,6 +59,19 @@ public:
     bool
     empty() const BLACKHOLE_NOEXCEPT {
         return internal.v.empty() && external.v.empty() && attached.v.empty();
+    }
+
+    //! Message is the only one late attribute allowed to set internally.
+    void message(const std::string& message) {
+        internal.v.insert(
+            std::make_pair("message", attribute_t(message))
+        );
+    }
+
+    void message(std::string&& message) {
+        internal.v.insert(
+            std::make_pair("message", attribute_t(std::move(message)))
+        );
     }
 
     //! Intentionally allow to insert only into external attribute set.

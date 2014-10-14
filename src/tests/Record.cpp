@@ -1,3 +1,4 @@
+#include <blackhole/keyword/message.hpp>
 #include <blackhole/record.hpp>
 
 #include "global.hpp"
@@ -56,4 +57,12 @@ TEST(record, ExtractThrowsExceptionOnWrongType) {
     record_t record;
     record.insert(attribute::make("key", 42));
     EXPECT_THROW(record.extract<std::string>("key"), boost::bad_get);
+}
+
+TEST(record, SetMessageAttribute) {
+    record_t record;
+    record.message("le message");
+
+    EXPECT_TRUE(record.valid());
+    EXPECT_EQ("le message", record.extract<std::string>("message"));
 }

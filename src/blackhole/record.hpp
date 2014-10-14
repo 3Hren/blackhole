@@ -48,6 +48,19 @@ public:
     }
 
     /*!
+     * Set message attribute to the internal attribute set.
+     * This can be helpful, because message formatting can take significant
+     * amount of time to provide it while opening record.
+     */
+    void message(const std::string& message) {
+        view.message(message);
+    }
+
+    void message(std::string&& message) {
+        view.message(std::move(message));
+    }
+
+    /*!
      * Insert attribute pair into the record.
      */
     void insert(attribute::pair_t pair) {
