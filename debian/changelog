@@ -1,3 +1,10 @@
+blackhole (0.3.0-0rc3) unstable; urgency=low
+
+  * Bug fix: fixed broken include in default severity header.
+  * Other: fixed compatibility with GCC 4.4, which emitted false warning.
+
+ -- Evgeny Safronov <division494@gmail.com>  Wed, 15 Oct 2014 11:01:59 +0300
+
 blackhole (0.3.0-0rc2) unstable; urgency=low
 
   * Bug fix: message attribute should no longer hangs out with external attributes.
