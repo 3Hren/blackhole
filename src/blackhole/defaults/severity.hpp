@@ -1,8 +1,8 @@
 #pragma once
 
+#include "blackhole/detail/config/underlying.hpp"
 #include "blackhole/detail/stream/stream.hpp"
 #include "blackhole/sink/syslog.hpp"
-#include "blackhole/utils/underlying.hpp"
 
 namespace blackhole {
 
