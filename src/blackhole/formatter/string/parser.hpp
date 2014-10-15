@@ -174,6 +174,8 @@ public:
         default:
             BOOST_ASSERT(false);
         }
+
+        throw_<parser::broken_t>();
     }
 
 private:
