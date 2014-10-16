@@ -72,7 +72,7 @@ BENCHMARK_RETURN(Threaded, Null) {
         blackhole::sink::null_t
     >(FORMAT_DEFAULT)();
     auto it = 100000;
-    auto hc = std::thread::hardware_concurrency();
+    auto hc = boost::thread::hardware_concurrency();
     const ticktack::iteration_type iters(it);
     std::vector<std::thread> threads;
     for (uint tid = 0; tid < hc; ++tid) {
