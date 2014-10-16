@@ -5,6 +5,28 @@
 
 #include <blackhole/frontend.hpp>
 
+template<class L>
+struct modifier_t {
+    L log;
+
+    modifier_t(L log) :
+        log(std::move(log))
+    {}
+
+    modifier_t(modifier_t&& other) :
+        log(std::move(other.log))
+    {}
+
+    template<class... Args>
+    L operator()(std::function<void(L&)> fn = &modifier_t::nope) {
+        fn(log);
+        return std::move(log);
+    }
+
+private:
+    static inline void nope(L&) {}
+};
+
 template<class L, class F, class S>
 struct initializer_t {
     std::unique_ptr<F> f;
@@ -18,7 +40,8 @@ struct initializer_t {
     {}
 
     template<class... Args>
-    L operator()(Args&&... args) {
+    modifier_t<L>
+    operator()(Args&&... args) {
         std::unique_ptr<S> s(new S(std::forward<Args>(args)...));
         std::unique_ptr<blackhole::frontend_t<F, S>> frontend(
             new blackhole::frontend_t<F, S>(std::move(f), std::move(s))
@@ -26,7 +49,8 @@ struct initializer_t {
 
         L log;
         log.add_frontend(std::move(frontend));
-        return log;
+
+        return modifier_t<L> { std::move(log) };
     }
 };
 

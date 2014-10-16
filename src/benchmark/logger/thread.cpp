@@ -30,7 +30,7 @@ ticktack::iteration_type null(std::size_t concurrency) {
         blackhole::verbose_logger_t<level_t>,
         blackhole::formatter::string_t,
         blackhole::sink::null_t
-    >(FORMAT_VERBOSE)();
+    >(FORMAT_VERBOSE)()();
 
     const ticktack::iteration_type iters(100000);
     std::vector<std::thread> threads;
@@ -51,7 +51,7 @@ ticktack::iteration_type file(std::size_t concurrency) {
         blackhole::verbose_logger_t<level_t>,
         blackhole::formatter::string_t,
         blackhole::sink::files_t<>
-    >(FORMAT_VERBOSE)(config);
+    >(FORMAT_VERBOSE)(config)();
 
     const ticktack::iteration_type iters(1000000 / concurrency);
     std::vector<std::thread> threads;

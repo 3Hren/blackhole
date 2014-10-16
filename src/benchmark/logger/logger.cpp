@@ -17,7 +17,7 @@
 #define BENCHMARK_BASELINE_X(...) void TT_CONCATENATE(f, __LINE__)()
 #define BENCHMARK_RELATIVE_X(...) void TT_CONCATENATE(f, __LINE__)()
 
-namespace { enum level_t { info }; }
+namespace { enum level_t { debug, info }; }
 
 static const char MESSAGE_LONG[] = "Something bad is going on but I can handle it";
 
@@ -29,7 +29,7 @@ BENCHMARK(LogStringToNull, Baseline) {
         blackhole::verbose_logger_t<level_t>,
         blackhole::formatter::string_t,
         blackhole::sink::null_t
-    >(FORMAT_VERBOSE)();
+    >(FORMAT_VERBOSE)()();
 
     BH_LOG(log, level_t::info, MESSAGE_LONG)(
         "id", 42,
@@ -42,7 +42,7 @@ BENCHMARK_BASELINE(Logger, Base) {
         blackhole::logger_base_t,
         blackhole::formatter::string_t,
         blackhole::sink::null_t
-    >(FORMAT_BASE)();
+    >(FORMAT_BASE)()();
 
     BH_BASE_LOG(log, MESSAGE_LONG)(
         "id", 42,
@@ -55,7 +55,7 @@ BENCHMARK_RELATIVE(Logger, Verbose) {
         blackhole::verbose_logger_t<level_t>,
         blackhole::formatter::string_t,
         blackhole::sink::null_t
-    >(FORMAT_VERBOSE)();
+    >(FORMAT_VERBOSE)()();
 
     BH_LOG(log, level_t::info, MESSAGE_LONG)(
         "id", 42,
@@ -73,6 +73,40 @@ BENCHMARK_RELATIVE_X(Limits, Experimental) {
         blackhole::verbose_logger_t<level_t>,
         blackhole::formatter::string_t,
         blackhole::sink::stream_t
-    >(FORMAT_VERBOSE)(blackhole::sink::stream_t::output_t::stdout);
+    >(FORMAT_VERBOSE)(blackhole::sink::stream_t::output_t::stdout)();
     BH_LOG(log, level_t::info, MESSAGE_LONG);
+}
+
+namespace filter_by {
+
+void verbosity(blackhole::verbose_logger_t<level_t>& log, level_t level) {
+    log.set_filter(blackhole::keyword::severity<level_t>() >= level);
+}
+
+} // namespace filter_by
+
+BENCHMARK_BASELINE(Filtering, Rejected) {
+    static auto log = initialize<
+        blackhole::verbose_logger_t<level_t>,
+        blackhole::formatter::string_t,
+        blackhole::sink::null_t
+    >(FORMAT_BASE)()(std::bind(&filter_by::verbosity, std::placeholders::_1, level_t::info));
+
+    BH_LOG(log, level_t::debug, MESSAGE_LONG)(
+        "id", 42,
+        "info", "le string"
+    );
+}
+
+BENCHMARK_RELATIVE(Filtering, Accepted) {
+    static auto log = initialize<
+        blackhole::verbose_logger_t<level_t>,
+        blackhole::formatter::string_t,
+        blackhole::sink::null_t
+    >(FORMAT_BASE)()(std::bind(&filter_by::verbosity, std::placeholders::_1, level_t::info));
+
+    BH_LOG(log, level_t::info, MESSAGE_LONG)(
+        "id", 42,
+        "info", "le string"
+    );
 }
