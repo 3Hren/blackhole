@@ -55,6 +55,16 @@ initialize(Args&&... args) {
 
 } // namespace
 
+namespace {
+
+void run(blackhole::verbose_logger_t<level_t>& log, std::uint64_t iters, uint tid) {
+    for (uint j = 0; j < iters; ++j) {
+        BH_LOG(log, level_t::info, MESSAGE_LONG)("thread", tid, "id", j);
+    }
+}
+
+} // namespace
+
 BENCHMARK_RETURN(Threaded, Null) {
     static auto log = initialize<
         blackhole::verbose_logger_t<level_t>,
@@ -65,16 +75,12 @@ BENCHMARK_RETURN(Threaded, Null) {
     auto hc = std::thread::hardware_concurrency();
     const ticktack::iteration_type iters(it);
     std::vector<std::thread> threads;
-    for (uint i = 0; i < hc; ++i) {
-        threads.push_back(std::thread([iters, i](){
-            for (uint j = 0; j < iters.v; ++j) {
-                BH_LOG(log, level_t::info, MESSAGE_LONG)("thread", i, "id", j);
-            }
-        }));
+    for (uint tid = 0; tid < hc; ++tid) {
+        threads.push_back(std::thread(std::bind(&run, std::ref(log), iters.v, tid)));
     }
 
-    for (auto& t : threads) {
-        t.join();
+    for (uint i = 0; i < threads.size(); ++i) {
+        threads[i].join();
     }
 
     return ticktack::iteration_type(it * hc);
