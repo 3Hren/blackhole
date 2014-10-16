@@ -63,19 +63,16 @@ void run(blackhole::verbose_logger_t<level_t>& log, std::uint64_t iters, uint ti
     }
 }
 
-} // namespace
-
-BENCHMARK_RETURN(Threaded, Null) {
+ticktack::iteration_type Null(std::size_t concurrency) {
     static auto log = initialize<
         blackhole::verbose_logger_t<level_t>,
         blackhole::formatter::string_t,
         blackhole::sink::null_t
     >(FORMAT_DEFAULT)();
-    auto it = 100000;
-    auto hc = boost::thread::hardware_concurrency();
-    const ticktack::iteration_type iters(it);
+
+    const ticktack::iteration_type iters(100000);
     std::vector<std::thread> threads;
-    for (uint tid = 0; tid < hc; ++tid) {
+    for (uint tid = 0; tid < concurrency; ++tid) {
         threads.push_back(std::thread(std::bind(&run, std::ref(log), iters.v, tid)));
     }
 
@@ -83,5 +80,34 @@ BENCHMARK_RETURN(Threaded, Null) {
         threads[i].join();
     }
 
-    return ticktack::iteration_type(it * hc);
+    return ticktack::iteration_type(iters.v * concurrency);
 }
+
+ticktack::iteration_type File(std::size_t concurrency) {
+    blackhole::sink::files::config_t<> config("blackhole.log");
+    static auto log = initialize<
+        blackhole::verbose_logger_t<level_t>,
+        blackhole::formatter::string_t,
+        blackhole::sink::files_t<>
+    >(FORMAT_DEFAULT)(config);
+
+    const ticktack::iteration_type iters(1000000 / concurrency);
+    std::vector<std::thread> threads;
+    for (uint tid = 0; tid < concurrency; ++tid) {
+        threads.push_back(std::thread(std::bind(&run, std::ref(log), iters.v, tid)));
+    }
+
+    for (uint i = 0; i < threads.size(); ++i) {
+        threads[i].join();
+    }
+
+    return ticktack::iteration_type(iters.v * concurrency);
+}
+
+} // namespace
+
+BENCHMARK_BOUND(Threaded, Null, 1);
+BENCHMARK_BOUND(Threaded, Null, boost::thread::hardware_concurrency());
+
+BENCHMARK_BOUND(Threaded, File, 1);
+BENCHMARK_BOUND(Threaded, File, boost::thread::hardware_concurrency());
