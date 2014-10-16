@@ -6,53 +6,16 @@
 #include <blackhole/sink/files.hpp>
 #include <blackhole/sink/null.hpp>
 
+#include "../util.hpp"
+
 using namespace blackhole;
 
 namespace { enum level_t { info }; }
 
-namespace {
-
-static const char FORMAT_DEFAULT[] = "[%(timestamp)s] [%(severity)s]: %(message)s %(...:[:])s";
 static const char MESSAGE_LONG[] = "Something bad is going on but I can handle it";
 
-template<class L, class F, class S>
-struct initializer_t {
-    std::unique_ptr<F> f;
-
-    initializer_t(std::unique_ptr<F> f) :
-        f(std::move(f))
-    {}
-
-    initializer_t(initializer_t&& other) :
-        f(std::move(other.f))
-    {}
-
-    template<class... Args>
-    L operator()(Args&&... args) {
-        auto sink = blackhole::aux::util::make_unique<
-            S
-        >(std::forward<Args>(args)...);
-
-        auto frontend = blackhole::aux::util::make_unique<
-            blackhole::frontend_t<F, S>
-        >(std::move(f), std::move(sink));
-
-        L log;
-        log.add_frontend(std::move(frontend));
-        return log;
-    }
-};
-
-template<class L, class F, class S, class... Args>
-initializer_t<L, F, S>
-initialize(Args&&... args) {
-    auto formatter = blackhole::aux::util::make_unique<
-        F
-    >(std::forward<Args>(args)...);
-    return initializer_t<L, F, S>(std::move(formatter));
-}
-
-} // namespace
+static const std::string FORMAT_BASE    = "[%(timestamp)s]: %(message)s";
+static const std::string FORMAT_VERBOSE = "[%(timestamp)s] [%(severity)s]: %(message)s";
 
 namespace {
 
@@ -67,7 +30,7 @@ ticktack::iteration_type null(std::size_t concurrency) {
         blackhole::verbose_logger_t<level_t>,
         blackhole::formatter::string_t,
         blackhole::sink::null_t
-    >(FORMAT_DEFAULT)();
+    >(FORMAT_VERBOSE)();
 
     const ticktack::iteration_type iters(100000);
     std::vector<std::thread> threads;
@@ -88,7 +51,7 @@ ticktack::iteration_type file(std::size_t concurrency) {
         blackhole::verbose_logger_t<level_t>,
         blackhole::formatter::string_t,
         blackhole::sink::files_t<>
-    >(FORMAT_DEFAULT)(config);
+    >(FORMAT_VERBOSE)(config);
 
     const ticktack::iteration_type iters(1000000 / concurrency);
     std::vector<std::thread> threads;

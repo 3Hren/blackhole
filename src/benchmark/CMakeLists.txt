@@ -6,6 +6,7 @@ ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/foreign/ticktack ${CMAKE_BINARY_DIR}/tickta
 SET(CMAKE_BUILD_TYPE "Release")
 
 SET(HEADERS
+    util.hpp
 )
 
 SET(SOURCES
