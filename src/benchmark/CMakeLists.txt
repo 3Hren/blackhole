@@ -13,6 +13,7 @@ SET(SOURCES
 #    detail/datetime
     formatter/string
     logger/logger
+    logger/thread
 )
 
 PROJECT(${PROJECT})
