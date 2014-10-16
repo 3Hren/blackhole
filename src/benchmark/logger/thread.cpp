@@ -4,7 +4,6 @@
 
 #include <blackhole/frontend/files.hpp>
 #include <blackhole/sink/files.hpp>
-#include <blackhole/sink/stream.hpp>
 #include <blackhole/sink/null.hpp>
 
 using namespace blackhole;
