@@ -40,7 +40,6 @@ TEST(parser_t, ThrowsExceptionIfRequiredPlaceholderHasInvalidSymbols) {
     const std::vector<std::string> invalid = {
         "%(id )s",
         "%(id-)s",
-        "%(id_)s",
         "%(id+)s",
         "%(id=)s"
     };
