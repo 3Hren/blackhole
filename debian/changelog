@@ -1,3 +1,10 @@
+blackhole (0.3.0-0rc4) unstable; urgency=low
+
+  * Bug fix: process id attribute is back.
+  * Other: allow to use '_' in placeholder name.
+
+ -- Evgeny Safronov <division494@gmail.com>  Mon, 20 Oct 2014 17:26:10 +0300
+
 blackhole (0.3.0-0rc3) unstable; urgency=low
 
   * Bug fix: fixed broken include in default severity header.
