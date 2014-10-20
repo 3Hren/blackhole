@@ -66,7 +66,7 @@ public:
 class invalid_placeholder_t : public error_t {
 public:
     invalid_placeholder_t(uint pos, const std::string& pattern) :
-        error_t(pos, pattern, "invalid placeholder name (only [a-zA-Z0-9] allowed)")
+        error_t(pos, pattern, "invalid placeholder name (only [a-zA-Z0-9_] allowed)")
     {}
 };
 
@@ -220,7 +220,7 @@ private:
         while (pos != end) {
             const char ch = *pos;
 
-            if (std::isalpha(ch) || std::isdigit(ch)) {
+            if (std::isalpha(ch) || std::isdigit(ch) || ch == '_') {
                 name.push_back(ch);
             } else {
                 if (ch == ':') {
