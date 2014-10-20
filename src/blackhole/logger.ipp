@@ -4,6 +4,8 @@
 #include "blackhole/logger.hpp"
 #include "blackhole/trace/context.hpp"
 
+#include "blackhole/keyword/process.hpp"
+
 #ifdef __linux__
 # define BLACKHOLE_HAS_LWP
 # include <sys/syscall.h>
@@ -126,6 +128,9 @@ logger_base_t::open_record(attribute::set_t attributes) const {
         timeval tv;
         gettimeofday(&tv, nullptr);
         attributes.insert(keyword::timestamp() = tv);
+
+        static const pid_t pid = ::getpid();
+        attributes.insert(keyword::pid() = pid);
 
         if (state.tracked) {
             attributes.insert(

@@ -180,3 +180,16 @@ TEST(logger_base_t, LocalAttributesIsMoreSpecificThanScoped) {
 
     EXPECT_EQ(100500, record.extract<int>("answer"));
 }
+
+TEST(logger_base_t, HasPidAttributeOnSuccessfulOpen) {
+    std::unique_ptr<mock::frontend_t> frontend;
+
+    logger_base_t log;
+    log.add_frontend(std::move(frontend));
+
+    auto record = log.open_record();
+
+    ASSERT_TRUE(record.valid());
+    ASSERT_TRUE(record.attributes().find("pid"));
+    EXPECT_EQ(::getpid(), record.extract<std::uint32_t>("pid"));
+}
