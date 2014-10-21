@@ -19,7 +19,7 @@
 
 namespace { enum level_t { debug, info }; }
 
-static const char MESSAGE_LONG[] = "Something bad is going on but I can handle it";
+#define MESSAGE_LONG "Something bad is going on but I can handle it"
 
 static const std::string FORMAT_BASE    = "[%(timestamp)s]: %(message)s";
 static const std::string FORMAT_VERBOSE = "[%(timestamp)s] [%(severity)s]: %(message)s";

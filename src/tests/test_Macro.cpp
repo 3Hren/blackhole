@@ -295,7 +295,9 @@ TEST(Macro, RecursiveAttributeFeeders) {
 }
 
 #pragma GCC diagnostic ignored "-Wformat"
+#ifndef BLACKHOLE_HAS_GCC44
 #pragma GCC diagnostic push
+#endif
 TEST(Macro, CatchExceptionsOnFormatArgumentsUnderflow) {
     record_t record;
     record.insert(attribute::make("id", "42"));
@@ -309,4 +311,6 @@ TEST(Macro, CatchExceptionsOnFormatArgumentsUnderflow) {
             .Times(1);
     EXPECT_NO_THROW(BH_LOG(log, level::debug, "id: %d"));
 }
+#ifndef BLACKHOLE_HAS_GCC44
 #pragma GCC diagnostic pop
+#endif
