@@ -128,14 +128,14 @@ BENCHMARK_RELATIVE(Filtering, Accepted) {
     );
 }
 
-#define SUITE(msg, MSG, ARGS) \
-BENCHMARK(Logger_, BOOST_PP_CAT(Verbose__String__Null__, msg)) { \
+#define SUITE(msg, MSG, ARGS, attrs, ATTRIBUTES) \
+BENCHMARK(Logger_, BOOST_PP_CAT(BOOST_PP_CAT(BOOST_PP_CAT(Verbose__String__Null__, msg), _), attrs)) { \
     static auto log = initialize< \
         blackhole::verbose_logger_t<level_t>, \
         blackhole::formatter::string_t, \
         blackhole::sink::null_t \
     >(FORMAT_BASE)()(); \
-    BH_LOG(log, level_t::info, MSG ARGS); \
+    BH_LOG(log, level_t::info, MSG ARGS) ATTRIBUTES; \
 }
 
 //! =======================================================
@@ -162,29 +162,46 @@ BENCHMARK(Logger_, BOOST_PP_CAT(Verbose__String__Null__, msg)) { \
 #define MAYBE_STRIP_PARENS_2_I(...) __VA_ARGS__
 //! =======================================================
 
+#define TUPLE_SIZE 3
+
 // Transform all the shit to the message placeholder placed in benchmark name.
-#define MESSAGE_PH(size, args) \
+#define MESSAGE_PH(size, args, attrs) \
     BOOST_PP_CAT(BOOST_PP_CAT(BOOST_PP_CAT(MESSAGE_, size), _), BOOST_PP_TUPLE_ELEM(2, 0, args))
 
-#define MESSAGE_VAR(size, args) \
+#define MESSAGE_VAR(size, args, attrs) \
     BOOST_PP_CAT(BOOST_PP_CAT(MESSAGE_, size), BOOST_PP_TUPLE_ELEM(2, 0, args))
 
-#define MESSAGE_ARGS(size, args) \
+#define MESSAGE_ARGS(size, args, attrs) \
     STRIP_PARENS(BOOST_PP_TUPLE_ELEM(2, 1, args))
+
+#define ATTRIBUTES_PH(size, args, attrs) \
+    BOOST_PP_TUPLE_ELEM(2, 0, attrs)
+
+#define ATTRIBUTES_ARGS(size, args, attrs) \
+    BOOST_PP_TUPLE_ELEM(1, 0, BOOST_PP_TUPLE_ELEM(2, 1, attrs))
 
 #define SUITE0(r, product) \
     SUITE( \
         MESSAGE_PH BOOST_PP_SEQ_TO_TUPLE(product), \
         MESSAGE_VAR BOOST_PP_SEQ_TO_TUPLE(product), \
-        MESSAGE_ARGS BOOST_PP_SEQ_TO_TUPLE(product) \
+        MESSAGE_ARGS BOOST_PP_SEQ_TO_TUPLE(product), \
+        ATTRIBUTES_PH BOOST_PP_SEQ_TO_TUPLE(product), \
+        ATTRIBUTES_ARGS BOOST_PP_SEQ_TO_TUPLE(product) \
     )
 
 
 #define MESSAGE_SEQ (S)(M)(L)
+
 #define MESSAGE_ARGS_SEQ \
     ((0, ())) \
     ((1, ( , "okay"))) \
     ((2, ( , 42, "okay"))) \
     ((3, ( , 42, "okay", "description")))
 
-BOOST_PP_SEQ_FOR_EACH_PRODUCT(SUITE0, (MESSAGE_SEQ)(MESSAGE_ARGS_SEQ))
+#define ATTRIBUTES_SEQ \
+    ((0, ())) \
+    ((1, (("id", 42)))) \
+    ((2, (("id", 42, "info", "le string")))) \
+    ((3, (("id", 42, "info", "le string", "method", "POST"))))
+
+BOOST_PP_SEQ_FOR_EACH_PRODUCT(SUITE0, (MESSAGE_SEQ)(MESSAGE_ARGS_SEQ)(ATTRIBUTES_SEQ))
