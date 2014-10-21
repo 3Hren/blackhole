@@ -128,17 +128,17 @@ BENCHMARK_RELATIVE(Filtering, Accepted) {
     );
 }
 
-#define SUITE(msg, MSG, ARGS, attrs, ATTRIBUTES) \
-BENCHMARK(Logger_, BOOST_PP_SEQ_CAT((Verbose__String__Null__)(msg)(_)(attrs))) { \
+#define SUITE(FILTER_DESC, FILTER_ACT, msg, MSG, ARGS, attrs, ATTRIBUTES) \
+BENCHMARK(Logger_, BOOST_PP_SEQ_CAT((Verbose__String__Null__)(Filter_)(FILTER_DESC)(_)(msg)(_)(attrs))) { \
     static auto log = initialize< \
         blackhole::verbose_logger_t<level_t>, \
         blackhole::formatter::string_t, \
         blackhole::sink::null_t \
-    >(FORMAT_BASE)()(); \
+    >(FORMAT_BASE)()(FILTER_ACT); \
     BH_LOG(log, level_t::info, MSG ARGS) ATTRIBUTES; \
 }
 
-//! =======================================================
+//! ============================================================================
 #define CAT(x, y) CAT_I(x, y)
 #define CAT_I(x, y) x ## y
 
@@ -160,33 +160,34 @@ BENCHMARK(Logger_, BOOST_PP_SEQ_CAT((Verbose__String__Null__)(msg)(_)(attrs))) {
 #define MAYBE_STRIP_PARENS_1(x) x
 #define MAYBE_STRIP_PARENS_2(x) APPLY(MAYBE_STRIP_PARENS_2_I, x)
 #define MAYBE_STRIP_PARENS_2_I(...) __VA_ARGS__
-//! =======================================================
+//! ============================================================================
 
 // Transform all the shit to the message placeholder placed in benchmark name.
-#define MESSAGE_PH(size, args, attrs) \
+#define MESSAGE_PH(size, args, attrs, filter) \
     BOOST_PP_CAT(BOOST_PP_CAT(BOOST_PP_CAT(MESSAGE_, size), _), BOOST_PP_TUPLE_ELEM(2, 0, args))
 
-#define MESSAGE_VAR(size, args, attrs) \
+#define MESSAGE_VAR(size, args, attrs, filter) \
     BOOST_PP_CAT(BOOST_PP_CAT(MESSAGE_, size), BOOST_PP_TUPLE_ELEM(2, 0, args))
 
-#define MESSAGE_ARGS(size, args, attrs) \
+#define MESSAGE_ARGS(size, args, attrs, filter) \
     STRIP_PARENS(BOOST_PP_TUPLE_ELEM(2, 1, args))
 
-#define ATTRIBUTES_PH(size, args, attrs) \
+#define ATTRIBUTES_PH(size, args, attrs, filter) \
     BOOST_PP_TUPLE_ELEM(2, 0, attrs)
 
-#define ATTRIBUTES_ARGS(size, args, attrs) \
+#define ATTRIBUTES_ARGS(size, args, attrs, filter) \
     BOOST_PP_TUPLE_ELEM(1, 0, BOOST_PP_TUPLE_ELEM(2, 1, attrs))
 
 #define SUITE0(r, product) \
     SUITE( \
+        BOOST_PP_TUPLE_ELEM(2, 0, BOOST_PP_SEQ_ELEM(3, product)), \
+        BOOST_PP_TUPLE_ELEM(1, 0, BOOST_PP_TUPLE_ELEM(2, 1, BOOST_PP_SEQ_ELEM(3, product))), \
         MESSAGE_PH BOOST_PP_SEQ_TO_TUPLE(product), \
         MESSAGE_VAR BOOST_PP_SEQ_TO_TUPLE(product), \
         MESSAGE_ARGS BOOST_PP_SEQ_TO_TUPLE(product), \
         ATTRIBUTES_PH BOOST_PP_SEQ_TO_TUPLE(product), \
         ATTRIBUTES_ARGS BOOST_PP_SEQ_TO_TUPLE(product) \
     )
-
 
 #define MESSAGE_SEQ (S)(M)(L)
 
@@ -202,4 +203,13 @@ BENCHMARK(Logger_, BOOST_PP_SEQ_CAT((Verbose__String__Null__)(msg)(_)(attrs))) {
     ((2, (("id", 42, "info", "le string")))) \
     ((3, (("id", 42, "info", "le string", "method", "POST"))))
 
-BOOST_PP_SEQ_FOR_EACH_PRODUCT(SUITE0, (MESSAGE_SEQ)(MESSAGE_ARGS_SEQ)(ATTRIBUTES_SEQ))
+#define FILTER_SEQ \
+    ((PASS, ())) \
+    ((FAIL, (std::bind(&filter_by::verbosity, std::placeholders::_1, level_t::info))))
+
+BOOST_PP_SEQ_FOR_EACH_PRODUCT(SUITE0, \
+    (MESSAGE_SEQ)\
+    (MESSAGE_ARGS_SEQ)\
+    (ATTRIBUTES_SEQ)\
+    (FILTER_SEQ)\
+)
