@@ -12,9 +12,10 @@ SET(HEADERS
 SET(SOURCES
 #    attribute_set
 #    detail/datetime
-    formatter/string
+#    formatter/string
+    logger/batch
     logger/logger
-    logger/thread
+#    logger/thread
 )
 
 PROJECT(${PROJECT})
