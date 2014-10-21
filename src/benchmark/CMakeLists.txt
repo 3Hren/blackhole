@@ -21,6 +21,7 @@ PROJECT(${PROJECT})
 
 INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/foreign/rapidjson/include
     ${CMAKE_SOURCE_DIR}/foreign/ticktack/include
 )
 
