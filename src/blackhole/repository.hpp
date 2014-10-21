@@ -137,7 +137,7 @@ public:
 
 BLACKHOLE_API
 repository_t::repository_t() {
-    registrate<sink::stream_t, formatter::string_t>();
+    //registrate<sink::stream_t, formatter::string_t>();
     add_config(repository::config::trivial());
 }
 
