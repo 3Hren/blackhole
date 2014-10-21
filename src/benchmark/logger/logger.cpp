@@ -129,7 +129,7 @@ BENCHMARK_RELATIVE(Filtering, Accepted) {
 }
 
 #define SUITE(msg, MSG, ARGS, attrs, ATTRIBUTES) \
-BENCHMARK(Logger_, BOOST_PP_CAT(BOOST_PP_CAT(BOOST_PP_CAT(Verbose__String__Null__, msg), _), attrs)) { \
+BENCHMARK(Logger_, BOOST_PP_SEQ_CAT((Verbose__String__Null__)(msg)(_)(attrs))) { \
     static auto log = initialize< \
         blackhole::verbose_logger_t<level_t>, \
         blackhole::formatter::string_t, \
