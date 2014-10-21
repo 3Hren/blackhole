@@ -3,10 +3,13 @@
 #include <boost/preprocessor.hpp>
 
 #include <blackhole/detail/util/unique.hpp>
+#include <blackhole/formatter/json.hpp>
 #include <blackhole/formatter/string.hpp>
+#include <blackhole/frontend/files.hpp>
 #include <blackhole/logger.hpp>
 #include <blackhole/macro.hpp>
 #include <blackhole/sink/null.hpp>
+#include <blackhole/sink/files.hpp>
 #include <blackhole/sink/stream.hpp>
 
 #include "../util.hpp"
@@ -128,16 +131,6 @@ BENCHMARK_RELATIVE(Filtering, Accepted) {
     );
 }
 
-#define SUITE(FILTER_DESC, FILTER_ACT, msg, MSG, ARGS, attrs, ATTRIBUTES) \
-BENCHMARK(Logger_, BOOST_PP_SEQ_CAT((Verbose__String__Null__)(Filter_)(FILTER_DESC)(_)(msg)(_)(attrs))) { \
-    static auto log = initialize< \
-        blackhole::verbose_logger_t<level_t>, \
-        blackhole::formatter::string_t, \
-        blackhole::sink::null_t \
-    >(FORMAT_BASE)()(FILTER_ACT); \
-    BH_LOG(log, level_t::info, MSG ARGS) ATTRIBUTES; \
-}
-
 //! ============================================================================
 #define CAT(x, y) CAT_I(x, y)
 #define CAT_I(x, y) x ## y
@@ -162,24 +155,45 @@ BENCHMARK(Logger_, BOOST_PP_SEQ_CAT((Verbose__String__Null__)(Filter_)(FILTER_DE
 #define MAYBE_STRIP_PARENS_2_I(...) __VA_ARGS__
 //! ============================================================================
 
+#define SUITE(FORMATTER, SINK, FILTER_DESC, FILTER_ACT, msg, MSG, ARGS, attrs, ATTRIBUTES) \
+BENCHMARK(Logger_, BOOST_PP_SEQ_CAT( \
+    (Verbose__)\
+    (BOOST_PP_TUPLE_ELEM(3, 0, FORMATTER))(__)\
+    (BOOST_PP_TUPLE_ELEM(3, 0, SINK))(__)\
+    (Filter_)(FILTER_DESC)(_)(msg)(_)(attrs)) \
+) { \
+    static auto log = initialize< \
+        blackhole::verbose_logger_t<level_t>, \
+        BOOST_PP_TUPLE_ELEM(3, 1, FORMATTER), \
+        BOOST_PP_TUPLE_ELEM(3, 1, SINK) \
+    >\
+    BOOST_PP_TUPLE_ELEM(3, 2, FORMATTER)\
+    BOOST_PP_TUPLE_ELEM(3, 2, SINK)\
+    (FILTER_ACT); \
+    \
+    BH_LOG(log, level_t::debug, MSG ARGS) ATTRIBUTES; \
+}
+
 // Transform all the shit to the message placeholder placed in benchmark name.
-#define MESSAGE_PH(size, args, attrs, filter) \
-    BOOST_PP_CAT(BOOST_PP_CAT(BOOST_PP_CAT(MESSAGE_, size), _), BOOST_PP_TUPLE_ELEM(2, 0, args))
+#define MESSAGE_PH(log, fmt, snk, flt, msg, msgargs, attrs) \
+    BOOST_PP_SEQ_CAT((MESSAGE_)(msg)(_)(BOOST_PP_TUPLE_ELEM(2, 0, msgargs)))
 
-#define MESSAGE_VAR(size, args, attrs, filter) \
-    BOOST_PP_CAT(BOOST_PP_CAT(MESSAGE_, size), BOOST_PP_TUPLE_ELEM(2, 0, args))
+#define MESSAGE_VAR(log, fmt, snk, flt, msg, msgargs, attrs) \
+    BOOST_PP_CAT(BOOST_PP_CAT(MESSAGE_, msg), BOOST_PP_TUPLE_ELEM(2, 0, msgargs))
 
-#define MESSAGE_ARGS(size, args, attrs, filter) \
-    STRIP_PARENS(BOOST_PP_TUPLE_ELEM(2, 1, args))
+#define MESSAGE_ARGS(log, fmt, snk, flt, msg, msgargs, attrs) \
+    STRIP_PARENS(BOOST_PP_TUPLE_ELEM(2, 1, msgargs))
 
-#define ATTRIBUTES_PH(size, args, attrs, filter) \
+#define ATTRIBUTES_PH(log, fmt, snk, flt, msg, msgargs, attrs) \
     BOOST_PP_TUPLE_ELEM(2, 0, attrs)
 
-#define ATTRIBUTES_ARGS(size, args, attrs, filter) \
+#define ATTRIBUTES_ARGS(log, fmt, snk, flt, msg, msgargs, attrs) \
     BOOST_PP_TUPLE_ELEM(1, 0, BOOST_PP_TUPLE_ELEM(2, 1, attrs))
 
 #define SUITE0(r, product) \
     SUITE( \
+        BOOST_PP_SEQ_ELEM(1, product), /* Formatter */ \
+        BOOST_PP_SEQ_ELEM(2, product), /* Sink */ \
         BOOST_PP_TUPLE_ELEM(2, 0, BOOST_PP_SEQ_ELEM(3, product)), \
         BOOST_PP_TUPLE_ELEM(1, 0, BOOST_PP_TUPLE_ELEM(2, 1, BOOST_PP_SEQ_ELEM(3, product))), \
         MESSAGE_PH BOOST_PP_SEQ_TO_TUPLE(product), \
@@ -189,27 +203,34 @@ BENCHMARK(Logger_, BOOST_PP_SEQ_CAT((Verbose__String__Null__)(Filter_)(FILTER_DE
         ATTRIBUTES_ARGS BOOST_PP_SEQ_TO_TUPLE(product) \
     )
 
-#define MESSAGE_SEQ (S)(M)(L)
+#define LOGGER_SEQ ()
+#define FORMATTER_SEQ \
+    ((String, blackhole::formatter::string_t, (FORMAT_BASE)))\
+    ((Json,   blackhole::formatter::json_t,   ()))
+
+#define SINK_SEQ \
+    ((Null,  blackhole::sink::null_t,    ()))\
+    ((Files, blackhole::sink::files_t<>, (blackhole::sink::files::config_t<>("blackhole.log"))))
+
+#define MESSAGE_SEQ (S)(M)//(L)
 
 #define MESSAGE_ARGS_SEQ \
     ((0, ())) \
-    ((1, ( , "okay"))) \
+    ((1, ( , "okay"))) /*\
     ((2, ( , 42, "okay"))) \
-    ((3, ( , 42, "okay", "description")))
+    ((3, ( , 42, "okay", "description")))*/
 
 #define ATTRIBUTES_SEQ \
     ((0, ())) \
-    ((1, (("id", 42)))) \
+    ((1, (("id", 42)))) /*\
     ((2, (("id", 42, "info", "le string")))) \
-    ((3, (("id", 42, "info", "le string", "method", "POST"))))
+    ((3, (("id", 42, "info", "le string", "method", "POST"))))*/
 
 #define FILTER_SEQ \
     ((PASS, ())) \
     ((FAIL, (std::bind(&filter_by::verbosity, std::placeholders::_1, level_t::info))))
 
 BOOST_PP_SEQ_FOR_EACH_PRODUCT(SUITE0, \
-    (MESSAGE_SEQ)\
-    (MESSAGE_ARGS_SEQ)\
-    (ATTRIBUTES_SEQ)\
-    (FILTER_SEQ)\
-)
+    (LOGGER_SEQ) \
+    (FORMATTER_SEQ)(SINK_SEQ)(FILTER_SEQ) \
+    (MESSAGE_SEQ)(MESSAGE_ARGS_SEQ)(ATTRIBUTES_SEQ))
