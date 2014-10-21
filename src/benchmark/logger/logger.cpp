@@ -162,8 +162,6 @@ BENCHMARK(Logger_, BOOST_PP_CAT(BOOST_PP_CAT(BOOST_PP_CAT(Verbose__String__Null_
 #define MAYBE_STRIP_PARENS_2_I(...) __VA_ARGS__
 //! =======================================================
 
-#define TUPLE_SIZE 3
-
 // Transform all the shit to the message placeholder placed in benchmark name.
 #define MESSAGE_PH(size, args, attrs) \
     BOOST_PP_CAT(BOOST_PP_CAT(BOOST_PP_CAT(MESSAGE_, size), _), BOOST_PP_TUPLE_ELEM(2, 0, args))
