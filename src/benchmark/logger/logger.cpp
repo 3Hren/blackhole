@@ -212,19 +212,19 @@ BENCHMARK(Logger_, BOOST_PP_SEQ_CAT( \
     ((Null,  blackhole::sink::null_t,    ()))\
     ((Files, blackhole::sink::files_t<>, (blackhole::sink::files::config_t<>("blackhole.log"))))
 
-#define MESSAGE_SEQ (S)(M)//(L)
+#define MESSAGE_SEQ (S)(M)(L)
 
 #define MESSAGE_ARGS_SEQ \
     ((0, ())) \
-    ((1, ( , "okay"))) /*\
+    ((1, ( , "okay"))) \
     ((2, ( , 42, "okay"))) \
-    ((3, ( , 42, "okay", "description")))*/
+    ((3, ( , 42, "okay", "description")))
 
 #define ATTRIBUTES_SEQ \
     ((0, ())) \
-    ((1, (("id", 42)))) /*\
+    ((1, (("id", 42)))) \
     ((2, (("id", 42, "info", "le string")))) \
-    ((3, (("id", 42, "info", "le string", "method", "POST"))))*/
+    ((3, (("id", 42, "info", "le string", "method", "POST"))))
 
 #define FILTER_SEQ \
     ((PASS, ())) \
