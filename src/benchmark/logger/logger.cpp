@@ -1,6 +1,5 @@
 #include <ticktack/benchmark.hpp>
 
-#include <blackhole/detail/util/unique.hpp>
 #include <blackhole/formatter/string.hpp>
 #include <blackhole/logger.hpp>
 #include <blackhole/macro.hpp>
@@ -77,20 +76,12 @@ BENCHMARK_RELATIVE_X(Limits, Experimental) {
     BH_LOG(log, level_t::info, MESSAGE_LONG);
 }
 
-namespace filter_by {
-
-void verbosity(blackhole::verbose_logger_t<level_t>& log, level_t level) {
-    log.set_filter(blackhole::keyword::severity<level_t>() >= level);
-}
-
-} // namespace filter_by
-
 BENCHMARK_BASELINE(Filtering, Rejected) {
     static auto log = initialize<
         blackhole::verbose_logger_t<level_t>,
         blackhole::formatter::string_t,
         blackhole::sink::null_t
-    >(FORMAT_BASE)()(std::bind(&filter_by::verbosity, std::placeholders::_1, level_t::info));
+    >(FORMAT_BASE)()(std::bind(&filter_by::verbosity<level_t>, std::placeholders::_1, level_t::info));
 
     BH_LOG(log, level_t::debug, MESSAGE_LONG)(
         "id", 42,
@@ -103,7 +94,7 @@ BENCHMARK_RELATIVE(Filtering, Accepted) {
         blackhole::verbose_logger_t<level_t>,
         blackhole::formatter::string_t,
         blackhole::sink::null_t
-    >(FORMAT_BASE)()(std::bind(&filter_by::verbosity, std::placeholders::_1, level_t::info));
+    >(FORMAT_BASE)()(std::bind(&filter_by::verbosity<level_t>, std::placeholders::_1, level_t::info));
 
     BH_LOG(log, level_t::info, MESSAGE_LONG)(
         "id", 42,

@@ -61,3 +61,12 @@ initialize(Args&&... args) {
     std::unique_ptr<F> formatter(new F(std::forward<Args>(args)...));
     return initializer_t<L, F, S>(std::move(formatter));
 }
+
+namespace filter_by {
+
+template<typename Level>
+void verbosity(blackhole::verbose_logger_t<Level>& log, Level level) {
+    log.set_filter(blackhole::keyword::severity<Level>() >= level);
+}
+
+} // namespace filter_by

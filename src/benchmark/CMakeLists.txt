@@ -12,15 +12,17 @@ SET(HEADERS
 SET(SOURCES
 #    attribute_set
 #    detail/datetime
-    formatter/string
+#    formatter/string
+    logger/batch
     logger/logger
-    logger/thread
+#    logger/thread
 )
 
 PROJECT(${PROJECT})
 
 INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/foreign/rapidjson/include
     ${CMAKE_SOURCE_DIR}/foreign/ticktack/include
 )
 
