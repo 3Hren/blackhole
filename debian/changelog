@@ -1,3 +1,9 @@
+blackhole (0.3.0-1) unstable; urgency=low
+
+  * Release version.
+
+ -- Evgeny Safronov <division494@gmail.com>  Tue, 28 Oct 2014 15:41:59 +0300
+
 blackhole (0.3.0-0rc4) unstable; urgency=low
 
   * Bug fix: process id attribute is back.
