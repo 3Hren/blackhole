@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
 Version:	0.3.0
-Release:	0rc4%{?dist}
+Release:	1%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
@@ -65,6 +65,9 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Tue Oct 28 2014 Evgeny Safronov <division494@gmail.com> - 0.3.0-1
+- Release version.
+
 * Mon Oct 20 2014 Evgeny Safronov <division494@gmail.com> - 0.3.0-0rc4
 - Bug fix: process id attribute is back.
 - Other: allow to use '_' in placeholder name.
