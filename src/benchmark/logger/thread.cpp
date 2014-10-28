@@ -1,4 +1,4 @@
-#include <ticktack/benchmark.hpp>
+#include <epicmeter/benchmark.hpp>
 
 #include <blackhole/blackhole.hpp>
 
@@ -16,6 +16,7 @@ namespace { enum level_t { info }; }
 
 static const std::string FORMAT_BASE    = "[%(timestamp)s]: %(message)s";
 static const std::string FORMAT_VERBOSE = "[%(timestamp)s] [%(severity)s]: %(message)s";
+static const int COUNT = 100000;
 
 namespace {
 
@@ -25,14 +26,14 @@ void run(blackhole::verbose_logger_t<level_t>& log, std::uint64_t iters, uint ti
     }
 }
 
-ticktack::iteration_type null(std::size_t concurrency) {
+epicmeter::iteration_type null(std::size_t concurrency) {
     static auto log = initialize<
         blackhole::verbose_logger_t<level_t>,
         blackhole::formatter::string_t,
         blackhole::sink::null_t
     >(FORMAT_VERBOSE)()();
 
-    const ticktack::iteration_type iters(100000);
+    const epicmeter::iteration_type iters(COUNT / concurrency);
     std::vector<std::thread> threads;
     for (uint tid = 0; tid < concurrency; ++tid) {
         threads.push_back(std::thread(std::bind(&run, std::ref(log), iters.v, tid)));
@@ -42,10 +43,10 @@ ticktack::iteration_type null(std::size_t concurrency) {
         threads[i].join();
     }
 
-    return ticktack::iteration_type(iters.v * concurrency);
+    return epicmeter::iteration_type(iters.v * concurrency);
 }
 
-ticktack::iteration_type file(std::size_t concurrency) {
+epicmeter::iteration_type file(std::size_t concurrency) {
     blackhole::sink::files::config_t<> config("blackhole.log");
     static auto log = initialize<
         blackhole::verbose_logger_t<level_t>,
@@ -53,7 +54,7 @@ ticktack::iteration_type file(std::size_t concurrency) {
         blackhole::sink::files_t<>
     >(FORMAT_VERBOSE)(config)();
 
-    const ticktack::iteration_type iters(1000000 / concurrency);
+    const epicmeter::iteration_type iters(COUNT / concurrency);
     std::vector<std::thread> threads;
     for (uint tid = 0; tid < concurrency; ++tid) {
         threads.push_back(std::thread(std::bind(&run, std::ref(log), iters.v, tid)));
@@ -63,7 +64,7 @@ ticktack::iteration_type file(std::size_t concurrency) {
         threads[i].join();
     }
 
-    return ticktack::iteration_type(iters.v * concurrency);
+    return epicmeter::iteration_type(iters.v * concurrency);
 }
 
 } // namespace

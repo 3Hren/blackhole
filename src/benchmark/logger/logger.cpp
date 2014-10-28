@@ -1,4 +1,4 @@
-#include <ticktack/benchmark.hpp>
+#include <epicmeter/benchmark.hpp>
 
 #include <blackhole/formatter/string.hpp>
 #include <blackhole/logger.hpp>
@@ -49,7 +49,7 @@ BENCHMARK_BASELINE(Logger, Base) {
     );
 }
 
-BENCHMARK_RELATIVE(Logger, Verbose) {
+BENCHMARK(Logger, Verbose) {
     static auto log = initialize<
         blackhole::verbose_logger_t<level_t>,
         blackhole::formatter::string_t,
@@ -89,7 +89,7 @@ BENCHMARK_BASELINE(Filtering, Rejected) {
     );
 }
 
-BENCHMARK_RELATIVE(Filtering, Accepted) {
+BENCHMARK(Filtering, Accepted) {
     static auto log = initialize<
         blackhole::verbose_logger_t<level_t>,
         blackhole::formatter::string_t,

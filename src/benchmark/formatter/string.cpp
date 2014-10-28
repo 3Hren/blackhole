@@ -1,4 +1,4 @@
-#include <ticktack/benchmark.hpp>
+#include <epicmeter/benchmark.hpp>
 
 #include <blackhole/formatter/string.hpp>
 #include <blackhole/keyword/message.hpp>
@@ -35,7 +35,7 @@ BENCHMARK(PureStringFormatter, Baseline) {
         "[%(timestamp)s] [%(severity)s]: %(message)s"
     );
     static int initializer = initialize(formatter);
-    ticktack::compiler::do_not_optimize(initializer);
+    epicmeter::compiler::do_not_optimize(initializer);
 
     blackhole::record_t record;
     record.insert(blackhole::keyword::message() = MESSAGE_LONG);
@@ -44,7 +44,7 @@ BENCHMARK(PureStringFormatter, Baseline) {
     gettimeofday(&tv, nullptr);
     record.insert(blackhole::keyword::timestamp() = tv);
     record.insert(blackhole::keyword::severity<level_t>() = level_t::info);
-    ticktack::compiler::do_not_optimize(formatter.format(record));
+    epicmeter::compiler::do_not_optimize(formatter.format(record));
 }
 
 BENCHMARK(VariadicStringFormatter, Baseline) {
@@ -52,7 +52,7 @@ BENCHMARK(VariadicStringFormatter, Baseline) {
         "[%(timestamp)s] [%(severity)s]: %(message)s %(...:(:))s"
     );
     static int initializer = initialize(formatter);
-    ticktack::compiler::do_not_optimize(initializer);
+    epicmeter::compiler::do_not_optimize(initializer);
 
     blackhole::attribute::set_t attached;
     blackhole::attribute::set_t external;
@@ -68,5 +68,5 @@ BENCHMARK(VariadicStringFormatter, Baseline) {
 
     blackhole::attribute::set_view_t view(attached, external, std::move(internal));
     blackhole::record_t record(std::move(view));
-    ticktack::compiler::do_not_optimize(formatter.format(record));
+    epicmeter::compiler::do_not_optimize(formatter.format(record));
 }

@@ -1,6 +1,6 @@
 #include <boost/preprocessor.hpp>
 
-#include <ticktack/benchmark.hpp>
+#include <epicmeter/benchmark.hpp>
 
 #include <blackhole/formatter/json.hpp>
 #include <blackhole/formatter/string.hpp>
@@ -54,12 +54,13 @@ namespace { enum level_t { debug, info }; }
 //! ============================================================================
 
 #define SUITE(FORMATTER, SINK, FILTER_DESC, FILTER_ACT, msg, MSG, ARGS, attrs, ATTRIBUTES) \
-BENCHMARK(Logger_, BOOST_PP_SEQ_CAT( \
-    (Verbose__)\
-    (BOOST_PP_TUPLE_ELEM(3, 0, FORMATTER))(__)\
-    (BOOST_PP_TUPLE_ELEM(3, 0, SINK))(__)\
-    (Filter_)(FILTER_DESC)(_)(msg)(_)(attrs)) \
-) { \
+BENCHMARK(Logger_, (L: Verbose, \
+    F: BOOST_PP_TUPLE_ELEM(3, 0, FORMATTER), \
+    S: BOOST_PP_TUPLE_ELEM(3, 0, SINK), \
+    R: FILTER_DESC, \
+    M: msg, \
+    A: attrs))\
+{ \
     static auto log = initialize< \
         blackhole::verbose_logger_t<level_t>, \
         BOOST_PP_TUPLE_ELEM(3, 1, FORMATTER), \
@@ -103,11 +104,11 @@ BENCHMARK(Logger_, BOOST_PP_SEQ_CAT( \
 
 #define LOGGER_SEQ ()
 #define FORMATTER_SEQ \
-    ((String, blackhole::formatter::string_t, ("[%(timestamp)s]: %(message)s")))\
+    ((String, blackhole::formatter::string_t, ("[%(timestamp)s]: %(message)s"))) \
     ((Json,   blackhole::formatter::json_t,   ()))
 
 #define SINK_SEQ \
-    ((Null,  blackhole::sink::null_t,    ()))\
+    ((Null,  blackhole::sink::null_t,    ())) \
     ((Files, blackhole::sink::files_t<>, (blackhole::sink::files::config_t<>("blackhole.log"))))
 
 #define MESSAGE_SEQ (S)(M)(L)

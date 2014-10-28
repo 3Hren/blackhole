@@ -10,6 +10,6 @@
 [submodule "foreign/urdl"]
 	path = foreign/urdl
 	url = git://github.com/chriskohlhoff/urdl.git
-[submodule "foreign/ticktack"]
-	path = foreign/ticktack
-	url = git://github.com/3hren/ticktack
+[submodule "foreign/epicmeter"]
+	path = foreign/epicmeter
+	url = https://github.com/3Hren/epicmeter.git
