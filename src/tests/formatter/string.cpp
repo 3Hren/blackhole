@@ -260,7 +260,7 @@ TEST_STRING(Optional, AbsentWithPrefixSuffixSquareBracketsReversed) {
     EXPECT_EQ("<>: [le message]", fmt.format(record));
 }
 
-TEST(string_t, FormatVariadicSingle) {
+TEST_STRING(Deprecated, FormatVariadicSingle) {
     record_t record;
     record.insert({ "uuid", attribute_t("123-456") });
 
@@ -269,7 +269,7 @@ TEST(string_t, FormatVariadicSingle) {
     EXPECT_EQ("['uuid': 123-456]", formatter.format(record));
 }
 
-TEST(string_t, FormatVariadicEmpty) {
+TEST_STRING(Deprecated, FormatVariadicEmpty) {
     record_t record;
 
     std::string pattern("[%(...L)s]");
@@ -277,7 +277,7 @@ TEST(string_t, FormatVariadicEmpty) {
     EXPECT_EQ("[]", formatter.format(record));
 }
 
-TEST(string_t, FormatVariadicMultiple) {
+TEST_STRING(Deprecated, FormatVariadicMultiple) {
     record_t record;
     record.insert({ "id", attribute_t(42) });
     record.insert({ "uuid", attribute_t("123-456") });
@@ -288,8 +288,10 @@ TEST(string_t, FormatVariadicMultiple) {
     EXPECT_TRUE(actual.find("'uuid': 123-456") != std::string::npos);
 }
 
-TEST(string_t, ComplexFormatVariadicMultiple) {
+TEST_STRING(Deprecated, ComplexFormatVariadicMultiple) {
     attribute::set_t global;
+    global.insert({ "global", attribute_t(10) });
+
     attribute::set_t external;
     external.insert({ "uuid", attribute_t("123-456") });
     external.insert({ "answer", attribute_t(42) });
@@ -306,12 +308,16 @@ TEST(string_t, ComplexFormatVariadicMultiple) {
     formatter::string_t formatter(pattern);
     std::string actual = formatter.format(record);
     EXPECT_TRUE(
-        "[1960-01-01 00:00:00] [INFO]: le message ['uuid': 123-456, 'answer': 42]" == actual ||
-        "[1960-01-01 00:00:00] [INFO]: le message ['answer': 42, 'uuid': 123-456]" == actual
+        "[1960-01-01 00:00:00] [INFO]: le message ['global': 10, 'uuid': 123-456, 'answer': 42]" == actual ||
+        "[1960-01-01 00:00:00] [INFO]: le message ['global': 10, 'answer': 42, 'uuid': 123-456]" == actual ||
+        "[1960-01-01 00:00:00] [INFO]: le message ['answer': 42, 'global': 10, 'uuid': 123-456]" == actual ||
+        "[1960-01-01 00:00:00] [INFO]: le message ['answer': 42, 'uuid': 123-456, 'global': 10]" == actual ||
+        "[1960-01-01 00:00:00] [INFO]: le message ['uuid': 123-456, 'global': 10, 'answer': 42]" == actual ||
+        "[1960-01-01 00:00:00] [INFO]: le message ['uuid': 123-456, 'answer': 42, 'global': 10]" == actual
     );
 }
 
-TEST(string_t, FormatVariadicSingleWithPrefix) {
+TEST_STRING(Variadic, SingleWithPrefix) {
     record_t record;
     record.insert({ "uuid", attribute_t("123-456") });
 
@@ -320,7 +326,7 @@ TEST(string_t, FormatVariadicSingleWithPrefix) {
     EXPECT_EQ("args=uuid: 123-456", formatter.format(record));
 }
 
-TEST(string_t, FormatVariadicEmptyWithPrefix) {
+TEST_STRING(Variadic, EmptyWithPrefix) {
     record_t record;
 
     std::string pattern("%(...:args=:)s");
@@ -328,7 +334,7 @@ TEST(string_t, FormatVariadicEmptyWithPrefix) {
     EXPECT_EQ("", formatter.format(record));
 }
 
-TEST(string_t, FormatVariadicSingleWithSuffix) {
+TEST_STRING(Variadic, SingleWithSuffix) {
     record_t record;
     record.insert({ "uuid", attribute_t("123-456") });
 
@@ -337,7 +343,7 @@ TEST(string_t, FormatVariadicSingleWithSuffix) {
     EXPECT_EQ("uuid: 123-456=args", formatter.format(record));
 }
 
-TEST(string_t, FormatVariadicEmptyWithSuffix) {
+TEST_STRING(Variadic, EmptyWithSuffix) {
     record_t record;
 
     std::string pattern("%(...::=args)s");
@@ -345,7 +351,7 @@ TEST(string_t, FormatVariadicEmptyWithSuffix) {
     EXPECT_EQ("", formatter.format(record));
 }
 
-TEST(string_t, FormatVariadicSingleWithPrefixSuffix) {
+TEST_STRING(Variadic, SingleWithPrefixSuffix) {
     record_t record;
     record.insert({ "uuid", attribute_t("123-456") });
 
@@ -354,7 +360,7 @@ TEST(string_t, FormatVariadicSingleWithPrefixSuffix) {
     EXPECT_EQ("[uuid: 123-456]", formatter.format(record));
 }
 
-TEST(string_t, FormatVariadicEmptyWithPrefixSuffix) {
+TEST_STRING(Variadic, EmptyWithPrefixSuffix) {
     record_t record;
 
     std::string pattern("%(...:[:])s");
@@ -362,7 +368,7 @@ TEST(string_t, FormatVariadicEmptyWithPrefixSuffix) {
     EXPECT_EQ("", formatter.format(record));
 }
 
-TEST(string_t, FormatVariadicEmptySeparator) {
+TEST_STRING(Variadic, EmptySeparator) {
     record_t record;
 
     std::string pattern("%(...::: | )s");
@@ -370,7 +376,7 @@ TEST(string_t, FormatVariadicEmptySeparator) {
     EXPECT_EQ("", formatter.format(record));
 }
 
-TEST(string_t, FormatVariadicSingleSeparator) {
+TEST_STRING(Variadic, SingleSeparator) {
     record_t record;
     record.insert({ "uuid", attribute_t("123-456") });
 
@@ -379,7 +385,7 @@ TEST(string_t, FormatVariadicSingleSeparator) {
     EXPECT_EQ("uuid: 123-456", formatter.format(record));
 }
 
-TEST(string_t, FormatVariadicMultipleSeparator) {
+TEST_STRING(Variadic, MultipleSeparator) {
     record_t record;
     record.insert({ "id", attribute_t(42) });
     record.insert({ "uuid", attribute_t("123-456") });
@@ -393,7 +399,7 @@ TEST(string_t, FormatVariadicMultipleSeparator) {
     );
 }
 
-TEST(string_t, FormatVariadicEmptyPrefixSuffixSeparator) {
+TEST_STRING(Variadic, EmptyPrefixSuffixSeparator) {
     record_t record;
 
     std::string pattern("%(...:[:]: | )s");
@@ -401,7 +407,7 @@ TEST(string_t, FormatVariadicEmptyPrefixSuffixSeparator) {
     EXPECT_EQ("", formatter.format(record));
 }
 
-TEST(string_t, FormatVariadicSinglePrefixSuffixSeparator) {
+TEST_STRING(Variadic, SinglePrefixSuffixSeparator) {
     record_t record;
     record.insert({ "uuid", attribute_t("123-456") });
 
@@ -410,7 +416,7 @@ TEST(string_t, FormatVariadicSinglePrefixSuffixSeparator) {
     EXPECT_EQ("[uuid: 123-456]", formatter.format(record));
 }
 
-TEST(string_t, FormatVariadicMultiplePrefixSuffixSeparator) {
+TEST_STRING(Variadic, MultiplePrefixSuffixSeparator) {
     record_t record;
     record.insert({ "id", attribute_t(42) });
     record.insert({ "uuid", attribute_t("123-456") });
@@ -424,7 +430,7 @@ TEST(string_t, FormatVariadicMultiplePrefixSuffixSeparator) {
     );
 }
 
-TEST(string_t, FormatVariadicSinglePattern) {
+TEST_STRING(Variadic, SinglePattern) {
     record_t record;
     record.insert({ "uuid", attribute_t("123-456") });
 
@@ -433,7 +439,7 @@ TEST(string_t, FormatVariadicSinglePattern) {
     EXPECT_EQ("uuid=123-456", formatter.format(record));
 }
 
-TEST(string_t, FormatVariadicMultiplePrefixSuffixSeparatorPattern) {
+TEST_STRING(Variadic, MultiplePrefixSuffixSeparatorPattern) {
     record_t record;
     record.insert({ "id", attribute_t(42) });
     record.insert({ "uuid", attribute_t("123-456") });
@@ -446,3 +452,5 @@ TEST(string_t, FormatVariadicMultiplePrefixSuffixSeparatorPattern) {
         "[id=42 | uuid=123-456]" == actual
     );
 }
+
+
