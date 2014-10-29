@@ -139,6 +139,7 @@ private:
     level_type level;
 
 public:
+    //!@todo: Replace with initialization ctor, repository.create<>("name", ...).
     verbose_logger_t() :
         logger_base_t(),
         level(static_cast<level_type>(0))
