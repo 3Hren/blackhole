@@ -1,3 +1,9 @@
+blackhole (0.3.1-1) unstable; urgency=low
+
+  * Bug fix: fixed improper attributes routing.
+
+ -- Evgeny Safronov <division494@gmail.com>  Wed, 29 Oct 2014 12:26:22 +0300
+
 blackhole (0.3.0-1) unstable; urgency=low
 
   * Release version.

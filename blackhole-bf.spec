@@ -1,6 +1,6 @@
 Summary:	Blackhole
 Name:		libblackhole
-Version:	0.3.0
+Version:	0.3.1
 Release:	1%{?dist}
 
 License:	MIT
@@ -65,6 +65,9 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Wed Oct 29 2014 Evgeny Safronov <division494@gmail.com> - 0.3.1-1
+- Bug fix: fixed improper attributes routing.
+
 * Tue Oct 28 2014 Evgeny Safronov <division494@gmail.com> - 0.3.0-1
 - Release version.
 
