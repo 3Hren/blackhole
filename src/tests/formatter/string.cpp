@@ -290,6 +290,8 @@ TEST(string_t, FormatVariadicMultiple) {
 
 TEST(string_t, ComplexFormatVariadicMultiple) {
     attribute::set_t global;
+    global.insert({ "global", attribute_t(10) });
+
     attribute::set_t external;
     external.insert({ "uuid", attribute_t("123-456") });
     external.insert({ "answer", attribute_t(42) });
@@ -306,8 +308,12 @@ TEST(string_t, ComplexFormatVariadicMultiple) {
     formatter::string_t formatter(pattern);
     std::string actual = formatter.format(record);
     EXPECT_TRUE(
-        "[1960-01-01 00:00:00] [INFO]: le message ['uuid': 123-456, 'answer': 42]" == actual ||
-        "[1960-01-01 00:00:00] [INFO]: le message ['answer': 42, 'uuid': 123-456]" == actual
+        "[1960-01-01 00:00:00] [INFO]: le message ['global': 10, 'uuid': 123-456, 'answer': 42]" == actual ||
+        "[1960-01-01 00:00:00] [INFO]: le message ['global': 10, 'answer': 42, 'uuid': 123-456]" == actual ||
+        "[1960-01-01 00:00:00] [INFO]: le message ['answer': 42, 'global': 10, 'uuid': 123-456]" == actual ||
+        "[1960-01-01 00:00:00] [INFO]: le message ['answer': 42, 'uuid': 123-456, 'global': 10]" == actual ||
+        "[1960-01-01 00:00:00] [INFO]: le message ['uuid': 123-456, 'global': 10, 'answer': 42]" == actual ||
+        "[1960-01-01 00:00:00] [INFO]: le message ['uuid': 123-456, 'answer': 42, 'global': 10]" == actual
     );
 }
 
@@ -446,3 +452,5 @@ TEST(string_t, FormatVariadicMultiplePrefixSuffixSeparatorPattern) {
         "[id=42 | uuid=123-456]" == actual
     );
 }
+
+
