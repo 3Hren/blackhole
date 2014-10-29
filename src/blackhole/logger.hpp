@@ -204,10 +204,10 @@ public:
                 reader_lock_type lock(state.lock.open);
                 if (state.attributes.scoped.get()) {
                     const auto& scoped = state.attributes.scoped->attributes();
-                    auto scoped_it = scoped.find(keyword::tracebit().name());
-                    if (scoped_it != scoped.end()) {
+                    auto it = scoped.find(keyword::tracebit().name());
+                    if (it != scoped.end()) {
                         trace = boost::get<keyword::tag::tracebit_t::type>(
-                            scoped_it->second.value
+                            it->second.value
                         );
                     }
                 }
