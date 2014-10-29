@@ -116,8 +116,14 @@ logger_base_t::open_record(attribute::pair_t attribute) const {
 BLACKHOLE_API
 record_t
 logger_base_t::open_record(attribute::set_t attributes) const {
+    return open_record(attribute::set_t(), std::move(attributes));
+}
+
+BLACKHOLE_API
+record_t
+logger_base_t::open_record(attribute::set_t internal, attribute::set_t external) const {
     if (enabled() && !state.frontends.empty()) {
-        attributes.insert(
+        internal.insert(
 #ifdef BLACKHOLE_HAS_LWP
             keyword::lwp() = syscall(SYS_gettid)
 #else
@@ -127,27 +133,31 @@ logger_base_t::open_record(attribute::set_t attributes) const {
 
         timeval tv;
         gettimeofday(&tv, nullptr);
-        attributes.insert(keyword::timestamp() = tv);
+        internal.insert(keyword::timestamp() = tv);
 
         static const pid_t pid = ::getpid();
-        attributes.insert(keyword::pid() = pid);
+        internal.insert(keyword::pid() = pid);
 
         if (state.tracked) {
-            attributes.insert(
+            internal.insert(
                 attribute::make("trace", ::this_thread::current_span().trace)
             );
         }
 
         reader_lock_type lock(state.lock.open);
+        if (state.attributes.scoped.get()) {
+            const auto& scoped = state.attributes.scoped->attributes();
+            external.insert(scoped.begin(), scoped.end());
+        }
+
         attribute::set_view_t view(
             state.attributes.global,
-            state.attributes.scoped.get() ?
-                state.attributes.scoped->attributes() :
-                attribute::set_t(),
-            std::move(attributes)
+            std::move(external),
+            std::move(internal)
         );
 
         if (state.filter(view)) {
+
             return record_t(std::move(view));
         }
     }

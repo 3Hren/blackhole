@@ -50,7 +50,7 @@ TEST(Functional, SyslogConfiguredVerboseLogger) {
     }
 }
 
-TEST(Functional, LoggerShouldProperlyAllocateAttributesInItsProperScope) {
+TEST(Functional, LoggerShouldProperlyRouteAttributesByScope) {
     /*
      * We define full Blackhole's util stack: logger, wrapper, scoped attributes
      * and user specific attributes.
@@ -84,11 +84,11 @@ TEST(Functional, LoggerShouldProperlyAllocateAttributesInItsProperScope) {
 
     auto actual = stream.str();
     EXPECT_THAT(actual, AnyOf(
-        Eq("[0]: message is so message [w1: 42, s1: 10, u1: value]"),
-        Eq("[0]: message is so message [w1: 42, u1: value, s1: 10]"),
-        Eq("[0]: message is so message [u1: value, s1: 10, w1: 42]"),
-        Eq("[0]: message is so message [u1: value, w1: 42, s1: 10]"),
-        Eq("[0]: message is so message [s1: 10, u1: value, w1: 42]"),
-        Eq("[0]: message is so message [s1: 10, w1: 42, u1: value]")
+        Eq("[0]: message is so message [w1: 42, s1: 10, u1: value]\n"),
+        Eq("[0]: message is so message [w1: 42, u1: value, s1: 10]\n"),
+        Eq("[0]: message is so message [u1: value, s1: 10, w1: 42]\n"),
+        Eq("[0]: message is so message [u1: value, w1: 42, s1: 10]\n"),
+        Eq("[0]: message is so message [s1: 10, u1: value, w1: 42]\n"),
+        Eq("[0]: message is so message [s1: 10, w1: 42, u1: value]\n")
     ));
 }

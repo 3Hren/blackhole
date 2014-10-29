@@ -93,7 +93,7 @@ public:
     void tracked(bool enable);
 
     void set_filter(filter_t&& filter);
-    void add_attribute(const attribute::pair_t& attribute);
+    void add_attribute(const attribute::pair_t& attribute); //!@todo: May be drop it, because there are wrappers?
     void add_frontend(std::unique_ptr<base_frontend_t> frontend);
     void set_exception_handler(log::exception_handler_t&& handler);
 
@@ -102,6 +102,9 @@ public:
     record_t open_record(attribute::set_t attributes) const;
 
     void push(record_t&& record) const;
+
+protected:
+    record_t open_record(attribute::set_t internal, attribute::set_t external) const;
 };
 
 /// Concept form scoped attributes holder.
@@ -211,8 +214,9 @@ public:
         }
 
         if (passed || trace) {
-            local.insert(keyword::severity<Level>() = level);
-            return logger_base_t::open_record(std::move(local));
+            attribute::set_t internal;
+            internal.insert(keyword::severity<Level>() = level);
+            return logger_base_t::open_record(std::move(internal), std::move(local));
         }
 
         return record_t();
