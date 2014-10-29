@@ -137,6 +137,10 @@ public:
 
 private:
     level_type level;
+    //!@todo: Filter function (level_type level, const lightweight_view&) -> bool.
+    //!       - By default checks verbosity level.
+    //!       - Removes that creepy `logger_verbosity_traits`.
+    //!       - Filter hierarchy: verbose_logger_t -> logger_t -> sink_t.
 
 public:
     //!@todo: Replace with initialization ctor, repository.create<>("name", ...).
