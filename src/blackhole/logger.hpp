@@ -200,23 +200,23 @@ public:
         const bool passed = verbosity_traits::passed(this->level, level);
 
         bool trace = false;
-        if (!passed) {
-            auto it = std::find_if(local.begin(), local.end(), [](const attribute::set_t::value_type& v) { return v.first == keyword::tracebit().name(); });
-            if (it != local.end()) {
-                trace = boost::get<keyword::tag::tracebit_t::type>(it->second.value);
-            } else {
-                reader_lock_type lock(state.lock.open);
-                if (state.attributes.scoped.get()) {
-                    const auto& scoped = state.attributes.scoped->attributes();
-                    auto it = std::find_if(scoped.begin(), scoped.end(), [](const attribute::set_t::value_type& v) { return v.first == keyword::tracebit().name(); });
-                    if (it != scoped.end()) {
-                        trace = boost::get<keyword::tag::tracebit_t::type>(
-                            it->second.value
-                        );
-                    }
-                }
-            }
-        }
+//        if (!passed) {
+//            auto it = std::find_if(local.begin(), local.end(), [](const attribute::set_t::value_type& v) { return v.first == keyword::tracebit().name(); });
+//            if (it != local.end()) {
+//                trace = boost::get<keyword::tag::tracebit_t::type>(it->second.value);
+//            } else {
+//                reader_lock_type lock(state.lock.open);
+//                if (state.attributes.scoped.get()) {
+//                    const auto& scoped = state.attributes.scoped->attributes();
+//                    auto it = std::find_if(scoped.begin(), scoped.end(), [](const attribute::set_t::value_type& v) { return v.first == keyword::tracebit().name(); });
+//                    if (it != scoped.end()) {
+//                        trace = boost::get<keyword::tag::tracebit_t::type>(
+//                            it->second.value
+//                        );
+//                    }
+//                }
+//            }
+//        }
 
         if (passed || trace) {
             attribute::set_t internal;
