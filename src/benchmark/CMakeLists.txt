@@ -15,7 +15,7 @@ SET(SOURCES
     formatter/string
     logger/batch
     logger/logger
-    logger/thread
+#    logger/thread
 #    experimental
 )
 
