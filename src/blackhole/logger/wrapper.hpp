@@ -84,7 +84,7 @@ public:
         wrapped(wrapper.wrapped),
         attributes(wrapper.attributes)
     {
-        this->attributes.insert(attributes.begin(), attributes.end());
+        std::copy(attributes.begin(), attributes.end(), std::back_inserter(this->attributes));
     }
 
     wrapper_t(wrapper_t&& other) {
@@ -122,22 +122,19 @@ public:
 
     record_t open_record(attribute::pair_t attribute) const {
         attribute::set_t attributes = this->attributes;
-        attributes.insert(attribute);
+        attributes.emplace_back(attribute);
         return wrapped->open_record(std::move(attributes));
     }
 
     record_t open_record(attribute::set_t attributes) const {
-        attribute::set_t attributes_ = this->attributes;
-        attributes_.insert(attributes.begin(), attributes.end());
-        return wrapped->open_record(std::move(attributes_));
+        std::copy(this->attributes.begin(), this->attributes.end(), std::back_inserter(attributes));
+        return wrapped->open_record(std::move(attributes));
     }
 
     template<typename Level>
     record_t
-    open_record(Level level,
-                attribute::set_t attributes = attribute::set_t()) const
-    {
-        attributes.insert(this->attributes.begin(), this->attributes.end());
+    open_record(Level level, attribute::set_t attributes = attribute::set_t()) const {
+        std::copy(this->attributes.begin(), this->attributes.end(), std::back_inserter(attributes));
         return wrapped->open_record(level, std::move(attributes));
     }
 

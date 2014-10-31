@@ -93,7 +93,7 @@ TEST(logger_base_t, OpensRecordWhenAttributeFilterSucceed) {
     logger_base_t log;
     log.add_frontend(std::move(frontend));
     log.set_filter(expr::has_attr(::keyword::urgent()));
-    log.add_attribute(::keyword::urgent() = 1);
+//    log.add_attribute(::keyword::urgent() = 1);
     EXPECT_TRUE(log.open_record().valid());
 }
 
@@ -112,7 +112,7 @@ TEST(logger_base_t, OpenRecordWhenComplexFilterSucceed) {
     logger_base_t log;
     log.add_frontend(std::move(frontend));
     log.set_filter(expr::has_attr(::keyword::urgent()) && ::keyword::urgent() == 1);
-    log.add_attribute(::keyword::urgent() = 1);
+//    log.add_attribute(::keyword::urgent() = 1);
     EXPECT_TRUE(log.open_record().valid());
 }
 
@@ -122,7 +122,7 @@ TEST(logger_base_t, DoNotOpenRecordWhenComplexFilterFailed) {
     logger_base_t log;
     log.add_frontend(std::move(frontend));
     log.set_filter(expr::has_attr(::keyword::urgent()) && ::keyword::urgent() == 1);
-    log.add_attribute(::keyword::urgent() = 2);
+//    log.add_attribute(::keyword::urgent() = 2);
     EXPECT_FALSE(log.open_record().valid());
 }
 
@@ -156,7 +156,7 @@ TEST(logger_base_t, FilteringUsingDynamicAttributes) {
 TEST(logger_base_t, LocalAttributesIsMoreSpecificThanGlobal) {
     std::unique_ptr<mock::frontend_t> frontend;
     logger_base_t log;
-    log.add_attribute(attribute::make("answer", 42));
+//    log.add_attribute(attribute::make("answer", 42));
     log.add_frontend(std::move(frontend));
 
     auto record = log.open_record(attribute::make("answer", 100500));

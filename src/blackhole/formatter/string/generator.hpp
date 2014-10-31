@@ -81,9 +81,8 @@ public:
     }
 
     void operator()(const placeholder::variadic_t& ph) {
-        auto view = attribute::partial_view_t<
-            attribute::set_view_t::external_set_t,
-            attribute::set_view_t::attached_set_t
+        auto view = attribute::partial_view_t< //!@todo: Drop this class.
+            attribute::set_view_t::external_set_t
         >(this->view);
 
         if (view.empty()) {

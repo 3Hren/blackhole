@@ -93,7 +93,7 @@ public:
     void tracked(bool enable);
 
     void set_filter(filter_t&& filter);
-    void add_attribute(const attribute::pair_t& attribute); //!@todo: May be drop it, because there are wrappers?
+//    void add_attribute(const attribute::pair_t& attribute); //!@todo: May be drop it, because there are wrappers?
     void add_frontend(std::unique_ptr<base_frontend_t> frontend);
     void set_exception_handler(log::exception_handler_t&& handler);
 
@@ -201,14 +201,14 @@ public:
 
         bool trace = false;
         if (!passed) {
-            auto it = local.find(keyword::tracebit().name());
+            auto it = std::find_if(local.begin(), local.end(), [](const attribute::set_t::value_type& v) { return v.first == keyword::tracebit().name(); });
             if (it != local.end()) {
                 trace = boost::get<keyword::tag::tracebit_t::type>(it->second.value);
             } else {
                 reader_lock_type lock(state.lock.open);
                 if (state.attributes.scoped.get()) {
                     const auto& scoped = state.attributes.scoped->attributes();
-                    auto it = scoped.find(keyword::tracebit().name());
+                    auto it = std::find_if(scoped.begin(), scoped.end(), [](const attribute::set_t::value_type& v) { return v.first == keyword::tracebit().name(); });
                     if (it != scoped.end()) {
                         trace = boost::get<keyword::tag::tracebit_t::type>(
                             it->second.value
@@ -220,7 +220,7 @@ public:
 
         if (passed || trace) {
             attribute::set_t internal;
-            internal.insert(keyword::severity<Level>() = level);
+            internal.emplace_back(keyword::severity<Level>() = level);
             return logger_base_t::open_record(std::move(internal), std::move(local));
         }
 

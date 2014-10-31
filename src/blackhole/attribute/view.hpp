@@ -38,79 +38,63 @@ class set_view_t {
 public:
     typedef aux::iterator::join_t<set_t, true> const_iterator;
 
-    struct attached_set_t { set_t v; };
     struct internal_set_t { set_t v; };
     struct external_set_t { set_t v; };
 
 private:
-    attached_set_t attached;  // Likely empty (logger attached attributes).
-    internal_set_t internal;  // About level + message + pid + tid + timestamp (4-5).
-    external_set_t external;  // The most filled (scoped + user attributes)
+    internal_set_t internal;  // Severity, message, timestamp. Maybe pid, tid.
+    external_set_t external;  // All other.
 
 public:
     set_view_t() = default;
 
-    set_view_t(set_t attached, set_t external, set_t&& internal) :
-        attached({ std::move(attached) }),
+    set_view_t(set_t external, set_t&& internal) :
         internal({ std::move(internal) }),
         external({ std::move(external) })
     {}
 
     bool
     empty() const BLACKHOLE_NOEXCEPT {
-        return internal.v.empty() && external.v.empty() && attached.v.empty();
+        return internal.v.empty() && external.v.empty();
     }
 
-    //! Message is the only one late attribute allowed to set internally.
+    //! Message is the only(?) one late attribute allowed to set internally.
     void message(const std::string& message) {
-        internal.v.insert(
-            std::make_pair("message", attribute_t(message))
-        );
+        internal.v.emplace_back("message", message);
     }
 
     void message(std::string&& message) {
-        internal.v.insert(
-            std::make_pair("message", attribute_t(std::move(message)))
-        );
+        internal.v.emplace_back("message", std::move(message));
     }
 
     //! Intentionally allow to insert only into external attribute set.
     void insert(pair_t pair) {
-        external.v.insert(std::move(pair));
+        external.v.emplace_back(std::move(pair));
     }
 
     //! Intentionally allow to insert only into external attribute set.
     template<typename InputIterator>
     void insert(InputIterator first, InputIterator last) {
-        external.v.insert(first, last);
+        std::copy(first, last, std::back_inserter(external.v));
     }
 
     const_iterator begin() const BLACKHOLE_NOEXCEPT {
-        return const_iterator(
-            aux::make_array(&internal.v, &external.v, &attached.v)
-        );
+        return const_iterator(aux::make_array(&internal.v, &external.v));
     }
 
     const_iterator end() const BLACKHOLE_NOEXCEPT {
-        return const_iterator::invalid(
-            aux::make_array(&internal.v, &external.v, &attached.v)
-        );
+        return const_iterator::invalid(aux::make_array(&internal.v, &external.v));
     }
 
     boost::optional<const attribute_t&>
     find(const std::string& name) const BLACKHOLE_NOEXCEPT {
-        auto it = internal.v.find(name);
+        auto it = std::find_if(internal.v.begin(), internal.v.end(), [&name](const set_t::value_type& v) { return v.first == name; });
         if (it != internal.v.end()) {
             return it->second;
         }
 
-        it = external.v.find(name);
+        it = std::find_if(external.v.begin(), external.v.end(), [&name](const set_t::value_type& v) { return v.first == name; });
         if (it != external.v.end()) {
-            return it->second;
-        }
-
-        it = attached.v.find(name);
-        if (it != attached.v.end()) {
             return it->second;
         }
 
@@ -135,13 +119,6 @@ struct tuple_empty<> {
 };
 
 template<>
-struct tuple_empty<set_view_t::attached_set_t> {
-    static inline bool empty(const set_view_t& view) {
-        return view.attached.v.empty();
-    }
-};
-
-template<>
 struct tuple_empty<set_view_t::internal_set_t> {
     static inline bool empty(const set_view_t& view) {
         return view.internal.v.empty();
@@ -160,16 +137,6 @@ struct tuple_empty<T, Args...> {
     static inline bool empty(const set_view_t& view) {
         return tuple_empty<T>::empty(view) &&
                 tuple_empty<Args...>::empty(view);
-    }
-};
-
-template<>
-struct extractor<set_view_t::attached_set_t> {
-    static
-    inline
-    const set_t*
-    extract(const set_view_t& view) {
-        return &view.attached.v;
     }
 };
 

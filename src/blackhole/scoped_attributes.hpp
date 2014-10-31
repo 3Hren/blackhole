@@ -38,7 +38,7 @@ public:
             m_merged_attributes = std::move(m_guard_attributes);
             if (has_parent()) {
                 const auto& parent_attributes = parent().attributes();
-                m_merged_attributes.insert(parent_attributes.begin(), parent_attributes.end());
+                std::copy(parent_attributes.begin(), parent_attributes.end(), std::back_inserter(m_merged_attributes));
             }
         }
         return m_merged_attributes;

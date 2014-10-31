@@ -1,6 +1,6 @@
 #pragma once
 
-#include <unordered_map>
+#include <vector>
 
 #include "blackhole/attribute/name.hpp"
 #include "blackhole/attribute/value.hpp"
@@ -15,9 +15,8 @@ typedef std::pair<
     attribute_t
 > pair_t;
 
-typedef std::unordered_map<
-    pair_t::first_type,
-    pair_t::second_type
+typedef std::vector<
+    pair_t
 > set_t;
 
 } // namespace attribute

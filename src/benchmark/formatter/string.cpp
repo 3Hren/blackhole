@@ -54,19 +54,18 @@ BENCHMARK(VariadicStringFormatter, Baseline) {
     static int initializer = initialize(formatter);
     epicmeter::compiler::do_not_optimize(initializer);
 
-    blackhole::attribute::set_t attached;
     blackhole::attribute::set_t external;
-    external.insert(blackhole::attribute::make("id", 42));
-    external.insert(blackhole::attribute::make("source", "app/benchmark"));
+    external.emplace_back(blackhole::attribute::make("id", 42));
+    external.emplace_back(blackhole::attribute::make("source", "app/benchmark"));
 
     blackhole::attribute::set_t internal;
     timeval tv;
     gettimeofday(&tv, nullptr);
-    internal.insert(blackhole::keyword::timestamp() = tv);
-    internal.insert(blackhole::keyword::severity<level_t>() = level_t::info);
-    internal.insert(blackhole::keyword::message() = MESSAGE_LONG);
+    internal.emplace_back(blackhole::keyword::timestamp() = tv);
+    internal.emplace_back(blackhole::keyword::severity<level_t>() = level_t::info);
+    internal.emplace_back(blackhole::keyword::message() = MESSAGE_LONG);
 
-    blackhole::attribute::set_view_t view(attached, external, std::move(internal));
+    blackhole::attribute::set_view_t view(external, std::move(internal));
     blackhole::record_t record(std::move(view));
     epicmeter::compiler::do_not_optimize(formatter.format(record));
 }

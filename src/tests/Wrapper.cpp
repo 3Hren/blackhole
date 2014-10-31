@@ -90,7 +90,7 @@ TEST(Wrapper, MoveAssignment) {
 
 TEST(Wrapper, Usage) {
     auto log = logger_factory_t::create<logger_base_t>();
-    log.add_attribute(attribute::make("id", 100500));
+//    log.add_attribute(attribute::make("id", 100500));
 
     {
         wrapper_t<logger_base_t> wrapper(log, attribute::set_t({
@@ -117,7 +117,7 @@ TEST(Wrapper, Usage) {
 
 TEST(Wrapper, UsageWithVerboseLogger) {
     auto log = logger_factory_t::create<verbose_logger_t<testing::level>>();
-    log.add_attribute(attribute::make("id", 100500));
+//    log.add_attribute(attribute::make("id", 100500));
 
     {
         wrapper_t<verbose_logger_t<testing::level>> wrapper(
@@ -174,7 +174,7 @@ TEST(Wrapper, UsageWithVerboseLogger) {
 
 TEST(Wrapper, MacroUsage) {
     auto log = logger_factory_t::create<verbose_logger_t<testing::level>>();
-    log.add_attribute(attribute::make("id", 100500));
+//    log.add_attribute(attribute::make("id", 100500));
 
     {
         wrapper_t<verbose_logger_t<testing::level>> wrapper(
@@ -190,7 +190,7 @@ TEST(Wrapper, MacroUsage) {
 
 TEST(Wrapper, NestedWrappers) {
     auto log = logger_factory_t::create<verbose_logger_t<testing::level>>();
-    log.add_attribute(attribute::make("id", 100500));
+//    log.add_attribute(attribute::make("id", 100500));
 
     {
         wrapper_t<verbose_logger_t<testing::level>> wrapper(
@@ -271,7 +271,7 @@ TEST(Wrapper, UnderlyingLogger) {
     typedef verbose_logger_t<testing::level> logger_type;
     typedef wrapper_t<logger_type> wrapper_type;
     logger_type log = logger_factory_t::create<logger_type>();
-    log.add_attribute(attribute::make("a", 100500));
+//    log.add_attribute(attribute::make("a", 100500));
 
     wrapper_type wrapper(log, attribute::set_t({attribute::make("b", 42)}));
 
@@ -291,7 +291,7 @@ TEST(Wrapper, ConstUnderlyingLogger) {
     typedef verbose_logger_t<testing::level> logger_type;
     typedef wrapper_t<logger_type> wrapper_type;
     logger_type log = logger_factory_t::create<logger_type>();
-    log.add_attribute(attribute::make("a", 100500));
+//    log.add_attribute(attribute::make("a", 100500));
 
     const wrapper_type wrapper(log, attribute::set_t({attribute::make("b", 42)}));
 
@@ -313,7 +313,7 @@ TEST(Wrapper, UnderlyingNestedLogger) {
     typedef wrapper_t<logger_type> wrapper_type;
     typedef wrapper_t<wrapper_type> deep_wrapper_type;
     logger_type log = logger_factory_t::create<logger_type>();
-    log.add_attribute(attribute::make("a", 100500));
+//    log.add_attribute(attribute::make("a", 100500));
 
     wrapper_type wrapper(log, attribute::set_t({attribute::make("b", 42)}));
     deep_wrapper_type deep_wrapper(wrapper, attribute::set_t({attribute::make("c", 5)}));
@@ -337,7 +337,7 @@ TEST(Wrapper, ConstUnderlyingNestedLogger) {
     typedef wrapper_t<logger_type> wrapper_type;
     typedef wrapper_t<wrapper_type> deep_wrapper_type;
     logger_type log = logger_factory_t::create<logger_type>();
-    log.add_attribute(attribute::make("a", 100500));
+//    log.add_attribute(attribute::make("a", 100500));
 
     wrapper_type wrapper(log, attribute::set_t({attribute::make("b", 42)}));
     const deep_wrapper_type deep_wrapper(wrapper, attribute::set_t({attribute::make("c", 5)}));

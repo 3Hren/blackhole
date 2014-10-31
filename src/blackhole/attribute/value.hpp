@@ -49,6 +49,14 @@ struct attribute_t {
         value(std::uint8_t(0))
     {}
 
+    attribute_t(const char* value) :
+        value(value)
+    {}
+
+    attribute_t(std::string value) :
+        value(std::move(value))
+    {}
+
     attribute_t(const attribute::value_t& value) :
         value(value)
     {}

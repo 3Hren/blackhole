@@ -289,31 +289,24 @@ TEST_STRING(Deprecated, FormatVariadicMultiple) {
 }
 
 TEST_STRING(Deprecated, ComplexFormatVariadicMultiple) {
-    attribute::set_t global;
-    global.insert({ "global", attribute_t(10) });
-
     attribute::set_t external;
-    external.insert({ "uuid", attribute_t("123-456") });
-    external.insert({ "answer", attribute_t(42) });
+    external.emplace_back("uuid", attribute_t("123-456"));
+    external.emplace_back("answer", attribute_t(42));
 
     blackhole::attribute::set_t internal;
-    internal.insert({ "timestamp", attribute_t("1960-01-01 00:00:00") });
-    internal.insert({ "level", attribute_t("INFO") });
-    internal.insert(keyword::message() = "le message");
+    internal.emplace_back("timestamp", attribute_t("1960-01-01 00:00:00"));
+    internal.emplace_back("level", attribute_t("INFO"));
+    internal.emplace_back(keyword::message() = "le message");
 
-    attribute::set_view_t view(global, external, std::move(internal));
+    attribute::set_view_t view(external, std::move(internal));
     record_t record(std::move(view));
 
     std::string pattern("[%(timestamp)s] [%(level)s]: %(message)s [%(...L)s]");
     formatter::string_t formatter(pattern);
     std::string actual = formatter.format(record);
     EXPECT_TRUE(
-        "[1960-01-01 00:00:00] [INFO]: le message ['global': 10, 'uuid': 123-456, 'answer': 42]" == actual ||
-        "[1960-01-01 00:00:00] [INFO]: le message ['global': 10, 'answer': 42, 'uuid': 123-456]" == actual ||
-        "[1960-01-01 00:00:00] [INFO]: le message ['answer': 42, 'global': 10, 'uuid': 123-456]" == actual ||
-        "[1960-01-01 00:00:00] [INFO]: le message ['answer': 42, 'uuid': 123-456, 'global': 10]" == actual ||
-        "[1960-01-01 00:00:00] [INFO]: le message ['uuid': 123-456, 'global': 10, 'answer': 42]" == actual ||
-        "[1960-01-01 00:00:00] [INFO]: le message ['uuid': 123-456, 'answer': 42, 'global': 10]" == actual
+        "[1960-01-01 00:00:00] [INFO]: le message ['uuid': 123-456, 'answer': 42]" == actual ||
+        "[1960-01-01 00:00:00] [INFO]: le message ['answer': 42, 'uuid': 123-456]" == actual
     );
 }
 

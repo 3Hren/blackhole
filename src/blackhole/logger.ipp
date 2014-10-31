@@ -80,12 +80,12 @@ logger_base_t::set_filter(filter_t&& filter) {
     state.filter = std::move(filter);
 }
 
-BLACKHOLE_API
-void
-logger_base_t::add_attribute(const attribute::pair_t& attribute) {
-    writer_lock_type lock(state.lock.open);
-    state.attributes.global.insert(attribute);
-}
+//BLACKHOLE_API
+//void
+//logger_base_t::add_attribute(const attribute::pair_t& attribute) {
+//    writer_lock_type lock(state.lock.open);
+//    state.attributes.global.insert(attribute);
+//}
 
 BLACKHOLE_API
 void
@@ -122,8 +122,10 @@ logger_base_t::open_record(attribute::set_t attributes) const {
 BLACKHOLE_API
 record_t
 logger_base_t::open_record(attribute::set_t internal, attribute::set_t external) const {
+    internal.reserve(6);
+    external.reserve(16);
     if (enabled() && !state.frontends.empty()) {
-        internal.insert(
+        internal.emplace_back(
 #ifdef BLACKHOLE_HAS_LWP
             keyword::lwp() = syscall(SYS_gettid)
 #else
@@ -133,13 +135,13 @@ logger_base_t::open_record(attribute::set_t internal, attribute::set_t external)
 
         timeval tv;
         gettimeofday(&tv, nullptr);
-        internal.insert(keyword::timestamp() = tv);
+        internal.emplace_back(keyword::timestamp() = tv);
 
         static const pid_t pid = ::getpid();
-        internal.insert(keyword::pid() = pid);
+        internal.emplace_back(keyword::pid() = pid);
 
         if (state.tracked) {
-            internal.insert(
+            internal.emplace_back(
                 attribute::make("trace", ::this_thread::current_span().trace)
             );
         }
@@ -147,17 +149,12 @@ logger_base_t::open_record(attribute::set_t internal, attribute::set_t external)
         reader_lock_type lock(state.lock.open);
         if (state.attributes.scoped.get()) {
             const auto& scoped = state.attributes.scoped->attributes();
-            external.insert(scoped.begin(), scoped.end());
+            std::copy(scoped.begin(), scoped.end(), std::back_inserter(external));
         }
 
-        attribute::set_view_t view(
-            state.attributes.global,
-            std::move(external),
-            std::move(internal)
-        );
+        attribute::set_view_t view(std::move(external), std::move(internal));
 
         if (state.filter(view)) {
-
             return record_t(std::move(view));
         }
     }
