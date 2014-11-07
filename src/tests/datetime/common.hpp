@@ -28,9 +28,12 @@ protected:
 
 namespace common {
 
-inline std::string using_strftime(const std::string& format, const std::tm& tm) {
-    char buffer[64];
-    std::strftime(buffer, 64, format.c_str(), &tm);
+template<std::size_t N>
+inline std::string using_strftime(const char(&format)[N], const std::tm& tm) {
+    char buffer[128];
+    std::size_t ret = std::strftime(buffer, sizeof(buffer), format, &tm);
+    BOOST_ASSERT(ret > 0);
+
     return buffer;
 }
 
