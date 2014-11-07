@@ -93,8 +93,7 @@ TEST(logger_base_t, OpensRecordWhenAttributeFilterSucceed) {
     logger_base_t log;
     log.add_frontend(std::move(frontend));
     log.set_filter(expr::has_attr(::keyword::urgent()));
-//    log.add_attribute(::keyword::urgent() = 1);
-    EXPECT_TRUE(log.open_record().valid());
+    EXPECT_TRUE(log.open_record(::keyword::urgent() = 1).valid());
 }
 
 TEST(logger_base_t, DoNotOpenRecordWhenAttributeFilterFailed) {
@@ -112,8 +111,7 @@ TEST(logger_base_t, OpenRecordWhenComplexFilterSucceed) {
     logger_base_t log;
     log.add_frontend(std::move(frontend));
     log.set_filter(expr::has_attr(::keyword::urgent()) && ::keyword::urgent() == 1);
-//    log.add_attribute(::keyword::urgent() = 1);
-    EXPECT_TRUE(log.open_record().valid());
+    EXPECT_TRUE(log.open_record(::keyword::urgent() = 1).valid());
 }
 
 TEST(logger_base_t, DoNotOpenRecordWhenComplexFilterFailed) {
@@ -122,8 +120,7 @@ TEST(logger_base_t, DoNotOpenRecordWhenComplexFilterFailed) {
     logger_base_t log;
     log.add_frontend(std::move(frontend));
     log.set_filter(expr::has_attr(::keyword::urgent()) && ::keyword::urgent() == 1);
-//    log.add_attribute(::keyword::urgent() = 2);
-    EXPECT_FALSE(log.open_record().valid());
+    EXPECT_FALSE(log.open_record(::keyword::urgent() = 2).valid());
 }
 
 TEST(logger_base_t, DoNotOpenRecordIfThereAreNoFrontends) {
@@ -151,17 +148,6 @@ TEST(logger_base_t, FilteringUsingDynamicAttributes) {
     record_t record = log.open_record(attribute::make<std::int32_t>("custom", 42));
 
     EXPECT_TRUE(record.valid());
-}
-
-TEST(logger_base_t, LocalAttributesIsMoreSpecificThanGlobal) {
-    std::unique_ptr<mock::frontend_t> frontend;
-    logger_base_t log;
-//    log.add_attribute(attribute::make("answer", 42));
-    log.add_frontend(std::move(frontend));
-
-    auto record = log.open_record(attribute::make("answer", 100500));
-
-    EXPECT_EQ(100500, record.extract<int>("answer"));
 }
 
 #include <blackhole/scoped_attributes.hpp>
