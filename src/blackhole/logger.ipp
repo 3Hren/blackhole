@@ -80,13 +80,6 @@ logger_base_t::set_filter(filter_t&& filter) {
     state.filter = std::move(filter);
 }
 
-//BLACKHOLE_API
-//void
-//logger_base_t::add_attribute(const attribute::pair_t& attribute) {
-//    writer_lock_type lock(state.lock.open);
-//    state.attributes.global.insert(attribute);
-//}
-
 BLACKHOLE_API
 void
 logger_base_t::add_frontend(std::unique_ptr<base_frontend_t> frontend) {
@@ -218,7 +211,6 @@ swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT {
 
     using std::swap;
     swap(lhs.state.filter, rhs.state.filter);
-    swap(lhs.state.attributes.global, rhs.state.attributes.global);
 
     swap(lhs.state.frontends, rhs.state.frontends);
     swap(lhs.state.exception, rhs.state.exception);

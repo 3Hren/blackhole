@@ -56,7 +56,6 @@ protected:
 
         filter_t filter;
         struct attrbutes_t {
-            attribute::set_t global;
             boost::thread_specific_ptr<scoped_attributes_concept_t> scoped;
 
             attrbutes_t(void(*deleter)(scoped_attributes_concept_t*)) :
@@ -93,7 +92,6 @@ public:
     void tracked(bool enable);
 
     void set_filter(filter_t&& filter);
-//    void add_attribute(const attribute::pair_t& attribute); //!@todo: May be drop it, because there are wrappers?
     void add_frontend(std::unique_ptr<base_frontend_t> frontend);
     void set_exception_handler(log::exception_handler_t&& handler);
 
