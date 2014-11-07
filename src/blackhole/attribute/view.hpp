@@ -31,6 +31,18 @@ struct extractor;
 template<class... Args>
 struct tuple_empty;
 
+namespace compare_by {
+
+struct name_t {
+    const std::string name;
+
+    bool operator()(const set_t::value_type& v) const {
+        return v.first == name;
+    }
+};
+
+} // namespace
+
 class set_view_t {
     template<class T> friend struct extractor;
     template<class... Args> friend struct tuple_empty;
@@ -88,12 +100,14 @@ public:
 
     boost::optional<const attribute_t&>
     find(const std::string& name) const BLACKHOLE_NOEXCEPT {
-        auto it = std::find_if(internal.v.begin(), internal.v.end(), [&name](const set_t::value_type& v) { return v.first == name; });
+        const compare_by::name_t action { name };
+
+        auto it = std::find_if(internal.v.begin(), internal.v.end(), action);
         if (it != internal.v.end()) {
             return it->second;
         }
 
-        it = std::find_if(external.v.begin(), external.v.end(), [&name](const set_t::value_type& v) { return v.first == name; });
+        it = std::find_if(external.v.begin(), external.v.end(), action);
         if (it != external.v.end()) {
             return it->second;
         }
