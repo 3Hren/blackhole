@@ -70,7 +70,7 @@ public:
         return internal.v.empty() && external.v.empty();
     }
 
-    //! Message is the only(?) one late attribute allowed to set internally.
+    //! Message is the only(?) late attribute allowed to set internally.
     void message(const std::string& message) {
         internal.v.emplace_back("message", message);
     }
