@@ -112,7 +112,7 @@ public:
             return it->second;
         }
 
-        return boost::optional<const attribute_t&>();
+        return boost::none;
     }
 
     const attribute_t& at(const std::string& name) const {
