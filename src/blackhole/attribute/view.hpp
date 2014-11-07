@@ -34,7 +34,7 @@ struct tuple_empty;
 namespace compare_by {
 
 struct name_t {
-    const std::string name;
+    const std::string& name;
 
     bool operator()(const set_t::value_type& v) const {
         return v.first == name;
