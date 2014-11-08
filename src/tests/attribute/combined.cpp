@@ -63,12 +63,6 @@ private:
 
 } // namespace blackhole
 
-// TODO: Move to attribute/partial.
-// TODO: Teach attribute::view to provide partial_view: view.partial<external/internal>();
-
-// TODO: TEST - pass by primary verbosity filter (pass only level).
-// TODO: TEST - pass by primary filter (with tracebit).
-
 using namespace blackhole;
 
 TEST(combined_view_t, Ctor) {
