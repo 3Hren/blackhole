@@ -1,67 +1,6 @@
-#include <functional>
-
-#include <boost/optional.hpp>
-
-#include "blackhole/attribute/name.hpp"
-#include "blackhole/attribute/set.hpp"
-#include "blackhole/attribute/value.hpp"
-#include "blackhole/attribute/view.hpp"
+#include <blackhole/attribute/view.hpp>
 
 #include "../global.hpp"
-
-namespace blackhole {
-
-namespace attribute {
-
-class combined_view_t {
-    std::vector<const set_t*> sets;
-
-public:
-    template<class... Other>
-    combined_view_t(const set_t& set, const Other&... other) {
-        emplace(set, other...);
-    }
-
-    template<typename T>
-    boost::optional<const T&>
-    get(const name_t& name) const {
-        if (auto option = get(name)) {
-            if (auto result = boost::get<T>(&option.get())) {
-                return *result;
-            }
-        }
-
-        return boost::none;
-    }
-
-    boost::optional<const value_t&>
-    get(const name_t& name) const {
-        const compare_by::name_t action { name };
-
-        for (auto it = this->sets.begin(); it != this->sets.end(); ++it) {
-            auto set = *it;
-            auto vit = std::find_if(set->begin(), set->end(), action);
-            if (vit != set->end()) {
-                return vit->second.value;
-            }
-        }
-
-        return boost::none;
-    }
-
-private:
-    template<class... Other>
-    inline void emplace(const set_t& set, const Other&... other) {
-        sets.emplace_back(&set);
-        emplace(other...);
-    }
-
-    inline void emplace() {}
-};
-
-} // namespace attribute
-
-} // namespace blackhole
 
 using namespace blackhole;
 
