@@ -49,7 +49,7 @@ TEST(verbose_logger_t, PrimaryComplexFiltering) {
     EXPECT_TRUE (log.open_record(testing::error).valid());
 
     {
-        const attribute::set_t wrapped = {{ "tracebit", attribute_t(std::uint32_t(0)) }};
+        const attribute::set_t wrapped = { attribute::make("tracebit", std::uint32_t(0)) };
         EXPECT_FALSE(log.open_record(testing::debug, wrapped).valid());
         EXPECT_FALSE(log.open_record(testing::info, wrapped).valid());
         EXPECT_TRUE (log.open_record(testing::warn, wrapped).valid());
@@ -57,7 +57,7 @@ TEST(verbose_logger_t, PrimaryComplexFiltering) {
     }
 
     {
-        const attribute::set_t wrapped = {{ "tracebit", attribute_t(std::uint32_t(1)) }};
+        const attribute::set_t wrapped = { attribute::make("tracebit", std::uint32_t(1)) };
         EXPECT_TRUE(log.open_record(testing::debug, wrapped).valid());
         EXPECT_TRUE(log.open_record(testing::info, wrapped).valid());
         EXPECT_TRUE(log.open_record(testing::warn, wrapped).valid());
