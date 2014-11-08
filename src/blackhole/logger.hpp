@@ -133,18 +133,27 @@ class verbose_logger_t : public logger_base_t {
 public:
     typedef Level level_type;
 
+    typedef std::function<
+        bool(level_type, const attribute::combined_view_t&)
+    > filter_type;
+
 private:
     level_type level;
-    //!@todo: Filter function (level_type level, const lightweight_view&) -> bool.
-    //!       - By default checks verbosity level.
-    //!       - Removes that creepy `logger_verbosity_traits`.
-    //!       - Filter hierarchy: verbose_logger_t -> logger_t -> sink_t.
+    filter_type filter; // TODO: Mutex.
 
 public:
     //!@todo: Replace with initialization ctor, repository.create<>("name", ...).
     verbose_logger_t() :
         logger_base_t(),
-        level(static_cast<level_type>(0))
+        level(static_cast<level_type>(0)),
+        filter(
+            std::bind(
+               &verbose_logger_t::default_filter,
+               std::placeholders::_1,
+               level,
+               std::placeholders::_2
+            )
+        )
     {}
 
     //! @compat: GCC4.4
@@ -152,12 +161,14 @@ public:
     //! classes. It's a bug.
     verbose_logger_t(verbose_logger_t&& other) BLACKHOLE_NOEXCEPT :
         logger_base_t(std::move(other)),
-        level(static_cast<level_type>(other.level))
+        level(static_cast<level_type>(other.level)),
+        filter(other.filter)
     {}
 
     verbose_logger_t& operator=(verbose_logger_t&& other) BLACKHOLE_NOEXCEPT {
         logger_base_t::operator=(std::move(other));
         level = other.level;
+        filter = other.filter;
         return *this;
     }
 
@@ -178,6 +189,16 @@ public:
      */
     void verbosity(level_type level) {
         this->level = level;
+        this->filter = std::bind(
+            &verbose_logger_t::default_filter,
+            std::placeholders::_1,
+            level,
+            std::placeholders::_2
+        );
+    }
+
+    void verbosity(filter_type filter) {
+        this->filter = filter;
     }
 
     /*!
@@ -194,35 +215,35 @@ public:
     open_record(level_type level,
                 attribute::set_t local = attribute::set_t()) const
     {
-        typedef logger_verbosity_traits<level_type> verbosity_traits;
-        const bool passed = verbosity_traits::passed(this->level, level);
+        bool passed = false;
+        reader_lock_type lock(state.lock.open);
+        if (auto scoped = state.attributes.scoped.get()) {
+            const attribute::combined_view_t view(local, scoped->attributes());
+            passed = filter(level, view);
+        } else {
+            const attribute::combined_view_t view(local);
+            passed = filter(level, view);
+        }
 
-        bool trace = false;
-//        if (!passed) {
-//            auto it = std::find_if(local.begin(), local.end(), [](const attribute::set_t::value_type& v) { return v.first == keyword::tracebit().name(); });
-//            if (it != local.end()) {
-//                trace = boost::get<keyword::tag::tracebit_t::type>(it->second.value);
-//            } else {
-//                reader_lock_type lock(state.lock.open);
-//                if (state.attributes.scoped.get()) {
-//                    const auto& scoped = state.attributes.scoped->attributes();
-//                    auto it = std::find_if(scoped.begin(), scoped.end(), [](const attribute::set_t::value_type& v) { return v.first == keyword::tracebit().name(); });
-//                    if (it != scoped.end()) {
-//                        trace = boost::get<keyword::tag::tracebit_t::type>(
-//                            it->second.value
-//                        );
-//                    }
-//                }
-//            }
-//        }
-
-        if (passed || trace) {
+        if (passed) {
             attribute::set_t internal;
             internal.emplace_back(keyword::severity<Level>() = level);
             return logger_base_t::open_record(std::move(internal), std::move(local));
         }
 
         return record_t();
+    }
+
+private:
+    static
+    inline
+    BLACKHOLE_ALWAYS_INLINE
+    bool
+    default_filter(level_type level,
+                   level_type threshold,
+                   const attribute::combined_view_t&)
+    {
+        return level >= threshold;
     }
 };
 

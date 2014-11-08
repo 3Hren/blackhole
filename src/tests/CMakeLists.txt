@@ -102,6 +102,7 @@ ENDIF()
 
 SET(SOURCES_DEVELOP
     attribute/combined
+    logger/verbose
 )
 
 SET(SOURCES
