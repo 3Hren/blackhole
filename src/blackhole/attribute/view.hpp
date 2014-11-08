@@ -123,91 +123,9 @@ public:
 
         return *value;
     }
-};
 
-template<>
-struct tuple_empty<> {
-    static inline bool empty(const set_view_t&) {
-        return true;
-    }
-};
-
-template<>
-struct tuple_empty<set_view_t::internal_set_t> {
-    static inline bool empty(const set_view_t& view) {
-        return view.internal.v.empty();
-    }
-};
-
-template<>
-struct tuple_empty<set_view_t::external_set_t> {
-    static inline bool empty(const set_view_t& view) {
-        return view.external.v.empty();
-    }
-};
-
-template<class T, class... Args>
-struct tuple_empty<T, Args...> {
-    static inline bool empty(const set_view_t& view) {
-        return tuple_empty<T>::empty(view) &&
-                tuple_empty<Args...>::empty(view);
-    }
-};
-
-template<>
-struct extractor<set_view_t::internal_set_t> {
-    static
-    inline
-    const set_t*
-    extract(const set_view_t& view) {
-        return &view.internal.v;
-    }
-};
-
-template<>
-struct extractor<set_view_t::external_set_t> {
-    static
-    inline
-    const set_t*
-    extract(const set_view_t& view) {
-        return &view.external.v;
-    }
-};
-
-template<class... T>
-class partial_view_t {
-    static_assert(unique<T...>::value, "all attribute set types must be unique");
-
-    typedef std::array<const set_t*, sizeof...(T)> array_type;
-
-public:
-    typedef set_view_t::const_iterator const_iterator;
-
-private:
-    const set_view_t& view;
-
-public:
-    partial_view_t(const set_view_t& view) :
-        view(view)
-    {}
-
-    bool
-    empty() const BLACKHOLE_NOEXCEPT {
-        return tuple_empty<T...>::empty(view);
-    }
-
-    const_iterator
-    begin() const BLACKHOLE_NOEXCEPT {
-        return const_iterator(
-            array_type {{ extractor<T>::extract(view)... }}
-        );
-    }
-
-    const_iterator
-    end() const BLACKHOLE_NOEXCEPT {
-        return const_iterator::invalid(
-            array_type {{ extractor<T>::extract(view)... }}
-        );
+    const set_t& partial() const {
+        return external.v;
     }
 };
 

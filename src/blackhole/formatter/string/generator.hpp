@@ -81,20 +81,18 @@ public:
     }
 
     void operator()(const placeholder::variadic_t& ph) {
-        auto view = attribute::partial_view_t< //!@todo: Drop this class.
-            attribute::set_view_t::external_set_t
-        >(this->view);
+        const auto& attributes = this->view.partial();
 
-        if (view.empty()) {
+        if (attributes.empty()) {
             return;
         }
 
         stream.rdbuf()->storage()->append(ph.prefix);
-        auto it = view.begin();
+        auto it = attributes.begin();
         traverse(ph.pattern, it->first, it->second.value, stream);
         it++;
 
-        for (; it != view.end(); ++it) {
+        for (; it != attributes.end(); ++it) {
             stream.rdbuf()->storage()->append(ph.separator);
             traverse(ph.pattern, it->first, it->second.value, stream);
         }
