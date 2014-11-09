@@ -7,71 +7,8 @@
 
 using namespace blackhole;
 
-TEST(verbose_logger_t, Class) {
-    verbose_logger_t<testing::level> log;
-    UNUSED(log);
-}
-
-TEST(verbose_logger_t, MoveExplicitConstructor) {
-    verbose_logger_t<testing::level> log;
-    log.verbosity(testing::info);
-
-    verbose_logger_t<testing::level> other(std::move(log));
-
-    EXPECT_EQ(testing::info, other.verbosity());
-}
-
-TEST(verbose_logger_t, MoveImplicitConstructor) {
-    verbose_logger_t<testing::level> log;
-    log.verbosity(testing::info);
-    EXPECT_EQ(testing::info, log.verbosity());
-
-    verbose_logger_t<testing::level> other = std::move(log);
-    EXPECT_EQ(testing::info, other.verbosity());
-}
-
-TEST(verbose_logger_t, MoveAssignment) {
-    verbose_logger_t<testing::level> log;
-    log.verbosity(testing::info);
-    EXPECT_EQ(testing::info, log.verbosity());
-
-    verbose_logger_t<testing::level> other;
-    EXPECT_EQ(testing::debug, other.verbosity());
-
-    other = std::move(log);
-    EXPECT_EQ(testing::info, other.verbosity());
-}
-
-TEST(verbose_logger_t, OpenRecordByDefault) {
-    std::unique_ptr<mock::frontend_t> frontend;
-
-    verbose_logger_t<testing::level> log;
-    log.add_frontend(std::move(frontend));
-    record_t record = log.open_record(testing::level::debug);
-    EXPECT_TRUE(record.valid());
-}
-
-TEST(verbose_logger_t, OpenRecordForValidVerbosityLevel) {
-    std::unique_ptr<mock::frontend_t> frontend;
-
-    verbose_logger_t<testing::level> log;
-    log.add_frontend(std::move(frontend));
-    log.set_filter(keyword::severity<testing::level>() >= testing::level::info);
-    EXPECT_FALSE(log.open_record(testing::level::debug).valid());
-    EXPECT_TRUE(log.open_record(testing::level::info).valid());
-    EXPECT_TRUE(log.open_record(testing::level::warn).valid());
-    EXPECT_TRUE(log.open_record(testing::level::error).valid());
-}
-
-TEST(verbose_logger_t, ImportsOpenRecordFromAncestor) {
-    verbose_logger_t<testing::level> log;
-    log.open_record(blackhole::attribute::set_t({
-        blackhole::attribute::make("key", 42)
-    }));
-}
-
 TEST(verbose_logger_t, Manual) {
-    verbose_logger_t<testing::level> log;
+    verbose_logger_t<testing::level> log(testing::debug);
 
     // Factory starts here...
     auto formatter = aux::util::make_unique<

@@ -142,10 +142,9 @@ private:
     filter_type filter; // TODO: Mutex.
 
 public:
-    //!@todo: Replace with initialization ctor, repository.create<>("name", ...).
-    verbose_logger_t() :
+    verbose_logger_t(level_type level) :
         logger_base_t(),
-        level(static_cast<level_type>(0)),
+        level(level),
         filter(
             std::bind(
                &verbose_logger_t::default_filter,

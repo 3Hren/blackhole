@@ -5,6 +5,34 @@
 
 using namespace blackhole;
 
+TEST(verbose_logger_t, Constructor) {
+    verbose_logger_t<testing::level> log(testing::debug);
+
+    EXPECT_EQ(testing::debug, log.verbosity());
+}
+
+TEST(verbose_logger_t, MoveExplicitConstructor) {
+    verbose_logger_t<testing::level> log(testing::info);
+    verbose_logger_t<testing::level> other(std::move(log));
+
+    EXPECT_EQ(testing::info, other.verbosity());
+}
+
+TEST(verbose_logger_t, MoveImplicitConstructor) {
+    verbose_logger_t<testing::level> log(testing::info);
+    verbose_logger_t<testing::level> other = std::move(log);
+
+    EXPECT_EQ(testing::info, other.verbosity());
+}
+
+TEST(verbose_logger_t, MoveAssignment) {
+    verbose_logger_t<testing::level> log(testing::info);
+    verbose_logger_t<testing::level> other(testing::debug);
+
+    other = std::move(log);
+    EXPECT_EQ(testing::info, other.verbosity());
+}
+
 namespace {
 
 inline
@@ -26,7 +54,7 @@ filter_by_tracebit(testing::level severity, const attribute::combined_view_t& vi
 TEST(verbose_logger_t, PrimaryVerbosityFiltering) {
     std::unique_ptr<mock::frontend_t> frontend;
 
-    verbose_logger_t<testing::level> log;
+    verbose_logger_t<testing::level> log(testing::debug);
     log.add_frontend(std::move(frontend));
     log.verbosity(testing::warn);
 
@@ -39,7 +67,7 @@ TEST(verbose_logger_t, PrimaryVerbosityFiltering) {
 TEST(verbose_logger_t, PrimaryComplexFiltering) {
     std::unique_ptr<mock::frontend_t> frontend;
 
-    verbose_logger_t<testing::level> log;
+    verbose_logger_t<testing::level> log(testing::debug);
     log.add_frontend(std::move(frontend));
     log.verbosity(&filter_by_tracebit);
 
@@ -63,4 +91,14 @@ TEST(verbose_logger_t, PrimaryComplexFiltering) {
         EXPECT_TRUE(log.open_record(testing::warn, wrapped).valid());
         EXPECT_TRUE(log.open_record(testing::error, wrapped).valid());
     }
+}
+
+// TODO: Test secondary filter.
+
+// TODO: Shouldn't compile!!!
+TEST(verbose_logger_t, ImportsOpenRecordFromAncestor) {
+    verbose_logger_t<testing::level> log(testing::debug);
+    log.open_record(blackhole::attribute::set_t({
+        blackhole::attribute::make("key", 42)
+    }));
 }
