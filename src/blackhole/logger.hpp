@@ -147,20 +147,22 @@ public:
     explicit verbose_logger_t(level_type level) :
         logger_base_t(),
         level(level),
-        filter(make_default_filter(level))
+        filter(default_filter { level })
     {}
 
     //! @compat: GCC4.4
     //! GCC 4.4 doesn't create default copy/move constructor for derived
     //! classes. It's a bug.
     verbose_logger_t(verbose_logger_t&& other) BLACKHOLE_NOEXCEPT :
-        logger_base_t(std::move(other)),
-        level(static_cast<level_type>(other.level)),
-        filter(other.filter)
-    {}
+        logger_base_t(std::move(other))
+    {
+        level = other.level;
+        filter = other.filter;
+    }
 
     verbose_logger_t& operator=(verbose_logger_t&& other) BLACKHOLE_NOEXCEPT {
         logger_base_t::operator=(std::move(other));
+
         level = other.level;
         filter = other.filter;
         return *this;
@@ -183,7 +185,7 @@ public:
      */
     void verbosity(level_type level) {
         this->level = level;
-        this->filter = make_default_filter(level);
+        this->filter = default_filter { level };
     }
 
     void verbosity(filter_type filter) {
@@ -223,27 +225,15 @@ public:
     }
 
 private:
-    static
-    inline
-    filter_type
-    make_default_filter(level_type level) {
-        return std::bind(
-            &verbose_logger_t::default_filter,
-            std::placeholders::_1,
-            level,
-            std::placeholders::_2
-         );
-    }
+    struct default_filter {
+        level_type threshold;
 
-    static
-    inline
-    bool
-    default_filter(level_type level,
-                   level_type threshold,
-                   const attribute::combined_view_t&)
-    {
-        return level >= threshold;
-    }
+        inline
+        bool
+        operator()(level_type level, const attribute::combined_view_t&) const {
+            return level >= threshold;
+        }
+    };
 };
 
 } // namespace blackhole
