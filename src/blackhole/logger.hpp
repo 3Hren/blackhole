@@ -188,6 +188,7 @@ public:
         this->filter = default_filter { level };
     }
 
+    // TODO: Level is necessary!
     void verbosity(filter_type filter) {
         this->filter = filter;
     }
