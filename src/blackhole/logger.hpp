@@ -145,14 +145,7 @@ public:
     explicit verbose_logger_t(level_type level) :
         logger_base_t(),
         level(level),
-        filter(
-            std::bind(
-               &verbose_logger_t::default_filter,
-               std::placeholders::_1,
-               level,
-               std::placeholders::_2
-            )
-        )
+        filter(make_default_filter(level))
     {}
 
     //! @compat: GCC4.4
@@ -188,12 +181,7 @@ public:
      */
     void verbosity(level_type level) {
         this->level = level;
-        this->filter = std::bind(
-            &verbose_logger_t::default_filter,
-            std::placeholders::_1,
-            level,
-            std::placeholders::_2
-        );
+        this->filter = make_default_filter(level);
     }
 
     void verbosity(filter_type filter) {
@@ -235,7 +223,18 @@ public:
 private:
     static
     inline
-    BLACKHOLE_ALWAYS_INLINE
+    filter_type
+    make_default_filter(level_type level) {
+        return std::bind(
+            &verbose_logger_t::default_filter,
+            std::placeholders::_1,
+            level,
+            std::placeholders::_2
+         );
+    }
+
+    static
+    inline
     bool
     default_filter(level_type level,
                    level_type threshold,
