@@ -142,7 +142,7 @@ private:
     filter_type filter; // TODO: Mutex.
 
 public:
-    verbose_logger_t(level_type level) :
+    explicit verbose_logger_t(level_type level) :
         logger_base_t(),
         level(level),
         filter(
