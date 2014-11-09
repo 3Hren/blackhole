@@ -7,6 +7,7 @@
 #include <blackhole/forwards.hpp>
 #include <blackhole/detail/traits/supports/stream_push.hpp>
 
+// TODO: Deprecated!
 namespace blackhole {
 
 namespace concept {

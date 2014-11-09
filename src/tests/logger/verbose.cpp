@@ -69,6 +69,7 @@ TEST(verbose_logger_t, PrimaryComplexFiltering) {
 
     verbose_logger_t<testing::level> log(testing::debug);
     log.add_frontend(std::move(frontend));
+    // TODO: It must contain level value too.
     log.verbosity(&filter_by_tracebit);
 
     EXPECT_FALSE(log.open_record(testing::debug).valid());
