@@ -139,7 +139,9 @@ public:
 
 private:
     level_type level;
-    filter_type filter; // TODO: Mutex.
+    filter_type filter;
+
+    // TODO: Thread-safety.
 
 public:
     explicit verbose_logger_t(level_type level) :
