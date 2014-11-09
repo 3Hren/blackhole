@@ -210,11 +210,10 @@ public:
      * @param[in] level - Desired verbosity level.
      * @return valid or invalid `record_t` object.
      * @todo: Replace with custom filter once a time.
+     * @todo: Decompose.
      */
     record_t
-    open_record(level_type level,
-                attribute::set_t local = attribute::set_t()) const
-    {
+    open_record(level_type level, attribute::set_t local = attribute::set_t()) const {
         bool passed = false;
         reader_lock_type lock(state.lock.open);
         if (auto scoped = state.attributes.scoped.get()) {
