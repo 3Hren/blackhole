@@ -163,6 +163,7 @@ public:
         verbosity(level, default_filter { level });
     }
 
+    // TODO: Maybe rename this to `filter` and the upper one?
     void verbosity(level_type level, filter_type filter) {
         this->level = level;
         this->filter = filter;
