@@ -41,11 +41,11 @@ TEST(Functional, SyslogConfiguredVerboseLogger) {
     typedef frontend_t<formatter_type, sink_type> frontend_type;
     typedef verbose_logger_t<level>               logger_type;
 
-    logger_type log(testing::debug);
-
     auto formatter = make_unique<formatter_type>("%(message)s [%(...L)s]");
     auto sink      = make_unique<sink_type>("testing");
     auto frontend  = make_unique<frontend_type>(std::move(formatter), std::move(sink));
+
+    logger_type log(level::debug);
     log.add_frontend(std::move(frontend));
 
     record_t record = log.open_record(level::error);
@@ -63,14 +63,13 @@ TEST(Functional, Manual) {
     typedef frontend_t<formatter_type, sink_type> frontend_type;
     typedef verbose_logger_t<level>               logger_type;
 
-    verbose_logger_t<testing::level> log(testing::debug);
-
     // Factory starts here...
     auto formatter = make_unique<formatter_type>("[]: %(message)s [%(...)s]");
     auto sink      = make_unique<sink_type>();
     auto frontend  = make_unique<frontend_type>(std::move(formatter), std::move(sink));
 
     // ... till here.
+    logger_type log(level::debug);
     log.add_frontend(std::move(frontend));
 
     // Next lines can be hidden via logging macro.
@@ -101,11 +100,11 @@ TEST(Functional, LoggerShouldProperlyRouteAttributesByScope) {
     typedef verbose_logger_t<level>               logger_type;
 
     std::ostringstream stream;
-    logger_type log(level::debug);
 
     auto formatter = make_unique<formatter_type>("[%(severity)s]: %(message)s %(...:[:])s");
     auto sink      = make_unique<sink_type>(stream);
     auto frontend  = make_unique<frontend_type>(std::move(formatter), std::move(sink));
+    logger_type log(level::debug);
     log.add_frontend(std::move(frontend));
 
     wrapper_t<logger_type> wrapper(log, attribute::set_t({{ "w1", attribute_t(42) }}));
