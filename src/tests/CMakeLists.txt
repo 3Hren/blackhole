@@ -71,7 +71,6 @@ SET(SOURCES_BASE
     test_SyslogSink
     test_Traits
     test_Utils
-    test_VerboseLogger
     utils/test_GenericStringFormatter
     Dynamic
     Record
