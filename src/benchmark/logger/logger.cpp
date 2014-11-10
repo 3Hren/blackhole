@@ -28,7 +28,7 @@ BENCHMARK(LogStringToNull, Baseline) {
         blackhole::verbose_logger_t<level_t>,
         blackhole::formatter::string_t,
         blackhole::sink::null_t
-    >(FORMAT_VERBOSE)()(level_t::debug)();
+    >().formatter(FORMAT_VERBOSE).sink().log(level_t::debug).get();
 
     BH_LOG(log, level_t::info, MESSAGE_LONG)(
         "id", 42,
@@ -41,7 +41,7 @@ BENCHMARK_BASELINE(Logger, Base) {
         blackhole::logger_base_t,
         blackhole::formatter::string_t,
         blackhole::sink::null_t
-    >(FORMAT_BASE)()()();
+    >().formatter(FORMAT_BASE).sink().log().get();
 
     BH_BASE_LOG(log, MESSAGE_LONG)(
         "id", 42,
@@ -54,7 +54,7 @@ BENCHMARK(Logger, Verbose) {
         blackhole::verbose_logger_t<level_t>,
         blackhole::formatter::string_t,
         blackhole::sink::null_t
-    >(FORMAT_VERBOSE)()(level_t::debug)();
+    >().formatter(FORMAT_VERBOSE).sink().log(level_t::debug).get();
 
     BH_LOG(log, level_t::info, MESSAGE_LONG)(
         "id", 42,
@@ -72,7 +72,11 @@ BENCHMARK_RELATIVE_X(Limits, Experimental) {
         blackhole::verbose_logger_t<level_t>,
         blackhole::formatter::string_t,
         blackhole::sink::stream_t
-    >(FORMAT_VERBOSE)(blackhole::sink::stream_t::output_t::stdout)(level_t::debug)();
+    >()
+        .formatter(FORMAT_VERBOSE)
+        .sink(blackhole::sink::stream_t::output_t::stdout)
+        .log(level_t::debug)
+        .get();
     BH_LOG(log, level_t::info, MESSAGE_LONG);
 }
 
@@ -81,7 +85,12 @@ BENCHMARK_BASELINE(Filtering, Rejected) {
         blackhole::verbose_logger_t<level_t>,
         blackhole::formatter::string_t,
         blackhole::sink::null_t
-    >(FORMAT_BASE)()(level_t::debug)(std::bind(&filter_by::verbosity<level_t>, std::placeholders::_1, level_t::info));
+    >()
+        .formatter(FORMAT_BASE)
+        .sink()
+        .log(level_t::debug)
+        .mod(std::bind(&filter_by::verbosity<level_t>, std::placeholders::_1, level_t::info))
+        .get();
 
     BH_LOG(log, level_t::debug, MESSAGE_LONG)(
         "id", 42,
@@ -94,7 +103,12 @@ BENCHMARK(Filtering, Accepted) {
         blackhole::verbose_logger_t<level_t>,
         blackhole::formatter::string_t,
         blackhole::sink::null_t
-    >(FORMAT_BASE)()(level_t::debug)(std::bind(&filter_by::verbosity<level_t>, std::placeholders::_1, level_t::info));
+    >()
+        .formatter(FORMAT_BASE)
+        .sink()
+        .log(level_t::debug)
+        .mod(std::bind(&filter_by::verbosity<level_t>, std::placeholders::_1, level_t::info))
+        .get();
 
     BH_LOG(log, level_t::info, MESSAGE_LONG)(
         "id", 42,

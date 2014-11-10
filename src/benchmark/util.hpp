@@ -5,58 +5,68 @@
 
 #include <blackhole/frontend.hpp>
 
-namespace initializer {
-
-template<class L>
-struct mod_t {
-    L log;
-
-    template<class... Args>
-    L operator()(std::function<void(L&)> fn = &mod_t::nope) {
-        fn(log);
-        return std::move(log);
-    }
-
-    static inline void nope(L&) {}
-};
-
 template<class L, class F, class S>
-struct log_t {
+struct initializer_t {
     std::unique_ptr<F> f;
     std::unique_ptr<S> s;
+    std::unique_ptr<L> l;
+
+    // TODO: GCC 4.4. Hack.
+    initializer_t() = default;
+    initializer_t(initializer_t&& other) :
+        f(std::move(other.f)),
+        s(std::move(other.s)),
+        l(std::move(other.l))
+    {}
 
     template<class... Args>
-    mod_t<L>
-    operator()(Args&&... args) {
+    initializer_t& formatter(Args&&... args) {
+        f = std::unique_ptr<F>(new F(std::forward<Args>(args)...));
+        return *this;
+    }
+
+    template<class... Args>
+    initializer_t& sink(Args&&... args) {
+        s = std::unique_ptr<S>(new S(std::forward<Args>(args)...));
+        return *this;
+    }
+
+    template<class... Args>
+    initializer_t& log(Args&&... args) {
+        BOOST_ASSERT(f);
+        BOOST_ASSERT(s);
+
         std::unique_ptr<blackhole::frontend_t<F, S>> frontend(
             new blackhole::frontend_t<F, S>(std::move(f), std::move(s))
         );
 
-        L log(std::forward<Args>(args)...);
-        log.add_frontend(std::move(frontend));
-
-        return mod_t<L> { std::move(log) };
+        l = std::unique_ptr<L>(new L(std::forward<Args>(args)...));
+        l->add_frontend(std::move(frontend));
+        return *this;
     }
+
+    template<class... Args>
+    initializer_t& mod(std::function<void(L&)> fn = &initializer_t::nope) {
+        BOOST_ASSERT(l);
+        fn(*l);
+        return *this;
+    }
+
+    L get() {
+        BOOST_ASSERT(l);
+
+        return std::move(*l);
+    }
+
+private:
+    static inline void nope(L&) {}
 };
 
 template<class L, class F, class S>
-struct sink_t {
-    std::unique_ptr<F> f;
-
-    template<class... Args>
-    log_t<L, F, S>
-    operator()(Args&&... args) {
-        return log_t<L, F, S> { std::move(f), std::unique_ptr<S>(new S(std::forward<Args>(args)...)) };
-    }
-};
-
-} // namespace initializer
-
-template<class L, class F, class S, class... Args>
 inline
-initializer::sink_t<L, F, S>
-initialize(Args&&... args) {
-    return initializer::sink_t<L, F, S> { std::unique_ptr<F>(new F(std::forward<Args>(args)...)) };
+initializer_t<L, F, S>
+initialize() {
+    return initializer_t<L, F, S>();
 }
 
 namespace filter_by {

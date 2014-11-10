@@ -65,11 +65,12 @@ BENCHMARK(Logger_, (L: Verbose, \
         blackhole::verbose_logger_t<level_t>, \
         BOOST_PP_TUPLE_ELEM(3, 1, FORMATTER), \
         BOOST_PP_TUPLE_ELEM(3, 1, SINK) \
-    >\
-    BOOST_PP_TUPLE_ELEM(3, 2, FORMATTER)\
-    BOOST_PP_TUPLE_ELEM(3, 2, SINK)\
-    (level_t::debug)\
-    (FILTER_ACT); \
+    >()\
+        .formatter BOOST_PP_TUPLE_ELEM(3, 2, FORMATTER) \
+        .sink BOOST_PP_TUPLE_ELEM(3, 2, SINK) \
+        .log(level_t::debug) \
+        .mod(FILTER_ACT) \
+        .get(); \
     \
     BH_LOG(log, level_t::debug, MSG ARGS) ATTRIBUTES; \
 }
