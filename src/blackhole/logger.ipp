@@ -115,6 +115,7 @@ logger_base_t::open_record(attribute::set_t attributes) const {
 BLACKHOLE_API
 record_t
 logger_base_t::open_record(attribute::set_t internal, attribute::set_t external) const {
+    // TODO: Magic.
     internal.reserve(6);
     external.reserve(16);
     if (enabled() && !state.frontends.empty()) {
