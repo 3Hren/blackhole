@@ -128,7 +128,7 @@ public:
      * @since: 0.3.
      */
 
-#ifdef BLACKHOLE_HAS_GCC_44
+#ifdef BLACKHOLE_HAS_GCC44
     // GCC 4.4 cannot properly forward empty variadic pack into constructor.
     template<class Logger>
     typename std::enable_if<
@@ -233,7 +233,7 @@ repository_t::create(const std::string& name) const {
     return create<verbose_logger_t<Level>>(name);
 }
 
-#ifdef BLACKHOLE_HAS_GCC_44
+#ifdef BLACKHOLE_HAS_GCC44
 template<class Logger>
 BLACKHOLE_API
 typename std::enable_if<

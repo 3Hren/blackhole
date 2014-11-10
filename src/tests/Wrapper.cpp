@@ -14,7 +14,7 @@ namespace {
 
 class logger_factory_t {
 public:
-#ifdef BLACKHOLE_HAS_GCC_44
+#ifdef BLACKHOLE_HAS_GCC44
     // GCC 4.4 cannot properly forward empty variadic pack into constructor.
     template<class Logger>
     static Logger create() {
