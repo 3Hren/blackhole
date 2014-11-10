@@ -34,14 +34,18 @@ struct priority_traits<level> {
 } } // namespace blackhole::sink
 
 TEST(Functional, SyslogConfiguredVerboseLogger) {
-    verbose_logger_t<level> log(level::debug);
+    using aux::util::make_unique;
 
-    typedef formatter::string_t formatter_type;
-    typedef sink::syslog_t<level> sink_type;
+    typedef formatter::string_t                   formatter_type;
+    typedef sink::syslog_t<level>                 sink_type;
+    typedef frontend_t<formatter_type, sink_type> frontend_type;
+    typedef verbose_logger_t<level>               logger_type;
 
-    auto formatter = aux::util::make_unique<formatter_type>("%(message)s [%(...L)s]");
-    auto sink = aux::util::make_unique<sink_type>("testing");
-    auto frontend = aux::util::make_unique<frontend_t<formatter_type, sink_type>>(std::move(formatter), std::move(sink));
+    logger_type log(testing::debug);
+
+    auto formatter = make_unique<formatter_type>("%(message)s [%(...L)s]");
+    auto sink      = make_unique<sink_type>("testing");
+    auto frontend  = make_unique<frontend_type>(std::move(formatter), std::move(sink));
     log.add_frontend(std::move(frontend));
 
     record_t record = log.open_record(level::error);
