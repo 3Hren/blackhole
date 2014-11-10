@@ -26,21 +26,6 @@ namespace blackhole {
 
 class scoped_attributes_concept_t;
 
-template<typename Level>
-struct logger_verbosity_traits {
-    typedef Level level_type;
-
-    static
-    inline
-    bool
-    passed(level_type logger_verbosity, level_type record_verbosity) {
-        typedef typename aux::underlying_type<Level>::type underlying_type;
-
-        return static_cast<underlying_type>(record_verbosity) >=
-            static_cast<underlying_type>(logger_verbosity);
-    }
-};
-
 class logger_base_t {
     friend class scoped_attributes_concept_t;
     friend void swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT;
