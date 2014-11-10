@@ -40,13 +40,7 @@ protected:
         std::atomic<bool> tracked;
 
         filter_t filter;
-        struct attrbutes_t {
-            boost::thread_specific_ptr<scoped_attributes_concept_t> scoped;
-
-            attrbutes_t(void(*deleter)(scoped_attributes_concept_t*)) :
-                scoped(deleter)
-            {}
-        } attributes;
+        boost::thread_specific_ptr<scoped_attributes_concept_t> scoped;
 
         std::vector<std::unique_ptr<base_frontend_t>> frontends;
         log::exception_handler_t exception;
@@ -189,7 +183,7 @@ public:
     open_record(level_type level, attribute::set_t local = attribute::set_t()) const {
         bool passed = false;
         reader_lock_type lock(state.lock.open);
-        if (auto scoped = state.attributes.scoped.get()) {
+        if (auto scoped = state.scoped.get()) {
             const attribute::combined_view_t view(local, scoped->attributes());
             passed = filter(level, view);
         } else {

@@ -28,7 +28,7 @@ logger_base_t::state_t::state_t() :
     enabled(true),
     tracked(false),
     filter(&filter::none),
-    attributes(&aux::guard::no_deleter),
+    scoped(&aux::guard::no_deleter),
     exception(log::default_exception_handler_t())
 {}
 
@@ -140,8 +140,8 @@ logger_base_t::open_record(attribute::set_t internal, attribute::set_t external)
         }
 
         reader_lock_type lock(state.lock.open);
-        if (state.attributes.scoped.get()) {
-            const auto& scoped = state.attributes.scoped->attributes();
+        if (state.scoped.get()) {
+            const auto& scoped = state.scoped->attributes();
             std::copy(scoped.begin(), scoped.end(), std::back_inserter(external));
         }
 
@@ -172,16 +172,16 @@ logger_base_t::push(record_t&& record) const {
 BLACKHOLE_API
 scoped_attributes_concept_t::scoped_attributes_concept_t(logger_base_t& log) :
     m_logger(&log),
-    m_previous(log.state.attributes.scoped.get())
+    m_previous(log.state.scoped.get())
 {
-    log.state.attributes.scoped.reset(this);
+    log.state.scoped.reset(this);
 }
 
 BLACKHOLE_API
 scoped_attributes_concept_t::~scoped_attributes_concept_t() {
     BOOST_ASSERT(m_logger);
-    BOOST_ASSERT(m_logger->state.attributes.scoped.get() == this);
-    m_logger->state.attributes.scoped.reset(m_previous);
+    BOOST_ASSERT(m_logger->state.scoped.get() == this);
+    m_logger->state.scoped.reset(m_previous);
 }
 
 BLACKHOLE_API
@@ -215,16 +215,16 @@ swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT {
     swap(lhs.state.frontends, rhs.state.frontends);
     swap(lhs.state.exception, rhs.state.exception);
 
-    auto lhs_operation_attributes = lhs.state.attributes.scoped.get();
-    lhs.state.attributes.scoped.reset(rhs.state.attributes.scoped.get());
-    rhs.state.attributes.scoped.reset(lhs_operation_attributes);
+    auto lhs_operation_attributes = lhs.state.scoped.get();
+    lhs.state.scoped.reset(rhs.state.scoped.get());
+    rhs.state.scoped.reset(lhs_operation_attributes);
 
-    if (lhs.state.attributes.scoped.get()) {
-        lhs.state.attributes.scoped->m_logger = &lhs;
+    if (lhs.state.scoped.get()) {
+        lhs.state.scoped->m_logger = &lhs;
     }
 
-    if (rhs.state.attributes.scoped.get()) {
-        rhs.state.attributes.scoped->m_logger = &rhs;
+    if (rhs.state.scoped.get()) {
+        rhs.state.scoped->m_logger = &rhs;
     }
 }
 
