@@ -50,6 +50,29 @@ TEST(Functional, SyslogConfiguredVerboseLogger) {
     }
 }
 
+TEST(Functional, Manual) {
+    using aux::util::make_unique;
+
+    verbose_logger_t<testing::level> log(testing::debug);
+
+    // Factory starts here...
+    auto formatter = make_unique<formatter::string_t>("[]: %(message)s [%(...L)s]");
+    auto sink      = make_unique<sink::files_t<>>(sink::files_t<>::config_type("/dev/stdout"));
+    auto frontend  = make_unique<frontend_t<formatter::string_t, sink::files_t<>>>(std::move(formatter), std::move(sink));
+
+    // ... till here.
+    log.add_frontend(std::move(frontend));
+
+    // Next lines can be hidden via macro:
+    // LOG(log, debug, "Message %s", "Hell")(keyword::answer = 42, keyword::blah = "WAT?", keyword::make("urgent", 1));
+    record_t record = log.open_record(testing::level::error);
+    if (record.valid()) {
+        record.insert(keyword::message() = utils::format("Some message from: '%s'!", "Hell"));
+        // Add another attributes.
+        log.push(std::move(record));
+    }
+}
+
 TEST(Functional, LoggerShouldProperlyRouteAttributesByScope) {
     /*
      * We define full Blackhole's util stack: logger, wrapper, scoped attributes
