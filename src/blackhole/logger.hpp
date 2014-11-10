@@ -198,7 +198,6 @@ public:
      * Can return invalid log record if some conditions are not met.
      * @param[in] level - Desired verbosity level.
      * @return valid or invalid `record_t` object.
-     * @todo: Replace with custom filter once a time.
      * @todo: Decompose.
      */
     record_t
