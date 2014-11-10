@@ -2,6 +2,7 @@
 #include <blackhole/formatter/string.hpp>
 #include <blackhole/frontend/syslog.hpp>
 #include <blackhole/scoped_attributes.hpp>
+#include <blackhole/sink/null.hpp>
 #include <blackhole/sink/stream.hpp>
 #include <blackhole/sink/syslog.hpp>
 
@@ -53,22 +54,26 @@ TEST(Functional, SyslogConfiguredVerboseLogger) {
 TEST(Functional, Manual) {
     using aux::util::make_unique;
 
+    typedef formatter::string_t                   formatter_type;
+    typedef sink::null_t                          sink_type;
+    typedef frontend_t<formatter_type, sink_type> frontend_type;
+    typedef verbose_logger_t<level>               logger_type;
+
     verbose_logger_t<testing::level> log(testing::debug);
 
     // Factory starts here...
-    auto formatter = make_unique<formatter::string_t>("[]: %(message)s [%(...L)s]");
-    auto sink      = make_unique<sink::files_t<>>(sink::files_t<>::config_type("/dev/stdout"));
-    auto frontend  = make_unique<frontend_t<formatter::string_t, sink::files_t<>>>(std::move(formatter), std::move(sink));
+    auto formatter = make_unique<formatter_type>("[]: %(message)s [%(...)s]");
+    auto sink      = make_unique<sink_type>();
+    auto frontend  = make_unique<frontend_type>(std::move(formatter), std::move(sink));
 
     // ... till here.
     log.add_frontend(std::move(frontend));
 
-    // Next lines can be hidden via macro:
-    // LOG(log, debug, "Message %s", "Hell")(keyword::answer = 42, keyword::blah = "WAT?", keyword::make("urgent", 1));
+    // Next lines can be hidden via logging macro.
     record_t record = log.open_record(testing::level::error);
     if (record.valid()) {
         record.insert(keyword::message() = utils::format("Some message from: '%s'!", "Hell"));
-        // Add another attributes.
+        // Here we can add another attributes, but just push the record.
         log.push(std::move(record));
     }
 }
