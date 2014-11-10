@@ -51,6 +51,20 @@ filter_by_tracebit(testing::level severity, const attribute::combined_view_t& vi
 
 } // namespace
 
+TEST(verbose_logger_t, Verbosity) {
+    verbose_logger_t<testing::level> log(testing::debug);
+    log.verbosity(testing::warn);
+
+    EXPECT_EQ(testing::warn, log.verbosity());
+}
+
+TEST(verbose_logger_t, ExtendedVerbosity) {
+    verbose_logger_t<testing::level> log(testing::debug);
+    log.verbosity(testing::warn, &filter_by_tracebit);
+
+    EXPECT_EQ(testing::warn, log.verbosity());
+}
+
 TEST(verbose_logger_t, PrimaryVerbosityFiltering) {
     std::unique_ptr<mock::frontend_t> frontend;
 
@@ -69,8 +83,8 @@ TEST(verbose_logger_t, PrimaryComplexFiltering) {
 
     verbose_logger_t<testing::level> log(testing::debug);
     log.add_frontend(std::move(frontend));
-    // TODO: It must contain level value too.
-    log.verbosity(&filter_by_tracebit);
+
+    log.verbosity(level::debug, &filter_by_tracebit);
 
     EXPECT_FALSE(log.open_record(testing::debug).valid());
     EXPECT_FALSE(log.open_record(testing::info).valid());

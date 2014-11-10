@@ -160,12 +160,11 @@ public:
      * @param[in] level - Upper verbosity value.
      */
     void verbosity(level_type level) {
-        this->level = level;
-        this->filter = default_filter { level };
+        verbosity(level, default_filter { level });
     }
 
-    // TODO: Level is necessary!
-    void verbosity(filter_type filter) {
+    void verbosity(level_type level, filter_type filter) {
+        this->level = level;
         this->filter = filter;
     }
 
