@@ -100,7 +100,7 @@ void init() {
 
 int main(int, char**) {
     init();
-    auto log = repository_t::instance().create<verbose_logger_t<level>>("root");
+    auto log = repository_t::instance().create<verbose_logger_t<level>>("root", level::debug);
 
     BH_LOG(log, level::debug,   "[%d] %s - done", 0, "debug");
     BH_LOG(log, level::info,    "[%d] %s - done", 1, "info");

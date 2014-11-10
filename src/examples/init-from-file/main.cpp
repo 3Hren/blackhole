@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
     }
 
     init(doc);
-    auto log = repository_t::instance().create<verbose_logger_t<level>>("root");
+    auto log = repository_t::instance().create<verbose_logger_t<level>>("root", level::debug);
 
     BH_LOG(log, level::info, "this is just testing message")(
         attribute::make("id", 42)

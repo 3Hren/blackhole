@@ -75,7 +75,7 @@ void init() {
 
 int main(int, char**) {
     init();
-    auto log = repository_t::instance().create<verbose_logger_t<level>>("root");
+    auto log = repository_t::instance().create<verbose_logger_t<level>>("root", level::debug);
 
     for (int id = 0; id < 200; ++id) {
         BH_LOG(log, level::debug, "this is a debug message")(attribute::list({

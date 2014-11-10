@@ -51,7 +51,7 @@ void init() {
 
 int main(int, char**) {
     init();
-    auto log = repository_t::instance().create<verbose_logger_t<level>>("root");
+    auto log = repository_t::instance().create<verbose_logger_t<level>>("root", level::debug);
 
     // See that 'second' invocation after macro? That's how additional attributes are attached to
     // the log event.
