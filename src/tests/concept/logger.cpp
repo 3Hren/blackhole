@@ -13,19 +13,19 @@ TEST(LoggerConcept, AcceptsBaseLogger) {
     );
 }
 
-TEST(LoggerConcept, AcceptsVerboseLogger) {
-    static_assert(
-        (concept::logger<verbose_logger_t<testing::level>>::value),
-        "`verbose_logger_t` should pass concept check"
-    );
-}
+//TEST(LoggerConcept, AcceptsVerboseLogger) {
+//    static_assert(
+//        (concept::logger<verbose_logger_t<testing::level>>::value),
+//        "`verbose_logger_t` should pass concept check"
+//    );
+//}
 
-TEST(LoggerConcept, AcceptsWrapper) {
-    static_assert(
-        (concept::logger<wrapper_t<logger_base_t>>::value),
-        "`wrapper_t` should pass concept check"
-    );
-}
+//TEST(LoggerConcept, AcceptsWrapper) {
+//    static_assert(
+//        (concept::logger<wrapper_t<logger_base_t>>::value),
+//        "`wrapper_t` should pass concept check"
+//    );
+//}
 
 TEST(LoggerConcept, DeclinesString) {
     static_assert(

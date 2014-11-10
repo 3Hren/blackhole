@@ -33,7 +33,7 @@ namespace blackhole {
     template<typename Level>
     class verbose_logger_t;
 
-    template<class Logger>
+    template<class Logger, class = void>
     class wrapper_t;
 
     template<class T, class Mutex = std::mutex>

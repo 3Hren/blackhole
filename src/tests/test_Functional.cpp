@@ -33,7 +33,7 @@ struct priority_traits<level> {
 } } // namespace blackhole::sink
 
 TEST(Functional, SyslogConfiguredVerboseLogger) {
-    verbose_logger_t<level> log;
+    verbose_logger_t<level> log(level::debug);
 
     typedef formatter::string_t formatter_type;
     typedef sink::syslog_t<level> sink_type;
@@ -69,7 +69,7 @@ TEST(Functional, LoggerShouldProperlyRouteAttributesByScope) {
     typedef verbose_logger_t<level>               logger_type;
 
     std::ostringstream stream;
-    logger_type log;
+    logger_type log(level::debug);
 
     auto formatter = make_unique<formatter_type>("[%(severity)s]: %(message)s %(...:[:])s");
     auto sink      = make_unique<sink_type>(stream);

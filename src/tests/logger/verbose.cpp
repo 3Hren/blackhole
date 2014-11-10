@@ -95,11 +95,3 @@ TEST(verbose_logger_t, PrimaryComplexFiltering) {
 }
 
 // TODO: Test secondary filter.
-
-// TODO: Shouldn't compile!!!
-TEST(verbose_logger_t, ImportsOpenRecordFromAncestor) {
-    verbose_logger_t<testing::level> log(testing::debug);
-    log.open_record(blackhole::attribute::set_t({
-        blackhole::attribute::make("key", 42)
-    }));
-}

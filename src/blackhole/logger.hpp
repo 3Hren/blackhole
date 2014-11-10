@@ -168,9 +168,6 @@ public:
         return *this;
     }
 
-    // Explicit import other overloaded methods.
-    using logger_base_t::open_record;
-
     /*!
      * Gets the current upper verbosity bound.
      */
