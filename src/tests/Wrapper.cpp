@@ -6,6 +6,7 @@
 #include <blackhole/sink/null.hpp>
 
 #include "global.hpp"
+#include "mocks/frontend.hpp"
 
 using namespace blackhole;
 
@@ -13,24 +14,23 @@ namespace {
 
 class logger_factory_t {
 public:
+#ifdef BLACKHOLE_HAS_GCC_44
+    // GCC 4.4 cannot properly forward empty variadic pack into constructor.
+    template<class Logger>
+    static Logger create() {
+        std::unique_ptr<mock::frontend_t> frontend(new mock::frontend_t);
+
+        Logger logger;
+        logger.add_frontend(std::move(frontend));
+        return logger;
+    }
+#endif
+
     template<class Logger, class... Args>
     static Logger create(Args&&... args) {
+        std::unique_ptr<mock::frontend_t> frontend(new mock::frontend_t);
+
         Logger logger(std::forward<Args>(args)...);
-        auto formatter = aux::util::make_unique<
-            formatter::string_t
-        >("[%(timestamp)s]: %(message)s");
-
-        auto sink = aux::util::make_unique<
-            sink::null_t
-        >();
-
-        auto frontend = aux::util::make_unique<
-            frontend_t<
-                formatter::string_t,
-                sink::null_t
-            >
-        >(std::move(formatter), std::move(sink));
-
         logger.add_frontend(std::move(frontend));
         return logger;
     }

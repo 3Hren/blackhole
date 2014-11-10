@@ -127,6 +127,17 @@ public:
      * registered with.
      * @since: 0.3.
      */
+
+#ifdef BLACKHOLE_HAS_GCC_44
+    // GCC 4.4 cannot properly forward empty variadic pack into constructor.
+    template<class Logger>
+    typename std::enable_if<
+        std::is_base_of<logger_base_t, Logger>::value,
+        Logger
+    >::type
+    create(const std::string& name) const;
+#endif
+
     template<class Logger, class... Args>
     typename std::enable_if<
         std::is_base_of<logger_base_t, Logger>::value,
@@ -221,6 +232,25 @@ typename std::enable_if<
 repository_t::create(const std::string& name) const {
     return create<verbose_logger_t<Level>>(name);
 }
+
+#ifdef BLACKHOLE_HAS_GCC_44
+template<class Logger>
+BLACKHOLE_API
+typename std::enable_if<
+    std::is_base_of<logger_base_t, Logger>::value,
+    Logger
+>::type
+repository_t::create(const std::string& name) const {
+    std::lock_guard<std::mutex> lock(mutex);
+
+    Logger logger;
+    const auto& frontends = configs.at(name).frontends;
+    for (auto it = frontends.begin(); it != frontends.end(); ++it) {
+        logger.add_frontend(factory.create(it->formatter, it->sink));
+    }
+    return logger;
+}
+#endif
 
 template<class Logger, class... Args>
 BLACKHOLE_API
