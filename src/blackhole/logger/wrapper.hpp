@@ -72,6 +72,7 @@ private:
     underlying_type* wrapped;
     attribute::set_t attributes;
 
+    // TODO: Class isn't completely thread-safe.
     mutable std::mutex mutex;
 
 public:
