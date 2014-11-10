@@ -68,6 +68,7 @@ BENCHMARK(Logger_, (L: Verbose, \
     >\
     BOOST_PP_TUPLE_ELEM(3, 2, FORMATTER)\
     BOOST_PP_TUPLE_ELEM(3, 2, SINK)\
+    (level_t::debug)\
     (FILTER_ACT); \
     \
     BH_LOG(log, level_t::debug, MSG ARGS) ATTRIBUTES; \
