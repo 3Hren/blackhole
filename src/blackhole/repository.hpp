@@ -127,12 +127,12 @@ public:
      * registered with.
      * @since: 0.3.
      */
-    template<class Logger>
+    template<class Logger, class... Args>
     typename std::enable_if<
         std::is_base_of<logger_base_t, Logger>::value,
         Logger
     >::type
-    create(const std::string& name) const;
+    create(const std::string& name, Args&&... args) const;
 };
 
 BLACKHOLE_API
@@ -222,17 +222,17 @@ repository_t::create(const std::string& name) const {
     return create<verbose_logger_t<Level>>(name);
 }
 
-template<class Logger>
+template<class Logger, class... Args>
 BLACKHOLE_API
 typename std::enable_if<
     std::is_base_of<logger_base_t, Logger>::value,
     Logger
 >::type
-repository_t::create(const std::string& name) const {
+repository_t::create(const std::string& name, Args&&... args) const {
     std::lock_guard<std::mutex> lock(mutex);
 
     const auto& frontends = configs.at(name).frontends;
-    Logger logger;
+    Logger logger(std::forward<Args>(args)...);
     for (auto it = frontends.begin(); it != frontends.end(); ++it) {
         logger.add_frontend(factory.create(it->formatter, it->sink));
     }

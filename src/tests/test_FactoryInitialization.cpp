@@ -311,7 +311,7 @@ TEST(Repository, InitializationFromSettings) {
 TEST(Repository, ThrowsExceptionIfLoggerWithSpecifiedNameNotFound) {
     repository_t repository;
     repository.add_config(create_valid_config());
-    EXPECT_THROW(repository.create<verbose_logger_t<testing::level>>("log"),
+    EXPECT_THROW(repository.create<verbose_logger_t<testing::level>>("log", testing::debug),
                  std::out_of_range);
 }
 
@@ -319,7 +319,7 @@ TEST(Repository, CreatesDuplicateOfRootLoggerByDefault) {
     repository_t repository;
     log_config_t config = create_valid_config();
     repository.add_config(config);
-    repository.create<verbose_logger_t<testing::level>>("root");
+    repository.create<verbose_logger_t<testing::level>>("root", testing::debug);
 }
 
 TEST(Factory, ThrowsExceptionWhenRequestNotRegisteredSink) {
@@ -452,6 +452,6 @@ TEST(Repository, ThrowsExceptionWhenSinkIsRegisteredTypeIsDifferent) {
     >();
     repository.add_config(config);
 
-    EXPECT_THROW(repository.create<verbose_logger_t<level>>("root"),
+    EXPECT_THROW(repository.create<verbose_logger_t<level>>("root", testing::debug),
                  blackhole::error_t);
 }

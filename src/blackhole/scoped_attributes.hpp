@@ -24,7 +24,7 @@ public:
         Wrapper& wrapper,
         attribute::set_t attributes,
         typename std::enable_if<
-            concept::logger<Wrapper>::value && !std::is_base_of<logger_base_t, Wrapper>::value
+            !std::is_base_of<logger_base_t, Wrapper>::value
         >::type* = 0
     ) :
         scoped_attributes_concept_t(wrapper.log()),
