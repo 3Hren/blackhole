@@ -213,7 +213,9 @@ private:
         inline
         bool
         operator()(level_type level, const attribute::combined_view_t&) const {
-            return level >= threshold;
+            typedef typename aux::underlying_type<Level>::type underlying_type;
+
+            return static_cast<underlying_type>(level) >= static_cast<underlying_type>(threshold);
         }
     };
 };
