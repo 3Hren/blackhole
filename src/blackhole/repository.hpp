@@ -261,8 +261,8 @@ typename std::enable_if<
 repository_t::create(const std::string& name, Args&&... args) const {
     std::lock_guard<std::mutex> lock(mutex);
 
-    const auto& frontends = configs.at(name).frontends;
     Logger logger(std::forward<Args>(args)...);
+    const auto& frontends = configs.at(name).frontends;
     for (auto it = frontends.begin(); it != frontends.end(); ++it) {
         logger.add_frontend(factory.create(it->formatter, it->sink));
     }
