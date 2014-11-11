@@ -172,12 +172,11 @@ public:
     /*!
      * Tries to open log record with specific verbosity level.
      *
-     * Internally this method compares desired verbosity level with the upper
-     * one and checks for tracebit attribute (temporary until filter redesign).
-     * Can return invalid log record if some conditions are not met.
-     * @param[in] level - Desired verbosity level.
-     * @return valid or invalid `record_t` object.
-     * @todo: Decompose.
+     * Internally this method does primary filtering either using early provided filtering function
+     * or via comparing verbosity level with threshold specified.
+     * \param level - Desired verbosity level.
+     * \return Valid or invalid `record_t` object.
+     * \todo Decompose.
      */
     record_t
     open_record(level_type level, attribute::set_t local = attribute::set_t()) const {
