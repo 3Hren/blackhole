@@ -72,10 +72,10 @@ TEST(verbose_logger_t, PrimaryVerbosityFiltering) {
     log.add_frontend(std::move(frontend));
     log.verbosity(testing::warn);
 
-    EXPECT_FALSE(log.open_record(testing::debug).valid());
-    EXPECT_FALSE(log.open_record(testing::info).valid());
-    EXPECT_TRUE (log.open_record(testing::warn).valid());
-    EXPECT_TRUE (log.open_record(testing::error).valid());
+    EXPECT_FALSE(log.open_record(testing::debug));
+    EXPECT_FALSE(log.open_record(testing::info));
+    EXPECT_TRUE (log.open_record(testing::warn));
+    EXPECT_TRUE (log.open_record(testing::error));
 }
 
 TEST(verbose_logger_t, PrimaryComplexFiltering) {
@@ -86,25 +86,25 @@ TEST(verbose_logger_t, PrimaryComplexFiltering) {
 
     log.verbosity(level::debug, &filter_by_tracebit);
 
-    EXPECT_FALSE(log.open_record(testing::debug).valid());
-    EXPECT_FALSE(log.open_record(testing::info).valid());
-    EXPECT_TRUE (log.open_record(testing::warn).valid());
-    EXPECT_TRUE (log.open_record(testing::error).valid());
+    EXPECT_FALSE(log.open_record(testing::debug));
+    EXPECT_FALSE(log.open_record(testing::info));
+    EXPECT_TRUE (log.open_record(testing::warn));
+    EXPECT_TRUE (log.open_record(testing::error));
 
     {
         const attribute::set_t wrapped = { attribute::make("tracebit", std::uint32_t(0)) };
-        EXPECT_FALSE(log.open_record(testing::debug, wrapped).valid());
-        EXPECT_FALSE(log.open_record(testing::info, wrapped).valid());
-        EXPECT_TRUE (log.open_record(testing::warn, wrapped).valid());
-        EXPECT_TRUE (log.open_record(testing::error, wrapped).valid());
+        EXPECT_FALSE(log.open_record(testing::debug, wrapped));
+        EXPECT_FALSE(log.open_record(testing::info, wrapped));
+        EXPECT_TRUE (log.open_record(testing::warn, wrapped));
+        EXPECT_TRUE (log.open_record(testing::error, wrapped));
     }
 
     {
         const attribute::set_t wrapped = { attribute::make("tracebit", std::uint32_t(1)) };
-        EXPECT_TRUE(log.open_record(testing::debug, wrapped).valid());
-        EXPECT_TRUE(log.open_record(testing::info, wrapped).valid());
-        EXPECT_TRUE(log.open_record(testing::warn, wrapped).valid());
-        EXPECT_TRUE(log.open_record(testing::error, wrapped).valid());
+        EXPECT_TRUE(log.open_record(testing::debug, wrapped));
+        EXPECT_TRUE(log.open_record(testing::info, wrapped));
+        EXPECT_TRUE(log.open_record(testing::warn, wrapped));
+        EXPECT_TRUE(log.open_record(testing::error, wrapped));
     }
 }
 
