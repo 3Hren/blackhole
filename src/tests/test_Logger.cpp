@@ -73,7 +73,7 @@ TEST(logger_base_t, OpenRecordByDefault) {
 
     logger_base_t log;
     log.add_frontend(std::move(frontend));
-    EXPECT_TRUE(log.open_record().valid());
+    EXPECT_TRUE(log.open_record());
 }
 
 TEST(logger_base_t, DoNotOpenRecordIfDisabled) {
@@ -82,7 +82,7 @@ TEST(logger_base_t, DoNotOpenRecordIfDisabled) {
     logger_base_t log;
     log.add_frontend(std::move(frontend));
     log.enabled(false);
-    EXPECT_FALSE(log.open_record().valid());
+    EXPECT_FALSE(log.open_record());
 }
 
 DECLARE_KEYWORD(urgent, std::uint32_t)
@@ -93,7 +93,7 @@ TEST(logger_base_t, OpensRecordWhenAttributeFilterSucceed) {
     logger_base_t log;
     log.add_frontend(std::move(frontend));
     log.set_filter(expr::has_attr(::keyword::urgent()));
-    EXPECT_TRUE(log.open_record(::keyword::urgent() = 1).valid());
+    EXPECT_TRUE(log.open_record(::keyword::urgent() = 1));
 }
 
 TEST(logger_base_t, DoNotOpenRecordWhenAttributeFilterFailed) {
@@ -102,7 +102,7 @@ TEST(logger_base_t, DoNotOpenRecordWhenAttributeFilterFailed) {
     logger_base_t log;
     log.add_frontend(std::move(frontend));
     log.set_filter(expr::has_attr(::keyword::urgent()));
-    EXPECT_FALSE(log.open_record().valid());
+    EXPECT_FALSE(log.open_record());
 }
 
 TEST(logger_base_t, OpenRecordWhenComplexFilterSucceed) {
@@ -111,7 +111,7 @@ TEST(logger_base_t, OpenRecordWhenComplexFilterSucceed) {
     logger_base_t log;
     log.add_frontend(std::move(frontend));
     log.set_filter(expr::has_attr(::keyword::urgent()) && ::keyword::urgent() == 1);
-    EXPECT_TRUE(log.open_record(::keyword::urgent() = 1).valid());
+    EXPECT_TRUE(log.open_record(::keyword::urgent() = 1));
 }
 
 TEST(logger_base_t, DoNotOpenRecordWhenComplexFilterFailed) {
@@ -120,12 +120,12 @@ TEST(logger_base_t, DoNotOpenRecordWhenComplexFilterFailed) {
     logger_base_t log;
     log.add_frontend(std::move(frontend));
     log.set_filter(expr::has_attr(::keyword::urgent()) && ::keyword::urgent() == 1);
-    EXPECT_FALSE(log.open_record(::keyword::urgent() = 2).valid());
+    EXPECT_FALSE(log.open_record(::keyword::urgent() = 2));
 }
 
 TEST(logger_base_t, DoNotOpenRecordIfThereAreNoFrontends) {
     logger_base_t log;
-    EXPECT_FALSE(log.open_record().valid());
+    EXPECT_FALSE(log.open_record());
 }
 
 TEST(logger_base_t, SettingDynamicAttributes) {
@@ -134,7 +134,7 @@ TEST(logger_base_t, SettingDynamicAttributes) {
     logger_base_t log;
     log.add_frontend(std::move(frontend));
     record_t record = log.open_record(attribute::make<std::int32_t>("custom", 42));
-    ASSERT_TRUE(record.valid());
+    ASSERT_TRUE(record);
     ASSERT_TRUE(record.attributes().find("custom"));
     EXPECT_EQ(42, record.extract<std::int32_t>("custom"));
 }
@@ -147,7 +147,7 @@ TEST(logger_base_t, FilteringUsingDynamicAttributes) {
     log.set_filter(expr::has_attr<std::int32_t>("custom") && expr::get_attr<std::int32_t>("custom") == 42);
     record_t record = log.open_record(attribute::make<std::int32_t>("custom", 42));
 
-    EXPECT_TRUE(record.valid());
+    EXPECT_TRUE(record);
 }
 
 #include <blackhole/scoped_attributes.hpp>
@@ -175,7 +175,7 @@ TEST(logger_base_t, HasPidAttributeOnSuccessfulOpen) {
 
     auto record = log.open_record();
 
-    ASSERT_TRUE(record.valid());
+    ASSERT_TRUE(record);
     ASSERT_TRUE(record.attributes().find("pid"));
     EXPECT_EQ(::getpid(), record.extract<std::uint32_t>("pid"));
 }

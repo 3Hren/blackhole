@@ -48,8 +48,7 @@ TEST(Functional, SyslogConfiguredVerboseLogger) {
     logger_type log(level::debug);
     log.add_frontend(std::move(frontend));
 
-    record_t record = log.open_record(level::error);
-    if (record.valid()) {
+    if (auto record = log.open_record(level::error)) {
         record.insert(keyword::message() = utils::format("Some message from: '%s'!", "Hell"));
         log.push(std::move(record));
     }
@@ -73,8 +72,7 @@ TEST(Functional, Manual) {
     log.add_frontend(std::move(frontend));
 
     // Next lines can be hidden via logging macro.
-    record_t record = log.open_record(testing::level::error);
-    if (record.valid()) {
+    if (auto record = log.open_record(testing::level::error)) {
         record.insert(keyword::message() = utils::format("Some message from: '%s'!", "Hell"));
         // Here we can add another attributes, but just push the record.
         log.push(std::move(record));
