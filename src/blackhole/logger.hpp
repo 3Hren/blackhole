@@ -219,3 +219,5 @@ private:
 #if defined(BLACKHOLE_HEADER_ONLY)
 #include "blackhole/logger.ipp"
 #endif
+
+// TODO: Write tests, which will test multithreading logger/wrapper usage. Helpful, when checking with Valgrind.
