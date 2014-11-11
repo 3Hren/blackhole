@@ -31,7 +31,7 @@ ADD_SUBDIRECTORY(src)
 IF(ENABLE_DOCUMENTATION_GENERATION)
     MESSAGE("-- Checking for Doxygen ...")
     FIND_PACKAGE(Doxygen)
-endif()
+ENDIF()
 
 IF(DOXYGEN_FOUND)
     SET(DOC_TARGET "doc")
@@ -48,4 +48,4 @@ IF(DOXYGEN_FOUND)
         COMMENT "Building documentation"
         SOURCE doc/Doxyfile.in
     )
-endif()
+ENDIF()
