@@ -18,7 +18,7 @@ convert(const attribute::set_t& attributes) {
     return converted;
 }
 
-}
+} // namespace testing
 
 TEST(HasAttribute, ReturnsTrueIfDynamicAttributeExists) {
     auto filter = expression::has_attr<std::int32_t>("custom");

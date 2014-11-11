@@ -1,36 +1,33 @@
 #pragma once
 
+#include <boost/preprocessor/cat.hpp>
+
 #include "attribute.hpp"
 #include "filter.hpp"
 
-#define DECLARE_KEYWORD_IMPL(Name, T) \
-    namespace keyword { \
-    namespace tag { \
-        struct Name##_t { \
-            typedef T type; \
-            static const char* name() { return #Name; } \
-        }; \
-    } \
-    static inline ::blackhole::keyword::keyword_t<T, tag::Name##_t>& Name() { \
-        static ::blackhole::keyword::keyword_t<T, tag::Name##_t> self; \
-        return self; \
-    } \
+#define BLACKHOLE_AUX_KEYWORD_TAG_TYPE(name) BOOST_PP_CAT(name, _t)
+#define BLACKHOLE_AUX_KEYWORD_TYPE(name, T) \
+    ::blackhole::keyword::keyword_t<T, tag::BLACKHOLE_AUX_KEYWORD_TAG_TYPE(name)>
+
+#define BLACKHOLE_AUX_DECLARE_KEYWORD(_name_, T) \
+    namespace keyword {                                                         \
+    namespace tag {                                                             \
+        struct BLACKHOLE_AUX_KEYWORD_TAG_TYPE(_name_) {                         \
+            typedef T type;                                                     \
+            static const char* name() { return BOOST_PP_STRINGIZE(_name_); }    \
+        };                                                                      \
+    }                                                                           \
+    static inline BLACKHOLE_AUX_KEYWORD_TYPE(_name_, T)& _name_() {             \
+        static BLACKHOLE_AUX_KEYWORD_TYPE(_name_, T) self;                      \
+        return self;                                                            \
+    }                                                                           \
     }
 
-#define DECLARE_LOCAL_KEYWORD(Name, T) \
-    DECLARE_KEYWORD_IMPL(Name, T)
-
-#define DECLARE_EVENT_KEYWORD(Name, T) \
-    DECLARE_KEYWORD_IMPL(Name, T)
-
-#define DECLARE_KEYWORD(Name, T) \
-    DECLARE_KEYWORD_IMPL(Name, T)
-
-#define DECLARE_THREAD_KEYWORD(Name, T) \
-    DECLARE_KEYWORD_IMPL(Name, T)
-
-#define DECLARE_UNIVERSE_KEYWORD(Name, T) \
-    DECLARE_KEYWORD_IMPL(Name, T)
+#define DECLARE_LOCAL_KEYWORD(Name, T)    BLACKHOLE_AUX_DECLARE_KEYWORD(Name, T)
+#define DECLARE_EVENT_KEYWORD(Name, T)    BLACKHOLE_AUX_DECLARE_KEYWORD(Name, T)
+#define DECLARE_KEYWORD(Name, T)          BLACKHOLE_AUX_DECLARE_KEYWORD(Name, T)
+#define DECLARE_THREAD_KEYWORD(Name, T)   BLACKHOLE_AUX_DECLARE_KEYWORD(Name, T)
+#define DECLARE_UNIVERSE_KEYWORD(Name, T) BLACKHOLE_AUX_DECLARE_KEYWORD(Name, T)
 
 #include "blackhole/expression/helper.hpp"
 
