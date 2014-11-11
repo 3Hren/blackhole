@@ -116,6 +116,10 @@ public:
     const logger_type& log() const {
         return unwrap<wrapper_base_t>::log(*this);
     }
+
+    void push(record_t&& record) const {
+        wrapped->push(std::move(record));
+    }
 };
 
 template<class Wrapped>
@@ -197,10 +201,6 @@ public:
         // TODO: Move inserter is better.
         std::copy(this->attributes.begin(), this->attributes.end(), std::back_inserter(attributes));
         return this->wrapped->open_record(level, std::move(attributes));
-    }
-
-    void push(record_t&& record) const {
-        this->wrapped->push(std::move(record));
     }
 };
 
