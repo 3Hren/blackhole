@@ -1,6 +1,5 @@
 #pragma once
 
-#include "blackhole/detail/concept.hpp"
 #include "logger.hpp"
 #include "logger/wrapper.hpp"
 

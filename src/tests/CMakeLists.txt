@@ -36,7 +36,6 @@ SET(HEADERS
 SET(SOURCE_MAIN main)
 
 SET(SOURCES_BASE
-    concept/logger
     datetime/test_DayOfYear
     datetime/test_DayOfMonth
     datetime/test_DayOfWeek
