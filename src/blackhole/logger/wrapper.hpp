@@ -92,6 +92,7 @@ public:
         *this = std::move(other);
     }
 
+    // TODO: Is it REALLY need to be assignable? If not - I can easily drop thread synchronization.
     wrapper_base_t& operator=(wrapper_base_t&& other) {
         if (this != &other) {
             auto lock = detail::thread::make_multi_lock_t(mutex, other.mutex);
