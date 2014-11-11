@@ -6,22 +6,33 @@
 namespace blackhole {
 
 class record_t {
+    bool valid_;
     attribute::set_view_t view;
 
 public:
     /*!
      * Default constructor.
-     * Creates an empty record that is equivalent to the invalid record handle.
+     * Creates an empty record.
      */
-    record_t() = default;
+    record_t() : valid_(true) {}
 
     /*!
      * Conversion constructor.
      * Creates a record with specified attribute set.
      */
     record_t(attribute::set_view_t&& view) :
+        valid_(true),
         view(std::move(view))
     {}
+
+    /*!
+     * Return invalid record.
+     */
+    static record_t invalid() {
+        record_t invalid;
+        invalid.valid_ = false;
+        return invalid;
+    }
 
     /*!
      * Conversion to an unspecified boolean type.
@@ -32,11 +43,10 @@ public:
     }
 
     /*!
-     * Check if the record is valid.
-     * A record is considered valid if it contains at least one attribute.
+     * Checks if the record is valid.
      */
     bool valid() const BLACKHOLE_NOEXCEPT {
-        return !view.empty();
+        return valid_;
     }
 
     /*!
@@ -44,6 +54,7 @@ public:
      * record.
      */
     const attribute::set_view_t& attributes() const BLACKHOLE_NOEXCEPT {
+        BOOST_ASSERT(valid());
         return view;
     }
 
@@ -53,10 +64,12 @@ public:
      * amount of time to provide it while opening record.
      */
     void message(const std::string& message) {
+        BOOST_ASSERT(valid());
         view.message(message);
     }
 
     void message(std::string&& message) {
+        BOOST_ASSERT(valid());
         view.message(std::move(message));
     }
 
@@ -64,6 +77,7 @@ public:
      * Insert attribute pair into the record.
      */
     void insert(attribute::pair_t pair) {
+        BOOST_ASSERT(valid());
         view.insert(std::move(pair));
     }
 
@@ -76,6 +90,7 @@ public:
      */
     template<typename T>
     T extract(const std::string& name) const {
+        BOOST_ASSERT(valid());
         return attribute::traits<T>::extract(view, name);
     }
 };

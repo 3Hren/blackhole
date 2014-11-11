@@ -6,7 +6,7 @@
 using namespace blackhole;
 
 TEST(Macro, OpensInvalidLogRecordAndNotPush) {
-    record_t record;
+    record_t record = record_t::invalid();
     mock::verbose_log_t<level> log;
     EXPECT_CALL(log, open_record(level::debug))
             .Times(1)

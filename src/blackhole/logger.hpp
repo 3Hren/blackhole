@@ -196,7 +196,7 @@ public:
             return logger_base_t::open_record(std::move(internal), std::move(local));
         }
 
-        return record_t();
+        return record_t::invalid();
     }
 
 private:

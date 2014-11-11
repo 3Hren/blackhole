@@ -8,9 +8,16 @@ using namespace blackhole;
 TEST(record_t, DefaultConstructor) {
     record_t record;
 
+    EXPECT_TRUE(record);
+    EXPECT_TRUE(record.valid());
+    EXPECT_TRUE(record.attributes().empty());
+}
+
+TEST(record_t, InvalidConstructor) {
+    record_t record = record_t::invalid();
+
     EXPECT_FALSE(record);
     EXPECT_FALSE(record.valid());
-    EXPECT_TRUE(record.attributes().empty());
 }
 
 TEST(record_t, ConversionConstructor) {

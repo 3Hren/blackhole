@@ -153,7 +153,7 @@ logger_base_t::open_record(attribute::set_t internal, attribute::set_t external)
         }
     }
 
-    return record_t();
+    return record_t::invalid();
 }
 
 BLACKHOLE_API

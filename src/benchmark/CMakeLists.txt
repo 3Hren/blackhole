@@ -4,6 +4,7 @@ SET(PROJECT blackhole-benchmark)
 ADD_SUBDIRECTORY(${CMAKE_SOURCE_DIR}/foreign/epicmeter ${CMAKE_BINARY_DIR}/epicmeter)
 
 SET(CMAKE_BUILD_TYPE "Release")
+ADD_DEFINITIONS(-DBOOST_DISABLE_ASSERTS=1)
 
 SET(HEADERS
     util.hpp
