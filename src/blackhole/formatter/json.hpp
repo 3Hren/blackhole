@@ -27,7 +27,7 @@ template<typename Visitor, typename T>
 void apply_visitor(Visitor&, const std::string&, const T&);
 } // namespace aux
 
-//!@todo: Fix code style for this file.
+// TODO: Fix code style for this file.
 //! This class looks creppy, because of inconvenient rapidjson interface. Hope someone could refactor it.
 class json_visitor_t : public boost::static_visitor<> {
     rapidjson::Document* root;

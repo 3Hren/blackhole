@@ -243,7 +243,7 @@ private:
     }
 };
 
-//!@todo: Make it easier.
+// TODO: Make it easier.
 typedef attachable_basic_ostringstream<char> attachable_ostringstream;
 
 } // namespace aux
