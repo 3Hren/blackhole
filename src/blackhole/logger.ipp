@@ -118,7 +118,8 @@ logger_base_t::open_record(attribute::set_t internal, attribute::set_t external)
     // TODO: Magic.
     internal.reserve(6);
     external.reserve(16);
-    if (enabled() && !state.frontends.empty()) {
+
+    if (enabled() && !state.frontends.empty()) { // TODO: Maybe data race!
         internal.emplace_back(
 #ifdef BLACKHOLE_HAS_LWP
             keyword::lwp() = syscall(SYS_gettid)
