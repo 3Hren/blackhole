@@ -1,5 +1,6 @@
 #include <blackhole/keyword/process.hpp>
 #include <blackhole/keyword/timestamp.hpp>
+#include <blackhole/keyword/thread.hpp>
 
 #include "global.hpp"
 
@@ -20,4 +21,8 @@ TEST(timestamp, Init) {
 
 TEST(pid, Init) {
     EXPECT_EQ(::getpid(), keyword::init::pid());
+}
+
+TEST(tid, Init) {
+    EXPECT_EQ(this_thread::get_id<std::string>(), keyword::init::tid());
 }
