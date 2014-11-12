@@ -130,8 +130,9 @@ logger_base_t::open_record(attribute::set_t internal, attribute::set_t external)
 
         internal.emplace_back(keyword::timestamp() = keyword::init::timestamp());
 
-        static const pid_t pid = ::getpid();
-        internal.emplace_back(keyword::pid() = pid);
+#ifdef BLACKHOLE_HAS_ATTRIBUTE_PID
+        internal.emplace_back(keyword::pid() = keyword::init::pid());
+#endif
 
         if (state.tracked) {
             internal.emplace_back(
