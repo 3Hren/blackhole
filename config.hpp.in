@@ -16,4 +16,13 @@
     #define BLACKHOLE_API
 #endif
 
+// Add process id attribute to every logging event. Attribute has integer type.
+#define BLACKHOLE_HAS_ATTRIBUTE_PID
+
+// Add thread id attribute to every logging event. Attribute is represented as hex-formatted string.
+#define BLACKHOLE_HAS_ATTRIBUTE_TID
+
+// Add lightweight process id attribute to every logging event. Attribute has integer type.
+#undef  BLACKHOLE_HAS_ATTRIBUTE_LWP
+
 #endif // CONFIG_H

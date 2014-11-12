@@ -6,11 +6,6 @@
 
 #include "blackhole/keyword/process.hpp"
 
-#ifdef __linux__
-# define BLACKHOLE_HAS_LWP
-# include <sys/syscall.h>
-#endif
-
 namespace blackhole {
 
 namespace aux {
@@ -120,19 +115,19 @@ logger_base_t::open_record(attribute::set_t internal, attribute::set_t external)
     external.reserve(16);
 
     if (enabled() && !state.frontends.empty()) { // TODO: Maybe data race!
-        internal.emplace_back(
-#ifdef BLACKHOLE_HAS_LWP
-            keyword::lwp() = syscall(SYS_gettid)
-#else
-            keyword::tid() = this_thread::get_id<std::string>()
-#endif
-        );
-
-        internal.emplace_back(keyword::timestamp() = keyword::init::timestamp());
-
 #ifdef BLACKHOLE_HAS_ATTRIBUTE_PID
         internal.emplace_back(keyword::pid() = keyword::init::pid());
 #endif
+
+#ifdef BLACKHOLE_HAS_ATTRIBUTE_TID
+        internal.emplace_back(keyword::tid() = keyword::init::tid());
+#endif
+
+#ifdef BLACKHOLE_HAS_ATTRIBUTE_LWP
+        internal.emplace_back(keyword::lwp() = keyword::init::lwp());
+#endif
+
+        internal.emplace_back(keyword::timestamp() = keyword::init::timestamp());
 
         if (state.tracked) {
             internal.emplace_back(
