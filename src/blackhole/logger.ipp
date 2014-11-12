@@ -142,6 +142,8 @@ logger_base_t::open_record(attribute::set_t internal, attribute::set_t external)
         reader_lock_type lock(state.lock.open);
         if (state.scoped.get()) {
             const auto& scoped = state.scoped->attributes();
+            // TODO: We can avoid early copying when record won't pass filtering by using combined_view_t.
+            // Moveover, verbose logger does the same.
             std::copy(scoped.begin(), scoped.end(), std::back_inserter(external));
         }
 
