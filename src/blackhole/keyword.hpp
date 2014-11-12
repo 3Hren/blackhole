@@ -2,8 +2,9 @@
 
 #include <boost/preprocessor/cat.hpp>
 
-#include "attribute.hpp"
-#include "filter.hpp"
+#include "blackhole/attribute.hpp"
+#include "blackhole/config.hpp"
+#include "blackhole/filter.hpp"
 
 #define BLACKHOLE_AUX_KEYWORD_TAG_TYPE(name) BOOST_PP_CAT(name, _t)
 #define BLACKHOLE_AUX_KEYWORD_TYPE(name, T) \
