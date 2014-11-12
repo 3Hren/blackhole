@@ -128,9 +128,7 @@ logger_base_t::open_record(attribute::set_t internal, attribute::set_t external)
 #endif
         );
 
-        timeval tv;
-        gettimeofday(&tv, nullptr);
-        internal.emplace_back(keyword::timestamp() = tv);
+        internal.emplace_back(keyword::timestamp() = keyword::init::timestamp());
 
         static const pid_t pid = ::getpid();
         internal.emplace_back(keyword::pid() = pid);
