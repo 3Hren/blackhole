@@ -19,10 +19,14 @@ TEST(timestamp, Init) {
     EXPECT_TRUE(1000000 * value.tv_sec + value.tv_usec <= 1000000 * max.tv_sec + max.tv_usec);
 }
 
+#ifdef BLACKHOLE_HAS_ATTRIBUTE_PID
 TEST(pid, Init) {
     EXPECT_EQ(::getpid(), keyword::init::pid());
 }
+#endif
 
+#ifdef BLACKHOLE_HAS_ATTRIBUTE_TID
 TEST(tid, Init) {
     EXPECT_EQ(this_thread::get_id<std::string>(), keyword::init::tid());
 }
+#endif

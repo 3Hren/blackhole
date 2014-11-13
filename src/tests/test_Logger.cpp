@@ -167,6 +167,7 @@ TEST(logger_base_t, LocalAttributesIsMoreSpecificThanScoped) {
     EXPECT_EQ(100500, record.extract<int>("answer"));
 }
 
+#ifdef BLACKHOLE_HAS_ATTRIBUTE_PID
 TEST(logger_base_t, HasPidAttributeOnSuccessfulOpen) {
     std::unique_ptr<mock::frontend_t> frontend;
 
@@ -179,3 +180,4 @@ TEST(logger_base_t, HasPidAttributeOnSuccessfulOpen) {
     ASSERT_TRUE(record.attributes().find("pid"));
     EXPECT_EQ(::getpid(), record.extract<std::uint32_t>("pid"));
 }
+#endif
