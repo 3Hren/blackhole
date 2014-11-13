@@ -82,6 +82,12 @@ public:
 
 protected:
     record_t open_record(attribute::set_t internal, attribute::set_t external) const;
+
+    // Unlocked.
+    void populate_i(attribute::set_t& internal) const;
+
+    // Locked.
+    void populate_e(attribute::set_t& external) const;
 };
 
 /// Concept form scoped attributes holder.
@@ -180,28 +186,36 @@ public:
      */
     record_t
     open_record(level_type level, attribute::set_t external = attribute::set_t()) const {
-        bool passed = false;
         reader_lock_type lock(state.lock.open);
-        if (auto scoped = state.scoped.get()) {
-            const attribute::combined_view_t view(external, scoped->attributes());
-            passed = filter(level, view);
-        } else {
-            const attribute::combined_view_t view(external);
-            passed = filter(level, view);
-        }
-
-        if (passed) {
+        const attribute::combined_view_t view = combined(lock, external);
+        if (filter(level, view)) {
+            // Populate.
             attribute::set_t internal;
+            internal.reserve(6);
+            populate_i(internal);
             internal.emplace_back(keyword::severity<Level>() = level);
-            return logger_base_t::open_record(std::move(internal), std::move(external));
+            external.reserve(16);
+            populate_e(external);
+            attribute::set_view_t view(std::move(external), std::move(internal));
+            return record_t(std::move(view));
         }
 
         return record_t::invalid();
     }
 
 private:
+    template<class... Sets>
+    attribute::combined_view_t
+    combined(const reader_lock_type&, const Sets&... sets) const {
+        if (auto scoped = state.scoped.get()) {
+            return attribute::combined_view_t(sets..., scoped->attributes());
+        } else {
+            return attribute::combined_view_t(sets...);
+        }
+    }
+
     struct default_filter {
-        level_type threshold;
+        const level_type threshold;
 
         inline
         bool

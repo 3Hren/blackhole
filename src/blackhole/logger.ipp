@@ -110,39 +110,12 @@ logger_base_t::open_record(attribute::set_t attributes) const {
 BLACKHOLE_API
 record_t
 logger_base_t::open_record(attribute::set_t internal, attribute::set_t external) const {
-    // TODO: Magic.
-    internal.reserve(6);
-    external.reserve(16);
-
     if (enabled() && !state.frontends.empty()) { // TODO: Maybe data race!
-#ifdef BLACKHOLE_HAS_ATTRIBUTE_PID
-        internal.emplace_back(keyword::pid() = keyword::init::pid());
-#endif
-
-#ifdef BLACKHOLE_HAS_ATTRIBUTE_TID
-        internal.emplace_back(keyword::tid() = keyword::init::tid());
-#endif
-
-#ifdef BLACKHOLE_HAS_ATTRIBUTE_LWP
-        internal.emplace_back(keyword::lwp() = keyword::init::lwp());
-#endif
-
-        internal.emplace_back(keyword::timestamp() = keyword::init::timestamp());
-
-        if (state.tracked) {
-            internal.emplace_back(
-                attribute::make("trace", ::this_thread::current_span().trace)
-            );
-        }
-
+        internal.reserve(6); // TODO: Magic.
+        populate_i(internal);
+        external.reserve(16); // TODO: Magic.
         reader_lock_type lock(state.lock.open);
-        if (state.scoped.get()) {
-            const auto& scoped = state.scoped->attributes();
-            // TODO: We can avoid early copying when record won't pass filtering by using combined_view_t.
-            // Moveover, verbose logger does the same.
-            std::copy(scoped.begin(), scoped.end(), std::back_inserter(external));
-        }
-
+        populate_e(external);
         attribute::set_view_t view(std::move(external), std::move(internal));
 
         if (state.filter(view)) {
@@ -151,6 +124,39 @@ logger_base_t::open_record(attribute::set_t internal, attribute::set_t external)
     }
 
     return record_t::invalid();
+}
+
+BLACKHOLE_API
+void
+logger_base_t::populate_i(attribute::set_t& internal) const {
+#ifdef BLACKHOLE_HAS_ATTRIBUTE_PID
+    internal.emplace_back(keyword::pid() = keyword::init::pid());
+#endif
+
+#ifdef BLACKHOLE_HAS_ATTRIBUTE_TID
+    internal.emplace_back(keyword::tid() = keyword::init::tid());
+#endif
+
+#ifdef BLACKHOLE_HAS_ATTRIBUTE_LWP
+    internal.emplace_back(keyword::lwp() = keyword::init::lwp());
+#endif
+
+    internal.emplace_back(keyword::timestamp() = keyword::init::timestamp());
+
+    if (state.tracked) {
+        internal.emplace_back(
+            attribute::make("trace", ::this_thread::current_span().trace)
+        );
+    }
+}
+
+BLACKHOLE_API
+void
+logger_base_t::populate_e(attribute::set_t& external) const {
+    if (auto scoped = state.scoped.get()) {
+        const auto& attributes = scoped->attributes();
+        std::copy(attributes.begin(), attributes.end(), std::back_inserter(external));
+    }
 }
 
 BLACKHOLE_API
