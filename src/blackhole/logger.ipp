@@ -111,14 +111,16 @@ BLACKHOLE_API
 record_t
 logger_base_t::open_record(attribute::set_t internal, attribute::set_t external) const {
     if (enabled() && !state.frontends.empty()) { // TODO: Maybe data race!
-        internal.reserve(6); // TODO: Magic.
-        populate_i(internal);
-        external.reserve(16); // TODO: Magic.
         reader_lock_type lock(state.lock.open);
-        populate_e(external);
 
         const attribute::combined_view_t view = combined(lock, external, internal);
         if (state.filter(view)) {
+            internal.reserve(6); // TODO: Magic.
+            populate_i(internal);
+
+            external.reserve(16); // TODO: Magic.
+            populate_e(external);
+
             return record_t(std::move(internal), std::move(external));
         }
     }
