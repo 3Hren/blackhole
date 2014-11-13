@@ -202,13 +202,14 @@ public:
     record_t
     open_record(level_type level, attribute::set_t external = attribute::set_t()) const {
         reader_lock_type lock(state.lock.open);
+
         const attribute::combined_view_t view = combined(lock, external);
         if (filter(level, view)) {
-            // Populate.
             attribute::set_t internal;
             internal.reserve(6);
             populate_i(internal);
             internal.emplace_back(keyword::severity<Level>() = level);
+
             external.reserve(16);
             populate_e(external);
 
