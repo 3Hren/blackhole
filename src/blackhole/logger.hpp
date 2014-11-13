@@ -197,7 +197,6 @@ public:
      * or via comparing verbosity level with threshold specified.
      * \param level - Desired verbosity level.
      * \return Valid or invalid `record_t` object.
-     * \todo Decompose.
      */
     record_t
     open_record(level_type level, attribute::set_t external = attribute::set_t()) const {
