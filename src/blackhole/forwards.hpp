@@ -18,6 +18,7 @@ namespace blackhole {
 
     namespace attribute {
         class set_view_t;
+        class combined_view_t;
     } // namespace attribute
 
     class base_frontend_t;
