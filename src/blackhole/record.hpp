@@ -16,6 +16,13 @@ public:
      */
     record_t() : valid_(true) {}
 
+    // TODO: Test.
+    // TODO: Doc.
+    record_t(attribute::set_t&& internal, attribute::set_t&& external) :
+        valid_(true),
+        view(std::move(external), std::move(internal))
+    {}
+
     /*!
      * Conversion constructor.
      * Creates a record with specified attribute set.

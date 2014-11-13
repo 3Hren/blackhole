@@ -211,8 +211,8 @@ public:
             internal.emplace_back(keyword::severity<Level>() = level);
             external.reserve(16);
             populate_e(external);
-            attribute::set_view_t view(std::move(external), std::move(internal));
-            return record_t(std::move(view));
+
+            return record_t(std::move(internal), std::move(external));
         }
 
         return record_t::invalid();
