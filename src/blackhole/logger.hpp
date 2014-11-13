@@ -179,21 +179,21 @@ public:
      * \todo Decompose.
      */
     record_t
-    open_record(level_type level, attribute::set_t local = attribute::set_t()) const {
+    open_record(level_type level, attribute::set_t external = attribute::set_t()) const {
         bool passed = false;
         reader_lock_type lock(state.lock.open);
         if (auto scoped = state.scoped.get()) {
-            const attribute::combined_view_t view(local, scoped->attributes());
+            const attribute::combined_view_t view(external, scoped->attributes());
             passed = filter(level, view);
         } else {
-            const attribute::combined_view_t view(local);
+            const attribute::combined_view_t view(external);
             passed = filter(level, view);
         }
 
         if (passed) {
             attribute::set_t internal;
             internal.emplace_back(keyword::severity<Level>() = level);
-            return logger_base_t::open_record(std::move(internal), std::move(local));
+            return logger_base_t::open_record(std::move(internal), std::move(external));
         }
 
         return record_t::invalid();
