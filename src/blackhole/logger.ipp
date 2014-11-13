@@ -116,9 +116,10 @@ logger_base_t::open_record(attribute::set_t internal, attribute::set_t external)
         external.reserve(16); // TODO: Magic.
         reader_lock_type lock(state.lock.open);
         populate_e(external);
-        attribute::set_view_t view(std::move(external), std::move(internal));
 
+        const attribute::combined_view_t view = combined(lock, external, internal);
         if (state.filter(view)) {
+            attribute::set_view_t view(std::move(external), std::move(internal));
             return record_t(std::move(view));
         }
     }

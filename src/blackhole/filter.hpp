@@ -7,13 +7,13 @@
 
 namespace blackhole {
 
-typedef std::function<bool(const attribute::set_view_t& attributes)> filter_t;
+typedef std::function<bool(const attribute::combined_view_t& attributes)> filter_t;
 
 namespace filter {
 
 inline
 BLACKHOLE_ALWAYS_INLINE
-bool none(const attribute::set_view_t&) {
+bool none(const attribute::combined_view_t&) {
     return true;
 }
 

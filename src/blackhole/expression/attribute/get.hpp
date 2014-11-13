@@ -28,7 +28,7 @@ struct get_attr_action_t {
         return Operator<get_attr_action_t<T>>({ *this, static_cast<result_type>(other) });
     }
 
-    result_type operator ()(const attribute::set_view_t& attributes) const {
+    result_type operator ()(const attribute::combined_view_t& attributes) const {
         // GCC 4.4. can't compare strongly-typed enums.
         return static_cast<result_type>(attribute::traits<T>::extract(attributes, name));
     }

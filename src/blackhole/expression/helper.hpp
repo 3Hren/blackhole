@@ -31,7 +31,7 @@ struct And : public LogicMixin<And> {
 
     And(filter_t first, filter_t second) : first(first), second(second) {}
 
-    bool operator ()(const attribute::set_view_t& attributes) const {
+    bool operator ()(const attribute::combined_view_t& attributes) const {
         return first(attributes) && second(attributes);
     }
 };
@@ -42,7 +42,7 @@ struct Or : public LogicMixin<Or> {
 
     Or(filter_t first, filter_t second) : first(first), second(second) {}
 
-    bool operator ()(const attribute::set_view_t& attributes) const {
+    bool operator ()(const attribute::combined_view_t& attributes) const {
         return first(attributes) || second(attributes);
     }
 };
@@ -64,7 +64,7 @@ struct Eq : public LogicMixin<Eq<T>> {
 
     Eq(T extracter, typename T::result_type other) : extracter(extracter), other(other) {}
 
-    bool operator ()(const attribute::set_view_t& attributes) const {
+    bool operator ()(const attribute::combined_view_t& attributes) const {
         return extracter(attributes) == other;
     }
 };
@@ -76,7 +76,7 @@ struct Less : public LogicMixin<Less<T>> {
 
     Less(T extracter, typename T::result_type other) : extracter(extracter), other(other) {}
 
-    bool operator ()(const attribute::set_view_t& attributes) const {
+    bool operator ()(const attribute::combined_view_t& attributes) const {
         return extracter(attributes) < other;
     }
 };
@@ -88,7 +88,7 @@ struct LessEq : public LogicMixin<LessEq<T>> {
 
     LessEq(T extracter, typename T::result_type other) : extracter(extracter), other(other) {}
 
-    bool operator ()(const attribute::set_view_t& attributes) const {
+    bool operator ()(const attribute::combined_view_t& attributes) const {
         return extracter(attributes) <= other;
     }
 };
@@ -100,7 +100,7 @@ struct Gt : public LogicMixin<Gt<T>> {
 
     Gt(T extracter, typename T::result_type other) : extracter(extracter), other(other) {}
 
-    bool operator ()(const attribute::set_view_t& attributes) const {
+    bool operator ()(const attribute::combined_view_t& attributes) const {
         return extracter(attributes) > other;
     }
 };
@@ -112,7 +112,7 @@ struct GtEq : public LogicMixin<GtEq<T>> {
 
     GtEq(T extracter, typename T::result_type other) : extracter(extracter), other(other) {}
 
-    bool operator ()(const attribute::set_view_t& attributes) const {
+    bool operator ()(const attribute::combined_view_t& attributes) const {
         return extracter(attributes) >= other;
     }
 };

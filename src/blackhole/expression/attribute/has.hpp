@@ -34,11 +34,11 @@ struct has_attr_action_t : public aux::LogicMixin<has_attr_action_t<T>> {
 
     has_attr_action_t(const std::string& name) : name(name) {}
 
-    bool operator()(const attribute::set_view_t& attributes) const {
+    bool operator()(const attribute::combined_view_t& attributes) const {
         static has_attribute_visitor<underlying_type> visitor;
 
-        if (auto attribute = attributes.find(name)) {
-            return boost::apply_visitor(visitor, attribute->value);
+        if (auto attribute = attributes.get(name)) {
+            return boost::apply_visitor(visitor, *attribute);
         }
 
         return false;

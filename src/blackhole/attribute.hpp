@@ -36,6 +36,14 @@ struct traits {
     static inline T extract(const set_view_t& attributes, const name_t& name) {
         return boost::get<T>(attributes.at(name).value);
     }
+
+    static inline T extract(const combined_view_t& attributes, const name_t& name) {
+        if (auto attribute = attributes.get<T>(name)) {
+            return *attribute;
+        }
+
+        throw std::logic_error("TODO: Description");
+    }
 };
 
 /// Attribute packing/extracting trait specialization for enumeration types.
@@ -49,6 +57,14 @@ struct traits<T, typename std::enable_if<std::is_enum<T>::value>::type> {
 
     static inline T extract(const set_view_t& attributes, const name_t& name) {
         return static_cast<T>(boost::get<underlying_type>(attributes.at(name).value));
+    }
+
+    static inline T extract(const combined_view_t& attributes, const name_t& name) {
+        if (auto attribute = attributes.get<underlying_type>(name)) {
+            return static_cast<T>(*attribute);
+        }
+
+        throw std::logic_error("TODO: Description");
     }
 };
 
