@@ -55,7 +55,7 @@ public:
     struct external_set_t { set_t v; };
 
 private:
-    internal_set_t internal;  // Severity, message, timestamp. Maybe pid, tid.
+    internal_set_t internal;  // Message, timestamp. Maybe pid, tid, lwp, traceid, severity.
     external_set_t external;  // All other.
 
 public:
