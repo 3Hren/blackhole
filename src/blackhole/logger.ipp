@@ -103,18 +103,13 @@ logger_base_t::open_record(attribute::pair_t attribute) const {
 
 BLACKHOLE_API
 record_t
-logger_base_t::open_record(attribute::set_t attributes) const {
-    return open_record(attribute::set_t(), std::move(attributes));
-}
-
-BLACKHOLE_API
-record_t
-logger_base_t::open_record(attribute::set_t internal, attribute::set_t external) const {
+logger_base_t::open_record(attribute::set_t external) const {
     if (enabled() && !state.frontends.empty()) { // TODO: Maybe data race!
         reader_lock_type lock(state.lock.open);
 
-        const attribute::combined_view_t view = combined(lock, external, internal);
+        const attribute::combined_view_t view = combined(lock, external);
         if (state.filter(view)) {
+            attribute::set_t internal;
             internal.reserve(6); // TODO: Magic.
             populate_i(internal);
 

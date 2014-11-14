@@ -76,13 +76,11 @@ public:
 
     record_t open_record() const;
     record_t open_record(attribute::pair_t attribute) const;
-    record_t open_record(attribute::set_t attributes) const;
+    record_t open_record(attribute::set_t external) const;
 
     void push(record_t&& record) const;
 
 protected:
-    record_t open_record(attribute::set_t internal, attribute::set_t external) const;
-
     // Unlocked.
     void populate_i(attribute::set_t& internal) const;
 
