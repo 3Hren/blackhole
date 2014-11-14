@@ -90,8 +90,7 @@ protected:
     void populate_e(attribute::set_t& external) const;
 
     template<class... Sets>
-    attribute::combined_view_t
-    combined(const reader_lock_type&, const Sets&... sets) const;
+    attribute::combined_view_t combined(const reader_lock_type&, const Sets&... sets) const;
 };
 
 /// Concept form scoped attributes holder.
