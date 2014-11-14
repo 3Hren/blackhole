@@ -58,9 +58,6 @@ protected:
 public:
     logger_base_t();
 
-    //! @compat GCC4.4
-    //! Blaming GCC4.4 - it needs explicit move constructor definition,
-    //! because it cannot define default move constructor for derived class.
     logger_base_t(logger_base_t&& other) BLACKHOLE_NOEXCEPT;
     logger_base_t& operator=(logger_base_t&& other) BLACKHOLE_NOEXCEPT;
 
@@ -132,9 +129,6 @@ public:
         filter(default_filter { level })
     {}
 
-    //! @compat: GCC4.4
-    //! GCC 4.4 doesn't create default copy/move constructor for derived
-    //! classes. It's a bug.
     verbose_logger_t(verbose_logger_t&& other) BLACKHOLE_NOEXCEPT :
         logger_base_t(std::move(other))
     {
