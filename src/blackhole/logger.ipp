@@ -107,7 +107,7 @@ logger_base_t::open_record(attribute::set_t external) const {
     if (enabled() && !state.frontends.empty()) { // TODO: Maybe data race!
         reader_lock_type lock(state.lock.open);
 
-        const attribute::combined_view_t view = combined(lock, external);
+        const attribute::combined_view_t view = with_scoped(external, lock);
         if (state.filter(view)) {
             attribute::set_t internal;
             internal.reserve(6); // TODO: Magic.
@@ -156,14 +156,13 @@ logger_base_t::populate_e(attribute::set_t& external) const {
     }
 }
 
-template<class... Sets>
 BLACKHOLE_API
 attribute::combined_view_t
-logger_base_t::combined(const reader_lock_type&, const Sets&... sets) const  {
+logger_base_t::with_scoped(const attribute::set_t& external, const reader_lock_type&) const {
     if (auto scoped = state.scoped.get()) {
-        return attribute::combined_view_t(sets..., scoped->attributes());
+        return attribute::combined_view_t(external, scoped->attributes());
     } else {
-        return attribute::combined_view_t(sets...);
+        return attribute::combined_view_t(external);
     }
 }
 

@@ -87,8 +87,8 @@ protected:
     // Locked.
     void populate_e(attribute::set_t& external) const;
 
-    template<class... Sets>
-    attribute::combined_view_t combined(const reader_lock_type&, const Sets&... sets) const;
+    attribute::combined_view_t
+    with_scoped(const attribute::set_t& external, const reader_lock_type&) const;
 };
 
 /// Concept form scoped attributes holder.
@@ -187,8 +187,8 @@ public:
     record_t
     open_record(level_type level, attribute::set_t external = attribute::set_t()) const {
         reader_lock_type lock(state.lock.open);
+        const attribute::combined_view_t view = with_scoped(external, lock);
 
-        const attribute::combined_view_t view = combined(lock, external);
         if (filter(level, view)) {
             attribute::set_t internal;
             internal.reserve(6);
