@@ -110,12 +110,8 @@ logger_base_t::open_record(attribute::set_t external) const {
         const attribute::combined_view_t view = with_scoped(external, lock);
         if (state.filter(view)) {
             attribute::set_t internal;
-            internal.reserve(6); // TODO: Magic.
-            populate_i(internal);
-
-            external.reserve(16); // TODO: Magic.
-            populate_e(external);
-
+            populate(internal);
+            populate(external, lock);
             return record_t(std::move(internal), std::move(external));
         }
     }
@@ -125,7 +121,9 @@ logger_base_t::open_record(attribute::set_t external) const {
 
 BLACKHOLE_API
 void
-logger_base_t::populate_i(attribute::set_t& internal) const {
+logger_base_t::populate(attribute::set_t& internal) const {
+    internal.reserve(6); // TODO: Magic.
+
 #ifdef BLACKHOLE_HAS_ATTRIBUTE_PID
     internal.emplace_back(keyword::pid() = keyword::init::pid());
 #endif
@@ -141,15 +139,15 @@ logger_base_t::populate_i(attribute::set_t& internal) const {
     internal.emplace_back(keyword::timestamp() = keyword::init::timestamp());
 
     if (state.tracked) {
-        internal.emplace_back(
-            attribute::make("trace", ::this_thread::current_span().trace)
-        );
+        internal.emplace_back(attribute::make("trace", ::this_thread::current_span().trace));
     }
 }
 
 BLACKHOLE_API
 void
-logger_base_t::populate_e(attribute::set_t& external) const {
+logger_base_t::populate(attribute::set_t& external, const reader_lock_type&) const {
+    external.reserve(16); // TODO: Magic.
+
     if (auto scoped = state.scoped.get()) {
         const auto& attributes = scoped->attributes();
         std::copy(attributes.begin(), attributes.end(), std::back_inserter(external));

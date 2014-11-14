@@ -81,14 +81,10 @@ public:
     void push(record_t&& record) const;
 
 protected:
-    // Unlocked.
-    void populate_i(attribute::set_t& internal) const;
+    void populate(attribute::set_t& internal) const;
+    void populate(attribute::set_t& external, const reader_lock_type&) const;
 
-    // Locked.
-    void populate_e(attribute::set_t& external) const;
-
-    attribute::combined_view_t
-    with_scoped(const attribute::set_t& external, const reader_lock_type&) const;
+    attribute::combined_view_t with_scoped(const attribute::set_t& external, const reader_lock_type&) const;
 };
 
 /// Concept form scoped attributes holder.
@@ -192,13 +188,9 @@ public:
             const attribute::combined_view_t view = with_scoped(external, lock);
             if (filter(level, view)) {
                 attribute::set_t internal;
-                internal.reserve(6);
-                populate_i(internal);
-                internal.emplace_back(keyword::severity<Level>() = level);
-
-                external.reserve(16);
-                populate_e(external);
-
+                populate(internal);
+                internal.emplace_back(keyword::severity<level_type>() = level);
+                populate(external, lock);
                 return record_t(std::move(internal), std::move(external));
             }
         }
