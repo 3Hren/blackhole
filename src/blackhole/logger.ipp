@@ -122,7 +122,7 @@ logger_base_t::open_record(attribute::set_t external) const {
 BLACKHOLE_API
 void
 logger_base_t::populate(attribute::set_t& internal) const {
-    internal.reserve(6); // TODO: Magic.
+    internal.reserve(BLACKHOLE_INTERNAL_SET_RESERVED_SIZE);
 
 #ifdef BLACKHOLE_HAS_ATTRIBUTE_PID
     internal.emplace_back(keyword::pid() = keyword::init::pid());
@@ -146,7 +146,7 @@ logger_base_t::populate(attribute::set_t& internal) const {
 BLACKHOLE_API
 void
 logger_base_t::populate(attribute::set_t& external, const reader_lock_type&) const {
-    external.reserve(16); // TODO: Magic.
+    external.reserve(BLACKHOLE_EXTERNAL_SET_RESERVED_SIZE);
 
     if (auto scoped = state.scoped.get()) {
         const auto& attributes = scoped->attributes();
