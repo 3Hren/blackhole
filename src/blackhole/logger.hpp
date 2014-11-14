@@ -187,18 +187,20 @@ public:
     record_t
     open_record(level_type level, attribute::set_t external = attribute::set_t()) const {
         reader_lock_type lock(state.lock.open);
-        const attribute::combined_view_t view = with_scoped(external, lock);
+        if (enabled() && !state.frontends.empty()) {
 
-        if (filter(level, view)) {
-            attribute::set_t internal;
-            internal.reserve(6);
-            populate_i(internal);
-            internal.emplace_back(keyword::severity<Level>() = level);
+            const attribute::combined_view_t view = with_scoped(external, lock);
+            if (filter(level, view)) {
+                attribute::set_t internal;
+                internal.reserve(6);
+                populate_i(internal);
+                internal.emplace_back(keyword::severity<Level>() = level);
 
-            external.reserve(16);
-            populate_e(external);
+                external.reserve(16);
+                populate_e(external);
 
-            return record_t(std::move(internal), std::move(external));
+                return record_t(std::move(internal), std::move(external));
+            }
         }
 
         return record_t::invalid();

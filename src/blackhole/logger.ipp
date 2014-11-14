@@ -104,8 +104,8 @@ logger_base_t::open_record(attribute::pair_t attribute) const {
 BLACKHOLE_API
 record_t
 logger_base_t::open_record(attribute::set_t external) const {
-    if (enabled() && !state.frontends.empty()) { // TODO: Maybe data race!
-        reader_lock_type lock(state.lock.open);
+    reader_lock_type lock(state.lock.open);
+    if (enabled() && !state.frontends.empty()) {
 
         const attribute::combined_view_t view = with_scoped(external, lock);
         if (state.filter(view)) {
