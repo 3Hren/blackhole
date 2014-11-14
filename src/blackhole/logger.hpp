@@ -117,17 +117,6 @@ protected:
     const scoped_attributes_concept_t& parent() const;
 };
 
-template<class... Sets>
-BLACKHOLE_API
-attribute::combined_view_t
-logger_base_t::combined(const reader_lock_type&, const Sets&... sets) const  {
-    if (auto scoped = state.scoped.get()) {
-        return attribute::combined_view_t(sets..., scoped->attributes());
-    } else {
-        return attribute::combined_view_t(sets...);
-    }
-}
-
 template<typename Level>
 class verbose_logger_t : public logger_base_t {
 public:

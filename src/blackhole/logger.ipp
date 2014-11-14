@@ -161,6 +161,17 @@ logger_base_t::populate_e(attribute::set_t& external) const {
     }
 }
 
+template<class... Sets>
+BLACKHOLE_API
+attribute::combined_view_t
+logger_base_t::combined(const reader_lock_type&, const Sets&... sets) const  {
+    if (auto scoped = state.scoped.get()) {
+        return attribute::combined_view_t(sets..., scoped->attributes());
+    } else {
+        return attribute::combined_view_t(sets...);
+    }
+}
+
 BLACKHOLE_API
 void
 logger_base_t::push(record_t&& record) const {
