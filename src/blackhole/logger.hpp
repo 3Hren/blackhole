@@ -10,6 +10,7 @@
 #include "blackhole/detail/config/noncopyable.hpp"
 #include "blackhole/detail/config/nullptr.hpp"
 #include "blackhole/detail/util/unique.hpp"
+#include "blackhole/forwards.hpp"
 #include "error/handler.hpp"
 #include "filter.hpp"
 #include "frontend.hpp"
@@ -23,8 +24,6 @@
 #include "blackhole/config.hpp"
 
 namespace blackhole {
-
-class scoped_attributes_concept_t;
 
 class logger_base_t {
     friend class scoped_attributes_concept_t;
