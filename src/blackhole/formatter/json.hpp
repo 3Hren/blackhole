@@ -98,8 +98,7 @@ private:
 
     template<typename T>
     void map_and_add_member(rapidjson::Value* node, const std::string& name, const T& value) {
-        auto result = mapper(name, value);
-        if (result.is_initialized()) {
+        if (auto result = mapper(name, value)) {
             cache.push_back(result.get());
             add_member(node, name, cache.back());
         } else {
