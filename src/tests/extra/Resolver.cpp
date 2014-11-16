@@ -50,7 +50,20 @@ TEST(resolver, ResolveByHostname) {
     );
 
     auto actual = resolver<protocol_type>::resolve("localhost/:5000", service);
-    EXPECT_TRUE(expected_v4 == actual || expected_v6 == actual);
+
+    // Expanded fe80:1::1.
+    auto isatap = endpoint_type(
+        boost::asio::ip::address_v6(boost::asio::ip::address_v6::bytes_type {{
+            254, 128, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+        }}),
+        5000
+    );
+
+    EXPECT_THAT(actual, AnyOf(
+        Eq(expected_v4),
+        Eq(expected_v6),
+        Eq(isatap)
+    ));
 }
 
 TEST(resolver, ThrowExceptionWhenPortNotSpecifyed) {
