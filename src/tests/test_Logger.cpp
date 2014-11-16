@@ -135,7 +135,7 @@ TEST(logger_base_t, SettingDynamicAttributes) {
     log.add_frontend(std::move(frontend));
     record_t record = log.open_record(attribute::make<std::int32_t>("custom", 42));
     ASSERT_TRUE(record);
-    ASSERT_TRUE(record.attributes().find("custom"));
+    ASSERT_TRUE(!!record.attributes().find("custom"));
     EXPECT_EQ(42, record.extract<std::int32_t>("custom"));
 }
 
@@ -177,7 +177,7 @@ TEST(logger_base_t, HasPidAttributeOnSuccessfulOpen) {
     auto record = log.open_record();
 
     ASSERT_TRUE(record);
-    ASSERT_TRUE(record.attributes().find("pid"));
+    ASSERT_TRUE(!!record.attributes().find("pid"));
     EXPECT_EQ(::getpid(), record.extract<std::uint32_t>("pid"));
 }
 #endif

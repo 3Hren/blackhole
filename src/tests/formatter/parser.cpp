@@ -8,7 +8,7 @@ TEST(parser_t, Literal) {
     parser_t parser("literal");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
     EXPECT_EQ("literal", boost::get<literal_t>(*token).value);
 
     EXPECT_FALSE(parser.next());
@@ -18,7 +18,7 @@ TEST(parser_t, RequiredPlaceholder) {
     parser_t parser("%(id)s");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
     EXPECT_EQ("id", boost::get<placeholder::required_t>(*token).name);
 
     EXPECT_FALSE(parser.next());
@@ -56,11 +56,11 @@ TEST(parser_t, LiteralFollowedByRequiredPlaceholder) {
     parser_t parser("id=%(id)s");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
     EXPECT_EQ("id=", boost::get<literal_t>(*token).value);
 
     token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
     EXPECT_EQ("id", boost::get<placeholder::required_t>(*token).name);
 
     EXPECT_FALSE(parser.next());
@@ -70,11 +70,11 @@ TEST(parser_t, RequiredPlaceholderFollowedByLiteral) {
     parser_t parser("%(id)s == id");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
     EXPECT_EQ("id", boost::get<placeholder::required_t>(*token).name);
 
     token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
     EXPECT_EQ(" == id", boost::get<literal_t>(*token).value);
 
     EXPECT_FALSE(parser.next());
@@ -85,15 +85,15 @@ TEST(parser_t, RequiredPlaceholderSurroundedByLiterals) {
 
     auto token = parser.next();
 
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
     EXPECT_EQ("id=", boost::get<literal_t>(*token).value);
 
     token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
     EXPECT_EQ("id", boost::get<placeholder::required_t>(*token).name);
 
     token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
     EXPECT_EQ(" definitely an id", boost::get<literal_t>(*token).value);
 
     EXPECT_FALSE(parser.next());
@@ -103,7 +103,7 @@ TEST(parser_t, OptionalPlaceholder) {
     parser_t parser("%(id::)s");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
 
     auto placeholder = boost::get<placeholder::optional_t>(*token);
     EXPECT_EQ("id", placeholder.name);
@@ -132,7 +132,7 @@ TEST(parser_t, OptionalPlaceholderWithPrefix) {
         parser_t parser(it->pattern);
 
         auto token = parser.next();
-        ASSERT_TRUE(token);
+        ASSERT_TRUE(!!token);
 
         auto placeholder = boost::get<placeholder::optional_t>(*token);
         EXPECT_EQ(it->expected.name, placeholder.name);
@@ -147,7 +147,7 @@ TEST(parser_t, OptionalPlaceholderWithSuffix) {
     parser_t parser("%(id::/)s");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
 
     auto placeholder = boost::get<placeholder::optional_t>(*token);
     EXPECT_EQ("id", placeholder.name);
@@ -165,7 +165,7 @@ TEST(parser_t, OptionalPlaceholderWithPrefixAndSuffix) {
     parser_t parser("%(id:/:/)s");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
 
     auto placeholder = boost::get<placeholder::optional_t>(*token);
     EXPECT_EQ("id", placeholder.name);
@@ -179,7 +179,7 @@ TEST(parser_t, OptionalPlaceholderWithPrefixAndSuffixEscaped) {
     parser_t parser("%(id:\\::\\:)s");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
 
     auto placeholder = boost::get<placeholder::optional_t>(*token);
     EXPECT_EQ("id", placeholder.name);
@@ -193,7 +193,7 @@ TEST(parser_t, OptionalPlaceholderAny) {
     parser_t parser("%(id:id=:)s");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
 
 
     auto placeholder = boost::get<placeholder::optional_t>(*token);
@@ -208,7 +208,7 @@ TEST(parser_t, VariadicPlaceholder) {
     parser_t parser("%(...)s");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
 
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("", placeholder.prefix);
@@ -227,7 +227,7 @@ TEST(parser_t, VariadicPlaceholderFollowedByLiteral) {
     parser_t parser("%(...)s is great!");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
 
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("", placeholder.prefix);
@@ -239,7 +239,7 @@ TEST(parser_t, VariadicPlaceholderFollowedByLiteral) {
     EXPECT_EQ(", ", placeholder.separator);
 
     token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
     EXPECT_EQ(" is great!", boost::get<literal_t>(*token).value);
 
     EXPECT_FALSE(parser.next());
@@ -254,7 +254,7 @@ TEST(parser_t, VariadicPlaceholderWithPrefix) {
     parser_t parser("%(...:/:)s");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
 
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("/", placeholder.prefix);
@@ -272,7 +272,7 @@ TEST(parser_t, VariadicPlaceholderWithSuffix) {
     parser_t parser("%(...::/)s");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
 
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("", placeholder.prefix);
@@ -290,7 +290,7 @@ TEST(parser_t, VariadicPlaceholderWithPrefixSuffix) {
     parser_t parser("%(...:/:/)s");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
 
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("/", placeholder.prefix);
@@ -308,7 +308,7 @@ TEST(parser_t, VariadicPlaceholderWithSeparator) {
     parser_t parser("%(...:::.)s");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
 
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("", placeholder.prefix);
@@ -326,7 +326,7 @@ TEST(parser_t, VariadicPlaceholderWithPrefixSuffixSeparator) {
     parser_t parser("%(...:/:/: )s");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
 
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("/", placeholder.prefix);
@@ -344,7 +344,7 @@ TEST(parser_t, VariadicPlaceholderWithPrefixSuffixBraceAndSeparator) {
     parser_t parser("%(...:(:):, )s");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
 
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("(", placeholder.prefix);
@@ -362,7 +362,7 @@ TEST(parser_t, VariadicPlaceholderWithPattern) {
     parser_t parser("%(...[%k=%v])s");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
 
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("", placeholder.prefix);
@@ -387,7 +387,7 @@ TEST(parser_t, VariadicPlaceholderWithPatternPrefixSuffix) {
     parser_t parser("%(...[%k=%v]:/:/)s");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
 
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("/", placeholder.prefix);
@@ -405,7 +405,7 @@ TEST(parser_t, VariadicPlaceholderWithPatternPrefixSuffixSeparator) {
     parser_t parser("%(...[%k=%v]:/:/: )s");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
 
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("/", placeholder.prefix);
@@ -423,7 +423,7 @@ TEST(parser_t, VariadicPlaceholderLegacy) {
     parser_t parser("%(...L)s");
 
     auto token = parser.next();
-    ASSERT_TRUE(token);
+    ASSERT_TRUE(!!token);
 
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("", placeholder.prefix);

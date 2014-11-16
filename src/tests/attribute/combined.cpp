@@ -16,7 +16,7 @@ TEST(combined_view_t, GetFromSingleSet) {
 
     auto attribute = view.get("a");
 
-    ASSERT_TRUE(attribute);
+    ASSERT_TRUE(!!attribute);
     EXPECT_EQ(42, boost::get<int>(attribute.get()));
 
     EXPECT_FALSE(view.get("b"));
@@ -30,19 +30,19 @@ TEST(combined_view_t, GetFromMultipleSets) {
 
     {
         auto attribute = view.get("a1");
-        ASSERT_TRUE(attribute);
+        ASSERT_TRUE(!!attribute);
         EXPECT_EQ(42, boost::get<int>(attribute.get()));
     }
 
     {
         auto attribute = view.get("a2");
-        ASSERT_TRUE(attribute);
+        ASSERT_TRUE(!!attribute);
         EXPECT_DOUBLE_EQ(3.1415, boost::get<double>(attribute.get()));
     }
 
     {
         auto attribute = view.get("a3");
-        ASSERT_TRUE(attribute);
+        ASSERT_TRUE(!!attribute);
         EXPECT_EQ("value", boost::get<std::string>(attribute.get()));
     }
 
@@ -55,7 +55,7 @@ TEST(combined_view_t, TypedGetFromSingleSet) {
 
     auto attribute = view.get<int>("a");
 
-    ASSERT_TRUE(attribute);
+    ASSERT_TRUE(!!attribute);
     EXPECT_EQ(42, attribute.get());
 
     EXPECT_FALSE(view.get("b"));
@@ -70,19 +70,19 @@ TEST(combined_view_t, TypedGetFromMultipleSets) {
 
     {
         auto attribute = view.get<int>("a1");
-        ASSERT_TRUE(attribute);
+        ASSERT_TRUE(!!attribute);
         EXPECT_EQ(42, attribute.get());
     }
 
     {
         auto attribute = view.get<double>("a2");
-        ASSERT_TRUE(attribute);
+        ASSERT_TRUE(!!attribute);
         EXPECT_DOUBLE_EQ(3.1415, attribute.get());
     }
 
     {
         auto attribute = view.get<std::string>("a3");
-        ASSERT_TRUE(attribute);
+        ASSERT_TRUE(!!attribute);
         EXPECT_EQ("value", attribute.get());
     }
 

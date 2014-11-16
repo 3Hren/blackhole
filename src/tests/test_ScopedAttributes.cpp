@@ -54,10 +54,10 @@ TEST(ScopedAttributes, BasicUsage) {
 
         auto record1 = logger.open_record();
 
-        EXPECT_TRUE(record1.attributes().find("att1"));
+        EXPECT_TRUE(!!record1.attributes().find("att1"));
         EXPECT_EQ(1, record1.extract<int>("att1"));
 
-        EXPECT_TRUE(record1.attributes().find("att2"));
+        EXPECT_TRUE(!!record1.attributes().find("att2"));
         EXPECT_EQ(2, record1.extract<int>("att2"));
 
         {
@@ -71,22 +71,22 @@ TEST(ScopedAttributes, BasicUsage) {
 
             const auto record2 = logger.open_record();
 
-            EXPECT_TRUE(record2.attributes().find("att1"));
+            EXPECT_TRUE(!!record2.attributes().find("att1"));
             EXPECT_EQ(10, record2.extract<int>("att1"));
 
-            EXPECT_TRUE(record2.attributes().find("att2"));
+            EXPECT_TRUE(!!record2.attributes().find("att2"));
             EXPECT_EQ(2, record2.extract<int>("att2"));
 
-            EXPECT_TRUE(record2.attributes().find("att3"));
+            EXPECT_TRUE(!!record2.attributes().find("att3"));
             EXPECT_EQ(3, record2.extract<int>("att3"));
         }
 
         auto record3 = logger.open_record();
 
-        EXPECT_TRUE(record3.attributes().find("att1"));
+        EXPECT_TRUE(!!record3.attributes().find("att1"));
         EXPECT_EQ(1, record3.extract<int>("att1"));
 
-        EXPECT_TRUE(record3.attributes().find("att2"));
+        EXPECT_TRUE(!!record3.attributes().find("att2"));
         EXPECT_EQ(2, record3.extract<int>("att2"));
 
         EXPECT_FALSE(record3.attributes().find("att3"));
@@ -109,10 +109,10 @@ TEST_SCOPED_ATTRIBUTES(Cons, ViaCopyingAttributes) {
     scoped_attributes_t guard(log, attributes);
     auto record = log.open_record();
 
-    ASSERT_TRUE(record.attributes().find("att1"));
+    ASSERT_TRUE(!!record.attributes().find("att1"));
     EXPECT_EQ(1, record.extract<int>("att1"));
 
-    ASSERT_TRUE(record.attributes().find("att2"));
+    ASSERT_TRUE(!!record.attributes().find("att2"));
     EXPECT_EQ(2, record.extract<int>("att2"));
 }
 
@@ -138,20 +138,20 @@ TEST(ScopedAttributes, SwapLoggers) {
 
     {
         auto record1 = logger1.open_record();
-        EXPECT_TRUE(record1.attributes().find("att1"));
+        EXPECT_TRUE(!!record1.attributes().find("att1"));
         EXPECT_EQ(1, record1.extract<int>("att1"));
 
-        EXPECT_TRUE(record1.attributes().find("att2"));
+        EXPECT_TRUE(!!record1.attributes().find("att2"));
         EXPECT_EQ(2, record1.extract<int>("att2"));
 
         EXPECT_FALSE(record1.attributes().find("att3"));
         EXPECT_FALSE(record1.attributes().find("att4"));
 
         auto record2 = logger2.open_record();
-        EXPECT_TRUE(record2.attributes().find("att3"));
+        EXPECT_TRUE(!!record2.attributes().find("att3"));
         EXPECT_EQ(3, record2.extract<int>("att3"));
 
-        EXPECT_TRUE(record2.attributes().find("att4"));
+        EXPECT_TRUE(!!record2.attributes().find("att4"));
         EXPECT_EQ(4, record2.extract<int>("att4"));
 
         EXPECT_FALSE(record2.attributes().find("att1"));
@@ -162,20 +162,20 @@ TEST(ScopedAttributes, SwapLoggers) {
 
     {
         auto record1 = logger2.open_record();
-        EXPECT_TRUE(record1.attributes().find("att1"));
+        EXPECT_TRUE(!!record1.attributes().find("att1"));
         EXPECT_EQ(1, record1.extract<int>("att1"));
 
-        EXPECT_TRUE(record1.attributes().find("att2"));
+        EXPECT_TRUE(!!record1.attributes().find("att2"));
         EXPECT_EQ(2, record1.extract<int>("att2"));
 
         EXPECT_FALSE(record1.attributes().find("att3"));
         EXPECT_FALSE(record1.attributes().find("att4"));
 
         auto record2 = logger1.open_record();
-        EXPECT_TRUE(record2.attributes().find("att3"));
+        EXPECT_TRUE(!!record2.attributes().find("att3"));
         EXPECT_EQ(3, record2.extract<int>("att3"));
 
-        EXPECT_TRUE(record2.attributes().find("att4"));
+        EXPECT_TRUE(!!record2.attributes().find("att4"));
         EXPECT_EQ(4, record2.extract<int>("att4"));
 
         EXPECT_FALSE(record2.attributes().find("att1"));
@@ -202,7 +202,7 @@ struct thread_tester_t {
 
         auto record = logger->open_record();
 
-        EXPECT_TRUE(record.attributes().find("attr"));
+        EXPECT_TRUE(!!record.attributes().find("attr"));
         EXPECT_EQ(value, record.extract<int>("attr"));
 
         barrier->wait();
@@ -243,16 +243,16 @@ TEST(ScopedAttrbutes, CompatibleWithWrapperViaMovingAttributes) {
 
         auto record = wrapper.open_record();
 
-        ASSERT_TRUE(record.attributes().find("answer"));
+        ASSERT_TRUE(!!record.attributes().find("answer"));
         EXPECT_EQ(42, record.extract<int>("answer"));
 
-        ASSERT_TRUE(record.attributes().find("piece of"));
+        ASSERT_TRUE(!!record.attributes().find("piece of"));
         EXPECT_EQ("shit", record.extract<std::string>("piece of"));
     }
 
     auto record = wrapper.open_record();
 
-    ASSERT_TRUE(record.attributes().find("answer"));
+    ASSERT_TRUE(!!record.attributes().find("answer"));
     EXPECT_EQ(42, record.extract<int>("answer"));
 
     EXPECT_FALSE(record.attributes().find("piece of"));
@@ -272,16 +272,16 @@ TEST(ScopedAttrbutes, CompatibleWithWrapperViaCopyingAttributes) {
 
         auto record = wrapper.open_record();
 
-        ASSERT_TRUE(record.attributes().find("answer"));
+        ASSERT_TRUE(!!record.attributes().find("answer"));
         EXPECT_EQ(42, record.extract<int>("answer"));
 
-        ASSERT_TRUE(record.attributes().find("piece of"));
+        ASSERT_TRUE(!!record.attributes().find("piece of"));
         EXPECT_EQ("shit", record.extract<std::string>("piece of"));
     }
 
     auto record = wrapper.open_record();
 
-    ASSERT_TRUE(record.attributes().find("answer"));
+    ASSERT_TRUE(!!record.attributes().find("answer"));
     EXPECT_EQ(42, record.extract<int>("answer"));
 
     EXPECT_FALSE(record.attributes().find("piece of"));

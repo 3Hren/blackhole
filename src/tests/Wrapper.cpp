@@ -65,7 +65,7 @@ TEST(Wrapper, MoveConstructor) {
     wrapper_t<logger_type> other(std::move(wrapper));
 
     auto record = other.open_record(testing::debug);
-    ASSERT_TRUE(record.attributes().find("answer"));
+    ASSERT_TRUE(!!record.attributes().find("answer"));
     EXPECT_EQ(42, record.extract<int>("answer"));
 }
 
@@ -86,7 +86,7 @@ TEST(Wrapper, MoveAssignment) {
     other = std::move(wrapper);
 
     auto record = other.open_record(testing::debug);
-    ASSERT_TRUE(record.attributes().find("answer"));
+    ASSERT_TRUE(!!record.attributes().find("answer"));
     EXPECT_EQ(42, record.extract<int>("answer"));
 }
 
@@ -102,7 +102,7 @@ TEST(Wrapper, Usage) {
         EXPECT_FALSE(record.attributes().find("answer"));
 
         record = wrapper.open_record();
-        ASSERT_TRUE(record.attributes().find("answer"));
+        ASSERT_TRUE(!!record.attributes().find("answer"));
         EXPECT_EQ(42, record.extract<int>("answer"));
     }
 
@@ -122,7 +122,7 @@ TEST(Wrapper, UsageWithVerboseLogger) {
         );
 
         auto record = log.open_record(testing::info);
-        ASSERT_TRUE(record.attributes().find("severity"));
+        ASSERT_TRUE(!!record.attributes().find("severity"));
         EXPECT_EQ(
             testing::info,
             record.extract<
@@ -134,7 +134,7 @@ TEST(Wrapper, UsageWithVerboseLogger) {
 
         record = wrapper.open_record(testing::info);
 
-        ASSERT_TRUE(record.attributes().find("severity"));
+        ASSERT_TRUE(!!record.attributes().find("severity"));
         EXPECT_EQ(
             testing::info,
             record.extract<
@@ -142,13 +142,13 @@ TEST(Wrapper, UsageWithVerboseLogger) {
             >("severity")
         );
 
-        ASSERT_TRUE(record.attributes().find("answer"));
+        ASSERT_TRUE(!!record.attributes().find("answer"));
         EXPECT_EQ(42, record.extract<int>("answer"));
     }
 
     auto record = log.open_record(testing::info);
 
-    ASSERT_TRUE(record.attributes().find("severity"));
+    ASSERT_TRUE(!!record.attributes().find("severity"));
     EXPECT_EQ(
         testing::info,
         record.extract<
@@ -186,7 +186,7 @@ TEST(Wrapper, NestedWrappers) {
         );
 
         auto record = wrapper.open_record(testing::debug);
-        ASSERT_TRUE(record.attributes().find("answer"));
+        ASSERT_TRUE(!!record.attributes().find("answer"));
         EXPECT_EQ(42, record.extract<int>("answer"));
         EXPECT_FALSE(record.attributes().find("result"));
 
@@ -198,14 +198,14 @@ TEST(Wrapper, NestedWrappers) {
                 })
             );
             auto record = nested.open_record(testing::debug);
-            ASSERT_TRUE(record.attributes().find("answer"));
+            ASSERT_TRUE(!!record.attributes().find("answer"));
             EXPECT_EQ(42, record.extract<int>("answer"));
-            ASSERT_TRUE(record.attributes().find("result"));
+            ASSERT_TRUE(!!record.attributes().find("result"));
             EXPECT_EQ(300, record.extract<int>("result"));
         }
 
         record = wrapper.open_record(testing::debug);
-        ASSERT_TRUE(record.attributes().find("answer"));
+        ASSERT_TRUE(!!record.attributes().find("answer"));
         EXPECT_EQ(42, record.extract<int>("answer"));
         EXPECT_FALSE(record.attributes().find("result"));
     }
@@ -255,7 +255,7 @@ TEST(Wrapper, UnderlyingLogger) {
 
     logger_type& initial = wrapper.log();
     auto record = initial.open_record(testing::level::debug);
-    ASSERT_TRUE(record.attributes().find("severity"));
+    ASSERT_TRUE(!!record.attributes().find("severity"));
     EXPECT_EQ(testing::level::debug, record.extract<testing::level>("severity"));
     EXPECT_FALSE(record.attributes().find("b"));
 }
@@ -274,7 +274,7 @@ TEST(Wrapper, ConstUnderlyingLogger) {
 
     const logger_type& initial = wrapper.log();
     auto record = initial.open_record(testing::level::debug);
-    ASSERT_TRUE(record.attributes().find("severity"));
+    ASSERT_TRUE(!!record.attributes().find("severity"));
     EXPECT_EQ(testing::level::debug, record.extract<testing::level>("severity"));
     EXPECT_FALSE(record.attributes().find("b"));
 }
@@ -296,7 +296,7 @@ TEST(Wrapper, UnderlyingNestedLogger) {
 
     logger_type& initial = deep_wrapper.log();
     auto record = initial.open_record(testing::level::debug);
-    ASSERT_TRUE(record.attributes().find("severity"));
+    ASSERT_TRUE(!!record.attributes().find("severity"));
     EXPECT_EQ(testing::level::debug, record.extract<testing::level>("severity"));
     EXPECT_FALSE(record.attributes().find("b"));
     EXPECT_FALSE(record.attributes().find("b"));
@@ -320,7 +320,7 @@ TEST(Wrapper, ConstUnderlyingNestedLogger) {
 
     const logger_type& initial = deep_wrapper.log();
     auto record = initial.open_record(testing::level::debug);
-    ASSERT_TRUE(record.attributes().find("severity"));
+    ASSERT_TRUE(!!record.attributes().find("severity"));
     EXPECT_EQ(testing::level::debug, record.extract<testing::level>("severity"));
     EXPECT_FALSE(record.attributes().find("b"));
     EXPECT_FALSE(record.attributes().find("b"));

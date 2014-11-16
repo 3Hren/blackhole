@@ -304,7 +304,7 @@ void assign(boost::optional<task_type>& lhs, task_type rhs) {
 void apply(boost::optional<task_type>& task,
            boost::asio::io_service& loop,
            const boost::system::error_code& ec) {
-    ASSERT_TRUE(task.is_initialized());
+    ASSERT_TRUE(!!task);
     loop.post(std::bind(task.get(), ec, 0));
 }
 
