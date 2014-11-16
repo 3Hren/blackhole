@@ -178,6 +178,6 @@ TEST(logger_base_t, HasPidAttributeOnSuccessfulOpen) {
 
     ASSERT_TRUE(record);
     ASSERT_TRUE(!!record.attributes().find("pid"));
-    EXPECT_EQ(::getpid(), record.extract<std::uint32_t>("pid"));
+    EXPECT_EQ(::getpid(), static_cast<pid_t>(record.extract<std::uint32_t>("pid")));
 }
 #endif

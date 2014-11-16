@@ -14,14 +14,14 @@ TEST(Context, Initiating) {
             .Times(1)
             .WillOnce(Return(42));
 
-    EXPECT_EQ(0, this_thread::current_span().trace);
-    EXPECT_EQ(0, this_thread::current_span().span);
-    EXPECT_EQ(0, this_thread::current_span().parent);
+    EXPECT_EQ(0ULL, this_thread::current_span().trace);
+    EXPECT_EQ(0ULL, this_thread::current_span().span);
+    EXPECT_EQ(0ULL, this_thread::current_span().parent);
 
     trace::context_t<random_t<mock::distribution_t>> context;
-    EXPECT_EQ(42, this_thread::current_span().trace);
-    EXPECT_EQ(42, this_thread::current_span().span);
-    EXPECT_EQ(0, this_thread::current_span().parent);
+    EXPECT_EQ(42ULL, this_thread::current_span().trace);
+    EXPECT_EQ(42ULL, this_thread::current_span().span);
+    EXPECT_EQ(0ULL, this_thread::current_span().parent);
 }
 
 TEST(Context, ResetContextAfterLeavingScope) {
@@ -30,21 +30,21 @@ TEST(Context, ResetContextAfterLeavingScope) {
             .Times(1)
             .WillOnce(Return(42));
 
-    EXPECT_EQ(0, this_thread::current_span().trace);
-    EXPECT_EQ(0, this_thread::current_span().span);
-    EXPECT_EQ(0, this_thread::current_span().parent);
+    EXPECT_EQ(0ULL, this_thread::current_span().trace);
+    EXPECT_EQ(0ULL, this_thread::current_span().span);
+    EXPECT_EQ(0ULL, this_thread::current_span().parent);
 
     {
         trace::context_t<random_t<mock::distribution_t>> context;
-        EXPECT_EQ(42, this_thread::current_span().trace);
-        EXPECT_EQ(42, this_thread::current_span().span);
-        EXPECT_EQ(0, this_thread::current_span().parent);
+        EXPECT_EQ(42ULL, this_thread::current_span().trace);
+        EXPECT_EQ(42ULL, this_thread::current_span().span);
+        EXPECT_EQ(0ULL, this_thread::current_span().parent);
     }
 
     // Trace context is completery reset.
-    EXPECT_EQ(0, this_thread::current_span().trace);
-    EXPECT_EQ(0, this_thread::current_span().span);
-    EXPECT_EQ(0, this_thread::current_span().parent);
+    EXPECT_EQ(0ULL, this_thread::current_span().trace);
+    EXPECT_EQ(0ULL, this_thread::current_span().span);
+    EXPECT_EQ(0ULL, this_thread::current_span().parent);
 }
 
 TEST(Context, ExactlyResetNotFallbackContextAfterLeavingScope) {
@@ -54,33 +54,33 @@ TEST(Context, ExactlyResetNotFallbackContextAfterLeavingScope) {
             .WillOnce(Return(42))
             .WillOnce(Return(100500));
 
-    EXPECT_EQ(0, this_thread::current_span().trace);
-    EXPECT_EQ(0, this_thread::current_span().span);
-    EXPECT_EQ(0, this_thread::current_span().parent);
+    EXPECT_EQ(0ULL, this_thread::current_span().trace);
+    EXPECT_EQ(0ULL, this_thread::current_span().span);
+    EXPECT_EQ(0ULL, this_thread::current_span().parent);
 
     {
         trace::context_t<random_t<mock::distribution_t>> context;
-        EXPECT_EQ(42, this_thread::current_span().trace);
-        EXPECT_EQ(42, this_thread::current_span().span);
-        EXPECT_EQ(0, this_thread::current_span().parent);
+        EXPECT_EQ(42ULL, this_thread::current_span().trace);
+        EXPECT_EQ(42ULL, this_thread::current_span().span);
+        EXPECT_EQ(0ULL, this_thread::current_span().parent);
 
         {
             trace::context_t<random_t<mock::distribution_t>> nested;
-            EXPECT_EQ(42, this_thread::current_span().trace);
-            EXPECT_EQ(100500, this_thread::current_span().span);
-            EXPECT_EQ(42, this_thread::current_span().parent);
+            EXPECT_EQ(42ULL, this_thread::current_span().trace);
+            EXPECT_EQ(100500ULL, this_thread::current_span().span);
+            EXPECT_EQ(42ULL, this_thread::current_span().parent);
         }
 
         // Trace context is partially reset at this moment.
-        EXPECT_EQ(42, this_thread::current_span().trace);
-        EXPECT_EQ(42, this_thread::current_span().span);
-        EXPECT_EQ(0, this_thread::current_span().parent);
+        EXPECT_EQ(42ULL, this_thread::current_span().trace);
+        EXPECT_EQ(42ULL, this_thread::current_span().span);
+        EXPECT_EQ(0ULL, this_thread::current_span().parent);
     }
 
     // Trace context is completery reset now.
-    EXPECT_EQ(0, this_thread::current_span().trace);
-    EXPECT_EQ(0, this_thread::current_span().span);
-    EXPECT_EQ(0, this_thread::current_span().parent);
+    EXPECT_EQ(0ULL, this_thread::current_span().trace);
+    EXPECT_EQ(0ULL, this_thread::current_span().span);
+    EXPECT_EQ(0ULL, this_thread::current_span().parent);
 }
 
 namespace testing {

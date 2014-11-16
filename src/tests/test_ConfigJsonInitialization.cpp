@@ -111,13 +111,13 @@ protected:
 };
 
 TEST_F(parser_test_case_t, NameParsing) {
-    ASSERT_EQ(1, configs.size());
+    ASSERT_EQ(1UL, configs.size());
     EXPECT_EQ("root", configs.at(0).name);
 }
 
 TEST_F(parser_test_case_t, CheckFormatterConfigAfterParsing) {
-    ASSERT_EQ(1, configs.size());
-    ASSERT_EQ(1, configs.at(0).frontends.size());
+    ASSERT_EQ(1UL, configs.size());
+    ASSERT_EQ(1UL, configs.at(0).frontends.size());
 
     const formatter_config_t& fmt = configs.at(0).frontends.at(0).formatter;
     EXPECT_EQ("string", fmt.type());
@@ -125,8 +125,8 @@ TEST_F(parser_test_case_t, CheckFormatterConfigAfterParsing) {
 }
 
 TEST_F(parser_test_case_t, CheckSinkConfigAfterParsing) {
-    ASSERT_EQ(1, configs.size());
-    ASSERT_EQ(1, configs.at(0).frontends.size());
+    ASSERT_EQ(1UL, configs.size());
+    ASSERT_EQ(1UL, configs.at(0).frontends.size());
 
     const sink_config_t& sink = configs.at(0).frontends.at(0).sink;
     EXPECT_EQ("files", sink.type());
@@ -170,9 +170,9 @@ TEST(parser_t, MultipleFrontends) {
         rapidjson::Value,
         std::vector<log_config_t>
     >::parse(doc);
-    ASSERT_EQ(1, configs.size());
+    ASSERT_EQ(1UL, configs.size());
     EXPECT_EQ("root", configs.at(0).name);
-    ASSERT_EQ(2, configs.at(0).frontends.size());
+    ASSERT_EQ(2UL, configs.at(0).frontends.size());
 
     const frontend_config_t& front1 = configs.at(0).frontends.at(0);
     ASSERT_EQ("string", front1.formatter.type());
@@ -272,9 +272,9 @@ TEST(parser_t, FormatterWithArray) {
         rapidjson::Value,
         std::vector<log_config_t>
     >::parse(doc);
-    ASSERT_EQ(1, configs.size());
+    ASSERT_EQ(1UL, configs.size());
     EXPECT_EQ("root", configs.at(0).name);
-    ASSERT_EQ(1, configs.at(0).frontends.size());
+    ASSERT_EQ(1UL, configs.at(0).frontends.size());
 
     const frontend_config_t& front = configs.at(0).frontends.at(0);
     ASSERT_EQ("json", front.formatter.type());
