@@ -132,7 +132,7 @@ public:
     // GCC 4.4 cannot properly forward empty variadic pack into constructor.
     template<class Logger>
     typename std::enable_if<
-        std::is_base_of<logger_base_t, Logger>::value,
+        std::is_base_of<base_logger_t, Logger>::value,
         Logger
     >::type
     create(const std::string& name) const;
@@ -140,7 +140,7 @@ public:
 
     template<class Logger, class... Args>
     typename std::enable_if<
-        std::is_base_of<logger_base_t, Logger>::value,
+        std::is_base_of<base_logger_t, Logger>::value,
         Logger
     >::type
     create(const std::string& name, Args&&... args) const;
@@ -237,7 +237,7 @@ repository_t::create(const std::string& name) const {
 template<class Logger>
 BLACKHOLE_API
 typename std::enable_if<
-    std::is_base_of<logger_base_t, Logger>::value,
+    std::is_base_of<base_logger_t, Logger>::value,
     Logger
 >::type
 repository_t::create(const std::string& name) const {
@@ -255,7 +255,7 @@ repository_t::create(const std::string& name) const {
 template<class Logger, class... Args>
 BLACKHOLE_API
 typename std::enable_if<
-    std::is_base_of<logger_base_t, Logger>::value,
+    std::is_base_of<base_logger_t, Logger>::value,
     Logger
 >::type
 repository_t::create(const std::string& name, Args&&... args) const {

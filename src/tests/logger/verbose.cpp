@@ -37,7 +37,7 @@ namespace {
 
 inline
 bool
-filter_by_tracebit(testing::level severity, const attribute::combined_view_t& view) {
+filter_by_tracebit(const attribute::combined_view_t& view, testing::level severity) {
     auto passed = severity >= testing::warn;
 
     if (!passed) {
@@ -60,7 +60,7 @@ TEST(verbose_logger_t, Verbosity) {
 
 TEST(verbose_logger_t, ExtendedVerbosity) {
     verbose_logger_t<testing::level> log(testing::debug);
-    log.verbosity(testing::warn, &filter_by_tracebit);
+    log.set_filter(testing::warn, &filter_by_tracebit);
 
     EXPECT_EQ(testing::warn, log.verbosity());
 }
@@ -84,7 +84,7 @@ TEST(verbose_logger_t, PrimaryComplexFiltering) {
     verbose_logger_t<testing::level> log(testing::debug);
     log.add_frontend(std::move(frontend));
 
-    log.verbosity(level::debug, &filter_by_tracebit);
+    log.set_filter(level::debug, &filter_by_tracebit);
 
     EXPECT_FALSE(log.open_record(testing::debug));
     EXPECT_FALSE(log.open_record(testing::info));

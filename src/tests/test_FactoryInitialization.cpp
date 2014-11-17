@@ -362,11 +362,10 @@ TEST(Repository, InitializationFromSettings) {
     repository_t repository;
     repository.add_config(create_valid_config());
 
-    const bool condition = std::is_same<
+    static_assert((std::is_same<
         verbose_logger_t<testing::level>,
-        decltype(repository.create<verbose_logger_t<testing::level>>("root"))
-    >::value;
-    static_assert(condition, "repository should return `verbose_logger_t` object");
+        decltype(repository.create<verbose_logger_t<testing::level>>("root", testing::debug))
+    >::value), "repository should return `verbose_logger_t` object");
 }
 
 TEST(Repository, ThrowsExceptionIfLoggerWithSpecifiedNameNotFound) {

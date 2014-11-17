@@ -158,7 +158,7 @@ TEST(ScopedAttributes, SwapLoggers) {
         EXPECT_FALSE(record2.attributes().find("att2"));
     }
 
-    swap(logger1, logger2);
+    std::swap(logger1, logger2);
 
     {
         auto record1 = logger2.open_record();
