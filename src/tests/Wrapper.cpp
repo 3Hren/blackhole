@@ -111,7 +111,7 @@ TEST(Wrapper, Usage) {
 }
 
 TEST(Wrapper, UsageWithVerboseLogger) {
-    auto log = logger_factory_t::create<verbose_logger_t<testing::level>>(testing::debug);
+    auto log = logger_factory_t::create<verbose_logger_t<testing::level>>(testing::info);
 
     {
         wrapper_t<verbose_logger_t<testing::level>> wrapper(
