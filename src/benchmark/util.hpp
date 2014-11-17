@@ -73,12 +73,7 @@ namespace filter_by {
 
 template<typename Level>
 void verbosity(blackhole::verbose_logger_t<Level>& log, Level level) {
-    log.verbosity(level);
-}
-
-template<typename Level>
-void verbosity_filter(blackhole::verbose_logger_t<Level>& log, Level level) {
-    log.set_filter(blackhole::keyword::severity<Level>() >= level);
+    log.set_filter(level);
 }
 
 } // namespace filter_by
