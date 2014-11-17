@@ -27,7 +27,7 @@ namespace blackhole {
 
 class logger_base_t {
     friend class scoped_attributes_concept_t;
-    friend void swap(logger_base_t& lhs, logger_base_t& rhs) BLACKHOLE_NOEXCEPT;
+    friend void swap(logger_base_t& lhs, logger_base_t& rhs);
 
 protected:
     typedef boost::shared_mutex rw_mutex_type;
@@ -57,8 +57,8 @@ protected:
 public:
     logger_base_t();
 
-    logger_base_t(logger_base_t&& other) BLACKHOLE_NOEXCEPT;
-    logger_base_t& operator=(logger_base_t&& other) BLACKHOLE_NOEXCEPT;
+    logger_base_t(logger_base_t&& other);
+    logger_base_t& operator=(logger_base_t&& other);
 
     bool enabled() const;
     void enabled(bool enable);
@@ -93,7 +93,7 @@ class scoped_attributes_concept_t {
     logger_base_t *m_logger;
     scoped_attributes_concept_t *m_previous;
 
-    friend void swap(logger_base_t&, logger_base_t&) BLACKHOLE_NOEXCEPT;
+    friend void swap(logger_base_t&, logger_base_t&);
 
 public:
     scoped_attributes_concept_t(logger_base_t& log);
@@ -128,14 +128,14 @@ public:
         filter(default_filter { level })
     {}
 
-    verbose_logger_t(verbose_logger_t&& other) BLACKHOLE_NOEXCEPT :
+    verbose_logger_t(verbose_logger_t&& other) :
         logger_base_t(std::move(other))
     {
         level = other.level;
         filter = other.filter;
     }
 
-    verbose_logger_t& operator=(verbose_logger_t&& other) BLACKHOLE_NOEXCEPT {
+    verbose_logger_t& operator=(verbose_logger_t&& other) {
         logger_base_t::operator=(std::move(other));
 
         level = other.level;
