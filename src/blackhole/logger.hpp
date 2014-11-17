@@ -194,41 +194,40 @@ class verbose_logger_t : public composite_logger_t<verbose_logger_t<Level>, Leve
 
 public:
     typedef Level level_type;
+    typedef typename aux::underlying_type<level_type>::type underlying_type;
 
 private:
-    level_type level;
+    std::atomic<underlying_type> level;
 
 public:
-    verbose_logger_t(level_type threshold) :
-        base_type(default_filter { threshold }),
-        level(threshold)
+    verbose_logger_t(level_type level) :
+        base_type(default_filter { level }),
+        level(level)
     {}
 
-#ifdef BLACKHOLE_HAS_GCC44
     verbose_logger_t(verbose_logger_t&& other) :
         base_type(std::move(other)),
-        level(other.level)
+        level(other.level.load())
     {}
 
     verbose_logger_t& operator=(verbose_logger_t&& other) {
         base_type::operator=(std::move(other));
-        level = other.level;
+        level.store(other.level);
         return *this;
     }
-#endif
 
     level_type verbosity() const {
-        return level;
+        return static_cast<level_type>(level.load());
     }
 
     void set_filter(level_type level) {
         base_type::set_filter(default_filter { level });
-        this->level = level;
+        this->level.store(level);
     }
 
     void set_filter(level_type level, typename base_type::filter_type filter) {
         base_type::set_filter(std::move(filter));
-        this->level = level;
+        this->level.store(level);
     }
 
     record_t open_record(level_type level, attribute::set_t external = attribute::set_t()) const {
