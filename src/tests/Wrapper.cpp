@@ -122,6 +122,7 @@ TEST(Wrapper, UsageWithVerboseLogger) {
         );
 
         auto record = log.open_record(testing::info);
+        ASSERT_TRUE(!!record);
         ASSERT_TRUE(!!record.attributes().find("severity"));
         EXPECT_EQ(
             testing::info,
