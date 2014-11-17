@@ -1,3 +1,9 @@
+blackhole (0.3.2-1) unstable; urgency=low
+
+  * Bug fix: fixed improper type mapping by name.
+
+ -- Evgeny Safronov <division494@gmail.com>  Mon, 17 Nov 2014 13:07:00 +0300
+
 blackhole (0.3.1-1) unstable; urgency=low
 
   * Bug fix: fixed improper attributes routing.

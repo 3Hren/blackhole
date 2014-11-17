@@ -286,6 +286,67 @@ TEST(Factory, TcpSocketStringsFrontend) {
     EXPECT_TRUE(bool(factory.create(formatter, sink)));
 }
 
+TEST(Factory, CreateFrontendsAfterRegisteringFormatterCombination) {
+    typedef boost::mpl::list<
+        formatter::string_t,
+        formatter::json_t
+    > formatters_t;
+
+    typedef boost::mpl::vector<
+        sink::stream_t
+    > sinks_t;
+
+    factory_t factory;
+    factory.add<sinks_t, formatters_t>();
+
+    sink_config_t sink("stream");
+    sink["output"] = "stdout";
+
+    {
+        formatter_config_t formatter("string");
+        formatter["pattern"] = "[%(timestamp)s]: %(message)s";
+        EXPECT_NO_THROW(factory.create(formatter, sink));
+    }
+
+    {
+        formatter_config_t formatter("json");
+        formatter["newline"] = true;
+        formatter["mapping"]["message"] = "@message";
+        formatter["routing"]["/"] = dynamic_t::array_t { "message" };
+        factory.create(formatter, sink);
+        EXPECT_NO_THROW(factory.create(formatter, sink));
+    }
+}
+
+TEST(Factory, CreateFrontendsAfterRegisteringSinkCombination) {
+    typedef boost::mpl::list<
+        formatter::string_t
+    > formatters_t;
+
+    typedef boost::mpl::vector<
+        sink::stream_t,
+        sink::syslog_t<level>
+    > sinks_t;
+
+    factory_t factory;
+    factory.add<sinks_t, formatters_t>();
+
+    formatter_config_t formatter("string");
+    formatter["pattern"] = "[%(timestamp)s]: %(message)s";
+
+    {
+        sink_config_t sink("stream");
+        sink["output"] = "stdout";
+        EXPECT_NO_THROW(factory.create(formatter, sink));
+    }
+
+    {
+        sink_config_t sink("syslog");
+        sink["identity"] = "blackhole";
+        EXPECT_NO_THROW(factory.create(formatter, sink));
+    }
+}
+
 log_config_t create_valid_config() {
     formatter_config_t formatter("string");
     formatter["pattern"] = "[%(timestamp)s]: %(message)s";
