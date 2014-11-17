@@ -53,7 +53,7 @@ filter_by_tracebit(const attribute::combined_view_t& view, testing::level severi
 
 TEST(verbose_logger_t, Verbosity) {
     verbose_logger_t<testing::level> log(testing::debug);
-    log.verbosity(testing::warn);
+    log.set_filter(testing::warn);
 
     EXPECT_EQ(testing::warn, log.verbosity());
 }
@@ -70,7 +70,7 @@ TEST(verbose_logger_t, PrimaryVerbosityFiltering) {
 
     verbose_logger_t<testing::level> log(testing::debug);
     log.add_frontend(std::move(frontend));
-    log.verbosity(testing::warn);
+    log.set_filter(testing::warn);
 
     EXPECT_FALSE(log.open_record(testing::debug));
     EXPECT_FALSE(log.open_record(testing::info));

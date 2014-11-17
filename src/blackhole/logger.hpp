@@ -105,6 +105,11 @@ public:
         state.enabled.store(enable);
     }
 
+    void set_filter(filter_type filter) {
+        writer_lock_type lock(state.lock.open);
+        state.filter = std::move(filter);
+    }
+
     void add_frontend(std::unique_ptr<base_frontend_t> frontend) {
         writer_lock_type lock(state.lock.push);
         state.frontends.push_back(std::move(frontend));
@@ -177,10 +182,6 @@ public:
     }
 #endif
 
-    void set_filter(filter_type filter) {
-        state.filter = filter;
-    }
-
 private:
     void populate_additional(attribute::set_t&) const {}
 };
@@ -216,22 +217,18 @@ public:
     }
 #endif
 
+    level_type verbosity() const {
+        return level;
+    }
+
     void set_filter(level_type level) {
-        // TODO: Lock.
+        base_type::set_filter(default_filter { level });
         this->level = level;
-        this->state.filter = default_filter { level };
     }
 
     void set_filter(level_type level, typename base_type::filter_type filter) {
-        // TODO: Lock.
+        base_type::set_filter(std::move(filter));
         this->level = level;
-        this->state.filter = filter;
-    }
-
-    void verbosity(level_type level) { set_filter(level); }
-
-    level_type verbosity() const {
-        return level;
     }
 
     record_t open_record(level_type level, attribute::set_t external = attribute::set_t()) const {
