@@ -35,15 +35,12 @@ TEST(logger_base_t, MoveExplicitAssignment) {
 TEST(logger_base_t, Swap) {
     logger_base_t l, r;
     l.enabled(false);
-    l.tracked(true);
 
     std::swap(l, r);
 
     EXPECT_TRUE (l.enabled());
-    EXPECT_FALSE(l.tracked());
 
     EXPECT_FALSE(r.enabled());
-    EXPECT_TRUE (r.tracked());
 }
 
 TEST(logger_base_t, CanBeEnabled) {
@@ -61,11 +58,6 @@ TEST(logger_base_t, CanBeDisabled) {
 TEST(logger_base_t, EnabledByDefault) {
     logger_base_t log;
     EXPECT_TRUE(log.enabled());
-}
-
-TEST(logger_base_t, TrackingIsDisabledByDefault) {
-    logger_base_t log;
-    EXPECT_FALSE(log.tracked());
 }
 
 TEST(logger_base_t, OpenRecordByDefault) {
@@ -123,9 +115,9 @@ TEST(logger_base_t, DoNotOpenRecordWhenComplexFilterFailed) {
     EXPECT_FALSE(log.open_record(::keyword::urgent() = 2));
 }
 
-TEST(logger_base_t, DoNotOpenRecordIfThereAreNoFrontends) {
+TEST(logger_base_t, DoOpenRecordIfThereAreNoFrontends) {
     logger_base_t log;
-    EXPECT_FALSE(log.open_record());
+    EXPECT_TRUE(log.open_record());
 }
 
 TEST(logger_base_t, SettingDynamicAttributes) {

@@ -21,7 +21,6 @@ inline void no_deleter(scoped_attributes_concept_t*) {}
 BLACKHOLE_API
 logger_base_t::state_t::state_t() :
     enabled(true),
-    tracked(false),
     filter(&filter::none),
     scoped(&aux::guard::no_deleter),
     exception(log::default_exception_handler_t())
@@ -56,17 +55,6 @@ logger_base_t::enabled(bool enable) {
     state.enabled = enable;
 }
 
-BLACKHOLE_API
-bool
-logger_base_t::tracked() const {
-    return state.tracked;
-}
-
-BLACKHOLE_API
-void
-logger_base_t::tracked(bool enable) {
-    state.tracked = enable;
-}
 
 BLACKHOLE_API
 void
@@ -137,10 +125,6 @@ logger_base_t::populate(attribute::set_t& internal) const {
 #endif
 
     internal.emplace_back(keyword::timestamp() = keyword::init::timestamp());
-
-    if (state.tracked) {
-        internal.emplace_back(attribute::make("trace", ::this_thread::current_span().trace));
-    }
 }
 
 BLACKHOLE_API

@@ -36,7 +36,6 @@ protected:
 
     struct state_t {
         std::atomic<bool> enabled;
-        std::atomic<bool> tracked;
 
         filter_t filter;
         boost::thread_specific_ptr<scoped_attributes_concept_t> scoped;
@@ -63,8 +62,6 @@ public:
     bool enabled() const;
     void enabled(bool enable);
 
-    bool tracked() const;
-    void tracked(bool enable);
 
     void set_filter(filter_t&& filter);
     void add_frontend(std::unique_ptr<base_frontend_t> frontend);
