@@ -52,7 +52,14 @@ struct match_traits {
      *
      * By default returns Formatter or Sink typeid;
      */
-    static type_index_t type_index(const std::string&, const dynamic_t&) {
+
+    typedef type_index_t index_type;
+
+    static type_index_t type_index(const std::string& type, const dynamic_t&) {
+        if (type != T::name()) {
+            return index_type(typeid(void));
+        }
+
         return typeid(T);
     }
 };
