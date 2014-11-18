@@ -199,7 +199,6 @@ public:
     template<typename Level>
     record_t
     open_record(Level level, attribute::set_t attributes = attribute::set_t()) const {
-        // TODO: Move inserter is better.
         std::copy(this->attributes.begin(), this->attributes.end(), std::back_inserter(attributes));
         return this->wrapped->open_record(level, std::move(attributes));
     }
