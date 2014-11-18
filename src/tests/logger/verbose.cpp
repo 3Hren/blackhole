@@ -11,6 +11,14 @@ TEST(verbose_logger_t, Constructor) {
     EXPECT_EQ(testing::debug, log.verbosity());
 }
 
+namespace { enum class severity { debug, info, warn, error }; }
+
+TEST(verbose_logger_t, ConstructorEnumClass) {
+    verbose_logger_t<severity> log(severity::debug);
+
+    EXPECT_EQ(severity::debug, log.verbosity());
+}
+
 TEST(verbose_logger_t, MoveExplicitConstructor) {
     verbose_logger_t<testing::level> log(testing::info);
     verbose_logger_t<testing::level> other(std::move(log));

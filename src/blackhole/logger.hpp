@@ -191,7 +191,7 @@ private:
 public:
     verbose_logger_t(level_type level) :
         base_type(default_filter { level }),
-        level(level)
+        level(static_cast<underlying_type>(level))
     {}
 
     verbose_logger_t(verbose_logger_t&& other) :
