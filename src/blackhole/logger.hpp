@@ -59,7 +59,7 @@ public:
     typedef boost::unique_lock<rw_mutex_type> writer_lock_type;
 
 protected:
-    struct state_t {
+    struct {
         std::atomic<bool> enabled;
 
         filter_type filter;
@@ -71,25 +71,14 @@ protected:
             mutable rw_mutex_type open;
             mutable rw_mutex_type push;
         } lock;
-
-        state_t() :
-            enabled(true),
-            exception(log::default_exception_handler_t())
-        {}
-
-        state_t(filter_type filter) :
-            enabled(true),
-            filter(filter),
-            exception(log::default_exception_handler_t())
-        {}
-    };
-
-    state_t state;
+    } state;
 
 public:
-    composite_logger_t(filter_type filter) :
-        state(filter)
-    {}
+    composite_logger_t(filter_type filter) {
+        state.enabled = true;
+        state.exception = log::default_exception_handler_t();
+        state.filter = std::move(filter);
+    }
 
     composite_logger_t(composite_logger_t&& other) {
         *this = std::move(other);
