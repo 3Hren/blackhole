@@ -14,19 +14,19 @@ composite_logger_t<T, FilterArgs...>::operator=(composite_logger_t<T, FilterArgs
     auto& lhs = *this;
     auto& rhs = other;
 
-    rhs.state.enabled = lhs.state.enabled.exchange(rhs.state.enabled);
+    rhs.d.enabled = lhs.d.enabled.exchange(rhs.d.enabled);
 
     auto lock = blackhole::detail::thread::make_multi_lock_t(
-        lhs.state.lock.open,
-        lhs.state.lock.push,
-        rhs.state.lock.open,
-        rhs.state.lock.push
+        lhs.d.lock.open,
+        lhs.d.lock.push,
+        rhs.d.lock.open,
+        rhs.d.lock.push
     );
 
     using std::swap;
-    swap(lhs.state.filter, rhs.state.filter);
+    swap(lhs.d.filter, rhs.d.filter);
 
-    swap(lhs.state.frontends, rhs.state.frontends);
+    swap(lhs.d.frontends, rhs.d.frontends);
 
     auto lhs_operation_attributes = lhs.scoped.get();
     lhs.scoped.reset(rhs.scoped.get());

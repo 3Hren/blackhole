@@ -71,13 +71,13 @@ protected:
             mutable rw_mutex_type open;
             mutable rw_mutex_type push;
         } lock;
-    } state;
+    } d;
 
 public:
     composite_logger_t(filter_type filter) {
-        state.enabled = true;
-        state.exception = log::default_exception_handler_t();
-        state.filter = std::move(filter);
+        d.enabled = true;
+        d.exception = log::default_exception_handler_t();
+        d.filter = std::move(filter);
     }
 
     composite_logger_t(composite_logger_t&& other) {
@@ -87,26 +87,26 @@ public:
     composite_logger_t& operator=(composite_logger_t&& other);
 
     bool enabled() const {
-        return state.enabled;
+        return d.enabled;
     }
 
     void enabled(bool enable) {
-        state.enabled.store(enable);
+        d.enabled.store(enable);
     }
 
     void set_filter(filter_type filter) {
-        writer_lock_type lock(state.lock.open);
-        state.filter = std::move(filter);
+        writer_lock_type lock(d.lock.open);
+        d.filter = std::move(filter);
     }
 
     void add_frontend(std::unique_ptr<base_frontend_t> frontend) {
-        writer_lock_type lock(state.lock.push);
-        state.frontends.push_back(std::move(frontend));
+        writer_lock_type lock(d.lock.push);
+        d.frontends.push_back(std::move(frontend));
     }
 
     void set_exception_handler(log::exception_handler_t handler) {
-        writer_lock_type lock(state.lock.push);
-        state.exception = handler;
+        writer_lock_type lock(d.lock.push);
+        d.exception = handler;
     }
 
     record_t open_record(FilterArgs... args) const {
@@ -122,9 +122,9 @@ public:
             return record_t::invalid();
         }
 
-        reader_lock_type lock(state.lock.open);
+        reader_lock_type lock(d.lock.open);
         const attribute::combined_view_t view = with_scoped(external, lock);
-        if (!state.filter(view, args...)) {
+        if (!d.filter(view, args...)) {
             return record_t::invalid();
         }
 
@@ -136,12 +136,12 @@ public:
     }
 
     void push(record_t&& record) const {
-        reader_lock_type lock(state.lock.push);
-        for (auto it = state.frontends.begin(); it != state.frontends.end(); ++it) {
+        reader_lock_type lock(d.lock.push);
+        for (auto it = d.frontends.begin(); it != d.frontends.end(); ++it) {
             try {
                 (*it)->handle(record);
             } catch (...) {
-                state.exception();
+                d.exception();
             }
         }
     }
