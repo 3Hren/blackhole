@@ -13,12 +13,7 @@ composite_logger_t<T, FilterArgs...>&
 composite_logger_t<T, FilterArgs...>::operator=(composite_logger_t<T, FilterArgs...>&& other) {
     other.d.enabled = d.enabled.exchange(other.d.enabled);
 
-    auto lock = blackhole::detail::thread::make_multi_lock_t(
-        d.lock.open,
-        d.lock.push,
-        other.d.lock.open,
-        other.d.lock.push
-    );
+    auto lock = detail::thread::multi_lock(d.lock.open, d.lock.push, other.d.lock.open, other.d.lock.push);
 
     using std::swap;
     swap(d.filter, other.d.filter);

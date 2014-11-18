@@ -95,7 +95,7 @@ public:
     // TODO: Is it REALLY need to be assignable? If not - I can easily drop thread synchronization.
     wrapper_base_t& operator=(wrapper_base_t&& other) {
         if (this != &other) {
-            auto lock = detail::thread::make_multi_lock_t(mutex, other.mutex);
+            auto lock = detail::thread::multi_lock(mutex, other.mutex);
             wrapped = other.wrapped;
             other.wrapped = nullptr;
             attributes = std::move(other.attributes);
