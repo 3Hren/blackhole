@@ -118,8 +118,7 @@ public:
         }
 
         reader_lock_type lock(d.lock.open);
-        const attribute::combined_view_t view = with_scoped(external, lock);
-        if (!d.filter(view, args...)) {
+        if (!d.filter(with_scoped(external, lock), args...)) {
             return record_t::invalid();
         }
 
