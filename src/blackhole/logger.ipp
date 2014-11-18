@@ -11,34 +11,31 @@ namespace blackhole {
 template<class T, class... FilterArgs>
 composite_logger_t<T, FilterArgs...>&
 composite_logger_t<T, FilterArgs...>::operator=(composite_logger_t<T, FilterArgs...>&& other) {
-    auto& lhs = *this;
-    auto& rhs = other;
-
-    rhs.d.enabled = lhs.d.enabled.exchange(rhs.d.enabled);
+    other.d.enabled = d.enabled.exchange(other.d.enabled);
 
     auto lock = blackhole::detail::thread::make_multi_lock_t(
-        lhs.d.lock.open,
-        lhs.d.lock.push,
-        rhs.d.lock.open,
-        rhs.d.lock.push
+        d.lock.open,
+        d.lock.push,
+        other.d.lock.open,
+        other.d.lock.push
     );
 
     using std::swap;
-    swap(lhs.d.filter, rhs.d.filter);
+    swap(d.filter, other.d.filter);
+    swap(d.frontends, other.d.frontends);
 
-    swap(lhs.d.frontends, rhs.d.frontends);
+    auto this_scoped_attributes = scoped.get();
+    scoped.reset(other.scoped.get());
+    other.scoped.reset(this_scoped_attributes);
 
-    auto lhs_operation_attributes = lhs.scoped.get();
-    lhs.scoped.reset(rhs.scoped.get());
-    rhs.scoped.reset(lhs_operation_attributes);
-
-    if (lhs.scoped.get()) {
-        lhs.scoped->m_logger = &lhs;
+    if (scoped.get()) {
+        scoped->m_logger = this;
     }
 
-    if (rhs.scoped.get()) {
-        rhs.scoped->m_logger = &rhs;
+    if (other.scoped.get()) {
+        other.scoped->m_logger = &other;
     }
+
     return *this;
 }
 
