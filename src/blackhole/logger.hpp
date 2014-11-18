@@ -4,24 +4,19 @@
 #include <vector>
 
 #include <boost/thread/tss.hpp>
+#include <boost/thread/shared_mutex.hpp>
 
 #include "blackhole/attribute.hpp"
+#include "blackhole/config.hpp"
 #include "blackhole/detail/config/atomic.hpp"
 #include "blackhole/detail/config/noncopyable.hpp"
 #include "blackhole/detail/config/nullptr.hpp"
 #include "blackhole/detail/util/unique.hpp"
+#include "blackhole/error/handler.hpp"
 #include "blackhole/forwards.hpp"
-#include "error/handler.hpp"
-#include "filter.hpp"
-#include "frontend.hpp"
-#include "keyword.hpp"
-#include "keyword/message.hpp"
-#include "keyword/severity.hpp"
-#include "keyword/thread.hpp"
-#include "keyword/timestamp.hpp"
-#include "keyword/tracebit.hpp"
-
-#include "blackhole/config.hpp"
+#include "blackhole/filter.hpp"
+#include "blackhole/frontend.hpp"
+#include "blackhole/keyword/severity.hpp"
 
 namespace blackhole {
 

@@ -1,9 +1,12 @@
-#include "blackhole/config.hpp"
+#include "blackhole/logger.hpp"
+
 #include "blackhole/detail/config/nullptr.hpp"
 #include "blackhole/detail/thread/lock.hpp"
-#include "blackhole/logger.hpp"
-#include "blackhole/trace/context.hpp"
-
+#include "blackhole/keyword.hpp"
+#include "blackhole/keyword/message.hpp"
+#include "blackhole/keyword/thread.hpp"
+#include "blackhole/keyword/timestamp.hpp"
+#include "blackhole/keyword/tracebit.hpp"
 #include "blackhole/keyword/process.hpp"
 
 namespace blackhole {
