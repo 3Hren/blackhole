@@ -33,7 +33,7 @@ static inline void empty(scoped_attributes_concept_t*) {}
 
 } // namespace deleter
 
-} //namespace aux
+} // namespace aux
 
 class scope_feature_t {
     friend class scoped_attributes_concept_t;
