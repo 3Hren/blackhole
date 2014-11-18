@@ -168,7 +168,7 @@ TEST_JOIN_ITERATOR(Forward, Map) {
         {"0", 0}, {"1", 1}, {"2", 2}, {"3", 0}, {"4", 1}, {"5", 2}
     };
 
-    ASSERT_EQ(expected.size(), std::distance(begin, end));
+    ASSERT_EQ(expected.size(), static_cast<unsigned long long>(std::distance(begin, end)));
     for (auto it = begin; it != end; ++it) {
         EXPECT_TRUE(expected.find(it->first)->second == it->second);
     }

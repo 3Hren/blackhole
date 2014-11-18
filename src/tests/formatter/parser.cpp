@@ -213,7 +213,7 @@ TEST(parser_t, VariadicPlaceholder) {
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("", placeholder.prefix);
     EXPECT_EQ("", placeholder.suffix);
-    ASSERT_EQ(3, placeholder.pattern.size());
+    ASSERT_EQ(3ULL, placeholder.pattern.size());
     EXPECT_NO_THROW(boost::get<placeholder::variadic_t::key_t>(placeholder.pattern.at(0)));
     EXPECT_NO_THROW(boost::get<literal_t>(placeholder.pattern.at(1)));
     EXPECT_EQ(": ", boost::get<literal_t>(placeholder.pattern.at(1)).value);
@@ -232,7 +232,7 @@ TEST(parser_t, VariadicPlaceholderFollowedByLiteral) {
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("", placeholder.prefix);
     EXPECT_EQ("", placeholder.suffix);
-    ASSERT_EQ(3, placeholder.pattern.size());
+    ASSERT_EQ(3ULL, placeholder.pattern.size());
     EXPECT_NO_THROW(boost::get<placeholder::variadic_t::key_t>(placeholder.pattern.at(0)));
     EXPECT_NO_THROW(boost::get<literal_t>(placeholder.pattern.at(1)));
     EXPECT_EQ(": ", boost::get<literal_t>(placeholder.pattern.at(1)).value);
@@ -259,7 +259,7 @@ TEST(parser_t, VariadicPlaceholderWithPrefix) {
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("/", placeholder.prefix);
     EXPECT_EQ("", placeholder.suffix);
-    ASSERT_EQ(3, placeholder.pattern.size());
+    ASSERT_EQ(3ULL, placeholder.pattern.size());
     EXPECT_NO_THROW(boost::get<placeholder::variadic_t::key_t>(placeholder.pattern.at(0)));
     EXPECT_NO_THROW(boost::get<literal_t>(placeholder.pattern.at(1)));
     EXPECT_EQ(": ", boost::get<literal_t>(placeholder.pattern.at(1)).value);
@@ -277,7 +277,7 @@ TEST(parser_t, VariadicPlaceholderWithSuffix) {
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("", placeholder.prefix);
     EXPECT_EQ("/", placeholder.suffix);
-    ASSERT_EQ(3, placeholder.pattern.size());
+    ASSERT_EQ(3ULL, placeholder.pattern.size());
     EXPECT_NO_THROW(boost::get<placeholder::variadic_t::key_t>(placeholder.pattern.at(0)));
     EXPECT_NO_THROW(boost::get<literal_t>(placeholder.pattern.at(1)));
     EXPECT_EQ(": ", boost::get<literal_t>(placeholder.pattern.at(1)).value);
@@ -295,7 +295,7 @@ TEST(parser_t, VariadicPlaceholderWithPrefixSuffix) {
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("/", placeholder.prefix);
     EXPECT_EQ("/", placeholder.suffix);
-    ASSERT_EQ(3, placeholder.pattern.size());
+    ASSERT_EQ(3ULL, placeholder.pattern.size());
     EXPECT_NO_THROW(boost::get<placeholder::variadic_t::key_t>(placeholder.pattern.at(0)));
     EXPECT_NO_THROW(boost::get<literal_t>(placeholder.pattern.at(1)));
     EXPECT_EQ(": ", boost::get<literal_t>(placeholder.pattern.at(1)).value);
@@ -313,7 +313,7 @@ TEST(parser_t, VariadicPlaceholderWithSeparator) {
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("", placeholder.prefix);
     EXPECT_EQ("", placeholder.suffix);
-    ASSERT_EQ(3, placeholder.pattern.size());
+    ASSERT_EQ(3ULL, placeholder.pattern.size());
     EXPECT_NO_THROW(boost::get<placeholder::variadic_t::key_t>(placeholder.pattern.at(0)));
     EXPECT_NO_THROW(boost::get<literal_t>(placeholder.pattern.at(1)));
     EXPECT_EQ(": ", boost::get<literal_t>(placeholder.pattern.at(1)).value);
@@ -331,7 +331,7 @@ TEST(parser_t, VariadicPlaceholderWithPrefixSuffixSeparator) {
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("/", placeholder.prefix);
     EXPECT_EQ("/", placeholder.suffix);
-    ASSERT_EQ(3, placeholder.pattern.size());
+    ASSERT_EQ(3ULL, placeholder.pattern.size());
     EXPECT_NO_THROW(boost::get<placeholder::variadic_t::key_t>(placeholder.pattern.at(0)));
     EXPECT_NO_THROW(boost::get<literal_t>(placeholder.pattern.at(1)));
     EXPECT_EQ(": ", boost::get<literal_t>(placeholder.pattern.at(1)).value);
@@ -349,7 +349,7 @@ TEST(parser_t, VariadicPlaceholderWithPrefixSuffixBraceAndSeparator) {
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("(", placeholder.prefix);
     EXPECT_EQ(")", placeholder.suffix);
-    ASSERT_EQ(3, placeholder.pattern.size());
+    ASSERT_EQ(3ULL, placeholder.pattern.size());
     EXPECT_NO_THROW(boost::get<placeholder::variadic_t::key_t>(placeholder.pattern.at(0)));
     EXPECT_NO_THROW(boost::get<literal_t>(placeholder.pattern.at(1)));
     EXPECT_EQ(": ", boost::get<literal_t>(placeholder.pattern.at(1)).value);
@@ -367,7 +367,7 @@ TEST(parser_t, VariadicPlaceholderWithPattern) {
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("", placeholder.prefix);
     EXPECT_EQ("", placeholder.suffix);
-    ASSERT_EQ(3, placeholder.pattern.size());
+    ASSERT_EQ(3ULL, placeholder.pattern.size());
     EXPECT_NO_THROW(boost::get<placeholder::variadic_t::key_t>(placeholder.pattern.at(0)));
     EXPECT_NO_THROW(boost::get<literal_t>(placeholder.pattern.at(1)));
     EXPECT_EQ("=", boost::get<literal_t>(placeholder.pattern.at(1)).value);
@@ -392,7 +392,7 @@ TEST(parser_t, VariadicPlaceholderWithPatternPrefixSuffix) {
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("/", placeholder.prefix);
     EXPECT_EQ("/", placeholder.suffix);
-    ASSERT_EQ(3, placeholder.pattern.size());
+    ASSERT_EQ(3ULL, placeholder.pattern.size());
     EXPECT_NO_THROW(boost::get<placeholder::variadic_t::key_t>(placeholder.pattern.at(0)));
     EXPECT_NO_THROW(boost::get<literal_t>(placeholder.pattern.at(1)));
     EXPECT_EQ("=", boost::get<literal_t>(placeholder.pattern.at(1)).value);
@@ -410,7 +410,7 @@ TEST(parser_t, VariadicPlaceholderWithPatternPrefixSuffixSeparator) {
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("/", placeholder.prefix);
     EXPECT_EQ("/", placeholder.suffix);
-    ASSERT_EQ(3, placeholder.pattern.size());
+    ASSERT_EQ(3ULL, placeholder.pattern.size());
     EXPECT_NO_THROW(boost::get<placeholder::variadic_t::key_t>(placeholder.pattern.at(0)));
     EXPECT_NO_THROW(boost::get<literal_t>(placeholder.pattern.at(1)));
     EXPECT_EQ("=", boost::get<literal_t>(placeholder.pattern.at(1)).value);
@@ -428,7 +428,7 @@ TEST(parser_t, VariadicPlaceholderLegacy) {
     auto placeholder = boost::get<placeholder::variadic_t>(*token);
     EXPECT_EQ("", placeholder.prefix);
     EXPECT_EQ("", placeholder.suffix);
-    ASSERT_EQ(4, placeholder.pattern.size());
+    ASSERT_EQ(4ULL, placeholder.pattern.size());
     EXPECT_NO_THROW(boost::get<literal_t>(placeholder.pattern.at(0)));
     EXPECT_EQ("'", boost::get<literal_t>(placeholder.pattern.at(0)).value);
     EXPECT_NO_THROW(boost::get<placeholder::variadic_t::key_t>(placeholder.pattern.at(1)));

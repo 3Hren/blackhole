@@ -34,7 +34,7 @@ void post_read(boost::asio::io_service& loop,
     BOOST_ASSERT(data.size() <= 4096);
 
     std::size_t size = boost::asio::buffer_size(buffer);
-    EXPECT_EQ(4096, size);
+    EXPECT_EQ(4096ULL, size);
 
     unsigned char* p = boost::asio::buffer_cast<unsigned char*>(buffer);
     std::copy(data.begin(), data.end(), p);
