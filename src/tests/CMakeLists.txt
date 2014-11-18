@@ -36,6 +36,7 @@ SET(HEADERS
 SET(SOURCE_MAIN main)
 
 SET(SOURCES_BASE
+    attribute/combined
     datetime/test_DayOfYear
     datetime/test_DayOfMonth
     datetime/test_DayOfWeek
@@ -44,6 +45,7 @@ SET(SOURCES_BASE
     datetime/test_Time
     datetime/test_Year
     datetime/test_Week
+    logger/verbose
     test_AttachableStream
     test_Attribute
     test_Config
@@ -99,8 +101,6 @@ IF(ENABLE_ELASTICSEARCH)
 ENDIF()
 
 SET(SOURCES_DEVELOP
-    attribute/combined
-    logger/verbose
 )
 
 SET(SOURCES
