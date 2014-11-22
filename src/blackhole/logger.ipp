@@ -22,17 +22,7 @@ composite_logger_t<T, FilterArgs...>::operator=(composite_logger_t<T, FilterArgs
     swap(d.filter, other.d.filter);
     swap(d.frontends, other.d.frontends);
 
-    auto this_scoped_attributes = scoped.get();
-    scoped.reset(other.scoped.get());
-    other.scoped.reset(this_scoped_attributes);
-
-    if (scoped.get()) {
-        scoped->m_logger = this;
-    }
-
-    if (other.scoped.get()) {
-        other.scoped->m_logger = &other;
-    }
+    scoped.swap(other.scoped);
 
     return *this;
 }
@@ -57,37 +47,6 @@ composite_logger_t<T, FilterArgs...>::populate(attribute::set_t& internal) const
     internal.emplace_back(keyword::timestamp() = keyword::init::timestamp());
 }
 
-template<class T, class... FilterArgs>
-BLACKHOLE_API
-void
-composite_logger_t<T, FilterArgs...>::populate(attribute::set_t& external, const reader_lock_type&) const {
-    external.reserve(BLACKHOLE_EXTERNAL_SET_RESERVED_SIZE);
-
-    if (auto scoped = this->scoped.get()) {
-        const auto& attributes = scoped->attributes();
-        std::copy(attributes.begin(), attributes.end(), std::back_inserter(external));
-    }
-}
-
-template<class T, class... FilterArgs>
-BLACKHOLE_API
-attribute::combined_view_t
-composite_logger_t<T, FilterArgs...>::with_scoped(const attribute::set_t& external, const reader_lock_type&) const {
-    if (auto scoped = this->scoped.get()) {
-        return attribute::combined_view_t(external, scoped->attributes());
-    } else {
-        return attribute::combined_view_t(external);
-    }
-}
-
-BLACKHOLE_API
-scoped_attributes_concept_t::scoped_attributes_concept_t(scope_feature_t& log) :
-    m_logger(&log),
-    m_previous(log.scoped.get())
-{
-    log.scoped.reset(this);
-}
-
 BLACKHOLE_API
 scoped_attributes_concept_t::~scoped_attributes_concept_t() {
     BOOST_ASSERT(m_logger);
@@ -105,6 +64,38 @@ BLACKHOLE_API
 const scoped_attributes_concept_t&
 scoped_attributes_concept_t::parent() const {
     return *m_previous;
+}
+
+BLACKHOLE_API
+void scope_feature_t::swap(scope_feature_t &other) {
+    auto this_scoped_attributes = scoped.get();
+    scoped.reset(other.scoped.get());
+    other.scoped.reset(this_scoped_attributes);
+
+    if (scoped.get()) {
+        scoped->m_logger = this;
+    }
+
+    if (other.scoped.get()) {
+        other.scoped->m_logger = &other;
+    }
+}
+
+BLACKHOLE_API
+void scope_feature_t::merge(attribute::set_t &external) const {
+    if (auto scoped = this->scoped.get()) {
+        const auto& attributes = scoped->attributes();
+        std::copy(attributes.begin(), attributes.end(), std::back_inserter(external));
+    }
+}
+
+BLACKHOLE_API
+attribute::combined_view_t scope_feature_t::view(const attribute::set_t &external) const {
+    if (auto scoped = this->scoped.get()) {
+        return attribute::combined_view_t(external, scoped->attributes());
+    } else {
+        return attribute::combined_view_t(external);
+    }
 }
 
 } // namespace blackhole

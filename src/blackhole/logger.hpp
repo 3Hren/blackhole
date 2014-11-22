@@ -40,12 +40,27 @@ public:
     scope_feature_t() :
         scoped(&aux::deleter::empty)
     {}
+
+    void swap(scope_feature_t& other);
+
+    void merge(attribute::set_t& external) const;
+    attribute::combined_view_t view(const attribute::set_t& external) const;
+
+    scoped_attributes_concept_t* get() const {
+        return scoped.get();
+    }
+
+    void reset(scoped_attributes_concept_t* v) {
+        scoped.reset(v);
+    }
 };
 
 class base_logger_t {};
 
 template<class T, class... FilterArgs>
-class composite_logger_t : public scope_feature_t, public base_logger_t {
+class composite_logger_t : public base_logger_t {
+    friend class scoped_attributes_concept_t;
+
 public:
     typedef std::function<bool(const attribute::combined_view_t&, const FilterArgs&...)> filter_type;
 
@@ -53,7 +68,13 @@ public:
     typedef boost::shared_lock<rw_mutex_type> reader_lock_type;
     typedef boost::unique_lock<rw_mutex_type> writer_lock_type;
 
+    // TODO: Doc!
+    typedef scope_feature_t scoped_type;
+
+    // TODO: Make private!
 protected:
+    scope_feature_t scoped;
+
     struct {
         std::atomic<bool> enabled;
 
@@ -118,14 +139,16 @@ public:
         }
 
         reader_lock_type lock(d.lock.open);
-        if (!d.filter(with_scoped(external, lock), args...)) {
+        if (!d.filter(scoped.view(external), args...)) {
             return record_t::invalid();
         }
 
         attribute::set_t internal;
         populate(internal);
         static_cast<const T&>(*this).populate_additional(internal, args...);
-        populate(external, lock);
+
+        external.reserve(BLACKHOLE_EXTERNAL_SET_RESERVED_SIZE);
+        scoped.merge(external);
         return record_t(std::move(internal), std::move(external));
     }
 
@@ -142,9 +165,6 @@ public:
 
 private:
     void populate(attribute::set_t& internal) const;
-    void populate(attribute::set_t& external, const reader_lock_type&) const;
-
-    attribute::combined_view_t with_scoped(const attribute::set_t& external, const reader_lock_type&) const;
 };
 
 class logger_base_t : public composite_logger_t<logger_base_t> {
@@ -244,14 +264,23 @@ namespace blackhole {
 class scoped_attributes_concept_t {
     BLACKHOLE_DECLARE_NONCOPYABLE(scoped_attributes_concept_t);
 
-    scope_feature_t *m_logger;
+    scope_feature_t *m_logger; // TODO: Actually, it's a holder.
     scoped_attributes_concept_t *m_previous;
+
+    friend class scope_feature_t;
 
     template<class T, class... FilterArgs>
     friend class composite_logger_t;
 
 public:
-    scoped_attributes_concept_t(scope_feature_t& log);
+    template<class T>
+    scoped_attributes_concept_t(T& log, typename T::scoped_type* = 0) :
+        m_logger(&log.scoped),
+        m_previous(log.scoped.get())
+    {
+        log.scoped.reset(this);
+    }
+
     virtual ~scoped_attributes_concept_t();
 
     virtual const attribute::set_t& attributes() const = 0;
