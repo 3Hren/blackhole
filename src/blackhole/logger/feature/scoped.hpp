@@ -13,6 +13,11 @@ namespace blackhole {
 
 namespace feature {
 
+/*!
+ * This feature allows the logger to be attached with scoped attributes.
+ *
+ * \note Use only as template parameter.
+ */
 class scoped_t {
     boost::thread_specific_ptr<scoped_attributes_concept_t> scoped;
 
@@ -48,9 +53,9 @@ private:
 namespace blackhole {
 
 /*!
- *  Concept form scoped attributes holder.
+ * Concept form scoped attributes holder.
  *
- *  \note It's not movable to avoid moving to another thread.
+ * \note It's not movable to avoid moving to another thread.
  */
 class scoped_attributes_concept_t {
     BLACKHOLE_DECLARE_NONCOPYABLE(scoped_attributes_concept_t);
