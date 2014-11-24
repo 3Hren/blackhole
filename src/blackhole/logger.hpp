@@ -42,7 +42,6 @@ public:
     typedef boost::shared_lock<rw_mutex_type> reader_lock_type;
     typedef boost::unique_lock<rw_mutex_type> writer_lock_type;
 
-    // TODO: Doc!
     typedef feature::scoped_t scoped_type;
 
 private:
