@@ -74,8 +74,7 @@ public:
     // TODO: Doc!
     typedef scope_feature_t scoped_type;
 
-    // TODO: Make private!
-protected:
+private:
     scope_feature_t scoped;
 
     struct {
