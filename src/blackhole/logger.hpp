@@ -18,43 +18,9 @@
 #include "blackhole/filter.hpp"
 #include "blackhole/frontend.hpp"
 #include "blackhole/keyword/severity.hpp"
+#include "blackhole/logger/feature/scoped.hpp"
 
 namespace blackhole {
-
-namespace aux {
-
-namespace deleter {
-
-static inline void empty(scoped_attributes_concept_t*) {}
-
-} // namespace deleter
-
-} // namespace aux
-
-class scoped_feature_t {
-    friend class scoped_attributes_concept_t;
-
-protected:
-    boost::thread_specific_ptr<scoped_attributes_concept_t> scoped;
-
-public:
-    scoped_feature_t() :
-        scoped(&aux::deleter::empty)
-    {}
-
-    void swap(scoped_feature_t& other);
-
-    void merge(attribute::set_t& external) const;
-    attribute::combined_view_t view(const attribute::set_t& external) const;
-
-    scoped_attributes_concept_t* get() const {
-        return scoped.get();
-    }
-
-    void reset(scoped_attributes_concept_t* v) {
-        scoped.reset(v);
-    }
-};
 
 class base_logger_t {};
 
@@ -72,10 +38,10 @@ public:
     typedef boost::unique_lock<rw_mutex_type> writer_lock_type;
 
     // TODO: Doc!
-    typedef scoped_feature_t scoped_type;
+    typedef feature::scoped_t scoped_type;
 
 private:
-    scoped_feature_t scoped;
+    feature::scoped_t scoped;
 
     struct {
         std::atomic<bool> enabled;
@@ -267,47 +233,8 @@ private:
 
 };
 
-}
-
-namespace blackhole {
-
-/// Concept form scoped attributes holder.
-/*!
- * @note: It's not movable to avoid moving to another thread.
- */
-class scoped_attributes_concept_t {
-    BLACKHOLE_DECLARE_NONCOPYABLE(scoped_attributes_concept_t);
-
-    scoped_feature_t *m_scoped;
-    scoped_attributes_concept_t *m_previous;
-
-    friend class scoped_feature_t;
-
-    template<class T, class... FilterArgs>
-    friend class composite_logger_t;
-
-public:
-    template<class T>
-    scoped_attributes_concept_t(T& log, typename T::scoped_type* = 0) :
-        m_scoped(&log.scoped),
-        m_previous(log.scoped.get())
-    {
-        log.scoped.reset(this);
-    }
-
-    virtual ~scoped_attributes_concept_t();
-
-    virtual const attribute::set_t& attributes() const = 0;
-
-protected:
-    bool has_parent() const;
-    const scoped_attributes_concept_t& parent() const;
-};
-
 } // namespace blackhole
 
 #if defined(BLACKHOLE_HEADER_ONLY)
 #include "blackhole/logger.ipp"
 #endif
-
-// TODO: Write tests, which will test multithreading logger/wrapper usage. Helpful, when checking with Valgrind.
