@@ -1,6 +1,5 @@
 #include "blackhole/logger.hpp"
 
-#include "blackhole/detail/config/nullptr.hpp"
 #include "blackhole/keyword.hpp"
 #include "blackhole/keyword/message.hpp"
 #include "blackhole/keyword/thread.hpp"
