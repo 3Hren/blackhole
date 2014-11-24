@@ -63,6 +63,8 @@ class composite_logger_t : public base_logger_t {
     friend class scoped_attributes_concept_t;
 
 public:
+    typedef T mixed_type;
+
     typedef std::function<bool(const attribute::combined_view_t&, const FilterArgs&...)> filter_type;
 
     typedef boost::shared_mutex rw_mutex_type;
@@ -158,7 +160,7 @@ public:
 
         attribute::set_t internal;
         populate(internal);
-        static_cast<const T&>(*this).populate_additional(internal, args...);
+        static_cast<const mixed_type&>(*this).populate_additional(internal, args...);
 
         external.reserve(BLACKHOLE_EXTERNAL_SET_RESERVED_SIZE);
         scoped.merge(external);
