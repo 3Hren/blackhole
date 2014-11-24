@@ -43,9 +43,10 @@ private:
 
 namespace blackhole {
 
-/// Concept form scoped attributes holder.
 /*!
- * @note: It's not movable to avoid moving to another thread.
+ *  Concept form scoped attributes holder.
+ *
+ *  \note It's not movable to avoid moving to another thread.
  */
 class scoped_attributes_concept_t {
     BLACKHOLE_DECLARE_NONCOPYABLE(scoped_attributes_concept_t);
