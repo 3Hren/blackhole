@@ -1,7 +1,10 @@
 #pragma once
 
+#include <iterator>
+
 #include <boost/thread/tss.hpp>
 
+#include "blackhole/attribute/set.hpp"
 #include "blackhole/config.hpp"
 #include "blackhole/detail/config/noncopyable.hpp"
 #include "blackhole/forwards.hpp"
@@ -21,6 +24,7 @@ public:
     void swap(scoped_t& other);
 
     void merge(attribute::set_t& external) const;
+
     attribute::combined_view_t view(const attribute::set_t& external) const;
 
     scoped_attributes_concept_t* get() const {
@@ -107,7 +111,7 @@ void scoped_t::swap(scoped_t &other) {
 }
 
 BLACKHOLE_API
-void scoped_t::merge(attribute::set_t &external) const {
+void scoped_t::merge(attribute::set_t& external) const {
     if (auto scoped = this->scoped.get()) {
         const auto& attributes = scoped->attributes();
         std::copy(attributes.begin(), attributes.end(), std::back_inserter(external));
@@ -115,7 +119,7 @@ void scoped_t::merge(attribute::set_t &external) const {
 }
 
 BLACKHOLE_API
-attribute::combined_view_t scoped_t::view(const attribute::set_t &external) const {
+attribute::combined_view_t scoped_t::view(const attribute::set_t& external) const {
     if (auto scoped = this->scoped.get()) {
         return attribute::combined_view_t(external, scoped->attributes());
     } else {
