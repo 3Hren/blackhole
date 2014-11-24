@@ -27,8 +27,8 @@ public:
         return scoped.get();
     }
 
-    void reset(scoped_attributes_concept_t* v) {
-        scoped.reset(v);
+    void reset(scoped_attributes_concept_t* value) {
+        scoped.reset(value);
     }
 
 private:
