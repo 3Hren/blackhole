@@ -32,9 +32,9 @@ composite_logger_t<T, FilterArgs...>::populate(attribute::set_t& internal) const
 
 BLACKHOLE_API
 scoped_attributes_concept_t::~scoped_attributes_concept_t() {
-    BOOST_ASSERT(m_logger);
-    BOOST_ASSERT(m_logger->scoped.get() == this);
-    m_logger->scoped.reset(m_previous);
+    BOOST_ASSERT(m_scoped);
+    BOOST_ASSERT(m_scoped->scoped.get() == this);
+    m_scoped->scoped.reset(m_previous);
 }
 
 BLACKHOLE_API
@@ -50,22 +50,22 @@ scoped_attributes_concept_t::parent() const {
 }
 
 BLACKHOLE_API
-void scope_feature_t::swap(scope_feature_t &other) {
+void scoped_feature_t::swap(scoped_feature_t &other) {
     auto this_scoped_attributes = scoped.get();
     scoped.reset(other.scoped.get());
     other.scoped.reset(this_scoped_attributes);
 
     if (scoped.get()) {
-        scoped->m_logger = this;
+        scoped->m_scoped = this;
     }
 
     if (other.scoped.get()) {
-        other.scoped->m_logger = &other;
+        other.scoped->m_scoped = &other;
     }
 }
 
 BLACKHOLE_API
-void scope_feature_t::merge(attribute::set_t &external) const {
+void scoped_feature_t::merge(attribute::set_t &external) const {
     if (auto scoped = this->scoped.get()) {
         const auto& attributes = scoped->attributes();
         std::copy(attributes.begin(), attributes.end(), std::back_inserter(external));
@@ -73,7 +73,7 @@ void scope_feature_t::merge(attribute::set_t &external) const {
 }
 
 BLACKHOLE_API
-attribute::combined_view_t scope_feature_t::view(const attribute::set_t &external) const {
+attribute::combined_view_t scoped_feature_t::view(const attribute::set_t &external) const {
     if (auto scoped = this->scoped.get()) {
         return attribute::combined_view_t(external, scoped->attributes());
     } else {

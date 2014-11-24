@@ -31,18 +31,18 @@ static inline void empty(scoped_attributes_concept_t*) {}
 
 } // namespace aux
 
-class scope_feature_t {
+class scoped_feature_t {
     friend class scoped_attributes_concept_t;
 
 protected:
     boost::thread_specific_ptr<scoped_attributes_concept_t> scoped;
 
 public:
-    scope_feature_t() :
+    scoped_feature_t() :
         scoped(&aux::deleter::empty)
     {}
 
-    void swap(scope_feature_t& other);
+    void swap(scoped_feature_t& other);
 
     void merge(attribute::set_t& external) const;
     attribute::combined_view_t view(const attribute::set_t& external) const;
@@ -72,10 +72,10 @@ public:
     typedef boost::unique_lock<rw_mutex_type> writer_lock_type;
 
     // TODO: Doc!
-    typedef scope_feature_t scoped_type;
+    typedef scoped_feature_t scoped_type;
 
 private:
-    scope_feature_t scoped;
+    scoped_feature_t scoped;
 
     struct {
         std::atomic<bool> enabled;
@@ -278,10 +278,10 @@ namespace blackhole {
 class scoped_attributes_concept_t {
     BLACKHOLE_DECLARE_NONCOPYABLE(scoped_attributes_concept_t);
 
-    scope_feature_t *m_logger; // TODO: Actually, it's a holder.
+    scoped_feature_t *m_scoped;
     scoped_attributes_concept_t *m_previous;
 
-    friend class scope_feature_t;
+    friend class scoped_feature_t;
 
     template<class T, class... FilterArgs>
     friend class composite_logger_t;
@@ -289,7 +289,7 @@ class scoped_attributes_concept_t {
 public:
     template<class T>
     scoped_attributes_concept_t(T& log, typename T::scoped_type* = 0) :
-        m_logger(&log.scoped),
+        m_scoped(&log.scoped),
         m_previous(log.scoped.get())
     {
         log.scoped.reset(this);
