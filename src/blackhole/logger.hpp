@@ -11,6 +11,7 @@
 #include "blackhole/detail/config/atomic.hpp"
 #include "blackhole/detail/config/noncopyable.hpp"
 #include "blackhole/detail/config/nullptr.hpp"
+#include "blackhole/detail/thread/lock.hpp"
 #include "blackhole/detail/util/unique.hpp"
 #include "blackhole/error/handler.hpp"
 #include "blackhole/forwards.hpp"
@@ -100,7 +101,19 @@ public:
         *this = std::move(other);
     }
 
-    composite_logger_t& operator=(composite_logger_t&& other);
+    composite_logger_t& operator=(composite_logger_t&& other) {
+        other.d.enabled = d.enabled.exchange(other.d.enabled);
+
+        auto lock = detail::thread::multi_lock(d.lock.open, d.lock.push, other.d.lock.open, other.d.lock.push);
+
+        using std::swap;
+        swap(d.filter, other.d.filter);
+        swap(d.frontends, other.d.frontends);
+
+        scoped.swap(other.scoped);
+
+        return *this;
+    }
 
     bool enabled() const {
         return d.enabled;

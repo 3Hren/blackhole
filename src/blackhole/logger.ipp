@@ -1,7 +1,6 @@
 #include "blackhole/logger.hpp"
 
 #include "blackhole/detail/config/nullptr.hpp"
-#include "blackhole/detail/thread/lock.hpp"
 #include "blackhole/keyword.hpp"
 #include "blackhole/keyword/message.hpp"
 #include "blackhole/keyword/thread.hpp"
@@ -10,22 +9,6 @@
 #include "blackhole/keyword/process.hpp"
 
 namespace blackhole {
-
-template<class T, class... FilterArgs>
-composite_logger_t<T, FilterArgs...>&
-composite_logger_t<T, FilterArgs...>::operator=(composite_logger_t<T, FilterArgs...>&& other) {
-    other.d.enabled = d.enabled.exchange(other.d.enabled);
-
-    auto lock = detail::thread::multi_lock(d.lock.open, d.lock.push, other.d.lock.open, other.d.lock.push);
-
-    using std::swap;
-    swap(d.filter, other.d.filter);
-    swap(d.frontends, other.d.frontends);
-
-    scoped.swap(other.scoped);
-
-    return *this;
-}
 
 template<class T, class... FilterArgs>
 void
