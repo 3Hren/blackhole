@@ -17,7 +17,12 @@
 #include "blackhole/forwards.hpp"
 #include "blackhole/filter.hpp"
 #include "blackhole/frontend.hpp"
+#include "blackhole/keyword/message.hpp"
 #include "blackhole/keyword/severity.hpp"
+#include "blackhole/keyword/thread.hpp"
+#include "blackhole/keyword/timestamp.hpp"
+#include "blackhole/keyword/tracebit.hpp"
+#include "blackhole/keyword/process.hpp"
 #include "blackhole/logger/feature/scoped.hpp"
 
 namespace blackhole {
@@ -144,7 +149,22 @@ public:
     }
 
 private:
-    void populate(attribute::set_t& internal) const;
+    void populate(attribute::set_t& internal) const {
+        internal.reserve(BLACKHOLE_INTERNAL_SET_RESERVED_SIZE);
+#ifdef BLACKHOLE_HAS_ATTRIBUTE_PID
+        internal.emplace_back(keyword::pid() = keyword::init::pid());
+#endif
+
+#ifdef BLACKHOLE_HAS_ATTRIBUTE_TID
+        internal.emplace_back(keyword::tid() = keyword::init::tid());
+#endif
+
+#ifdef BLACKHOLE_HAS_ATTRIBUTE_LWP
+        internal.emplace_back(keyword::lwp() = keyword::init::lwp());
+#endif
+
+        internal.emplace_back(keyword::timestamp() = keyword::init::timestamp());
+    }
 };
 
 class logger_base_t : public composite_logger_t<logger_base_t> {
@@ -234,7 +254,3 @@ private:
 };
 
 } // namespace blackhole
-
-#if defined(BLACKHOLE_HEADER_ONLY)
-#include "blackhole/logger.ipp"
-#endif
