@@ -15,6 +15,7 @@ OPTION(ENABLE_EXAMPLES "Enable examples" OFF)
 OPTION(ENABLE_BENCHMARKING "Enable benchmarking" OFF)
 OPTION(ENABLE_ELASTICSEARCH "Enable elasticsearch sink" OFF)
 OPTION(ENABLE_ELASTICSEARCH_DEBUG "Enable elasticsearch debug" OFF)
+OPTION(ENABLE_TRACING_FRAMEWORK "Enable tracing framework" OFF)
 OPTION(ENABLE_DOCUMENTATION_GENERATION "Generate documentation by Doxygen" OFF)
 
 CONFIGURE_FILE(

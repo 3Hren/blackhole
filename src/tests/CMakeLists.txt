@@ -105,7 +105,6 @@ SET(SOURCES_BASE
     Record
     Repository
     TcpSink
-    Trace
     UdpSink
     View
     Wrapper
@@ -128,6 +127,12 @@ IF(ENABLE_ELASTICSEARCH)
     )
 ENDIF()
 
+IF(ENABLE_TRACING_FRAMEWORK)
+    SET(SOURCES_TRACING
+        Trace
+    )
+ENDIF()
+
 SET(SOURCES_DEVELOP
 )
 
@@ -136,6 +141,7 @@ SET(SOURCES
     ${SOURCES_BASE}
     ${SOURCES_FORMATTER}
     ${SOURCES_ES}
+    ${SOURCES_TRACING}
     ${SOURCES_DEVELOP}
 )
 
