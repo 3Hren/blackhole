@@ -6,10 +6,8 @@ if [ -z "$TRAVIS_OS_NAME" ]; then
 fi
 
 if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-    echo 'sudo apt-get update -qq'
     sudo apt-get update -qq
 elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
-    echo 'brew update && brew --config'
     brew update && brew --config
 else
     echo "Unknown OS - '$TRAVIS_OS_NAME'. Stopping the build ..."
