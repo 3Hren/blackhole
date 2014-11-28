@@ -31,6 +31,7 @@ namespace blackhole {
 
     class record_t;
 
+    class base_logger_t;
     class logger_base_t;
 
     template<typename Level>
