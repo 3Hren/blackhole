@@ -73,6 +73,7 @@ SET(SOURCES_BASE
     datetime/test_Time
     datetime/test_Year
     datetime/test_Week
+    logger/composite
     logger/verbose
     test_AttachableStream
     test_Attribute
