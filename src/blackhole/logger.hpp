@@ -27,20 +27,35 @@
 
 namespace blackhole {
 
+namespace policy {
+
+namespace threading {
+
+struct rw_lock_t {
+    typedef boost::shared_mutex               rw_mutex_type;
+    typedef boost::shared_lock<rw_mutex_type> reader_lock_type;
+    typedef boost::unique_lock<rw_mutex_type> writer_lock_type;
+};
+
+} // namespace threading
+
+} // namespace policy
+
 class base_logger_t {};
 
-template<class T, class... FilterArgs>
+template<class T, class ThreadPolicy, class... FilterArgs>
 class composite_logger_t : public base_logger_t {
     friend class scoped_attributes_concept_t;
 
 public:
     typedef T mixed_type;
+    typedef ThreadPolicy thread_policy;
 
     typedef std::function<bool(const attribute::combined_view_t&, const FilterArgs&...)> filter_type;
 
-    typedef boost::shared_mutex rw_mutex_type;
-    typedef boost::shared_lock<rw_mutex_type> reader_lock_type;
-    typedef boost::unique_lock<rw_mutex_type> writer_lock_type;
+    typedef typename thread_policy::rw_mutex_type rw_mutex_type;
+    typedef typename thread_policy::reader_lock_type reader_lock_type;
+    typedef typename thread_policy::writer_lock_type writer_lock_type;
 
     typedef feature::scoped_t scoped_type;
 
@@ -166,10 +181,10 @@ private:
     }
 };
 
-class logger_base_t : public composite_logger_t<logger_base_t> {
-    friend class composite_logger_t<logger_base_t>;
+class logger_base_t : public composite_logger_t<logger_base_t, policy::threading::rw_lock_t> {
+    friend class composite_logger_t<logger_base_t, policy::threading::rw_lock_t>;
 
-    typedef composite_logger_t<logger_base_t> base_type;
+    typedef composite_logger_t<logger_base_t, policy::threading::rw_lock_t> base_type;
 
 public:
     logger_base_t() :
@@ -189,10 +204,12 @@ private:
 };
 
 template<typename Level>
-class verbose_logger_t : public composite_logger_t<verbose_logger_t<Level>, Level> {
-    friend class composite_logger_t<verbose_logger_t<Level>, Level>;
+class verbose_logger_t :
+    public composite_logger_t<verbose_logger_t<Level>, policy::threading::rw_lock_t, Level>
+{
+    friend class composite_logger_t<verbose_logger_t<Level>, policy::threading::rw_lock_t, Level>;
 
-    typedef composite_logger_t<verbose_logger_t<Level>, Level> base_type;
+    typedef composite_logger_t<verbose_logger_t<Level>, policy::threading::rw_lock_t, Level> base_type;
 
 public:
     typedef Level level_type;
