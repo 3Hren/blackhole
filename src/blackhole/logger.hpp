@@ -242,8 +242,6 @@ class logger_base_t :
         policy::filter_t<void>
     >
 {
-    friend class composite_logger_t<policy::threading::rw_lock_t, policy::filter_t<void>>;
-
     typedef composite_logger_t<policy::threading::rw_lock_t, policy::filter_t<void>> base_type;
 
 public:
@@ -277,11 +275,6 @@ class verbose_logger_t :
         policy::filter_t<verbose_polulator_t<Level>, Level>
     >
 {
-    friend class composite_logger_t<
-        policy::threading::rw_lock_t,
-        policy::filter_t<verbose_polulator_t<Level>, Level>
-    >;
-
     typedef composite_logger_t<
         policy::threading::rw_lock_t,
         policy::filter_t<verbose_polulator_t<Level>, Level>
