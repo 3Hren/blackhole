@@ -51,19 +51,59 @@ struct rw_lock_t {
 
 } // namespace threading
 
+template<class T, typename... Args>
+class filter_t {
+    typedef T polulator_type;
+
+public:
+    typedef std::function<bool(const attribute::combined_view_t&, const Args&...)> function_type;
+
+public:
+    BLACKHOLE_ALWAYS_INLINE
+    static inline
+    bool
+    filter(const function_type& fn, const attribute::combined_view_t& view, const Args&... args) {
+        return fn(view, args...);
+    }
+
+    BLACKHOLE_ALWAYS_INLINE
+    static inline
+    void populate_with(attribute::set_t& internal, const Args&... args) {
+        polulator_type::insert(internal, args...);
+    }
+};
+
+template<>
+class filter_t<void> {
+public:
+    typedef std::function<bool(const attribute::combined_view_t&)> function_type;
+
+public:
+    BLACKHOLE_ALWAYS_INLINE
+    static inline
+    bool
+    filter(const function_type& fn, const attribute::combined_view_t& view) {
+        return fn(view);
+    }
+
+    BLACKHOLE_ALWAYS_INLINE
+    static inline
+    void populate_with(attribute::set_t&) {}
+};
+
 } // namespace policy
 
 class base_logger_t {};
 
-template<class T, class ThreadPolicy, class... FilterArgs>
+template<class ThreadPolicy, class FilterPolicy>
 class composite_logger_t : public base_logger_t {
     friend class scoped_attributes_concept_t;
 
 public:
-    typedef T mixed_type;
     typedef ThreadPolicy thread_policy;
+    typedef FilterPolicy filter_policy;
 
-    typedef std::function<bool(const attribute::combined_view_t&, const FilterArgs&...)> filter_type;
+    typedef typename filter_policy::function_type filter_type;
 
     typedef typename thread_policy::rw_mutex_type rw_mutex_type;
     typedef typename thread_policy::reader_lock_type reader_lock_type;
@@ -136,27 +176,30 @@ public:
         d.exception = handler;
     }
 
-    record_t open_record(FilterArgs... args) const {
-        return open_record(attribute::set_t(), std::forward<FilterArgs>(args)...);
+    template<typename... Args>
+    record_t open_record(Args&&... args) const {
+        return open_record(attribute::set_t(), std::forward<Args>(args)...);
     }
 
-    record_t open_record(attribute::pair_t pair, FilterArgs... args) const {
-        return open_record(attribute::set_t({ pair }), std::forward<FilterArgs>(args)...);
+    template<typename... Args>
+    record_t open_record(attribute::pair_t pair, Args&&... args) const {
+        return open_record(attribute::set_t({ pair }), std::forward<Args>(args)...);
     }
 
-    record_t open_record(attribute::set_t external, FilterArgs... args) const {
+    template<typename... Args>
+    record_t open_record(attribute::set_t external, Args&&... args) const {
         if (!enabled()) {
             return record_t::invalid();
         }
 
         reader_lock_type lock(d.lock.open);
-        if (!d.filter(scoped.view(external), args...)) {
+        if (!filter_policy::filter(d.filter, scoped.view(external), args...)) {
             return record_t::invalid();
         }
 
         attribute::set_t internal;
         populate(internal);
-        static_cast<const mixed_type&>(*this).populate_additional(internal, args...);
+        filter_policy::populate_with(internal, args...);
 
         external.reserve(BLACKHOLE_EXTERNAL_SET_RESERVED_SIZE);
         scoped.merge(external);
@@ -193,10 +236,15 @@ private:
     }
 };
 
-class logger_base_t : public composite_logger_t<logger_base_t, policy::threading::rw_lock_t> {
-    friend class composite_logger_t<logger_base_t, policy::threading::rw_lock_t>;
+class logger_base_t :
+    public composite_logger_t<
+        policy::threading::rw_lock_t,
+        policy::filter_t<void>
+    >
+{
+    friend class composite_logger_t<policy::threading::rw_lock_t, policy::filter_t<void>>;
 
-    typedef composite_logger_t<logger_base_t, policy::threading::rw_lock_t> base_type;
+    typedef composite_logger_t<policy::threading::rw_lock_t, policy::filter_t<void>> base_type;
 
 public:
     logger_base_t() :
@@ -210,18 +258,34 @@ public:
         return *this;
     }
 #endif
+};
 
-private:
-    void populate_additional(attribute::set_t&) const {}
+template<typename Level>
+struct verbose_polulator_t {
+    typedef Level level_type;
+
+    BLACKHOLE_ALWAYS_INLINE
+    static inline void insert(attribute::set_t& internal, level_type level) {
+        internal.emplace_back(keyword::severity<level_type>() = level);
+    }
 };
 
 template<typename Level>
 class verbose_logger_t :
-    public composite_logger_t<verbose_logger_t<Level>, policy::threading::rw_lock_t, Level>
+    public composite_logger_t<
+        policy::threading::rw_lock_t,
+        policy::filter_t<verbose_polulator_t<Level>, Level>
+    >
 {
-    friend class composite_logger_t<verbose_logger_t<Level>, policy::threading::rw_lock_t, Level>;
+    friend class composite_logger_t<
+        policy::threading::rw_lock_t,
+        policy::filter_t<verbose_polulator_t<Level>, Level>
+    >;
 
-    typedef composite_logger_t<verbose_logger_t<Level>, policy::threading::rw_lock_t, Level> base_type;
+    typedef composite_logger_t<
+        policy::threading::rw_lock_t,
+        policy::filter_t<verbose_polulator_t<Level>, Level>
+    > base_type;
 
 public:
     typedef Level level_type;
@@ -266,10 +330,6 @@ public:
     }
 
 private:
-    void populate_additional(attribute::set_t& internal, level_type level) const {
-        internal.emplace_back(keyword::severity<level_type>() = level);
-    }
-
     struct default_filter {
         const level_type threshold;
 
