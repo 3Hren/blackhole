@@ -133,9 +133,11 @@ IF(ENABLE_TRACING_FRAMEWORK)
     )
 ENDIF()
 
-SET(SOURCES_FUNCTIONAL
-    functional/threading/logger
-)
+IF(ENABLE_TESTING_THREAD)
+    SET(SOURCES_FUNCTIONAL
+        functional/threading/logger
+    )
+ENDIF()
 
 SET(SOURCES_DEVELOP
 )

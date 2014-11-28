@@ -11,6 +11,7 @@ SET(BLACKHOLE_VERSION "${BLACKHOLE_VERSION_MAJOR}.${BLACKHOLE_VERSION_MINOR}.${B
 OPTION(BLACKHOLE_HEADER_ONLY "Build as header-only library" ON)
 OPTION(BLACKHOLE_DEBUG "Enable debugging messages support" ON)
 OPTION(ENABLE_TESTING "Enable testing" OFF)
+OPTION(ENABLE_TESTING_THREAD, "Enable testing in multithreaded environment" OFF)
 OPTION(ENABLE_EXAMPLES "Enable examples" OFF)
 OPTION(ENABLE_BENCHMARKING "Enable benchmarking" OFF)
 OPTION(ENABLE_ELASTICSEARCH "Enable elasticsearch sink" OFF)
