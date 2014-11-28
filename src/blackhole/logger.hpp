@@ -118,7 +118,7 @@ public:
 
     template<typename... Args>
     record_t open_record(attribute::pair_t pair, Args&&... args) const {
-        return open_record(attribute::set_t({ pair }), std::forward<Args>(args)...);
+        return open_record(attribute::set_t({ std::move(pair) }), std::forward<Args>(args)...);
     }
 
     template<typename... Args>
