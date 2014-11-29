@@ -23,12 +23,11 @@
 #include "blackhole/keyword/tracebit.hpp"
 #include "blackhole/keyword/process.hpp"
 #include "blackhole/logger/feature/scoped.hpp"
+#include "blackhole/logger/mod.hpp"
 #include "blackhole/logger/policy/filter.hpp"
 #include "blackhole/logger/policy/thread.hpp"
 
 namespace blackhole {
-
-class base_logger_t {};
 
 template<class ThreadPolicy, class FilterPolicy>
 class composite_logger_t : public base_logger_t {
