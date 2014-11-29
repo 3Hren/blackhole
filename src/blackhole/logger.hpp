@@ -137,7 +137,7 @@ public:
 
         external.reserve(BLACKHOLE_EXTERNAL_SET_RESERVED_SIZE);
         scoped.merge(external);
-        return record_t(std::move(internal), std::move(external));
+        return record_t(attribute::set_view_t(std::move(external), std::move(internal)));
     }
 
     void push(record_t&& record) const {
