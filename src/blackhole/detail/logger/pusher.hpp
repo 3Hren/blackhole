@@ -44,14 +44,13 @@ public:
     }
 
     /*!
-     * @compat: GCC 4.6
-     * Using initializer lists is problematic, since GCC 4.6 has an extension
-     * which can deduce {{ "value", "42" }} expressions in function call to
-     * the initializer list without looking at the overload resolution.
-     * This behaviour violates C++11 standard, which allows such deducing only
-     * for `auto` keyword (including range-based `for` loop).
-     * Please, specify `attribute::list` type explicitly when using initializer
-     * lists to provide attributes.
+     * \compat GCC 4.6
+     * Using initializer lists is problematic, since GCC 4.6 has an extension (enabled by default)
+     * which can deduce {{ "value", "42" }} expressions in function call to the initializer list
+     * without looking at the overload resolution. This behaviour violates C++11 standard, which
+     * allows such deducing only for `auto` keyword (including range-based `for` loop).
+     * Please, specify `attribute::list` type explicitly when using initializer lists to provide
+     * attributes.
      */
     pusher_t&
     operator()(std::initializer_list<std::pair<std::string, attribute::value_t>>&& args) {
