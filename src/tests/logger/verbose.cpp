@@ -115,5 +115,3 @@ TEST(verbose_logger_t, PrimaryComplexFiltering) {
         EXPECT_TRUE(log.open_record(testing::error, wrapped));
     }
 }
-
-// TODO: Test secondary filter.
