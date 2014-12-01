@@ -1,8 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 SET(PROJECT blackhole-tests)
 
-LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-
 INCLUDE(Compiler)
 
 # Use gmock 1.6 for ancient compilers and systems.
@@ -193,4 +191,3 @@ ENABLE_TESTING()
 ADD_TEST(NAME blackhole-tests COMMAND blackhole-tests)
 
 ADD_DEFINITIONS(-std=c++0x)
-
