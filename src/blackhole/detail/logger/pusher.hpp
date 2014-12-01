@@ -54,14 +54,9 @@ public:
      * lists to provide attributes.
      */
     pusher_t&
-    operator()(std::initializer_list<
-                   std::pair<std::string, attribute::value_t>
-               >&& args)
-    {
+    operator()(std::initializer_list<std::pair<std::string, attribute::value_t>>&& args) {
         for (auto it = args.begin(); it != args.end(); ++it) {
-            record.insert(
-                std::make_pair(it->first, attribute_t(it->second))
-            );
+            record.insert(std::make_pair(it->first, attribute_t(it->second)));
         }
 
         return *this;
