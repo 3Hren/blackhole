@@ -1,0 +1,18 @@
+INCLUDE(Compiler)
+INCLUDE(ExternalProject)
+
+FUNCTION(DOWNLOAD_BENCHMARKING)
+    SET_DIRECTORY_PROPERTIES(properties EP_PREFIX "${CMAKE_BINARY_DIR}/foreign")
+    ExternalProject_ADD(em
+        URL https://github.com/3Hren/epicmeter/archive/v0.1.0.tar.gz
+        URL_MD5 7ead4a6c4e2f33a6593631b995387292
+        SOURCE_DIR "${CMAKE_BINARY_DIR}/foreign/em"
+        CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=-fPIC"
+        INSTALL_COMMAND ""
+    )
+    ExternalProject_GET_PROPERTY(em SOURCE_DIR)
+    ExternalProject_GET_PROPERTY(em BINARY_DIR)
+
+    SET(EPICMETER_INCLUDE_DIR ${SOURCE_DIR}/include PARENT_SCOPE)
+    SET(EPICMETER_BINARY_DIR  ${BINARY_DIR} PARENT_SCOPE)
+ENDFUNCTION()
