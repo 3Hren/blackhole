@@ -3,8 +3,6 @@
 #include <memory>
 #include <vector>
 
-#include <boost/thread/tss.hpp>
-
 #include "blackhole/attribute.hpp"
 #include "blackhole/config.hpp"
 #include "blackhole/detail/config/atomic.hpp"
