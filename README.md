@@ -1,4 +1,4 @@
-# Blackhole [![Build Status](https://travis-ci.org/3Hren/blackhole.png?branch=master)](https://travis-ci.org/3Hren/blackhole) 
+# Blackhole [![Build Status](https://travis-ci.org/3Hren/blackhole.png?branch=master)](https://travis-ci.org/3Hren/blackhole) [![Coverage Status](https://coveralls.io/repos/3Hren/blackhole/badge.png?branch=master)](https://coveralls.io/r/3Hren/blackhole?branch=master)
 
 Yet another C++ logging library.
 
