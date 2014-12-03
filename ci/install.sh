@@ -6,7 +6,8 @@ if [ -z "$TRAVIS_OS_NAME" ]; then
 fi
 
 if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-    sudo apt-get install -qq cdbs cmake libboost-dev libboost-thread-dev libboost-filesystem-dev libmsgpack-dev
+    sudo apt-get install -qq cdbs cmake libboost-dev libboost-thread-dev libboost-filesystem-dev libmsgpack-dev lcov
+    gem install coveralls-lcov
 elif [ "$TRAVIS_OS_NAME" = "osx" ]; then
     brew install msgpack
 else
