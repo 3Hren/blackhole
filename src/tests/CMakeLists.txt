@@ -168,7 +168,5 @@ IF(ENABLE_ELASTICSEARCH)
     )
 ENDIF()
 
-ENABLE_TESTING()
-ADD_TEST(NAME blackhole-tests COMMAND blackhole-tests)
 
 ADD_DEFINITIONS(-std=c++0x)
