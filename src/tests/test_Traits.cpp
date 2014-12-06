@@ -9,13 +9,13 @@
 using namespace blackhole;
 
 TEST(Traits, IsSupportedAttributeType) {
-    static_assert(attribute::is_supported<std::uint32_t>::value,   "`std::uint32_t` must be supported");
-    static_assert(attribute::is_supported<std::int32_t>::value,    "`std::int32_t` must be supported");
-    static_assert(attribute::is_supported<std::uint64_t>::value,   "`std::uint64_t` must be supported");
-    static_assert(attribute::is_supported<std::int64_t>::value,    "`std::int64_t` must be supported");
-    static_assert(attribute::is_supported<double>::value,   "`doutle` must be supported");
-    static_assert(attribute::is_supported<std::string>::value,     "`std::string` must be supported");
-    static_assert(attribute::is_supported<timeval>::value,         "`timeval` must be supported");
+    static_assert(attribute::is_supported<std::uint32_t>::value, "`std::uint32_t` must be supported");
+    static_assert(attribute::is_supported<std::int32_t>::value,  "`std::int32_t` must be supported");
+    static_assert(attribute::is_supported<std::uint64_t>::value, "`std::uint64_t` must be supported");
+    static_assert(attribute::is_supported<std::int64_t>::value,  "`std::int64_t` must be supported");
+    static_assert(attribute::is_supported<double>::value,        "`double` must be supported");
+    static_assert(attribute::is_supported<std::string>::value,   "`std::string` must be supported");
+    static_assert(attribute::is_supported<timeval>::value,       "`timeval` must be supported");
 }
 
 TEST(Traits, LiteralIsConvertibleToAttribute) {
