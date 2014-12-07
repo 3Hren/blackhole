@@ -5,7 +5,7 @@ Yet another C++ logging library.
 Please visit [project site](http://blackhole-logger.herokuapp.com) for more information, including design overview, tutorials, examples and library reference.
 
 
-Blackhole is designed to be flexible configurable and fast. It supports multiply backends and can write into several of them simultaneusely. It allows to change logging process easily without of big coding and even on the fly with the feature of external configuring.
+Blackhole is designed to be flexible configurable and fast. It supports multiply backends and can write into all of them simultaneusely. It allows to change logging process easily without of big coding and even on the fly with the feature of external configuring.
 
   * [Detailed documentation](doc/contents.md)
   * [Features](#features)
@@ -34,7 +34,7 @@ Blackhole is designed to be flexible configurable and fast. It supports multiply
  
    Every log event contains multiple attributes. For example, typical HTTP event from request contains HTTP code, URL, message string and something else. In Blackhole log attributes is everything. It can be indexed, it can be filtered and it is type-safe.
 
-   By the way, have you heard about [Elasticsearch](http://www.elasticsearch.org/)? With the Elasticsearch frontend you can index your logs on the fly and store it there with great support of manipulating, analyzing and monitoring. You are also get the Elasticsearch ELK Stack out of the box.
+   By the way, have you heard about [Elasticsearch](http://www.elasticsearch.org/)? With the Elasticsearch frontend you can index your logs on the fly and store it there with great support of manipulating, analyzing and monitoring. You also get the Elasticsearch ELK Stack out of the box.
 
  - **Robust and tested**
  
