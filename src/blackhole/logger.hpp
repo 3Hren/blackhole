@@ -241,8 +241,7 @@ public:
     }
 
     void set_filter(level_type level) {
-        base_type::set_filter(default_filter { level });
-        this->level.store(level);
+        set_filter(level, default_filter { level });
     }
 
     void set_filter(level_type level, typename base_type::filter_type filter) {
