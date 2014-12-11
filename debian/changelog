@@ -1,3 +1,44 @@
+blackhole (0.4.0-0rc1) unstable; urgency=low
+
+  * Feature: combined logger concept.
+  * Feature: filtering policies, which provide almost costless filtering.
+  * Feature: threading policy support for logger.
+  * Feature: internal attributes attachment as a feature.
+  * Bug fix: fix string literal warnings on some ancient compilers.
+  * Bug fix: workaround GCC 4.4 pragmas.
+  * Bug fix: checking frontend set emptiness is now always under the lock.
+  * API: it's possible to forward all required arguments to final logger's constructor, while
+    creating it through a repository.
+  * API: logger's move constructor, move assignment operator and swap function no longer contain
+    `noexcept` specifications, because given methods actually can throw.
+  * API: disabled tracking feature, because it shouldn't be in a logger itself, but somewhere else.
+  * API: verbose logger concept review.
+  * API: proper verbose logger initialization with a given severity level.
+  * API: drop global logger attribute set.
+  * API: dropped logger concept classes, because it was inconvenient and buggy.
+  * API: redesign invalid record concept.
+  * API: filtering function parameters review.
+  * API: deprecated file `blackhole/log.hpp` file is no longer part of public API, just as planned.
+  * Other: internal and external attribute sets initial capacity can be configured using macro
+    variables.
+  * Other: clang support on non OS X targets.
+  * Other: documentation has been slightly changed and restyled.
+  * Other: code coverage analyze using `lcov` util.
+  * Other: no longer fetch gtest/gmock as submodules.
+  * Other: no longer fetch benchmarking framework as submodule.
+  * Performance: changed attribute set underlying representation.
+  * Performance: got rid of several unnecessary file includes, which saves some compile time.
+  * Performance: avoid unnecessary string copying or moving when comparing attributes.
+  * Performance: explicitly move the value when opening a record with a single attribute.
+  * Testing: added multithreaded scalability benchmarks.
+  * TestingL added huge number of benchmarks (approximately 300), that test every possible
+    combination of cases.
+  * Testing: fixed possible conditional jump.
+  * Testing: fixed comparing signed with signed and vise versa.
+  * Testing: fixed broken resolver test.
+
+ -- Evgeny Safronov <division494@gmail.com>  Thu, 11 Dec 2014 12:40:54 +0300
+
 blackhole (0.3.2-1) unstable; urgency=low
 
   * Bug fix: fixed improper type mapping by name.
