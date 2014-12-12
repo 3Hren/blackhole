@@ -97,7 +97,7 @@ rm -rf %{buildroot}
 - Performance: avoid unnecessary string copying or moving when comparing attributes.
 - Performance: explicitly move the value when opening a record with a single attribute.
 - Testing: added multithreaded scalability benchmarks.
-- TestingL added huge number of benchmarks (approximately 300), that test every possible
+- Testing: added huge number of benchmarks (approximately 300), that test every possible
   combination of cases.
 - Testing: fixed possible conditional jump.
 - Testing: fixed comparing signed with signed and vise versa.
