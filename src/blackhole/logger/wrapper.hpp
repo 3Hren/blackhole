@@ -155,12 +155,14 @@ public:
         return this->wrapped->open_record(this->attributes);
     }
 
+    // TODO: Do this under lock or drop assignment.
     record_t open_record(attribute::pair_t attribute) const {
         attribute::set_t attributes = this->attributes;
         attributes.emplace_back(attribute);
         return this->wrapped->open_record(std::move(attributes));
     }
 
+    // TODO: Do this under lock or drop assignment.
     record_t open_record(attribute::set_t attributes) const {
         std::copy(this->attributes.begin(), this->attributes.end(), std::back_inserter(attributes));
         return this->wrapped->open_record(std::move(attributes));
@@ -199,6 +201,7 @@ public:
     template<typename Level>
     record_t
     open_record(Level level, attribute::set_t attributes = attribute::set_t()) const {
+        // TODO: Do this under lock or drop assignment.
         std::copy(this->attributes.begin(), this->attributes.end(), std::back_inserter(attributes));
         return this->wrapped->open_record(level, std::move(attributes));
     }
