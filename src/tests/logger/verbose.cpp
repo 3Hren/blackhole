@@ -66,6 +66,13 @@ TEST(verbose_logger_t, Verbosity) {
     EXPECT_EQ(testing::warn, log.verbosity());
 }
 
+TEST(verbose_logger_t, VerbosityStrongEnum) {
+    verbose_logger_t<severity> log(severity::debug);
+    log.set_filter(severity::warn);
+
+    EXPECT_EQ(severity::warn, log.verbosity());
+}
+
 TEST(verbose_logger_t, ExtendedVerbosity) {
     verbose_logger_t<testing::level> log(testing::debug);
     log.set_filter(testing::warn, &filter_by_tracebit);

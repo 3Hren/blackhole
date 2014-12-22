@@ -246,7 +246,7 @@ public:
 
     void set_filter(level_type level, typename base_type::filter_type filter) {
         base_type::set_filter(std::move(filter));
-        this->level.store(level);
+        this->level.store(static_cast<underlying_type>(level));
     }
 
     record_t open_record(level_type level, attribute::set_t external = attribute::set_t()) const {
