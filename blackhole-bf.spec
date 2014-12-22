@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
 Version:	0.4.0
-Release:	0rc1%{?dist}
+Release:	0rc2%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
@@ -65,6 +65,10 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Thu Dec 22 2014 Evgeny Safronov <division494@gmail.com> - 0.4.0-0rc2
+- Bug fix: fixed filtering using strong enums.
+- Other: syntax checking can be disabled now.
+
 * Thu Dec 11 2014 Evgeny Safronov <division494@gmail.com> - 0.4.0-0rc1
 - Feature: combined logger concept.
 - Feature: filtering policies, which provide almost costless filtering.

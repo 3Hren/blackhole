@@ -1,3 +1,10 @@
+blackhole (0.4.0-0rc2) unstable; urgency=low
+
+  * Bug fix: fixed filtering using strong enums.
+  * Other: syntax checking can be disabled now.
+
+ -- Evgeny Safronov <division494@gmail.com>  Mon, 22 Dec 2014 11:53:43 +0300
+
 blackhole (0.4.0-0rc1) unstable; urgency=low
 
   * Feature: combined logger concept.
