@@ -58,6 +58,10 @@ struct unwrap<verbose_logger_t<Level>> {
     }
 };
 
+/*! 
+ *  \note The wrapped instance must live longer than the wrapper itself. Otherwise, the behaviour
+ *  is undefined.
+ */ 
 template<class Wrapped>
 class wrapper_base_t {
     BLACKHOLE_DECLARE_NONCOPYABLE(wrapper_base_t);
