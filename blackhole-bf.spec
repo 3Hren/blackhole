@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
 Version:	0.4.0
-Release:	0rc2%{?dist}
+Release:	0rc3%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
@@ -65,6 +65,12 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Mon Dec 29 2014 Evgeny Safronov <division494@gmail.com> - 0.4.0-0rc3
+- Bug fix: allow to override LWP attribute presence.
+- API: one popular header file (blackhole/log.hpp) is returned back.
+- Other: added a little more documentation about logger wrappers.
+- Other: mangle internal macro variables.
+
 * Thu Dec 22 2014 Evgeny Safronov <division494@gmail.com> - 0.4.0-0rc2
 - Bug fix: fixed filtering using strong enums.
 - Other: syntax checking can be disabled now.

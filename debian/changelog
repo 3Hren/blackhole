@@ -1,3 +1,12 @@
+blackhole (0.4.0-0rc3) unstable; urgency=low
+
+  * Bug fix: allow to override LWP attribute presence.
+  * API: one popular header file (blackhole/log.hpp) is returned back.
+  * Other: added a little more documentation about logger wrappers.
+  * Other: mangle internal macro variables.
+
+ -- Evgeny Safronov <division494@gmail.com>  Mon, 29 Dec 2014 12:53:38 +0300
+
 blackhole (0.4.0-0rc2) unstable; urgency=low
 
   * Bug fix: fixed filtering using strong enums.
