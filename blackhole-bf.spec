@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
 Version:	0.4.0
-Release:	0rc3%{?dist}
+Release:	1%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
@@ -65,6 +65,9 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Tue Jan 13 2014 Evgeny Safronov <division494@gmail.com> - 0.4.0-1
+- Release version.
+
 * Mon Dec 29 2014 Evgeny Safronov <division494@gmail.com> - 0.4.0-0rc3
 - Bug fix: allow to override LWP attribute presence.
 - API: one popular header file (blackhole/log.hpp) is returned back.
