@@ -3,6 +3,7 @@
 #include <type_traits>
 #include <tuple>
 #include <ostream>
+#include <exception>
 
 #include "blackhole/detail/traits/attributes/pack/feeder.hpp"
 #include "blackhole/keyword/message.hpp"
@@ -40,7 +41,13 @@ public:
     }
 
     ~pusher_t() {
-        log.push(std::move(record));
+        //In Debug builds push can throw.
+        try {
+            log.push(std::move(record));
+        }
+        catch (const std::exception& e) {
+            std::cout << "Exception caught in pusher destructor: " << e.what() << std::endl;
+        }
     }
 
     /*!

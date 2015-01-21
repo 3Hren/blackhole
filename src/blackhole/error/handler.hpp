@@ -16,9 +16,6 @@ typedef std::function<void()> exception_handler_t;
 class default_exception_handler_t {
 public:
     void operator()() const {
-#ifdef BLACKHOLE_DEBUG
-        throw;
-#else
         try {
             throw;
         } catch (const std::exception& err) {
@@ -26,6 +23,9 @@ public:
         } catch (...) {
             std::cout << "logging core error occurred: unknown" << std::endl;
         }
+        //First we make a message about core error and then rethrow in debug
+#ifdef BLACKHOLE_DEBUG
+        throw;
 #endif
     }
 };
