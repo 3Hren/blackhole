@@ -5,4 +5,4 @@ include /usr/share/cdbs/1/class/cmake.mk
 
 DEB_CMAKE_EXTRA_FLAGS=-DBLACKHOLE_DEBUG=OFF -DENABLE_TESTING=OFF -DENABLE_EXAMPLES=OFF -DENABLE_BENCHMARKING=OFF
 
-install/blackhole-dev::
+install/blackhole4-dev::

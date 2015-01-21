@@ -65,7 +65,7 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
-* Tue Jan 13 2014 Evgeny Safronov <division494@gmail.com> - 0.4.0-1
+* Tue Jan 13 2015 Evgeny Safronov <division494@gmail.com> - 0.4.0-1
 - Release version.
 
 * Mon Dec 29 2014 Evgeny Safronov <division494@gmail.com> - 0.4.0-0rc3
