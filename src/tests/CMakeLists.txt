@@ -54,6 +54,7 @@ SET(SOURCES_BASE
     datetime/test_Week
     logger/composite
     logger/verbose
+    logger/pusher
     test_AttachableStream
     test_Attribute
     test_Config

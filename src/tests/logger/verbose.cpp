@@ -21,14 +21,33 @@ TEST(verbose_logger_t, ConstructorEnumClass) {
 
 TEST(verbose_logger_t, MoveExplicitConstructor) {
     verbose_logger_t<testing::level> log(testing::info);
+    std::unique_ptr<mock::frontend_t> frontend(new mock::frontend_t());
+    mock::frontend_t& frontend_ref(*frontend);
+    EXPECT_CALL(frontend_ref, handle(_)).
+            WillRepeatedly(Throw(std::logic_error("Mock exception")));
+    log.add_frontend(std::move(frontend));
     verbose_logger_t<testing::level> other(std::move(log));
-
+#ifdef BLACKHOLE_DEBUG
+    EXPECT_THROW(other.push(record_t()), std::logic_error);
+#else
+    EXPECT_NO_THROW(other.push(record));
+#endif
     EXPECT_EQ(testing::info, other.verbosity());
 }
 
 TEST(verbose_logger_t, MoveImplicitConstructor) {
     verbose_logger_t<testing::level> log(testing::info);
+    std::unique_ptr<mock::frontend_t> frontend(new mock::frontend_t());
+    mock::frontend_t& frontend_ref(*frontend);
+    EXPECT_CALL(frontend_ref, handle(_)).
+            WillRepeatedly(Throw(std::logic_error("Mock exception")));
+    log.add_frontend(std::move(frontend));
     verbose_logger_t<testing::level> other = std::move(log);
+#ifdef BLACKHOLE_DEBUG
+    EXPECT_THROW(other.push(record_t()), std::logic_error);
+#else
+    EXPECT_NO_THROW(other.push(record));
+#endif
 
     EXPECT_EQ(testing::info, other.verbosity());
 }
