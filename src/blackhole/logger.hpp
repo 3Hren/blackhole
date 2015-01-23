@@ -79,6 +79,7 @@ public:
         using std::swap;
         swap(d.filter, other.d.filter);
         swap(d.frontends, other.d.frontends);
+        swap(d.exception, other.d.exception);
 
         scoped.swap(other.scoped);
 
