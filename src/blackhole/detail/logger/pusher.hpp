@@ -41,12 +41,11 @@ public:
     }
 
     ~pusher_t() {
-        //In Debug builds push can throw.
+        // In Debug builds push can throw.
         try {
             log.push(std::move(record));
-        }
-        catch (const std::exception& e) {
-            std::cout << "Exception caught in pusher destructor: " << e.what() << std::endl;
+        } catch (const std::exception& err) {
+            std::cout << "Exception caught in pusher destructor: " << err.what() << std::endl;
         }
     }
 
