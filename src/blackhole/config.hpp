@@ -23,7 +23,9 @@
 #define BLACKHOLE_HAS_ATTRIBUTE_TID
 
 // Add lightweight process id attribute to every logging event. Attribute has integer type.
-#undef  BLACKHOLE_HAS_ATTRIBUTE_LWP
+#ifndef BLACKHOLE_HAS_ATTRIBUTE_LWP
+    #undef BLACKHOLE_HAS_ATTRIBUTE_LWP
+#endif
 
 #define BLACKHOLE_INTERNAL_SET_RESERVED_SIZE 6
 #define BLACKHOLE_EXTERNAL_SET_RESERVED_SIZE 16
