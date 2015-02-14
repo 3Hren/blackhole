@@ -1,5 +1,5 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef BLACKHOLE_CONFIG_H
+#define BLACKHOLE_CONFIG_H
 
 #define BLACKHOLE_VERSION_MAJOR 0
 #define BLACKHOLE_VERSION_MINOR 4
@@ -35,4 +35,4 @@
     #define BLACKHOLE_CHECK_FORMAT_SYNTAX 1
 #endif
 
-#endif // CONFIG_H
+#endif // BLACKHOLE_CONFIG_H
