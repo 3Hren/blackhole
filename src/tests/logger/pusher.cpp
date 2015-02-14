@@ -11,7 +11,8 @@ TEST(pusher_t, Constructor) {
     record_t record;
     const char* msg = "test msg";
     aux::logger::pusher_t<decltype(log)> pusher(log, record, msg);
-    EXPECT_CALL(log, push(_)).WillOnce(Throw(std::logic_error("mock exception")));
+    EXPECT_CALL(log, push(_))
+        .WillOnce(Throw(std::logic_error("mock exception")));
 }
 
 TEST(pusher_t, VarArgsConstructor) {
@@ -20,5 +21,6 @@ TEST(pusher_t, VarArgsConstructor) {
     const char* msg = "test msg. Data %s";
     const char* data = "DATA";
     aux::logger::pusher_t<decltype(log)> pusher(log, record, msg, data);
-    EXPECT_CALL(log, push(_)).WillOnce(Throw(std::logic_error("mock exception")));
+    EXPECT_CALL(log, push(_))
+        .WillOnce(Throw(std::logic_error("mock exception")));
 }
