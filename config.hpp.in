@@ -28,4 +28,11 @@
 #define BLACKHOLE_INTERNAL_SET_RESERVED_SIZE 6
 #define BLACKHOLE_EXTERNAL_SET_RESERVED_SIZE 16
 
+// Enable format expression syntax checking in type-safe manner.
+// 0 - disable.
+// 1 - using printf GNU extension.
+#ifndef BLACKHOLE_CHECK_FORMAT_SYNTAX
+    #define BLACKHOLE_CHECK_FORMAT_SYNTAX 1
+#endif
+
 #endif // BLACKHOLE_CONFIG_H
