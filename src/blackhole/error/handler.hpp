@@ -23,7 +23,7 @@ public:
         } catch (...) {
             std::cout << "logging core error occurred: unknown" << std::endl;
         }
-        //First we make a message about core error and then rethrow in debug
+        // Firstly notify about core error, then rethrow if we are in debug mode.
 #ifdef BLACKHOLE_DEBUG
         throw;
 #endif
