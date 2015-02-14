@@ -1,9 +1,9 @@
 #pragma once
 
-#include <type_traits>
-#include <tuple>
-#include <ostream>
 #include <exception>
+#include <ostream>
+#include <tuple>
+#include <type_traits>
 
 #include "blackhole/detail/traits/attributes/pack/feeder.hpp"
 #include "blackhole/keyword/message.hpp"
