@@ -1,6 +1,6 @@
 Summary:	Blackhole
 Name:		libblackhole
-Version:	0.4.0
+Version:	0.4.1
 Release:	1%{?dist}
 
 License:	MIT
@@ -65,6 +65,10 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Sat Feb 14 2015 Evgeny Safronov <division494@gmail.com> - 0.4.1-1
+- Bug fix: Fixed corrupted move constructor for logger class.
+- Other: optional syntax checking option.
+
 * Tue Jan 13 2015 Evgeny Safronov <division494@gmail.com> - 0.4.0-1
 - Release version.
 
