@@ -66,7 +66,7 @@ rm -rf %{buildroot}
 
 %changelog
 * Sat Feb 14 2015 Evgeny Safronov <division494@gmail.com> - 0.4.1-1
-- Bug fix: Fixed corrupted move constructor for logger class.
+- Bug fix: fixed corrupted move constructor for logger class.
 - Other: optional syntax checking option.
 
 * Tue Jan 13 2015 Evgeny Safronov <division494@gmail.com> - 0.4.0-1

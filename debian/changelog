@@ -1,6 +1,6 @@
 blackhole (0.4.1-1) unstable; urgency=low
 
-  * Bug fix: Fixed corrupted move constructor for logger class.
+  * Bug fix: fixed corrupted move constructor for logger class.
   * Other: optional syntax checking option.
 
  -- Evgeny Safronov <division494@gmail.com>  Sat, 14 Feb 2015 20:43:24 +0300
