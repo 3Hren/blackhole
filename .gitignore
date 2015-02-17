@@ -1,5 +1,11 @@
 _site
+build
 
 # [IDE specific]
 .idea
 *.user*
+
+blackhole.config
+blackhole.creator
+blackhole.files
+blackhole.includes
