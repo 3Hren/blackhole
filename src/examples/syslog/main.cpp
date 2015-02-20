@@ -13,7 +13,7 @@ enum class level {
 // To be able to properly map user-defined severity enumeration to the syslog's one
 // we should implement special mapping trait that is called by library each time when
 // mapping is required.
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -37,7 +37,7 @@ struct priority_traits<level> {
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS
 
 using namespace blackhole;
 

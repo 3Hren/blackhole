@@ -12,7 +12,7 @@ typedef sink::rotator_t<mock::files::backend_t, mock::files::rotation::watcher_t
 
 }
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 namespace sink {
 namespace rotation {
 namespace watcher {
@@ -23,7 +23,7 @@ struct config_t<mock::files::rotation::watcher_t> {};
 } // namespace watcher
 } // namespace rotation
 } // namespace sink
-} // namespace blackhole
+BLACKHOLE_END_NS
 
 TEST(rotator_t, Class) {
     sink::rotation::config_t<mock::files::rotation::watcher_t> config = { "test.log.%N", 1 };

@@ -5,7 +5,9 @@
 
 using namespace blackhole;
 
-namespace blackhole { namespace sink {
+BLACKHOLE_BEG_NS
+
+namespace sink {
 
 template<>
 struct priority_traits<testing::level> {
@@ -26,7 +28,9 @@ struct priority_traits<testing::level> {
     }
 };
 
-} } // namespace blackhole::sink
+} // namespace sink
+
+BLACKHOLE_END_NS
 
 TEST(syslog_t, Class) {
     sink::syslog_t<testing::level> sink("identity");

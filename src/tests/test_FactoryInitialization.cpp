@@ -13,7 +13,9 @@
 
 using namespace blackhole;
 
-namespace blackhole { namespace sink {
+BLACKHOLE_BEG_NS
+
+namespace sink {
 
 template<>
 struct priority_traits<testing::level> {
@@ -34,7 +36,9 @@ struct priority_traits<testing::level> {
     }
 };
 
-} } // namespace blackhole::sink
+} // namespace sink
+
+BLACKHOLE_END_NS
 
 TEST(Factory, StreamStringsFrontend) {
     factory_t factory;

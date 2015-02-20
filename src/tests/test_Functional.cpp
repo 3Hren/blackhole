@@ -10,7 +10,9 @@
 
 using namespace blackhole;
 
-namespace blackhole { namespace sink {
+BLACKHOLE_BEG_NS
+
+namespace sink {
 
 template<>
 struct priority_traits<level> {
@@ -31,7 +33,9 @@ struct priority_traits<level> {
     }
 };
 
-} } // namespace blackhole::sink
+} // namespace sink
+
+BLACKHOLE_END_NS
 
 TEST(Functional, SyslogConfiguredVerboseLogger) {
     using aux::util::make_unique;
