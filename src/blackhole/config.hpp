@@ -2,12 +2,12 @@
 #define BLACKHOLE_CONFIG_H
 
 #define BLACKHOLE_VERSION_MAJOR 0
-#define BLACKHOLE_VERSION_MINOR 4
-#define BLACKHOLE_VERSION_PATCH 1
+#define BLACKHOLE_VERSION_MINOR 5
+#define BLACKHOLE_VERSION_PATCH 0
 #define BLACKHOLE_HEADER_ONLY
 #define BLACKHOLE_DEBUG
 
-#define BLACKHOLE_BEG_NS namespace blackhole { inline namespace v401 {
+#define BLACKHOLE_BEG_NS namespace blackhole { inline namespace v500 {
 #define BLACKHOLE_END_NS } } // namespace blackhole::version
 
 #if defined(BLACKHOLE_HEADER_ONLY)
