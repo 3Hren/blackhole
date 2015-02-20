@@ -3,11 +3,13 @@
 #include <sstream>
 #include <type_traits>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/attribute.hpp"
 #include "blackhole/detail/traits/supports/stream_push.hpp"
 #include "blackhole/detail/util/lazy.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -67,4 +69,4 @@ struct conv<T, typename std::enable_if<
 
 } // namespace aux
 
-} // namespace blackhole
+BLACKHOLE_END_NS

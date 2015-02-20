@@ -1,9 +1,11 @@
 #pragma once
 
+#include "blackhole/config.hpp"
+
 #include "attribute.hpp"
 #include "blackhole/utils/format.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 class record_t {
     bool valid_;
@@ -101,4 +103,4 @@ typedef blackhole::record_t record_t BLACKHOLE_DEPRECATED("Use `record_t` instea
 
 } // namespace log
 
-} // namespace blackhole
+BLACKHOLE_END_NS

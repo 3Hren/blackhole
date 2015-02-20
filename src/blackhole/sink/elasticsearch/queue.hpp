@@ -7,7 +7,9 @@
 #include <string>
 #include <vector>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -66,4 +68,4 @@ private:
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS

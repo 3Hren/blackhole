@@ -5,9 +5,11 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/sink/files/rotation/naming/helpers.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -163,4 +165,4 @@ inline bool matched(const std::string& pattern, const std::string& filename) {
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS

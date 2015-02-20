@@ -1,8 +1,10 @@
 #pragma once
 
+#include "blackhole/config.hpp"
+
 #include "log.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace repository {
 
@@ -23,4 +25,4 @@ static inline log_config_t trivial() {
 
 } // namespace repository
 
-} // namespace blackhole
+BLACKHOLE_END_NS

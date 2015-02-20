@@ -2,7 +2,7 @@
 
 #include "blackhole/keyword.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace keyword {
 
@@ -24,4 +24,4 @@ static keyword_t<T, tag::severity_t<T>>& severity() {
 
 } // namespace keyword
 
-} // namespace blackhole
+BLACKHOLE_END_NS

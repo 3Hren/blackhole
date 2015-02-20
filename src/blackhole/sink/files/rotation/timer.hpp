@@ -2,9 +2,11 @@
 
 #include <ctime>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/config/nullptr.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -20,4 +22,4 @@ struct timepicker_t {
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS

@@ -3,9 +3,11 @@
 #include <type_traits>
 #include <tuple>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/traits/tuple/concat.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace tuple {
 
@@ -35,4 +37,4 @@ struct add_index<std::tuple<Args...>> {
 
 } // namespace tuple
 
-} // namespace blackhole
+BLACKHOLE_END_NS

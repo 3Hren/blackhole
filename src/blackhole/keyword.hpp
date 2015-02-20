@@ -2,6 +2,8 @@
 
 #include <boost/preprocessor/cat.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/attribute.hpp"
 #include "blackhole/config.hpp"
 #include "blackhole/filter.hpp"
@@ -32,7 +34,7 @@
 
 #include "blackhole/expression/helper.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace keyword {
 
@@ -93,4 +95,4 @@ struct keyword_t {
 
 } // namespace keyword
 
-} // namespace blackhole
+BLACKHOLE_END_NS

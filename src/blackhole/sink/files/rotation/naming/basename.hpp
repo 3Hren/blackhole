@@ -4,7 +4,9 @@
 
 #include <boost/algorithm/string.hpp>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -35,4 +37,4 @@ public:
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS

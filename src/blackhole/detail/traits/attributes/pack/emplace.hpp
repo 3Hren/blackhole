@@ -2,12 +2,14 @@
 
 #include <tuple>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/attribute.hpp"
 #include "blackhole/detail/traits/attributes/convertible.hpp"
 #include "blackhole/detail/traits/literal.hpp"
 #include "blackhole/detail/traits/tuple.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -71,4 +73,4 @@ struct is_emplace_pack {
 
 } // namespace aux
 
-} // namespace blackhole
+BLACKHOLE_END_NS

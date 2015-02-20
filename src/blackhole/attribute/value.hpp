@@ -7,6 +7,8 @@
 
 #include <boost/variant.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/config/platform/deprecated.hpp"
 #include "blackhole/detail/config/underlying.hpp"
 
@@ -24,7 +26,7 @@ operator==(const timeval& lhs, const timeval& rhs) {
     return lhs.tv_sec == rhs.tv_sec && lhs.tv_usec == rhs.tv_usec;
 }
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace attribute {
 
@@ -88,4 +90,4 @@ typedef blackhole::attribute_t attribute_t
 
 } // namespace log
 
-} // namespace blackhole
+BLACKHOLE_END_NS

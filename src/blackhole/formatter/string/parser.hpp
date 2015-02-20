@@ -10,9 +10,11 @@
 #include <boost/optional.hpp>
 #include <boost/variant.hpp>
 
-#include <blackhole/detail/config/noexcept.hpp>
+#include "blackhole/config.hpp"
 
-namespace blackhole {
+#include "blackhole/detail/config/noexcept.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace formatter {
 
@@ -430,4 +432,4 @@ private:
 
 } // namespace formatter
 
-} // namespace blackhole
+BLACKHOLE_END_NS

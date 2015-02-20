@@ -4,11 +4,13 @@
 
 #include <string>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/error.hpp"
 #include "blackhole/repository/factory/traits.hpp"
 #include "blackhole/sink/thread.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -145,4 +147,4 @@ struct factory_traits<sink::syslog_t<Level>> {
     }
 };
 
-} // namespace blackhole
+BLACKHOLE_END_NS

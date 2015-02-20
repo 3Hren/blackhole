@@ -5,6 +5,8 @@
 #include <boost/asio.hpp>
 #include <boost/thread/barrier.hpp>
 
+#include "blackhole/config.hpp"
+
 #include <blackhole/detail/config/atomic.hpp>
 #include <blackhole/detail/logger/pusher.hpp>
 #include <blackhole/formatter/string.hpp>
@@ -18,7 +20,7 @@
 #include "elasticsearch/settings.hpp"
 #include "elasticsearch/queue.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -332,4 +334,4 @@ struct factory_traits<sink::elasticsearch_t> {
     }
 };
 
-} // namespace blackhole
+BLACKHOLE_END_NS

@@ -1,9 +1,11 @@
 #pragma once
 
+#include "blackhole/config.hpp"
+
 #include "logger.hpp"
 #include "logger/wrapper.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 class scoped_attributes_t : public scoped_attributes_concept_t {
     // Attributes provided by this guard.
@@ -45,4 +47,4 @@ public:
     }
 };
 
-} // namespace blackhole
+BLACKHOLE_END_NS

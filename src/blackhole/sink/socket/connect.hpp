@@ -6,9 +6,11 @@
 #include <boost/asio.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/error.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -77,4 +79,4 @@ connect(boost::asio::io_service& io_service,
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS

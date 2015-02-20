@@ -9,7 +9,7 @@
 #include "blackhole/detail/util/thread.hpp"
 #include "blackhole/keyword.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 #ifdef BLACKHOLE_HAS_ATTRIBUTE_TID
 DECLARE_KEYWORD(tid, std::string)
@@ -39,4 +39,4 @@ static inline uint64_t lwp() {
 
 } // namespace keyword
 
-} // namespace blackhole
+BLACKHOLE_END_NS

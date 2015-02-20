@@ -2,10 +2,13 @@
 
 #include <mutex>
 
+#include "blackhole/config.hpp"
+
 /*!
  * Namespace indents were made intentionally to improve the readability.
  */
-namespace blackhole {
+BLACKHOLE_BEG_NS
+
     namespace repository {
         namespace config {
             template<class T>
@@ -42,4 +45,5 @@ namespace blackhole {
 
     template<class T, class Mutex = std::mutex>
     class synchronized;
-} // namespace blackhole
+
+BLACKHOLE_END_NS

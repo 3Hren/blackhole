@@ -1,12 +1,14 @@
 #pragma once
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/attribute.hpp"
 #include "blackhole/detail/traits/attributes/pack/keyword.hpp"
 #include "blackhole/detail/traits/attributes/pack/emplace.hpp"
 #include "blackhole/detail/traits/attributes/pack/convert.hpp"
 #include "blackhole/record.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -82,4 +84,4 @@ struct pack_feeder<unknown_pack_tag_t> {};
 
 } // namespace aux
 
-} // namespace blackhole
+BLACKHOLE_END_NS

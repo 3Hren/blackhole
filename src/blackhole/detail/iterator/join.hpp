@@ -4,11 +4,13 @@
 #include <type_traits>
 #include <vector>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/config/constexpr.hpp"
 #include "blackhole/detail/config/noexcept.hpp"
 #include "blackhole/detail/config/nullptr.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -150,4 +152,4 @@ private:
 
 } // namespace aux
 
-} // namespace blackhole
+BLACKHOLE_END_NS

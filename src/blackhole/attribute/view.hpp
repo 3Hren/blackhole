@@ -15,22 +15,23 @@
 #include <boost/mpl/set.hpp>
 #include <boost/optional.hpp>
 
-#include "blackhole/attribute/set.hpp"
 #include "blackhole/config.hpp"
+
+#include "blackhole/attribute/set.hpp"
 #include "blackhole/detail/array.hpp"
 #include "blackhole/detail/iterator/join.hpp"
 #include "blackhole/detail/traits/tuple.hpp"
 #include "blackhole/detail/traits/unique.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace attribute {
 
-template<class T>
-struct extractor;
+//template<class T>
+//struct extractor;
 
-template<class... Args>
-struct tuple_empty;
+//template<class... Args>
+//struct tuple_empty;
 
 namespace compare_by {
 
@@ -45,8 +46,9 @@ struct name_t {
 } // namespace
 
 class set_view_t {
-    template<class T> friend struct extractor;
-    template<class... Args> friend struct tuple_empty;
+    // TODO: Dead code?
+    // template<class T> friend struct extractor;
+    // template<class... Args> friend struct tuple_empty;
 
 public:
     typedef aux::iterator::join_t<set_t, true> const_iterator;
@@ -178,4 +180,4 @@ private:
 
 } // namespace attribute
 
-} // namespace blackhole
+BLACKHOLE_END_NS

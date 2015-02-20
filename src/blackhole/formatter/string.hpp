@@ -6,6 +6,8 @@
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/error.hpp"
 #include "blackhole/detail/stream/stream.hpp"
 #include "blackhole/formatter/base.hpp"
@@ -16,7 +18,7 @@
 #include "blackhole/record.hpp"
 #include "blackhole/repository/factory/traits.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace formatter {
 
@@ -83,4 +85,4 @@ struct factory_traits<formatter::string_t> {
     }
 };
 
-} // namespace blackhole
+BLACKHOLE_END_NS

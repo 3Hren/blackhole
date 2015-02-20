@@ -5,11 +5,13 @@
 #include <tuple>
 #include <type_traits>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/traits/attributes/pack/feeder.hpp"
 #include "blackhole/keyword/message.hpp"
 #include "blackhole/utils/format.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -100,4 +102,4 @@ make_pusher(Log& log, record_t& record, Args&&... args) {
 
 } // namespace aux
 
-} // namespace blackhole
+BLACKHOLE_END_NS

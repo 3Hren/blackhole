@@ -2,9 +2,11 @@
 
 #include <string>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/sink/files/rotation/watcher/config.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -31,4 +33,4 @@ struct move_t {
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS

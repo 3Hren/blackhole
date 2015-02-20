@@ -2,8 +2,8 @@
 
 #include "blackhole/keyword.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 DECLARE_UNIVERSE_KEYWORD(tracebit, std::uint32_t)
 
-} // namespace blackhole
+BLACKHOLE_END_NS

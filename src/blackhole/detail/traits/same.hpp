@@ -2,7 +2,9 @@
 
 #include <type_traits>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -23,4 +25,4 @@ struct are_same<T, Arg, Args...> :
 
 } // namespace aux
 
-} // namespace blackhole
+BLACKHOLE_END_NS

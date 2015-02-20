@@ -4,9 +4,11 @@
 #include <string>
 #include <typeinfo>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/dynamic.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 class type_index_t {
     const std::type_info* d;
@@ -64,7 +66,7 @@ struct match_traits {
     }
 };
 
-} // namespace blackhole
+BLACKHOLE_END_NS
 
 namespace std {
 

@@ -5,7 +5,9 @@
 
 #include <boost/thread.hpp>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace detail {
 
@@ -35,4 +37,4 @@ static inline multi_lock_t<Mutex...> multi_lock(Mutex&... mutexes) {
 
 } // namespace detail
 
-} // namespace blackhole
+BLACKHOLE_END_NS

@@ -2,9 +2,11 @@
 
 #include <string>
 
+#include "blackhole/config.hpp"
+
 #include "filter/helpers.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -30,4 +32,4 @@ struct filter_t {
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS

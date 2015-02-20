@@ -2,10 +2,12 @@
 
 #include <ctime>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/config/nullptr.hpp"
 #include "blackhole/sink/files/rotation/watcher/config.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -104,4 +106,4 @@ private:
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS

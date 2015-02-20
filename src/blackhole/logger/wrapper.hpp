@@ -1,13 +1,14 @@
 #pragma once
 
 #include "blackhole/config.hpp"
+
 #include "blackhole/detail/thread/lock.hpp"
 #include "blackhole/detail/config/noncopyable.hpp"
 #include "blackhole/forwards.hpp"
 #include "blackhole/record.hpp"
 #include "blackhole/config.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 template<class Wrapper>
 struct unwrap {
@@ -58,10 +59,10 @@ struct unwrap<verbose_logger_t<Level>> {
     }
 };
 
-/*! 
+/*!
  *  \note The wrapped instance must live longer than the wrapper itself. Otherwise, the behaviour
  *  is undefined.
- */ 
+ */
 template<class Wrapped>
 class wrapper_base_t {
     BLACKHOLE_DECLARE_NONCOPYABLE(wrapper_base_t);
@@ -211,4 +212,4 @@ public:
     }
 };
 
-} // namespace blackhole
+BLACKHOLE_END_NS

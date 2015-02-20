@@ -2,7 +2,7 @@
 
 #include "blackhole/keyword.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 DECLARE_UNIVERSE_KEYWORD(pid, std::uint32_t)
 
@@ -19,4 +19,4 @@ static inline pid_t pid() {
 
 } // namespace keyword
 
-} // namespace blackhole
+BLACKHOLE_END_NS

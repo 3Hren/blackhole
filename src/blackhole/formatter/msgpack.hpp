@@ -4,10 +4,12 @@
 
 #include <msgpack.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/formatter/base.hpp"
 #include "blackhole/record.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace formatter {
 
@@ -57,4 +59,4 @@ public:
 
 } // namespace formatter
 
-} // namespace blackhole
+BLACKHOLE_END_NS

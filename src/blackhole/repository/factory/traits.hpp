@@ -1,16 +1,14 @@
 #pragma once
 
-#include <map>
+#include "blackhole/config.hpp"
 
-#include <boost/any.hpp>
-
-#include "traits/config.hpp"
-#include "traits/extract.hpp"
 #include "blackhole/detail/util/lazy.hpp"
 #include "blackhole/dynamic.hpp"
 #include "blackhole/error.hpp"
+#include "blackhole/repository/factory/traits/config.hpp"
+#include "blackhole/repository/factory/traits/extract.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 template<class T>
 struct factory_traits {
@@ -28,13 +26,13 @@ struct config_mapper {
     typedef typename T::config_type config_type;
 
     static config_type map(const dynamic_t& input) {
-        const aux::extractor<T> extractor(input);
+        const extractor<T> ex(input);
         config_type config;
-        factory_traits<T>::map_config(extractor, config);
+        factory_traits<T>::map_config(ex, config);
         return config;
     }
 };
 
 } // namespace aux
 
-} // namespace blackhole
+BLACKHOLE_END_NS

@@ -4,8 +4,8 @@
 
 #include "blackhole/keyword.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 DECLARE_EVENT_KEYWORD(message, std::string)
 
-} // namespace blackhole
+BLACKHOLE_END_NS

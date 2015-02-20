@@ -6,6 +6,8 @@
 
 #include <boost/format.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/attribute.hpp"
 #include "blackhole/detail/config/underlying.hpp"
 #include "blackhole/detail/stream/stream.hpp"
@@ -13,7 +15,7 @@
 #include "blackhole/formatter/map/datetime.hpp"
 #include "blackhole/keyword/timestamp.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace mapping {
 
@@ -136,4 +138,4 @@ public:
 
 } // namespace mapping
 
-} // namespace blackhole
+BLACKHOLE_END_NS

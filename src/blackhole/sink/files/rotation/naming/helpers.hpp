@@ -4,7 +4,9 @@
 #include <cstdint>
 #include <string>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -38,4 +40,4 @@ inline uint digits(uint number) {
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS

@@ -1,9 +1,10 @@
 #pragma once
 
 #include "blackhole/config.hpp"
+
 #include "blackhole/detail/config/inline.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -19,4 +20,4 @@ syntax_check(const char*, ...) {
 
 } // namespace aux
 
-} // namespace blackhole
+BLACKHOLE_END_NS

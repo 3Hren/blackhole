@@ -5,6 +5,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/formatter/string.hpp"
 #include "blackhole/frontend.hpp"
 #include "blackhole/logger.hpp"
@@ -13,7 +15,7 @@
 #include "blackhole/repository/factory.hpp"
 #include "blackhole/sink/stream.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 class repository_t {
     factory_t factory;
@@ -269,4 +271,4 @@ repository_t::create(const std::string& name, Args&&... args) const {
     return logger;
 }
 
-} // namespace blackhole
+BLACKHOLE_END_NS

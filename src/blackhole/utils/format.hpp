@@ -5,7 +5,9 @@
 
 #include <boost/format.hpp>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace utils {
 
@@ -39,4 +41,6 @@ format(const std::string& format, const Args&... args) {
     }
 }
 
-} } // namespace blackhole::utils
+} // namespace utils
+
+BLACKHOLE_END_NS

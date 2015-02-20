@@ -5,9 +5,11 @@
 
 #include <boost/thread.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "lazy.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace this_thread {
 
@@ -36,4 +38,4 @@ inline const std::string& get_id<std::string>() {
 
 } // namespace this_thread
 
-} // namespace blackhole
+BLACKHOLE_END_NS

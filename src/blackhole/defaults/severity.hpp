@@ -1,10 +1,12 @@
 #pragma once
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/config/underlying.hpp"
 #include "blackhole/detail/stream/stream.hpp"
 #include "blackhole/sink/syslog.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace defaults {
 
@@ -64,4 +66,4 @@ struct priority_traits<defaults::severity> {
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS

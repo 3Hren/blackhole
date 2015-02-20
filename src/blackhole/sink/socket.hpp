@@ -3,10 +3,12 @@
 #include "socket/udp.hpp"
 #include "socket/tcp.hpp"
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/repository/factory/traits.hpp"
 #include "blackhole/sink/thread.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -75,4 +77,4 @@ struct factory_traits<sink::socket_t<Protocol>> {
     }
 };
 
-} // namespace blackhole
+BLACKHOLE_END_NS

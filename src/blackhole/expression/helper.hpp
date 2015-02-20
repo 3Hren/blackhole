@@ -1,9 +1,11 @@
 #pragma once
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/attribute.hpp"
 #include "blackhole/filter.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace expression {
 
@@ -121,4 +123,4 @@ struct GtEq : public LogicMixin<GtEq<T>> {
 
 } // namespace expression
 
-} // namespace blackhole
+BLACKHOLE_END_NS

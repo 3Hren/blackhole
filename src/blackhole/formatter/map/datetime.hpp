@@ -1,8 +1,10 @@
 #pragma once
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/datetime.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace mapping {
 
@@ -52,4 +54,4 @@ struct datetime_formatter_action_t {
 
 } // namespace mapping
 
-} // namespace blackhole
+BLACKHOLE_END_NS

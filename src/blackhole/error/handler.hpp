@@ -5,9 +5,10 @@
 #include <stdexcept>
 
 #include "blackhole/config.hpp"
+
 #include "blackhole/detail/util/meta.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace log {
 
@@ -135,4 +136,4 @@ struct handler_factory_t {
 
 } // namespace log
 
-} // namespace blackhole
+BLACKHOLE_END_NS

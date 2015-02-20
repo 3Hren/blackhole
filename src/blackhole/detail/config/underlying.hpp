@@ -2,9 +2,11 @@
 
 #include <type_traits>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/config/platform/underlying.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -24,4 +26,4 @@ struct underlying_type<T, typename std::enable_if<std::is_enum<T>::value>::type>
 
 } // namespace aux
 
-} // namespace blackhole
+BLACKHOLE_END_NS

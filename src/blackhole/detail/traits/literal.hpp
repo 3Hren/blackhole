@@ -2,9 +2,11 @@
 
 #include <type_traits>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/traits/or.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 template<typename T>
 struct is_string_literal_type : public or_<
@@ -18,4 +20,4 @@ struct is_string_literal_type : public or_<
     >::type
 > {};
 
-} // namespace blackhole
+BLACKHOLE_END_NS

@@ -6,7 +6,9 @@
 
 #include <boost/algorithm/string.hpp>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -35,4 +37,4 @@ split(const std::string& input, const std::string& separator) {
 
 } // namespace aux
 
-} // namespace blackhole
+BLACKHOLE_END_NS

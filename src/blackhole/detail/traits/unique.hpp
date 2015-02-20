@@ -6,7 +6,9 @@
 #include <boost/mpl/unique.hpp>
 #include <boost/mpl/vector.hpp>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 /// General definition of the helper class
 template<typename... Args> struct from_variadic;
@@ -52,4 +54,4 @@ struct unique :
     >::type
 {};
 
-} // namespace blackhole
+BLACKHOLE_END_NS

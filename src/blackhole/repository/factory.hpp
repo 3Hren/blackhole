@@ -8,11 +8,13 @@
 #include <boost/mpl/for_each.hpp>
 #include <boost/mpl/is_sequence.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/repository/config/formatter.hpp"
 #include "blackhole/repository/config/sink.hpp"
 #include "blackhole/repository/factory/traits.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 class factory_t {
     typedef type_index_t index_type;
@@ -241,4 +243,4 @@ private:
     }
 };
 
-} // namespace blackhole
+BLACKHOLE_END_NS

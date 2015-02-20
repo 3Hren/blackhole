@@ -2,7 +2,9 @@
 
 #include <string>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -35,4 +37,4 @@ struct descending {
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS

@@ -4,7 +4,9 @@
 #include <vector>
 #include <unordered_map>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace formatter {
 
@@ -37,4 +39,4 @@ struct config_t {
 
 } // namespace formatter
 
-} // namespace blackhole
+BLACKHOLE_END_NS

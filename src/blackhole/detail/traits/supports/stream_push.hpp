@@ -3,7 +3,9 @@
 #include <ostream>
 #include <type_traits>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace support {
 
@@ -42,4 +44,4 @@ struct stream_push : public std::integral_constant<
 
 } // traits
 
-} // namespace blackhole
+BLACKHOLE_END_NS

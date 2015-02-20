@@ -1,7 +1,9 @@
 #pragma once
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 class base_logger_t {};
 
-} // namespace blackhole
+BLACKHOLE_END_NS

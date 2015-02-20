@@ -4,7 +4,7 @@
 
 #include "blackhole/keyword.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 DECLARE_EVENT_KEYWORD(timestamp, timeval)
 
@@ -26,4 +26,4 @@ static inline timeval timestamp() {
 
 } // namespace keyword
 
-} // namespace blackhole
+BLACKHOLE_END_NS

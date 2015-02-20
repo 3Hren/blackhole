@@ -4,9 +4,11 @@
 
 #include <boost/thread/shared_mutex.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/config/inline.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace policy {
 
@@ -34,4 +36,4 @@ struct rw_lock_t {
 
 } // namespace policy
 
-} // namespace blackhole
+BLACKHOLE_END_NS

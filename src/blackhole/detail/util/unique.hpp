@@ -2,7 +2,9 @@
 
 #include <memory>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -17,4 +19,4 @@ std::unique_ptr<T> make_unique(Args&&... args) {
 
 } // namespace aux
 
-} // namespace blackhole
+BLACKHOLE_END_NS

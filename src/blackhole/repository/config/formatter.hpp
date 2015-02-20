@@ -1,9 +1,11 @@
 #pragma once
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/formatter/map/value.hpp"
 #include "blackhole/repository/config/base.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 class formatter_config_t : public repository::config::base_t {
 public:
@@ -19,4 +21,4 @@ public:
     {}
 };
 
-} // namespace blackhole
+BLACKHOLE_END_NS

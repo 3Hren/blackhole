@@ -3,8 +3,9 @@
 #include <memory>
 #include <vector>
 
-#include "blackhole/attribute.hpp"
 #include "blackhole/config.hpp"
+
+#include "blackhole/attribute.hpp"
 #include "blackhole/detail/config/atomic.hpp"
 #include "blackhole/detail/config/noncopyable.hpp"
 #include "blackhole/detail/config/nullptr.hpp"
@@ -25,7 +26,7 @@
 #include "blackhole/logger/policy/filter.hpp"
 #include "blackhole/logger/policy/thread.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 template<class ThreadPolicy, class FilterPolicy>
 class composite_logger_t : public base_logger_t {
@@ -266,4 +267,4 @@ private:
 
 };
 
-} // namespace blackhole
+BLACKHOLE_END_NS

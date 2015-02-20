@@ -2,9 +2,11 @@
 
 #include <rapidjson/document.h>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/repository/config/parser.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace repository {
 
@@ -63,4 +65,4 @@ struct transformer_t<rapidjson::Value> {
 
 } // namespace repository
 
-} // namespace blackhole
+BLACKHOLE_END_NS

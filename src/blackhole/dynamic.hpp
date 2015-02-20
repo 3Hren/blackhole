@@ -11,12 +11,13 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #include "blackhole/config.hpp"
+
 #include "blackhole/detail/config/noexcept.hpp"
 #include "blackhole/detail/config/nullptr.hpp"
 #include "blackhole/detail/traits/integer.hpp"
 #include "blackhole/utils/format.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace conversion {
 
@@ -418,4 +419,4 @@ dynamic_t::to() const {
     throw dynamic::bad_cast(value);
 }
 
-} // namespace blackhole
+BLACKHOLE_END_NS

@@ -2,11 +2,13 @@
 
 #include <vector>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/attribute/name.hpp"
 #include "blackhole/attribute/value.hpp"
 #include "blackhole/detail/config/platform/deprecated.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace attribute {
 
@@ -31,4 +33,4 @@ typedef blackhole::attribute::set_t attributes_t
 
 } // namespace log
 
-} // namespace blackhole
+BLACKHOLE_END_NS

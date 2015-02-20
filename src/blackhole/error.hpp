@@ -2,9 +2,11 @@
 
 #include <stdexcept>
 
+#include "blackhole/config.hpp"
+
 #include "utils/format.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 class error_t : public std::runtime_error {
 public:
@@ -14,4 +16,4 @@ public:
     {}
 };
 
-} // namespace blackhole
+BLACKHOLE_END_NS

@@ -5,12 +5,14 @@
 
 #include <boost/asio.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/util/unique.hpp"
 
 #include "backend.hpp"
 #include "connect.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -73,4 +75,4 @@ private:
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS

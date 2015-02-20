@@ -3,12 +3,14 @@
 #include <string>
 #include <vector>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/error.hpp"
 #include "blackhole/forwards.hpp"
 #include "blackhole/repository/config/base.hpp"
 #include "blackhole/repository/config/log.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace repository {
 
@@ -151,4 +153,4 @@ public:
 
 } // namespace repository
 
-} // namespace blackhole
+BLACKHOLE_END_NS

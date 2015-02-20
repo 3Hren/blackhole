@@ -7,7 +7,9 @@
 #include <boost/assert.hpp>
 #include <boost/utility/addressof.hpp>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -115,4 +117,4 @@ typedef basic_ostringstreambuf<char> ostringstreambuf;
 
 } // namespace aux
 
-} // namespace blackhole
+BLACKHOLE_END_NS

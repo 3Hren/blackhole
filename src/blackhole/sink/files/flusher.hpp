@@ -1,8 +1,10 @@
 #pragma once
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/config/noncopyable.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -36,4 +38,4 @@ public:
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS

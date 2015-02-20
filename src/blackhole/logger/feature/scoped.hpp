@@ -4,12 +4,13 @@
 
 #include <boost/thread/tss.hpp>
 
-#include "blackhole/attribute/set.hpp"
 #include "blackhole/config.hpp"
+
+#include "blackhole/attribute/set.hpp"
 #include "blackhole/detail/config/noncopyable.hpp"
 #include "blackhole/forwards.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace feature {
 
@@ -46,11 +47,11 @@ private:
 
 } // namespace feature
 
-} // namespace blackhole
+BLACKHOLE_END_NS
 
 //==================================================================================================
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 /*!
  * Concept form scoped attributes holder.
@@ -92,11 +93,11 @@ protected:
     }
 };
 
-} // namespace blackhole
+BLACKHOLE_END_NS
 
 //==================================================================================================
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace feature {
 
@@ -134,4 +135,4 @@ attribute::combined_view_t scoped_t::view(const attribute::set_t& external) cons
 
 } // namespace feature
 
-} // namespace blackhole
+BLACKHOLE_END_NS

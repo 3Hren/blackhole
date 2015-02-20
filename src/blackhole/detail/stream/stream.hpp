@@ -7,12 +7,14 @@
 #include <boost/assert.hpp>
 #include <boost/config.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/config/nullptr.hpp"
 #include "blackhole/detail/support/char.hpp"
 
 #include "streambuf.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -250,4 +252,4 @@ typedef attachable_basic_ostringstream<char> attachable_ostringstream;
 
 typedef aux::attachable_ostringstream stickystream_t;
 
-} // namespace blackhole
+BLACKHOLE_END_NS

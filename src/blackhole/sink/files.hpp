@@ -2,6 +2,8 @@
 
 #include <boost/config.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/attribute.hpp"
 #include "blackhole/detail/string/formatting/formatter.hpp"
 #include "blackhole/detail/util/unique.hpp"
@@ -13,7 +15,7 @@
 #include "blackhole/sink/files/writer.hpp"
 #include "blackhole/sink/thread.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -265,4 +267,4 @@ struct factory_traits<sink::files_t<Backend, sink::rotator_t<Backend, sink::rota
     }
 };
 
-} // namespace blackhole
+BLACKHOLE_END_NS

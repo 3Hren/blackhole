@@ -6,13 +6,15 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/sink/files/rotation/config.hpp"
 #include "blackhole/sink/files/rotation/counter.hpp"
 #include "blackhole/sink/files/rotation/naming/filter.hpp"
 #include "blackhole/sink/files/rotation/timer.hpp"
 #include "blackhole/sink/files/rotation/watcher.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -147,4 +149,4 @@ public:
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS

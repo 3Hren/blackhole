@@ -2,7 +2,9 @@
 
 #include <type_traits>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 template<class, class>
 struct or_ : public std::true_type {};
@@ -10,4 +12,4 @@ struct or_ : public std::true_type {};
 template<>
 struct or_<std::false_type, std::false_type> : public std::false_type {};
 
-} // namespace blackhole
+BLACKHOLE_END_NS

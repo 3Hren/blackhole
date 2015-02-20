@@ -14,9 +14,11 @@
 #include <boost/version.hpp>
 #include <boost/utility.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/stream/stream.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -603,4 +605,4 @@ public:
 
 } // namespace aux
 
-} // namespace blackhole
+BLACKHOLE_END_NS

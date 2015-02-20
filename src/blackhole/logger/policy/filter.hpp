@@ -2,11 +2,13 @@
 
 #include <functional>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/attribute/set.hpp"
 #include "blackhole/detail/config/inline.hpp"
 #include "blackhole/forwards.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace policy {
 
@@ -52,4 +54,4 @@ public:
 
 } // namespace policy
 
-} // namespace blackhole
+BLACKHOLE_END_NS

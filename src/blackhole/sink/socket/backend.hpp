@@ -1,6 +1,8 @@
 #pragma once
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -13,4 +15,4 @@ class boost_backend_t;
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS

@@ -2,9 +2,11 @@
 
 #include <string>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/config/platform/deprecated.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace attribute {
 
@@ -15,4 +17,4 @@ typedef std::string name_t;
 typedef blackhole::attribute::name_t attribute_name_t
     BLACKHOLE_DEPRECATED("Use `attribute::name_t` instead.");
 
-} // namespace blackhole
+BLACKHOLE_END_NS

@@ -4,12 +4,14 @@
 
 #include <boost/variant.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/attribute.hpp"
 #include "blackhole/detail/config/underlying.hpp"
 #include "blackhole/expression/helper.hpp"
 #include "blackhole/filter.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace expression {
 
@@ -59,4 +61,4 @@ has_attr_action_t<typename T::type> has_attr(const T&) {
 
 } // namespace expression
 
-} // namespace blackhole
+BLACKHOLE_END_NS

@@ -3,9 +3,11 @@
 #include <array>
 #include <type_traits>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/traits/same.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -20,4 +22,4 @@ make_array(T t, Args&&... args) {
 
 } // namespace utils
 
-} // namespace blackhole
+BLACKHOLE_END_NS

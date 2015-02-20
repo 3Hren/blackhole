@@ -2,9 +2,11 @@
 
 #include <tuple>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/traits/is_true.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace tuple {
 
@@ -21,4 +23,4 @@ struct all<std::tuple<T, Args...>, F> {
 
 } // namespace tuple
 
-} // namespace blackhole
+BLACKHOLE_END_NS

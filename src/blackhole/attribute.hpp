@@ -4,6 +4,8 @@
 #include <initializer_list>
 #include <utility>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/attribute/name.hpp"
 #include "blackhole/attribute/set.hpp"
 #include "blackhole/attribute/view.hpp"
@@ -11,7 +13,7 @@
 #include "blackhole/attribute/value.hpp"
 #include "blackhole/detail/config/underlying.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace attribute {
 
@@ -70,4 +72,4 @@ struct traits<T, typename std::enable_if<std::is_enum<T>::value>::type> {
 
 } // namespace attribute
 
-} // namespace blackhole
+BLACKHOLE_END_NS

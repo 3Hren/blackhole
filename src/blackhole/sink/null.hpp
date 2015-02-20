@@ -2,10 +2,12 @@
 
 #include <string>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/repository/factory/traits.hpp"
 #include "blackhole/sink/thread.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -46,4 +48,4 @@ struct factory_traits<sink::null_t> {
     static void map_config(const aux::extractor<sink_type>&, config_type&) {}
 };
 
-} // namespace blackhole
+BLACKHOLE_END_NS

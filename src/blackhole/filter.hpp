@@ -2,10 +2,12 @@
 
 #include <functional>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/config/inline.hpp"
 #include "blackhole/forwards.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 typedef std::function<bool(const attribute::combined_view_t& attributes)> filter_t;
 
@@ -19,4 +21,4 @@ bool none(const attribute::combined_view_t&) {
 
 } // namespace filter
 
-} // namespace blackhole
+BLACKHOLE_END_NS

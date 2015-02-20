@@ -2,7 +2,9 @@
 
 #include <type_traits>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace type_traits {
 
@@ -35,4 +37,4 @@ struct is_signed_integer :
 
 } // namespace type_traits
 
-} // namespace blackhole
+BLACKHOLE_END_NS

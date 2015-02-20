@@ -4,7 +4,9 @@
 #include <boost/mpl/push_back.hpp>
 #include <boost/mpl/reverse.hpp>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -41,4 +43,4 @@ template<class T1, class T2> struct metaholder {};
 
 } // namespace aux
 
-} // namespace blackhole
+BLACKHOLE_END_NS

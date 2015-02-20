@@ -3,7 +3,9 @@
 #include <cstdint>
 #include <string>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -59,4 +61,4 @@ struct config_t<watcher_set<Args...>> {
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS

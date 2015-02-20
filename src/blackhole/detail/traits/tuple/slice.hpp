@@ -5,7 +5,9 @@
 
 #include <boost/integer_traits.hpp>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace tuple {
 
@@ -24,4 +26,4 @@ struct slice {
 
 } // namespace tuple
 
-} // namespace blackhole
+BLACKHOLE_END_NS

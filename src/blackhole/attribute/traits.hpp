@@ -5,9 +5,11 @@
 #include <boost/mpl/contains.hpp>
 #include <boost/mpl/vector.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "value.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace attribute {
 
@@ -54,4 +56,4 @@ struct is_constructible {
 
 } // namespace attribute
 
-} // namespace blackhole
+BLACKHOLE_END_NS

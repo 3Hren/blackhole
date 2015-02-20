@@ -4,9 +4,11 @@
 
 #include <boost/variant.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/dynamic.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace repository {
 
@@ -48,4 +50,4 @@ public:
 
 } // namespace repository
 
-} // namespace blackhole
+BLACKHOLE_END_NS

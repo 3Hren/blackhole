@@ -1,10 +1,12 @@
 #pragma once
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/frontend.hpp"
 #include "blackhole/sink/syslog.hpp"
 #include "blackhole/keyword/severity.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 template<class Formatter, typename Level>
 class frontend_t<Formatter, sink::syslog_t<Level>> :
@@ -28,4 +30,4 @@ public:
     }
 };
 
-} // namespace blackhole
+BLACKHOLE_END_NS

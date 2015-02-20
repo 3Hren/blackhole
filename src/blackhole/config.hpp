@@ -7,6 +7,14 @@
 #define BLACKHOLE_HEADER_ONLY
 #define BLACKHOLE_DEBUG
 
+#define BLACKHOLE_ABI_VERSION \
+    BLACKHOLE_VERSION_MAJOR * 10000 + \
+    BLACKHOLE_VERSION_MINOR * 100 + \
+    BLACKHOLE_VERSION_PATCH
+
+#define BLACKHOLE_BEG_NS namespace blackhole { inline namespace v##BLACKHOLE_ABI_VERSION {
+#define BLACKHOLE_END_NS } } // namespace blackhole::version
+
 #if defined(BLACKHOLE_HEADER_ONLY)
     #define BLACKHOLE_API inline
 #endif

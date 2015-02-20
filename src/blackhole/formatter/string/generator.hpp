@@ -6,13 +6,15 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/variant.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/stream/stream.hpp"
 #include "blackhole/error.hpp"
 #include "blackhole/formatter/map/value.hpp"
 #include "blackhole/formatter/string/parser.hpp"
 #include "blackhole/record.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace formatter {
 
@@ -121,4 +123,4 @@ private:
 
 } // namespace formatter
 
-} // namespace blackhole
+BLACKHOLE_END_NS

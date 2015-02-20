@@ -2,12 +2,14 @@
 
 #include <string>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/attribute.hpp"
 #include "blackhole/detail/config/underlying.hpp"
 #include "blackhole/expression/helper.hpp"
 #include "blackhole/filter.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace expression {
 
@@ -66,4 +68,4 @@ get_attr_action_t<typename T::type> get_attr(const T&) {
 
 } // namespace expression
 
-} // namespace blackhole
+BLACKHOLE_END_NS

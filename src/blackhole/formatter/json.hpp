@@ -10,6 +10,8 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/string/split.hpp"
 #include "blackhole/error.hpp"
 #include "blackhole/formatter/base.hpp"
@@ -18,7 +20,7 @@
 #include "blackhole/record.hpp"
 #include "blackhole/repository/factory/traits.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace formatter {
 
@@ -242,4 +244,4 @@ struct factory_traits<formatter::json_t> {
     }
 };
 
-} // namespace blackhole
+BLACKHOLE_END_NS

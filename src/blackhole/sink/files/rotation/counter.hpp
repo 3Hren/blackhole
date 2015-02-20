@@ -9,11 +9,13 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/sink/files/rotation/naming/basename.hpp"
 #include "blackhole/sink/files/rotation/naming/comparator.hpp"
 #include "blackhole/sink/files/rotation/naming/helpers.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -134,4 +136,4 @@ private:
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS

@@ -3,12 +3,12 @@
 #include <map>
 #include <string>
 
-#include <boost/any.hpp>
+#include "blackhole/config.hpp"
 
 #include "blackhole/dynamic.hpp"
 #include "blackhole/error.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -58,4 +58,4 @@ public:
 
 } // namespace aux
 
-}  // namespace blackhole
+BLACKHOLE_END_NS

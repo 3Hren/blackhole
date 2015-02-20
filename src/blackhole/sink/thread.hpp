@@ -2,7 +2,9 @@
 
 #include <type_traits>
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace sink {
 
@@ -22,4 +24,4 @@ struct thread_safety :
 
 } // namespace sink
 
-} // namespace blackhole
+BLACKHOLE_END_NS

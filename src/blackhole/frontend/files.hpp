@@ -1,9 +1,11 @@
 #pragma once
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/frontend.hpp"
 #include "blackhole/sink/files.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 template<class Formatter, class Backend, class Rotator>
 class frontend_t<Formatter, sink::files_t<Backend, Rotator>> :
@@ -28,4 +30,4 @@ public:
     }
 };
 
-} // namespace blackhole
+BLACKHOLE_END_NS

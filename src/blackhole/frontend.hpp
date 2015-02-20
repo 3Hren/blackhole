@@ -3,10 +3,12 @@
 #include <memory>
 #include <mutex>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/sink/thread.hpp"
 #include "blackhole/record.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace handler {
 
@@ -127,4 +129,4 @@ public:
     }
 };
 
-} // namespace blackhole
+BLACKHOLE_END_NS

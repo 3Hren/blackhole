@@ -1,6 +1,8 @@
 #pragma once
 
-namespace blackhole {
+#include "blackhole/config.hpp"
+
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -15,4 +17,4 @@ struct lazy_false {
 
 } // namespace aux
 
-} // namespace blackhole
+BLACKHOLE_END_NS

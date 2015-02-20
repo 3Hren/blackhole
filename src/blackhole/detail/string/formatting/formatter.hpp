@@ -4,9 +4,11 @@
 #include <string>
 #include <vector>
 
+#include "blackhole/config.hpp"
+
 #include "blackhole/detail/stream/stream.hpp"
 
-namespace blackhole {
+BLACKHOLE_BEG_NS
 
 namespace aux {
 
@@ -122,4 +124,4 @@ private:
 
 } // namespace aux
 
-} // namespace blackhole
+BLACKHOLE_END_NS
