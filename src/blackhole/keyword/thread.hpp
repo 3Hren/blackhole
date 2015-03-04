@@ -30,9 +30,17 @@ static inline std::string tid() {
 #endif
 
 #ifdef BLACKHOLE_HAS_ATTRIBUTE_LWP
+
 static inline uint64_t lwp() {
+#ifdef __linux__
     return ::syscall(SYS_gettid);
+#elif __APPLE__
+    return ::syscall(SYS_thread_selfid);
+#else
+#   error LWP attribute for your platform is not supported
+#endif
 }
+
 #endif
 
 } // namespace init
