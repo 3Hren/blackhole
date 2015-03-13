@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
-Version:	0.4.1
-Release:	1%{?dist}
+Version:	0.5.0
+Release:	0rc1%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
@@ -65,6 +65,11 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Fri Mar 13 2015 Evgeny Safronov <division494@gmail.com> - 0.5.0-0rc1
+- Feature: inline namespaces - allows to link together multiple libraries that are compiled with
+  different Blackhole versions.
+- Feature: lightweight process attribute for OS X targets.
+
 * Sat Feb 14 2015 Evgeny Safronov <division494@gmail.com> - 0.4.1-1
 - Bug fix: fixed corrupted move constructor for logger class.
 - Other: optional syntax checking option.

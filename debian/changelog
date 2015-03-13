@@ -1,3 +1,11 @@
+blackhole (0.5.0-0rc1) unstable; urgency=low
+
+  * Feature: inline namespaces - allows to link together multiple libraries that are compiled with
+    different Blackhole versions.
+  * Feature: lightweight process attribute for OS X targets.
+
+ -- Evgeny Safronov <division494@gmail.com>  Fri, 13 Mar 2015 12:08:27 +0300
+
 blackhole (0.4.1-1) unstable; urgency=low
 
   * Bug fix: fixed corrupted move constructor for logger class.
