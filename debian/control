@@ -6,7 +6,7 @@ Standards-Version: 3.9.1
 Section: libs
 Vcs-Git: git://github.com/3Hren/blackhole.git
 Vcs-Browser: https://github.com/3Hren/blackhole.git
-Homepage: http://3hren.github.io/blackhole
+Homepage: http://blackhole-logger.herokuapp.com/
 
 Package: blackhole5-dev
 Section: libdevel
