@@ -24,21 +24,21 @@ TEST(files_t, WritesToTheFile) {
     sink::files_t<NiceMock<mock::files::backend_t>>::config_type config("test.log");
     sink::files_t<NiceMock<mock::files::backend_t>> sink(config);
     //!@note: It is needed for first file handler creation.
-    sink.consume("", {});
+    sink.consume("", {{}});
     const auto& handlers = sink.handlers();
     auto it = handlers.find("test.log");
     ASSERT_TRUE(it != handlers.end());
     const auto& backend = it->second->backend();
     EXPECT_CALL(backend, write(std::string("formatted message"))).
             Times(1);
-    sink.consume("formatted message", {});
+    sink.consume("formatted message", {{}});
 }
 
 TEST(files_t, OpensFileIfItClosedWhenWriting) {
     sink::files_t<NiceMock<mock::files::backend_t>>::config_type config("test.log");
     sink::files_t<NiceMock<mock::files::backend_t>> sink(config);
 
-    sink.consume("", {});
+    sink.consume("", {{}});
     const auto& handlers = sink.handlers();
     auto it = handlers.find("test.log");
     ASSERT_TRUE(it != handlers.end());
@@ -52,14 +52,14 @@ TEST(files_t, OpensFileIfItClosedWhenWriting) {
             WillOnce(Return(true));
     EXPECT_CALL(backend, write(_)).
             Times(1);
-    sink.consume("message", {});
+    sink.consume("message", {{}});
 }
 
 TEST(files_t, ThrowsExceptionIfFileCannotBeOpened) {
     sink::files_t<NiceMock<mock::files::backend_t>>::config_type config("test.log");
     sink::files_t<NiceMock<mock::files::backend_t>> sink(config);
 
-    sink.consume("", {});
+    sink.consume("", {{}});
     const auto& handlers = sink.handlers();
     auto it = handlers.find("test.log");
     ASSERT_TRUE(it != handlers.end());
@@ -73,14 +73,14 @@ TEST(files_t, ThrowsExceptionIfFileCannotBeOpened) {
             .WillOnce(Return(false));
     EXPECT_CALL(backend, write(_))
             .Times(0);
-    EXPECT_THROW(sink.consume("message", {}), blackhole::error_t);
+    EXPECT_THROW(sink.consume("message", {{}}), blackhole::error_t);
 }
 
 TEST(files_t, AutoFlushIfSpecified) {
     sink::files_t<NiceMock<mock::files::backend_t>>::config_type config("test.log", true);
     sink::files_t<NiceMock<mock::files::backend_t>> sink(config);
 
-    sink.consume("", {});
+    sink.consume("", {{}});
     const auto& handlers = sink.handlers();
     auto it = handlers.find("test.log");
     ASSERT_TRUE(it != handlers.end());
@@ -89,14 +89,14 @@ TEST(files_t, AutoFlushIfSpecified) {
     EXPECT_CALL(backend, flush())
             .Times(1);
 
-    sink.consume("message", {});
+    sink.consume("message", {{}});
 }
 
 TEST(files_t, AutoFlushIsDisabledIfSpecified) {
     sink::files_t<NiceMock<mock::files::backend_t>>::config_type config("test.log", false);
     sink::files_t<NiceMock<mock::files::backend_t>> sink(config);
 
-    sink.consume("", {});
+    sink.consume("", {{}});
     const auto& handlers = sink.handlers();
     auto it = handlers.find("test.log");
     ASSERT_TRUE(it != handlers.end());
@@ -105,14 +105,14 @@ TEST(files_t, AutoFlushIsDisabledIfSpecified) {
     EXPECT_CALL(backend, flush())
             .Times(0);
 
-    sink.consume("message", {});
+    sink.consume("message", {{}});
 }
 
 TEST(files_t, AutoFlushIsEnabledByDefault) {
     sink::files_t<NiceMock<mock::files::backend_t>>::config_type config("test.log");
     sink::files_t<NiceMock<mock::files::backend_t>> sink(config);
 
-    sink.consume("", {});
+    sink.consume("", {{}});
     const auto& handlers = sink.handlers();
     auto it = handlers.find("test.log");
     ASSERT_TRUE(it != handlers.end());
@@ -120,5 +120,5 @@ TEST(files_t, AutoFlushIsEnabledByDefault) {
 
     EXPECT_CALL(backend, flush())
             .Times(1);
-    sink.consume("message", {});
+    sink.consume("message", {{}});
 }
