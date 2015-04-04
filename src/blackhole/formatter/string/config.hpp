@@ -12,6 +12,13 @@ namespace string {
 
 struct config_t {
     std::string pattern;
+    bool filter;
+
+    config_t() : filter(true) {}
+    explicit config_t(std::string pattern) :
+        pattern(std::move(pattern)),
+        filter(true)
+    {}
 };
 
 } // namespace string

@@ -2,6 +2,7 @@
 
 #include <ostream>
 #include <string>
+#include <unordered_set>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/variant.hpp>
@@ -52,13 +53,17 @@ class visitor_t : public boost::static_visitor<> {
     const mapping::value_t& mapper;
     const attribute::set_view_t& view;
 
+    bool filter;
+
 public:
     visitor_t(stickystream_t& stream,
               const mapping::value_t& mapper,
-              const attribute::set_view_t& view) :
+              const attribute::set_view_t& view,
+              bool filter) :
         stream(stream),
         mapper(mapper),
-        view(view)
+        view(view),
+        filter(filter)
     {}
 
     void operator()(const literal_t& literal) {
@@ -90,13 +95,35 @@ public:
         }
 
         stream.rdbuf()->storage()->append(ph.prefix);
-        auto it = attributes.begin();
-        traverse(ph.pattern, it->first, it->second.value, stream);
-        it++;
 
-        for (; it != attributes.end(); ++it) {
-            stream.rdbuf()->storage()->append(ph.separator);
+        if (filter) {
+            std::unordered_set<std::string> set;
+            auto it = attributes.rbegin();
             traverse(ph.pattern, it->first, it->second.value, stream);
+
+            set.insert(it->first);
+
+            it++;
+
+            for (; it != attributes.rend(); ++it) {
+                if (set.count(it->first)) {
+                    continue;
+                } else {
+                    set.insert(it->first);
+                }
+
+                stream.rdbuf()->storage()->append(ph.separator);
+                traverse(ph.pattern, it->first, it->second.value, stream);
+            }
+        } else {
+            auto it = attributes.begin();
+            traverse(ph.pattern, it->first, it->second.value, stream);
+            it++;
+
+            for (; it != attributes.end(); ++it) {
+                stream.rdbuf()->storage()->append(ph.separator);
+                traverse(ph.pattern, it->first, it->second.value, stream);
+            }
         }
 
         stream.rdbuf()->storage()->append(ph.suffix);

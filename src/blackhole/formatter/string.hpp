@@ -23,9 +23,6 @@ BLACKHOLE_BEG_NS
 namespace formatter {
 
 class string_t : public base_t {
-    const std::string pattern;
-    const std::vector<string::token_t> tokens;
-
 public:
     typedef string::config_t config_type;
 
@@ -33,13 +30,21 @@ public:
         return "string";
     }
 
+private:
+    const std::string pattern;
+    bool filter;
+    const std::vector<string::token_t> tokens;
+
+public:
     string_t(const std::string& pattern) :
         pattern(pattern),
+        filter(true),
         tokens(tokenize(pattern))
     {}
 
     string_t(const config_type& config) :
         pattern(config.pattern),
+        filter(config.filter),
         tokens(tokenize(config.pattern))
     {}
 
@@ -48,7 +53,7 @@ public:
         stickystream_t stream;
         stream.attach(buffer);
         try {
-            string::visitor_t visitor(stream, mapper, record.attributes());
+            string::visitor_t visitor(stream, mapper, record.attributes(), filter);
             for (auto it = tokens.begin(); it != tokens.end(); ++it) {
                 boost::apply_visitor(visitor, *it);
                 stream.flush();

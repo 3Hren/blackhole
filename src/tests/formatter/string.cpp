@@ -446,4 +446,25 @@ TEST_STRING(Variadic, MultiplePrefixSuffixSeparatorPattern) {
     );
 }
 
+TEST_STRING(Variadic, MultipleDuplicated) {
+    record_t record;
+    record.insert({ "id", attribute_t(42) });
+    record.insert({ "id", attribute_t(45) });
 
+    std::string pattern("%(...)s");
+    formatter::string_t::config_type config(pattern);
+    config.filter = false;
+    formatter::string_t formatter(config);
+    EXPECT_EQ("id: 42, id: 45", formatter.format(record));
+}
+
+TEST_STRING(Variadic, MultipleDuplicatedWithFilterDuplicatedByDefault) {
+    record_t record;
+    record.insert({ "id", attribute_t(42) });
+    record.insert({ "id", attribute_t(45) });
+
+    std::string pattern("%(...)s");
+    formatter::string_t::config_type config(pattern);
+    formatter::string_t formatter(config);
+    EXPECT_EQ("id: 45", formatter.format(record));
+}

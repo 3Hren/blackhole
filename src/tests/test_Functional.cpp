@@ -125,3 +125,43 @@ TEST(Functional, LoggerShouldProperlyRouteAttributesByScope) {
         Eq("[0]: message is so message [s1: 10, w1: 42, u1: value]\n")
     ));
 }
+
+TEST(Functional, LoggerShouldProperlyFilterAttributesByScope) {
+    /*
+     * We define full Blackhole's util stack: logger, wrapper, scoped attributes
+     * and user specific attributes.
+     * We expect, that duplicated external attributes will be filtered in variadic placeholder
+     * by its scope.
+     * External attributes are:
+     *  - Logger attached.
+     *  - Wrapper attached.
+     *  - Scoped.
+     *  - User defined (via macro)
+     */
+    using aux::util::make_unique;
+
+    typedef formatter::string_t                   formatter_type;
+    typedef sink::stream_t                        sink_type;
+    typedef frontend_t<formatter_type, sink_type> frontend_type;
+    typedef verbose_logger_t<level>               logger_type;
+
+    std::ostringstream stream;
+
+    auto formatter = make_unique<formatter_type>("[%(severity)s]: %(message)s %(...:[:])s");
+    auto sink      = make_unique<sink_type>(stream);
+    auto frontend  = make_unique<frontend_type>(std::move(formatter), std::move(sink));
+    logger_type log(level::debug);
+    log.add_frontend(std::move(frontend));
+
+    wrapper_t<logger_type> wrapper(log, attribute::set_t({{ "id", attribute_t(42) }}));
+
+    scoped_attributes_t scope(wrapper, attribute::set_t({{ "id", attribute_t(10) }}));
+
+    BH_LOG(wrapper, level::debug, "message is so %s", "message")("u1", "value");
+
+    auto actual = stream.str();
+    EXPECT_THAT(actual, AnyOf(
+        Eq("[0]: message is so message [id: 10, u1: value]\n"),
+        Eq("[0]: message is so message [u1: value, id: 10]\n")
+    ));
+}
