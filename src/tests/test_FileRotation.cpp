@@ -1,8 +1,11 @@
+#include <gtest/gtest.h>
+
 #include <blackhole/sink/files/rotation.hpp>
 
-#include "global.hpp"
 #include "mocks.hpp"
 #include "mocks/files.hpp"
+
+#include "util/unused.hpp"
 
 using namespace blackhole;
 

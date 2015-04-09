@@ -2,10 +2,6 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include <blackhole/detail/util/unused.hpp>
-
-#define UNUSED(...) \
-    ::blackhole::aux::util::ignore_unused_variable_warning(__VA_ARGS__);
 
 using namespace ::testing;
 

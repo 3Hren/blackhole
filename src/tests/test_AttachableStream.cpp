@@ -1,6 +1,8 @@
+#include <gtest/gtest.h>
+
 #include <blackhole/detail/stream/stream.hpp>
 
-#include "global.hpp"
+#include "util/unused.hpp"
 
 using namespace blackhole::aux;
 

@@ -4,6 +4,7 @@
 #include <blackhole/attribute/view.hpp>
 
 #include "global.hpp"
+#include "util/unused.hpp"
 
 using namespace blackhole;
 using aux::iterator::join_t;

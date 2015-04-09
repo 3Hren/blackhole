@@ -1,6 +1,8 @@
+#include <gtest/gtest.h>
+
 #include <blackhole/sink/null.hpp>
 
-#include "global.hpp"
+#include "util/unused.hpp"
 
 using namespace blackhole;
 
