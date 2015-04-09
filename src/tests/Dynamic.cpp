@@ -1,12 +1,16 @@
-#include "global.hpp"
+#include <gtest/gtest.h>
 
-#include "blackhole/dynamic.hpp"
+#include <blackhole/dynamic.hpp>
+
+#include "util/unused.hpp"
 
 using namespace blackhole;
 
+using namespace testing;
+
 TEST(Dynamic, Class) {
     dynamic_t d;
-    UNUSED(d)
+    UNUSED(d);
 }
 
 TEST(Dynamic, CopyConstructible) {

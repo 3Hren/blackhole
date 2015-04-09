@@ -3,6 +3,7 @@
 #include <blackhole/keyword/timestamp.hpp>
 
 #include "global.hpp"
+#include "util/unused.hpp"
 
 using namespace blackhole;
 

@@ -1,6 +1,7 @@
 #include <blackhole/sink/stream.hpp>
 
 #include "global.hpp"
+#include "util/unused.hpp"
 
 using namespace blackhole;
 

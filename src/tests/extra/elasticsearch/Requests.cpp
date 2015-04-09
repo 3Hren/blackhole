@@ -2,6 +2,7 @@
 #include <blackhole/sink/elasticsearch/request/info.hpp>
 
 #include "../../global.hpp"
+#include "../../util/unused.hpp"
 
 using namespace elasticsearch;
 

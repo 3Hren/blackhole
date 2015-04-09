@@ -1,6 +1,7 @@
-#include "../global.hpp"
-
 #include <blackhole/detail/string/formatting/formatter.hpp>
+
+#include "../global.hpp"
+#include "../util/unused.hpp"
 
 using namespace blackhole::aux;
 

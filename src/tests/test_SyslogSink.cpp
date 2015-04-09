@@ -2,6 +2,7 @@
 
 #include "global.hpp"
 #include "mocks/syslog.hpp"
+#include "util/unused.hpp"
 
 using namespace blackhole;
 

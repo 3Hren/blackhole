@@ -1,10 +1,14 @@
+#include <gtest/gtest.h>
+
 #include <boost/filesystem.hpp>
 
 #include <blackhole/sink/files/backend.hpp>
 
-#include "global.hpp"
+#include "util/unused.hpp"
 
 using namespace blackhole;
+
+using namespace testing;
 
 namespace testing {
 

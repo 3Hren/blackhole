@@ -3,6 +3,8 @@
 #include "global.hpp"
 #include "mocks/files.hpp"
 
+#include "util/unused.hpp"
+
 using namespace blackhole;
 
 TEST(size_t, Class) {

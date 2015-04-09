@@ -4,6 +4,7 @@
 
 #include "../global.hpp"
 #include "../mocks/urlfetch.hpp"
+#include "../util/unused.hpp"
 
 TEST(request_t, Class) {
     urlfetch::request_t request;

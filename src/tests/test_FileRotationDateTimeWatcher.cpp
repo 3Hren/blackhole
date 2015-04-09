@@ -3,6 +3,7 @@
 #include "global.hpp"
 #include "mocks.hpp"
 #include "mocks/files.hpp"
+#include "util/unused.hpp"
 
 using namespace blackhole;
 
