@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
 Version:	0.5.0
-Release:	0rc1%{?dist}
+Release:	1%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
@@ -65,6 +65,10 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Thu Apr 09 2015 Evgeny Safronov <division494@gmail.com> - 0.5.0-1
+- Release version.
+- Feature: variadic placeholder filter policy for string formatter.
+
 * Fri Mar 13 2015 Evgeny Safronov <division494@gmail.com> - 0.5.0-0rc1
 - Feature: inline namespaces - allows to link together multiple libraries that are compiled with
   different Blackhole versions.

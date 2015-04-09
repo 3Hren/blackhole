@@ -1,3 +1,10 @@
+blackhole (0.5.0-1) unstable; urgency=low
+
+  * Release version.
+  * Feature: variadic placeholder filter policy for string formatter.
+
+ -- Evgeny Safronov <division494@gmail.com>  Thu, 09 Apr 2015 14:47:45 +0300
+
 blackhole (0.5.0-0rc1) unstable; urgency=low
 
   * Feature: inline namespaces - allows to link together multiple libraries that are compiled with
