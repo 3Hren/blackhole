@@ -21,7 +21,7 @@ prepare() {
 
 build() {
 	cd "$srcdir/$pkgname"
-	cmake -DCMAKE_INSTALL_PREFIX=${pkgdir}/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_TESTING=ON
+	cmake -DCMAKE_INSTALL_PREFIX=${pkgdir}/usr -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_TESTING=ON -DENABLE_EXAMPLES=ON -DENABLE_BENCHMARKING=ON
 	make -j $(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
 }
 
