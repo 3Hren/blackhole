@@ -1,5 +1,5 @@
 Summary:	Blackhole
-Name:		libblackhole
+Name:		libblackhole5
 Version:	0.5.0
 Release:	1%{?dist}
 
