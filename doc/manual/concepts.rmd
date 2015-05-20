@@ -40,7 +40,7 @@ formatted like jsoned, msgpacked or protobuffed string).
 Thus, formatter's objects always produce strings.
 
 Blackhole has some predefined formatters. You can read theirs description in
-the ["Formatters"](formatters.md) part of documentation.
+the "Formatters" part of documentation.
 
 After formatting we have log event's string representation, and (we are almost
 done with it) the last thing we can do with that string - is to send it into
@@ -50,7 +50,7 @@ the final destination appointment.
 
 Sink module is responsible for sending formatted message into its final
 destination. It can be file, socket, syslog or whatever else. You can find
-descriptions of implemented sinks in the ["Sinks"](sinks.md) part of
+descriptions of implemented sinks in the "Sinks" part of
 documentation.
 
 Here lifetime of log event ends.
