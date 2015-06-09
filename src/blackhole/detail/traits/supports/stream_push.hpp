@@ -28,14 +28,19 @@ struct any_t {
 
 } // namespace aux
 
-aux::return_t operator<<(std::ostream&, const aux::any_t&);
+template<class T>
+decltype(support::declval<std::ostream&>() << support::declval<T>())
+deduce(std::ostream& os, const T&);
+
+aux::return_t
+deduce(std::ostream& os, aux::any_t);
 
 template<typename T>
 struct stream_push : public std::integral_constant<
         bool,
         !std::is_same<
             aux::return_t,
-            decltype(support::declval<std::ostream&>() << support::declval<T>())
+            decltype(deduce(support::declval<std::ostream&>(), support::declval<T>()))
         >::value
     >
 {};
