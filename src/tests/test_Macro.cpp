@@ -1,3 +1,16 @@
+#include <ostream>
+#include <vector>
+
+/// Forward declaration for using user-defined mapping.
+namespace testing {
+
+std::ostream&
+operator<<(std::ostream& stream, const std::vector<int>& value);
+
+} // namespace testing
+
+using ::testing::operator<<;
+
 #include <blackhole/macro.hpp>
 
 #include "global.hpp"
@@ -227,6 +240,51 @@ TEST(Macro, UsingStreamOperatorIfNoImplicitConversionAvailable) {
 
     EXPECT_EQ("message", actual.message);
     EXPECT_EQ("['42', 42]", actual.value);
+}
+
+namespace testing {
+
+std::ostream&
+operator<<(std::ostream& stream, const std::vector<int>& value) {
+    stream << "[";
+    auto it = value.begin();
+    stream << *it;
+    ++it;
+
+    for (; it != value.end(); ++it) {
+        stream << ", " << *it;
+    }
+
+    stream << "]";
+    return stream;
+}
+
+} // namespace
+
+TEST(Macro, UsingStreamOperatorIfNoImplicitConversionAvailableUsingContainers) {
+    static_assert(traits::supports::stream_push<std::vector<int>>::value,
+                  "`std::vector<int>` must support stream push operator<<");
+
+    const std::vector<int> value {{ 42, 10 }};
+
+    record_t record;
+    record.insert(attribute::make("attr1", "value1"));
+
+    mock::verbose_log_t<level> log;
+    EXPECT_CALL(log, open_record(level::debug))
+            .Times(1)
+            .WillOnce(Return(record));
+
+    ExtractStreamableValueAttributesAction::pack_t actual;
+    ExtractStreamableValueAttributesAction action { actual };
+    EXPECT_CALL(log, push(_))
+            .Times(1)
+            .WillOnce(WithArg<0>(Invoke(action)));
+
+    BH_LOG(log, level::debug, "message")("value", value);
+
+    EXPECT_EQ("message", actual.message);
+    EXPECT_EQ("[42, 10]", actual.value);
 }
 
 TEST(Macro, InitializerListAttributes) {
