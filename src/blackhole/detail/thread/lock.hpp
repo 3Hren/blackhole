@@ -3,7 +3,7 @@
 #include <mutex>
 #include <tuple>
 
-#include <boost/thread.hpp>
+#include <boost/thread/locks.hpp>
 
 #include "blackhole/config.hpp"
 

@@ -1,9 +1,10 @@
 #pragma once
 
-#include <thread>
 #include <iomanip>
+#include <sstream>
+#include <thread>
 
-#include <boost/thread.hpp>
+#include <boost/thread/tss.hpp>
 
 #include "blackhole/config.hpp"
 

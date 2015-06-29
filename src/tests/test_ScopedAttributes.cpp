@@ -1,4 +1,5 @@
-#include <boost/thread.hpp>
+#include <boost/thread/barrier.hpp>
+#include <boost/thread/thread.hpp>
 
 #include <blackhole/formatter/string.hpp>
 #include <blackhole/logger.hpp>
