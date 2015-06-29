@@ -46,10 +46,6 @@ struct name_t {
 } // namespace
 
 class set_view_t {
-    // TODO: Dead code?
-    // template<class T> friend struct extractor;
-    // template<class... Args> friend struct tuple_empty;
-
 public:
     typedef aux::iterator::join_t<set_t, true> const_iterator;
 
