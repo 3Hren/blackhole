@@ -7,6 +7,7 @@
 #define BLACKHOLE_HEADER_ONLY
 #define BLACKHOLE_DEBUG
 
+// TODO: Change these macro into manual driven ABI version counter.
 #define BLACKHOLE_BEG_NS namespace blackhole { inline namespace v500 {
 #define BLACKHOLE_END_NS } } // namespace blackhole::version
 
