@@ -16,6 +16,8 @@ Depends: ${shlibs:Depends}, ${misc:Depends},
  libboost-thread-dev | libboost-thread1.48-dev,
  libboost-iostreams-dev | libboost-iostreams1.48-dev
 Provides: blackhole-dev
+Conflicts: blackhole-dev
+Replaces: blackhole-dev
 Description: Blackhole Logger - Development Headers
  Fast header-only highly-configurable C++ logging library.
 
