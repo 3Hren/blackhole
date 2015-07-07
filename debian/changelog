@@ -1,3 +1,9 @@
+blackhole (0.5.0-2) unstable; urgency=low
+
+  * Fix debianization to prevent conflict with old blackhole-dev package.
+
+ -- Anton Matveenkov <antmat@me.com>  Tue, 07 Jul 2015 15:30:45 +0300
+
 blackhole (0.5.0-1) unstable; urgency=low
 
   * Release version.
