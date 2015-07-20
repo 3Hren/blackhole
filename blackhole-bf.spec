@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole5
 Version:	0.5.0
-Release:	1%{?dist}
+Release:	2%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
@@ -65,6 +65,9 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Mon Jul 20 2015 Evgeny Safronov <division494@gmail.com> - 0.5.0-2
+- Bug fix: fixed compiler version determiner macro to be usable with GCC5.
+
 * Thu Apr 09 2015 Evgeny Safronov <division494@gmail.com> - 0.5.0-1
 - Release version.
 - Feature: variadic placeholder filter policy for string formatter.
