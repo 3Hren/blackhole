@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
 Version:	0.2.3
-Release:	1%{?dist}
+Release:	2%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
@@ -65,8 +65,11 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Tue Jul 21 2015 Evgeny Safronov <division494@gmail.com> - 0.2.3-2
+- Bug fix: fixed compiler version determiner macro to be usable with GCC5.
+
 * Mon Sep 29 2014 Evgeny Safronov <division494@gmail.com> - 0.2.3-1
-Misc: fixed debianization for precise, which allows to install package with libboost 1.46 as like as 1.48.
+- Misc: fixed debianization for precise, which allows to install package with libboost 1.46 as like as 1.48.
 
 * Wed Sep 24 2014 Evgeny Safronov <division494@gmail.com> - 0.2.2-1
 - Feature: added file sink which can automatically reopen files after they are moved.
