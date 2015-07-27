@@ -1,3 +1,9 @@
+blackhole (0.2.3-2) unstable; urgency=low
+
+  * Bug fix: fixed compiler version determiner macro to be usable with GCC5.
+
+ -- Evgeny Safronov <division494@gmail.com>  Tue, 21 Jul 2015 11:44:52 +0300
+
 blackhole (0.2.3-1) unstable; urgency=low
 
   * Misc: fixed debianization for precise, which allows to install package with
