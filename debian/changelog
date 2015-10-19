@@ -1,3 +1,10 @@
+blackhole (0.2.3.3) unstable; urgency=low
+
+  * Specify debian format — native
+  * Change version style for native format in Jessie
+
+ -- Alexey Mochkin <alukardd@alukardd.org>  Mon, 19 Oct 2015 12:15:21 +0300
+
 blackhole (0.2.3-2) unstable; urgency=low
 
   * Bug fix: fixed compiler version determiner macro to be usable with GCC5.
