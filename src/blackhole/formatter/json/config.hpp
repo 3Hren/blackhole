@@ -26,11 +26,13 @@ struct routing_t {
 } // namespace map
 
 struct config_t {
+    bool filter;
     bool newline;
     map::mapping_t naming;
     map::routing_t routing;
 
     config_t() :
+        filter(false),
         newline(false)
     {}
 };

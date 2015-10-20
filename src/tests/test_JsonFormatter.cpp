@@ -240,3 +240,26 @@ TEST(json_t, AttributeMappingIsDeterminedByItsBaseNames) {
     ASSERT_TRUE(doc["@secret"].IsString());
     EXPECT_STREQ("(42)", doc["@secret"].GetString());
 }
+
+TEST(json_t, AllowDuplicateAttributes) {
+    record_t record;
+    record.insert(keyword::message() = "le message1");
+    record.insert(keyword::message() = "le message2");
+
+    formatter::json_t fmt;
+    std::string expected = "{\"message\":\"le message1\",\"message\":\"le message2\"}";
+    EXPECT_EQ(expected, fmt.format(record));
+}
+
+TEST(json_t, DisallowDuplicateAttributesIfNeeded) {
+    record_t record;
+    record.insert(keyword::message() = "le message1");
+    record.insert(keyword::message() = "le message2");
+
+    formatter::json::config_t config;
+    config.filter = true;
+
+    formatter::json_t fmt(config);
+    std::string expected = "{\"message\":\"le message2\"}";
+    EXPECT_EQ(expected, fmt.format(record));
+}
