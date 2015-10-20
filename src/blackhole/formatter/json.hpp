@@ -3,6 +3,7 @@
 #include <list>
 #include <string>
 #include <vector>
+#include <unordered_set>
 #include <unordered_map>
 
 #include <rapidjson/document.h>
@@ -172,10 +173,29 @@ public:
         root.SetObject();
 
         json_visitor_t visitor(&root, config, mapper);
-        for (auto it = record.attributes().begin(); it != record.attributes().end(); ++it) {
-            const std::string& name = it->first;
-            const attribute_t& attribute = it->second;
-            aux::apply_visitor(visitor, name, attribute.value);
+
+        const auto& attributes = record.attributes().partial();
+
+        if (config.filter) {
+            std::unordered_set<std::string> duplicates;
+
+            for (auto it = attributes.rbegin(); it != attributes.rend(); ++it) {
+                const std::string& name = it->first;
+                const attribute_t& attribute = it->second;
+
+                if (!duplicates.insert(name).second) {
+                    // Filter duplicates.
+                    continue;
+                }
+
+                aux::apply_visitor(visitor, name, attribute.value);
+            }
+        } else {
+            for (auto it = attributes.begin(); it != attributes.end(); ++it) {
+                const std::string& name = it->first;
+                const attribute_t& attribute = it->second;
+                aux::apply_visitor(visitor, name, attribute.value);
+            }
         }
 
         rapidjson::GenericStringBuffer<rapidjson::UTF8<>> buffer;
@@ -200,6 +220,12 @@ struct factory_traits<formatter::json_t> {
     static
     void
     map_config(const aux::extractor<formatter_type>& ex, config_type& config) {
+        try {
+            ex["filter"].to(config.filter);
+        } catch (const error_t&) {
+            config.filter = false;
+        }
+
         ex["newline"].to(config.newline);
 
         auto mapping = ex["mapping"].get<dynamic_t::object_t>();
