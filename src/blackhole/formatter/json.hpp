@@ -174,12 +174,24 @@ public:
 
         json_visitor_t visitor(&root, config, mapper);
 
-        const auto& attributes = record.attributes().partial();
-
         if (config.filter) {
             std::unordered_set<std::string> duplicates;
 
-            for (auto it = attributes.rbegin(); it != attributes.rend(); ++it) {
+            const auto& inner = record.attributes().hidden();
+            for (auto it = inner.begin(); it != inner.end(); ++it) {
+                const std::string& name = it->first;
+                const attribute_t& attribute = it->second;
+
+                if (!duplicates.insert(name).second) {
+                    // Filter duplicates.
+                    continue;
+                }
+
+                aux::apply_visitor(visitor, name, attribute.value);
+            }
+
+            const auto& partial = record.attributes().partial();
+            for (auto it = partial.rbegin(); it != partial.rend(); ++it) {
                 const std::string& name = it->first;
                 const attribute_t& attribute = it->second;
 
@@ -191,6 +203,8 @@ public:
                 aux::apply_visitor(visitor, name, attribute.value);
             }
         } else {
+            const auto& attributes = record.attributes();
+
             for (auto it = attributes.begin(); it != attributes.end(); ++it) {
                 const std::string& name = it->first;
                 const attribute_t& attribute = it->second;

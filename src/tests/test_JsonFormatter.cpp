@@ -251,6 +251,17 @@ TEST(json_t, AllowDuplicateAttributes) {
     EXPECT_EQ(expected, fmt.format(record));
 }
 
+TEST(json_t, AllowDuplicateAttributesInternal) {
+    record_t record;
+    record.insert(keyword::message() = "le message1");
+    record.insert(keyword::message() = "le message2");
+    record.message("123");
+
+    formatter::json_t fmt;
+    std::string expected = "{\"message\":\"123\",\"message\":\"le message1\",\"message\":\"le message2\"}";
+    EXPECT_EQ(expected, fmt.format(record));
+}
+
 TEST(json_t, DisallowDuplicateAttributesIfNeeded) {
     record_t record;
     record.insert(keyword::message() = "le message1");
@@ -261,5 +272,19 @@ TEST(json_t, DisallowDuplicateAttributesIfNeeded) {
 
     formatter::json_t fmt(config);
     std::string expected = "{\"message\":\"le message2\"}";
+    EXPECT_EQ(expected, fmt.format(record));
+}
+
+TEST(json_t, DisallowDuplicateAttributesIfNeededWithInternalPriority) {
+    record_t record;
+    record.insert(keyword::message() = "le message1");
+    record.insert(keyword::message() = "le message2");
+    record.message("123");
+
+    formatter::json::config_t config;
+    config.filter = true;
+
+    formatter::json_t fmt(config);
+    std::string expected = "{\"message\":\"123\"}";
     EXPECT_EQ(expected, fmt.format(record));
 }

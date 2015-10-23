@@ -123,6 +123,10 @@ public:
         return *value;
     }
 
+    const set_t& hidden() const {
+        return internal.v;
+    }
+
     const set_t& partial() const {
         return external.v;
     }
