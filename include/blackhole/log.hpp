@@ -56,14 +56,6 @@ public:
     size() const noexcept {
         return size_;
     }
-
-private:
-    constexpr
-    static
-    int
-    length(const char* data) noexcept {
-        return *data ? 1 + length(data + 1) : 0;
-    }
 };
 
 using inner2_t = boost::variant<
