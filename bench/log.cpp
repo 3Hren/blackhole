@@ -15,6 +15,8 @@ literal(::benchmark::State& state) {
     while (state.KeepRunning()) {
         log.info("[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326");
     }
+
+    state.SetItemsProcessed(state.iterations());
 }
 
 static
@@ -26,6 +28,8 @@ string(::benchmark::State& state) {
     while (state.KeepRunning()) {
         log.info(string);
     }
+
+    state.SetItemsProcessed(state.iterations());
 }
 
 static
@@ -37,6 +41,8 @@ literal_with_arg(::benchmark::State& state) {
         log.info("[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET {} HTTP/1.0' 200 2326",
             "/porn.png");
     }
+
+    state.SetItemsProcessed(state.iterations());
 }
 
 static
@@ -54,6 +60,8 @@ literal_with_args(::benchmark::State& state) {
             2326
         );
     }
+
+    state.SetItemsProcessed(state.iterations());
 }
 
 static
@@ -75,6 +83,8 @@ cpp14_formatter_with_args(::benchmark::State& state) {
             2326
         );
     }
+
+    state.SetItemsProcessed(state.iterations());
 }
 
 static
@@ -89,6 +99,8 @@ literal_with_attributes(::benchmark::State& state) {
             {"key#3", attribute_value_t("value")}
         });
     }
+
+    state.SetItemsProcessed(state.iterations());
 }
 
 static
@@ -111,6 +123,8 @@ literal_with_args_and_attributes(::benchmark::State& state) {
             2326
         );
     }
+
+    state.SetItemsProcessed(state.iterations());
 }
 
 static
@@ -137,6 +151,8 @@ literal_with_args_and_attributes_and_wrapper(::benchmark::State& state) {
             2326
         );
     }
+
+    state.SetItemsProcessed(state.iterations());
 }
 
 BENCHMARK(literal);

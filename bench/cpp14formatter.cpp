@@ -15,6 +15,8 @@ cpp14formatter(::benchmark::State& state) {
         fmt::MemoryWriter wr;
         formatter.format(wr, "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326);
     }
+
+    state.SetItemsProcessed(state.iterations());
 }
 
 BENCHMARK(cpp14formatter);
