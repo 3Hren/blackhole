@@ -1,0 +1,6 @@
+[submodule "foreign/cppformat"]
+	path = foreign/cppformat
+	url = https://github.com/cppformat/cppformat.git
+[submodule "foreign/modules"]
+	path = foreign/modules
+	url = https://github.com/3Hren/modules.git
