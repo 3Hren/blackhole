@@ -75,7 +75,7 @@ if (ENABLE_BENCHMARKING)
 	prepare_google_benchmarking()
 
     add_executable(${LIBRARY_NAME}-benchmarks
-		bench/blackhole
+		bench/cpp14formatter
 		bench/log
         bench/main
     )

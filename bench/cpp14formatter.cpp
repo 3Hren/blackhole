@@ -7,7 +7,7 @@ namespace benchmark {
 
 static
 void
-formatter(::benchmark::State& state) {
+cpp14formatter(::benchmark::State& state) {
     while (state.KeepRunning()) {
         constexpr auto formatter = blackhole::detail::formatter<
             blackhole::detail::literal_count("{} - {} [{}] 'GET {} HTTP/1.0' {} {}")
@@ -17,7 +17,7 @@ formatter(::benchmark::State& state) {
     }
 }
 
-BENCHMARK(formatter);
+BENCHMARK(cpp14formatter);
 
 }  // namespace benchmark
 }  // namespace blackhole
