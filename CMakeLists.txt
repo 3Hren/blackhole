@@ -57,33 +57,33 @@ if (ENABLE_TESTING)
 
 	enable_google_testing(${LIBRARY_NAME}-tests)
 
-    target_link_libraries(${LIBRARY_NAME}-tests
-        ${LIBRARY_NAME}
-        ${CMAKE_THREAD_LIBS_INIT}
-        gmock
-        gtest
-        gtest_main
-    )
+	target_link_libraries(${LIBRARY_NAME}-tests
+		${LIBRARY_NAME}
+		${CMAKE_THREAD_LIBS_INIT}
+		gmock
+		gtest
+		gtest_main
+	)
 endif (ENABLE_TESTING)
 
 if (ENABLE_BENCHMARKING)
 	list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/foreign/modules")
-    include(PrepareGoogleBenchmark)
+	include(PrepareGoogleBenchmark)
 
 	set(CMAKE_BUILD_TYPE Release)
 
 	prepare_google_benchmarking()
 
-    add_executable(${LIBRARY_NAME}-benchmarks
+	add_executable(${LIBRARY_NAME}-benchmarks
 		bench/cpp14formatter
 		bench/log
-        bench/main
-    )
+		bench/main
+	)
 
 	enable_google_benchmarking(${LIBRARY_NAME}-benchmarks)
 
-    target_link_libraries(${LIBRARY_NAME}-benchmarks
+	target_link_libraries(${LIBRARY_NAME}-benchmarks
         ${LIBRARY_NAME}
         benchmark
-    )
+	)
 endif (ENABLE_BENCHMARKING)
