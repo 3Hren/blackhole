@@ -119,7 +119,7 @@ public:
 };
 
 class sink_t {
-    virtual sink_t();
+    virtual ~sink_t();
 
     virtual auto filter(const record_t& record) -> bool = 0;
 
