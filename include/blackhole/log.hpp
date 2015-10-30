@@ -14,50 +14,24 @@
 #define FMT_HEADER_ONLY
 #include <cppformat/format.h>
 
+#include "blackhole/cpp17/string_view.hpp"
 #include "blackhole/sandbox.hpp"
 
 namespace blackhole {
 
 namespace cppformat = fmt;
 
+using cpp17::string_view;
+
 class scoped_t {};
 
-class string_view {
-    const char* data_;
-    std::size_t size_;
+using inner1_t = boost::variant<
+    std::int64_t,
+    double,
+    string_view
+>;
 
-public:
-    template<std::size_t N>
-    constexpr
-    string_view(const char(&message)[N]) noexcept:
-        data_(message),
-        size_(N - 1)
-    {}
-
-    constexpr
-    string_view(const char* message, std::size_t size) noexcept:
-        data_(message),
-        size_(size)
-    {}
-
-    string_view(const std::string& message) noexcept:
-        data_(message.data()),
-        size_(message.size())
-    {}
-
-    constexpr
-    const char*
-    data() const noexcept {
-        return data_;
-    }
-
-    constexpr
-    std::size_t
-    size() const noexcept {
-        return size_;
-    }
-};
-
+// mpl::transform + into_owned.
 using inner2_t = boost::variant<
     std::int64_t,
     double,
@@ -80,12 +54,6 @@ public:
         inner(std::move(v))
     {}
 };
-
-using inner1_t = boost::variant<
-    std::int64_t,
-    double,
-    string_view
->;
 
 struct from_owned_t : public boost::static_visitor<inner1_t> {
     template<typename T>
@@ -119,13 +87,66 @@ public:
 // using attributes_t = std::vector<std::pair<string_view, attribute_value_t>>;
 using attributes_t = boost::container::small_vector<std::pair<string_view, attribute_value_t>, 16>;
 
+class record_t {
+    // struct {
+    //     string_view message;
+    // } d;
+
+public:
+    auto message() const -> string_view;
+
+    auto severity() const -> int {
+        return 0;
+    }
+
+    // std::chrono::time_point timestamp() const;
+
+    const attributes_t& attributes() const;
+};
+
+typedef boost::any_range<
+    std::pair<string_view, attribute_value_t>,
+    boost::forward_traversal_tag
+> range_type;
+
+class writer_t;
+
+class formatter_t {
+public:
+    virtual ~formatter_t();
+
+    virtual auto format(const record_t& record, writer_t& writer) -> void = 0;
+};
+
+class sink_t {
+    virtual sink_t();
+
+    virtual auto filter(const record_t& record) -> bool = 0;
+
+    virtual auto execute(const record_t& record, string_view formatted) -> void = 0;
+};
+
+class handler_t {
+public:
+    auto set(std::unique_ptr<formatter_t> formatter) -> void;
+    auto add(std::unique_ptr<sink_t> sink) -> void;
+
+    auto execute(const record_t& record) -> void;
+};
+
 class log_t {
+public:
+    typedef std::function<bool(const record_t&)> filter_type;
+
+private:
     struct inner_t;
-    std::unique_ptr<inner_t> inner;
+    std::shared_ptr<inner_t> inner;
 
 public:
     log_t();
     ~log_t();
+
+    auto filter(filter_type fn) -> void;
 
     /// \note it's faster to provide a string literal instead of `std::string`.
     void
@@ -135,7 +156,7 @@ public:
     info(string_view message, const attributes_t& attributes);
 
     void
-    info_with_range(string_view message, const boost::any_range<std::pair<string_view, attribute_value_t>, boost::forward_traversal_tag>& range) {
+    info_with_range(string_view message, const range_type& range) {
         for (const auto& attribute : range) {
         }
     }
@@ -190,9 +211,6 @@ public:
     template<typename T, typename... Args>
     void
     info(string_view message, const attributes_t& attributes, const T& arg, const Args&... args) {
-        cppformat::MemoryWriter wr;
-        wr.write(message.data(), arg, args...);
-
         const auto range = this->attributes |
             boost::adaptors::transformed(+[](const std::pair<std::string, owned_attribute_value_t>& v)
                 -> std::pair<string_view, attribute_value_t>
@@ -200,6 +218,11 @@ public:
                 return std::make_pair(v.first, v.second);
             }
         );
+
+        // filter.
+
+        cppformat::MemoryWriter wr;
+        wr.write(message.data(), arg, args...);
 
         log.info_with_range({wr.data(), wr.size()}, boost::range::join(range, attributes));
     }

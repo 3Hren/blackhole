@@ -21,6 +21,21 @@ literal(::benchmark::State& state) {
 
 static
 void
+literal_reject(::benchmark::State& state) {
+    log_t log;
+    log.filter([](const record_t&) -> bool {
+        return false;
+    });
+
+    while (state.KeepRunning()) {
+        log.info("[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326");
+    }
+
+    state.SetItemsProcessed(state.iterations());
+}
+
+static
+void
 string(::benchmark::State& state) {
     log_t log;
 
@@ -39,7 +54,8 @@ literal_with_arg(::benchmark::State& state) {
 
     while (state.KeepRunning()) {
         log.info("[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET {} HTTP/1.0' 200 2326",
-            "/porn.png");
+            "/porn.png"
+        );
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -156,6 +172,7 @@ literal_with_args_and_attributes_and_wrapper(::benchmark::State& state) {
 }
 
 BENCHMARK(literal);
+BENCHMARK(literal_reject);
 BENCHMARK(string);
 BENCHMARK(literal_with_arg);
 BENCHMARK(literal_with_args);
