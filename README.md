@@ -1,11 +1,12 @@
 # Warning
-    This is pre-release for Blackhole 1.0.0. For clearness I've dropped all the code and started with empty project.
 
-    Some parts (almost all formatters and sinks) will be borrowed from v0.5 branch.
+This is pre-release for Blackhole 1.0.0. For clearness I've dropped all the code and started with empty project.
 
-    Other stuff will be rewritten completely using C++11/14 standard with minimal boost impact.
+Some parts (almost all formatters and sinks) will be borrowed from v0.5 branch.
 
-    If you want stable, but deprecated version, please switch to v0.5 branch.
+Other stuff will be rewritten completely using C++11/14 standard with minimal boost impact.
+
+If you want stable, but deprecated version, please switch to v0.5 branch.
 
 ### Planning
 
