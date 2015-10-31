@@ -15,8 +15,10 @@
 #include <cppformat/format.h>
 
 #include "blackhole/cpp17/string_view.hpp"
-#include "blackhole/sandbox.hpp"
+#include "blackhole/formatter.hpp"
 #include "blackhole/handler.hpp"
+#include "blackhole/sandbox.hpp"
+#include "blackhole/sink.hpp"
 
 namespace blackhole {
 
@@ -109,23 +111,6 @@ typedef boost::any_range<
     std::pair<string_view, attribute_value_t>,
     boost::forward_traversal_tag
 > range_type;
-
-class writer_t;
-
-class formatter_t {
-public:
-    virtual ~formatter_t();
-
-    virtual auto format(const record_t& record, writer_t& writer) -> void = 0;
-};
-
-class sink_t {
-    virtual ~sink_t();
-
-    virtual auto filter(const record_t& record) -> bool = 0;
-
-    virtual auto execute(const record_t& record, string_view formatted) -> void = 0;
-};
 
 class logger_t {
 public:
