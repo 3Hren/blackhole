@@ -19,7 +19,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 # add_library(cppformat STATIC foreign/cppformat/format)
 
 add_library(${LIBRARY_NAME} SHARED
-	src/log.cpp
+	src/logger
 )
 
 add_definitions(-std=c++14)
@@ -76,7 +76,7 @@ if (ENABLE_BENCHMARKING)
 
 	add_executable(${LIBRARY_NAME}-benchmarks
 		bench/cpp14formatter
-		bench/log
+		bench/logger
 		bench/main
 	)
 

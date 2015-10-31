@@ -2,7 +2,7 @@
 
 #include <benchmark/benchmark.h>
 
-#include <blackhole/log.hpp>
+#include <blackhole/logger.hpp>
 
 namespace blackhole {
 namespace benchmark {
@@ -10,7 +10,7 @@ namespace benchmark {
 static
 void
 literal(::benchmark::State& state) {
-    log_t log;
+    logger_t log({});
 
     while (state.KeepRunning()) {
         log.info("[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326");
@@ -22,7 +22,7 @@ literal(::benchmark::State& state) {
 static
 void
 literal_reject(::benchmark::State& state) {
-    log_t log;
+    logger_t log({});
     log.filter([](const record_t&) -> bool {
         return false;
     });
@@ -37,7 +37,7 @@ literal_reject(::benchmark::State& state) {
 static
 void
 string(::benchmark::State& state) {
-    log_t log;
+    logger_t log({});
 
     const std::string string("[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326");
     while (state.KeepRunning()) {
@@ -50,7 +50,7 @@ string(::benchmark::State& state) {
 static
 void
 literal_with_arg(::benchmark::State& state) {
-    log_t log;
+    logger_t log({});
 
     while (state.KeepRunning()) {
         log.info("[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET {} HTTP/1.0' 200 2326",
@@ -64,7 +64,7 @@ literal_with_arg(::benchmark::State& state) {
 static
 void
 literal_with_args(::benchmark::State& state) {
-    log_t log;
+    logger_t log({});
 
     while (state.KeepRunning()) {
         log.info("{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
@@ -83,7 +83,7 @@ literal_with_args(::benchmark::State& state) {
 static
 void
 cpp14_formatter_with_args(::benchmark::State& state) {
-    log_t log;
+    logger_t log({});
 
     while (state.KeepRunning()) {
         constexpr auto formatter = blackhole::detail::formatter<
@@ -106,7 +106,7 @@ cpp14_formatter_with_args(::benchmark::State& state) {
 static
 void
 literal_with_attributes(::benchmark::State& state) {
-    log_t log;
+    logger_t log({});
 
     while (state.KeepRunning()) {
         log.info("[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326", {
@@ -122,7 +122,7 @@ literal_with_attributes(::benchmark::State& state) {
 static
 void
 literal_with_args_and_attributes(::benchmark::State& state) {
-    log_t log;
+    logger_t log({});
 
     while (state.KeepRunning()) {
         log.info("{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
@@ -146,7 +146,7 @@ literal_with_args_and_attributes(::benchmark::State& state) {
 static
 void
 literal_with_args_and_attributes_and_wrapper(::benchmark::State& state) {
-    log_t log;
+    logger_t log({});
     wrapper_t wrapper{log, {
         {"key#0", owned_attribute_value_t(500)},
         {"key#1", owned_attribute_value_t("value#1")}

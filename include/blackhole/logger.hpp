@@ -16,6 +16,7 @@
 
 #include "blackhole/cpp17/string_view.hpp"
 #include "blackhole/sandbox.hpp"
+#include "blackhole/handler.hpp"
 
 namespace blackhole {
 
@@ -126,15 +127,7 @@ class sink_t {
     virtual auto execute(const record_t& record, string_view formatted) -> void = 0;
 };
 
-class handler_t {
-public:
-    auto set(std::unique_ptr<formatter_t> formatter) -> void;
-    auto add(std::unique_ptr<sink_t> sink) -> void;
-
-    auto execute(const record_t& record) -> void;
-};
-
-class log_t {
+class logger_t {
 public:
     typedef std::function<bool(const record_t&)> filter_type;
 
@@ -143,8 +136,12 @@ private:
     std::shared_ptr<inner_t> inner;
 
 public:
-    log_t();
-    ~log_t();
+    /// Creates a logger with the given handlers.
+    ///
+    /// \note you can create a logger with no handlers, it'll just drop all messages.
+    logger_t(std::vector<std::unique_ptr<handler_t>> handlers);
+
+    ~logger_t();
 
     auto filter(filter_type fn) -> void;
 
@@ -205,7 +202,7 @@ using owned_attributes_t = boost::container::small_vector<std::pair<std::string,
 
 class wrapper_t {
 public:
-    log_t& log;
+    logger_t& log;
     owned_attributes_t attributes;
 
     template<typename T, typename... Args>
