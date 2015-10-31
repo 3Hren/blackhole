@@ -121,10 +121,15 @@ private:
     std::shared_ptr<inner_t> inner;
 
 public:
-    /// Creates a logger with the given handlers.
-    ///
     /// \note you can create a logger with no handlers, it'll just drop all messages.
     logger_t(std::vector<std::unique_ptr<handler_t>> handlers);
+    logger_t(filter_type filter, std::vector<std::unique_ptr<handler_t>> handlers);
+
+    logger_t(const logger_t& other) = delete;
+    logger_t(logger_t&& other);
+
+    auto operator=(const logger_t& other) -> logger_t& = delete;
+    auto operator=(logger_t&& other) -> logger_t&;
 
     ~logger_t();
 
