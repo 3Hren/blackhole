@@ -114,7 +114,7 @@ typedef boost::any_range<
 
 class logger_t {
 public:
-    typedef std::function<bool(const record_t&)> filter_type;
+    typedef std::function<auto(const record_t&) -> bool> filter_type;
 
 private:
     struct inner_t;
