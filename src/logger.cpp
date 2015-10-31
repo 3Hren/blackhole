@@ -6,18 +6,17 @@ namespace blackhole {
 
 struct logger_t::inner_t {
     filter_type filter;
-    std::vector<std::unique_ptr<handler_t>> handlers;
+    const std::vector<std::unique_ptr<handler_t>> handlers;
 
-    inner_t():
-        filter([](const record_t&) -> bool { return true; })
+    inner_t(std::vector<std::unique_ptr<handler_t>> handlers):
+        filter([](const record_t&) -> bool { return true; }),
+        handlers(std::move(handlers))
     {}
 };
 
 logger_t::logger_t(std::vector<std::unique_ptr<handler_t>> handlers):
-    inner(std::make_shared<inner_t>())
-{
-    inner->handlers = std::move(handlers);
-}
+    inner(std::make_shared<inner_t>(std::move(handlers)))
+{}
 
 logger_t::~logger_t() {}
 
