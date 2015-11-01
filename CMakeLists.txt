@@ -35,6 +35,9 @@ target_compile_options(${LIBRARY_NAME} PRIVATE
     -Wctor-dtor-privacy
     -Wnon-virtual-dtor
     -Wunreachable-code
+	-Wuninitialized
+	-Wsometimes-uninitialized
+	-Wdocumentation
     -pedantic
     -pedantic-errors
 )

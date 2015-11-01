@@ -42,6 +42,48 @@ logger_t::filter(filter_type fn) -> void {
     // 4. Test with valgrind (write into log from N threads, reset filter from M threads)!
 }
 
+auto
+logger_t::log(int severity, string_view message) const -> void {
+    const auto inner = std::atomic_load(&this->inner);
+
+    record_t record;
+    if (inner->filter(record)) {
+        for (auto& handler : inner->handlers) {
+            handler->execute(record);
+        }
+    }
+}
+
+auto
+logger_t::log(int severity, string_view format, const format_callback& callback) const -> void {
+    const auto inner = std::atomic_load(&this->inner);
+
+    record_t record;
+    if (inner->filter(record)) {
+        cppformat::MemoryWriter wr;
+        callback(wr);
+
+        for (auto& handler : inner->handlers) {
+            handler->execute(record);
+        }
+    }
+}
+
+auto
+logger_t::log(int severity, const range_type& range, string_view format, const format_callback& callback) const -> void {
+    const auto inner = std::atomic_load(&this->inner);
+
+    record_t record;
+    if (inner->filter(record)) {
+        cppformat::MemoryWriter wr;
+        callback(wr);
+
+        for (auto& handler : inner->handlers) {
+            handler->execute(record);
+        }
+    }
+}
+
 void
 logger_t::info(string_view message) {
     const auto inner = std::atomic_load(&this->inner);

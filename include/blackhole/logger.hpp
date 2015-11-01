@@ -128,10 +128,51 @@ public:
     }
 };
 
-class logger_t {
+typedef std::function<auto(cppformat::MemoryWriter&) -> void> format_callback;
+
+// TODO: Rename to `logger_t`.
+class logger_interface_t {
 public:
+
+public:
+    virtual ~logger_interface_t() {}
+
+    /// Entry point.
+    ///
+    /// \note you must include `<blakhole/extensions/format.hpp>` manually to be able to compile
+    /// this method.
+    template<typename... Args>
+    auto log(int severity, const attributes_t& attributes, string_view format, const Args&... args) const -> void {
+        log(severity, boost::make_iterator_range(attributes.begin(), attributes.end()), format, [&](cppformat::MemoryWriter& wr) {
+            wr.write(format.data(), args...);
+        });
+    }
+
+#ifdef __cpp_constexpr
+    template<std::size_t N, typename T, typename... Args>
+    void
+    log(const detail::formatter<N>& formatter, const T& arg, const Args&... args) const {
+        // log(0, "", [&](cppformat::MemoryWriter& wr) {
+        //     formatter.format(wr, arg, args...);
+        // });
+        // Slow ^.
+
+        fmt::MemoryWriter wr;
+        formatter.format(wr, arg, args...);
+
+        log(0, {wr.data(), wr.size()});
+    }
+#endif
+
+    virtual auto log(int severity, string_view message) const -> void = 0;
+    virtual auto log(int severity, string_view format, const format_callback& callback) const -> void = 0;
+    virtual auto log(int severity, const range_type& range, string_view format, const format_callback& callback) const -> void = 0;
+//  virtual auto log(int severity, const range_t& range, string_view format, const format_t& fn) const -> void = 0;
+//  Better for reading ^.
+};
+
+class logger_t : public logger_interface_t {
     typedef std::function<auto(const record_t&) -> bool> filter_type;
-    typedef std::function<auto(writer_t&) -> void> format_callback;
 
 private:
     struct inner_t;
@@ -152,83 +193,18 @@ public:
 
     auto filter(filter_type fn) -> void;
 
-    // LOG(info, "### {}", 42, ({"#1", "v2"}, {"#2", "v2"});
-    // log("### {}", [](auto& stream) { stream << 42; }, {{"#1", "v1"}});
+    using logger_interface_t::log;
 
-    /// \note you must include `<blakhole/extensions/format.hpp>` manually to be able to compile
-    /// this method.
-    template<typename... Args>
-    auto log(int severity, const attributes_t& range, string_view format, const Args&... args) const -> void {
-        log(severity, boost::make_iterator_range(range.begin(), range.end()), format, [&](writer_t& wr) {
-            wr.write(args...);
-        });
-    }
+    auto log(int severity, string_view message) const -> void;
+    auto log(int severity, string_view format, const format_callback& callback) const -> void;
 
-    /// \note you must include `<blakhole/extensions/format.hpp>` manually to be able to compile
-    /// this method.
-    // template<typename... Args>
-    // auto log(int severity, const range_type& range, string_view format, const Args&... args) const -> void {
-    //     log(severity, range, format, [&](writer_t& wr) {
-    //         wr.write(args...);
-    //     });
-    // }
+    auto log(int severity, const range_type& range, string_view format, const format_callback& callback) const -> void override;
 
-    auto log(int severity, const range_type& range, string_view format, format_callback callback) const -> void;
-
-    // auto log(string_view message, std::function<auto(writer_t& wr) -> void>, const attributes_t& attributes) const {
-    //     record_t record; // Set message and attributes.
-    //
-    //     // if inner->filter(record) {
-    //     //     // Format.
-    //         cppformat::MemoryWriter wr;
-    //         wr.write({message.data(), message.size()});
-    //
-    //         stream<cppformat::MemoryWriter> stream{wr};
-    //
-    //     //     // Reset message.
-    //     //     // Push
-    //     // }
-    // }
-
-    // log("### {}", 42, {{"#1", "v1"}});
-    // // + Plain.
-    // // - Hard to encapsulate cppformat (nearly impossible) -> extra compile time.
-    // // - Possible excess rvalues for args or attributes.
-    //
-    // log("### {}", 42) << {{"#1", "v1"}};
-    // // - Lazy attributes - dislike.
-    //
-    // log("### {}", {{"#1", "v1"}}) << 42;
-    // // + Easy to encapsulate cppformat.
-    // // + All attributes available for filtering.
-    // // + Message args can are lazy.
-    // // - Impossible to implement, because cppformat is stateless.
-
-    // log({{"#1", "v1"}}) << format("### {}", 42);
-    // // - Dislike - no improvements comparing with previous version.
-    //
-    // log() << format("### {}", 42) << {{"#1", "v1"}};
-    // // - Dislike - need attributes.
-
-    /// \note it's faster to provide a string literal instead of `std::string`.
     void
     info(string_view message);
 
     void
     info(string_view message, const attributes_t& attributes);
-
-    void
-    info_with_range(string_view message, const range_type& range) {
-        for (const auto& attribute : range) {
-        }
-    }
-
-    // template<typename Range>
-    // void
-    // info_with_range(string_view message, const Range& range) {
-    //     for (const auto& attribute : range) {
-    //     }
-    // }
 
     template<typename T, typename... Args>
     void
@@ -248,46 +224,36 @@ public:
         info({wr.data(), wr.size()}, attributes);
     }
 
-#ifdef __cpp_constexpr
-    template<std::size_t N, typename T, typename... Args>
-    void
-    info(const detail::formatter<N>& formatter, const T& arg, const Args&... args) {
-        fmt::MemoryWriter wr;
-        formatter.format(wr, arg, args...);
-
-        info({wr.data(), wr.size()});
-    }
-#endif
-
     scoped_t
     scoped(attributes_t);
 };
 
 using owned_attributes_t = boost::container::small_vector<std::pair<std::string, owned_attribute_value_t>, 16>;
 
-// TODO: In situ wrapper (generates attributes each time instead of saving).
-class wrapper_t {
+// TODO: Add in place wrapper (generates attributes each time instead of saving).
+class wrapper_t : public logger_interface_t {
 public:
-    logger_t& log;
-    owned_attributes_t attributes;
+    logger_interface_t& inner;
+    owned_attributes_t owned;
+    attributes_t attributes;
 
-    template<typename T, typename... Args>
-    void
-    info(string_view message, const attributes_t& attributes, const T& arg, const Args&... args) {
-        const auto range = this->attributes |
-            boost::adaptors::transformed(+[](const std::pair<std::string, owned_attribute_value_t>& v)
-                -> std::pair<string_view, attribute_value_t>
-            {
-                return std::make_pair(v.first, v.second);
-            }
-        );
+    wrapper_t(logger_interface_t& log, owned_attributes_t owned_):
+        inner(log),
+        owned(std::move(owned_))
+    {
+        for (const auto& a : owned) {
+            attributes.push_back(std::make_pair(a.first, a.second));
+        }
+    }
 
-        // filter.
+    using logger_interface_t::log;
 
-        cppformat::MemoryWriter wr;
-        wr.write(message.data(), arg, args...);
+    virtual auto log(int severity, string_view message) const -> void { std::terminate(); }
+    virtual auto log(int severity, string_view format, const format_callback& callback) const -> void { std::terminate(); }
 
-        log.info_with_range({wr.data(), wr.size()}, boost::range::join(range, attributes));
+    auto log(int severity, const range_type& range, string_view format, const format_callback& callback) const -> void override {
+        const auto& r = this->attributes;
+        inner.log(severity, boost::range::join(r, attributes), format, callback);
     }
 };
 
