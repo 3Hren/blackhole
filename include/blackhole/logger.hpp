@@ -88,33 +88,50 @@ public:
 };
 
 // using attributes_t = std::vector<std::pair<string_view, attribute_value_t>>;
+// TODO: Try to encapsulate.
 using attributes_t = boost::container::small_vector<std::pair<string_view, attribute_value_t>, 16>;
-
-class record_t {
-    // struct {
-    //     string_view message;
-    // } d;
-
-public:
-    auto message() const -> string_view;
-
-    auto severity() const -> int {
-        return 0;
-    }
-
-    // std::chrono::time_point timestamp() const;
-
-    const attributes_t& attributes() const;
-};
 
 typedef boost::any_range<
     std::pair<string_view, attribute_value_t>,
     boost::forward_traversal_tag
 > range_type;
 
+class record_t {
+public:
+    typedef std::chrono::high_resolution_clock clock_type;
+    typedef clock_type::time_point time_point;
+
+private:
+    // struct {
+    //     string_view message;
+    // } d;
+
+public:
+    auto message() const -> string_view;
+    auto severity() const -> int;
+    auto timestamp() const -> time_point;
+
+    auto pid() const -> std::uint64_t;
+    auto tid() const -> std::uint64_t;
+
+    auto attributes() const -> const range_type&;
+};
+
+class writer_t {
+public:
+    string_view format;
+    cppformat::MemoryWriter& wr;
+
+    template<typename... Args>
+    auto write(const Args&... args) {
+        wr.write(format.data(), args...);
+    }
+};
+
 class logger_t {
 public:
     typedef std::function<auto(const record_t&) -> bool> filter_type;
+    typedef std::function<auto(writer_t&) -> void> format_callback;
 
 private:
     struct inner_t;
@@ -134,6 +151,64 @@ public:
     ~logger_t();
 
     auto filter(filter_type fn) -> void;
+
+    // LOG(info, "### {}", 42, ({"#1", "v2"}, {"#2", "v2"});
+    // log("### {}", [](auto& stream) { stream << 42; }, {{"#1", "v1"}});
+
+    /// \note you must include `<blakhole/extensions/format.hpp>` manually to be able to compile
+    /// this method.
+    template<typename... Args>
+    auto log(int severity, const attributes_t& range, string_view format, const Args&... args) const -> void {
+        log(severity, boost::make_iterator_range(range.begin(), range.end()), format, [&](writer_t& wr) {
+            wr.write(args...);
+        });
+    }
+
+    /// \note you must include `<blakhole/extensions/format.hpp>` manually to be able to compile
+    /// this method.
+    // template<typename... Args>
+    // auto log(int severity, const range_type& range, string_view format, const Args&... args) const -> void {
+    //     log(severity, range, format, [&](writer_t& wr) {
+    //         wr.write(args...);
+    //     });
+    // }
+
+    auto log(int severity, const range_type& range, string_view format, format_callback callback) const -> void;
+
+    // auto log(string_view message, std::function<auto(writer_t& wr) -> void>, const attributes_t& attributes) const {
+    //     record_t record; // Set message and attributes.
+    //
+    //     // if inner->filter(record) {
+    //     //     // Format.
+    //         cppformat::MemoryWriter wr;
+    //         wr.write({message.data(), message.size()});
+    //
+    //         stream<cppformat::MemoryWriter> stream{wr};
+    //
+    //     //     // Reset message.
+    //     //     // Push
+    //     // }
+    // }
+
+    // log("### {}", 42, {{"#1", "v1"}});
+    // // + Plain.
+    // // - Hard to encapsulate cppformat (nearly impossible) -> extra compile time.
+    // // - Possible excess rvalues for args or attributes.
+    //
+    // log("### {}", 42) << {{"#1", "v1"}};
+    // // - Lazy attributes - dislike.
+    //
+    // log("### {}", {{"#1", "v1"}}) << 42;
+    // // + Easy to encapsulate cppformat.
+    // // + All attributes available for filtering.
+    // // + Message args can are lazy.
+    // // - Impossible to implement, because cppformat is stateless.
+
+    // log({{"#1", "v1"}}) << format("### {}", 42);
+    // // - Dislike - no improvements comparing with previous version.
+    //
+    // log() << format("### {}", 42) << {{"#1", "v1"}};
+    // // - Dislike - need attributes.
 
     /// \note it's faster to provide a string literal instead of `std::string`.
     void
@@ -190,6 +265,7 @@ public:
 
 using owned_attributes_t = boost::container::small_vector<std::pair<std::string, owned_attribute_value_t>, 16>;
 
+// TODO: In situ wrapper (generates attributes each time instead of saving).
 class wrapper_t {
 public:
     logger_t& log;

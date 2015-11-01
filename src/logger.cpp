@@ -31,11 +31,15 @@ logger_t::~logger_t() {}
 
 auto
 logger_t::filter(filter_type fn) -> void {
+    // 1. Copy the inner ptr (using atomic load + copy ctor).
     auto inner = std::atomic_load(&this->inner);
     // TODO: Here the RC! Use RCU for function to avoid this.
+    // 2. Set new filter.
     inner->filter = std::move(fn);
 
+    // 3. Atomically reset inner ptr.
     std::atomic_store(&this->inner, std::move(inner));
+    // 4. Test with valgrind (write into log from N threads, reset filter from M threads)!
 }
 
 void
@@ -52,6 +56,7 @@ logger_t::info(string_view message) {
 
 void
 logger_t::info(string_view message, const attributes_t& attributes) {
+    // Copy the inner ptr to be alive even if swapped. Work only with it.
     const auto inner = std::atomic_load(&this->inner);
 
     record_t record;
