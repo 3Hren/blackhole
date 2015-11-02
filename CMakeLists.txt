@@ -19,6 +19,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 # add_library(cppformat STATIC foreign/cppformat/format)
 
 add_library(${LIBRARY_NAME} SHARED
+	src/attribute
 	src/logger
 )
 

@@ -63,9 +63,5 @@ struct from_owned_t: public boost::static_visitor<value_t::type> {
     }
 };
 
-value_t::value_t(const owned_t& val):
-    inner(boost::apply_visitor(from_owned_t(), val.inner))
-{}
-
 }  // namespace attribute
 }  // namespace blackhole
