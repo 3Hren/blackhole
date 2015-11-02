@@ -13,7 +13,7 @@ literal(::benchmark::State& state) {
     logger_t log({});
 
     while (state.KeepRunning()) {
-        log.info("[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326");
+        log.log(0, "[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326");
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -26,7 +26,7 @@ string(::benchmark::State& state) {
 
     const std::string string("[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326");
     while (state.KeepRunning()) {
-        log.info(string);
+        log.log(0, string);
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -41,7 +41,7 @@ literal_reject(::benchmark::State& state) {
     });
 
     while (state.KeepRunning()) {
-        log.info("[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326");
+        log.log(0, "[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326");
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -53,7 +53,7 @@ literal_with_arg(::benchmark::State& state) {
     logger_t log({});
 
     while (state.KeepRunning()) {
-        log.info("[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET {} HTTP/1.0' 200 2326",
+        log.log(0, "[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET {} HTTP/1.0' 200 2326",
             "/porn.png"
         );
     }
@@ -67,7 +67,7 @@ literal_with_args(::benchmark::State& state) {
     logger_t log({});
 
     while (state.KeepRunning()) {
-        log.info("{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
+        log.log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
             "[::]",
             "esafronov",
             "10/Oct/2000:13:55:36 -0700",
@@ -109,11 +109,11 @@ literal_with_attributes(::benchmark::State& state) {
     logger_t log({});
 
     while (state.KeepRunning()) {
-        log.info("[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326", {
+        log.log(0, {
             {"key#1", attribute_value_t(42)},
             {"key#2", attribute_value_t(3.1415)},
             {"key#3", attribute_value_t("value")}
-        });
+        }, "[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326");
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -125,12 +125,12 @@ literal_with_args_and_attributes(::benchmark::State& state) {
     logger_t log({});
 
     while (state.KeepRunning()) {
-        log.info("{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
+        log.log(0,
             {
                 {"key#1", attribute_value_t(42)},
                 {"key#2", attribute_value_t(3.1415)},
                 {"key#3", attribute_value_t("value")}
-            },
+            }, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
             "[::]",
             "esafronov",
             "10/Oct/2000:13:55:36 -0700",

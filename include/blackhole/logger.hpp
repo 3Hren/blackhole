@@ -104,6 +104,16 @@ class logger_interface_t {
 public:
     virtual ~logger_interface_t() {}
 
+    template<typename T, typename... Args>
+    auto log(int severity, string_view format, const T& arg, const Args&... args) const -> void {
+        const auto callback = [&](cppformat::MemoryWriter& wr) {
+            wr.write(format.data(), arg, args...);
+        };
+
+        std::vector<std::pair<string_view, attribute_value_t>> attributes;
+        log(severity, boost::make_iterator_range(attributes), format, std::cref(callback));
+    }
+
     /// Entry point.
     ///
     /// \note you must include `<blakhole/extensions/format.hpp>` manually to be able to compile
@@ -124,14 +134,16 @@ public:
             formatter.format(wr, arg, args...);
         };
 
-        log(0, "", std::cref(callback));
+        log(0, "", format_callback(std::cref(callback)));
     }
 #endif
 
     virtual auto log(int severity, string_view message) const -> void = 0;
     virtual auto log(int severity, string_view format, const format_callback& callback) const -> void = 0;
     virtual auto log(int severity, const range_type& range, string_view format, const format_callback& callback) const -> void = 0;
-//  virtual auto log(int severity, const range_t& range, string_view format, const format_t& fn) const -> void = 0;
+//  virtual
+//  auto
+//  log(int severity, const range_t& range, string_view format, const format_t& fn) const -> void = 0;
 //  Better for reading ^.
 };
 
@@ -163,30 +175,6 @@ public:
     auto log(int severity, string_view format, const format_callback& callback) const -> void;
 
     auto log(int severity, const range_type& range, string_view format, const format_callback& callback) const -> void;
-
-    void
-    info(string_view message);
-
-    void
-    info(string_view message, const attributes_t& attributes);
-
-    template<typename T, typename... Args>
-    void
-    info(string_view message, const T& arg, const Args&... args) {
-        cppformat::MemoryWriter wr;
-        wr.write(message.data(), arg, args...);
-
-        info({wr.data(), wr.size()});
-    }
-
-    template<typename T, typename... Args>
-    void
-    info(string_view message, const attributes_t& attributes, const T& arg, const Args&... args) {
-        cppformat::MemoryWriter wr;
-        wr.write(message.data(), arg, args...);
-
-        info({wr.data(), wr.size()}, attributes);
-    }
 
     scoped_t
     scoped(attributes_t);

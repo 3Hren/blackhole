@@ -84,27 +84,4 @@ logger_t::log(int severity, const range_type& range, string_view format, const f
     }
 }
 
-void
-logger_t::info(string_view message) {
-    const auto inner = std::atomic_load(&this->inner);
-
-    record_t record;
-    if (inner->filter(record)) {
-        for (auto& handler : inner->handlers) {
-            handler->execute(record);
-        }
-    }
-}
-
-void
-logger_t::info(string_view message, const attributes_t& attributes) {
-    // Copy the inner ptr to be alive even if swapped. Work only with it.
-    const auto inner = std::atomic_load(&this->inner);
-
-    record_t record;
-    for (auto& handler : inner->handlers) {
-        handler->execute(record);
-    }
-}
-
 }  // namespace blackhole
