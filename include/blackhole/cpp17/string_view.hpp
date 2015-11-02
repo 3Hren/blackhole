@@ -1,13 +1,18 @@
 #pragma once
 
-#include <cstddef>
-#include <string>
+#include <iosfwd>
+#include <limits>
 
 namespace blackhole {
 namespace cpp17 {
 
 class string_view {
+public:
+    static constexpr std::size_t npos = std::numeric_limits<std::size_t>::max();
+
+private:
     const char* data_;
+    /// Size without \0.
     std::size_t size_;
 
 public:
@@ -38,15 +43,44 @@ public:
     string_view(const string_view& other) = default;
 
     constexpr
-    const char*
-    data() const noexcept {
+    auto data() const noexcept -> const char* {
         return data_;
     }
 
     constexpr
-    std::size_t
-    size() const noexcept {
+    auto size() const noexcept -> std::size_t {
         return size_;
+    }
+
+    constexpr
+    auto operator[](std::size_t id) const -> char {
+        if (id < size()) {
+            return data_[id];
+        }
+
+        throw std::out_of_range("out of range");
+    }
+
+    /// Creates a `std::string` with a copy of the content of the current view.
+    auto to_string() const -> std::string {
+        return {data(), size()};
+    }
+
+    /// Returns a view of the substring [pos, pos + rcount), where rcount is the smaller of count
+    /// and `size() - pos`.
+    constexpr
+    auto substr(std::size_t pos = 0, std::size_t count = npos) const -> string_view {
+        if (pos > size()) {
+            throw std::out_of_range("out of range");
+        }
+
+        return string_view(data() + pos, std::min(count, size() - pos));
+    }
+
+    friend
+    std::ostream&
+    operator<<(std::ostream& stream, const string_view& value) {
+        return stream.write(value.data(), static_cast<std::streamsize>(value.size()));
     }
 };
 

@@ -5,17 +5,16 @@
 #include <string>
 
 #include "blackhole/cpp17/optional.hpp"
-
-#include "blackhole/detail/string.hpp"
+#include "blackhole/cpp17/string_view.hpp"
 
 #define FMT_HEADER_ONLY
 #include <cppformat/format.h>
 
-using blackhole::detail::constexpr_string;
+using blackhole::cpp17::string_view;
 
 constexpr
 std::size_t
-parse_argument(const constexpr_string& string, std::size_t& pos) {
+parse_argument(const string_view& string, std::size_t& pos) {
     char c = string[pos];
     if (c == '}') {
         return 2;
@@ -31,7 +30,7 @@ namespace cppformat = fmt;
 /// Returns the number of literals which will be produced by formatter internally.
 constexpr
 std::size_t
-literal_count(const constexpr_string& format) {
+literal_count(const string_view& format) {
     // Always has at least one literal.
     std::size_t result = 1;
 
@@ -92,7 +91,7 @@ literal_count(const constexpr_string& format) {
 
 }}} // namespace blackhole::v2::detail
 
-constexpr std::size_t count_placeholders(const constexpr_string& string) {
+constexpr std::size_t count_placeholders(const string_view& string) {
     std::size_t counter = 0;
 
     std::size_t i = 0;
@@ -139,7 +138,7 @@ constexpr std::size_t count_placeholders(const constexpr_string& string) {
     return counter;
 }
 
-constexpr std::size_t count_literals(const constexpr_string& string) {
+constexpr std::size_t count_literals(const string_view& string) {
     std::size_t counter = 0;
     int state = 0;
     std::size_t i = 0;
@@ -194,11 +193,11 @@ constexpr std::size_t count_literals(const constexpr_string& string) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 struct literal_t {
-    constexpr_string data;
+    string_view data;
     bool placeholder_next;
 
     constexpr
-    literal_t(constexpr_string data, bool placeholder_next):
+    literal_t(string_view data, bool placeholder_next):
         data(data),
         placeholder_next(placeholder_next)
     {}
@@ -212,7 +211,7 @@ struct literal_t {
 
 constexpr
 literal_t
-next_literal(const constexpr_string& string) {
+next_literal(const string_view& string) {
     size_t pos = 0;
 
     while (pos < string.size()) {
@@ -272,7 +271,7 @@ struct formatter {
 
 public:
     constexpr
-    formatter(const constexpr_string& format) :
+    formatter(const string_view& format) :
         literal(::next_literal(format)),
         // NOTE: 2 == placeholder.width.
         next(format.substr(literal.placeholder_next ? literal.data.size() + 2 : literal.data.size() + 1))
@@ -282,7 +281,7 @@ public:
     constexpr
     void
     format(fmt::MemoryWriter& writer, const T& arg, const Args&... args) const {
-        writer << fmt::StringRef(literal.data, literal.data.size());
+        writer << fmt::StringRef(literal.data.data(), literal.data.size());
 
         if (literal.placeholder_next) {
             format_traits<T>::format(writer, arg);
@@ -311,7 +310,7 @@ struct formatter<1> {
 
 public:
     constexpr
-    formatter(const constexpr_string& format) :
+    formatter(const string_view& format) :
         literal({format, false})
     {}
 
@@ -321,7 +320,7 @@ public:
     constexpr
     void
     format(fmt::MemoryWriter& writer, const Args&...) const {
-        writer << fmt::StringRef(literal.data, literal.data.size());
+        writer << fmt::StringRef(literal.data.data(), literal.data.size());
     }
 
     template<class Stream>
