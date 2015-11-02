@@ -18,6 +18,7 @@
 #include "blackhole/formatter.hpp"
 #include "blackhole/handler.hpp"
 #include "blackhole/sandbox.hpp"
+#include "blackhole/record.hpp"
 #include "blackhole/sink.hpp"
 
 namespace blackhole {
@@ -95,38 +96,6 @@ typedef boost::any_range<
     std::pair<string_view, attribute_value_t>,
     boost::forward_traversal_tag
 > range_type;
-
-class record_t {
-public:
-    typedef std::chrono::high_resolution_clock clock_type;
-    typedef clock_type::time_point time_point;
-
-private:
-    // struct {
-    //     string_view message;
-    // } d;
-
-public:
-    auto message() const -> string_view;
-    auto severity() const -> int;
-    auto timestamp() const -> time_point;
-
-    auto pid() const -> std::uint64_t;
-    auto tid() const -> std::uint64_t;
-
-    auto attributes() const -> const range_type&;
-};
-
-class writer_t {
-public:
-    string_view format;
-    cppformat::MemoryWriter& wr;
-
-    template<typename... Args>
-    auto write(const Args&... args) {
-        wr.write(format.data(), args...);
-    }
-};
 
 typedef std::function<auto(cppformat::MemoryWriter&) -> void> format_callback;
 
