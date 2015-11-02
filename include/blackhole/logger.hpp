@@ -167,7 +167,7 @@ public:
     auto log(int severity, string_view message) const -> void;
     auto log(int severity, string_view format, const format_callback& callback) const -> void;
 
-    auto log(int severity, const range_type& range, string_view format, const format_callback& callback) const -> void override;
+    auto log(int severity, const range_type& range, string_view format, const format_callback& callback) const -> void;
 
     void
     info(string_view message);
