@@ -217,10 +217,10 @@ public:
 
     using logger_interface_t::log;
 
-    virtual auto log(int severity, string_view message) const -> void { std::terminate(); }
-    virtual auto log(int severity, string_view format, const format_callback& callback) const -> void { std::terminate(); }
+    auto log(int severity, string_view message) const -> void { std::terminate(); }
+    auto log(int severity, string_view format, const format_callback& callback) const -> void { std::terminate(); }
 
-    auto log(int severity, const range_type& range, string_view format, const format_callback& callback) const -> void override {
+    auto log(int severity, const range_type& range, string_view format, const format_callback& callback) const -> void {
         const auto& r = this->attributes;
         inner.log(severity, boost::range::join(r, attributes), format, callback);
     }
