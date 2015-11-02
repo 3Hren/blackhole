@@ -13,6 +13,7 @@ namespace blackhole {
 namespace attribute {
 
 struct owned_t;
+
 struct value_t {
     typedef boost::variant<
         std::int64_t,
@@ -20,6 +21,7 @@ struct value_t {
         string_view
     > type;
 
+    /// Underlying type.
     type inner;
 
     value_t(int val): inner(static_cast<std::int64_t>(val)) {}
@@ -46,6 +48,7 @@ struct owned_t {
         >::type
     >::type type;
 
+    /// Underlying type.
     type inner;
 
     owned_t(int val): inner(static_cast<std::int64_t>(val)) {}
