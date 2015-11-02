@@ -5,7 +5,7 @@
 namespace blackhole {
 
 struct logger_t::inner_t {
-    filter_type filter;
+    filter_t filter;
     const std::vector<std::unique_ptr<handler_t>> handlers;
 
     inner_t(std::vector<std::unique_ptr<handler_t>> handlers):
@@ -13,7 +13,7 @@ struct logger_t::inner_t {
         handlers(std::move(handlers))
     {}
 
-    inner_t(filter_type filter, std::vector<std::unique_ptr<handler_t>> handlers):
+    inner_t(filter_t filter, std::vector<std::unique_ptr<handler_t>> handlers):
         filter(std::move(filter)),
         handlers(std::move(handlers))
     {}
@@ -23,14 +23,14 @@ logger_t::logger_t(std::vector<std::unique_ptr<handler_t>> handlers):
     inner(std::make_shared<inner_t>(std::move(handlers)))
 {}
 
-logger_t::logger_t(filter_type filter, std::vector<std::unique_ptr<handler_t>> handlers):
+logger_t::logger_t(filter_t filter, std::vector<std::unique_ptr<handler_t>> handlers):
     inner(std::make_shared<inner_t>(std::move(filter), std::move(handlers)))
 {}
 
 logger_t::~logger_t() {}
 
 auto
-logger_t::filter(filter_type fn) -> void {
+logger_t::filter(filter_t fn) -> void {
     // 1. Copy the inner ptr (using atomic load + copy ctor).
     auto inner = std::atomic_load(&this->inner);
     // TODO: Here the RC! Use RCU for function to avoid this.

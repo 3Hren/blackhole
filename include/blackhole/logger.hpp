@@ -148,7 +148,7 @@ public:
 };
 
 class logger_t : public logger_interface_t {
-    typedef std::function<auto(const record_t&) -> bool> filter_type;
+    typedef std::function<auto(const record_t&) -> bool> filter_t;
 
 private:
     struct inner_t;
@@ -157,7 +157,7 @@ private:
 public:
     /// \note you can create a logger with no handlers, it'll just drop all messages.
     logger_t(std::vector<std::unique_ptr<handler_t>> handlers);
-    logger_t(filter_type filter, std::vector<std::unique_ptr<handler_t>> handlers);
+    logger_t(filter_t filter, std::vector<std::unique_ptr<handler_t>> handlers);
 
     logger_t(const logger_t& other) = delete;
     logger_t(logger_t&& other);
@@ -167,7 +167,7 @@ public:
     auto operator=(const logger_t& other) -> logger_t& = delete;
     auto operator=(logger_t&& other) -> logger_t&;
 
-    auto filter(filter_type fn) -> void;
+    auto filter(filter_t fn) -> void;
 
     using logger_interface_t::log;
 
