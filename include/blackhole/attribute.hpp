@@ -61,6 +61,10 @@ struct from_owned_t: public boost::static_visitor<value_t::type> {
     auto operator()(const T& val) const -> value_t::type {
         return val;
     }
+
+    auto operator()(const std::string& val) const -> value_t::type {
+        return string_view(val.data(), val.size());
+    }
 };
 
 }  // namespace attribute

@@ -44,6 +44,8 @@ logger_t::filter(filter_t fn) -> void {
 
 auto
 logger_t::log(int severity, string_view message) const -> void {
+    (void)severity;
+    (void)message;
     const auto inner = std::atomic_load(&this->inner);
 
     record_t record;
@@ -55,7 +57,9 @@ logger_t::log(int severity, string_view message) const -> void {
 }
 
 auto
-logger_t::log(int severity, string_view format, const format_callback& callback) const -> void {
+logger_t::_log(int severity, string_view format, const format_callback& callback) const -> void {
+    (void)severity;
+    (void)format;
     const auto inner = std::atomic_load(&this->inner);
 
     record_t record;
@@ -70,8 +74,18 @@ logger_t::log(int severity, string_view format, const format_callback& callback)
 }
 
 auto
-logger_t::log(int severity, const range_type& range, string_view format, const format_callback& callback) const -> void {
+logger_t::_log(int severity, string_view format, const format_callback& callback,  range_type& range) const -> void {
+    (void)severity;
+    (void)format;
+    (void)range;
+    // std::cout << 3 << std::endl;
     const auto inner = std::atomic_load(&this->inner);
+
+    for (const auto& c : range) {
+        for (const auto& r : c.get()) {
+            std::cout << "\"" << r.first << "\"" << " => " << r.second.inner << std::endl;
+        }
+    }
 
     record_t record;
     if (inner->filter(record)) {

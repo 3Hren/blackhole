@@ -93,7 +93,7 @@ literal_with_args_using_cpp14_formatter(::benchmark::State& state) {
             blackhole::detail::literal_count("{} - {} [{}] 'GET {} HTTP/1.0' {} {}")
         >("{} - {} [{}] 'GET {} HTTP/1.0' {} {}");
 
-        log.log(formatter,
+        log.log(0, formatter,
             "[::]",
             "esafronov",
             "10/Oct/2000:13:55:36 -0700",

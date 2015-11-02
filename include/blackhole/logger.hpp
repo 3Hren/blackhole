@@ -3,13 +3,14 @@
 #include <string>
 #include <vector>
 
-#include <boost/container/small_vector.hpp>
-#include <boost/range/adaptor/transformed.hpp>
-#include <boost/range/any_range.hpp>
-#include <boost/range/join.hpp>
-#include <boost/variant/variant.hpp>
-#include <boost/variant/apply_visitor.hpp>
-#include <boost/variant/static_visitor.hpp>
+#ifdef __has_include
+#  if __has_include(<boost/container/small_vector.hpp>)
+#    include <boost/container/small_vector.hpp>
+#    define BLACKHOLE_HAVE_SMALL_VECTOR 1
+#  else
+#    define BLACKHOLE_HAVE_SMALL_VECTOR 0
+#  endif
+#endif
 
 #define FMT_HEADER_ONLY
 #include <cppformat/format.h>
@@ -30,14 +31,17 @@ using cpp17::string_view;
 
 class scoped_t {};
 
-// using attributes_t = std::vector<std::pair<string_view, attribute_value_t>>;
 // TODO: Try to encapsulate.
-using attributes_t = boost::container::small_vector<std::pair<string_view, attribute::value_t>, 16>;
+#ifdef BLACKHOLE_HAVE_SMALL_VECTOR
+typedef boost::container::small_vector<std::pair<string_view, attribute::value_t>, 16> attributes_t;
+typedef boost::container::small_vector<std::pair<std::string, attribute::owned_t>, 16> attributes_w_t;
+#else
+typedef std::vector<std::pair<string_view, attribute::value_t>> attributes_t;
+typedef std::vector<std::pair<std::string, attribute::owned_t>> attributes_w_t;
+#error sorry, small vector optimization is not supported
+#endif
 
-typedef boost::any_range<
-    std::pair<string_view, attribute::value_t>,
-    boost::forward_traversal_tag
-> range_type;
+typedef boost::container::small_vector<std::reference_wrapper<const attributes_t>, 16> range_type;
 
 typedef std::function<auto(cppformat::MemoryWriter&) -> void> format_callback;
 
@@ -48,12 +52,12 @@ public:
 
     template<typename T, typename... Args>
     auto log(int severity, string_view format, const T& arg, const Args&... args) const -> void {
-        const std::vector<std::pair<string_view, attribute::value_t>> attributes;
         const auto callback = [&](cppformat::MemoryWriter& wr) {
             wr.write(format.data(), arg, args...);
         };
 
-        log(severity, boost::make_iterator_range(attributes), format, std::cref(callback));
+        range_type range;
+        _log(severity, format, std::cref(callback), range);
     }
 
     /// Entry point.
@@ -66,27 +70,26 @@ public:
             wr.write(format.data(), args...);
         };
 
-        log(severity, boost::make_iterator_range(attributes), format, std::cref(callback));
+        range_type range;
+        range.push_back(std::cref(attributes));
+        _log(severity, format, std::cref(callback), range);
     }
 
 #ifdef __cpp_constexpr
     template<std::size_t N, typename T, typename... Args>
-    auto log(const detail::formatter<N>& formatter, const T& arg, const Args&... args) const -> void {
+    auto log(int severity, const detail::formatter<N>& formatter, const T& arg, const Args&... args) const -> void {
         const auto callback = [&](cppformat::MemoryWriter& wr) {
             formatter.format(wr, arg, args...);
         };
 
-        log(0, "", format_callback(std::cref(callback)));
+        _log(severity, "", format_callback(std::cref(callback)));
     }
 #endif
 
-    virtual auto log(int severity, string_view message) const -> void = 0;
-    virtual auto log(int severity, string_view format, const format_callback& callback) const -> void = 0;
-    virtual auto log(int severity, const range_type& range, string_view format, const format_callback& callback) const -> void = 0;
-//  virtual
-//  auto
-//  log(int severity, const range_t& range, string_view format, const format_t& fn) const -> void = 0;
-//  Better for reading ^.
+    virtual auto log(int severity, string_view format) const -> void = 0;
+
+    virtual auto _log(int severity, string_view format, const format_callback& callback) const -> void = 0;
+    virtual auto _log(int severity, string_view format, const format_callback& callback, range_type& range) const -> void = 0;
 };
 
 class logger_t : public logger_interface_t {
@@ -113,40 +116,49 @@ public:
 
     using logger_interface_t::log;
 
-    auto log(int severity, string_view message) const -> void;
-    auto log(int severity, string_view format, const format_callback& callback) const -> void;
-    auto log(int severity, const range_type& range, string_view format, const format_callback& callback) const -> void;
+    auto log(int severity, string_view format) const -> void;
+
+    auto _log(int severity, string_view format, const format_callback& callback) const -> void;
+    auto _log(int severity, string_view format, const format_callback& callback, range_type& range) const -> void;
 
     scoped_t
     scoped(attributes_t);
 };
 
-using owned_attributes_t = boost::container::small_vector<std::pair<std::string, attribute::owned_t>, 16>;
-
 // TODO: Add in place wrapper (generates attributes each time instead of saving).
 class wrapper_t : public logger_interface_t {
 public:
     logger_interface_t& inner;
-    owned_attributes_t owned;
     attributes_t attributes;
+    attributes_w_t owned;
 
-    wrapper_t(logger_interface_t& log, owned_attributes_t owned_):
+    wrapper_t(logger_interface_t& log, attributes_w_t owned_):
         inner(log),
         owned(std::move(owned_))
     {
         for (const auto& a : owned) {
-            attributes.push_back(std::make_pair(a.first, a.second));
+            attributes.push_back(std::make_pair(string_view(a.first.data(), a.first.size()), a.second));
         }
     }
 
     using logger_interface_t::log;
 
-    auto log(int severity, string_view message) const -> void { std::terminate(); }
-    auto log(int severity, string_view format, const format_callback& callback) const -> void { std::terminate(); }
+    auto log(int severity, string_view message) const -> void {
+        (void)severity;
+        (void)message;
+        std::terminate();
+    }
 
-    auto log(int severity, const range_type& range, string_view format, const format_callback& callback) const -> void {
-        const auto& r = this->attributes;
-        inner.log(severity, boost::range::join(r, attributes), format, callback);
+    auto _log(int severity, string_view format, const format_callback& callback) const -> void {
+        (void)severity;
+        (void)format;
+        (void)callback;
+        std::terminate();
+    }
+
+    auto _log(int severity, string_view format, const format_callback& callback, range_type& range) const -> void {
+        range.push_back(attributes);
+        inner._log(severity, format, callback, range);
     }
 };
 
