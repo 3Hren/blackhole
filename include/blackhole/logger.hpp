@@ -14,6 +14,7 @@
 #define FMT_HEADER_ONLY
 #include <cppformat/format.h>
 
+#include "blackhole/attribute.hpp"
 #include "blackhole/cpp17/string_view.hpp"
 #include "blackhole/formatter.hpp"
 #include "blackhole/handler.hpp"
@@ -29,71 +30,12 @@ using cpp17::string_view;
 
 class scoped_t {};
 
-using inner1_t = boost::variant<
-    std::int64_t,
-    double,
-    string_view
->;
-
-// mpl::transform + into_owned.
-using inner2_t = boost::variant<
-    std::int64_t,
-    double,
-    std::string
->;
-
-class owned_attribute_value_t {
-public:
-    inner2_t inner;
-
-    owned_attribute_value_t(int v):
-        inner(static_cast<std::int64_t>(v))
-    {}
-
-    owned_attribute_value_t(double v):
-        inner(v)
-    {}
-
-    owned_attribute_value_t(std::string v):
-        inner(std::move(v))
-    {}
-};
-
-struct from_owned_t : public boost::static_visitor<inner1_t> {
-    template<typename T>
-    inner1_t
-    operator()(const T& v) const {
-        return v;
-    }
-};
-
-class attribute_value_t {
-public:
-    inner1_t inner;
-
-    attribute_value_t(int v):
-        inner(static_cast<std::int64_t>(v))
-    {}
-
-    attribute_value_t(double v):
-        inner(v)
-    {}
-
-    attribute_value_t(string_view v):
-        inner(v)
-    {}
-
-    attribute_value_t(const owned_attribute_value_t& v):
-        inner(boost::apply_visitor(from_owned_t(), v.inner))
-    {}
-};
-
 // using attributes_t = std::vector<std::pair<string_view, attribute_value_t>>;
 // TODO: Try to encapsulate.
-using attributes_t = boost::container::small_vector<std::pair<string_view, attribute_value_t>, 16>;
+using attributes_t = boost::container::small_vector<std::pair<string_view, attribute::value_t>, 16>;
 
 typedef boost::any_range<
-    std::pair<string_view, attribute_value_t>,
+    std::pair<string_view, attribute::value_t>,
     boost::forward_traversal_tag
 > range_type;
 
@@ -106,11 +48,11 @@ public:
 
     template<typename T, typename... Args>
     auto log(int severity, string_view format, const T& arg, const Args&... args) const -> void {
+        const std::vector<std::pair<string_view, attribute::value_t>> attributes;
         const auto callback = [&](cppformat::MemoryWriter& wr) {
             wr.write(format.data(), arg, args...);
         };
 
-        std::vector<std::pair<string_view, attribute_value_t>> attributes;
         log(severity, boost::make_iterator_range(attributes), format, std::cref(callback));
     }
 
@@ -179,7 +121,7 @@ public:
     scoped(attributes_t);
 };
 
-using owned_attributes_t = boost::container::small_vector<std::pair<std::string, owned_attribute_value_t>, 16>;
+using owned_attributes_t = boost::container::small_vector<std::pair<std::string, attribute::owned_t>, 16>;
 
 // TODO: Add in place wrapper (generates attributes each time instead of saving).
 class wrapper_t : public logger_interface_t {

@@ -7,6 +7,9 @@
 namespace blackhole {
 namespace benchmark {
 
+using attribute::value_t;
+using attribute::owned_t;
+
 static
 void
 literal(::benchmark::State& state) {
@@ -110,9 +113,9 @@ literal_with_attributes(::benchmark::State& state) {
 
     while (state.KeepRunning()) {
         log.log(0, {
-            {"key#1", attribute_value_t(42)},
-            {"key#2", attribute_value_t(3.1415)},
-            {"key#3", attribute_value_t("value")}
+            {"key#1", value_t(42)},
+            {"key#2", value_t(3.1415)},
+            {"key#3", value_t("value")}
         }, "[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326");
     }
 
@@ -127,9 +130,9 @@ literal_with_args_and_attributes(::benchmark::State& state) {
     while (state.KeepRunning()) {
         log.log(0,
             {
-                {"key#1", attribute_value_t(42)},
-                {"key#2", attribute_value_t(3.1415)},
-                {"key#3", attribute_value_t("value")}
+                {"key#1", value_t(42)},
+                {"key#2", value_t(3.1415)},
+                {"key#3", value_t("value")}
             }, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
             "[::]",
             "esafronov",
@@ -148,16 +151,16 @@ void
 literal_with_args_and_attributes_and_wrapper(::benchmark::State& state) {
     logger_t log({});
     wrapper_t wrapper{log, {
-        {"key#0", owned_attribute_value_t(500)},
-        {"key#1", owned_attribute_value_t("value#1")}
+        {"key#0", owned_t(500)},
+        {"key#1", owned_t("value#1")}
     }};
 
     while (state.KeepRunning()) {
         wrapper.log(0,
             {
-                {"key#1", attribute_value_t(42)},
-                {"key#2", attribute_value_t(3.1415)},
-                {"key#3", attribute_value_t("value")}
+                {"key#1", value_t(42)},
+                {"key#2", value_t(3.1415)},
+                {"key#3", value_t("value")}
             }, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
             "[::]",
             "esafronov",
@@ -177,21 +180,21 @@ literal_with_args_and_attributes_and_two_wrappers(::benchmark::State& state) {
     logger_t log({});
 
     wrapper_t wrapper1{log, {
-        {"key#0", owned_attribute_value_t(500)},
-        {"key#1", owned_attribute_value_t("value#1")}
+        {"key#0", owned_t(500)},
+        {"key#1", owned_t("value#1")}
     }};
 
     wrapper_t wrapper2{wrapper1, {
-        {"key#3", owned_attribute_value_t(500)},
-        {"key#4", owned_attribute_value_t("value#1")}
+        {"key#3", owned_t(500)},
+        {"key#4", owned_t("value#1")}
     }};
 
     while (state.KeepRunning()) {
         wrapper2.log(0,
             {
-                {"key#1", attribute_value_t(42)},
-                {"key#2", attribute_value_t(3.1415)},
-                {"key#3", attribute_value_t("value")}
+                {"key#1", value_t(42)},
+                {"key#2", value_t(3.1415)},
+                {"key#3", value_t("value")}
             }, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
             "[::]",
             "esafronov",

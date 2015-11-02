@@ -51,4 +51,7 @@ public:
 };
 
 }  // namespace cpp17
+
+using cpp17::string_view;
+
 }  // namespace blackhole
