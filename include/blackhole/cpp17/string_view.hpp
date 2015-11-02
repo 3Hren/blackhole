@@ -2,6 +2,7 @@
 
 #include <iosfwd>
 #include <limits>
+#include <stdexcept>
 
 namespace blackhole {
 namespace cpp17 {
