@@ -185,8 +185,8 @@ literal_with_args_and_attributes_and_two_wrappers(::benchmark::State& state) {
     }};
 
     wrapper_t wrapper2{wrapper1, {
-        {"key#3", owned_t(500)},
-        {"key#4", owned_t("value#1")}
+        {"key#2", owned_t(500)},
+        {"key#3", owned_t("value#3")}
     }};
 
     while (state.KeepRunning()) {
@@ -195,6 +195,45 @@ literal_with_args_and_attributes_and_two_wrappers(::benchmark::State& state) {
                 {"key#1", value_t(42)},
                 {"key#2", value_t(3.1415)},
                 {"key#3", value_t("value")}
+            }, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
+            "[::]",
+            "esafronov",
+            "10/Oct/2000:13:55:36 -0700",
+            "/porn.png",
+            200,
+            2326
+        );
+    }
+
+    state.SetItemsProcessed(state.iterations());
+}
+
+static
+void
+literal_with_args_and_attributes_and_three_wrappers(::benchmark::State& state) {
+    logger_t log({});
+
+    wrapper_t wrapper1{log, {
+        {"key#0", owned_t(500)},
+        {"key#1", owned_t("value#1")}
+    }};
+
+    wrapper_t wrapper2{wrapper1, {
+        {"key#2", owned_t(500)},
+        {"key#3", owned_t("value#1")}
+    }};
+
+    wrapper_t wrapper3{wrapper2, {
+        {"key#4", owned_t(500)},
+        {"key#5", owned_t("value#5")}
+    }};
+
+    while (state.KeepRunning()) {
+        wrapper3.log(0,
+            {
+                {"key#6", value_t(42)},
+                {"key#7", value_t(3.1415)},
+                {"key#8", value_t("value")}
             }, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
             "[::]",
             "esafronov",
@@ -220,6 +259,7 @@ BENCHMARK(literal_with_args_and_attributes);
 
 BENCHMARK(literal_with_args_and_attributes_and_wrapper);
 BENCHMARK(literal_with_args_and_attributes_and_two_wrappers);
+BENCHMARK(literal_with_args_and_attributes_and_three_wrappers);
 
 }  // namespace benchmark
 }  // namespace blackhole
