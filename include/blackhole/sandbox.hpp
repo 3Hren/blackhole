@@ -11,8 +11,6 @@
 #define FMT_HEADER_ONLY
 #include <cppformat/format.h>
 
-using namespace blackhole;
-
 using blackhole::detail::constexpr_string;
 
 constexpr
