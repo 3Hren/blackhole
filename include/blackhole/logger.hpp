@@ -112,24 +112,22 @@ public:
     /// this method.
     template<typename... Args>
     auto log(int severity, const attributes_t& attributes, string_view format, const Args&... args) const -> void {
-        log(severity, boost::make_iterator_range(attributes.begin(), attributes.end()), format, [&](cppformat::MemoryWriter& wr) {
+        const auto callback = [&](cppformat::MemoryWriter& wr) {
             wr.write(format.data(), args...);
-        });
+        };
+
+        log(severity, boost::make_iterator_range(attributes.begin(), attributes.end()), format, std::cref(callback));
     }
 
 #ifdef __cpp_constexpr
     template<std::size_t N, typename T, typename... Args>
     void
     log(const detail::formatter<N>& formatter, const T& arg, const Args&... args) const {
-        // log(0, "", [&](cppformat::MemoryWriter& wr) {
-        //     formatter.format(wr, arg, args...);
-        // });
-        // Slow ^.
+        const auto callback = [&](cppformat::MemoryWriter& wr) {
+            formatter.format(wr, arg, args...);
+        };
 
-        fmt::MemoryWriter wr;
-        formatter.format(wr, arg, args...);
-
-        log(0, {wr.data(), wr.size()});
+        log(0, "", std::cref(callback));
     }
 #endif
 
