@@ -162,10 +162,10 @@ public:
     logger_t(const logger_t& other) = delete;
     logger_t(logger_t&& other);
 
+    ~logger_t();
+
     auto operator=(const logger_t& other) -> logger_t& = delete;
     auto operator=(logger_t&& other) -> logger_t&;
-
-    ~logger_t();
 
     auto filter(filter_type fn) -> void;
 
@@ -173,7 +173,6 @@ public:
 
     auto log(int severity, string_view message) const -> void;
     auto log(int severity, string_view format, const format_callback& callback) const -> void;
-
     auto log(int severity, const range_type& range, string_view format, const format_callback& callback) const -> void;
 
     scoped_t
