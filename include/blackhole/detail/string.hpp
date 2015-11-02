@@ -1,12 +1,13 @@
 #pragma once
 
 #include <iosfwd>
+#include <limits>
 
 namespace blackhole { inline namespace v2 { namespace detail {
 
 class constexpr_string {
 public:
-    static constexpr std::size_t npos = -1;
+    static constexpr std::size_t npos = std::numeric_limits<std::size_t>::max();
 
 private:
     const char* data_;
@@ -61,7 +62,7 @@ public:
     friend
     std::ostream&
     operator<<(std::ostream& stream, const constexpr_string& value) {
-        return stream.write(value.data_, value.size_);
+        return stream.write(value.data_, static_cast<std::streamsize>(value.size_));
     }
 
 private:
