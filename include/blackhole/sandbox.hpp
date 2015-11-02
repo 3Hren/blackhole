@@ -335,10 +335,3 @@ public:
 };
 
 }}} // namespace blackhole::v2::detail
-
-#define BLACKHOLE_LOG_CE(__format__) \
-    do { \
-        if (auto record = true) { \
-            constexpr auto formatter = blackhole::detail::formatter<blackhole::detail::literal_count(__format__)>(__format__); \
-        } \
-    } while (0)
