@@ -90,7 +90,7 @@ public:
 template<class Char, class Traits>
 std::basic_ostream<Char, Traits>&
 operator<<(std::basic_ostream<Char, Traits>& stream, const basic_string_view<Char, Traits>& value) {
-    return stream.write(value.data(), static_cast<std::streamsize>(value.size()));
+    return stream << value.to_string();
 }
 
 typedef basic_string_view<char> string_view;
