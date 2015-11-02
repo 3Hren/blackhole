@@ -71,8 +71,8 @@ public:
 
     /// Creates a `std::string` with a copy of the content of the current view.
     template<class Allocator = std::allocator<Char>>
-    auto to_string(const Allocator& a = Allocator()) const -> std::basic_string<Char, Traits, Allocator> {
-        return {data(), size()};
+    auto to_string(const Allocator& alloc = Allocator()) const -> std::basic_string<Char, Traits, Allocator> {
+        return {data(), size(), alloc};
     }
 
     /// Returns a view of the substring [pos, pos + rcount), where rcount is the smaller of count
