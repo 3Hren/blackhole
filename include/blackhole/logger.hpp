@@ -102,8 +102,6 @@ typedef std::function<auto(cppformat::MemoryWriter&) -> void> format_callback;
 // TODO: Rename to `logger_t`.
 class logger_interface_t {
 public:
-
-public:
     virtual ~logger_interface_t() {}
 
     /// Entry point.
@@ -116,13 +114,12 @@ public:
             wr.write(format.data(), args...);
         };
 
-        log(severity, boost::make_iterator_range(attributes.begin(), attributes.end()), format, std::cref(callback));
+        log(severity, boost::make_iterator_range(attributes), format, std::cref(callback));
     }
 
 #ifdef __cpp_constexpr
     template<std::size_t N, typename T, typename... Args>
-    void
-    log(const detail::formatter<N>& formatter, const T& arg, const Args&... args) const {
+    auto log(const detail::formatter<N>& formatter, const T& arg, const Args&... args) const -> void {
         const auto callback = [&](cppformat::MemoryWriter& wr) {
             formatter.format(wr, arg, args...);
         };
