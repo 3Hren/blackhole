@@ -50,7 +50,7 @@ if (ENABLE_TESTING)
 	prepare_google_testing()
 
     add_executable(${LIBRARY_NAME}-tests
-        tests/logger
+        tests/root
     )
 
 	enable_google_testing(${LIBRARY_NAME}-tests)
