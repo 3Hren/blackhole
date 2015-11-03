@@ -10,7 +10,7 @@ class wrapper_t : public logger_t {
     attributes_w_t owned;
 
 public:
-    wrapper_t(logger_t& log, attributes_w_t owned_);
+    wrapper_t(logger_t& log, attributes_w_t owned);
 
     auto log(int severity, string_view message) const -> void;
     auto log(int severity, string_view message, range_t& range) const -> void;

@@ -2,13 +2,13 @@
 
 #include <functional>
 #include <string>
+#include <vector>
 
 #ifdef __has_include
     #if __has_include(<boost/container/small_vector.hpp>)
         #include <boost/container/small_vector.hpp>
         #define BLACKHOLE_HAVE_SMALL_VECTOR 1
     #else
-        #include <vector>
         #define BLACKHOLE_HAVE_SMALL_VECTOR 0
     #endif
 #endif
