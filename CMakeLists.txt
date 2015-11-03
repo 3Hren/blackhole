@@ -13,7 +13,9 @@ set(LIBRARY_NAME blackhole)
 
 project(${LIBRARY_NAME})
 
-include_directories(BEFORE SYSTEM ${PROJECT_SOURCE_DIR}/foreign)
+include_directories(BEFORE SYSTEM
+	${PROJECT_SOURCE_DIR}/foreign)
+
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # add_library(cppformat STATIC foreign/cppformat/format)
@@ -26,14 +28,13 @@ add_library(${LIBRARY_NAME} SHARED
 add_definitions(-std=c++14)
 
 target_compile_options(${LIBRARY_NAME} PRIVATE
-    -Weverything
+	-Weverything
 	-Wno-padded
 	-Wno-shadow
 	-Wno-c++98-compat
 	-Wno-weak-vtables
 	-pedantic
-    -pedantic-errors
-)
+	-pedantic-errors)
 
 # target_link_libraries(
 # 	cppformat
