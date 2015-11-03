@@ -193,27 +193,4 @@ public:
     auto scoped(attributes_t attributes) const -> scoped_t;
 };
 
-// TODO: Add in place wrapper (generates attributes each time instead of saving).
-class wrapper_t : public logger_t {
-public:
-    logger_t& inner;
-    attributes_t attributes;
-    attributes_w_t owned;
-
-    wrapper_t(logger_t& log, attributes_w_t owned_):
-        inner(log),
-        owned(std::move(owned_))
-    {
-        for (const auto& a : owned) {
-            attributes.push_back(std::make_pair(string_view(a.first.data(), a.first.size()), a.second));
-        }
-    }
-
-    auto execute(int severity, string_view message, range_t& range) const -> void {}
-    auto execute(int severity, string_view message, range_t& range, const format_t& fn) const -> void {
-        range.push_back(attributes);
-        inner.execute(severity, message, range, fn);
-    }
-};
-
 }  // namespace blackhole

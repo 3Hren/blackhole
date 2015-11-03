@@ -3,6 +3,7 @@
 #include <benchmark/benchmark.h>
 
 #include <blackhole/logger.hpp>
+#include <blackhole/wrapper.hpp>
 
 namespace blackhole {
 namespace benchmark {

@@ -23,6 +23,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 add_library(${LIBRARY_NAME} SHARED
 	src/attribute
 	src/logger
+	src/wrapper
 )
 
 add_definitions(-std=c++14)

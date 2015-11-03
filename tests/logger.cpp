@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <blackhole/logger.hpp>
+#include <blackhole/wrapper.hpp>
 
 namespace blackhole {
 namespace testing {
