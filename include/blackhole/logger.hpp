@@ -33,12 +33,12 @@ class scoped_t {};
 
 // TODO: Try to encapsulate.
 #ifdef BLACKHOLE_HAVE_SMALL_VECTOR
-typedef boost::container::small_vector<std::pair<string_view, attribute::value_t>, 16> attributes_t;
-typedef boost::container::small_vector<std::pair<std::string, attribute::owned_t>, 16> attributes_w_t;
+    typedef boost::container::small_vector<std::pair<string_view, attribute::value_t>, 16> attributes_t;
+    typedef boost::container::small_vector<std::pair<std::string, attribute::owned_t>, 16> attributes_w_t;
 #else
-typedef std::vector<std::pair<string_view, attribute::value_t>> attributes_t;
-typedef std::vector<std::pair<std::string, attribute::owned_t>> attributes_w_t;
-#error sorry, small vector optimization is not supported
+    typedef std::vector<std::pair<string_view, attribute::value_t>> attributes_t;
+    typedef std::vector<std::pair<std::string, attribute::owned_t>> attributes_w_t;
+    #warning sorry, small vector optimization is not supported
 #endif
 
 typedef boost::container::small_vector<std::reference_wrapper<const attributes_t>, 16> range_t;
@@ -57,7 +57,8 @@ public:
         };
 
         range_t range;
-        _log(severity, format, std::cref(fn), range);
+
+        this->execute(severity, format, std::cref(fn), range);
     }
 
     /// Entry point.
@@ -72,7 +73,8 @@ public:
 
         range_t range;
         range.push_back(attributes);
-        _log(severity, format, std::cref(fn), range);
+
+        this->execute(severity, format, std::cref(fn), range);
     }
 
 #ifdef __cpp_constexpr
@@ -82,13 +84,15 @@ public:
             formatter.format(wr, arg, args...);
         };
 
-        _log(severity, "", std::cref(fn));
+        range_t range;
+
+        this->execute(severity, "", std::cref(fn), range);
     }
 #endif
 
     virtual auto log(int severity, string_view format) const -> void = 0;
-    virtual auto _log(int severity, string_view format, const format_t& fn) const -> void = 0;
-    virtual auto _log(int severity, string_view format, const format_t& fn, range_t& range) const -> void = 0;
+
+    virtual auto execute(int severity, string_view format, const format_t& fn, range_t& range) const -> void = 0;
 };
 
 class logger_t : public logger_interface_t {
@@ -119,8 +123,7 @@ public:
     scoped_t
     scoped(attributes_t);
 
-    auto _log(int severity, string_view format, const format_t& fn) const -> void;
-    auto _log(int severity, string_view format, const format_t& callback, range_t& range) const -> void;
+    auto execute(int severity, string_view format, const format_t& callback, range_t& range) const -> void;
 };
 
 // TODO: Add in place wrapper (generates attributes each time instead of saving).
@@ -147,16 +150,9 @@ public:
         std::terminate();
     }
 
-    auto _log(int severity, string_view format, const format_t& fn) const -> void {
-        (void)severity;
-        (void)format;
-        (void)fn;
-        std::terminate();
-    }
-
-    auto _log(int severity, string_view format, const format_t& fn, range_t& range) const -> void {
+    auto execute(int severity, string_view format, const format_t& fn, range_t& range) const -> void {
         range.push_back(attributes);
-        inner._log(severity, format, fn, range);
+        inner.execute(severity, format, fn, range);
     }
 };
 

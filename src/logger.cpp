@@ -57,35 +57,18 @@ logger_t::log(int severity, string_view message) const -> void {
 }
 
 auto
-logger_t::_log(int severity, string_view format, const format_t& fn) const -> void {
-    (void)severity;
-    (void)format;
-    const auto inner = std::atomic_load(&this->inner);
-
-    record_t record;
-    if (inner->filter(record)) {
-        cppformat::MemoryWriter wr;
-        fn(wr);
-
-        for (auto& handler : inner->handlers) {
-            handler->execute(record);
-        }
-    }
-}
-
-auto
-logger_t::_log(int severity, string_view format, const format_t& fn, range_t& range) const -> void {
+logger_t::execute(int severity, string_view format, const format_t& fn, range_t& range) const -> void {
     (void)severity;
     (void)format;
     (void)range;
     // std::cout << 3 << std::endl;
     const auto inner = std::atomic_load(&this->inner);
 
-    for (const auto& c : range) {
-        for (const auto& r : c.get()) {
-            std::cout << "\"" << r.first << "\"" << " => " << r.second.inner << std::endl;
-        }
-    }
+    // for (const auto& c : range) {
+    //     for (const auto& r : c.get()) {
+    //         std::cout << "\"" << r.first << "\"" << " => " << r.second.inner << std::endl;
+    //     }
+    // }
 
     record_t record;
     if (inner->filter(record)) {
