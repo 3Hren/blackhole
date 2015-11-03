@@ -7,19 +7,16 @@ namespace testing {
 
 /// Can be initialized with none handlers.
 TEST(Logger, Constructor) {
-    logger_t log({});
+    root_logger_t log({});
 
     (void)log;
 }
-
-// log.log(0, {{"#1", attribute_value_t("v1")}}, "### {}", 42);
-
 
 TEST(wrapper, call) {
     using attribute::value_t;
     using attribute::owned_t;
 
-    logger_t log({});
+    root_logger_t log({});
 
     wrapper_t wrapper1{log, {
         {"key#0", owned_t(0)},

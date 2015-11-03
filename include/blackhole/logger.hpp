@@ -45,57 +45,127 @@ typedef boost::container::small_vector<std::reference_wrapper<const attributes_t
 
 typedef std::function<auto(cppformat::MemoryWriter&) -> void> format_t;
 
-// TODO: Rename to `logger_t`.
-class logger_interface_t {
+class logger_t {
 public:
-    virtual ~logger_interface_t() {}
+    virtual ~logger_t() {}
 
-    template<typename T, typename... Args>
-    auto log(int severity, string_view format, const T& arg, const Args&... args) const -> void {
-        const auto fn = [&](cppformat::MemoryWriter& wr) {
-            wr.write(format.data(), arg, args...);
-        };
+    /// Log a message with the given severity level.
+    auto log(int severity, string_view format) const -> void;
 
-        range_t range;
-
-        this->execute(severity, format, std::cref(fn), range);
-    }
-
-    /// Entry point.
+    /// Log a message with the given severity level and further formatting using the given pattern
+    /// and arguments.
     ///
+    /// \overload
+    /// \tparam T and Args... must meet the requirements of `StreamFormatted`.
     /// \note you must include `<blakhole/extensions/format.hpp>` manually to be able to compile
-    /// this method.
-    template<typename... Args>
-    auto log(int severity, const attributes_t& attributes, string_view format, const Args&... args) const -> void {
-        const auto fn = [&](cppformat::MemoryWriter& wr) {
-            wr.write(format.data(), args...);
-        };
+    ///       this method.
+    template<typename T, typename... Args>
+    auto log(int severity, string_view format, const T& arg, const Args&... args) const -> void;
 
-        range_t range;
-        range.push_back(attributes);
+    /// Log a message with the given severity level and attributes.
+    ///
+    /// \overload
+    auto log(int severity, const attributes_t& attributes, string_view format) const -> void;
 
-        this->execute(severity, format, std::cref(fn), range);
-    }
+    /// Log a message with the given severity level and attributes and further formatting using the
+    /// given pattern and arguments.
+    ///
+    /// \overload
+    /// \tparam T and Args... must meet the requirements of `StreamFormatted`.
+    /// \note you must include `<blakhole/extensions/format.hpp>` manually to be able to compile
+    ///       this method.
+    template<typename T, typename... Args>
+    auto log(int severity, const attributes_t& attributes, string_view format, const T& arg, const Args&... args) const -> void;
 
 #ifdef __cpp_constexpr
+    /// Log a message with the given severity level and further formatting using the given pattern
+    /// and arguments.
+    ///
+    /// This is more fast alternative comparing with default formatting, because the given pattern
+    /// string is parsed into literals during compile time.
+    ///
+    /// \overload
+    /// \tparam T and Args... must meet the requirements of `StreamFormatted`.
+    /// \note you must include `<blakhole/extensions/format.hpp>` manually to be able to compile
+    ///       this method.
     template<std::size_t N, typename T, typename... Args>
-    auto log(int severity, const detail::formatter<N>& formatter, const T& arg, const Args&... args) const -> void {
-        const auto fn = [&](cppformat::MemoryWriter& wr) {
-            formatter.format(wr, arg, args...);
-        };
+    auto log(int severity, const detail::formatter<N>& formatter, const T& arg, const Args&... args) const -> void;
 
-        range_t range;
-
-        this->execute(severity, "", std::cref(fn), range);
-    }
+    /// Log a message with the given severity level and attributes and further formatting using the
+    /// given pattern and arguments.
+    ///
+    /// This is more fast alternative comparing with default formatting, because the given pattern
+    /// string is parsed into literals during compile time.
+    ///
+    /// \overload
+    /// \tparam T and Args... must meet the requirements of `StreamFormatted`.
+    /// \note you must include `<blakhole/extensions/format.hpp>` manually to be able to compile
+    ///       this method.
+    template<std::size_t N, typename T, typename... Args>
+    auto log(int severity, const attributes_t& attributes, const detail::formatter<N>& formatter, const T& arg, const Args&... args) const -> void;
 #endif
 
-    virtual auto log(int severity, string_view format) const -> void = 0;
-
-    virtual auto execute(int severity, string_view format, const format_t& fn, range_t& range) const -> void = 0;
+    virtual auto execute(int severity, string_view format, range_t& range) const -> void = 0;
+    virtual auto execute(int severity, string_view format, range_t& range, const format_t& fn) const -> void = 0;
 };
 
-class logger_t : public logger_interface_t {
+inline
+auto
+logger_t::log(int severity, string_view format) const -> void {
+    range_t range;
+    this->execute(severity, format, range);
+}
+
+template<typename T, typename... Args>
+inline
+auto
+logger_t::log(int severity, string_view format, const T& arg, const Args&... args) const -> void {
+    const auto fn = [&](cppformat::MemoryWriter& wr) {
+        wr.write(format.data(), arg, args...);
+    };
+
+    range_t range;
+    this->execute(severity, format, range, std::cref(fn));
+}
+
+inline
+auto
+logger_t::log(int severity, const attributes_t& attributes, string_view format) const -> void {
+    range_t range;
+    range.push_back(attributes);
+
+    this->execute(severity, format, range);
+}
+
+template<typename T, typename... Args>
+inline
+auto
+logger_t::log(int severity, const attributes_t& attributes, string_view format, const T& arg, const Args&... args) const -> void {
+    const auto fn = [&](cppformat::MemoryWriter& wr) {
+        wr.write(format.data(), arg, args...);
+    };
+
+    range_t range;
+    range.push_back(attributes);
+
+    this->execute(severity, format, range, std::cref(fn));
+}
+
+#ifdef __cpp_constexpr
+template<std::size_t N, typename T, typename... Args>
+inline
+auto
+logger_t::log(int severity, const detail::formatter<N>& formatter, const T& arg, const Args&... args) const -> void {
+    const auto fn = [&](cppformat::MemoryWriter& wr) {
+        formatter.format(wr, arg, args...);
+    };
+
+    range_t range;
+    this->execute(severity, "", range, std::cref(fn));
+}
+#endif
+
+class root_logger_t : public logger_t {
     typedef std::function<auto(const record_t&) -> bool> filter_t;
 
 private:
@@ -104,36 +174,33 @@ private:
 
 public:
     /// \note you can create a logger with no handlers, it'll just drop all messages.
-    logger_t(std::vector<std::unique_ptr<handler_t>> handlers);
-    logger_t(filter_t filter, std::vector<std::unique_ptr<handler_t>> handlers);
+    root_logger_t(std::vector<std::unique_ptr<handler_t>> handlers);
+    root_logger_t(filter_t filter, std::vector<std::unique_ptr<handler_t>> handlers);
 
-    logger_t(const logger_t& other) = delete;
-    logger_t(logger_t&& other);
+    root_logger_t(const root_logger_t& other) = delete;
+    root_logger_t(root_logger_t&& other);
 
-    ~logger_t();
+    ~root_logger_t();
 
-    auto operator=(const logger_t& other) -> logger_t& = delete;
-    auto operator=(logger_t&& other) -> logger_t&;
+    auto operator=(const root_logger_t& other) -> root_logger_t& = delete;
+    auto operator=(root_logger_t&& other) -> root_logger_t&;
 
     auto filter(filter_t fn) -> void;
 
-    auto log(int severity, string_view format) const -> void;
-    using logger_interface_t::log;
+    auto execute(int severity, string_view format, range_t& range) const -> void;
+    auto execute(int severity, string_view format, range_t& range, const format_t& callback) const -> void;
 
-    scoped_t
-    scoped(attributes_t);
-
-    auto execute(int severity, string_view format, const format_t& callback, range_t& range) const -> void;
+    auto scoped(attributes_t attributes) const -> scoped_t;
 };
 
 // TODO: Add in place wrapper (generates attributes each time instead of saving).
-class wrapper_t : public logger_interface_t {
+class wrapper_t : public logger_t {
 public:
-    logger_interface_t& inner;
+    logger_t& inner;
     attributes_t attributes;
     attributes_w_t owned;
 
-    wrapper_t(logger_interface_t& log, attributes_w_t owned_):
+    wrapper_t(logger_t& log, attributes_w_t owned_):
         inner(log),
         owned(std::move(owned_))
     {
@@ -142,17 +209,10 @@ public:
         }
     }
 
-    using logger_interface_t::log;
-
-    auto log(int severity, string_view message) const -> void {
-        (void)severity;
-        (void)message;
-        std::terminate();
-    }
-
-    auto execute(int severity, string_view format, const format_t& fn, range_t& range) const -> void {
+    auto execute(int severity, string_view message, range_t& range) const -> void {}
+    auto execute(int severity, string_view message, range_t& range, const format_t& fn) const -> void {
         range.push_back(attributes);
-        inner.execute(severity, format, fn, range);
+        inner.execute(severity, message, range, fn);
     }
 };
 

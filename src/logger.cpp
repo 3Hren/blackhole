@@ -4,7 +4,7 @@
 
 namespace blackhole {
 
-struct logger_t::inner_t {
+struct root_logger_t::inner_t {
     filter_t filter;
     const std::vector<std::unique_ptr<handler_t>> handlers;
 
@@ -19,18 +19,18 @@ struct logger_t::inner_t {
     {}
 };
 
-logger_t::logger_t(std::vector<std::unique_ptr<handler_t>> handlers):
+root_logger_t::root_logger_t(std::vector<std::unique_ptr<handler_t>> handlers):
     inner(std::make_shared<inner_t>(std::move(handlers)))
 {}
 
-logger_t::logger_t(filter_t filter, std::vector<std::unique_ptr<handler_t>> handlers):
+root_logger_t::root_logger_t(filter_t filter, std::vector<std::unique_ptr<handler_t>> handlers):
     inner(std::make_shared<inner_t>(std::move(filter), std::move(handlers)))
 {}
 
-logger_t::~logger_t() {}
+root_logger_t::~root_logger_t() {}
 
 auto
-logger_t::filter(filter_t fn) -> void {
+root_logger_t::filter(filter_t fn) -> void {
     // 1. Copy the inner ptr (using atomic load + copy ctor).
     auto inner = std::atomic_load(&this->inner);
     // TODO: Here the RC! Use RCU for function to avoid this.
@@ -43,9 +43,10 @@ logger_t::filter(filter_t fn) -> void {
 }
 
 auto
-logger_t::log(int severity, string_view message) const -> void {
+root_logger_t::execute(int severity, string_view message, range_t& range) const -> void {
     (void)severity;
     (void)message;
+    (void)range;
     const auto inner = std::atomic_load(&this->inner);
 
     record_t record;
@@ -57,11 +58,10 @@ logger_t::log(int severity, string_view message) const -> void {
 }
 
 auto
-logger_t::execute(int severity, string_view format, const format_t& fn, range_t& range) const -> void {
+root_logger_t::execute(int severity, string_view format, range_t& range, const format_t& fn) const -> void {
     (void)severity;
     (void)format;
     (void)range;
-    // std::cout << 3 << std::endl;
     const auto inner = std::atomic_load(&this->inner);
 
     // for (const auto& c : range) {
