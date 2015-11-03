@@ -31,14 +31,14 @@ TEST(Root, Log) {
 
 TEST(Root, ForwardToHandler) {
     std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
-    auto& handler_ = *handler.get();
+    auto& mock = *handler.get();
 
     std::vector<std::unique_ptr<handler_t>> handlers;
     handlers.push_back(std::move(handler));
 
     root_logger_t logger(std::move(handlers));
 
-    EXPECT_CALL(handler_, execute(_))
+    EXPECT_CALL(mock, execute(_))
         .Times(1);
 
     logger.log(0, "GET /porn.png HTTP/1.1");
