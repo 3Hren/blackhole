@@ -110,9 +110,7 @@ logger_t::log(int severity, string_view format, const T& arg, const Args&... arg
 inline
 auto
 logger_t::log(int severity, const attributes_t& attributes, string_view format) const -> void {
-    range_t range;
-    range.push_back(attributes);
-
+    range_t range{attributes};
     this->execute(severity, format, range);
 }
 
@@ -124,9 +122,7 @@ logger_t::log(int severity, const attributes_t& attributes, string_view format, 
         wr.write(format.data(), arg, args...);
     };
 
-    range_t range;
-    range.push_back(attributes);
-
+    range_t range{attributes};
     this->execute(severity, format, range, std::cref(fn));
 }
 
