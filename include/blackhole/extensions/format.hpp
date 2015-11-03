@@ -26,6 +26,8 @@ public:
     }
 };
 
+/// Logging facade wraps the underlying logger providing convenient format methods.
+///
 /// \tparam Logger must meet the requirements of `Logger`.
 template<typename Logger>
 class logger_facade {
