@@ -94,6 +94,16 @@ private:
     }
 };
 
+namespace gcc {
+
+/// Workaround for GCC versions up to 4.9, which fails to expand variadic pack inside lambdas.
+template<class... Args>
+inline void write_all(writer_t& wr, const char* pattern, const Args&... args) {
+    wr.write(pattern, args...);
+}
+
+}  // namespace gcc
+
 template<typename Logger>
 inline
 auto
@@ -107,9 +117,10 @@ template<typename T, typename... Args>
 inline
 auto
 logger_facade<Logger>::log(int severity, string_view format, const T& arg, const Args&... args) const -> void {
-    const auto fn = [&](writer_t& wr) {
-        wr.write(format.data(), arg, args...);
-    };
+    const auto fn = std::bind(&gcc::write_all<T, Args...>, std::placeholders::_1, format.data(), std::cref(arg), std::cref(args)...);
+    // const auto fn = [&](writer_t& wr) {
+    //     wr.write(format.data(), arg, args...);
+    // };
 
     range_t range;
     inner().log(severity, format, range, std::cref(fn));
@@ -128,9 +139,10 @@ template<typename T, typename... Args>
 inline
 auto
 logger_facade<Logger>::log(int severity, const attributes_t& attributes, string_view format, const T& arg, const Args&... args) const -> void {
-    const auto fn = [&](writer_t& wr) {
-        wr.write(format.data(), arg, args...);
-    };
+    const auto fn = std::bind(&gcc::write_all<T, Args...>, std::placeholders::_1, format.data(), std::cref(arg), std::cref(args)...);
+    // const auto fn = [&](writer_t& wr) {
+    //     wr.write(format.data(), arg, args...);
+    // };
 
     range_t range{attributes};
     inner().log(severity, format, range, std::cref(fn));
