@@ -1,8 +1,10 @@
-#include "blackhole/logger.hpp"
+#include "blackhole/root.hpp"
 
 #include <atomic>
 
+#include "blackhole/extensions/format.hpp"
 #include "blackhole/handler.hpp"
+#include "blackhole/record.hpp"
 
 namespace blackhole {
 
@@ -45,7 +47,13 @@ root_logger_t::filter(filter_t fn) -> void {
 }
 
 auto
-root_logger_t::execute(int severity, string_view message, range_t& range) const -> void {
+root_logger_t::log(int severity, string_view message) const -> void {
+    range_t range;
+    log(severity, message, range);
+}
+
+auto
+root_logger_t::log(int severity, string_view message, range_t& range) const -> void {
     (void)severity;
     (void)message;
     (void)range;
@@ -60,7 +68,7 @@ root_logger_t::execute(int severity, string_view message, range_t& range) const 
 }
 
 auto
-root_logger_t::execute(int severity, string_view format, range_t& range, const format_t& fn) const -> void {
+root_logger_t::log(int severity, string_view format, range_t& range, const format_t& fn) const -> void {
     (void)severity;
     (void)format;
     (void)range;

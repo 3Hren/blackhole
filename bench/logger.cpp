@@ -2,11 +2,11 @@
 
 #include <benchmark/benchmark.h>
 
+#include <blackhole/extensions/format.hpp>
 #include <blackhole/handler.hpp>
 #include <blackhole/logger.hpp>
+#include <blackhole/root.hpp>
 #include <blackhole/wrapper.hpp>
-
-#include <blackhole/sandbox.hpp>
 
 namespace blackhole {
 namespace benchmark {
@@ -17,10 +17,11 @@ using attribute::owned_t;
 static
 void
 literal(::benchmark::State& state) {
-    root_logger_t log({});
+    root_logger_t root({});
+    logger_facade<root_logger_t> logger(root);
 
     while (state.KeepRunning()) {
-        log.log(0, "[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326");
+        logger.log(0, "[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326");
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -29,11 +30,12 @@ literal(::benchmark::State& state) {
 static
 void
 string(::benchmark::State& state) {
-    root_logger_t log({});
+    root_logger_t root({});
+    logger_facade<root_logger_t> logger(root);
 
     const std::string string("[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326");
     while (state.KeepRunning()) {
-        log.log(0, string);
+        logger.log(0, string);
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -42,13 +44,15 @@ string(::benchmark::State& state) {
 static
 void
 literal_reject(::benchmark::State& state) {
-    root_logger_t log({});
-    log.filter([](const record_t&) -> bool {
+    root_logger_t root({});
+    root.filter([](const record_t&) -> bool {
         return false;
     });
 
+    logger_facade<root_logger_t> logger(root);
+
     while (state.KeepRunning()) {
-        log.log(0, "[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326");
+        logger.log(0, "[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326");
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -57,10 +61,11 @@ literal_reject(::benchmark::State& state) {
 static
 void
 literal_with_arg(::benchmark::State& state) {
-    root_logger_t log({});
+    root_logger_t root({});
+    logger_facade<root_logger_t> logger(root);
 
     while (state.KeepRunning()) {
-        log.log(0, "[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET {} HTTP/1.0' 200 2326",
+        logger.log(0, "[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET {} HTTP/1.0' 200 2326",
             "/porn.png"
         );
     }
@@ -71,10 +76,11 @@ literal_with_arg(::benchmark::State& state) {
 static
 void
 literal_with_args(::benchmark::State& state) {
-    root_logger_t log({});
+    root_logger_t root({});
+    logger_facade<root_logger_t> logger(root);
 
     while (state.KeepRunning()) {
-        log.log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
+        logger.log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
             "[::]",
             "esafronov",
             "10/Oct/2000:13:55:36 -0700",
@@ -90,14 +96,15 @@ literal_with_args(::benchmark::State& state) {
 static
 void
 literal_with_args_using_cpp14_formatter(::benchmark::State& state) {
-    root_logger_t log({});
+    root_logger_t root({});
+    logger_facade<root_logger_t> logger(root);
 
     while (state.KeepRunning()) {
         constexpr auto formatter = blackhole::detail::formatter<
             blackhole::detail::literal_count("{} - {} [{}] 'GET {} HTTP/1.0' {} {}")
         >("{} - {} [{}] 'GET {} HTTP/1.0' {} {}");
 
-        log.log(0, formatter,
+        logger.log(0, formatter,
             "[::]",
             "esafronov",
             "10/Oct/2000:13:55:36 -0700",
@@ -113,10 +120,11 @@ literal_with_args_using_cpp14_formatter(::benchmark::State& state) {
 static
 void
 literal_with_attributes(::benchmark::State& state) {
-    root_logger_t log({});
+    root_logger_t root({});
+    logger_facade<root_logger_t> logger(root);
 
     while (state.KeepRunning()) {
-        log.log(0, {
+        logger.log(0, {
             {"key#1", value_t(42)},
             {"key#2", value_t(3.1415)},
             {"key#3", value_t("value")}
@@ -129,10 +137,11 @@ literal_with_attributes(::benchmark::State& state) {
 static
 void
 literal_with_args_and_attributes(::benchmark::State& state) {
-    root_logger_t log({});
+    root_logger_t root({});
+    logger_facade<root_logger_t> logger(root);
 
     while (state.KeepRunning()) {
-        log.log(0,
+        logger.log(0,
             {
                 {"key#1", value_t(42)},
                 {"key#2", value_t(3.1415)},
@@ -153,14 +162,16 @@ literal_with_args_and_attributes(::benchmark::State& state) {
 static
 void
 literal_with_args_and_attributes_and_wrapper(::benchmark::State& state) {
-    root_logger_t log({});
-    wrapper_t wrapper{log, {
+    root_logger_t root({});
+    wrapper_t wrapper{root, {
         {"key#0", owned_t(500)},
         {"key#1", owned_t("value#1")}
     }};
 
+    logger_facade<wrapper_t> logger(wrapper);
+
     while (state.KeepRunning()) {
-        wrapper.log(0,
+        logger.log(0,
             {
                 {"key#1", value_t(42)},
                 {"key#2", value_t(3.1415)},
@@ -181,9 +192,9 @@ literal_with_args_and_attributes_and_wrapper(::benchmark::State& state) {
 static
 void
 literal_with_args_and_attributes_and_two_wrappers(::benchmark::State& state) {
-    root_logger_t log({});
+    root_logger_t root({});
 
-    wrapper_t wrapper1{log, {
+    wrapper_t wrapper1{root, {
         {"key#0", owned_t(500)},
         {"key#1", owned_t("value#1")}
     }};
@@ -193,8 +204,10 @@ literal_with_args_and_attributes_and_two_wrappers(::benchmark::State& state) {
         {"key#3", owned_t("value#3")}
     }};
 
+    logger_facade<wrapper_t> logger(wrapper2);
+
     while (state.KeepRunning()) {
-        wrapper2.log(0,
+        logger.log(0,
             {
                 {"key#1", value_t(42)},
                 {"key#2", value_t(3.1415)},
@@ -215,9 +228,9 @@ literal_with_args_and_attributes_and_two_wrappers(::benchmark::State& state) {
 static
 void
 literal_with_args_and_attributes_and_three_wrappers(::benchmark::State& state) {
-    root_logger_t log({});
+    root_logger_t root({});
 
-    wrapper_t wrapper1{log, {
+    wrapper_t wrapper1{root, {
         {"key#0", owned_t(500)},
         {"key#1", owned_t("value#1")}
     }};
@@ -232,8 +245,10 @@ literal_with_args_and_attributes_and_three_wrappers(::benchmark::State& state) {
         {"key#5", owned_t("value#5")}
     }};
 
+    logger_facade<wrapper_t> logger(wrapper3);
+
     while (state.KeepRunning()) {
-        wrapper3.log(0,
+        logger.log(0,
             {
                 {"key#6", value_t(42)},
                 {"key#7", value_t(3.1415)},

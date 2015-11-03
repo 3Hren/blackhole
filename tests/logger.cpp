@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
 
+#include <blackhole/extensions/format.hpp>
 #include <blackhole/handler.hpp>
 #include <blackhole/logger.hpp>
+#include <blackhole/root.hpp>
 #include <blackhole/wrapper.hpp>
 
 namespace blackhole {
@@ -18,9 +20,9 @@ TEST(wrapper, call) {
     using attribute::value_t;
     using attribute::owned_t;
 
-    root_logger_t log({});
+    root_logger_t root({});
 
-    wrapper_t wrapper1{log, {
+    wrapper_t wrapper1{root, {
         {"key#0", owned_t(0)},
         {"key#1", owned_t("value#1")}
     }};
@@ -30,7 +32,9 @@ TEST(wrapper, call) {
         {"key#3", owned_t("value#3")}
     }};
 
-    wrapper2.log(0,
+    logger_facade<wrapper_t> logger(wrapper2);
+
+    logger.log(0,
         {
             {"key#4", value_t(42)},
             {"key#5", value_t(3.1415)},

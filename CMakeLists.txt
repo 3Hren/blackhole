@@ -22,7 +22,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_library(${LIBRARY_NAME} SHARED
 	src/attribute
-	src/logger
+	src/root
 	src/wrapper
 )
 
