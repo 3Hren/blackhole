@@ -3,19 +3,11 @@
 #include <string>
 #include <vector>
 
-#ifdef __has_include
-#  if __has_include(<boost/container/small_vector.hpp>)
-#    include <boost/container/small_vector.hpp>
-#    define BLACKHOLE_HAVE_SMALL_VECTOR 1
-#  else
-#    define BLACKHOLE_HAVE_SMALL_VECTOR 0
-#  endif
-#endif
-
 #define FMT_HEADER_ONLY
 #include <cppformat/format.h>
 
 #include "blackhole/attribute.hpp"
+#include "blackhole/attributes.hpp"
 #include "blackhole/cpp17/string_view.hpp"
 #include "blackhole/formatter.hpp"
 #include "blackhole/handler.hpp"
@@ -27,25 +19,12 @@ namespace blackhole {
 
 namespace cppformat = fmt;
 
-using cpp17::string_view;
-
-class scoped_t {};
-
-// TODO: Try to encapsulate.
-#ifdef BLACKHOLE_HAVE_SMALL_VECTOR
-    typedef boost::container::small_vector<std::pair<string_view, attribute::value_t>, 16> attributes_t;
-    typedef boost::container::small_vector<std::pair<std::string, attribute::owned_t>, 16> attributes_w_t;
-#else
-    typedef std::vector<std::pair<string_view, attribute::value_t>> attributes_t;
-    typedef std::vector<std::pair<std::string, attribute::owned_t>> attributes_w_t;
-    #warning sorry, small vector optimization is not supported
-#endif
-
-typedef boost::container::small_vector<std::reference_wrapper<const attributes_t>, 16> range_t;
-
-typedef std::function<auto(cppformat::MemoryWriter&) -> void> format_t;
+class scoped_t;
 
 class logger_t {
+public:
+    typedef std::function<auto(cppformat::MemoryWriter&) -> void> format_t;
+
 public:
     virtual ~logger_t() {}
 
