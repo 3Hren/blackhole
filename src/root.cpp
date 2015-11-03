@@ -76,7 +76,7 @@ root_logger_t::log(int severity, string_view format, range_t& range, const forma
 
     record_t record;
     if (inner->filter(record)) {
-        cppformat::MemoryWriter wr;
+        writer_t wr;
         fn(wr);
 
         for (auto& handler : inner->handlers) {

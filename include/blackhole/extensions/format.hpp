@@ -16,6 +16,16 @@ namespace blackhole {
 
 namespace cppformat = fmt;
 
+class writer_t {
+public:
+    cppformat::MemoryWriter inner;
+
+    template<typename... Args>
+    inline auto write(const Args&... args) -> void {
+        inner.write(args...);
+    }
+};
+
 /// \tparam Logger must meet the requirements of `Logger`.
 template<typename Logger>
 class logger_facade {
@@ -97,7 +107,7 @@ template<typename T, typename... Args>
 inline
 auto
 logger_facade<Logger>::log(int severity, string_view format, const T& arg, const Args&... args) const -> void {
-    const auto fn = [&](cppformat::MemoryWriter& wr) {
+    const auto fn = [&](writer_t& wr) {
         wr.write(format.data(), arg, args...);
     };
 
@@ -118,7 +128,7 @@ template<typename T, typename... Args>
 inline
 auto
 logger_facade<Logger>::log(int severity, const attributes_t& attributes, string_view format, const T& arg, const Args&... args) const -> void {
-    const auto fn = [&](cppformat::MemoryWriter& wr) {
+    const auto fn = [&](writer_t& wr) {
         wr.write(format.data(), arg, args...);
     };
 
@@ -133,8 +143,8 @@ template<std::size_t N, typename T, typename... Args>
 inline
 auto
 logger_facade<Logger>::log(int severity, const detail::formatter<N>& formatter, const T& arg, const Args&... args) const -> void {
-    const auto fn = [&](cppformat::MemoryWriter& wr) {
-        formatter.format(wr, arg, args...);
+    const auto fn = [&](writer_t& wr) {
+        formatter.format(wr.inner, arg, args...);
     };
 
     range_t range;

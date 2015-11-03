@@ -5,23 +5,14 @@
 #include "blackhole/attributes.hpp"
 #include "blackhole/cpp17/string_view.hpp"
 
-namespace fmt {
-
-// TODO: Hide over own class.
-template<typename Char, typename Allocator> class BasicMemoryWriter;
-typedef BasicMemoryWriter<char, std::allocator<char>> MemoryWriter;
-
-}  // namespace fmt
-
 namespace blackhole {
 
-namespace cppformat = fmt;
-
+class writer_t;
 class handler_t;
 
 class logger_t {
 public:
-    typedef std::function<auto(cppformat::MemoryWriter&) -> void> format_t;
+    typedef std::function<auto(writer_t&) -> void> format_t;
 
 public:
     virtual ~logger_t() {}
