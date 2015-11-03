@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <blackhole/handler.hpp>
 #include <blackhole/logger.hpp>
 #include <blackhole/wrapper.hpp>
 

@@ -1,21 +1,29 @@
 #pragma once
 
-#include <string>
 #include <vector>
-
-#define FMT_HEADER_ONLY
-#include <cppformat/format.h>
 
 #include "blackhole/attribute.hpp"
 #include "blackhole/attributes.hpp"
 #include "blackhole/cpp17/string_view.hpp"
-#include "blackhole/formatter.hpp"
-#include "blackhole/handler.hpp"
-#include "blackhole/sandbox.hpp"
+#include "blackhole/extensions/format.hpp"
 #include "blackhole/record.hpp"
-#include "blackhole/sink.hpp"
+
+namespace fmt {
+
+template<typename Char, typename Allocator>
+class BasicMemoryWriter;
+
+typedef BasicMemoryWriter<char, std::allocator<char>> MemoryWriter;
+
+}  // namespace fmt
 
 namespace blackhole {
+
+namespace detail {
+template<std::size_t> class formatter;
+}
+
+class handler_t;
 
 namespace cppformat = fmt;
 

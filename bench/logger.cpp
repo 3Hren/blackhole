@@ -2,8 +2,11 @@
 
 #include <benchmark/benchmark.h>
 
+#include <blackhole/handler.hpp>
 #include <blackhole/logger.hpp>
 #include <blackhole/wrapper.hpp>
+
+#include <blackhole/sandbox.hpp>
 
 namespace blackhole {
 namespace benchmark {

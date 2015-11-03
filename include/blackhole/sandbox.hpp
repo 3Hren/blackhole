@@ -4,11 +4,11 @@
 #include <iostream>
 #include <string>
 
-#include "blackhole/cpp17/optional.hpp"
-#include "blackhole/cpp17/string_view.hpp"
-
 #define FMT_HEADER_ONLY
 #include <cppformat/format.h>
+
+#include "blackhole/cpp17/optional.hpp"
+#include "blackhole/cpp17/string_view.hpp"
 
 using blackhole::cpp17::string_view;
 
@@ -23,7 +23,8 @@ parse_argument(const string_view& string, std::size_t& pos) {
     }
 }
 
-namespace blackhole { inline namespace v2 { namespace detail {
+namespace blackhole {
+namespace detail {
 
 namespace cppformat = fmt;
 
@@ -89,7 +90,8 @@ literal_count(const string_view& format) {
     return result;
 }
 
-}}} // namespace blackhole::v2::detail
+}  // namespace detail
+}  // namespace blackhole
 
 constexpr std::size_t count_placeholders(const string_view& string) {
     std::size_t counter = 0;
@@ -253,7 +255,8 @@ next_literal(const string_view& string) {
     return {string, false};
 }
 
-namespace blackhole { inline namespace v2 { namespace detail {
+namespace blackhole {
+namespace detail {
 
 template<class T>
 struct format_traits {
@@ -331,4 +334,5 @@ public:
     }
 };
 
-}}} // namespace blackhole::v2::detail
+}  // namespace detail
+}  // namespace blackhole

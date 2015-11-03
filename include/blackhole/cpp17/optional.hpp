@@ -1,7 +1,6 @@
 #pragma once
 
 namespace blackhole {
-inline namespace v2 {
 namespace detail {
 
 class null_t {};
@@ -25,11 +24,9 @@ union optional_storage {
 };
 
 }  // namespace detail
-}  // namespace v2
 }  // namespace blackhole
 
 namespace blackhole {
-inline namespace v2 {
 
 /// We don't want to wait for C++17, so imitate it partially.
 template<typename T>
@@ -70,5 +67,4 @@ public:
     }
 };
 
-}  // namespace v2
 }  // namespace blackhole

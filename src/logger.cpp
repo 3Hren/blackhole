@@ -2,6 +2,8 @@
 
 #include <atomic>
 
+#include "blackhole/handler.hpp"
+
 namespace blackhole {
 
 struct root_logger_t::inner_t {
@@ -63,12 +65,6 @@ root_logger_t::execute(int severity, string_view format, range_t& range, const f
     (void)format;
     (void)range;
     const auto inner = std::atomic_load(&this->inner);
-
-    // for (const auto& c : range) {
-    //     for (const auto& r : c.get()) {
-    //         std::cout << "\"" << r.first << "\"" << " => " << r.second.inner << std::endl;
-    //     }
-    // }
 
     record_t record;
     if (inner->filter(record)) {
