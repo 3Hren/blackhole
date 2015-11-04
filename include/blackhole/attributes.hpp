@@ -29,6 +29,7 @@ typedef boost::container::small_vector<std::reference_wrapper<const attributes_t
 #else
 typedef std::vector<std::pair<string_view, attribute::value_t>> attributes_t;
 typedef std::vector<std::pair<std::string, attribute::owned_t>> attributes_w_t;
+// TODO: I can use stack allocator with fallback for portability.
 typedef std::vector<std::reference_wrapper<const attributes_t>> range_t;
 #endif
 
