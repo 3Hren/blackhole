@@ -26,16 +26,70 @@ add_library(${LIBRARY_NAME} SHARED
 	src/wrapper
 )
 
-add_definitions(-std=c++14)
+# Set the Standard version.
 
-target_compile_options(${LIBRARY_NAME} PRIVATE
-	-Weverything
-	-Wno-padded
-	-Wno-shadow
-	-Wno-c++98-compat
-	-Wno-weak-vtables
-	-pedantic
-	-pedantic-errors)
+include(CheckCXXCompilerFlag)
+
+check_cxx_compiler_flag("-std=c++14" COMPILER_SUPPORTS_CXX14)
+check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
+check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+
+if (COMPILER_SUPPORTS_CXX14)
+	add_definitions(-std=c++11)
+elseif (COMPILER_SUPPORTS_CXX11)
+	add_definitions(-std=c++11)
+elseif (COMPILER_SUPPORTS_CXX0X)
+    add_definitions(-std=c++0x)
+else ()
+    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif ()
+
+# =========================
+
+# Set maximum warnings level depending on compiler.
+
+# if cmake < 3 - via properties.
+# 	if gcc == 4.6 -
+# 	if gcc == 4.8 -
+# 	...
+# 	if clang -
+#	...
+# else
+# 	...
+# end
+
+if (CMAKE_VERSION VERSION_LESS 2.8.12)
+	set_target_properties(${LIBRARY_NAME} PROPERTIES
+		COMPILE_FLAGS "-Wall"
+		COMPILE_FLAGS "-Wextra"
+		COMPILE_FLAGS "-Waddress"
+		COMPILE_FLAGS "-Warray-bounds"
+		COMPILE_FLAGS "-Wbuiltin-macro-redefined"
+		COMPILE_FLAGS "-Wconversion"
+		COMPILE_FLAGS "-Wctor-dtor-privacy"
+		COMPILE_FLAGS "-Winit-self"
+		COMPILE_FLAGS "-Wnon-virtual-dtor"
+		COMPILE_FLAGS "-Wold-style-cast"
+		COMPILE_FLAGS "-Woverloaded-virtual"
+		COMPILE_FLAGS "-Wunreachable-code"
+		COMPILE_FLAGS "-pedantic"
+		COMPILE_FLAGS "-Wswitch"
+		COMPILE_FLAGS "-Wsuggest-attribute=pure"
+		COMPILE_FLAGS "-Wsuggest-attribute=const"
+		COMPILE_FLAGS "-Wsuggest-attribute=noreturn"
+		COMPILE_FLAGS "-pedantic-errors")
+else ()
+	target_compile_options(${LIBRARY_NAME} PRIVATE
+		-Weverything
+		-Wno-c++98-compat
+		-Wno-padded
+		-Wno-shadow
+		-Wno-weak-vtables
+		-pedantic
+		-pedantic-errors)
+endif ()
+
+# =========================
 
 # target_link_libraries(
 # 	cppformat
