@@ -61,11 +61,9 @@ public:
 
     constexpr
     auto operator[](std::size_t id) const -> char {
-        if (id < size()) {
-            return data_[id];
-        }
-
-        throw std::out_of_range("out of range");
+        return id < size() ?
+            data_[id] :
+            throw std::out_of_range("out of range");
     }
 
     /// Operations.
@@ -80,11 +78,9 @@ public:
     /// and `size() - pos`.
     constexpr
     auto substr(std::size_t pos = 0, std::size_t count = npos) const -> basic_string_view {
-        if (pos > size()) {
+        return pos <= size() ?
+            basic_string_view(data() + pos, std::min(count, size() - pos)) :
             throw std::out_of_range("out of range");
-        }
-
-        return basic_string_view(data() + pos, std::min(count, size() - pos));
     }
 };
 
