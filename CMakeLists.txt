@@ -27,7 +27,6 @@ add_library(${LIBRARY_NAME} SHARED
 )
 
 # Set the Standard version.
-
 include(CheckCXXCompilerFlag)
 
 check_cxx_compiler_flag("-std=c++14" COMPILER_SUPPORTS_CXX14)
@@ -44,21 +43,18 @@ else ()
     message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif ()
 
-# =========================
-
 # Set maximum warnings level depending on compiler.
-
-# if cmake < 3 - via properties.
-# 	if gcc == 4.6 -
-# 	if gcc == 4.8 -
-# 	...
-# 	if clang -
-#	...
-# else
-# 	...
-# end
-
-if (CMAKE_VERSION VERSION_LESS 2.8.12)
+# TODO: target_maximum_warnings(${LIBRARY_NAME})
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	target_compile_options(${LIBRARY_NAME} PRIVATE
+		-Weverything
+		-Wno-c++98-compat
+		-Wno-padded
+		-Wno-shadow
+		-Wno-weak-vtables
+		-pedantic
+		-pedantic-errors)
+else ()
 	set_target_properties(${LIBRARY_NAME} PROPERTIES
 		COMPILE_FLAGS "-Wall"
 		COMPILE_FLAGS "-Wextra"
@@ -78,18 +74,7 @@ if (CMAKE_VERSION VERSION_LESS 2.8.12)
 		COMPILE_FLAGS "-Wsuggest-attribute=const"
 		COMPILE_FLAGS "-Wsuggest-attribute=noreturn"
 		COMPILE_FLAGS "-pedantic-errors")
-else ()
-	target_compile_options(${LIBRARY_NAME} PRIVATE
-		-Weverything
-		-Wno-c++98-compat
-		-Wno-padded
-		-Wno-shadow
-		-Wno-weak-vtables
-		-pedantic
-		-pedantic-errors)
 endif ()
-
-# =========================
 
 # target_link_libraries(
 # 	cppformat
