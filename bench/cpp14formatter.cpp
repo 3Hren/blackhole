@@ -1,3 +1,5 @@
+#if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
+
 #include <benchmark/benchmark.h>
 
 #define FMT_HEADER_ONLY
@@ -27,3 +29,5 @@ BENCHMARK(cpp14formatter);
 
 }  // namespace benchmark
 }  // namespace blackhole
+
+#endif

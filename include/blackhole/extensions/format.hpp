@@ -5,7 +5,7 @@
 #define FMT_HEADER_ONLY
 #include <cppformat/format.h>
 
-#ifdef __cpp_constexpr
+#if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
 #include "blackhole/sandbox.hpp"
 #endif
 
@@ -66,7 +66,7 @@ public:
     template<typename T, typename... Args>
     auto log(int severity, const attributes_t& attributes, string_view format, const T& arg, const Args&... args) const -> void;
 
-#ifdef __cpp_constexpr
+#if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
     /// Log a message with the given severity level and further formatting using the given pattern
     /// and arguments.
     ///
@@ -150,7 +150,7 @@ logger_facade<Logger>::log(int severity, const attributes_t& attributes, string_
     inner().log(severity, format, range, std::cref(fn));
 }
 
-#ifdef __cpp_constexpr
+#if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
 
 template<typename Logger>
 template<std::size_t N, typename T, typename... Args>

@@ -93,6 +93,7 @@ literal_with_args(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
+#if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
 static
 void
 literal_with_args_using_cpp14_formatter(::benchmark::State& state) {
@@ -116,6 +117,7 @@ literal_with_args_using_cpp14_formatter(::benchmark::State& state) {
 
     state.SetItemsProcessed(state.iterations());
 }
+#endif
 
 static
 void
@@ -271,7 +273,10 @@ BENCHMARK(literal_reject);
 BENCHMARK(string);
 BENCHMARK(literal_with_arg);
 BENCHMARK(literal_with_args);
+
+#if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
 BENCHMARK(literal_with_args_using_cpp14_formatter);
+#endif
 
 BENCHMARK(literal_with_attributes);
 BENCHMARK(literal_with_args_and_attributes);
