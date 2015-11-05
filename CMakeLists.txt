@@ -76,9 +76,9 @@ else ()
 		COMPILE_FLAGS "-pedantic-errors")
 endif ()
 
-# target_link_libraries(
-# 	cppformat
-# )
+target_link_libraries(${LIBRARY_NAME}
+	# cppformat
+)
 
 if (ENABLE_TESTING)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/foreign/modules")
