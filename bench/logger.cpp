@@ -1,4 +1,5 @@
 /// Format string and write it to null.
+#include <thread>
 
 #include <benchmark/benchmark.h>
 
@@ -284,6 +285,38 @@ BENCHMARK(literal_with_args_and_attributes);
 BENCHMARK(literal_with_args_and_attributes_and_wrapper);
 BENCHMARK(literal_with_args_and_attributes_and_two_wrappers);
 BENCHMARK(literal_with_args_and_attributes_and_three_wrappers);
+
+class threaded_fixture_t: public ::benchmark::Fixture {
+protected:
+    root_logger_t root;
+    logger_facade<root_logger_t> logger;
+
+public:
+    threaded_fixture_t(): root({}), logger(root) {}
+};
+
+BENCHMARK_DEFINE_F(threaded_fixture_t, facade)(::benchmark::State& state) {
+   while (state.KeepRunning()) {
+       logger.log(0,
+           {
+               {"key#6", value_t(42)},
+               {"key#7", value_t(3.1415)},
+               {"key#8", value_t("value")}
+           }, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
+           "[::]",
+           "esafronov",
+           "10/Oct/2000:13:55:36 -0700",
+           "/porn.png",
+           200,
+           2326
+       );
+    }
+
+    state.SetItemsProcessed(state.iterations());
+}
+
+BENCHMARK_REGISTER_F(threaded_fixture_t, facade)
+    ->ThreadRange(1, 2 * std::thread::hardware_concurrency());
 
 }  // namespace benchmark
 }  // namespace blackhole
