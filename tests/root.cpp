@@ -44,6 +44,26 @@ TEST(RootLogger, ForwardToHandler) {
     logger.log(0, "GET /porn.png HTTP/1.1");
 }
 
+TEST(RootLogger, ForwardToHandlers) {
+    std::vector<std::unique_ptr<handler_t>> handlers;
+    std::vector<mock::handler_t*> handlers_view;
+
+    for (int i = 0; i < 4; ++i) {
+        std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
+        handlers_view.push_back(handler.get());
+        handlers.push_back(std::move(handler));
+    }
+
+    root_logger_t logger(std::move(handlers));
+
+    for (auto handler : handlers_view) {
+        EXPECT_CALL(*handler, execute(_))
+            .Times(1);
+    }
+
+    logger.log(0, "GET /porn.png HTTP/1.1");
+}
+
 // TEST(wrapper, call) {
 //     using attribute::value_t;
 //     using attribute::owned_t;
