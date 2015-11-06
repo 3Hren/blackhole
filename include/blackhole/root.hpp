@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -16,11 +17,37 @@ class scoped_t;
 
 namespace blackhole {
 
+class spinlock {
+private:
+    enum state_t {
+        locked = 0,
+        unlocked = 1
+    };
+
+    std::atomic<int> state;
+
+public:
+    constexpr spinlock() noexcept:
+        state(unlocked)
+    {}
+
+    auto lock() noexcept -> void {
+        while (state.exchange(locked, std::memory_order_acquire) == locked) {
+            // Ok... try again.
+        }
+    }
+
+    auto unlock() noexcept -> void {
+        state.store(unlocked, std::memory_order_release);
+    }
+};
+
 template<typename T>
 class transactional {
     std::shared_ptr<T> inner;
 #ifndef __clang__
-    mutable std::mutex mutex;
+    typedef spinlock mutex_type;
+    mutable mutex_type mutex;
 #endif
 
 public:
@@ -31,18 +58,18 @@ public:
 
     auto begin() const -> std::shared_ptr<T> {
 #ifdef __clang__
-        return std::atomic_load_explicit(&this->inner, std::memory_order_relaxed);
+        return std::atomic_load_explicit(&this->inner, std::memory_order_acquire);
 #else
-        std::lock_guard<std::mutex> lock(mutex);
+        std::lock_guard<mutex_type> lock(mutex);
         return inner;
 #endif
     }
 
     auto commit(std::shared_ptr<T> value) -> void {
 #ifdef __clang__
-        std::atomic_store(&inner, std::move(value));
+        std::atomic_store_explicit(&inner, std::move(value), std::memory_order_release);
 #else
-        std::lock_guard<std::mutex> lock(mutex);
+        std::lock_guard<mutex_type> lock(mutex);
         inner = std::move(value);
 #endif
     }
