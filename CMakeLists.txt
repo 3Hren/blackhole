@@ -107,6 +107,8 @@ if (ENABLE_BENCHMARKING)
 	list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/foreign/modules")
 	include(PrepareGoogleBenchmark)
 
+	find_package(Threads)
+
 	set(CMAKE_BUILD_TYPE Release)
 
 	prepare_google_benchmarking()
@@ -120,7 +122,8 @@ if (ENABLE_BENCHMARKING)
 	enable_google_benchmarking(${LIBRARY_NAME}-benchmarks)
 
 	target_link_libraries(${LIBRARY_NAME}-benchmarks
-        ${LIBRARY_NAME}
+		${LIBRARY_NAME}
         benchmark
+		${CMAKE_THREAD_LIBS_INIT}
 	)
 endif (ENABLE_BENCHMARKING)
