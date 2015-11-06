@@ -23,13 +23,13 @@ public:
 }  // namespace
 }  // namespace mock
 
-TEST(Root, Log) {
+TEST(RootLogger, Log) {
     // Can be initialized with none handlers, does nothing.
     root_logger_t logger({});
     logger.log(0, "GET /porn.png HTTP/1.1");
 }
 
-TEST(Root, ForwardToHandler) {
+TEST(RootLogger, ForwardToHandler) {
     std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
     auto& mock = *handler.get();
 
