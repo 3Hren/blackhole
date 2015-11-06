@@ -67,12 +67,12 @@ else ()
 		COMPILE_FLAGS "-Wnon-virtual-dtor"
 		COMPILE_FLAGS "-Wold-style-cast"
 		COMPILE_FLAGS "-Woverloaded-virtual"
-		COMPILE_FLAGS "-Wunreachable-code"
-		COMPILE_FLAGS "-pedantic"
-		COMPILE_FLAGS "-Wswitch"
-		COMPILE_FLAGS "-Wsuggest-attribute=pure"
 		COMPILE_FLAGS "-Wsuggest-attribute=const"
 		COMPILE_FLAGS "-Wsuggest-attribute=noreturn"
+		COMPILE_FLAGS "-Wsuggest-attribute=pure"
+		COMPILE_FLAGS "-Wswitch"
+		COMPILE_FLAGS "-Wunreachable-code"
+		COMPILE_FLAGS "-pedantic"
 		COMPILE_FLAGS "-pedantic-errors")
 endif ()
 
