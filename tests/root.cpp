@@ -17,7 +17,7 @@ namespace {
 
 class handler_t : public ::blackhole::handler_t {
 public:
-    MOCK_METHOD1(execute, auto(const record_t&) -> void);
+    MOCK_METHOD1(execute, void(const record_t&));
 };
 
 }  // namespace
