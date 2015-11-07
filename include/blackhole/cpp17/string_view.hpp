@@ -82,6 +82,11 @@ public:
             basic_string_view(data() + pos, std::min(count, size() - pos)) :
             throw std::out_of_range("out of range");
     }
+
+    constexpr
+    auto operator==(const basic_string_view& other) const -> bool {
+        return size() == other.size() && to_string() == other.to_string();
+    }
 };
 
 template<class Char, class Traits>
