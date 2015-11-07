@@ -21,6 +21,7 @@ namespace blackhole {
 
 // TODO: Try to encapsulate.
 #ifdef BLACKHOLE_HAVE_SMALL_VECTOR
+// TODO: Use initializer_list instead?
 typedef boost::container::small_vector<std::pair<string_view, attribute::value_t>, 16> attributes_t;
 typedef boost::container::small_vector<std::pair<std::string, attribute::owned_t>, 16> attributes_w_t;
 typedef boost::container::small_vector<std::reference_wrapper<const attributes_t>, 16> range_t;
