@@ -26,6 +26,10 @@ struct value_t {
     value_t(double val): inner(val) {}
     value_t(string_view val): inner(val) {}
     value_t(const owned_t& val);
+
+    auto operator==(const value_t& other) const -> bool {
+        return inner == other.inner;
+    }
 };
 
 template<typename T>
