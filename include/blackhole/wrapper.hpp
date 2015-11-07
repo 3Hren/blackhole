@@ -6,11 +6,15 @@ namespace blackhole {
 
 class wrapper_t : public logger_t {
     logger_t& inner;
-    attributes_t attributes;
+    attributes_t attributes_;
     attributes_w_t owned;
 
 public:
     wrapper_t(logger_t& log, attributes_w_t owned);
+
+    auto attributes() const noexcept -> const attributes_t& {
+        return attributes_;
+    }
 
     auto log(int severity, string_view message) const -> void;
     auto log(int severity, string_view message, range_t& range) const -> void;
