@@ -121,9 +121,6 @@ inline
 auto
 logger_facade<Logger>::log(int severity, string_view format, const T& arg, const Args&... args) const -> void {
     const auto fn = std::bind(&gcc::write_all<T, Args...>, std::placeholders::_1, format.data(), std::cref(arg), std::cref(args)...);
-    // const auto fn = [&](writer_t& wr) {
-    //     wr.write(format.data(), arg, args...);
-    // };
 
     range_t range;
     inner().log(severity, format, range, std::cref(fn));
@@ -143,9 +140,6 @@ inline
 auto
 logger_facade<Logger>::log(int severity, const attribute_list& attributes, string_view format, const T& arg, const Args&... args) const -> void {
     const auto fn = std::bind(&gcc::write_all<T, Args...>, std::placeholders::_1, format.data(), std::cref(arg), std::cref(args)...);
-    // const auto fn = [&](writer_t& wr) {
-    //     wr.write(format.data(), arg, args...);
-    // };
 
     range_t range{attributes};
     inner().log(severity, format, range, std::cref(fn));
