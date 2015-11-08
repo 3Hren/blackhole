@@ -7,17 +7,19 @@ namespace blackhole {
 namespace attribute {
 namespace {
 
-struct from_owned_t: public boost::static_visitor<value_t::type> {
+struct into_view: public boost::static_visitor<view_t::type> {
+    typedef view_t::type result_type;
+
     template<typename T>
-    auto operator()(const T& val) const -> value_t::type {
-        return val;
+    auto operator()(const T& value) const -> result_type {
+        return value;
     }
 };
 
 }  // namespace
 
-value_t::value_t(const owned_t& val):
-    inner(boost::apply_visitor(from_owned_t(), val.inner))
+view_t::view_t(const value_t& value):
+    inner(value.apply(into_view()))
 {}
 
 }  // namespace attribute

@@ -10,6 +10,7 @@
 #endif
 
 #ifdef BLACKHOLE_HAVE_SMALL_VECTOR
+    // TODO: Use stack composable allocator instead.
     #include <boost/container/small_vector.hpp>
 #else
     #include <vector>
@@ -19,17 +20,38 @@
 
 namespace blackhole {
 
-// TODO: Try to encapsulate.
+typedef std::pair<std::string, attribute::value_t> attribute_t;
+
 #ifdef BLACKHOLE_HAVE_SMALL_VECTOR
-// TODO: Use initializer_list instead?
-typedef boost::container::small_vector<std::pair<string_view, attribute::value_t>, 16> attributes_t;
-typedef boost::container::small_vector<std::pair<std::string, attribute::owned_t>, 16> attributes_w_t;
-typedef boost::container::small_vector<std::reference_wrapper<const attributes_t>, 16> range_t;
+typedef boost::container::small_vector<attribute_t, 16> attributes_t;
 #else
-typedef std::vector<std::pair<string_view, attribute::value_t>> attributes_t;
-typedef std::vector<std::pair<std::string, attribute::owned_t>> attributes_w_t;
+typedef std::vector<attribute_t> attributes_t;
+#endif
+
+template<>
+struct view_of<attribute_t> {
+    typedef string_view key_type;
+    typedef attribute::view_t value_type;
+
+    typedef std::pair<key_type, value_type> type;
+};
+
+template<>
+struct view_of<attributes_t> {
+    typedef view_of<attribute_t>::type value_type;
+
+#ifdef BLACKHOLE_HAVE_SMALL_VECTOR
+    typedef boost::container::small_vector<value_type, 16> type;
+#else
+    typedef std::vector<value_type> type;
+#endif
+};
+
+#ifdef BLACKHOLE_HAVE_SMALL_VECTOR
+typedef boost::container::small_vector<std::reference_wrapper<const view_of<attributes_t>::type>, 16> range_t;
+#else
 // TODO: I can use stack allocator with fallback for portability.
-typedef std::vector<std::reference_wrapper<const attributes_t>> range_t;
+typedef std::vector<std::reference_wrapper<const view_of<attributes_t>::type>> range_t;
 #endif
 
 }  // namespace blackhole

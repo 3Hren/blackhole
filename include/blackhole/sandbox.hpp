@@ -4,7 +4,6 @@
 #include <iostream>
 #include <string>
 
-#define FMT_HEADER_ONLY
 #include <cppformat/format.h>
 
 #include "blackhole/cpp17/optional.hpp"

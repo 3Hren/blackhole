@@ -2,7 +2,6 @@
 
 #include <functional>
 
-#define FMT_HEADER_ONLY
 #include <cppformat/format.h>
 
 #if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
@@ -25,6 +24,8 @@ public:
         inner.write(args...);
     }
 };
+
+typedef view_of<attributes_t>::type attribute_list;
 
 /// Logging facade wraps the underlying logger providing convenient format methods.
 ///
@@ -56,7 +57,7 @@ public:
     /// Log a message with the given severity level and attributes.
     ///
     /// \overload
-    auto log(int severity, const attributes_t& attributes, string_view format) const -> void;
+    auto log(int severity, const attribute_list& attributes, string_view format) const -> void;
 
     /// Log a message with the given severity level and attributes and further formatting using the
     /// given pattern and arguments.
@@ -64,7 +65,7 @@ public:
     /// \overload
     /// \tparam T and Args... must meet the requirements of `StreamFormatted`.
     template<typename T, typename... Args>
-    auto log(int severity, const attributes_t& attributes, string_view format, const T& arg, const Args&... args) const -> void;
+    auto log(int severity, const attribute_list& attributes, string_view format, const T& arg, const Args&... args) const -> void;
 
 #if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
     /// Log a message with the given severity level and further formatting using the given pattern
@@ -87,7 +88,7 @@ public:
     /// \overload
     /// \tparam T and Args... must meet the requirements of `StreamFormatted`.
     template<std::size_t N, typename T, typename... Args>
-    auto log(int severity, const attributes_t& attributes, const detail::formatter<N>& formatter, const T& arg, const Args&... args) const -> void;
+    auto log(int severity, const attribute_list& attributes, const detail::formatter<N>& formatter, const T& arg, const Args&... args) const -> void;
 #endif
 
 private:
@@ -131,7 +132,7 @@ logger_facade<Logger>::log(int severity, string_view format, const T& arg, const
 template<typename Logger>
 inline
 auto
-logger_facade<Logger>::log(int severity, const attributes_t& attributes, string_view format) const -> void {
+logger_facade<Logger>::log(int severity, const attribute_list& attributes, string_view format) const -> void {
     range_t range{attributes};
     inner().log(severity, format, range);
 }
@@ -140,7 +141,7 @@ template<typename Logger>
 template<typename T, typename... Args>
 inline
 auto
-logger_facade<Logger>::log(int severity, const attributes_t& attributes, string_view format, const T& arg, const Args&... args) const -> void {
+logger_facade<Logger>::log(int severity, const attribute_list& attributes, string_view format, const T& arg, const Args&... args) const -> void {
     const auto fn = std::bind(&gcc::write_all<T, Args...>, std::placeholders::_1, format.data(), std::cref(arg), std::cref(args)...);
     // const auto fn = [&](writer_t& wr) {
     //     wr.write(format.data(), arg, args...);

@@ -6,21 +6,19 @@ namespace blackhole {
 
 class wrapper_t : public logger_t {
     logger_t& inner;
-    attributes_t attributes_;
-    attributes_w_t owned;
+    attributes_t storage;
+    view_of<attributes_t>::type attributes_view;
 
 public:
-    wrapper_t(logger_t& log, attributes_w_t owned);
+    wrapper_t(logger_t& log, attributes_t attributes);
 
-    auto attributes() const noexcept -> const attributes_t& {
-        return attributes_;
+    auto attributes() const noexcept -> const view_of<attributes_t>::type& {
+        return attributes_view;
     }
 
     auto log(int severity, string_view message) const -> void;
     auto log(int severity, string_view message, range_t& range) const -> void;
     auto log(int severity, string_view message, range_t& range, const format_t& fn) const -> void;
 };
-
-// TODO: auto make_wrapper(attributes_w_t attributes) -> std::unique_ptr<logger_t>;
 
 }  // namespace blackhole

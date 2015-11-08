@@ -18,7 +18,7 @@ include_directories(BEFORE SYSTEM
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-# add_library(cppformat STATIC foreign/cppformat/format)
+add_library(cppformat STATIC foreign/cppformat/format)
 
 add_library(${LIBRARY_NAME} SHARED
 	src/attribute
@@ -77,7 +77,7 @@ else ()
 endif ()
 
 target_link_libraries(${LIBRARY_NAME}
-	# cppformat
+	cppformat
 )
 
 if (ENABLE_TESTING)
@@ -89,6 +89,7 @@ if (ENABLE_TESTING)
 	prepare_google_testing()
 
     add_executable(${LIBRARY_NAME}-tests
+		tests/attribute
         tests/root
 		tests/wrapper
     )

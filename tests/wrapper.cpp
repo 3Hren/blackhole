@@ -24,18 +24,18 @@ public:
 
 TEST(Wrapper, Constructor) {
     using attribute::value_t;
-    using attribute::owned_t;
+    using attribute::view_t;
 
     mock::logger_t logger;
 
     wrapper_t wrapper(logger, {
-        {"key#0", owned_t(0)},
-        {"key#1", owned_t("value#1")}
-    });
-
-    const attributes_t expected = {
         {"key#0", value_t(0)},
         {"key#1", value_t("value#1")}
+    });
+
+    const view_of<attributes_t>::type expected = {
+        {"key#0", view_t(0)},
+        {"key#1", view_t("value#1")}
     };
 
     EXPECT_EQ(expected, wrapper.attributes());

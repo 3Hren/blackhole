@@ -2,12 +2,12 @@
 
 namespace blackhole {
 
-wrapper_t::wrapper_t(logger_t& log, attributes_w_t owned_):
+wrapper_t::wrapper_t(logger_t& log, attributes_t attributes):
     inner(log),
-    owned(std::move(owned_))
+    storage(std::move(attributes))
 {
-    for (const auto& attribute : owned) {
-        attributes_.emplace_back(attribute);
+    for (const auto& attribute : storage) {
+        attributes_view.emplace_back(attribute);
     }
 }
 
