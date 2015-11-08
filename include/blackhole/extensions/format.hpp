@@ -64,6 +64,7 @@ public:
     ///
     /// \overload
     /// \tparam T and Args... must meet the requirements of `StreamFormatted`.
+    // TODO: Find a way to make the `attribute_list` argument last.
     template<typename T, typename... Args>
     auto log(int severity, const attribute_list& attributes, string_view format, const T& arg, const Args&... args) const -> void;
 
