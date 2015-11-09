@@ -78,6 +78,7 @@ private:
     std::reference_wrapper<const wrapped_type> wrapped;
 
 public:
+    /// Creates a logger facade by wrapping the given logger.
     constexpr explicit logger_facade(const wrapped_type& wrapped) noexcept:
         wrapped(wrapped)
     {}
