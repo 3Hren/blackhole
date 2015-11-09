@@ -25,7 +25,95 @@ public:
     }
 };
 
+namespace gcc {
+
+/// Workaround for GCC versions up to 4.9, which fails to expand variadic pack inside lambdas.
+template<class... Args>
+inline void write_all(writer_t& wr, const char* pattern, const Args&... args) {
+    wr.write(pattern, args...);
+}
+
+}  // namespace gcc
+
+template<typename... Args>
+class args_t {
+    typedef decltype(std::bind(&gcc::write_all<Args...>, std::placeholders::_1,
+        // std::declval<string_view>().data(),
+        std::placeholders::_2,
+        std::declval<std::reference_wrapper<const Args>>()...
+    )) storage_type;
+
+    mutable storage_type storage;
+
+public:
+    mutable const char* format;
+
+    constexpr
+    args_t(const Args&... args) noexcept:
+        // storage(std::bind(&gcc::write_all<Args...>, std::placeholders::_1, format.data(), std::cref(args)...))
+        storage(std::bind(&gcc::write_all<Args...>, std::placeholders::_1, std::placeholders::_2, std::cref(args)...)),
+        format(nullptr)
+    {}
+
+    constexpr
+    auto bind(const char* format) const -> void {
+        this->format = format;
+    }
+
+    constexpr
+    auto operator()(writer_t& wr) const -> void {
+        storage(wr, format);
+    }
+};
+
+template<typename... Args>
+auto formatted(const Args&... args) -> args_t<Args...> {
+    return args_t<Args...>(args...);
+}
+
 typedef view_of<attributes_t>::type attribute_list;
+
+/// Helper metafunction that deduces the last type from the given variadic pack.
+template<class... Tail>
+struct last_of;
+
+template<class T, class U, class... Tail>
+struct last_of<T, U, Tail...> {
+    typedef typename last_of<U, Tail...>::type type;
+};
+
+template<class T>
+struct last_of<T> {
+    typedef T type;
+};
+
+namespace detail {
+
+template<typename... Args>
+struct dummy_t {};
+
+template<template<typename...> class F, typename T, typename... Args>
+struct internal_t;
+
+template<template<typename...> class F, typename... Args, typename T, typename... Tail>
+struct internal_t<F, dummy_t<Args...>, T, Tail...> {
+    typedef typename internal_t<F, dummy_t<Args..., T>, Tail...>::type type;
+};
+
+template<template<typename...> class F, typename... Args, typename Tail, typename Last>
+struct internal_t<F, dummy_t<Args...>, Tail, Last> {
+    typedef F<Args..., Tail> type;
+};
+
+template<typename... Args>
+struct with_attributes : public std::is_same<typename last_of<Args...>::type, attribute_list> {};
+
+template<template<typename...> class F, typename... Args>
+struct without_tail {
+    typedef typename detail::internal_t<F, detail::dummy_t<>, Args...>::type type;
+};
+
+}  // namespace detail
 
 /// Logging facade wraps the underlying logger providing convenient format methods.
 ///
@@ -42,6 +130,23 @@ public:
     constexpr explicit logger_facade(const wrapped_type& wrapped) noexcept:
         wrapped(wrapped)
     {}
+
+    template<typename... Args>
+    auto Log(int severity,
+             const string_view& format,
+             const args_t<Args...>& args,
+             const attribute_list& attributes) const -> void
+    {
+        args.bind(format.data());
+
+        range_t range{attributes};
+        inner().log(severity, format, range, std::cref(args));
+    }
+
+    template<typename... Args>
+    auto Hog(int severity, const string_view& format, const Args&... args) const -> void {
+        deduce(severity, format, args...);
+    }
 
     /// Log a message with the given severity level.
     auto log(int severity, string_view format) const -> void;
@@ -96,17 +201,42 @@ private:
     constexpr auto inner() const noexcept -> const wrapped_type& {
         return wrapped.get();
     }
+
+    template<typename... Args>
+    inline
+    auto deduce(int severity, const string_view& format, const Args&... args) const ->
+        typename std::enable_if<!detail::with_attributes<Args...>::value>::type
+    {
+        const auto fn = std::bind(&gcc::write_all<Args...>, std::placeholders::_1, format.data(), std::cref(args)...);
+
+        range_t range;
+        inner().log(severity, format, range, std::cref(fn));
+    }
+
+    template<class... Args>
+    struct applier_t {
+        static
+        auto apply(const wrapped_type& log,
+                   int severity,
+                   const string_view& format,
+                   const Args&... args,
+                   const attribute_list& attributes) -> void
+        {
+            const auto fn = std::bind(&gcc::write_all<Args...>, std::placeholders::_1, format.data(), std::cref(args)...);
+
+            range_t range{attributes};
+            log.log(severity, format, range, std::cref(fn));
+        }
+    };
+
+    template<typename... Args>
+    constexpr
+    auto deduce(int severity, const string_view& format, const Args&... args) const ->
+        typename std::enable_if<detail::with_attributes<Args...>::value>::type
+    {
+        detail::without_tail<applier_t, Args...>::type::apply(inner(), severity, format, args...);
+    }
 };
-
-namespace gcc {
-
-/// Workaround for GCC versions up to 4.9, which fails to expand variadic pack inside lambdas.
-template<class... Args>
-inline void write_all(writer_t& wr, const char* pattern, const Args&... args) {
-    wr.write(pattern, args...);
-}
-
-}  // namespace gcc
 
 template<typename Logger>
 inline

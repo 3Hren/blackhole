@@ -4,6 +4,7 @@
 
 #include <boost/mpl/transform.hpp>
 #include <boost/mpl/vector.hpp>
+#include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/variant.hpp>
 
 #include "blackhole/cpp17/string_view.hpp"

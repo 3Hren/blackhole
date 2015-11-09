@@ -251,19 +251,37 @@ literal_with_args_and_attributes_and_three_wrappers(::benchmark::State& state) {
     logger_facade<wrapper_t> logger(wrapper3);
 
     while (state.KeepRunning()) {
-        logger.log(0,
-            {
+        // logger.Log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
+        //     formatted("[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326),
+        //     {
+        //         {"key#6", view_t(42)},
+        //         {"key#7", view_t(3.1415)},
+        //         {"key#8", view_t("value")}
+        //     }
+        // );
+
+        logger.Hog(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
+            "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326,
+            attribute_list{
                 {"key#6", view_t(42)},
                 {"key#7", view_t(3.1415)},
                 {"key#8", view_t("value")}
-            }, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
-            "[::]",
-            "esafronov",
-            "10/Oct/2000:13:55:36 -0700",
-            "/porn.png",
-            200,
-            2326
+            }
         );
+
+        // logger.log(0,
+        //     {
+        //         {"key#6", view_t(42)},
+        //         {"key#7", view_t(3.1415)},
+        //         {"key#8", view_t("value")}
+        //     }, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
+        //     "[::]",
+        //     "esafronov",
+        //     "10/Oct/2000:13:55:36 -0700",
+        //     "/porn.png",
+        //     200,
+        //     2326
+        // );
     }
 
     state.SetItemsProcessed(state.iterations());
