@@ -27,19 +27,16 @@ public:
 }  // namespace mock
 
 TEST(Wrapper, Constructor) {
-    using attribute::value_t;
-    using attribute::view_t;
-
     mock::logger_t logger;
 
     wrapper_t wrapper(logger, {
-        {"key#0", value_t(0)},
-        {"key#1", value_t("value#1")}
+        {"key#0", {0}},
+        {"key#1", {"value#1"}}
     });
 
     const view_of<attributes_t>::type expected = {
-        {"key#0", view_t(0)},
-        {"key#1", view_t("value#1")}
+        {"key#0", {0}},
+        {"key#1", {"value#1"}}
     };
 
     EXPECT_EQ(expected, wrapper.attributes());
@@ -50,8 +47,6 @@ TEST(Wrapper, Constructor) {
 // p a
 // p f a
 TEST(__TESTING__, __API__) {
-    using attribute::view_t;
-
     root_logger_t root({});
     logger_facade<root_logger_t> logger(root);
 
@@ -62,9 +57,9 @@ TEST(__TESTING__, __API__) {
     logger.log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
         "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326,
         attribute_list{
-            {"key#6", view_t(42)},
-            {"key#7", view_t(3.1415)},
-            {"key#8", view_t("value")}
+            {"key#6", {42}},
+            {"key#7", {3.1415}},
+            {"key#8", {"value"}}
         }
     );
 }

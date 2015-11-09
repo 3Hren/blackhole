@@ -12,9 +12,6 @@
 namespace blackhole {
 namespace benchmark {
 
-using attribute::value_t;
-using attribute::view_t;
-
 static
 void
 literal(::benchmark::State& state) {
@@ -82,13 +79,7 @@ literal_with_args(::benchmark::State& state) {
 
     while (state.KeepRunning()) {
         logger.log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
-            "[::]",
-            "esafronov",
-            "10/Oct/2000:13:55:36 -0700",
-            "/porn.png",
-            200,
-            2326
-        );
+            "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326);
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -107,13 +98,7 @@ literal_with_args_using_cpp14_formatter(::benchmark::State& state) {
         >("{} - {} [{}] 'GET {} HTTP/1.0' {} {}");
 
         logger.log(0, formatter,
-            "[::]",
-            "esafronov",
-            "10/Oct/2000:13:55:36 -0700",
-            "/porn.png",
-            200,
-            2326
-        );
+            "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326);
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -128,9 +113,9 @@ literal_with_attributes(::benchmark::State& state) {
 
     while (state.KeepRunning()) {
         logger.log(0, "[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326", {
-            {"key#1", view_t(42)},
-            {"key#2", view_t(3.1415)},
-            {"key#3", view_t("value")}
+            {"key#1", {42}},
+            {"key#2", {3.1415}},
+            {"key#3", {"value"}}
         });
     }
 
@@ -147,9 +132,9 @@ literal_with_args_and_attributes(::benchmark::State& state) {
         logger.log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
             "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326,
             attribute_list{
-                {"key#1", view_t(42)},
-                {"key#2", view_t(3.1415)},
-                {"key#3", view_t("value")}
+                {"key#1", {42}},
+                {"key#2", {3.1415}},
+                {"key#3", {"value"}}
             }
         );
     }
@@ -162,8 +147,8 @@ void
 literal_with_args_and_attributes_and_wrapper(::benchmark::State& state) {
     root_logger_t root({});
     wrapper_t wrapper{root, {
-        {"key#0", value_t(500)},
-        {"key#1", value_t("value#1")}
+        {"key#0", {500}},
+        {"key#1", {"value#1"}}
     }};
 
     logger_facade<wrapper_t> logger(wrapper);
@@ -172,9 +157,9 @@ literal_with_args_and_attributes_and_wrapper(::benchmark::State& state) {
         logger.log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
             "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326,
             attribute_list{
-                {"key#1", view_t(42)},
-                {"key#2", view_t(3.1415)},
-                {"key#3", view_t("value")}
+                {"key#1", {42}},
+                {"key#2", {3.1415}},
+                {"key#3", {"value"}}
             }
         );
     }
@@ -188,13 +173,13 @@ literal_with_args_and_attributes_and_two_wrappers(::benchmark::State& state) {
     root_logger_t root({});
 
     wrapper_t wrapper1{root, {
-        {"key#0", value_t(500)},
-        {"key#1", value_t("value#1")}
+        {"key#0", {500}},
+        {"key#1", {"value#1"}}
     }};
 
     wrapper_t wrapper2{wrapper1, {
-        {"key#2", value_t(500)},
-        {"key#3", value_t("value#3")}
+        {"key#2", {500}},
+        {"key#3", {"value#3"}}
     }};
 
     logger_facade<wrapper_t> logger(wrapper2);
@@ -213,18 +198,18 @@ literal_with_args_and_attributes_and_three_wrappers(::benchmark::State& state) {
     root_logger_t root({});
 
     wrapper_t wrapper1{root, {
-        {"key#0", value_t(500)},
-        {"key#1", value_t("value#1")}
+        {"key#0", {500}},
+        {"key#1", {"value#1"}}
     }};
 
     wrapper_t wrapper2{wrapper1, {
-        {"key#2", value_t(500)},
-        {"key#3", value_t("value#1")}
+        {"key#2", {500}},
+        {"key#3", {"value#1"}}
     }};
 
     wrapper_t wrapper3{wrapper2, {
-        {"key#4", value_t(500)},
-        {"key#5", value_t("value#5")}
+        {"key#4", {500}},
+        {"key#5", {"value#5"}}
     }};
 
     logger_facade<wrapper_t> logger(wrapper3);
@@ -274,9 +259,9 @@ BENCHMARK_DEFINE_F(threaded_fixture_t, facade)(::benchmark::State& state) {
        logger.log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
            "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326,
            attribute_list{
-               {"key#6", view_t(42)},
-               {"key#7", view_t(3.1415)},
-               {"key#8", view_t("value")}
+               {"key#6", {42}},
+               {"key#7", {3.1415}},
+               {"key#8", {"value"}}
            }
        );
     }
