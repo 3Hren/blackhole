@@ -44,7 +44,7 @@ process was chosen because of many reasons.
 
 Mainly, header-only libraries has one big disadvantage: any code change may (or not) result in recompiling all its dependencies, otherwise having weird runtime errors with symbol loading race.
 
-The other reason was an radically to reduce compile time, because it was fucking huge!
+The other reason was the personal aim to reduce compile time, because it was fucking huge!
 
 Of course there are disadvantages, such as virtual function call cost and closed doors for inlining, but here my personal benchmark-driven development helped to avoid performance degradation.
 
