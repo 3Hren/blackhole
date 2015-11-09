@@ -37,19 +37,31 @@ elapsed:   2326
 Blackhole allows to specify any number of attributes you want, providing an ability to work with them before of while
 you writing them into its final destination. For example, Elasticsearch.
 
+### Shared library
+
+Despite the header-only dark past now Blackhole is developing as a shared library. Such radical change of distributing
+process was chosen because of many reasons.
+
+Mainly, header-only libraries has one big disadvantage: any code change may (or not) result in recompiling all its dependencies, otherwise having weird runtime errors with symbol loading race.
+
+The other reason was an radically to reduce compile time, because it was fucking huge!
+
+Of course there are disadvantages, such as virtual function call cost and closed doors for inlining, but here my personal benchmark-driven development helped to avoid performance degradation.
+
 ### Planning
 
 - [x] Shared library.
-- [x] Optional compile-time inline messages transformation.
+- [ ] Inline namespaces (?).
+- [x] Optional compile-time inline messages transformation (C++14).
 - [x] Python-like formatting (no printf-like formatting support) both inline and result messages.
 - [x] Attributes.
 - [ ] Scatter-gathered IO (?)
 - [ ] Scoped attributes.
-- [ ] Optional thread-safety.
+- [ ] Optional thread-safety (?).
 - [x] Wrappers.
 - [ ] Custom verbosity.
 - [x] Custom attributes formatting.
-- [ ] Optional asynchronous queue.
+- [ ] Optional asynchronous pipelining.
 
 ### Formatters
 
