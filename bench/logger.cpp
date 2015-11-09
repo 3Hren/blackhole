@@ -127,11 +127,11 @@ literal_with_attributes(::benchmark::State& state) {
     logger_facade<root_logger_t> logger(root);
 
     while (state.KeepRunning()) {
-        logger.log(0, {
+        logger.log(0, "[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326", {
             {"key#1", view_t(42)},
             {"key#2", view_t(3.1415)},
             {"key#3", view_t("value")}
-        }, "[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326");
+        });
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -144,18 +144,13 @@ literal_with_args_and_attributes(::benchmark::State& state) {
     logger_facade<root_logger_t> logger(root);
 
     while (state.KeepRunning()) {
-        logger.log(0,
-            {
+        logger.log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
+            "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326,
+            attribute_list{
                 {"key#1", view_t(42)},
                 {"key#2", view_t(3.1415)},
                 {"key#3", view_t("value")}
-            }, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
-            "[::]",
-            "esafronov",
-            "10/Oct/2000:13:55:36 -0700",
-            "/porn.png",
-            200,
-            2326
+            }
         );
     }
 
@@ -174,18 +169,13 @@ literal_with_args_and_attributes_and_wrapper(::benchmark::State& state) {
     logger_facade<wrapper_t> logger(wrapper);
 
     while (state.KeepRunning()) {
-        logger.log(0,
-            {
+        logger.log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
+            "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326,
+            attribute_list{
                 {"key#1", view_t(42)},
                 {"key#2", view_t(3.1415)},
                 {"key#3", view_t("value")}
-            }, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
-            "[::]",
-            "esafronov",
-            "10/Oct/2000:13:55:36 -0700",
-            "/porn.png",
-            200,
-            2326
+            }
         );
     }
 
@@ -210,19 +200,8 @@ literal_with_args_and_attributes_and_two_wrappers(::benchmark::State& state) {
     logger_facade<wrapper_t> logger(wrapper2);
 
     while (state.KeepRunning()) {
-        logger.log(0,
-            {
-                {"key#1", view_t(42)},
-                {"key#2", view_t(3.1415)},
-                {"key#3", view_t("value")}
-            }, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
-            "[::]",
-            "esafronov",
-            "10/Oct/2000:13:55:36 -0700",
-            "/porn.png",
-            200,
-            2326
-        );
+        logger.log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
+            "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326);
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -251,37 +230,14 @@ literal_with_args_and_attributes_and_three_wrappers(::benchmark::State& state) {
     logger_facade<wrapper_t> logger(wrapper3);
 
     while (state.KeepRunning()) {
-        // logger.Log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
-        //     formatted("[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326),
-        //     {
-        //         {"key#6", view_t(42)},
-        //         {"key#7", view_t(3.1415)},
-        //         {"key#8", view_t("value")}
-        //     }
-        // );
-
-        logger.Hog(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
+        logger.log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
             "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326,
             attribute_list{
-                {"key#6", view_t(42)},
-                {"key#7", view_t(3.1415)},
-                {"key#8", view_t("value")}
+                {"key#6", {42}},
+                {"key#7", {3.1415}},
+                {"key#8", {"value"}}
             }
         );
-
-        // logger.log(0,
-        //     {
-        //         {"key#6", view_t(42)},
-        //         {"key#7", view_t(3.1415)},
-        //         {"key#8", view_t("value")}
-        //     }, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
-        //     "[::]",
-        //     "esafronov",
-        //     "10/Oct/2000:13:55:36 -0700",
-        //     "/porn.png",
-        //     200,
-        //     2326
-        // );
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -315,18 +271,13 @@ public:
 
 BENCHMARK_DEFINE_F(threaded_fixture_t, facade)(::benchmark::State& state) {
    while (state.KeepRunning()) {
-       logger.log(0,
-           {
+       logger.log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
+           "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326,
+           attribute_list{
                {"key#6", view_t(42)},
                {"key#7", view_t(3.1415)},
                {"key#8", view_t("value")}
-           }, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
-           "[::]",
-           "esafronov",
-           "10/Oct/2000:13:55:36 -0700",
-           "/porn.png",
-           200,
-           2326
+           }
        );
     }
 

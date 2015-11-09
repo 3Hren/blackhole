@@ -13,6 +13,7 @@
 
 namespace blackhole {
 
+namespace ph = std::placeholders;
 namespace cppformat = fmt;
 
 class writer_t {
@@ -35,87 +36,40 @@ inline void write_all(writer_t& wr, const char* pattern, const Args&... args) {
 
 }  // namespace gcc
 
-template<typename... Args>
-class args_t {
-    typedef decltype(std::bind(&gcc::write_all<Args...>, std::placeholders::_1,
-        // std::declval<string_view>().data(),
-        std::placeholders::_2,
-        std::declval<std::reference_wrapper<const Args>>()...
-    )) storage_type;
-
-    mutable storage_type storage;
-
-public:
-    mutable const char* format;
-
-    constexpr
-    args_t(const Args&... args) noexcept:
-        // storage(std::bind(&gcc::write_all<Args...>, std::placeholders::_1, format.data(), std::cref(args)...))
-        storage(std::bind(&gcc::write_all<Args...>, std::placeholders::_1, std::placeholders::_2, std::cref(args)...)),
-        format(nullptr)
-    {}
-
-    constexpr
-    auto bind(const char* format) const -> void {
-        this->format = format;
-    }
-
-    constexpr
-    auto operator()(writer_t& wr) const -> void {
-        storage(wr, format);
-    }
-};
-
-template<typename... Args>
-auto formatted(const Args&... args) -> args_t<Args...> {
-    return args_t<Args...>(args...);
-}
-
 typedef view_of<attributes_t>::type attribute_list;
 
+namespace detail {
+
 /// Helper metafunction that deduces the last type from the given variadic pack.
-template<class... Tail>
+///
+/// For example:
+///     last_of<int>::type         => int.
+///     last_of<int, double>::type => double.
+template<typename T, typename... Tail>
 struct last_of;
 
-template<class T, class U, class... Tail>
+template<typename T, typename U, typename... Tail>
 struct last_of<T, U, Tail...> {
     typedef typename last_of<U, Tail...>::type type;
 };
 
-template<class T>
+template<typename T>
 struct last_of<T> {
     typedef T type;
 };
 
-namespace detail {
-
-template<typename... Args>
-struct dummy_t {};
-
-template<template<typename...> class F, typename T, typename... Args>
-struct internal_t;
-
-template<template<typename...> class F, typename... Args, typename T, typename... Tail>
-struct internal_t<F, dummy_t<Args...>, T, Tail...> {
-    typedef typename internal_t<F, dummy_t<Args..., T>, Tail...>::type type;
-};
-
-template<template<typename...> class F, typename... Args, typename Tail, typename Last>
-struct internal_t<F, dummy_t<Args...>, Tail, Last> {
-    typedef F<Args..., Tail> type;
-};
-
+/// Helper metafunction that determines whether the last parameter from given variadic pack is an
+/// attributes list.
+///
+/// For example:
+///     with_attributes<int, double>::type                 => std::false_type.
+///     with_attributes<int, double, attribute_list>::type => std::true_type.
 template<typename... Args>
 struct with_attributes : public std::is_same<typename last_of<Args...>::type, attribute_list> {};
 
-template<template<typename...> class F, typename... Args>
-struct without_tail {
-    typedef typename detail::internal_t<F, detail::dummy_t<>, Args...>::type type;
-};
-
 }  // namespace detail
 
-/// Logging facade wraps the underlying logger providing convenient format methods.
+/// Logging facade wraps the underlying logger and provides convenient formatting methods.
 ///
 /// \tparam Logger must meet the requirements of `Logger`.
 template<typename Logger>
@@ -131,47 +85,22 @@ public:
         wrapped(wrapped)
     {}
 
-    template<typename... Args>
-    auto Log(int severity,
-             const string_view& format,
-             const args_t<Args...>& args,
-             const attribute_list& attributes) const -> void
-    {
-        args.bind(format.data());
-
-        range_t range{attributes};
-        inner().log(severity, format, range, std::cref(args));
-    }
-
-    template<typename... Args>
-    auto Hog(int severity, const string_view& format, const Args&... args) const -> void {
-        deduce(severity, format, args...);
-    }
-
     /// Log a message with the given severity level.
     auto log(int severity, string_view format) const -> void;
-
-    /// Log a message with the given severity level and further formatting using the given pattern
-    /// and arguments.
-    ///
-    /// \overload
-    /// \tparam T and Args... must meet the requirements of `StreamFormatted`.
-    template<typename T, typename... Args>
-    auto log(int severity, string_view format, const T& arg, const Args&... args) const -> void;
 
     /// Log a message with the given severity level and attributes.
     ///
     /// \overload
-    auto log(int severity, const attribute_list& attributes, string_view format) const -> void;
+    auto log(int severity, string_view format, const attribute_list& attributes) const -> void;
 
-    /// Log a message with the given severity level and attributes and further formatting using the
-    /// given pattern and arguments.
+    /// Log a message with the given severity level and further formatting using the given pattern
+    /// and arguments with optional attributes list as a last parameter.
     ///
     /// \overload
     /// \tparam T and Args... must meet the requirements of `StreamFormatted`.
-    // TODO: Find a way to make the `attribute_list` argument last.
+    /// \note the last parameter of variadic `Args...` pack can be an `attribute_list`.
     template<typename T, typename... Args>
-    auto log(int severity, const attribute_list& attributes, string_view format, const T& arg, const Args&... args) const -> void;
+    auto log(int severity, string_view format, const T& arg, const Args&... args) const -> void;
 
 #if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
     /// Log a message with the given severity level and further formatting using the given pattern
@@ -202,40 +131,21 @@ private:
         return wrapped.get();
     }
 
+    /// Selects the proper method overload when using variadic pack interface.
+    ///
+    /// \overload for variadic pack without attribute list as the last argument.
     template<typename... Args>
     inline
-    auto deduce(int severity, const string_view& format, const Args&... args) const ->
-        typename std::enable_if<!detail::with_attributes<Args...>::value>::type
-    {
-        const auto fn = std::bind(&gcc::write_all<Args...>, std::placeholders::_1, format.data(), std::cref(args)...);
+    auto select(int severity, const string_view& format, const Args&... args) const ->
+        typename std::enable_if<!detail::with_attributes<Args...>::value>::type;
 
-        range_t range;
-        inner().log(severity, format, range, std::cref(fn));
-    }
-
-    template<class... Args>
-    struct applier_t {
-        static
-        auto apply(const wrapped_type& log,
-                   int severity,
-                   const string_view& format,
-                   const Args&... args,
-                   const attribute_list& attributes) -> void
-        {
-            const auto fn = std::bind(&gcc::write_all<Args...>, std::placeholders::_1, format.data(), std::cref(args)...);
-
-            range_t range{attributes};
-            log.log(severity, format, range, std::cref(fn));
-        }
-    };
-
+    /// Selects the proper method overload when using variadic pack interface.
+    ///
+    /// \overload for variadic pack with attribute list as the last argument.
     template<typename... Args>
     constexpr
-    auto deduce(int severity, const string_view& format, const Args&... args) const ->
-        typename std::enable_if<detail::with_attributes<Args...>::value>::type
-    {
-        detail::without_tail<applier_t, Args...>::type::apply(inner(), severity, format, args...);
-    }
+    auto select(int severity, const string_view& format, const Args&... args) const ->
+        typename std::enable_if<detail::with_attributes<Args...>::value>::type;
 };
 
 template<typename Logger>
@@ -251,29 +161,15 @@ template<typename T, typename... Args>
 inline
 auto
 logger_facade<Logger>::log(int severity, string_view format, const T& arg, const Args&... args) const -> void {
-    const auto fn = std::bind(&gcc::write_all<T, Args...>, std::placeholders::_1, format.data(), std::cref(arg), std::cref(args)...);
-
-    range_t range;
-    inner().log(severity, format, range, std::cref(fn));
+    select(severity, format, arg, args...);
 }
 
 template<typename Logger>
 inline
 auto
-logger_facade<Logger>::log(int severity, const attribute_list& attributes, string_view format) const -> void {
+logger_facade<Logger>::log(int severity, string_view format, const attribute_list& attributes) const -> void {
     range_t range{attributes};
     inner().log(severity, format, range);
-}
-
-template<typename Logger>
-template<typename T, typename... Args>
-inline
-auto
-logger_facade<Logger>::log(int severity, const attribute_list& attributes, string_view format, const T& arg, const Args&... args) const -> void {
-    const auto fn = std::bind(&gcc::write_all<T, Args...>, std::placeholders::_1, format.data(), std::cref(arg), std::cref(args)...);
-
-    range_t range{attributes};
-    inner().log(severity, format, range, std::cref(fn));
 }
 
 #if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
@@ -292,5 +188,70 @@ logger_facade<Logger>::log(int severity, const detail::formatter<N>& formatter, 
 }
 
 #endif
+
+namespace detail {
+
+template<typename... Args>
+struct dummy_t {};
+
+template<template<typename...> class F, typename T, typename... Args>
+struct internal_t;
+
+template<template<typename...> class F, typename... Args, typename T, typename... Tail>
+struct internal_t<F, dummy_t<Args...>, T, Tail...> {
+    typedef typename internal_t<F, dummy_t<Args..., T>, Tail...>::type type;
+};
+
+template<template<typename...> class F, typename... Args, typename Tail, typename Last>
+struct internal_t<F, dummy_t<Args...>, Tail, Last> {
+    typedef F<Args..., Tail> type;
+};
+
+template<template<typename...> class F, typename... Args>
+struct without_tail {
+    typedef typename detail::internal_t<F, detail::dummy_t<>, Args...>::type type;
+};
+
+template<typename... Args>
+struct select_t {
+    template<typename Logger>
+    static
+    auto apply(const Logger& log,
+               int severity,
+               const string_view& format,
+               const Args&... args,
+               const attribute_list& attributes) -> void
+    {
+        const auto fn = std::bind(&gcc::write_all<Args...>, ph::_1, format.data(), std::cref(args)...);
+
+        range_t range{attributes};
+        log.log(severity, format, range, std::cref(fn));
+    }
+};
+
+}  // namespace detail
+
+template<typename Logger>
+template<typename... Args>
+inline
+auto
+logger_facade<Logger>::select(int severity, const string_view& format, const Args&... args) const ->
+    typename std::enable_if<!detail::with_attributes<Args...>::value>::type
+{
+    const auto fn = std::bind(&gcc::write_all<Args...>, ph::_1, format.data(), std::cref(args)...);
+
+    range_t range;
+    inner().log(severity, format, range, std::cref(fn));
+}
+
+template<typename Logger>
+template<typename... Args>
+constexpr
+auto
+logger_facade<Logger>::select(int severity, const string_view& format, const Args&... args) const ->
+    typename std::enable_if<detail::with_attributes<Args...>::value>::type
+{
+    detail::without_tail<detail::select_t, Args...>::type::apply(inner(), severity, format, args...);
+}
 
 }  // namespace blackhole
