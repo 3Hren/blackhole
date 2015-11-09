@@ -26,16 +26,6 @@ public:
     }
 };
 
-namespace gcc {
-
-/// Workaround for GCC versions up to 4.9, which fails to expand variadic pack inside lambdas.
-template<class... Args>
-inline void write_all(writer_t& wr, const char* pattern, const Args&... args) {
-    wr.write(pattern, args...);
-}
-
-}  // namespace gcc
-
 typedef view_of<attributes_t>::type attribute_list;
 
 namespace detail {
@@ -195,6 +185,16 @@ logger_facade<Logger>::log(int severity, const detail::formatter<N>& formatter, 
 }
 
 #endif
+
+namespace gcc {
+
+/// Workaround for GCC versions up to 4.9, which fails to expand variadic pack inside lambdas.
+template<class... Args>
+inline void write_all(writer_t& wr, const char* pattern, const Args&... args) {
+    wr.write(pattern, args...);
+}
+
+}  // namespace gcc
 
 namespace detail {
 
