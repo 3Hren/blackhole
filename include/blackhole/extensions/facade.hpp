@@ -28,12 +28,12 @@ public:
     {}
 
     /// Log a message with the given severity level.
-    auto log(int severity, string_view format) const -> void;
+    auto log(int severity, const string_view& format) const -> void;
 
     /// Log a message with the given severity level and attributes.
     ///
     /// \overload
-    auto log(int severity, string_view format, const attribute_list& attributes) const -> void;
+    auto log(int severity, const string_view& format, const attribute_list& attributes) const -> void;
 
     /// Log a message with the given severity level and further formatting using the given pattern
     /// and arguments with optional attributes list as a last parameter.
@@ -42,7 +42,7 @@ public:
     /// \tparam T and Args... must meet the requirements of `StreamFormatted`.
     /// \note the last parameter of variadic `Args...` pack can be an `attribute_list`.
     template<typename T, typename... Args>
-    auto log(int severity, string_view format, const T& arg, const Args&... args) const -> void;
+    auto log(int severity, const string_view& format, const T& arg, const Args&... args) const -> void;
 
 #if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
     /// Log a message with the given severity level and further formatting using the given pattern
@@ -93,7 +93,7 @@ private:
 template<typename Logger>
 inline
 auto
-logger_facade<Logger>::log(int severity, string_view format) const -> void {
+logger_facade<Logger>::log(int severity, const string_view& format) const -> void {
     range_t range;
     inner().log(severity, format, range);
 }
@@ -102,14 +102,14 @@ template<typename Logger>
 template<typename T, typename... Args>
 inline
 auto
-logger_facade<Logger>::log(int severity, string_view format, const T& arg, const Args&... args) const -> void {
+logger_facade<Logger>::log(int severity, const string_view& format, const T& arg, const Args&... args) const -> void {
     select(severity, format, arg, args...);
 }
 
 template<typename Logger>
 inline
 auto
-logger_facade<Logger>::log(int severity, string_view format, const attribute_list& attributes) const -> void {
+logger_facade<Logger>::log(int severity, const string_view& format, const attribute_list& attributes) const -> void {
     range_t range{attributes};
     inner().log(severity, format, range);
 }
