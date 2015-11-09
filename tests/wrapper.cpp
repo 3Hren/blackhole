@@ -4,9 +4,9 @@
 #include <blackhole/logger.hpp>
 #include <blackhole/wrapper.hpp>
 
-#include <blackhole/root.hpp>
+#include <blackhole/extensions/facade.hpp>
 #include <blackhole/handler.hpp>
-#include <blackhole/extensions/format.hpp>
+#include <blackhole/root.hpp>
 
 namespace blackhole {
 namespace testing {

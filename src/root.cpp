@@ -2,7 +2,7 @@
 
 #include <atomic>
 
-#include "blackhole/extensions/format.hpp"
+#include "blackhole/extensions/facade.hpp"
 #include "blackhole/handler.hpp"
 #include "blackhole/record.hpp"
 
