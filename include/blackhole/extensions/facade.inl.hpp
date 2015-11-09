@@ -23,6 +23,7 @@ public:
     }
 };
 
+/// Internal details. Please move along, nothing to see here.
 namespace detail {
 namespace gcc {
 
