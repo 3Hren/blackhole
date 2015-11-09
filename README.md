@@ -17,21 +17,21 @@ Attributes is the core feature of Blackhole. Technically speaking it's a key-val
 For example we have HTTP/1.1 server which produces access logs like:
 
 ```
-[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326
+[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326 - SUCCESS
 ```
 
 It can be splitted into indexes or attributes:
 
 ```
-host: [::]
-user: esafronov
-message: ""
+message:   SUCCESS
+host:      [::]
+user:      esafronov
 timestamp: 10/Oct/2000:13:55:36 -0700
-method: GET
-uri: /porn.png
-protocol: HTTP/1.0
-status: 200
-elapsed: 2326
+method:    GET
+uri:       /porn.png
+protocol:  HTTP/1.0
+status:    200
+elapsed:   2326
 ```
 
 Blackhole allows to specify any number of attributes you want, providing an ability to work with them before of while
@@ -39,18 +39,17 @@ you writing them into its final destination. For example, Elasticsearch.
 
 ### Planning
 
-- Shared library.
-- Optional compile-time inline messages transformation.
-  If literal and C++14 -> ok, else if literal - check arguments, else use `cppformat`.
-- Python-like formatting (no printf-like formatting support) both inline and result messages.
-- Attributes.
-- Scatter-gathered IO (?)
-- Scoped attributes.
-- Optional thread-safety.
-- Wrappers.
-- Custom verbosity.
-- Custom attributes formatting.
-- Optional asynchronous queue.
+- [x] Shared library.
+- [x] Optional compile-time inline messages transformation.
+- [x] Python-like formatting (no printf-like formatting support) both inline and result messages.
+- [x] Attributes.
+- [ ] Scatter-gathered IO (?)
+- [ ] Scoped attributes.
+- [ ] Optional thread-safety.
+- [x] Wrappers.
+- [ ] Custom verbosity.
+- [x] Custom attributes formatting.
+- [ ] Optional asynchronous queue.
 
 ### Formatters
 
