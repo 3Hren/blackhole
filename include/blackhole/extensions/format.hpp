@@ -45,17 +45,24 @@ namespace detail {
 /// For example:
 ///     last_of<int>::type         => int.
 ///     last_of<int, double>::type => double.
-template<typename T, typename... Tail>
+template<typename... Tail>
 struct last_of;
 
-template<typename T, typename U, typename... Tail>
-struct last_of<T, U, Tail...> {
-    typedef typename last_of<U, Tail...>::type type;
-};
+/// Forbid unpacking empty variadic pack.
+///
+/// \note the same behavior can be achieved using another type parameter prepending variadic pack,
+///       but GCC fails to compile it with `sorry, unimplemented`.
+template<>
+struct last_of<>;
 
 template<typename T>
 struct last_of<T> {
     typedef T type;
+};
+
+template<typename T, typename U, typename... Tail>
+struct last_of<T, U, Tail...> {
+    typedef typename last_of<U, Tail...>::type type;
 };
 
 /// Helper metafunction that determines whether the last parameter from given variadic pack is an
