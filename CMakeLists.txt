@@ -91,12 +91,12 @@ if (ENABLE_TESTING)
 	include_directories(${PROJECT_SOURCE_DIR}/tests/include)
 
     add_executable(${LIBRARY_NAME}-tests
-		tests/mocks/logger
 		tests/attribute
 		tests/facade
+		tests/mocks/logger
+		tests/record
 		tests/wrapper
-        tests/root
-    )
+        tests/root)
 
 	enable_google_testing(${LIBRARY_NAME}-tests)
 
@@ -105,8 +105,7 @@ if (ENABLE_TESTING)
 		${CMAKE_THREAD_LIBS_INIT}
 		gmock
 		gtest
-		gtest_main
-	)
+		gtest_main)
 endif (ENABLE_TESTING)
 
 if (ENABLE_BENCHMARKING)
