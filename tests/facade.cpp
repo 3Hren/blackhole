@@ -6,6 +6,21 @@
 
 #include "mocks/logger.hpp"
 
+#define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+
+#if GCC_VERSION < 40900
+
+namespace std {
+
+template<typename T>
+auto operator==(const std::reference_wrapper<T>& lhs, const std::reference_wrapper<T>& rhs) -> bool {
+    return lhs.get() == rhs.get();
+}
+
+}  // namespace std
+
+#endif
+
 namespace blackhole {
 namespace testing {
 
