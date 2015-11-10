@@ -62,6 +62,7 @@ Of course there are disadvantages, such as virtual function call cost and closed
 - [ ] Custom verbosity.
 - [x] Custom attributes formatting.
 - [ ] Optional asynchronous pipelining.
+- [ ] Colored terminal output.
 
 ### Formatters
 
@@ -72,7 +73,8 @@ Of course there are disadvantages, such as virtual function call cost and closed
 
 - Null.
 - Stream.
-- Files.
+- Term.
+- File.
 - Socket.
 
 ### Requirements
