@@ -40,8 +40,8 @@ inline void write_all(writer_t& wr, const char* pattern, const Args&... args) {
 /// Helper metafunction that deduces the last type from the given variadic pack.
 ///
 /// For example:
-///     last_of<int>::type         => int.
-///     last_of<int, double>::type => double.
+///     last_of<int>::type         -> int.
+///     last_of<int, double>::type -> double.
 template<typename... Tail>
 struct last_of;
 
@@ -66,8 +66,8 @@ struct last_of<T, U, Tail...> {
 /// attributes list.
 ///
 /// For example:
-///     with_attributes<int, double>::type                 => std::false_type.
-///     with_attributes<int, double, attribute_list>::type => std::true_type.
+///     with_attributes<int, double>::type                 -> std::false_type.
+///     with_attributes<int, double, attribute_list>::type -> std::true_type.
 template<typename... Args>
 struct with_attributes : public std::is_same<typename last_of<Args...>::type, attribute_list> {};
 
