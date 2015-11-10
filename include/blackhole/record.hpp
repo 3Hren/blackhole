@@ -24,7 +24,7 @@ public:
     auto pid() const -> std::uint64_t;
     auto tid() const -> std::uint64_t;
 
-    // auto attributes() const -> const range_type&;
+    // auto attributes() const -> const attribute_packype&;
 };
 
 }  // namespace blackhole

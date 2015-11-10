@@ -61,12 +61,12 @@ root_logger_t::filter(filter_t fn) -> void {
 
 auto
 root_logger_t::log(int severity, string_view message) const -> void {
-    range_t range;
+    attribute_pack range;
     log(severity, message, range);
 }
 
 auto
-root_logger_t::log(int severity, string_view message, range_t& range) const -> void {
+root_logger_t::log(int severity, string_view message, attribute_pack& range) const -> void {
     (void)severity;
     (void)message;
     (void)range;
@@ -82,7 +82,7 @@ root_logger_t::log(int severity, string_view message, range_t& range) const -> v
 }
 
 auto
-root_logger_t::log(int severity, string_view format, range_t& range, const format_t& fn) const -> void {
+root_logger_t::log(int severity, string_view format, attribute_pack& range, const format_t& fn) const -> void {
     (void)severity;
     (void)format;
     (void)range;

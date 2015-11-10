@@ -13,18 +13,18 @@ wrapper_t::wrapper_t(logger_t& log, attributes_t attributes):
 
 auto
 wrapper_t::log(int severity, string_view message) const -> void {
-    range_t range{attributes()};
+    attribute_pack range{attributes()};
     inner.log(severity, message, range);
 }
 
 auto
-wrapper_t::log(int severity, string_view message, range_t& range) const -> void {
+wrapper_t::log(int severity, string_view message, attribute_pack& range) const -> void {
     range.push_back(attributes());
     inner.log(severity, message, range);
 }
 
 auto
-wrapper_t::log(int severity, string_view message, range_t& range, const format_t& fn) const -> void {
+wrapper_t::log(int severity, string_view message, attribute_pack& range, const format_t& fn) const -> void {
     range.push_back(attributes());
     inner.log(severity, message, range, fn);
 }

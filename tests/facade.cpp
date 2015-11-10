@@ -44,7 +44,7 @@ TEST(Facade, AttributeLog) {
     const logger_facade<logger_type> logger(inner);
 
     const attribute_list attributes{{"key#1", {42}}};
-    range_t expected{attributes};
+    attribute_pack expected{attributes};
 
     EXPECT_CALL(inner, log(0, string_view("GET /porn.png HTTP/1.0"), expected))
         .Times(1);
@@ -58,7 +58,7 @@ TEST(Facade, FormattedLog) {
     const logger_type inner{};
     const logger_facade<logger_type> logger(inner);
 
-    range_t expected;
+    attribute_pack expected;
     writer_t writer;
 
     EXPECT_CALL(inner, log(0, string_view("GET /porn.png HTTP/1.0 - {}"), expected, _))
@@ -75,7 +75,7 @@ TEST(Facade, FormattedAttributeLog) {
     const logger_facade<logger_type> logger(inner);
 
     const attribute_list attributes{{"key#1", {42}}};
-    range_t expected{attributes};
+    attribute_pack expected{attributes};
     writer_t writer;
 
     EXPECT_CALL(inner, log(0, string_view("GET /porn.png HTTP/1.0 - {}"), expected, _))

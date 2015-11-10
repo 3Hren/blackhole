@@ -98,8 +98,8 @@ public:
     auto filter(filter_t fn) -> void;
 
     auto log(int severity, string_view format) const -> void;
-    auto log(int severity, string_view format, range_t& range) const -> void;
-    auto log(int severity, string_view format, range_t& range, const format_t& fn) const -> void;
+    auto log(int severity, string_view format, attribute_pack& range) const -> void;
+    auto log(int severity, string_view format, attribute_pack& range, const format_t& fn) const -> void;
 
     auto scoped(attributes_t attributes) const -> scoped_t;
 };

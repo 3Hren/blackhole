@@ -109,7 +109,7 @@ template<typename Logger>
 inline
 auto
 logger_facade<Logger>::log(int severity, const string_view& format, const attribute_list& attributes) const -> void {
-    range_t range{attributes};
+    attribute_pack range{attributes};
     inner().log(severity, format, range);
 }
 
@@ -124,7 +124,7 @@ logger_facade<Logger>::log(int severity, const detail::formatter<N>& formatter, 
         formatter.format(wr.inner, arg, args...);
     };
 
-    range_t range;
+    attribute_pack range;
     inner().log(severity, "", range, std::cref(fn));
 }
 
@@ -139,7 +139,7 @@ logger_facade<Logger>::select(int severity, const string_view& format, const Arg
 {
     const auto fn = std::bind(&detail::gcc::write_all<Args...>, ph::_1, format.data(), std::cref(args)...);
 
-    range_t range;
+    attribute_pack range;
     inner().log(severity, format, range, std::cref(fn));
 }
 

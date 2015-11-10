@@ -104,7 +104,7 @@ struct select_t {
     {
         const auto fn = std::bind(&gcc::write_all<Args...>, ph::_1, format.data(), std::cref(args)...);
 
-        range_t range{attributes};
+        attribute_pack range{attributes};
         log.log(severity, format, range, std::cref(fn));
     }
 };

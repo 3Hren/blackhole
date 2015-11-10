@@ -48,10 +48,10 @@ struct view_of<attributes_t> {
 };
 
 #ifdef BLACKHOLE_HAVE_SMALL_VECTOR
-typedef boost::container::small_vector<std::reference_wrapper<const view_of<attributes_t>::type>, 16> range_t;
+typedef boost::container::small_vector<std::reference_wrapper<const view_of<attributes_t>::type>, 16> attribute_pack;
 #else
 // TODO: I can use stack allocator with fallback for portability.
-typedef std::vector<std::reference_wrapper<const view_of<attributes_t>::type>> range_t;
+typedef std::vector<std::reference_wrapper<const view_of<attributes_t>::type>> attribute_pack;
 #endif
 
 }  // namespace blackhole

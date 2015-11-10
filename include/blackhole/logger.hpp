@@ -18,8 +18,8 @@ public:
     virtual ~logger_t() {}
 
     virtual auto log(int severity, string_view format) const -> void = 0;
-    virtual auto log(int severity, string_view format, range_t& range) const -> void = 0;
-    virtual auto log(int severity, string_view format, range_t& range, const format_t& fn) const -> void = 0;
+    virtual auto log(int severity, string_view format, attribute_pack& range) const -> void = 0;
+    virtual auto log(int severity, string_view format, attribute_pack& range, const format_t& fn) const -> void = 0;
 };
 
 }  // namespace blackhole
