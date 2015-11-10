@@ -90,8 +90,9 @@ if (ENABLE_TESTING)
 
     add_executable(${LIBRARY_NAME}-tests
 		tests/attribute
-        tests/root
+		tests/facade
 		tests/wrapper
+        tests/root
     )
 
 	enable_google_testing(${LIBRARY_NAME}-tests)

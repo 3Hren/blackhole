@@ -94,8 +94,7 @@ template<typename Logger>
 inline
 auto
 logger_facade<Logger>::log(int severity, const string_view& format) const -> void {
-    range_t range;
-    inner().log(severity, format, range);
+    inner().log(severity, format);
 }
 
 template<typename Logger>
