@@ -88,7 +88,10 @@ if (ENABLE_TESTING)
 
 	prepare_google_testing()
 
+	include_directories(${PROJECT_SOURCE_DIR}/tests/include)
+
     add_executable(${LIBRARY_NAME}-tests
+		tests/mocks/logger
 		tests/attribute
 		tests/facade
 		tests/wrapper
