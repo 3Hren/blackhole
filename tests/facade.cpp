@@ -31,6 +31,7 @@ TEST(Facade, AttributeLog) {
 
     const attribute_list attributes{{"key#1", {42}}};
     range_t expected{attributes};
+
     EXPECT_CALL(inner, log(0, string_view("GET /porn.png HTTP/1.0"), expected))
         .Times(1);
 
@@ -45,6 +46,7 @@ TEST(Facade, FormattedLog) {
 
     range_t expected;
     writer_t writer;
+
     EXPECT_CALL(inner, log(0, string_view("GET /porn.png HTTP/1.0 - {}"), expected, _))
         .Times(1)
         .WillOnce(InvokeArgument<3>(ByRef(writer)));
@@ -61,6 +63,7 @@ TEST(Facade, FormattedAttributeLog) {
     const attribute_list attributes{{"key#1", {42}}};
     range_t expected{attributes};
     writer_t writer;
+
     EXPECT_CALL(inner, log(0, string_view("GET /porn.png HTTP/1.0 - {}"), expected, _))
         .Times(1)
         .WillOnce(InvokeArgument<3>(ByRef(writer)));
