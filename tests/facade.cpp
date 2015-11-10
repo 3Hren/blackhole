@@ -24,6 +24,7 @@ public:
 
 TEST(Facade, PrimitiveLog) {
     typedef mock::logger_t logger_type;
+
     const logger_type inner{};
     logger_facade<logger_type> logger(inner);
 
