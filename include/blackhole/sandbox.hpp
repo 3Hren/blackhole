@@ -92,107 +92,6 @@ literal_count(const string_view& format) {
 }  // namespace detail
 }  // namespace blackhole
 
-constexpr std::size_t count_placeholders(const string_view& string) {
-    std::size_t counter = 0;
-
-    std::size_t i = 0;
-
-    while (i != string.size()) {
-        char c = string[i];
-
-        if (c == '{') {
-            i++;
-
-            if (i == string.size()) {
-                throw std::out_of_range("unmatched '{' in format");
-            }
-            c = string[i];
-
-            if (c == '{') {
-                i++;
-                continue;
-            } else {
-                // save literal.
-                parse_argument(string, i);
-                counter++;
-                // parse_argument.
-            }
-        } else if (c == '}') {
-            // expect_closed_brace()
-            i++;
-            if (i == string.size()) {
-                throw std::out_of_range("single '}' encountered in format string");
-            }
-
-            c = string[i];
-            if (c == '}') {
-                i++;
-                continue;
-            } else {
-                throw std::out_of_range("single '}' encountered in format string");
-            }
-        }
-
-        i++;
-    }
-
-    return counter;
-}
-
-constexpr std::size_t count_literals(const string_view& string) {
-    std::size_t counter = 0;
-    int state = 0;
-    std::size_t i = 0;
-
-    while (i != string.size()) {
-        char c = string[i];
-
-        if (c == '{') {
-            i++;
-
-            if (i == string.size()) {
-                throw std::out_of_range("unmatched '{' in format");
-            }
-
-            c = string[i];
-            if (c == '{') {
-                i++;
-                continue;
-            } else {
-                // save literal.
-                parse_argument(string, i);
-                counter++;
-                state = 1;
-                // parse_argument.
-            }
-        } else if (c == '}') {
-            // expect_closed_brace()
-            i++;
-            if (i == string.size()) {
-                throw std::out_of_range("single '}' encountered in format string");
-            }
-
-            c = string[i];
-            if (c == '}') {
-                i++;
-                continue;
-            } else {
-                throw std::out_of_range("single '}' encountered in format string");
-            }
-        }
-
-        i++;
-        state = 0;
-    }
-
-    if (state == 0) {
-        counter++;
-    }
-    return counter;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 struct literal_t {
     string_view data;
     bool placeholder_next;
@@ -266,6 +165,7 @@ struct format_traits {
     }
 };
 
+// TODO: Store placeholder number information too.
 template<std::size_t N>
 struct formatter {
     const literal_t literal;
