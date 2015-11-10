@@ -234,4 +234,26 @@ public:
 };
 
 }  // namespace detail
+
+// NOTE: We are ready for C++17, but our compilers aren't!
+// template<char... Char>
+// struct metastring {
+//     static constexpr std::size_t size = sizeof...(Char);
+//     static constexpr const char data[size + 1] = {Char..., '\0'};
+// };
+//
+// template<char... Char>
+// constexpr const char metastring<Char...>::data[metastring<Char...>::size + 1];
+//
+// template<typename Char, Char... String>
+// constexpr
+// decltype(auto) operator"" _parsed() {
+//     constexpr auto meta = metastring<String...>();
+//     constexpr auto pattern = string_view(meta.data, meta.size);
+//
+//     constexpr auto formatter = detail::formatter<detail::literal_count(pattern)>(pattern);
+//
+//     return formatter;
+// }
+
 }  // namespace blackhole
