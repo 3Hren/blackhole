@@ -2,7 +2,6 @@
 #include <gtest/gtest.h>
 
 #include <blackhole/extensions/facade.hpp>
-#include <blackhole/logger.hpp>
 
 #include "mocks/logger.hpp"
 
