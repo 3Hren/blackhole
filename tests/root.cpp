@@ -28,6 +28,11 @@ TEST(RootLogger, Log) {
     logger.log(0, "GET /porn.png HTTP/1.1");
 }
 
+TEST(RootLogger, ConstLog) {
+    const root_logger_t logger({});
+    logger.log(0, "GET /porn.png HTTP/1.1");
+}
+
 TEST(RootLogger, DispatchRecordToHandlers) {
     std::vector<std::unique_ptr<handler_t>> handlers;
     std::vector<mock::handler_t*> handlers_view;
@@ -38,7 +43,7 @@ TEST(RootLogger, DispatchRecordToHandlers) {
         handlers.push_back(std::move(handler));
     }
 
-    root_logger_t logger(std::move(handlers));
+    const root_logger_t logger(std::move(handlers));
 
     for (auto handler : handlers_view) {
         EXPECT_CALL(*handler, execute(_))
