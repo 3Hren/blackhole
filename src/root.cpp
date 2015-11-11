@@ -19,21 +19,21 @@ struct root_logger_t::sync_t {
     mutable mutex_type mutex;
 #endif
 
-    auto clone(const std::shared_ptr<inner_t>& inner) const -> std::shared_ptr<inner_t> {
+    auto load(const std::shared_ptr<inner_t>& source) const noexcept -> std::shared_ptr<inner_t> {
 #ifdef __clang__
-        return std::atomic_load_explicit(&inner, std::memory_order_acquire);
+        return std::atomic_load_explicit(&source, std::memory_order_acquire);
 #else
         std::lock_guard<mutex_type> lock(mutex);
-        return inner;
+        return source;
 #endif
     }
 
-    auto commit(std::shared_ptr<inner_t>& inner, std::shared_ptr<inner_t> value) -> void {
+    auto store(std::shared_ptr<inner_t>& source, std::shared_ptr<inner_t> value) noexcept -> void {
 #ifdef __clang__
-        std::atomic_store_explicit(&inner, std::move(value), std::memory_order_release);
+        std::atomic_store_explicit(&source, std::move(value), std::memory_order_release);
 #else
         std::lock_guard<mutex_type> lock(mutex);
-        inner = std::move(value);
+        source = std::move(value);
 #endif
     }
 };
@@ -78,13 +78,13 @@ root_logger_t::~root_logger_t() {}
 
 auto
 root_logger_t::filter(filter_t fn) -> void {
-    auto inner = sync->clone(this->inner);
+    auto inner = sync->load(this->inner);
 
     inner->apply([&](inner_t& inner) {
         inner.filter = std::move(fn);
     });
 
-    sync->commit(this->inner, std::move(inner));
+    sync->store(this->inner, std::move(inner));
 }
 
 auto
@@ -99,7 +99,7 @@ root_logger_t::log(int severity, string_view message, attribute_pack& range) con
     (void)message;
     (void)range;
 
-    const auto inner = sync->clone(this->inner);
+    const auto inner = sync->load(this->inner);
     const auto filter = inner->apply([&](inner_t& inner) -> filter_t {
         return inner.filter;
     });
@@ -118,7 +118,7 @@ root_logger_t::log(int severity, string_view format, attribute_pack& range, cons
     (void)format;
     (void)range;
 
-    const auto filter = sync->clone(inner)->apply([&](inner_t& inner) -> filter_t {
+    const auto filter = sync->load(inner)->apply([&](inner_t& inner) -> filter_t {
         return inner.filter;
     });
 
@@ -134,13 +134,13 @@ root_logger_t::log(int severity, string_view format, attribute_pack& range, cons
 }
 
 auto
-root_logger_t::operator=(root_logger_t&& other) -> root_logger_t& {
+root_logger_t::operator=(root_logger_t&& other) noexcept -> root_logger_t& {
     if (this == &other) {
         return *this;
     }
 
-    const auto inner = std::move(other.sync->clone(other.inner));
-    sync->commit(this->inner, std::move(inner));
+    const auto inner = std::move(other.sync->load(other.inner));
+    sync->store(this->inner, std::move(inner));
 
     return *this;
 }

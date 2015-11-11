@@ -36,7 +36,7 @@ public:
     ~root_logger_t();
 
     auto operator=(const root_logger_t& other) -> root_logger_t& = delete;
-    auto operator=(root_logger_t&& other) -> root_logger_t&;
+    auto operator=(root_logger_t&& other) noexcept -> root_logger_t&;
 
     /// \warning the filter function must be thread-safe.
     auto filter(filter_t fn) -> void;
