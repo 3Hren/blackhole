@@ -29,6 +29,13 @@ using ::testing::_;
 
 typedef mock::logger_t logger_type;
 
+TEST(Facade, ConstFacadeFromMutableLogger) {
+    logger_type inner{};
+    const logger_facade<logger_type> logger(inner);
+
+    (void)logger;
+}
+
 TEST(Facade, PrimitiveLog) {
     const logger_type inner{};
     const logger_facade<logger_type> logger(inner);
