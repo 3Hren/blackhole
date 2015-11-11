@@ -39,6 +39,15 @@ TEST(Record, Pid) {
     EXPECT_EQ(::getpid(), record.pid());
 }
 
+TEST(Record, Tid) {
+    attribute_pack pack;
+
+    record_t record(42, "GET /porn.png HTTP/1.1", pack);
+
+    // TODO: Fail for now, need to check platform dependent behavior.
+    // EXPECT_EQ(std::this_thread::get_id(), record.tid())
+}
+
 TEST(Record, Timestamp) {
     attribute_pack pack;
 

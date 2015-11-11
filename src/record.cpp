@@ -59,6 +59,10 @@ auto record_t::pid() const noexcept -> std::uint64_t {
     return static_cast<std::uint64_t>(inner_t::cast(storage).pid);
 }
 
+auto record_t::tid() const noexcept -> std::uint64_t {
+    return 0;
+}
+
 auto record_t::attributes() const noexcept -> const attribute_pack& {
     return inner_t::cast(storage).attributes.get();
 }
