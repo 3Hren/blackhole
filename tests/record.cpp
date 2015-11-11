@@ -39,5 +39,16 @@ TEST(Record, Pid) {
     EXPECT_EQ(::getpid(), record.pid());
 }
 
+TEST(Record, Timestamp) {
+    attribute_pack pack;
+
+    const auto min = std::chrono::high_resolution_clock::now();
+    record_t record(42, "GET /porn.png HTTP/1.1", pack);
+    const auto max = std::chrono::high_resolution_clock::now();
+
+    EXPECT_TRUE(min <= record.timestamp());
+    EXPECT_TRUE(max >= record.timestamp());
+}
+
 }  // namespace testing
 }  // namespace blackhole

@@ -31,9 +31,14 @@ record_t::record_t(int severity, const string_view& message, const attribute_pac
 
     auto& inner = inner_t::cast(storage);
     inner.message = message;
+
     inner.severity = severity;
+    // TODO: It can be too costy to obtain a timestamp using high resolution clock. Try coarse clock
+    // instead.
+    inner.timestamp = clock_type::now();
 
     inner.pid = ::getpid();
+
     inner.attributes = attributes;
 }
 
@@ -43,6 +48,10 @@ auto record_t::message() const noexcept -> const string_view& {
 
 auto record_t::severity() const noexcept -> int {
     return inner_t::cast(storage).severity;
+}
+
+auto record_t::timestamp() const noexcept -> time_point {
+    return inner_t::cast(storage).timestamp;
 }
 
 auto record_t::pid() const noexcept -> std::uint64_t {
