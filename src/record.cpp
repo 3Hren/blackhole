@@ -17,25 +17,17 @@ struct record_t::inner_t {
     std::thread::id tid;
 
     std::reference_wrapper<const attribute_pack> attributes;
-
-    static auto cast(storage_type& storage) noexcept -> inner_t& {
-        return reinterpret_cast<inner_t&>(storage);
-    }
-
-    static auto cast(const storage_type& storage) noexcept -> const inner_t& {
-        return reinterpret_cast<const inner_t&>(storage);
-    }
 };
 
 record_t::record_t(int severity, const string_view& message, const attribute_pack& attributes) {
     static_assert(sizeof(inner_t) <= sizeof(record_t), "padding or alignment violation");
 
-    auto& inner = inner_t::cast(storage);
+    auto& inner = this->inner();
     inner.message = message;
 
     inner.severity = severity;
     // TODO: It can be too costy to obtain a timestamp using high resolution clock. Try coarse clock
-    // instead.
+    // instead (~20ns slowdown).
     inner.timestamp = clock_type::now();
 
     inner.pid = ::getpid();
@@ -44,19 +36,19 @@ record_t::record_t(int severity, const string_view& message, const attribute_pac
 }
 
 auto record_t::message() const noexcept -> const string_view& {
-    return inner_t::cast(storage).message.get();
+    return inner().message.get();
 }
 
 auto record_t::severity() const noexcept -> int {
-    return inner_t::cast(storage).severity;
+    return inner().severity;
 }
 
 auto record_t::timestamp() const noexcept -> time_point {
-    return inner_t::cast(storage).timestamp;
+    return inner().timestamp;
 }
 
 auto record_t::pid() const noexcept -> std::uint64_t {
-    return static_cast<std::uint64_t>(inner_t::cast(storage).pid);
+    return static_cast<std::uint64_t>(inner().pid);
 }
 
 auto record_t::tid() const noexcept -> std::uint64_t {
@@ -64,7 +56,15 @@ auto record_t::tid() const noexcept -> std::uint64_t {
 }
 
 auto record_t::attributes() const noexcept -> const attribute_pack& {
-    return inner_t::cast(storage).attributes.get();
+    return inner().attributes.get();
+}
+
+auto record_t::inner() noexcept -> inner_t& {
+    return reinterpret_cast<inner_t&>(storage);
+}
+
+auto record_t::inner() const noexcept -> const inner_t& {
+    return reinterpret_cast<const inner_t&>(storage);
 }
 
 }  // namespace blackhole

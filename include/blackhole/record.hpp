@@ -32,6 +32,10 @@ public:
     auto tid() const noexcept -> std::uint64_t;
 
     auto attributes() const noexcept -> const attribute_pack&;
+
+private:
+    auto inner() noexcept -> inner_t&;
+    auto inner() const noexcept -> const inner_t&;
 };
 
 }  // namespace blackhole
