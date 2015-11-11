@@ -15,7 +15,7 @@ struct record_t::inner_t {
     pid_t pid;
     std::thread::id tid;
 
-    const attribute_pack* attributes;
+    std::reference_wrapper<const attribute_pack> attributes;
 
     static auto cast(storage_type& storage) noexcept -> inner_t& {
         return reinterpret_cast<inner_t&>(storage);
@@ -32,6 +32,7 @@ record_t::record_t(int severity, const string_view& message, const attribute_pac
     auto& inner = inner_t::cast(storage);
     inner.message = message;
     inner.severity = severity;
+    inner.attributes = attributes;
 }
 
 auto record_t::message() const noexcept -> const string_view& {
@@ -40,6 +41,10 @@ auto record_t::message() const noexcept -> const string_view& {
 
 auto record_t::severity() const noexcept -> int {
     return inner_t::cast(storage).severity;
+}
+
+auto record_t::attributes() const noexcept -> const attribute_pack& {
+    return inner_t::cast(storage).attributes.get();
 }
 
 }  // namespace blackhole
