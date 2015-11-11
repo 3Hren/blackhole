@@ -62,7 +62,12 @@ Of course there are disadvantages, such as virtual function call cost and closed
 - [ ] Custom verbosity.
 - [x] Custom attributes formatting.
 - [ ] Optional asynchronous pipelining.
+-   [ ] With block on overload.
+-   [ ] With drop on overload (count dropped message).
 - [ ] Colored terminal output.
+- [ ] Builder.
+- [ ] Macro with line and filename attributes.
+- [ ] Initializer from json (filename, string).
 
 ### Formatters
 
