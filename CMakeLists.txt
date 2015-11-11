@@ -8,6 +8,7 @@ endif (POLICY CMP0042)
 
 OPTION(ENABLE_TESTING "Build the library with tests" OFF)
 OPTION(ENABLE_BENCHMARKING "Build the library with benchmarks" OFF)
+OPTION(ENABLE_TESTING_THREADSAFETY "Build the thread-safety testing suite" OFF)
 
 set(LIBRARY_NAME blackhole)
 
@@ -79,6 +80,28 @@ endif ()
 target_link_libraries(${LIBRARY_NAME}
 	cppformat
 )
+
+if (ENABLE_TESTING_THREADSAFETY)
+	find_package(Boost 1.46 REQUIRED COMPONENTS
+	    system
+		thread)
+
+	add_executable(${LIBRARY_NAME}-tests-rc-assign
+		tests/rc/assign)
+
+	target_link_libraries(${LIBRARY_NAME}-tests-rc-assign
+		${LIBRARY_NAME}
+		${CMAKE_THREAD_LIBS_INIT}
+		${Boost_LIBRARIES})
+
+	add_executable(${LIBRARY_NAME}-tests-rc-filter
+		tests/rc/filter)
+
+	target_link_libraries(${LIBRARY_NAME}-tests-rc-filter
+		${LIBRARY_NAME}
+		${CMAKE_THREAD_LIBS_INIT}
+		${Boost_LIBRARIES})
+endif (ENABLE_TESTING_THREADSAFETY)
 
 if (ENABLE_TESTING)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/foreign/modules")
