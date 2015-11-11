@@ -3,6 +3,7 @@
 #include <iosfwd>
 #include <limits>
 #include <stdexcept>
+#include <string>
 
 namespace blackhole {
 namespace cpp17 {
