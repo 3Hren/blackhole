@@ -6,7 +6,6 @@ namespace blackhole {
 namespace testing {
 
 TEST(Record, Severity) {
-    const view_of<attributes_t>::type attributes{{"key#1", {42}}};
     attribute_pack pack{};
 
     record_t record(42, "GET /porn.png HTTP/1.1", pack);
@@ -15,7 +14,6 @@ TEST(Record, Severity) {
 }
 
 TEST(Record, Message) {
-    const view_of<attributes_t>::type attributes{{"key#1", {42}}};
     attribute_pack pack{};
 
     record_t record(42, "GET /porn.png HTTP/1.1", pack);
