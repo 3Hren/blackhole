@@ -28,8 +28,8 @@ public:
     auto severity() const noexcept -> int;
     auto timestamp() const noexcept -> time_point;
 
-    auto tid() const -> std::uint64_t;
     auto pid() const noexcept -> std::uint64_t;
+    auto tid() const noexcept -> std::uint64_t;
 
     auto attributes() const noexcept -> const attribute_pack&;
 };
