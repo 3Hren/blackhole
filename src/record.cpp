@@ -7,10 +7,11 @@
 namespace blackhole {
 
 struct record_t::inner_t {
-    int severity;
-    time_point timestamp;
     std::reference_wrapper<const string_view> message;
     std::reference_wrapper<const string_view> formatted;
+
+    int severity;
+    time_point timestamp;
 
     pid_t pid;
     std::thread::id tid;
