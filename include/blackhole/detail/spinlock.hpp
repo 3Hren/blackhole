@@ -2,7 +2,7 @@
 
 #ifdef __APPLE__
 #   include <libkern/OSAtomic.h>
-#else
+#elif __linux__
 #   include <pthread.h>
 #endif
 
@@ -14,46 +14,51 @@ class spinlock_t {
     OSSpinLock mutex;
 
 public:
-    spinlock_t():
+    constexpr spinlock_t() noexcept:
         mutex(0)
     {}
 
-    auto lock() -> void {
+    auto lock() noexcept -> void {
         OSSpinLockLock(&mutex);
     }
 
-    auto unlock() -> void {
+    auto unlock() noexcept -> void {
         OSSpinLockUnlock(&mutex);
     }
 
-    auto trylock() -> bool {
+    auto trylock() noexcept -> bool {
         return OSSpinLockTry(&mutex);
     }
 };
 
-#else // __APPLE__
+#elif __linux__
 
 class spinlock_t {
     pthread_spinlock_t mutex;
 
 public:
     spinlock_t() {
-        pthread_spin_init(&mutex, PTHREAD_PROCESS_PRIVATE);
+        const int rc = pthread_spin_init(&mutex, PTHREAD_PROCESS_PRIVATE);
+        if (rc != 0) {
+            throw std::system_error(errno, std::system_category());
+        }
     }
 
     ~spinlock_t() {
         pthread_spin_destroy(&mutex);
     }
 
-    auto lock() -> void {
+    // These methods may fail only if the mutex is invalid or on attempt to use it recursively. We
+    // don't do this.
+    auto lock() noexcept -> void {
         pthread_spin_lock(&mutex);
     }
 
-    auto unlock() -> void {
+    auto unlock() noexcept -> void {
         pthread_spin_unlock(&mutex);
     }
 };
-#endif // __APPLE__
+#endif
 
 }  // namespace detail
 }  // namespace blackhole

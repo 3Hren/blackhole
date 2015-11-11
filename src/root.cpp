@@ -14,7 +14,10 @@ namespace blackhole {
 using detail::spinlock_t;
 
 struct root_logger_t::sync_t {
+#ifndef __clang__
     typedef spinlock_t mutex_type;
+    mutable mutex_type mutex;
+#endif
 
     auto clone(const std::shared_ptr<inner_t>& inner) const -> std::shared_ptr<inner_t> {
 #ifdef __clang__
@@ -33,9 +36,6 @@ struct root_logger_t::sync_t {
         inner = std::move(value);
 #endif
     }
-
-private:
-    mutable mutex_type mutex;
 };
 
 struct root_logger_t::inner_t {
