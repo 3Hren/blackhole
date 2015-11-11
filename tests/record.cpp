@@ -31,5 +31,13 @@ TEST(Record, Attributes) {
     EXPECT_EQ(attributes, record.attributes().at(0));
 }
 
+TEST(Record, Pid) {
+    attribute_pack pack;
+
+    record_t record(42, "GET /porn.png HTTP/1.1", pack);
+
+    EXPECT_EQ(::getpid(), record.pid());
+}
+
 }  // namespace testing
 }  // namespace blackhole

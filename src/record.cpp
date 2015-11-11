@@ -32,6 +32,8 @@ record_t::record_t(int severity, const string_view& message, const attribute_pac
     auto& inner = inner_t::cast(storage);
     inner.message = message;
     inner.severity = severity;
+
+    inner.pid = ::getpid();
     inner.attributes = attributes;
 }
 
@@ -41,6 +43,10 @@ auto record_t::message() const noexcept -> const string_view& {
 
 auto record_t::severity() const noexcept -> int {
     return inner_t::cast(storage).severity;
+}
+
+auto record_t::pid() const noexcept -> std::uint64_t {
+    return static_cast<std::uint64_t>(inner_t::cast(storage).pid);
 }
 
 auto record_t::attributes() const noexcept -> const attribute_pack& {
