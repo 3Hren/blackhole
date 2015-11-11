@@ -49,11 +49,12 @@ TEST(Record, Tid) {
 }
 
 TEST(Record, Timestamp) {
+    typedef std::chrono::high_resolution_clock clock_type;
     attribute_pack pack;
 
-    const auto min = std::chrono::high_resolution_clock::now();
+    const auto min = clock_type::now();
     record_t record(42, "GET /porn.png HTTP/1.1", pack);
-    const auto max = std::chrono::high_resolution_clock::now();
+    const auto max = clock_type::now();
 
     EXPECT_TRUE(min <= record.timestamp());
     EXPECT_TRUE(max >= record.timestamp());
