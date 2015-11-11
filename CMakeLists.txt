@@ -23,6 +23,7 @@ add_library(cppformat STATIC foreign/cppformat/format)
 
 add_library(${LIBRARY_NAME} SHARED
 	src/attribute
+	src/record
 	src/root
 	src/wrapper
 )
@@ -145,6 +146,7 @@ if (ENABLE_BENCHMARKING)
 		bench/cpp14formatter
 		bench/logger
 		bench/main
+		bench/record
 	)
 
 	enable_google_benchmarking(${LIBRARY_NAME}-benchmarks)

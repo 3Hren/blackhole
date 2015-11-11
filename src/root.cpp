@@ -94,17 +94,13 @@ root_logger_t::log(int severity, string_view message) const -> void {
 }
 
 auto
-root_logger_t::log(int severity, string_view message, attribute_pack& range) const -> void {
-    (void)severity;
-    (void)message;
-    (void)range;
-
+root_logger_t::log(int severity, string_view format, attribute_pack& range) const -> void {
     const auto inner = sync->load(this->inner);
     const auto filter = inner->apply([&](inner_t& inner) -> filter_t {
         return inner.filter;
     });
 
-    record_t record;
+    record_t record(severity, format, range);
     if (filter(record)) {
         for (auto& handler : inner->handlers) {
             handler->execute(record);
@@ -114,18 +110,16 @@ root_logger_t::log(int severity, string_view message, attribute_pack& range) con
 
 auto
 root_logger_t::log(int severity, string_view format, attribute_pack& range, const format_t& fn) const -> void {
-    (void)severity;
-    (void)format;
-    (void)range;
-
-    const auto filter = sync->load(inner)->apply([&](inner_t& inner) -> filter_t {
+    const auto inner = sync->load(this->inner);
+    const auto filter = inner->apply([&](inner_t& inner) -> filter_t {
         return inner.filter;
     });
 
-    record_t record;
+    record_t record(severity, format, range);
     if (filter(record)) {
         writer_t wr;
         fn(wr);
+        // record.formatted = {wr.writer.data(), wr.writer.size()};
 
         for (auto& handler : inner->handlers) {
             handler->execute(record);
