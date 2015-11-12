@@ -46,6 +46,12 @@ public:
     auto activate(const string_view& formatted = string_view()) noexcept -> void;
 
 private:
+    // Constructing from rvalue references is explicitly forbidden.
+    // TODO: Consider more elegant solution.
+    record_t(int severity, const string_view&, attribute_pack&&) = delete;
+    record_t(int severity, string_view&&, const attribute_pack&) = delete;
+    record_t(int severity, string_view&&, attribute_pack&&) = delete;
+
     auto inner() noexcept -> inner_t&;
     auto inner() const noexcept -> const inner_t&;
 };
