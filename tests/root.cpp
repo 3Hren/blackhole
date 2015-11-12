@@ -50,8 +50,9 @@ TEST(RootLogger, DispatchRecordToHandlers) {
         EXPECT_CALL(*handler, execute(_))
             .Times(1)
             .WillOnce(Invoke([](const record_t& record) {
-                EXPECT_EQ(0, record.severity());
                 EXPECT_EQ("GET /porn.png HTTP/1.1", record.message().to_string());
+                EXPECT_EQ(0, record.severity());
+                EXPECT_EQ(0, record.attributes().size());
             }));
     }
 

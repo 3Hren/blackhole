@@ -6,7 +6,7 @@ namespace blackhole {
 namespace testing {
 
 TEST(Record, Severity) {
-    attribute_pack pack{};
+    attribute_pack pack;
 
     record_t record(42, "GET /porn.png HTTP/1.1", pack);
 
@@ -14,7 +14,7 @@ TEST(Record, Severity) {
 }
 
 TEST(Record, Message) {
-    attribute_pack pack{};
+    attribute_pack pack;
 
     record_t record(42, "GET /porn.png HTTP/1.1", pack);
 
