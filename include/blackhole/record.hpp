@@ -22,6 +22,12 @@ private:
     storage_type storage;
 
 public:
+    /// Creates a log record with the given severity, possibly unformatted message and attributes.
+    ///
+    /// The created record contains almost all information about the logging event associated except
+    /// the timestamp and formatted message.
+    ///
+    /// These missing attributes are set right after filtering pass with `activate` method.
     record_t(int severity, const string_view& message, const attribute_pack& attributes);
 
     auto message() const noexcept -> const string_view&;
@@ -34,6 +40,8 @@ public:
     auto formatted() const noexcept -> const string_view&;
     auto attributes() const noexcept -> const attribute_pack&;
 
+    /// Activate the record by setting the given formatted message accompanied by obtaining and
+    /// setting the current time point.
     auto activate(const string_view& formatted = string_view()) noexcept -> void;
 
 private:
