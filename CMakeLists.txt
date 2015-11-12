@@ -145,6 +145,7 @@ if (ENABLE_BENCHMARKING)
 	add_executable(${LIBRARY_NAME}-benchmarks
 		bench/cpp14formatter
 		bench/logger
+		bench/clock
 		bench/main
 		bench/record
 	)
