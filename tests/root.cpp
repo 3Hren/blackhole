@@ -9,6 +9,7 @@
 namespace blackhole {
 namespace testing {
 
+using ::testing::Invoke;
 using ::testing::_;
 
 namespace mock {
@@ -47,7 +48,11 @@ TEST(RootLogger, DispatchRecordToHandlers) {
 
     for (auto handler : handlers_view) {
         EXPECT_CALL(*handler, execute(_))
-            .Times(1);
+            .Times(1)
+            .WillOnce(Invoke([](const record_t& record) {
+                EXPECT_EQ(0, record.severity());
+                EXPECT_EQ("GET /porn.png HTTP/1.1", record.message().to_string());
+            }));
     }
 
     logger.log(0, "GET /porn.png HTTP/1.1");
