@@ -54,17 +54,19 @@ auto record_t::tid() const noexcept -> std::uint64_t {
     return 0;
 }
 
+auto record_t::formatted() const noexcept -> const string_view& {
+    return inner().formatted;
+}
+
 auto record_t::attributes() const noexcept -> const attribute_pack& {
     return inner().attributes.get();
 }
 
 auto record_t::activate(const string_view& formatted) noexcept -> void {
     if (formatted.data() != nullptr) {
-        // TODO: Set.
+        inner().formatted = formatted;
     }
 
-    // TODO: It can be too costy to obtain timestamps using high resolution clock (~22ns slowdown
-    // on 2,3 GHz Intel Core i7 OSX 10.11). Try coarse clock instead.
     inner().timestamp = clock_type::now();
 }
 

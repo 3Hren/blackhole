@@ -68,5 +68,14 @@ TEST(Record, Timestamp) {
     EXPECT_TRUE(max >= record.timestamp());
 }
 
+TEST(Record, Formatted) {
+    attribute_pack pack;
+
+    record_t record(42, "GET /porn.png HTTP/1.1", pack);
+    record.activate("GET /porn.png HTTP/1.1 - SUCCESS");
+
+    EXPECT_EQ("GET /porn.png HTTP/1.1 - SUCCESS", record.formatted().to_string());
+}
+
 }  // namespace testing
 }  // namespace blackhole
