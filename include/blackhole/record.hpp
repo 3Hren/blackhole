@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <thread>
 
 #include "blackhole/attributes.hpp"
 #include "blackhole/cpp17/string_view.hpp"
@@ -35,7 +36,7 @@ public:
     auto timestamp() const noexcept -> time_point;
 
     auto pid() const noexcept -> std::uint64_t;
-    auto tid() const noexcept -> std::uint64_t;
+    auto tid() const noexcept -> std::thread::id;
 
     auto formatted() const noexcept -> const string_view&;
     auto attributes() const noexcept -> const attribute_pack&;

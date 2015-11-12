@@ -49,8 +49,7 @@ TEST(Record, Tid) {
 
     record_t record(42, message, pack);
 
-    // TODO: Fail for now, need to check platform dependent behavior.
-    // EXPECT_EQ(std::this_thread::get_id(), record.tid())
+    EXPECT_EQ(std::this_thread::get_id(), record.tid());
 }
 
 TEST(Record, NullTimestampByDefault) {

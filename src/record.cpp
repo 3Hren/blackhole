@@ -30,6 +30,7 @@ record_t::record_t(int severity, const string_view& message, const attribute_pac
     inner.timestamp = time_point();
 
     inner.pid = ::getpid();
+    inner.tid = std::this_thread::get_id();
 
     inner.attributes = attributes;
 }
@@ -50,8 +51,8 @@ auto record_t::pid() const noexcept -> std::uint64_t {
     return static_cast<std::uint64_t>(inner().pid);
 }
 
-auto record_t::tid() const noexcept -> std::uint64_t {
-    return 0;
+auto record_t::tid() const noexcept -> std::thread::id {
+    return inner().tid;
 }
 
 auto record_t::formatted() const noexcept -> const string_view& {
