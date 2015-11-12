@@ -8,11 +8,11 @@ namespace benchmark {
 static
 void
 record(::benchmark::State& state) {
-    attribute_pack pack;
+    const string_view message("GET /porn.png HTTP/1.1");
+    const attribute_pack pack;
 
     while (state.KeepRunning()) {
-        record_t record(42, "GET /porn.png HTTP/1.1", pack);
-        ::benchmark::DoNotOptimize(record);
+        record_t(42, message, pack);
     }
 
     state.SetItemsProcessed(state.iterations());
