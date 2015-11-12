@@ -28,7 +28,7 @@ TEST(Record, Attributes) {
     record_t record(42, "GET /porn.png HTTP/1.1", pack);
 
     ASSERT_EQ(1, record.attributes().size());
-    EXPECT_EQ(attributes, record.attributes().at(0));
+    EXPECT_EQ(attributes, record.attributes().at(0).get());
 }
 
 TEST(Record, Pid) {
