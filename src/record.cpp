@@ -24,7 +24,7 @@ record_t::record_t(int severity, const string_view& message, const attribute_pac
 
     auto& inner = this->inner();
     inner.message = message;
-    // inner.formatted = message;
+    inner.formatted = message;
 
     inner.severity = severity;
     inner.timestamp = time_point();
