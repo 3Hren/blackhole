@@ -31,7 +31,10 @@ public:
     auto pid() const noexcept -> std::uint64_t;
     auto tid() const noexcept -> std::uint64_t;
 
+    auto formatted() const noexcept -> const string_view&;
     auto attributes() const noexcept -> const attribute_pack&;
+
+    auto activate(const string_view& formatted = string_view()) noexcept -> void;
 
 private:
     auto inner() noexcept -> inner_t&;

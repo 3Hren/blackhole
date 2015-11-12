@@ -48,13 +48,21 @@ TEST(Record, Tid) {
     // EXPECT_EQ(std::this_thread::get_id(), record.tid())
 }
 
-TEST(Record, Timestamp) {
-    typedef std::chrono::high_resolution_clock clock_type;
+TEST(Record, NullTimestampByDefault) {
     attribute_pack pack;
 
-    const auto min = clock_type::now();
     record_t record(42, "GET /porn.png HTTP/1.1", pack);
-    const auto max = clock_type::now();
+
+    EXPECT_EQ(record_t::time_point(), record.timestamp());
+}
+
+TEST(Record, Timestamp) {
+    attribute_pack pack;
+
+    const auto min = record_t::clock_type::now();
+    record_t record(42, "GET /porn.png HTTP/1.1", pack);
+    record.activate();
+    const auto max = record_t::clock_type::now();
 
     EXPECT_TRUE(min <= record.timestamp());
     EXPECT_TRUE(max >= record.timestamp());

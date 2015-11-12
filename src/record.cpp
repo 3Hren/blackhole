@@ -24,11 +24,10 @@ record_t::record_t(int severity, const string_view& message, const attribute_pac
 
     auto& inner = this->inner();
     inner.message = message;
+    // inner.formatted = message;
 
     inner.severity = severity;
-    // TODO: It can be too costy to obtain a timestamp using high resolution clock. Try coarse clock
-    // instead (~20ns slowdown).
-    inner.timestamp = clock_type::now();
+    inner.timestamp = time_point();
 
     inner.pid = ::getpid();
 
@@ -57,6 +56,16 @@ auto record_t::tid() const noexcept -> std::uint64_t {
 
 auto record_t::attributes() const noexcept -> const attribute_pack& {
     return inner().attributes.get();
+}
+
+auto record_t::activate(const string_view& formatted) noexcept -> void {
+    if (formatted.data() != nullptr) {
+        // TODO: Set.
+    }
+
+    // TODO: It can be too costy to obtain timestamps using high resolution clock (~22ns slowdown
+    // on 2,3 GHz Intel Core i7 OSX 10.11). Try coarse clock instead.
+    inner().timestamp = clock_type::now();
 }
 
 auto record_t::inner() noexcept -> inner_t& {
