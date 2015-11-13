@@ -39,7 +39,11 @@ public:
     auto operator=(const root_logger_t& other) -> root_logger_t& = delete;
     auto operator=(root_logger_t&& other) noexcept -> root_logger_t&;
 
-    /// \warning the filter function must be thread-safe.
+    /// Replaces the current logger filter function with the given one.
+    ///
+    /// Any logging event for which the filter function returns `false` is rejected.
+    ///
+    /// \warning the function must be thread-safe.
     auto filter(filter_t fn) -> void;
 
     auto log(int severity, string_view pattern) -> void;
