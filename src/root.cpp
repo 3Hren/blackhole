@@ -117,9 +117,9 @@ root_logger_t::log(int severity, string_view pattern, attribute_pack& pack, cons
 
     record_t record(severity, pattern, pack);
     if (filter(record)) {
-        writer_t wr;
-        fn(wr);
-        // record.formatted = {wr.writer.data(), wr.writer.size()};
+        writer_t writer;
+        fn(writer);
+        record.activate({writer.inner.data(), writer.inner.size()});
 
         for (auto& handler : inner->handlers) {
             handler->execute(record);

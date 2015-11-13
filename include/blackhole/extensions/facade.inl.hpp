@@ -2,10 +2,9 @@
 
 #include <functional>
 
-#include <cppformat/format.h>
-
 #include "blackhole/attributes.hpp"
 #include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/extensions/writer.hpp"
 
 namespace blackhole {
 
@@ -13,17 +12,6 @@ namespace ph = std::placeholders;
 
 /// Convenient typedef for attributes set view.
 typedef view_of<attributes_t>::type attribute_list;
-
-/// Represents stream writer backed up by cppformat.
-class writer_t {
-public:
-    fmt::MemoryWriter inner;
-
-    template<typename... Args>
-    inline auto write(const Args&... args) -> void {
-        inner.write(args...);
-    }
-};
 
 /// Internal details. Please move along, nothing to see here.
 namespace detail {
