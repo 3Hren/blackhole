@@ -17,6 +17,7 @@ class scoped_t;
 namespace blackhole {
 
 class root_logger_t : public logger_t {
+public:
     typedef std::function<auto(const record_t&) -> bool> filter_t;
 
 private:
