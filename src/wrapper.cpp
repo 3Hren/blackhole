@@ -12,21 +12,21 @@ wrapper_t::wrapper_t(logger_t& log, attributes_t attributes):
 }
 
 auto
-wrapper_t::log(int severity, string_view message) const -> void {
-    attribute_pack range{attributes()};
-    inner.log(severity, message, range);
+wrapper_t::log(int severity, string_view pattern) -> void {
+    attribute_pack pack{attributes()};
+    inner.log(severity, pattern, pack);
 }
 
 auto
-wrapper_t::log(int severity, string_view message, attribute_pack& range) const -> void {
-    range.push_back(attributes());
-    inner.log(severity, message, range);
+wrapper_t::log(int severity, string_view pattern, attribute_pack& pack) -> void {
+    pack.push_back(attributes());
+    inner.log(severity, pattern, pack);
 }
 
 auto
-wrapper_t::log(int severity, string_view message, attribute_pack& range, const format_t& fn) const -> void {
-    range.push_back(attributes());
-    inner.log(severity, message, range, fn);
+wrapper_t::log(int severity, string_view pattern, attribute_pack& pack, const format_t& fn) -> void {
+    pack.push_back(attributes());
+    inner.log(severity, pattern, pack, fn);
 }
 
 }  // namespace blackhole

@@ -88,19 +88,19 @@ root_logger_t::filter(filter_t fn) -> void {
 }
 
 auto
-root_logger_t::log(int severity, string_view message) const -> void {
-    attribute_pack range;
-    log(severity, message, range);
+root_logger_t::log(int severity, string_view pattern) -> void {
+    attribute_pack pack;
+    log(severity, pattern, pack);
 }
 
 auto
-root_logger_t::log(int severity, string_view format, attribute_pack& range) const -> void {
+root_logger_t::log(int severity, string_view pattern, attribute_pack& pack) -> void {
     const auto inner = sync->load(this->inner);
     const auto filter = inner->apply([&](inner_t& inner) -> filter_t {
         return inner.filter;
     });
 
-    record_t record(severity, format, range);
+    record_t record(severity, pattern, pack);
     if (filter(record)) {
         for (auto& handler : inner->handlers) {
             handler->execute(record);
@@ -109,13 +109,13 @@ root_logger_t::log(int severity, string_view format, attribute_pack& range) cons
 }
 
 auto
-root_logger_t::log(int severity, string_view format, attribute_pack& range, const format_t& fn) const -> void {
+root_logger_t::log(int severity, string_view pattern, attribute_pack& pack, const format_t& fn) -> void {
     const auto inner = sync->load(this->inner);
     const auto filter = inner->apply([&](inner_t& inner) -> filter_t {
         return inner.filter;
     });
 
-    record_t record(severity, format, range);
+    record_t record(severity, pattern, pack);
     if (filter(record)) {
         writer_t wr;
         fn(wr);

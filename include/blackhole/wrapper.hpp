@@ -16,9 +16,9 @@ public:
         return attributes_view;
     }
 
-    auto log(int severity, string_view message) const -> void;
-    auto log(int severity, string_view message, attribute_pack& range) const -> void;
-    auto log(int severity, string_view message, attribute_pack& range, const format_t& fn) const -> void;
+    auto log(int severity, string_view pattern) -> void;
+    auto log(int severity, string_view pattern, attribute_pack& pack) -> void;
+    auto log(int severity, string_view pattern, attribute_pack& pack, const format_t& fn) -> void;
 };
 
 }  // namespace blackhole

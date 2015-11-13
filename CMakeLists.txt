@@ -23,6 +23,7 @@ add_library(cppformat STATIC foreign/cppformat/format)
 
 add_library(${LIBRARY_NAME} SHARED
 	src/attribute
+	src/logger
 	src/record
 	src/root
 	src/wrapper
@@ -117,8 +118,8 @@ if (ENABLE_TESTING)
     add_executable(${LIBRARY_NAME}-tests
 		tests/attribute
 		tests/facade
-		tests/mocks/logger
 		tests/record
+		tests/src/mocks/logger
 		tests/wrapper
         tests/root)
 

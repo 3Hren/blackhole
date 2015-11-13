@@ -8,6 +8,7 @@
 
 namespace blackhole {
 
+class handler_t;
 class record_t;
 class scoped_t;
 
@@ -41,11 +42,9 @@ public:
     /// \warning the filter function must be thread-safe.
     auto filter(filter_t fn) -> void;
 
-    auto log(int severity, string_view format) const -> void;
-    auto log(int severity, string_view format, attribute_pack& range) const -> void;
-    auto log(int severity, string_view format, attribute_pack& range, const format_t& fn) const -> void;
-
-    auto scoped(attributes_t attributes) const -> scoped_t;
+    auto log(int severity, string_view pattern) -> void;
+    auto log(int severity, string_view pattern, attribute_pack& pack) -> void;
+    auto log(int severity, string_view pattern, attribute_pack& pack, const format_t& fn) -> void;
 };
 
 }  // namespace blackhole

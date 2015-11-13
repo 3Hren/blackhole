@@ -43,12 +43,12 @@ public:
     }
 
     /// Log a message with the given severity level.
-    auto log(int severity, const string_view& format) const -> void;
+    auto log(int severity, const string_view& pattern) -> void;
 
     /// Log a message with the given severity level and attributes.
     ///
     /// \overload
-    auto log(int severity, const string_view& format, const attribute_list& attributes) const -> void;
+    auto log(int severity, const string_view& pattern, const attribute_list& attributes) -> void;
 
     /// Log a message with the given severity level and further formatting using the given pattern
     /// and arguments with optional attributes list as a last parameter.
@@ -57,7 +57,7 @@ public:
     /// \tparam T and Args... must meet the requirements of `StreamFormatted`.
     /// \note the last parameter of variadic `Args...` pack can be an `attribute_list`.
     template<typename T, typename... Args>
-    auto log(int severity, const string_view& format, const T& arg, const Args&... args) const -> void;
+    auto log(int severity, const string_view& pattern, const T& arg, const Args&... args) -> void;
 
 #if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
     /// Log a message with the given severity level and further formatting using the given pattern
@@ -69,18 +69,7 @@ public:
     /// \overload
     /// \tparam T and Args... must meet the requirements of `StreamFormatted`.
     template<std::size_t N, typename T, typename... Args>
-    auto log(int severity, const detail::formatter<N>& formatter, const T& arg, const Args&... args) const -> void;
-
-    /// Log a message with the given severity level and attributes and further formatting using the
-    /// given pattern and arguments.
-    ///
-    /// This is more fast alternative comparing with default formatting, because the given pattern
-    /// string is parsed into literals during compile time.
-    ///
-    /// \overload
-    /// \tparam T and Args... must meet the requirements of `StreamFormatted`.
-    template<std::size_t N, typename T, typename... Args>
-    auto log(int severity, const attribute_list& attributes, const detail::formatter<N>& formatter, const T& arg, const Args&... args) const -> void;
+    auto log(int severity, const detail::formatter<N>& pattern, const T& arg, const Args&... args) -> void;
 #endif
 
 private:
@@ -89,39 +78,39 @@ private:
     /// \overload for variadic pack without attribute list as the last argument.
     template<typename... Args>
     inline
-    auto select(int severity, const string_view& format, const Args&... args) const ->
+    auto select(int severity, const string_view& pattern, const Args&... args) ->
         typename std::enable_if<!detail::with_attributes<Args...>::value>::type;
 
     /// Selects the proper method overload when using variadic pack interface.
     ///
     /// \overload for variadic pack with attribute list as the last argument.
     template<typename... Args>
-    constexpr
-    auto select(int severity, const string_view& format, const Args&... args) const ->
+    inline
+    auto select(int severity, const string_view& pattern, const Args&... args) ->
         typename std::enable_if<detail::with_attributes<Args...>::value>::type;
 };
 
 template<typename Logger>
 inline
 auto
-logger_facade<Logger>::log(int severity, const string_view& format) const -> void {
-    inner().log(severity, format);
+logger_facade<Logger>::log(int severity, const string_view& pattern) -> void {
+    inner().log(severity, pattern);
 }
 
 template<typename Logger>
 template<typename T, typename... Args>
 inline
 auto
-logger_facade<Logger>::log(int severity, const string_view& format, const T& arg, const Args&... args) const -> void {
-    select(severity, format, arg, args...);
+logger_facade<Logger>::log(int severity, const string_view& pattern, const T& arg, const Args&... args) -> void {
+    select(severity, pattern, arg, args...);
 }
 
 template<typename Logger>
 inline
 auto
-logger_facade<Logger>::log(int severity, const string_view& format, const attribute_list& attributes) const -> void {
-    attribute_pack range{attributes};
-    inner().log(severity, format, range);
+logger_facade<Logger>::log(int severity, const string_view& pattern, const attribute_list& attributes) -> void {
+    attribute_pack pack{attributes};
+    inner().log(severity, pattern, pack);
 }
 
 #if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
@@ -130,13 +119,14 @@ template<typename Logger>
 template<std::size_t N, typename T, typename... Args>
 inline
 auto
-logger_facade<Logger>::log(int severity, const detail::formatter<N>& formatter, const T& arg, const Args&... args) const -> void {
+logger_facade<Logger>::log(int severity, const detail::formatter<N>& pattern, const T& arg, const Args&... args) -> void {
     const auto fn = [&](writer_t& wr) {
-        formatter.format(wr.inner, arg, args...);
+        pattern.format(wr.inner, arg, args...);
     };
 
-    attribute_pack range;
-    inner().log(severity, "", range, std::cref(fn));
+    attribute_pack pack;
+    // TODO: Pass non-empty pattern.
+    inner().log(severity, "", pack, std::cref(fn));
 }
 
 #endif
@@ -145,23 +135,23 @@ template<typename Logger>
 template<typename... Args>
 inline
 auto
-logger_facade<Logger>::select(int severity, const string_view& format, const Args&... args) const ->
+logger_facade<Logger>::select(int severity, const string_view& pattern, const Args&... args) ->
     typename std::enable_if<!detail::with_attributes<Args...>::value>::type
 {
-    const auto fn = std::bind(&detail::gcc::write_all<Args...>, ph::_1, format.data(), std::cref(args)...);
+    const auto fn = std::bind(&detail::gcc::write_all<Args...>, ph::_1, pattern.data(), std::cref(args)...);
 
-    attribute_pack range;
-    inner().log(severity, format, range, std::cref(fn));
+    attribute_pack pack;
+    inner().log(severity, pattern, pack, std::cref(fn));
 }
 
 template<typename Logger>
 template<typename... Args>
-constexpr
+inline
 auto
-logger_facade<Logger>::select(int severity, const string_view& format, const Args&... args) const ->
+logger_facade<Logger>::select(int severity, const string_view& pattern, const Args&... args) ->
     typename std::enable_if<detail::with_attributes<Args...>::value>::type
 {
-    detail::without_tail<detail::select_t, Args...>::type::apply(inner(), severity, format, args...);
+    detail::without_tail<detail::select_t, Args...>::type::apply(inner(), severity, pattern, args...);
 }
 
 }  // namespace blackhole

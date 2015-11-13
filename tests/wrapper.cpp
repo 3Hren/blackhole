@@ -31,27 +31,5 @@ TEST(Wrapper, Constructor) {
     EXPECT_EQ(expected, wrapper.attributes());
 }
 
-// p   ::= p f{}
-// p f ::= p f a{}
-// p a
-// p f a
-TEST(__TESTING__, __API__) {
-    root_logger_t root({});
-    logger_facade<root_logger_t> logger(root);
-
-    logger.log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
-        "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326
-    );
-
-    logger.log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
-        "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326,
-        attribute_list{
-            {"key#6", {42}},
-            {"key#7", {3.1415}},
-            {"key#8", {"value"}}
-        }
-    );
-}
-
 }  // namespace testing
 }  // namespace blackhole

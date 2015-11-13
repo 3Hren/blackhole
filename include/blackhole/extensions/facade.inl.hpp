@@ -96,16 +96,13 @@ template<typename... Args>
 struct select_t {
     template<typename Logger>
     static
-    auto apply(const Logger& log,
-               int severity,
-               const string_view& format,
-               const Args&... args,
-               const attribute_list& attributes) -> void
+    auto apply(Logger& log, int severity, const string_view& pattern, const Args&... args,
+        const attribute_list& attributes) -> void
     {
-        const auto fn = std::bind(&gcc::write_all<Args...>, ph::_1, format.data(), std::cref(args)...);
+        const auto fn = std::bind(&gcc::write_all<Args...>, ph::_1, pattern.data(), std::cref(args)...);
 
-        attribute_pack range{attributes};
-        log.log(severity, format, range, std::cref(fn));
+        attribute_pack pack{attributes};
+        log.log(severity, pattern, pack, std::cref(fn));
     }
 };
 

@@ -31,14 +31,14 @@ typedef mock::logger_t logger_type;
 
 TEST(Facade, Constructor) {
     logger_type inner;
-    const logger_facade<logger_type> logger(inner);
+    logger_facade<logger_type> logger(inner);
 
     EXPECT_EQ(&inner, &logger.inner());
 }
 
 TEST(Facade, PrimitiveLog) {
     logger_type inner;
-    const logger_facade<logger_type> logger(inner);
+    logger_facade<logger_type> logger(inner);
 
     EXPECT_CALL(inner, log(0, string_view("GET /porn.png HTTP/1.0")))
         .Times(1);
@@ -48,7 +48,7 @@ TEST(Facade, PrimitiveLog) {
 
 TEST(Facade, AttributeLog) {
     logger_type inner;
-    const logger_facade<logger_type> logger(inner);
+    logger_facade<logger_type> logger(inner);
 
     const attribute_list attributes{{"key#1", {42}}};
     attribute_pack expected{attributes};
@@ -63,7 +63,7 @@ TEST(Facade, AttributeLog) {
 
 TEST(Facade, FormattedLog) {
     logger_type inner;
-    const logger_facade<logger_type> logger(inner);
+    logger_facade<logger_type> logger(inner);
 
     attribute_pack expected;
     writer_t writer;
@@ -79,7 +79,7 @@ TEST(Facade, FormattedLog) {
 
 TEST(Facade, FormattedAttributeLog) {
     logger_type inner;
-    const logger_facade<logger_type> logger(inner);
+    logger_facade<logger_type> logger(inner);
 
     const attribute_list attributes{{"key#1", {42}}};
     attribute_pack expected{attributes};
