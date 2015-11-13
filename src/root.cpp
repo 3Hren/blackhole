@@ -77,6 +77,18 @@ root_logger_t::root_logger_t(filter_t filter, std::vector<std::unique_ptr<handle
 root_logger_t::~root_logger_t() {}
 
 auto
+root_logger_t::operator=(root_logger_t&& other) noexcept -> root_logger_t& {
+    if (this == &other) {
+        return *this;
+    }
+
+    const auto inner = std::move(other.sync->load(other.inner));
+    sync->store(this->inner, std::move(inner));
+
+    return *this;
+}
+
+auto
 root_logger_t::filter(filter_t fn) -> void {
     auto inner = sync->load(this->inner);
 
@@ -127,16 +139,5 @@ root_logger_t::log(int severity, string_view pattern, attribute_pack& pack, cons
     }
 }
 
-auto
-root_logger_t::operator=(root_logger_t&& other) noexcept -> root_logger_t& {
-    if (this == &other) {
-        return *this;
-    }
-
-    const auto inner = std::move(other.sync->load(other.inner));
-    sync->store(this->inner, std::move(inner));
-
-    return *this;
-}
 
 }  // namespace blackhole
