@@ -19,13 +19,28 @@ public:
     typedef Logger wrapped_type;
 
 private:
-    std::reference_wrapper<const wrapped_type> wrapped;
+    std::reference_wrapper<wrapped_type> wrapped;
 
 public:
     /// Creates a logger facade by wrapping the given logger.
-    constexpr explicit logger_facade(const wrapped_type& wrapped) noexcept:
+    constexpr explicit logger_facade(wrapped_type& wrapped) noexcept:
         wrapped(wrapped)
     {}
+
+    /// Returns an lvalue reference to the the underlying logger.
+    ///
+    /// \note it should be constexpr, but C++11 automatically make this constant and conflicts with
+    ///       the overload.
+    auto inner() noexcept -> wrapped_type& {
+        return wrapped.get();
+    }
+
+    /// Returns a const lvalue reference to the the underlying logger.
+    ///
+    /// \overload
+    constexpr auto inner() const noexcept -> const wrapped_type& {
+        return wrapped.get();
+    }
 
     /// Log a message with the given severity level.
     auto log(int severity, const string_view& format) const -> void;
@@ -69,10 +84,6 @@ public:
 #endif
 
 private:
-    constexpr auto inner() const noexcept -> const wrapped_type& {
-        return wrapped.get();
-    }
-
     /// Selects the proper method overload when using variadic pack interface.
     ///
     /// \overload for variadic pack without attribute list as the last argument.

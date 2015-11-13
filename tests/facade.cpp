@@ -29,15 +29,15 @@ using ::testing::_;
 
 typedef mock::logger_t logger_type;
 
-TEST(Facade, ConstFacadeFromMutableLogger) {
-    logger_type inner{};
+TEST(Facade, Constructor) {
+    logger_type inner;
     const logger_facade<logger_type> logger(inner);
 
-    (void)logger;
+    EXPECT_EQ(&inner, &logger.inner());
 }
 
 TEST(Facade, PrimitiveLog) {
-    const logger_type inner{};
+    logger_type inner;
     const logger_facade<logger_type> logger(inner);
 
     EXPECT_CALL(inner, log(0, string_view("GET /porn.png HTTP/1.0")))
@@ -47,7 +47,7 @@ TEST(Facade, PrimitiveLog) {
 }
 
 TEST(Facade, AttributeLog) {
-    const logger_type inner{};
+    logger_type inner;
     const logger_facade<logger_type> logger(inner);
 
     const attribute_list attributes{{"key#1", {42}}};
@@ -62,7 +62,7 @@ TEST(Facade, AttributeLog) {
 }
 
 TEST(Facade, FormattedLog) {
-    const logger_type inner{};
+    logger_type inner;
     const logger_facade<logger_type> logger(inner);
 
     attribute_pack expected;
@@ -78,7 +78,7 @@ TEST(Facade, FormattedLog) {
 }
 
 TEST(Facade, FormattedAttributeLog) {
-    const logger_type inner{};
+    logger_type inner;
     const logger_facade<logger_type> logger(inner);
 
     const attribute_list attributes{{"key#1", {42}}};
