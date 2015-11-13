@@ -33,7 +33,7 @@ public:
     root_logger_t(filter_t filter, std::vector<std::unique_ptr<handler_t>> handlers);
 
     root_logger_t(const root_logger_t& other) = delete;
-    root_logger_t(root_logger_t&& other);
+    root_logger_t(root_logger_t&& other) noexcept;
 
     ~root_logger_t();
 
