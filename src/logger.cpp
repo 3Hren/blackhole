@@ -9,9 +9,9 @@ namespace blackhole {
 logger_t::~logger_t() {}
 
 auto
-logger_t::scoped(attributes_t attributes) -> scoped_t {
+logger_t::scoped(attributes_t) -> scoped_t {
     BLACKHOLE_UNIMPLEMENTED();
-    return scoped_t();
+    std::abort();
 }
 
 }  // namespace blackhole

@@ -6,6 +6,7 @@
 #include <blackhole/logger.hpp>
 #include <blackhole/record.hpp>
 #include <blackhole/root.hpp>
+#include <blackhole/scoped.hpp>
 
 namespace blackhole {
 namespace testing {
@@ -116,6 +117,31 @@ TEST(RootLogger, DispatchRecordWithFormatterToHandlers) {
     logger.log(0, "GET /porn.png HTTP/1.1 - {}/{}", pack, [](writer_t& writer) {
         writer.write("GET /porn.png HTTP/1.1 - {}/{}", 42, 2345);
     });
+}
+
+TEST(RootLogger, Scoped) {
+    std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
+    mock::handler_t* view = handler.get();
+
+    std::vector<std::unique_ptr<handler_t>> handlers;
+    handlers.push_back(std::move(handler));
+
+    root_logger_t logger(std::move(handlers));
+    const auto scoped = logger.scoped({{"key#1", {42}}});
+
+    EXPECT_CALL(*view, execute(_))
+        .Times(1)
+        .WillOnce(Invoke([](const record_t& record) {
+            EXPECT_EQ("GET /porn.png HTTP/1.1", record.message().to_string());
+            EXPECT_EQ("GET /porn.png HTTP/1.1", record.formatted().to_string());
+            EXPECT_EQ(0, record.severity());
+            ASSERT_EQ(1, record.attributes().size());
+
+            view_of<attributes_t>::type attributes{{"key#1", {42}}};
+            EXPECT_EQ(attributes, record.attributes().at(0).get());
+        }));
+
+    logger.log(0, "GET /porn.png HTTP/1.1");
 }
 
 }  // namespace testing

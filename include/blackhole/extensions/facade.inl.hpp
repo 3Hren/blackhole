@@ -10,9 +10,6 @@ namespace blackhole {
 
 namespace ph = std::placeholders;
 
-/// Convenient typedef for attributes set view.
-typedef view_of<attributes_t>::type attribute_list;
-
 /// Internal details. Please move along, nothing to see here.
 namespace detail {
 namespace gcc {

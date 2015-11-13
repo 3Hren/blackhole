@@ -47,6 +47,9 @@ struct view_of<attributes_t> {
 #endif
 };
 
+/// Convenient typedef for attributes set view.
+typedef view_of<attributes_t>::type attribute_list;
+
 #ifdef BLACKHOLE_HAVE_SMALL_VECTOR
 typedef boost::container::small_vector<std::reference_wrapper<const view_of<attributes_t>::type>, 16> attribute_pack;
 #else

@@ -28,8 +28,15 @@ private:
     std::shared_ptr<inner_t> inner;
 
 public:
+    /// Constructs a root level logger with the given handlers.
+    ///
     /// \note you can create a logger with no handlers, it'll just drop all messages.
     root_logger_t(std::vector<std::unique_ptr<handler_t>> handlers);
+
+    /// Constructs a root level logger with the given filtering function and handlers.
+    ///
+    /// \overload
+    /// \note you can create a logger with no handlers, it'll just drop all messages.
     root_logger_t(filter_t filter, std::vector<std::unique_ptr<handler_t>> handlers);
 
     root_logger_t(const root_logger_t& other) = delete;
@@ -50,6 +57,8 @@ public:
     auto log(int severity, string_view pattern) -> void;
     auto log(int severity, string_view pattern, attribute_pack& pack) -> void;
     auto log(int severity, string_view pattern, attribute_pack& pack, const format_t& fn) -> void;
+
+    auto scoped(attributes_t attributes) -> scoped_t;
 };
 
 }  // namespace blackhole

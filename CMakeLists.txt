@@ -12,6 +12,10 @@ OPTION(ENABLE_TESTING_THREADSAFETY "Build the thread-safety testing suite" OFF)
 
 set(LIBRARY_NAME blackhole)
 
+find_package(Boost 1.46 REQUIRED COMPONENTS
+	system
+	thread)
+
 project(${LIBRARY_NAME})
 
 include_directories(BEFORE SYSTEM
@@ -26,6 +30,7 @@ add_library(${LIBRARY_NAME} SHARED
 	src/logger
 	src/record
 	src/root
+	src/scoped
 	src/wrapper
 )
 
@@ -80,6 +85,7 @@ else ()
 endif ()
 
 target_link_libraries(${LIBRARY_NAME}
+	${Boost_LIBRARIES}
 	cppformat
 )
 

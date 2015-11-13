@@ -3,9 +3,12 @@
 #include <atomic>
 #include <mutex>
 
+#include <boost/thread/tss.hpp>
+
 #include "blackhole/extensions/facade.hpp"
 #include "blackhole/handler.hpp"
 #include "blackhole/record.hpp"
+#include "blackhole/scoped.hpp"
 
 #include "blackhole/detail/spinlock.hpp"
 
@@ -42,15 +45,18 @@ struct root_logger_t::inner_t {
     typedef spinlock_t mutex_type;
 
     filter_t filter;
+    boost::thread_specific_ptr<scoped_t> scoped;
     const std::vector<std::unique_ptr<handler_t>> handlers;
 
     inner_t(std::vector<std::unique_ptr<handler_t>> handlers):
         filter([](const record_t&) -> bool { return true; }),
+        scoped([](scoped_t*) {}),
         handlers(std::move(handlers))
     {}
 
     inner_t(filter_t filter, std::vector<std::unique_ptr<handler_t>> handlers):
         filter(std::move(filter)),
+        scoped([](scoped_t*) {}),
         handlers(std::move(handlers))
     {}
 
@@ -112,6 +118,10 @@ root_logger_t::log(int severity, string_view pattern, attribute_pack& pack) -> v
         return inner.filter;
     });
 
+    if (inner->scoped.get()) {
+        inner->scoped.get()->collect(&pack);
+    }
+
     record_t record(severity, pattern, pack);
     if (filter(record)) {
         for (auto& handler : inner->handlers) {
@@ -139,5 +149,10 @@ root_logger_t::log(int severity, string_view pattern, attribute_pack& pack, cons
     }
 }
 
+auto
+root_logger_t::scoped(attributes_t attributes) -> scoped_t {
+    const auto inner = sync->load(this->inner);
+    return scoped_t(inner->scoped, std::move(attributes));
+}
 
 }  // namespace blackhole
