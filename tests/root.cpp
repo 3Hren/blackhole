@@ -180,6 +180,8 @@ TEST(RootLogger, LogWithNestedScopedAttributes) {
 }
 
 TEST(RootLogger, AssignmentMovesScopedAttributes) {
+    typedef view_of<attributes_t>::type attribute_list;
+
     std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
     mock::handler_t* view = handler.get();
 
@@ -193,9 +195,7 @@ TEST(RootLogger, AssignmentMovesScopedAttributes) {
             EXPECT_EQ("GET /porn.png HTTP/1.1", record.formatted().to_string());
             EXPECT_EQ(0, record.severity());
             ASSERT_EQ(1, record.attributes().size());
-
-            view_of<attributes_t>::type attributes{{"key#1", {42}}};
-            EXPECT_EQ(attributes, record.attributes().at(0).get());
+            EXPECT_EQ((attribute_list{{"key#1", {42}}}), record.attributes().at(0).get());
         }));
 
     root_logger_t logger1({});
@@ -206,6 +206,80 @@ TEST(RootLogger, AssignmentMovesScopedAttributes) {
     logger1 = std::move(logger2);
 
     logger1.log(0, "GET /porn.png HTTP/1.1");
+}
+
+TEST(RootLogger, AssignmentMovesNestedScopedAttributes) {
+    std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
+    mock::handler_t* view = handler.get();
+
+    std::vector<std::unique_ptr<handler_t>> handlers;
+    handlers.push_back(std::move(handler));
+
+    EXPECT_CALL(*view, execute(_))
+        .Times(2)
+        .WillOnce(Invoke([](const record_t& record) {
+            ASSERT_EQ(2, record.attributes().size());
+            EXPECT_EQ((attribute_list{{"key#2", {"value#2"}}}), record.attributes().at(0).get());
+            EXPECT_EQ((attribute_list{{"key#1", {42}}}), record.attributes().at(1).get());
+        }))
+        .WillOnce(Invoke([](const record_t& record) {
+            ASSERT_EQ(1, record.attributes().size());
+            EXPECT_EQ((attribute_list{{"key#1", {42}}}), record.attributes().at(0).get());
+        }));;
+
+    root_logger_t logger1({});
+    root_logger_t logger2(std::move(handlers));
+    const auto s1 = logger2.scoped({{"key#1", {42}}});
+
+    {
+        const auto s2 = logger2.scoped({{"key#2", {"value#2"}}});
+        // All scoped attributes should be assigned to the new owner.
+        logger1 = std::move(logger2);
+        logger1.log(0, "-");
+    }
+
+    logger1.log(0, "-");
+}
+
+TEST(RootLogger, AssignmentMovesNestedTripleScopedAttributes) {
+    std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
+    mock::handler_t* view = handler.get();
+
+    std::vector<std::unique_ptr<handler_t>> handlers;
+    handlers.push_back(std::move(handler));
+
+    EXPECT_CALL(*view, execute(_))
+        .Times(3)
+        .WillOnce(Invoke([](const record_t& record) {
+            ASSERT_EQ(3, record.attributes().size());
+            EXPECT_EQ((attribute_list{{"key#3", {100}}}), record.attributes().at(0).get());
+            EXPECT_EQ((attribute_list{{"key#2", {"value#2"}}}), record.attributes().at(1).get());
+            EXPECT_EQ((attribute_list{{"key#1", {42}}}), record.attributes().at(2).get());
+        }))
+        .WillOnce(Invoke([](const record_t& record) {
+            ASSERT_EQ(2, record.attributes().size());
+            EXPECT_EQ((attribute_list{{"key#2", {"value#2"}}}), record.attributes().at(0).get());
+            EXPECT_EQ((attribute_list{{"key#1", {42}}}), record.attributes().at(1).get());
+        }))
+        .WillOnce(Invoke([](const record_t& record) {
+            ASSERT_EQ(1, record.attributes().size());
+            EXPECT_EQ((attribute_list{{"key#1", {42}}}), record.attributes().at(0).get());
+        }));;
+
+    root_logger_t logger1({});
+    root_logger_t logger2(std::move(handlers));
+    const auto s1 = logger2.scoped({{"key#1", {42}}});
+
+    {
+        const auto s2 = logger2.scoped({{"key#2", {"value#2"}}});
+        {
+            const auto s3 = logger2.scoped({{"key#3", {100}}});
+            logger1 = std::move(logger2);
+            logger1.log(0, "-");
+        }
+        logger1.log(0, "-");
+    }
+    logger1.log(0, "-");
 }
 
 }  // namespace testing

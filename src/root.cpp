@@ -98,7 +98,7 @@ root_logger_t::operator=(root_logger_t&& other) noexcept -> root_logger_t& {
 
     // TODO: TEST!
     if (sync->context.get()) {
-        // sync->context.get()->swap(&sync->context);
+        sync->context.get()->rebind(&sync->context);
     }
 
     return *this;

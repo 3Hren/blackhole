@@ -58,8 +58,11 @@ public:
         }
     }
 
-    auto swap(boost::thread_specific_ptr<scoped_t>* context) -> void {
+    auto rebind(boost::thread_specific_ptr<scoped_t>* context) -> void {
         this->context = context;
+        if (prev) {
+            prev->rebind(context);
+        }
     }
 };
 
