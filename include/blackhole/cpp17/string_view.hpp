@@ -48,12 +48,6 @@ public:
     {}
 
     constexpr
-    basic_string_view(const basic_string_view& other) = default;
-
-    constexpr
-    basic_string_view& operator=(const basic_string_view& other) = default;
-
-    constexpr
     auto data() const noexcept -> const char* {
         return data_;
     }
