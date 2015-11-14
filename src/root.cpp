@@ -148,6 +148,8 @@ root_logger_t::log(int severity, string_view pattern, attribute_pack& pack, cons
         return inner.filter;
     });
 
+    // TODO: Refactor here. No scoped yet.
+
     record_t record(severity, pattern, pack);
     if (filter(record)) {
         writer_t writer;
