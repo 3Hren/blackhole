@@ -16,7 +16,6 @@ using ::testing::Invoke;
 using ::testing::_;
 
 TEST(RootLogger, Constructor) {
-    // Can be initialized with none handlers, does nothing.
     root_logger_t logger({});
     logger.log(0, "GET /porn.png HTTP/1.1");
 }
