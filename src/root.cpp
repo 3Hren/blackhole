@@ -83,20 +83,18 @@ root_logger_t::root_logger_t(filter_t filter, std::vector<std::unique_ptr<handle
 
 root_logger_t::~root_logger_t() {}
 
-// TODO: TEST!
 auto
 root_logger_t::operator=(root_logger_t&& other) noexcept -> root_logger_t& {
     if (this == &other) {
         return *this;
     }
 
+    // TODO: TEST!
     const auto inner = std::move(other.sync->load(other.inner));
     sync->store(this->inner, std::move(inner));
 
-    // TODO: TEST!
     sync->context.reset(other.sync->context.get());
 
-    // TODO: TEST!
     if (sync->context.get()) {
         sync->context.get()->rebind(&sync->context);
     }
