@@ -31,7 +31,7 @@ TEST(RootLogger, Constructor) {
     logger.log(0, "GET /porn.png HTTP/1.1");
 }
 
-TEST(RootLogger, ConstructorWithFilter) {
+TEST(RootLogger, FilterConstructor) {
     int passed = 0;
 
     root_logger_t logger([&](const record_t&) -> bool {
