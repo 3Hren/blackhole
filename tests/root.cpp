@@ -2,28 +2,18 @@
 #include <gtest/gtest.h>
 
 #include "blackhole/extensions/writer.hpp"
-#include <blackhole/handler.hpp>
 #include <blackhole/logger.hpp>
 #include <blackhole/record.hpp>
 #include <blackhole/root.hpp>
 #include <blackhole/scoped.hpp>
+
+#include "mocks/handler.hpp"
 
 namespace blackhole {
 namespace testing {
 
 using ::testing::Invoke;
 using ::testing::_;
-
-namespace mock {
-namespace {
-
-class handler_t : public ::blackhole::handler_t {
-public:
-    MOCK_METHOD1(execute, void(const record_t&));
-};
-
-}  // namespace
-}  // namespace mock
 
 TEST(RootLogger, Constructor) {
     // Can be initialized with none handlers, does nothing.

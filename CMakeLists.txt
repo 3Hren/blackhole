@@ -121,6 +121,7 @@ if (ENABLE_TESTING)
 		tests/attribute
 		tests/facade
 		tests/record
+		tests/src/mocks/handler
 		tests/src/mocks/logger
 		tests/wrapper
         tests/root)
