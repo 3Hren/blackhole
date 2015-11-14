@@ -43,8 +43,6 @@ TEST(RootLogger, LogInvokesDispatchingRecordToHandlers) {
         handlers.push_back(std::move(handler));
     }
 
-    root_logger_t logger(std::move(handlers));
-
     for (auto handler : handlers_view) {
         EXPECT_CALL(*handler, execute(_))
             .Times(1)
@@ -56,10 +54,14 @@ TEST(RootLogger, LogInvokesDispatchingRecordToHandlers) {
             }));
     }
 
+    root_logger_t logger(std::move(handlers));
+
     logger.log(0, "GET /porn.png HTTP/1.1");
 }
 
 TEST(RootLogger, LogWithAttributesInvokesDispatchingRecordToHandlers) {
+    typedef view_of<attributes_t>::type attribute_list;
+
     std::vector<std::unique_ptr<handler_t>> handlers;
     std::vector<mock::handler_t*> handlers_view;
 
@@ -68,11 +70,6 @@ TEST(RootLogger, LogWithAttributesInvokesDispatchingRecordToHandlers) {
         handlers_view.push_back(handler.get());
         handlers.push_back(std::move(handler));
     }
-
-    root_logger_t logger(std::move(handlers));
-
-    const view_of<attributes_t>::type attributes{{"key#1", {42}}};
-    attribute_pack pack{attributes};
 
     for (auto handler : handlers_view) {
         EXPECT_CALL(*handler, execute(_))
@@ -82,14 +79,20 @@ TEST(RootLogger, LogWithAttributesInvokesDispatchingRecordToHandlers) {
                 EXPECT_EQ("GET /porn.png HTTP/1.1", record.formatted().to_string());
                 EXPECT_EQ(0, record.severity());
                 ASSERT_EQ(1, record.attributes().size());
-                EXPECT_EQ(attributes, record.attributes().at(0).get());
+                EXPECT_EQ((attribute_list{{"key#1", {42}}}), record.attributes().at(0).get());
             }));
     }
+
+    root_logger_t logger(std::move(handlers));
+    attribute_list attributes{{"key#1", {42}}};
+    attribute_pack pack{attributes};
 
     logger.log(0, "GET /porn.png HTTP/1.1", pack);
 }
 
 TEST(RootLogger, LogWithAttributesAndFormatterInvokesDispatchingRecordToHandlers) {
+    typedef view_of<attributes_t>::type attribute_list;
+
     std::vector<std::unique_ptr<handler_t>> handlers;
     std::vector<mock::handler_t*> handlers_view;
 
@@ -99,11 +102,6 @@ TEST(RootLogger, LogWithAttributesAndFormatterInvokesDispatchingRecordToHandlers
         handlers.push_back(std::move(handler));
     }
 
-    root_logger_t logger(std::move(handlers));
-
-    const view_of<attributes_t>::type attributes{{"key#1", {42}}};
-    attribute_pack pack{attributes};
-
     for (auto handler : handlers_view) {
         EXPECT_CALL(*handler, execute(_))
             .Times(1)
@@ -112,9 +110,14 @@ TEST(RootLogger, LogWithAttributesAndFormatterInvokesDispatchingRecordToHandlers
                 EXPECT_EQ("GET /porn.png HTTP/1.1 - 42/2345", record.formatted().to_string());
                 EXPECT_EQ(0, record.severity());
                 ASSERT_EQ(1, record.attributes().size());
-                EXPECT_EQ(attributes, record.attributes().at(0).get());
+                EXPECT_EQ((attribute_list{{"key#1", {42}}}), record.attributes().at(0).get());
             }));
     }
+
+    root_logger_t logger(std::move(handlers));
+
+    attribute_list attributes{{"key#1", {42}}};
+    attribute_pack pack{attributes};
 
     logger.log(0, "GET /porn.png HTTP/1.1 - {}/{}", pack, [](writer_t& writer) {
         writer.write("GET /porn.png HTTP/1.1 - {}/{}", 42, 2345);
@@ -183,13 +186,6 @@ TEST(RootLogger, AssignmentMovesScopedAttributes) {
     std::vector<std::unique_ptr<handler_t>> handlers;
     handlers.push_back(std::move(handler));
 
-    root_logger_t logger1({});
-    root_logger_t logger2(std::move(handlers));
-    const auto scoped = logger2.scoped({{"key#1", {42}}});
-
-    // All scoped attributes should be assigned to the new owner.
-    logger1 = std::move(logger2);
-
     EXPECT_CALL(*view, execute(_))
         .Times(1)
         .WillOnce(Invoke([](const record_t& record) {
@@ -201,6 +197,13 @@ TEST(RootLogger, AssignmentMovesScopedAttributes) {
             view_of<attributes_t>::type attributes{{"key#1", {42}}};
             EXPECT_EQ(attributes, record.attributes().at(0).get());
         }));
+
+    root_logger_t logger1({});
+    root_logger_t logger2(std::move(handlers));
+    const auto scoped = logger2.scoped({{"key#1", {42}}});
+
+    // All scoped attributes should be assigned to the new owner.
+    logger1 = std::move(logger2);
 
     logger1.log(0, "GET /porn.png HTTP/1.1");
 }
