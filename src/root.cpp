@@ -152,7 +152,8 @@ root_logger_t::log(int severity, string_view pattern, attribute_pack& pack, cons
     if (filter(record)) {
         writer_t writer;
         fn(writer);
-        record.activate({writer.inner.data(), writer.inner.size()});
+        const string_view formatted{writer.inner.data(), writer.inner.size()};
+        record.activate(formatted);
 
         for (auto& handler : inner->handlers) {
             handler->execute(record);
