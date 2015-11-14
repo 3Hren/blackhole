@@ -25,10 +25,23 @@ public:
 }  // namespace
 }  // namespace mock
 
-TEST(RootLogger, Log) {
+TEST(RootLogger, Constructor) {
     // Can be initialized with none handlers, does nothing.
     root_logger_t logger({});
     logger.log(0, "GET /porn.png HTTP/1.1");
+}
+
+TEST(RootLogger, ConstructorWithFilter) {
+    int passed = 0;
+
+    root_logger_t logger([&](const record_t&) -> bool {
+        passed++;
+        return false;
+    }, {});
+
+    logger.log(0, "GET /porn.png HTTP/1.1");
+
+    EXPECT_EQ(1, passed);
 }
 
 TEST(RootLogger, DispatchRecordToHandlers) {
