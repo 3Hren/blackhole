@@ -121,27 +121,57 @@ TEST(RootLogger, LogWithAttributesAndFormatterInvokesDispatchingRecordToHandlers
     });
 }
 
-TEST(RootLogger, ScopedAttributes) {
+TEST(RootLogger, LogWithScopedAttributes) {
+    typedef view_of<attributes_t>::type attribute_list;
+
     std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
     mock::handler_t* view = handler.get();
 
     std::vector<std::unique_ptr<handler_t>> handlers;
     handlers.push_back(std::move(handler));
 
-    root_logger_t logger(std::move(handlers));
-    const auto scoped = logger.scoped({{"key#1", {42}}});
-
     EXPECT_CALL(*view, execute(_))
         .Times(1)
         .WillOnce(Invoke([](const record_t& record) {
-            EXPECT_EQ("GET /porn.png HTTP/1.1", record.message().to_string());
-            EXPECT_EQ("GET /porn.png HTTP/1.1", record.formatted().to_string());
-            EXPECT_EQ(0, record.severity());
             ASSERT_EQ(1, record.attributes().size());
-
-            view_of<attributes_t>::type attributes{{"key#1", {42}}};
-            EXPECT_EQ(attributes, record.attributes().at(0).get());
+            EXPECT_EQ((attribute_list{{"key#1", {42}}}), record.attributes().at(0).get());
         }));
+
+    root_logger_t logger(std::move(handlers));
+    const auto scoped = logger.scoped({{"key#1", {42}}});
+
+    logger.log(0, "GET /porn.png HTTP/1.1");
+}
+
+TEST(RootLogger, LogWithNestedScopedAttributes) {
+    typedef view_of<attributes_t>::type attribute_list;
+
+    std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
+    mock::handler_t* view = handler.get();
+
+    std::vector<std::unique_ptr<handler_t>> handlers;
+    handlers.push_back(std::move(handler));
+
+    EXPECT_CALL(*view, execute(_))
+        .Times(2)
+        .WillOnce(Invoke([](const record_t& record) {
+            ASSERT_EQ(2, record.attributes().size());
+            EXPECT_EQ((attribute_list{{"key#2", {100}}}), record.attributes().at(0).get());
+            EXPECT_EQ((attribute_list{{"key#1", {42}}}), record.attributes().at(1).get());
+        }))
+        .WillOnce(Invoke([](const record_t& record) {
+            ASSERT_EQ(1, record.attributes().size());
+            EXPECT_EQ((attribute_list{{"key#1", {42}}}), record.attributes().at(0).get());
+        }));
+
+    root_logger_t logger(std::move(handlers));
+    const auto s1 = logger.scoped({{"key#1", {42}}});
+
+    // NOTE: The following log will contain flattened attributes list.
+    {
+        const auto s2 = logger.scoped({{"key#2", {100}}});
+        logger.log(0, "GET /porn.png HTTP/1.1");
+    }
 
     logger.log(0, "GET /porn.png HTTP/1.1");
 }
