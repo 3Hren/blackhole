@@ -89,7 +89,7 @@ TEST(RootLogger, LogWithAttributesInvokesDispatchingRecordToHandlers) {
     logger.log(0, "GET /porn.png HTTP/1.1", pack);
 }
 
-TEST(RootLogger, LogWithFormatterInvokesDispatchingRecordToHandlers) {
+TEST(RootLogger, LogWithAttributesAndFormatterInvokesDispatchingRecordToHandlers) {
     std::vector<std::unique_ptr<handler_t>> handlers;
     std::vector<mock::handler_t*> handlers_view;
 
@@ -121,7 +121,7 @@ TEST(RootLogger, LogWithFormatterInvokesDispatchingRecordToHandlers) {
     });
 }
 
-TEST(RootLogger, Scoped) {
+TEST(RootLogger, ScopedAttributes) {
     std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
     mock::handler_t* view = handler.get();
 
@@ -146,7 +146,7 @@ TEST(RootLogger, Scoped) {
     logger.log(0, "GET /porn.png HTTP/1.1");
 }
 
-TEST(RootLogger, Assignment) {
+TEST(RootLogger, AssignmentMovesScopedAttributes) {
     std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
     mock::handler_t* view = handler.get();
 
