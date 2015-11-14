@@ -12,11 +12,11 @@ OPTION(ENABLE_TESTING_THREADSAFETY "Build the thread-safety testing suite" OFF)
 
 set(LIBRARY_NAME blackhole)
 
+project(${LIBRARY_NAME})
+
 find_package(Boost 1.46 REQUIRED COMPONENTS
 	system
 	thread)
-
-project(${LIBRARY_NAME})
 
 include_directories(BEFORE SYSTEM
 	${PROJECT_SOURCE_DIR}/foreign)
@@ -90,10 +90,6 @@ target_link_libraries(${LIBRARY_NAME}
 )
 
 if (ENABLE_TESTING_THREADSAFETY)
-	find_package(Boost 1.46 REQUIRED COMPONENTS
-	    system
-		thread)
-
 	add_executable(${LIBRARY_NAME}-tests-rc-assign
 		tests/rc/assign)
 

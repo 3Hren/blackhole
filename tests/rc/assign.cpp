@@ -3,6 +3,7 @@
 
 #include <blackhole/handler.hpp>
 #include <blackhole/root.hpp>
+#include <blackhole/scoped.hpp>
 
 using namespace blackhole;
 
@@ -16,6 +17,7 @@ int main(int, char** argv) {
 
     for (int tid = 0; tid < thread_num; ++tid) {
         threads.emplace_back([&] {
+            const auto scoped = logger.scoped({{"key#1", {42}}});
             for (int i = 0; i < iterations; ++i) {
                 logger.log(0, "GET /porn.png HTTP/1.1");
             }
@@ -28,6 +30,7 @@ int main(int, char** argv) {
         logger = root_logger_t([=](const record_t&) -> bool {
             return allow;
         }, {});
+        const auto scoped = logger.scoped({{"key#2", {100}}});
     }
 
     for (auto& thread : threads) {

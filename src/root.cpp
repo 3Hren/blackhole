@@ -22,6 +22,10 @@ struct root_logger_t::sync_t {
     mutable mutex_type mutex;
 #endif
 
+    boost::thread_specific_ptr<scoped_t> context;
+
+    sync_t(): context([](scoped_t*) {}) {}
+
     auto load(const std::shared_ptr<inner_t>& source) const noexcept -> std::shared_ptr<inner_t> {
 #ifdef __clang__
         return std::atomic_load_explicit(&source, std::memory_order_acquire);
@@ -45,18 +49,15 @@ struct root_logger_t::inner_t {
     typedef spinlock_t mutex_type;
 
     filter_t filter;
-    boost::thread_specific_ptr<scoped_t> scoped;
     const std::vector<std::unique_ptr<handler_t>> handlers;
 
     inner_t(std::vector<std::unique_ptr<handler_t>> handlers):
         filter([](const record_t&) -> bool { return true; }),
-        scoped([](scoped_t*) {}),
         handlers(std::move(handlers))
     {}
 
     inner_t(filter_t filter, std::vector<std::unique_ptr<handler_t>> handlers):
         filter(std::move(filter)),
-        scoped([](scoped_t*) {}),
         handlers(std::move(handlers))
     {}
 
@@ -82,6 +83,7 @@ root_logger_t::root_logger_t(filter_t filter, std::vector<std::unique_ptr<handle
 
 root_logger_t::~root_logger_t() {}
 
+// TODO: TEST!
 auto
 root_logger_t::operator=(root_logger_t&& other) noexcept -> root_logger_t& {
     if (this == &other) {
@@ -90,6 +92,14 @@ root_logger_t::operator=(root_logger_t&& other) noexcept -> root_logger_t& {
 
     const auto inner = std::move(other.sync->load(other.inner));
     sync->store(this->inner, std::move(inner));
+
+    // TODO: TEST!
+    sync->context.reset(other.sync->context.get());
+
+    // TODO: TEST!
+    if (sync->context.get()) {
+        // sync->context.get()->swap(&sync->context);
+    }
 
     return *this;
 }
@@ -118,8 +128,9 @@ root_logger_t::log(int severity, string_view pattern, attribute_pack& pack) -> v
         return inner.filter;
     });
 
-    if (inner->scoped.get()) {
-        inner->scoped.get()->collect(&pack);
+    // TODO: Consider "null object" pattern.
+    if (sync->context.get()) {
+        sync->context.get()->collect(&pack);
     }
 
     record_t record(severity, pattern, pack);
@@ -151,8 +162,7 @@ root_logger_t::log(int severity, string_view pattern, attribute_pack& pack, cons
 
 auto
 root_logger_t::scoped(attributes_t attributes) -> scoped_t {
-    const auto inner = sync->load(this->inner);
-    return scoped_t(inner->scoped, std::move(attributes));
+    return scoped_t(&sync->context, std::move(attributes));
 }
 
 }  // namespace blackhole

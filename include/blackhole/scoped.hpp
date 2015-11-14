@@ -2,7 +2,9 @@
 
 #include "blackhole/attributes.hpp"
 
-#include <boost/thread/tss.hpp>
+namespace boost {
+    template<typename> class thread_specific_ptr;
+}  // namespace boost
 
 namespace blackhole {
 
@@ -24,15 +26,15 @@ namespace blackhole {
 ///     However I can't just delete move constructor, because there won't be any way to return
 ///     objects from factory methods and that's the way they are created.
 class scoped_t {
-    boost::thread_specific_ptr<scoped_t>& scoped;
     scoped_t* prev;
-    const attributes_t storage;
+    boost::thread_specific_ptr<scoped_t>* context;
 
 protected:
-    const attribute_list attributes;
+    attributes_t storage;
+    attribute_list attributes;
 
 public:
-    scoped_t(boost::thread_specific_ptr<scoped_t>& prev, attributes_t attributes);
+    scoped_t(boost::thread_specific_ptr<scoped_t>* context, attributes_t attributes);
 
     scoped_t(const scoped_t& other) = delete;
     scoped_t(scoped_t&& other) = default;
@@ -54,6 +56,10 @@ public:
         if (prev) {
             prev->collect(pack);
         }
+    }
+
+    auto swap(boost::thread_specific_ptr<scoped_t>* context) -> void {
+        this->context = context;
     }
 };
 

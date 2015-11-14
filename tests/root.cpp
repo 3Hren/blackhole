@@ -144,5 +144,34 @@ TEST(RootLogger, Scoped) {
     logger.log(0, "GET /porn.png HTTP/1.1");
 }
 
+TEST(RootLogger, Assignment) {
+    std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
+    mock::handler_t* view = handler.get();
+
+    std::vector<std::unique_ptr<handler_t>> handlers;
+    handlers.push_back(std::move(handler));
+
+    root_logger_t logger1({});
+    root_logger_t logger2(std::move(handlers));
+    const auto scoped = logger2.scoped({{"key#1", {42}}});
+
+    // All scoped attributes should be assigned to the new owner.
+    logger1 = std::move(logger2);
+
+    EXPECT_CALL(*view, execute(_))
+        .Times(1)
+        .WillOnce(Invoke([](const record_t& record) {
+            EXPECT_EQ("GET /porn.png HTTP/1.1", record.message().to_string());
+            EXPECT_EQ("GET /porn.png HTTP/1.1", record.formatted().to_string());
+            EXPECT_EQ(0, record.severity());
+            ASSERT_EQ(1, record.attributes().size());
+
+            view_of<attributes_t>::type attributes{{"key#1", {42}}};
+            EXPECT_EQ(attributes, record.attributes().at(0).get());
+        }));
+
+    logger1.log(0, "GET /porn.png HTTP/1.1");
+}
+
 }  // namespace testing
 }  // namespace blackhole
