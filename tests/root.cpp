@@ -34,7 +34,7 @@ TEST(RootLogger, FilterConstructor) {
     EXPECT_EQ(1, passed);
 }
 
-TEST(RootLogger, DispatchRecordToHandlers) {
+TEST(RootLogger, LogInvokesDispatchingRecordToHandlers) {
     std::vector<std::unique_ptr<handler_t>> handlers;
     std::vector<mock::handler_t*> handlers_view;
 
@@ -60,7 +60,7 @@ TEST(RootLogger, DispatchRecordToHandlers) {
     logger.log(0, "GET /porn.png HTTP/1.1");
 }
 
-TEST(RootLogger, DispatchRecordWithAttributesToHandlers) {
+TEST(RootLogger, LogWithAttributesInvokesDispatchingRecordToHandlers) {
     std::vector<std::unique_ptr<handler_t>> handlers;
     std::vector<mock::handler_t*> handlers_view;
 
@@ -90,7 +90,7 @@ TEST(RootLogger, DispatchRecordWithAttributesToHandlers) {
     logger.log(0, "GET /porn.png HTTP/1.1", pack);
 }
 
-TEST(RootLogger, DispatchRecordWithFormatterToHandlers) {
+TEST(RootLogger, LogWithFormatterInvokesDispatchingRecordToHandlers) {
     std::vector<std::unique_ptr<handler_t>> handlers;
     std::vector<mock::handler_t*> handlers_view;
 
