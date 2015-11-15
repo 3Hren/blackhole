@@ -59,6 +59,10 @@ public:
     auto log(int severity, string_view pattern, attribute_pack& pack, const format_t& fn) -> void;
 
     auto scoped(attributes_t attributes) -> scoped_t;
+
+private:
+    template<typename F>
+    auto consume(int severity, const string_view& pattern, attribute_pack& pack, const F& fn) -> void;
 };
 
 }  // namespace blackhole

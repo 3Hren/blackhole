@@ -119,8 +119,43 @@ root_logger_t::log(int severity, string_view pattern) -> void {
     log(severity, pattern, pack);
 }
 
+namespace {
+
+struct null_format_t {
+    typedef struct {} writer_type;
+
+    constexpr
+    auto operator()(writer_type&) const -> string_view {
+        return string_view();
+    }
+};
+
+struct real_format_t {
+    typedef writer_t writer_type;
+
+    const logger_t::format_t& fn;
+
+    auto operator()(writer_type& writer) const -> string_view {
+        fn(writer);
+        return string_view(writer.inner.data(), writer.inner.size());
+    }
+};
+
+}  // namespace
+
 auto
 root_logger_t::log(int severity, string_view pattern, attribute_pack& pack) -> void {
+    consume(severity, pattern, pack, null_format_t());
+}
+
+auto
+root_logger_t::log(int severity, string_view pattern, attribute_pack& pack, const format_t& fn) -> void {
+    consume(severity, pattern, pack, real_format_t{fn});
+}
+
+template<typename F>
+auto
+root_logger_t::consume(int severity, const string_view& pattern, attribute_pack& pack, const F& fn) -> void {
     const auto inner = sync->load(this->inner);
     const auto filter = inner->apply([&](inner_t& inner) -> filter_t {
         return inner.filter;
@@ -133,28 +168,13 @@ root_logger_t::log(int severity, string_view pattern, attribute_pack& pack) -> v
 
     record_t record(severity, pattern, pack);
     if (filter(record)) {
-        for (auto& handler : inner->handlers) {
-            handler->execute(record);
-        }
-    }
-}
+        typedef typename F::writer_type writer_type;
 
-auto
-root_logger_t::log(int severity, string_view pattern, attribute_pack& pack, const format_t& fn) -> void {
-    const auto inner = sync->load(this->inner);
-    const auto filter = inner->apply([&](inner_t& inner) -> filter_t {
-        return inner.filter;
-    });
+        // Keep this writer on stack to be sure that formatted message is alive.
+        writer_type writer;
+        const auto formatted = fn(writer);
 
-    // TODO: Refactor here. No scoped yet.
-
-    record_t record(severity, pattern, pack);
-    if (filter(record)) {
-        writer_t writer;
-        fn(writer);
-        const string_view formatted{writer.inner.data(), writer.inner.size()};
         record.activate(formatted);
-
         for (auto& handler : inner->handlers) {
             handler->execute(record);
         }
