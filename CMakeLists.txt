@@ -28,6 +28,7 @@ add_library(cppformat STATIC foreign/cppformat/format)
 add_library(${LIBRARY_NAME} SHARED
 	src/attribute
 	src/formatter/string/error
+	src/formatter/string/parser
 	src/logger
 	src/record
 	src/root

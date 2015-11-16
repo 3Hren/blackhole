@@ -15,6 +15,8 @@ class parser_error_t : public std::runtime_error {
 
 public:
     parser_error_t(std::size_t pos, const std::string& pattern, const std::string& reason);
+    parser_error_t(const parser_error_t& other) = default;
+
     ~parser_error_t() noexcept;
 
     auto position() const noexcept -> std::size_t;
