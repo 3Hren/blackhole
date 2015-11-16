@@ -120,6 +120,8 @@ if (ENABLE_TESTING)
     add_executable(${LIBRARY_NAME}-tests
 		tests/attribute
 		tests/facade
+		tests/formatter/parser
+		tests/formatter/string
 		tests/record
 		tests/src/mocks/handler
 		tests/src/mocks/logger
