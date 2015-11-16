@@ -113,12 +113,6 @@ root_logger_t::filter(filter_t fn) -> void {
     sync->store(this->inner, std::move(inner));
 }
 
-auto
-root_logger_t::log(int severity, string_view pattern) -> void {
-    attribute_pack pack;
-    log(severity, pattern, pack);
-}
-
 namespace {
 
 struct null_format_t {
@@ -142,6 +136,12 @@ struct real_format_t {
 };
 
 }  // namespace
+
+auto
+root_logger_t::log(int severity, string_view pattern) -> void {
+    attribute_pack pack;
+    log(severity, pattern, pack);
+}
 
 auto
 root_logger_t::log(int severity, string_view pattern, attribute_pack& pack) -> void {
