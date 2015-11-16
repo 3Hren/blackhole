@@ -47,12 +47,12 @@ parser_t::next() -> boost::optional<token_t> {
 }
 
 auto
-parser_t::begin() const -> std::string::const_iterator {
+parser_t::begin() const -> iterator_type {
     return pattern.begin();
 }
 
 auto
-parser_t::end() const -> std::string::const_iterator {
+parser_t::end() const -> iterator_type {
     return pattern.end();
 }
 

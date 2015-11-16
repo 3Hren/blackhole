@@ -19,12 +19,14 @@ struct placeholder_t {
     std::string spec;
 };
 
-typedef boost::variant<
-    literal_t,
-    placeholder_t
-> token_t;
-
 class parser_t {
+public:
+    typedef boost::variant<
+        literal_t,
+        placeholder_t
+    > token_t;
+
+private:
     enum class state_t {
         /// Undetermined state.
         whatever,
@@ -36,10 +38,12 @@ class parser_t {
         broken
     };
 
+    typedef std::string::const_iterator iterator_type;
+
     const std::string pattern;
 
     state_t state;
-    std::string::const_iterator pos;
+    iterator_type pos;
 
 public:
     explicit parser_t(std::string pattern);
@@ -47,8 +51,8 @@ public:
     auto next() -> boost::optional<token_t>;
 
 private:
-    auto begin() const -> std::string::const_iterator;
-    auto end() const -> std::string::const_iterator;
+    auto begin() const -> iterator_type;
+    auto end() const -> iterator_type;
 
     auto parse_unknown() -> boost::optional<token_t>;
     auto parse_literal() -> token_t;
