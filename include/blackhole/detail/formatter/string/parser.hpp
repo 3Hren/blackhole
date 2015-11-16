@@ -220,8 +220,7 @@ private:
     template<class Exception, class... Args>
     __attribute__((noreturn)) auto throw_(Args&&... args) -> void {
         state = broken;
-        throw Exception(std::distance(begin(), pos), std::string(begin(), end()),
-            std::forward<Args>(args)...);
+        throw Exception(std::distance(begin(), pos), pattern, std::forward<Args>(args)...);
     }
 
     template<typename Iterator, class Range>
