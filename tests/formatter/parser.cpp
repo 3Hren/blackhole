@@ -23,11 +23,12 @@
 namespace blackhole {
 namespace testing {
 
+using detail::formatter::string::broken_parser;
+using detail::formatter::string::illformed;
+using detail::formatter::string::invalid_placeholder;
 using detail::formatter::string::literal_t;
 using detail::formatter::string::parser_t;
 using detail::formatter::string::placeholder_t;
-
-namespace parser = detail::formatter::string::parser;
 
 TEST(parser_t, Literal) {
     parser_t parser("literal");
@@ -63,22 +64,22 @@ TEST(parser_t, PlaceholderWithSpec) {
 
 TEST(parser_t, ThrowsExceptionIfPlaceholderIsNotFullyClosed) {
     parser_t parser("{id");
-    EXPECT_THROW(parser.next(), parser::illformed_t);
-    EXPECT_THROW(parser.next(), parser::broken_t);
+    EXPECT_THROW(parser.next(), illformed);
+    EXPECT_THROW(parser.next(), broken_parser);
 }
 
 TEST(parser_t, ThrowsExceptionOnCloseBraceWhileNotInPlaceholderState) {
     parser_t parser("id } is bad");
-    EXPECT_THROW(parser.next(), parser::illformed_t);
-    EXPECT_THROW(parser.next(), parser::broken_t);
+    EXPECT_THROW(parser.next(), illformed);
+    EXPECT_THROW(parser.next(), broken_parser);
 }
 
 TEST(parser_t, ThrowsExceptionIfRequiredPlaceholderHasInvalidSymbols) {
     for (const auto& pattern : {"{id }", "{id-}", "{id+}", "{id=}"}) {
         parser_t parser(pattern);
 
-        EXPECT_THROW(parser.next(), parser::invalid_placeholder_t);
-        EXPECT_THROW(parser.next(), parser::broken_t);
+        EXPECT_THROW(parser.next(), invalid_placeholder);
+        EXPECT_THROW(parser.next(), broken_parser);
     }
 }
 

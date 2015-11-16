@@ -1,71 +1,15 @@
 #pragma once
 
-#include "blackhole/formatter.hpp"
-
 #include <boost/optional/optional.hpp>
 #include <boost/variant/variant.hpp>
 #include <boost/algorithm/string.hpp>
+
+#include "blackhole/detail/formatter/string/error.hpp"
 
 namespace blackhole {
 namespace detail {
 namespace formatter {
 namespace string {
-namespace parser {
-
-class error_t : public std::runtime_error {
-    const std::size_t pos;
-    const std::string inspect;
-
-public:
-    error_t(std::size_t pos, const std::string& pattern, const std::string& reason) :
-        std::runtime_error("parser error: " + reason),
-        pos(pos),
-        inspect("parser error: " +  reason + "\n" +
-            pattern + "\n" +
-            std::string(pos, '~') + "^"
-        )
-    {}
-
-    ~error_t() noexcept {}
-
-    auto position() const noexcept -> std::size_t {
-        return pos;
-    }
-
-    auto detail() const noexcept -> const std::string& {
-        return inspect;
-    }
-};
-
-class broken_t : public error_t {
-public:
-    broken_t(std::size_t pos, const std::string& pattern) :
-        error_t(pos, pattern, "broken parser")
-    {}
-};
-
-class exhausted_t : public error_t {
-public:
-    exhausted_t(std::size_t pos, const std::string& pattern) :
-        error_t(pos, pattern, "exhausted state")
-    {}
-};
-
-class illformed_t : public error_t {
-public:
-    illformed_t(std::size_t pos, const std::string& pattern) :
-        error_t(pos, pattern, "illformed pattern")
-    {}
-};
-
-class invalid_placeholder_t : public error_t {
-public:
-    invalid_placeholder_t(std::size_t pos, const std::string& pattern) :
-        error_t(pos, pattern, "invalid placeholder name (only [a-zA-Z0-9_] allowed)")
-    {}
-};
-
-}  // namespace parser
 
 struct literal_t {
     std::string value;
@@ -112,7 +56,7 @@ public:
 
     auto next() -> boost::optional<token_t> {
         if (state == broken) {
-            throw_<parser::broken_t>();
+            throw_<broken_parser>();
         }
 
         if (pos == end()) {
@@ -127,12 +71,12 @@ public:
         case placeholder:
             return parse_placeholder();
         case broken:
-            throw_<parser::broken_t>();
+            throw_<broken_parser>();
         default:
             BOOST_ASSERT(false);
         }
 
-        throw_<parser::broken_t>();
+        throw_<broken_parser>();
     }
 
 private:
@@ -160,7 +104,7 @@ private:
                 state = placeholder;
                 return literal;
             } else if (starts_with(pos, end(), "}")) {
-                throw_<parser::illformed_t>();
+                throw_<illformed>();
             }
 
             literal.value.push_back(*pos);
@@ -188,14 +132,14 @@ private:
                     state = whatever;
                     return result;
                 } else {
-                    throw_<parser::invalid_placeholder_t>();
+                    throw_<invalid_placeholder>();
                 }
             }
 
             pos++;
         }
 
-        throw_<parser::illformed_t>();
+        throw_<illformed>();
     }
 
     auto parse_spec(placeholder_t placeholder) -> token_t {
