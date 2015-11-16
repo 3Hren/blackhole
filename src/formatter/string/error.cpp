@@ -16,11 +16,13 @@ parser_error_t::parser_error_t(std::size_t pos, const std::string& pattern, cons
 
 parser_error_t::~parser_error_t() noexcept {}
 
-auto parser_error_t::position() const noexcept -> std::size_t {
+auto
+parser_error_t::position() const noexcept -> std::size_t {
     return pos;
 }
 
-auto parser_error_t::detail() const noexcept -> const std::string& {
+auto
+parser_error_t::detail() const noexcept -> const std::string& {
     return inspect;
 }
 
