@@ -1,17 +1,17 @@
-/// {severity}, [{timestamp}] {elapsed:.3f}: {message}{...}
-///
-/// timestamp: %Y-%m-%d %H:%M:%S.%f %z
-/// source:
-///   prefix?: " ["
-///   suffix?: "]"
-/// variants:
-///   - unique: true
-///     prefix?: " ["
-///     suffix?: "]"
-///     pattern: %k=%v
-///     separator: ", "
-///
-/// {}, [{}] {:.3f}: {}{...}
+// {severity}, [{timestamp}] {elapsed:.3f}: {message}{...}
+//
+// timestamp: %Y-%m-%d %H:%M:%S.%f %z
+// source:
+//   prefix?: " ["
+//   suffix?: "]"
+// variants:
+//   - unique: true
+//     prefix?: " ["
+//     suffix?: "]"
+//     pattern: %k=%v
+//     separator: ", "
+//
+// {}, [{}] {:.3f}: {}{...}
 
 #include <gtest/gtest.h>
 
