@@ -50,7 +50,7 @@ private:
     auto begin() const -> std::string::const_iterator;
     auto end() const -> std::string::const_iterator;
 
-    auto parse_whatever() -> boost::optional<token_t>;
+    auto parse_unknown() -> boost::optional<token_t>;
     auto parse_literal() -> token_t;
     auto parse_placeholder() -> token_t;
     auto parse_spec(placeholder_t placeholder) -> token_t;

@@ -34,7 +34,7 @@ parser_t::next() -> boost::optional<token_t> {
 
     switch (state) {
     case state_t::whatever:
-        return parse_whatever();
+        return parse_unknown();
     case state_t::literal:
         return parse_literal();
     case state_t::placeholder:
@@ -57,7 +57,7 @@ parser_t::end() const -> std::string::const_iterator {
 }
 
 auto
-parser_t::parse_whatever() -> boost::optional<token_t> {
+parser_t::parse_unknown() -> boost::optional<token_t> {
     if (starts_with(pos, end(), "{{")) {
         state = state_t::literal;
     } else if (starts_with(pos, end(), "{")) {
