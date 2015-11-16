@@ -50,20 +50,11 @@ public:
     auto operator=(const scoped_t& other) -> scoped_t& = delete;
     auto operator=(scoped_t&& other) -> scoped_t& = delete;
 
-    auto collect(attribute_pack* pack) const -> void {
-        pack->emplace_back(attributes);
+    /// Recursively collects all scoped attributes into the given attributes pack.
+    auto collect(attribute_pack* pack) const -> void;
 
-        if (prev) {
-            prev->collect(pack);
-        }
-    }
-
-    auto rebind(boost::thread_specific_ptr<scoped_t>* context) -> void {
-        this->context = context;
-        if (prev) {
-            prev->rebind(context);
-        }
-    }
+    /// Recursively rebind all scoped attributes with the new logger context.
+    auto rebind(boost::thread_specific_ptr<scoped_t>* context) -> void;
 };
 
 }  // namespace blackhole

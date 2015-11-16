@@ -33,4 +33,21 @@ scoped_t::~scoped_t() {
     context->reset(prev);
 }
 
+auto
+scoped_t::collect(attribute_pack* pack) const -> void {
+    pack->emplace_back(attributes);
+
+    if (prev) {
+        prev->collect(pack);
+    }
+}
+
+auto
+scoped_t::rebind(boost::thread_specific_ptr<scoped_t>* context) -> void {
+    this->context = context;
+    if (prev) {
+        prev->rebind(context);
+    }
+}
+
 }  // namespace blackhole
