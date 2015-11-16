@@ -19,7 +19,7 @@ public:
         inner.write(args...);
     }
 
-    constexpr auto result() const noexcept -> string_view {
+    auto result() const noexcept -> string_view {
         return string_view(inner.data(), inner.size());
     }
 };

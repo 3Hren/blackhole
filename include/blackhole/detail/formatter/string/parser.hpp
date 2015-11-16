@@ -26,13 +26,13 @@ public:
         )
     {}
 
-    ~error_t() noexcept = default;
+    ~error_t() noexcept {}
 
-    constexpr auto position() const noexcept -> std::size_t {
+    auto position() const noexcept -> std::size_t {
         return pos;
     }
 
-    constexpr auto detail() const -> const std::string& {
+    auto detail() const noexcept -> const std::string& {
         return inspect;
     }
 };
