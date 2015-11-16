@@ -89,7 +89,6 @@ root_logger_t::operator=(root_logger_t&& other) noexcept -> root_logger_t& {
         return *this;
     }
 
-    // TODO: TEST!
     const auto inner = std::move(other.sync->load(other.inner));
     sync->store(this->inner, std::move(inner));
 

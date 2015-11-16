@@ -124,6 +124,45 @@ TEST(RootLogger, LogWithAttributesAndFormatterInvokesDispatchingRecordToHandlers
     });
 }
 
+TEST(RootLogger, AssignmentMovesFilter) {
+    int passed = 0;
+
+    root_logger_t logger1([&](const record_t&) -> bool {
+        passed += 1;
+        return true;
+    }, {});
+
+    root_logger_t logger2([&](const record_t&) -> bool {
+        passed += 2;
+        return true;
+    }, {});
+
+    logger1 = std::move(logger2);
+    logger1.log(0, "-");
+
+    EXPECT_EQ(2, passed);
+}
+
+TEST(RootLogger, AssignmentMovesHandlers) {
+    typedef view_of<attributes_t>::type attribute_list;
+
+    std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
+    mock::handler_t* view = handler.get();
+
+    std::vector<std::unique_ptr<handler_t>> handlers;
+    handlers.push_back(std::move(handler));
+
+    EXPECT_CALL(*view, execute(_))
+        .Times(1);
+
+    root_logger_t logger1({});
+    root_logger_t logger2(std::move(handlers));
+
+    logger1 = std::move(logger2);
+
+    logger1.log(0, "GET /porn.png HTTP/1.1");
+}
+
 TEST(RootLogger, LogWithScopedAttributes) {
     typedef view_of<attributes_t>::type attribute_list;
 
