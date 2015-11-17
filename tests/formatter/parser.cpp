@@ -16,12 +16,14 @@ using detail::formatter::string::parser_t;
 
 using detail::formatter::string::literal_t;
 
-using detail::formatter::string::placeholder::common_t;
-using detail::formatter::string::placeholder::leftover_t;
-using detail::formatter::string::placeholder::message_t;
-using detail::formatter::string::placeholder::severity_t;
-using detail::formatter::string::placeholder::numeric_severity_t;
-using detail::formatter::string::placeholder::timestamp_t;
+using detail::formatter::string::num;
+using detail::formatter::string::user;
+
+using detail::formatter::string::ph::generic_t;
+using detail::formatter::string::ph::leftover_t;
+using detail::formatter::string::ph::message_t;
+using detail::formatter::string::ph::severity;
+using detail::formatter::string::ph::timestamp_t;
 
 TEST(parser_t, Empty) {
     parser_t parser("");
@@ -44,8 +46,8 @@ TEST(parser_t, Placeholder) {
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("id", boost::get<common_t>(*token).name);
-    EXPECT_EQ("{}", boost::get<common_t>(*token).spec);
+    EXPECT_EQ("id", boost::get<generic_t>(*token).name);
+    EXPECT_EQ("{}", boost::get<generic_t>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
@@ -55,8 +57,8 @@ TEST(parser_t, PlaceholderWithSpec) {
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("id", boost::get<common_t>(*token).name);
-    EXPECT_EQ("{:.3f}", boost::get<common_t>(*token).spec);
+    EXPECT_EQ("id", boost::get<generic_t>(*token).name);
+    EXPECT_EQ("{:.3f}", boost::get<generic_t>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
@@ -131,8 +133,8 @@ TEST(parser_t, LiteralFollowedByRequiredPlaceholder) {
 
     token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("id", boost::get<common_t>(*token).name);
-    EXPECT_EQ("{}", boost::get<common_t>(*token).spec);
+    EXPECT_EQ("id", boost::get<generic_t>(*token).name);
+    EXPECT_EQ("{}", boost::get<generic_t>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
@@ -142,7 +144,7 @@ TEST(parser_t, PlaceholderFollowedByLiteral) {
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("id", boost::get<common_t>(*token).name);
+    EXPECT_EQ("id", boost::get<generic_t>(*token).name);
 
     token = parser.next();
     ASSERT_TRUE(!!token);
@@ -161,8 +163,8 @@ TEST(parser_t, PlaceholderSurroundedByLiterals) {
 
     token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("id", boost::get<common_t>(*token).name);
-    EXPECT_EQ("{:<30}", boost::get<common_t>(*token).spec);
+    EXPECT_EQ("id", boost::get<generic_t>(*token).name);
+    EXPECT_EQ("{:<30}", boost::get<generic_t>(*token).spec);
 
     token = parser.next();
     ASSERT_TRUE(!!token);
@@ -176,7 +178,7 @@ TEST(parser_t, Severity) {
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("{}", boost::get<severity_t>(*token).spec);
+    EXPECT_EQ("{}", boost::get<severity<user>>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
@@ -186,7 +188,7 @@ TEST(parser_t, SeveritySpec) {
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("{:d}", boost::get<numeric_severity_t>(*token).spec);
+    EXPECT_EQ("{:d}", boost::get<severity<num>>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }

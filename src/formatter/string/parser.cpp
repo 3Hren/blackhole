@@ -66,6 +66,7 @@ parser_t::parse_literal() -> token_t {
     while (pos != std::end(pattern)) {
         if (starts_with(pos, std::end(pattern), "{{") || starts_with(pos, std::end(pattern), "}}")) {
             pos += 1;
+            // TODO: ? readability
         } else if (starts_with(pos, std::end(pattern), "{")) {
             pos += 1;
             state = state_t::placeholder;
@@ -98,19 +99,19 @@ parser_t::parse_placeholder() -> token_t {
 
                 // TODO: Consider token factory.
                 if (name == "message") {
-                    return parse_spec(placeholder::message_t{std::move(spec)});
+                    return parse_spec(ph::message_t{std::move(spec)});
                 } else if (name == "severity") {
-                    auto token = parse_spec(placeholder::severity_t{std::move(spec)});
-                    auto transformed = boost::get<placeholder::severity_t>(token);
+                    auto token = parse_spec(ph::severity<user>{std::move(spec)});
+                    auto transformed = boost::get<ph::severity<user>>(token);
                     if (boost::ends_with(transformed.spec, "d}")) {
-                        return placeholder::numeric_severity_t{transformed.spec};
+                        return ph::severity<num>{transformed.spec};
                     } else {
                         return token;
                     }
                 } else if (name == "timestamp") {
-                    return parse_spec(placeholder::timestamp_t{{}, std::move(spec)});
+                    return parse_spec(ph::timestamp_t{{}, std::move(spec)});
                 } else {
-                    return parse_spec(placeholder::common_t{std::move(name), std::move(spec)});
+                    return parse_spec(ph::generic_t{std::move(name), std::move(spec)});
                 }
             } else if (starts_with(pos, std::end(pattern), "}")) {
                 pos += 1;
@@ -118,16 +119,16 @@ parser_t::parse_placeholder() -> token_t {
 
                 spec.push_back('}');
                 if (boost::starts_with(name, "...")) {
-                    return placeholder::leftover_t{std::move(name)};
+                    return ph::leftover_t{std::move(name)};
                 } else if (name == "message") {
-                    return placeholder::message_t{std::move(spec)};
+                    return ph::message_t{std::move(spec)};
                 } else if (name == "severity") {
-                    return placeholder::severity_t{std::move(spec)};
+                    return ph::severity<user>{std::move(spec)};
                 } else if (name == "timestamp") {
-                    return placeholder::timestamp_t{{}, std::move(spec)};
+                    return ph::timestamp_t{{}, std::move(spec)};
                 }
 
-                return placeholder::common_t{std::move(name), std::move(spec)};
+                return ph::generic_t{std::move(name), std::move(spec)};
             } else {
                 throw_<invalid_placeholder_t>();
             }
@@ -162,7 +163,7 @@ parser_t::parse_spec(T token) -> token_t {
 }
 
 auto
-parser_t::parse_spec(placeholder::timestamp_t token) -> token_t {
+parser_t::parse_spec(ph::timestamp_t token) -> token_t {
     if (starts_with(pos, std::end(pattern), "{")) {
         ++pos;
 
@@ -179,7 +180,7 @@ parser_t::parse_spec(placeholder::timestamp_t token) -> token_t {
         }
     }
 
-    return parse_spec<placeholder::timestamp_t>(std::move(token));
+    return parse_spec<ph::timestamp_t>(std::move(token));
 }
 
 template<class Exception, class... Args>

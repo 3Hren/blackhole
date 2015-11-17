@@ -12,7 +12,7 @@ namespace string {
 
 namespace placeholder {
 
-struct common_t {
+struct generic_t {
     std::string name;
     std::string spec;
 };
@@ -21,7 +21,8 @@ struct message_t {
     std::string spec;
 };
 
-struct severity_t {
+template<typename T>
+struct severity {
     std::string spec;
 };
 
@@ -44,6 +45,12 @@ struct literal_t {
     std::string value;
 };
 
+namespace ph = placeholder;
+
+/// Helper named structs for making eye-candy code.
+struct num;
+struct user;
+
 class parser_t {
 public:
     typedef char char_type;
@@ -51,13 +58,19 @@ public:
 
     typedef boost::variant<
         literal_t,
-        placeholder::common_t,
-        placeholder::message_t,
-        placeholder::severity_t,
-        placeholder::severity_t,
-        placeholder::numeric_severity_t,
-        placeholder::timestamp_t,
-        placeholder::leftover_t
+        ph::generic_t,
+        ph::leftover_t,
+        // ph::process<id>,
+        // ph::process<name>,
+        // ph::thread<id>,
+        // ph::thread<hex>,
+        // ph::thread<name>,
+        ph::message_t,
+        ph::severity<num>,
+        ph::severity<user>,
+        // ph::timestamp<num>,
+        // ph::timestamp<user>,
+        ph::timestamp_t
     > token_t;
 
 private:
