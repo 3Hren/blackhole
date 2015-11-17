@@ -1,6 +1,7 @@
 #include "blackhole/detail/formatter/string/parser.hpp"
 
 #include <boost/algorithm/string.hpp>
+#include <boost/variant/get.hpp>
 
 namespace blackhole {
 namespace detail {
@@ -105,10 +106,17 @@ parser_t::parse_placeholder() -> token_t {
                 spec.push_back(ch);
                 ++pos;
 
+                // TODO: Consider token factory.
                 if (name == "message") {
                     return parse_spec(placeholder::message_t{std::move(spec)});
                 } else if (name == "severity") {
-                    return parse_spec(placeholder::severity_t{std::move(spec)});
+                    auto token = parse_spec(placeholder::severity_t{std::move(spec)});
+                    auto transformed = boost::get<placeholder::severity_t>(token);
+                    if (boost::ends_with(transformed.spec, "d}")) {
+                        return placeholder::numeric_severity_t{transformed.spec};
+                    } else {
+                        return token;
+                    }
                 } else if (name == "timestamp") {
                     return parse_spec(placeholder::timestamp_t{{}, std::move(spec)});
                 } else {

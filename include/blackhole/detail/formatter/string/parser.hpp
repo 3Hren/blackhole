@@ -25,6 +25,10 @@ struct severity_t {
     std::string spec;
 };
 
+struct numeric_severity_t {
+    std::string spec;
+};
+
 struct timestamp_t {
     std::string pattern;
     std::string spec;
@@ -47,6 +51,8 @@ public:
         placeholder::common_t,
         placeholder::message_t,
         placeholder::severity_t,
+        placeholder::severity_t,
+        placeholder::numeric_severity_t,
         placeholder::timestamp_t,
         placeholder::leftover_t
     > token_t;

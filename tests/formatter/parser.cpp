@@ -20,6 +20,7 @@ using detail::formatter::string::placeholder::common_t;
 using detail::formatter::string::placeholder::leftover_t;
 using detail::formatter::string::placeholder::message_t;
 using detail::formatter::string::placeholder::severity_t;
+using detail::formatter::string::placeholder::numeric_severity_t;
 using detail::formatter::string::placeholder::timestamp_t;
 
 TEST(parser_t, Empty) {
@@ -185,7 +186,7 @@ TEST(parser_t, SeveritySpec) {
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("{:d}", boost::get<severity_t>(*token).spec);
+    EXPECT_EQ("{:d}", boost::get<numeric_severity_t>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
