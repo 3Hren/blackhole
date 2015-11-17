@@ -28,7 +28,7 @@ add_library(cppformat STATIC foreign/cppformat/format)
 add_library(${LIBRARY_NAME} SHARED
 	src/attribute
 	src/formatter/string/error
-	# src/formatter/string/parser
+	src/formatter/string/parser
 	src/logger
 	src/record
 	src/root
@@ -122,7 +122,7 @@ if (ENABLE_TESTING)
 		tests/attribute
 		tests/facade
 		tests/formatter/parser
-		tests/formatter/string
+		# tests/formatter/string
 		tests/record
 		tests/src/mocks/handler
 		tests/src/mocks/logger

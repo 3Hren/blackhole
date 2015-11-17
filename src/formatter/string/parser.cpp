@@ -18,14 +18,14 @@ static auto starts_with(Iterator first, Iterator last, const Range& range) -> bo
 
 parser_t::parser_t(std::string pattern) :
     pattern(std::move(pattern)),
-    state(state_t::whatever),
+    state(state_t::unknown),
     pos(this->pattern.begin())
 {}
 
 auto
 parser_t::next() -> boost::optional<token_t> {
     if (state == state_t::broken) {
-        throw_<broken_parser>();
+        throw_<broken_t>();
     }
 
     if (pos == end()) {
@@ -33,17 +33,17 @@ parser_t::next() -> boost::optional<token_t> {
     }
 
     switch (state) {
-    case state_t::whatever:
+    case state_t::unknown:
         return parse_unknown();
     case state_t::literal:
         return parse_literal();
     case state_t::placeholder:
         return parse_placeholder();
     case state_t::broken:
-        throw_<broken_parser>();
+        throw_<broken_t>();
     }
 
-    throw_<broken_parser>();
+    throw_<broken_t>();
 }
 
 auto
@@ -80,7 +80,7 @@ parser_t::parse_literal() -> token_t {
             state = state_t::placeholder;
             return literal;
         } else if (starts_with(pos, end(), "}")) {
-            throw_<illformed>();
+            throw_<illformed_t>();
         }
 
         literal.value.push_back(*pos);
@@ -105,38 +105,38 @@ parser_t::parse_placeholder() -> token_t {
                 ++pos;
 
                 if (name == "message") {
-                    return parse_spec(message_t{std::move(spec)});
+                    return parse_spec(placeholder::message_t{std::move(spec)});
                 } else if (name == "severity") {
-                    return parse_spec(severity_t{std::move(spec)});
+                    return parse_spec(placeholder::severity_t{std::move(spec)});
                 } else if (name == "timestamp") {
-                    return parse_spec(timestamp_t{{}, std::move(spec)});
+                    return parse_spec(placeholder::timestamp_t{{}, std::move(spec)});
                 } else {
-                    return parse_spec(placeholder_t{std::move(name), std::move(spec)});
+                    return parse_spec(placeholder::common_t{std::move(name), std::move(spec)});
                 }
             } else if (starts_with(pos, end(), "}")) {
                 pos += 1;
-                state = state_t::whatever;
+                state = state_t::unknown;
 
                 if (boost::starts_with(name, "...")) {
                     return placeholder::leftover_t{std::move(name)};
                 } else if (name == "message") {
-                    return message_t{std::move(spec)};
+                    return placeholder::message_t{std::move(spec)};
                 } else if (name == "severity") {
-                    return severity_t{std::move(spec)};
+                    return placeholder::severity_t{std::move(spec)};
                 } else if (name == "timestamp") {
-                    return timestamp_t{{}, std::move(spec)};
+                    return placeholder::timestamp_t{{}, std::move(spec)};
                 }
 
-                return placeholder_t{std::move(name), std::move(spec)};
+                return placeholder::common_t{std::move(name), std::move(spec)};
             } else {
-                throw_<invalid_placeholder>();
+                throw_<invalid_placeholder_t>();
             }
         }
 
         pos++;
     }
 
-    throw_<illformed>();
+    throw_<illformed_t>();
 }
 
 template<typename T>
@@ -149,7 +149,7 @@ parser_t::parse_spec(T token) -> token_t {
         // time to implement it.
         if (starts_with(pos, end(), "}")) {
             pos += 1;
-            state = state_t::whatever;
+            state = state_t::unknown;
             return token;
         }
 
@@ -161,7 +161,7 @@ parser_t::parse_spec(T token) -> token_t {
 }
 
 auto
-parser_t::parse_spec(timestamp_t token) -> token_t {
+parser_t::parse_spec(placeholder::timestamp_t token) -> token_t {
     if (starts_with(pos, end(), "{")) {
         ++pos;
 
@@ -178,7 +178,7 @@ parser_t::parse_spec(timestamp_t token) -> token_t {
         }
     }
 
-    return parse_spec<timestamp_t>(std::move(token));
+    return parse_spec<placeholder::timestamp_t>(std::move(token));
 }
 
 template<class Exception, class... Args>
