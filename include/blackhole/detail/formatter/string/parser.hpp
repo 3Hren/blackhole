@@ -82,9 +82,6 @@ public:
     auto next() -> boost::optional<token_t>;
 
 private:
-    auto begin() const -> iterator_type;
-    auto end() const -> iterator_type;
-
     auto parse_unknown() -> boost::optional<token_t>;
     auto parse_literal() -> token_t;
     auto parse_placeholder() -> token_t;
