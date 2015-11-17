@@ -93,7 +93,8 @@ parser_t::parse_literal() -> token_t {
 auto
 parser_t::parse_placeholder() -> token_t {
     std::string name;
-    std::string spec;
+    std::string spec("{");
+
     while (pos != end()) {
         const auto ch = *pos;
 
@@ -117,6 +118,7 @@ parser_t::parse_placeholder() -> token_t {
                 pos += 1;
                 state = state_t::unknown;
 
+                spec.push_back('}');
                 if (boost::starts_with(name, "...")) {
                     return placeholder::leftover_t{std::move(name)};
                 } else if (name == "message") {
@@ -145,6 +147,8 @@ parser_t::parse_spec(T token) -> token_t {
     while (pos != end()) {
         const auto ch = *pos;
 
+        token.spec.push_back(ch);
+
         // TODO: Here it's the right place to validate spec format, but now I don't have much
         // time to implement it.
         if (starts_with(pos, end(), "}")) {
@@ -153,7 +157,6 @@ parser_t::parse_spec(T token) -> token_t {
             return token;
         }
 
-        token.spec.push_back(ch);
         ++pos;
     }
 

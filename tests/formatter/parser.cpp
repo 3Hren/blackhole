@@ -38,7 +38,7 @@ TEST(parser_t, Placeholder) {
     auto token = parser.next();
     ASSERT_TRUE(!!token);
     EXPECT_EQ("id", boost::get<common_t>(*token).name);
-    EXPECT_EQ("", boost::get<common_t>(*token).spec);
+    EXPECT_EQ("{}", boost::get<common_t>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
@@ -49,7 +49,7 @@ TEST(parser_t, PlaceholderWithSpec) {
     auto token = parser.next();
     ASSERT_TRUE(!!token);
     EXPECT_EQ("id", boost::get<common_t>(*token).name);
-    EXPECT_EQ(":.3f", boost::get<common_t>(*token).spec);
+    EXPECT_EQ("{:.3f}", boost::get<common_t>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
@@ -125,7 +125,7 @@ TEST(parser_t, LiteralFollowedByRequiredPlaceholder) {
     token = parser.next();
     ASSERT_TRUE(!!token);
     EXPECT_EQ("id", boost::get<common_t>(*token).name);
-    EXPECT_EQ("", boost::get<common_t>(*token).spec);
+    EXPECT_EQ("{}", boost::get<common_t>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
@@ -155,7 +155,7 @@ TEST(parser_t, PlaceholderSurroundedByLiterals) {
     token = parser.next();
     ASSERT_TRUE(!!token);
     EXPECT_EQ("id", boost::get<common_t>(*token).name);
-    EXPECT_EQ(":<30", boost::get<common_t>(*token).spec);
+    EXPECT_EQ("{:<30}", boost::get<common_t>(*token).spec);
 
     token = parser.next();
     ASSERT_TRUE(!!token);
@@ -169,7 +169,7 @@ TEST(parser_t, Severity) {
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("", boost::get<severity_t>(*token).spec);
+    EXPECT_EQ("{}", boost::get<severity_t>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
@@ -179,7 +179,7 @@ TEST(parser_t, SeveritySpec) {
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ(":d", boost::get<severity_t>(*token).spec);
+    EXPECT_EQ("{:d}", boost::get<severity_t>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
@@ -189,7 +189,7 @@ TEST(parser_t, Timestamp) {
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("", boost::get<timestamp_t>(*token).spec);
+    EXPECT_EQ("{}", boost::get<timestamp_t>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
@@ -199,7 +199,7 @@ TEST(parser_t, TimestampNumeric) {
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ(":d", boost::get<timestamp_t>(*token).spec);
+    EXPECT_EQ("{:d}", boost::get<timestamp_t>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
@@ -210,7 +210,7 @@ TEST(parser_t, TimestampString) {
     auto token = parser.next();
     ASSERT_TRUE(!!token);
     EXPECT_EQ("%Y-%m-%d %H:%M:%S.%f %z", boost::get<timestamp_t>(*token).pattern);
-    EXPECT_EQ(":s", boost::get<timestamp_t>(*token).spec);
+    EXPECT_EQ("{:s}", boost::get<timestamp_t>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
@@ -220,7 +220,7 @@ TEST(parser_t, Message) {
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("", boost::get<message_t>(*token).spec);
+    EXPECT_EQ("{}", boost::get<message_t>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
@@ -230,7 +230,7 @@ TEST(parser_t, MessageSpec) {
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ(":<30", boost::get<message_t>(*token).spec);
+    EXPECT_EQ("{:<30}", boost::get<message_t>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
