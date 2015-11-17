@@ -162,6 +162,26 @@ TEST(parser_t, PlaceholderSurroundedByLiterals) {
 }
 
 TEST(parser_t, Severity) {
+    parser_t parser("{severity}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("", boost::get<severity_t>(*token).spec);
+
+    EXPECT_FALSE(parser.next());
+}
+
+TEST(parser_t, Timestamp) {
+    parser_t parser("{timestamp}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("", boost::get<timestamp_t>(*token).spec);
+
+    EXPECT_FALSE(parser.next());
+}
+
+TEST(parser_t, SeveritySpec) {
     parser_t parser("{severity:d}");
 
     auto token = parser.next();

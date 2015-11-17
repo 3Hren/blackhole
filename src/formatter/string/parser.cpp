@@ -118,9 +118,9 @@ parser_t::parse_placeholder() -> token_t {
                 state = state_t::whatever;
 
                 if (name == "severity") {
-                    // return severity_t{std::move(spec)};
+                    return severity_t{std::move(spec)};
                 } else if (name == "timestamp") {
-                    //
+                    return timestamp_t{{}, std::move(spec)};
                 } else {
                     return placeholder_t{std::move(name), std::move(spec)};
                 }
