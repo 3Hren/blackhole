@@ -58,9 +58,7 @@ parser_t::end() const -> iterator_type {
 
 auto
 parser_t::parse_unknown() -> boost::optional<token_t> {
-    if (starts_with(pos, end(), "{{")) {
-        state = state_t::literal;
-    } else if (starts_with(pos, end(), "{")) {
+    if (starts_with(pos, end(), "{") && !starts_with(pos + 1, end(), "{")) {
         pos += 1;
         state = state_t::placeholder;
     } else {
@@ -99,7 +97,7 @@ parser_t::parse_placeholder() -> token_t {
     while (pos != end()) {
         const auto ch = *pos;
 
-        if (std::isalpha(ch) || std::isdigit(ch) || ch == '_') {
+        if (std::isalpha(ch) || std::isdigit(ch) || ch == '_' || ch == '.') {
             name.push_back(ch);
         } else {
             if (ch == ':') {
@@ -119,15 +117,17 @@ parser_t::parse_placeholder() -> token_t {
                 pos += 1;
                 state = state_t::whatever;
 
-                if (name == "message") {
+                if (boost::starts_with(name, "...")) {
+                    return placeholder::leftover_t{std::move(name)};
+                } else if (name == "message") {
                     return message_t{std::move(spec)};
                 } else if (name == "severity") {
                     return severity_t{std::move(spec)};
                 } else if (name == "timestamp") {
                     return timestamp_t{{}, std::move(spec)};
-                } else {
-                    return placeholder_t{std::move(name), std::move(spec)};
                 }
+
+                return placeholder_t{std::move(name), std::move(spec)};
             } else {
                 throw_<invalid_placeholder>();
             }

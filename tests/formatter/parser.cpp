@@ -20,6 +20,8 @@ using detail::formatter::string::placeholder_t;
 using detail::formatter::string::severity_t;
 using detail::formatter::string::timestamp_t;
 
+namespace placeholder = detail::formatter::string::placeholder;
+
 TEST(parser_t, Literal) {
     parser_t parser("literal");
 
@@ -229,6 +231,30 @@ TEST(parser_t, MessageSpec) {
     auto token = parser.next();
     ASSERT_TRUE(!!token);
     EXPECT_EQ(":<30", boost::get<message_t>(*token).spec);
+
+    EXPECT_FALSE(parser.next());
+}
+
+TEST(parser_t, Leftover) {
+    parser_t parser("{...}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+
+    auto placeholder = boost::get<placeholder::leftover_t>(*token);
+    ASSERT_EQ("...", placeholder.name);
+
+    EXPECT_FALSE(parser.next());
+}
+
+TEST(parser_t, LeftoverNamed) {
+    parser_t parser("{...last}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+
+    auto placeholder = boost::get<placeholder::leftover_t>(*token);
+    ASSERT_EQ("...last", placeholder.name);
 
     EXPECT_FALSE(parser.next());
 }

@@ -10,6 +10,14 @@ namespace detail {
 namespace formatter {
 namespace string {
 
+namespace placeholder {
+
+struct leftover_t {
+    std::string name;
+};
+
+}  // namespace placeholder
+
 struct literal_t {
     std::string value;
 };
@@ -39,7 +47,8 @@ public:
         message_t,
         severity_t,
         timestamp_t,
-        placeholder_t
+        placeholder_t,
+        placeholder::leftover_t
     > token_t;
 
 private:
@@ -76,7 +85,7 @@ private:
 
     template<typename T>
     auto parse_spec(T token) -> token_t;
-    auto parse_timestamp(timestamp_t token) -> token_t;
+    auto parse_spec(timestamp_t token) -> token_t;
 
     template<class Exception, class... Args>
     __attribute__((noreturn)) auto throw_(Args&&... args) -> void;
