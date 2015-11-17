@@ -109,7 +109,7 @@ parser_t::parse_placeholder() -> token_t {
                 if (name == "severity") {
                     return parse_spec(severity_t{std::move(spec)});
                 } else if (name == "timestamp") {
-                    return parse_spec(timestamp_t{{}, std::move(spec)});
+                    return parse_timestamp(timestamp_t{{}, std::move(spec)});
                 } else {
                     return parse_spec(placeholder_t{std::move(name), std::move(spec)});
                 }
@@ -157,7 +157,7 @@ parser_t::parse_spec(T token) -> token_t {
 }
 
 auto
-parser_t::parse_spec(timestamp_t token) -> token_t {
+parser_t::parse_timestamp(timestamp_t token) -> token_t {
     if (starts_with(pos, end(), "{")) {
         ++pos;
 
@@ -174,21 +174,7 @@ parser_t::parse_spec(timestamp_t token) -> token_t {
         }
     }
 
-    while (pos != end()) {
-        const auto ch = *pos;
-        // TODO: Here it's the right place to validate spec format, but now I don't have much
-        // time to implement it.
-        if (starts_with(pos, end(), "}")) {
-            pos += 1;
-            state = state_t::whatever;
-            return token;
-        }
-
-        token.spec.push_back(ch);
-        ++pos;
-    }
-
-    return token;
+    return parse_spec(std::move(token));
 }
 
 template<class Exception, class... Args>
