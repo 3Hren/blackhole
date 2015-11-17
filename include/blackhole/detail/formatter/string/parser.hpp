@@ -14,6 +14,15 @@ struct literal_t {
     std::string value;
 };
 
+struct severity_t {
+    std::string spec;
+};
+
+struct timestamp_t {
+    std::string pattern;
+    std::string spec;
+};
+
 struct placeholder_t {
     std::string name;
     std::string spec;
@@ -23,6 +32,8 @@ class parser_t {
 public:
     typedef boost::variant<
         literal_t,
+        severity_t,
+        timestamp_t,
         placeholder_t
     > token_t;
 
@@ -57,7 +68,9 @@ private:
     auto parse_unknown() -> boost::optional<token_t>;
     auto parse_literal() -> token_t;
     auto parse_placeholder() -> token_t;
-    auto parse_spec(placeholder_t placeholder) -> token_t;
+
+    template<typename T>
+    auto parse_spec(T token) -> token_t;
 
     template<class Exception, class... Args>
     __attribute__((noreturn)) auto throw_(Args&&... args) -> void;

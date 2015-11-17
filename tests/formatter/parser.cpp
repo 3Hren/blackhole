@@ -29,6 +29,7 @@ using detail::formatter::string::invalid_placeholder;
 using detail::formatter::string::literal_t;
 using detail::formatter::string::parser_t;
 using detail::formatter::string::placeholder_t;
+using detail::formatter::string::severity_t;
 
 TEST(parser_t, Literal) {
     parser_t parser("literal");
@@ -168,6 +169,16 @@ TEST(parser_t, PlaceholderSurroundedByLiterals) {
     token = parser.next();
     ASSERT_TRUE(!!token);
     EXPECT_EQ(" definitely an id", boost::get<literal_t>(*token).value);
+
+    EXPECT_FALSE(parser.next());
+}
+
+TEST(parser_t, Severity) {
+    parser_t parser("{severity:d}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ(":d", boost::get<severity_t>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }

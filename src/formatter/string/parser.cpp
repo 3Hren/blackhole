@@ -94,22 +94,36 @@ parser_t::parse_literal() -> token_t {
 
 auto
 parser_t::parse_placeholder() -> token_t {
-    placeholder_t result;
-
+    std::string name;
+    std::string spec;
     while (pos != end()) {
         const auto ch = *pos;
 
         if (std::isalpha(ch) || std::isdigit(ch) || ch == '_') {
-            result.name.push_back(ch);
+            name.push_back(ch);
         } else {
             if (ch == ':') {
-                result.spec.push_back(ch);
+                spec.push_back(ch);
                 ++pos;
-                return parse_spec(std::move(result));
+
+                if (name == "severity") {
+                    return parse_spec(severity_t{std::move(spec)});
+                } else if (name == "timestamp") {
+                    //
+                } else {
+                    return parse_spec(placeholder_t{std::move(name), std::move(spec)});
+                }
             } else if (starts_with(pos, end(), "}")) {
                 pos += 1;
                 state = state_t::whatever;
-                return result;
+
+                if (name == "severity") {
+                    return severity_t{std::move(spec)};
+                } else if (name == "timestamp") {
+                    //
+                } else {
+                    return placeholder_t{std::move(name), std::move(spec)};
+                }
             } else {
                 throw_<invalid_placeholder>();
             }
@@ -121,8 +135,9 @@ parser_t::parse_placeholder() -> token_t {
     throw_<illformed>();
 }
 
+template<typename T>
 auto
-parser_t::parse_spec(placeholder_t placeholder) -> token_t {
+parser_t::parse_spec(T token) -> token_t {
     while (pos != end()) {
         const auto ch = *pos;
 
@@ -131,14 +146,14 @@ parser_t::parse_spec(placeholder_t placeholder) -> token_t {
         if (starts_with(pos, end(), "}")) {
             pos += 1;
             state = state_t::whatever;
-            return placeholder;
+            return token;
         }
 
-        placeholder.spec.push_back(ch);
+        token.spec.push_back(ch);
         ++pos;
     }
 
-    return placeholder;
+    return token;
 }
 
 template<class Exception, class... Args>
