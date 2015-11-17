@@ -111,7 +111,7 @@ parser_t::parse_placeholder() -> token_t {
                 } else if (name == "severity") {
                     return parse_spec(severity_t{std::move(spec)});
                 } else if (name == "timestamp") {
-                    return parse_timestamp(timestamp_t{{}, std::move(spec)});
+                    return parse_spec(timestamp_t{{}, std::move(spec)});
                 } else {
                     return parse_spec(placeholder_t{std::move(name), std::move(spec)});
                 }
@@ -161,7 +161,7 @@ parser_t::parse_spec(T token) -> token_t {
 }
 
 auto
-parser_t::parse_timestamp(timestamp_t token) -> token_t {
+parser_t::parse_spec(timestamp_t token) -> token_t {
     if (starts_with(pos, end(), "{")) {
         ++pos;
 
@@ -178,7 +178,7 @@ parser_t::parse_timestamp(timestamp_t token) -> token_t {
         }
     }
 
-    return parse_spec(std::move(token));
+    return parse_spec<timestamp_t>(std::move(token));
 }
 
 template<class Exception, class... Args>
