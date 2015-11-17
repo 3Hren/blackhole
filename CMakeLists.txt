@@ -33,8 +33,7 @@ add_library(${LIBRARY_NAME} SHARED
 	src/record
 	src/root
 	src/scoped
-	src/wrapper
-)
+	src/wrapper)
 
 # Set the Standard version.
 include(CheckCXXCompilerFlag)
