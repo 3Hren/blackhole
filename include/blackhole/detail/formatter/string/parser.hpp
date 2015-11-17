@@ -46,6 +46,9 @@ struct literal_t {
 
 class parser_t {
 public:
+    typedef char char_type;
+    typedef std::basic_string<char_type> string_type;
+
     typedef boost::variant<
         literal_t,
         placeholder::common_t,
@@ -69,12 +72,10 @@ private:
         broken
     };
 
-    typedef std::string::const_iterator iterator_type;
+    state_t state;
 
     const std::string pattern;
-
-    state_t state;
-    iterator_type pos;
+    string_type::const_iterator pos;
 
 public:
     explicit parser_t(std::string pattern);

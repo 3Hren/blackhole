@@ -18,8 +18,8 @@ static auto starts_with(Iterator first, Iterator last, const Range& range) -> bo
 }  // namespace
 
 parser_t::parser_t(std::string pattern) :
-    pattern(std::move(pattern)),
     state(state_t::unknown),
+    pattern(std::move(pattern)),
     pos(std::begin(this->pattern))
 {}
 
@@ -50,7 +50,7 @@ parser_t::next() -> boost::optional<token_t> {
 auto
 parser_t::parse_unknown() -> boost::optional<token_t> {
     if (starts_with(pos, std::end(pattern), "{") && !starts_with(pos + 1, std::end(pattern), "{")) {
-        pos += 1;
+        ++pos;
         state = state_t::placeholder;
     } else {
         state = state_t::literal;
