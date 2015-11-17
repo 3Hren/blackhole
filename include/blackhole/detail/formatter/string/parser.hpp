@@ -74,6 +74,8 @@ public:
     > token_t;
 
 private:
+    typedef string_type::const_iterator const_iterator;
+
     enum class state_t {
         /// Undetermined state.
         unknown,
@@ -88,7 +90,7 @@ private:
     state_t state;
 
     const std::string pattern;
-    string_type::const_iterator pos;
+    const_iterator pos;
 
 public:
     explicit parser_t(std::string pattern);
@@ -97,12 +99,21 @@ public:
 
 private:
     auto parse_unknown() -> boost::optional<token_t>;
-    auto parse_literal() -> token_t;
+    auto parse_literal() -> literal_t;
     auto parse_placeholder() -> token_t;
 
     template<typename T>
     auto parse_spec(T token) -> token_t;
     auto parse_spec(placeholder::timestamp_t token) -> token_t;
+
+    /// Returns `true` on exact match with the given range from the current position.
+    ///
+    /// The given range may be larger than `std::distance(pos, std::end(pattern))`.
+    template<typename Range>
+    auto exact(const Range& range) const -> bool;
+
+    template<typename Range>
+    auto exact(const_iterator pos, const Range& range) const -> bool;
 
     template<class Exception, class... Args>
     __attribute__((noreturn)) auto throw_(Args&&... args) -> void;

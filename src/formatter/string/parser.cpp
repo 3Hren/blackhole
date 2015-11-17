@@ -37,21 +37,24 @@ parser_t::next() -> boost::optional<token_t> {
     case state_t::unknown:
         return parse_unknown();
     case state_t::literal:
-        return parse_literal();
+        return token_t(parse_literal());
     case state_t::placeholder:
         return parse_placeholder();
     case state_t::broken:
         throw_<broken_t>();
     }
-
-    throw_<broken_t>();
 }
 
 auto
 parser_t::parse_unknown() -> boost::optional<token_t> {
-    if (starts_with(pos, std::end(pattern), "{") && !starts_with(pos + 1, std::end(pattern), "{")) {
-        ++pos;
-        state = state_t::placeholder;
+    if (exact("{")) {
+        if (exact(std::next(pos), "{")) {
+            // The "{{" will be treated as a single "{", so don't advance the cursor.
+            state = state_t::literal;
+        } else {
+            ++pos;
+            state = state_t::placeholder;
+        }
     } else {
         state = state_t::literal;
     }
@@ -60,26 +63,30 @@ parser_t::parse_unknown() -> boost::optional<token_t> {
 }
 
 auto
-parser_t::parse_literal() -> token_t {
-    literal_t literal;
+parser_t::parse_literal() -> literal_t {
+    std::string result;
 
     while (pos != std::end(pattern)) {
-        if (starts_with(pos, std::end(pattern), "{{") || starts_with(pos, std::end(pattern), "}}")) {
-            pos += 1;
-            // TODO: ? readability
-        } else if (starts_with(pos, std::end(pattern), "{")) {
-            pos += 1;
+        // The "{{" and "}}" are treated as a single "{" and "}" respectively.
+        if (exact("{{") || exact("}}")) {
+            result.push_back(*pos);
+            ++pos;
+            ++pos;
+            continue;
+        } else if (exact("{")) {
             state = state_t::placeholder;
-            return literal;
-        } else if (starts_with(pos, std::end(pattern), "}")) {
+            ++pos;
+            return {result};
+        } else if (exact("}")) {
+            // Unclosed single "}".
             throw_<illformed_t>();
         }
 
-        literal.value.push_back(*pos);
+        result.push_back(*pos);
         ++pos;
     }
 
-    return literal;
+    return {result};
 }
 
 auto
@@ -113,7 +120,7 @@ parser_t::parse_placeholder() -> token_t {
                 } else {
                     return parse_spec(ph::generic_t{std::move(name), std::move(spec)});
                 }
-            } else if (starts_with(pos, std::end(pattern), "}")) {
+            } else if (exact("}")) {
                 pos += 1;
                 state = state_t::unknown;
 
@@ -150,7 +157,7 @@ parser_t::parse_spec(T token) -> token_t {
 
         // TODO: Here it's the right place to validate spec format, but now I don't have much
         // time to implement it.
-        if (starts_with(pos, std::end(pattern), "}")) {
+        if (exact("}")) {
             pos += 1;
             state = state_t::unknown;
             return token;
@@ -164,7 +171,7 @@ parser_t::parse_spec(T token) -> token_t {
 
 auto
 parser_t::parse_spec(ph::timestamp_t token) -> token_t {
-    if (starts_with(pos, std::end(pattern), "{")) {
+    if (exact("{")) {
         ++pos;
 
         while (pos != std::end(pattern)) {
@@ -181,6 +188,18 @@ parser_t::parse_spec(ph::timestamp_t token) -> token_t {
     }
 
     return parse_spec<ph::timestamp_t>(std::move(token));
+}
+
+template<typename Range>
+auto
+parser_t::exact(const Range& range) const -> bool {
+    return exact(pos, range);
+}
+
+template<typename Range>
+auto
+parser_t::exact(const_iterator pos, const Range& range) const -> bool {
+    return starts_with(pos, std::end(pattern), range);
 }
 
 template<class Exception, class... Args>
