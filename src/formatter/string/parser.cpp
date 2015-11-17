@@ -116,7 +116,13 @@ parser_t::parse_placeholder() -> token_t {
                         return token;
                     }
                 } else if (name == "timestamp") {
-                    return parse_spec(ph::timestamp_t{{}, std::move(spec)});
+                    auto token = parse_spec(ph::timestamp<user>{{}, std::move(spec)});
+                    auto transformed = boost::get<ph::timestamp<user>>(token);
+                    if (boost::ends_with(transformed.spec, "d}")) {
+                        return ph::timestamp<num>{transformed.pattern, transformed.spec};
+                    } else {
+                        return token;
+                    }
                 } else {
                     return parse_spec(ph::generic_t{std::move(name), std::move(spec)});
                 }
@@ -132,7 +138,7 @@ parser_t::parse_placeholder() -> token_t {
                 } else if (name == "severity") {
                     return ph::severity<user>{std::move(spec)};
                 } else if (name == "timestamp") {
-                    return ph::timestamp_t{{}, std::move(spec)};
+                    return ph::timestamp<user>{{}, std::move(spec)};
                 }
 
                 return ph::generic_t{std::move(name), std::move(spec)};
@@ -169,8 +175,9 @@ parser_t::parse_spec(T token) -> token_t {
     return token;
 }
 
+template<typename T>
 auto
-parser_t::parse_spec(ph::timestamp_t token) -> token_t {
+parser_t::parse_spec(ph::timestamp<T> token) -> token_t {
     if (exact("{")) {
         ++pos;
 
@@ -187,7 +194,7 @@ parser_t::parse_spec(ph::timestamp_t token) -> token_t {
         }
     }
 
-    return parse_spec<ph::timestamp_t>(std::move(token));
+    return parse_spec<ph::timestamp<T>>(std::move(token));
 }
 
 template<typename Range>

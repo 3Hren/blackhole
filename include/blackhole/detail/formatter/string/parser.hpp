@@ -30,7 +30,8 @@ struct numeric_severity_t {
     std::string spec;
 };
 
-struct timestamp_t {
+template<typename T>
+struct timestamp {
     std::string pattern;
     std::string spec;
 };
@@ -68,9 +69,8 @@ public:
         ph::message_t,
         ph::severity<num>,
         ph::severity<user>,
-        // ph::timestamp<num>,
-        // ph::timestamp<user>,
-        ph::timestamp_t
+        ph::timestamp<num>,
+        ph::timestamp<user>
     > token_t;
 
 private:
@@ -104,7 +104,9 @@ private:
 
     template<typename T>
     auto parse_spec(T token) -> token_t;
-    auto parse_spec(placeholder::timestamp_t token) -> token_t;
+
+    template<typename T>
+    auto parse_spec(placeholder::timestamp<T> token) -> token_t;
 
     /// Returns `true` on exact match with the given range from the current position.
     ///
