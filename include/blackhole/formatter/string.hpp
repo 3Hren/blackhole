@@ -40,15 +40,16 @@ typedef boost::variant<
     option::remaining_t
 > option_t;
 
-typedef std::function<void(int, writer_t&)> severity_function;
+typedef std::function<void(int, writer_t&)> severity_formatter;
 
 class token_visitor_t : public boost::static_visitor<> {
+    const severity_formatter& fn;
     const record_t& record;
-    // const severity_function fn;
     writer_t& writer;
 
 public:
-    token_visitor_t(const record_t& record, writer_t& writer) :
+    token_visitor_t(const severity_formatter& fn, const record_t& record, writer_t& writer) :
+        fn(fn),
         record(record),
         writer(writer)
     {}
@@ -61,7 +62,14 @@ public:
         writer.write("{" + token.spec + "}", record.formatted());
     }
 
-    // severity_t,
+    auto operator()(const severity_t& token) -> void {
+        if (token.spec.back() == 'd') {
+            // writer.inner << record.severity();
+        } else {
+            fn(record.severity(), writer);
+        }
+    }
+
     // timestamp_t,
     // placeholder_t,
     // placeholder::leftover_t
@@ -72,22 +80,22 @@ public:
     }
 };
 
-class string_t : formatter_t {
+class string_t : public formatter_t {
     const std::string pattern;
-    // const severity_function fn;
+    const severity_formatter fn;
     const std::vector<parser_t::token_t> tokens;
 
 public:
     string_t(std::string pattern, std::map<std::string, option_t> options = {}) :
         pattern(std::move(pattern)),
-        // fn(std::move(fn)),
+        fn([](int value, writer_t& writer) { writer.inner << value; }),
         tokens(tokenize(this->pattern))
     {}
     // pattern -> [token].
     // token.each -> find options[token.name] -> double match & attach options.
 
     auto format(const record_t& record, writer_t& writer) -> void {
-        token_visitor_t visitor(record, writer);
+        token_visitor_t visitor(fn, record, writer);
 
         for (const auto& token : tokens) {
             boost::apply_visitor(visitor, token);

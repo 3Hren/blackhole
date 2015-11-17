@@ -21,17 +21,17 @@ TEST(string_t, MessagePlaceholder) {
     EXPECT_EQ("[value]", writer.result().to_string());
 }
 
-// TEST(string_t, MessageSeverityPlaceholders) {
-//     formatter::string_t formatter("[{severity}]: {message}");
-//
-//     const string_view message("value");
-//     const attribute_pack pack;
-//     record_t record(0, message, pack);
-//     writer_t writer;
-//     formatter.format(record, writer);
-//
-//     EXPECT_EQ("[0]: value", writer.result().to_string());
-// }
+TEST(string_t, MessageSeverityPlaceholders) {
+    formatter::string_t formatter("[{severity}]: {message}");
+
+    const string_view message("value");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ("[0]: value", writer.result().to_string());
+}
 
 }  // namespace testing
 }  // namespace blackhole
