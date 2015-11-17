@@ -17,10 +17,10 @@ using detail::formatter::string::parser_t;
 using detail::formatter::string::literal_t;
 
 using detail::formatter::string::placeholder::common_t;
+using detail::formatter::string::placeholder::leftover_t;
 using detail::formatter::string::placeholder::message_t;
 using detail::formatter::string::placeholder::severity_t;
 using detail::formatter::string::placeholder::timestamp_t;
-using detail::formatter::string::placeholder::leftover_t;
 
 TEST(parser_t, Empty) {
     parser_t parser("");
