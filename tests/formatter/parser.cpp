@@ -15,6 +15,7 @@ using detail::formatter::string::invalid_placeholder;
 using detail::formatter::string::parser_t;
 
 using detail::formatter::string::literal_t;
+using detail::formatter::string::message_t;
 using detail::formatter::string::placeholder_t;
 using detail::formatter::string::severity_t;
 using detail::formatter::string::timestamp_t;
@@ -171,22 +172,22 @@ TEST(parser_t, Severity) {
     EXPECT_FALSE(parser.next());
 }
 
-TEST(parser_t, Timestamp) {
-    parser_t parser("{timestamp}");
-
-    auto token = parser.next();
-    ASSERT_TRUE(!!token);
-    EXPECT_EQ("", boost::get<timestamp_t>(*token).spec);
-
-    EXPECT_FALSE(parser.next());
-}
-
 TEST(parser_t, SeveritySpec) {
     parser_t parser("{severity:d}");
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
     EXPECT_EQ(":d", boost::get<severity_t>(*token).spec);
+
+    EXPECT_FALSE(parser.next());
+}
+
+TEST(parser_t, Timestamp) {
+    parser_t parser("{timestamp}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("", boost::get<timestamp_t>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
@@ -208,6 +209,26 @@ TEST(parser_t, TimestampString) {
     ASSERT_TRUE(!!token);
     EXPECT_EQ("%Y-%m-%d %H:%M:%S.%f %z", boost::get<timestamp_t>(*token).pattern);
     EXPECT_EQ(":s", boost::get<timestamp_t>(*token).spec);
+
+    EXPECT_FALSE(parser.next());
+}
+
+TEST(parser_t, Message) {
+    parser_t parser("{message}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("", boost::get<message_t>(*token).spec);
+
+    EXPECT_FALSE(parser.next());
+}
+
+TEST(parser_t, MessageSpec) {
+    parser_t parser("{message:<30}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ(":<30", boost::get<message_t>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }

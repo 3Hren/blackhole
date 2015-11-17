@@ -106,7 +106,9 @@ parser_t::parse_placeholder() -> token_t {
                 spec.push_back(ch);
                 ++pos;
 
-                if (name == "severity") {
+                if (name == "message") {
+                    return parse_spec(message_t{std::move(spec)});
+                } else if (name == "severity") {
                     return parse_spec(severity_t{std::move(spec)});
                 } else if (name == "timestamp") {
                     return parse_timestamp(timestamp_t{{}, std::move(spec)});
@@ -117,7 +119,9 @@ parser_t::parse_placeholder() -> token_t {
                 pos += 1;
                 state = state_t::whatever;
 
-                if (name == "severity") {
+                if (name == "message") {
+                    return message_t{std::move(spec)};
+                } else if (name == "severity") {
                     return severity_t{std::move(spec)};
                 } else if (name == "timestamp") {
                     return timestamp_t{{}, std::move(spec)};

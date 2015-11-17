@@ -14,6 +14,15 @@ struct literal_t {
     std::string value;
 };
 
+struct placeholder_t {
+    std::string name;
+    std::string spec;
+};
+
+struct message_t {
+    std::string spec;
+};
+
 struct severity_t {
     std::string spec;
 };
@@ -23,15 +32,11 @@ struct timestamp_t {
     std::string spec;
 };
 
-struct placeholder_t {
-    std::string name;
-    std::string spec;
-};
-
 class parser_t {
 public:
     typedef boost::variant<
         literal_t,
+        message_t,
         severity_t,
         timestamp_t,
         placeholder_t
