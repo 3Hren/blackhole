@@ -26,10 +26,13 @@ namespace testing {
 using detail::formatter::string::broken_parser;
 using detail::formatter::string::illformed;
 using detail::formatter::string::invalid_placeholder;
-using detail::formatter::string::literal_t;
+
 using detail::formatter::string::parser_t;
+
+using detail::formatter::string::literal_t;
 using detail::formatter::string::placeholder_t;
 using detail::formatter::string::severity_t;
+using detail::formatter::string::timestamp_t;
 
 TEST(parser_t, Literal) {
     parser_t parser("literal");
@@ -179,6 +182,27 @@ TEST(parser_t, Severity) {
     auto token = parser.next();
     ASSERT_TRUE(!!token);
     EXPECT_EQ(":d", boost::get<severity_t>(*token).spec);
+
+    EXPECT_FALSE(parser.next());
+}
+
+TEST(parser_t, TimestampNumeric) {
+    parser_t parser("{timestamp:d}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ(":d", boost::get<timestamp_t>(*token).spec);
+
+    EXPECT_FALSE(parser.next());
+}
+
+TEST(parser_t, TimestampString) {
+    parser_t parser("{timestamp:{%Y-%m-%d %H:%M:%S.%f %z}s}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("%Y-%m-%d %H:%M:%S.%f %z", boost::get<timestamp_t>(*token).pattern);
+    EXPECT_EQ(":s", boost::get<timestamp_t>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }

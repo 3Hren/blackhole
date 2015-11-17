@@ -71,6 +71,7 @@ private:
 
     template<typename T>
     auto parse_spec(T token) -> token_t;
+    auto parse_spec(timestamp_t token) -> token_t;
 
     template<class Exception, class... Args>
     __attribute__((noreturn)) auto throw_(Args&&... args) -> void;
