@@ -26,15 +26,15 @@ parser_error_t::detail() const noexcept -> const std::string& {
     return inspect;
 }
 
-broken_parser::broken_parser(std::size_t pos, const std::string& pattern) :
+broken_t::broken_t(std::size_t pos, const std::string& pattern) :
     parser_error_t(pos, pattern, "broken parser")
 {}
 
-illformed::illformed(std::size_t pos, const std::string& pattern) :
+illformed_t::illformed_t(std::size_t pos, const std::string& pattern) :
     parser_error_t(pos, pattern, "illformed pattern")
 {}
 
-invalid_placeholder::invalid_placeholder(std::size_t pos, const std::string& pattern) :
+invalid_placeholder_t::invalid_placeholder_t(std::size_t pos, const std::string& pattern) :
     parser_error_t(pos, pattern, "invalid placeholder name (only [a-zA-Z0-9_] allowed)")
 {}
 

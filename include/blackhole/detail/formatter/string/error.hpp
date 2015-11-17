@@ -23,19 +23,19 @@ public:
     auto detail() const noexcept -> const std::string&;
 };
 
-class broken_parser : public parser_error_t {
+class broken_t : public parser_error_t {
 public:
-    broken_parser(std::size_t pos, const std::string& pattern);
+    broken_t(std::size_t pos, const std::string& pattern);
 };
 
-class illformed : public parser_error_t {
+class illformed_t : public parser_error_t {
 public:
-    illformed(std::size_t pos, const std::string& pattern);
+    illformed_t(std::size_t pos, const std::string& pattern);
 };
 
-class invalid_placeholder : public parser_error_t {
+class invalid_placeholder_t : public parser_error_t {
 public:
-    invalid_placeholder(std::size_t pos, const std::string& pattern);
+    invalid_placeholder_t(std::size_t pos, const std::string& pattern);
 };
 
 }  // namespace string

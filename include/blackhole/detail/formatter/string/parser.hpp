@@ -1,5 +1,12 @@
 #pragma once
 
+#include <array>
+#include <iostream>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
+#include <boost/algorithm/string.hpp>
 #include <boost/optional/optional.hpp>
 #include <boost/variant/variant.hpp>
 
@@ -10,85 +17,366 @@ namespace detail {
 namespace formatter {
 namespace string {
 
-namespace placeholder {
+namespace parser {
 
-struct leftover_t {
-    std::string name;
-};
+using blackhole::detail::formatter::string::illformed_t;
+using blackhole::detail::formatter::string::invalid_placeholder_t;
+using blackhole::detail::formatter::string::broken_t;
 
-}  // namespace placeholder
+}  // namespace parser
 
 struct literal_t {
     std::string value;
 };
 
-struct placeholder_t {
+namespace placeholder {
+
+struct required_t {
     std::string name;
-    std::string spec;
 };
 
-struct message_t {
-    std::string spec;
+struct optional_t {
+    std::string name;
+    std::string prefix;
+    std::string suffix;
 };
 
-struct severity_t {
-    std::string spec;
-};
+struct variadic_t {
+    struct key_t {};
+    struct value_t {};
 
-struct timestamp_t {
-    std::string pattern;
-    std::string spec;
-};
-
-class parser_t {
-public:
     typedef boost::variant<
         literal_t,
-        message_t,
-        severity_t,
-        timestamp_t,
-        placeholder_t,
-        placeholder::leftover_t
-    > token_t;
+        key_t,
+        value_t
+    > pattern_t;
+
+    std::string prefix;
+    std::string suffix;
+    std::vector<pattern_t> pattern;
+    std::string separator;
+
+    variadic_t() :
+        pattern(default_pattern()),
+        separator(", ")
+    {}
 
 private:
-    enum class state_t {
-        /// Undetermined state.
+    static
+    std::vector<pattern_t>
+    default_pattern() {
+        return std::vector<pattern_t>({ key_t(), literal_t{ ": " }, value_t() });
+    }
+};
+
+}  // namespace placeholder
+
+typedef boost::variant<
+    literal_t,
+    placeholder::required_t,
+    placeholder::optional_t,
+    placeholder::variadic_t
+> token_t;
+
+static const std::array<char, 2> PH_BEGIN = {{ '%', '(' }};
+static const std::array<char, 2> PH_END   = {{ ')', 's' }};
+static const std::array<char, 3> PH_VARIADIC = {{ '.', '.', '.' }};
+
+class parser_t {
+    enum state_t {
         whatever,
-        /// Parsing literal.
         literal,
-        /// Parsing placeholder.
         placeholder,
-        /// Parser is broken.
         broken
     };
 
-    typedef std::string::const_iterator iterator_type;
-
-    const std::string pattern;
-
+    std::string pattern;
+    std::string::const_iterator pos;
+    const std::string::const_iterator begin;
+    const std::string::const_iterator end;
     state_t state;
-    iterator_type pos;
 
 public:
-    explicit parser_t(std::string pattern);
+    parser_t(std::string pattern) :
+        pattern(std::move(pattern)),
+        pos(this->pattern.begin()),
+        begin(this->pattern.begin()),
+        end(this->pattern.end()),
+        state(whatever)
+    {}
 
-    auto next() -> boost::optional<token_t>;
+    boost::optional<token_t>
+    next() {
+        if (state == broken) {
+            throw_<parser::broken_t>();
+        }
+
+        if (pos == end) {
+            return boost::optional<token_t>();
+        }
+
+        switch (state) {
+        case whatever:
+            return parse_whatever();
+        case literal:
+            return parse_literal();
+        case placeholder:
+            return parse_placeholder();
+        case broken:
+            throw_<parser::broken_t>();
+        default:
+            BOOST_ASSERT(false);
+        }
+
+        throw_<parser::broken_t>();
+    }
 
 private:
-    auto begin() const -> iterator_type;
-    auto end() const -> iterator_type;
+    boost::optional<token_t>
+    parse_whatever() {
+        if (starts_with(pos, end, PH_BEGIN)) {
+            pos += PH_BEGIN.size();
+            state = placeholder;
+        } else {
+            state = literal;
+        }
 
-    auto parse_unknown() -> boost::optional<token_t>;
-    auto parse_literal() -> token_t;
-    auto parse_placeholder() -> token_t;
+        return next();
+    }
 
-    template<typename T>
-    auto parse_spec(T token) -> token_t;
-    auto parse_spec(timestamp_t token) -> token_t;
+    token_t
+    parse_literal() {
+        literal_t literal;
 
+        while (pos != end) {
+            if (starts_with(pos, end, PH_BEGIN)) {
+                pos += PH_BEGIN.size();
+                state = placeholder;
+                return literal;
+            }
+
+            literal.value.push_back(*pos);
+            pos++;
+        }
+
+        return literal;
+    }
+
+    token_t
+    parse_placeholder() {
+        if (starts_with(pos, end, PH_VARIADIC)) {
+            pos += PH_VARIADIC.size();
+            return parse_variadic();
+        }
+
+        std::string name;
+        while (pos != end) {
+            const char ch = *pos;
+
+            if (std::isalpha(ch) || std::isdigit(ch) || ch == '_') {
+                name.push_back(ch);
+            } else {
+                if (ch == ':') {
+                    pos++;
+                    return parse_optional(name);
+                } else if (starts_with(pos, end, PH_END)) {
+                    pos += PH_END.size();
+                    state = whatever;
+                    return placeholder::required_t { name };
+                } else if (ch == ')' && std::next(pos) == end) {
+                    throw_<parser::illformed_t>();
+                } else {
+                    throw_<parser::invalid_placeholder_t>();
+                }
+            }
+
+            pos++;
+        }
+
+        throw_<parser::illformed_t>();
+    }
+
+    placeholder::optional_t
+    parse_optional(std::string name) {
+        placeholder::optional_t ph { std::move(name), "", "" };
+        std::tie(ph.prefix, std::ignore) = parse({ ":" });
+        std::tie(ph.suffix, std::ignore) = parse({ ")s" });
+        state = whatever;
+        return ph;
+    }
+
+    placeholder::variadic_t
+    parse_variadic() {
+        if (pos == end) {
+            throw_<parser::illformed_t>();
+        } else {
+            placeholder::variadic_t ph;
+            if (*pos == '[') {
+                pos++;
+
+                std::string pattern;
+                std::tie(pattern, std::ignore) = parse({ "]" });
+                parse_variadic_pattern(ph, pattern);
+                if (starts_with(pos, end, PH_END)) {
+                    pos += PH_END.size();
+                    state = whatever;
+                    return ph;
+                } else if (*pos == ':') {
+                    pos++;
+                    parse_variadic_options(ph);
+                    state = whatever;
+                    return ph;
+                } else {
+                    throw_<parser::illformed_t>();
+                }
+            } else if (*pos == ':') {
+                pos++;
+                placeholder::variadic_t ph;
+                parse_variadic_options(ph);
+                state = whatever;
+                return ph;
+            } else if (starts_with(pos, end, PH_END)) {
+                pos += PH_END.size();
+                state = whatever;
+                return placeholder::variadic_t();
+            } else if (is_variadic_legacy(*pos)) {
+                std::cout << "Warning: using legacy '"
+                          << *pos
+                          << "' character in variadic placeholder is deprecated"
+                          << std::endl;
+
+                while (is_variadic_legacy(*pos)) {
+                    pos++;
+                }
+
+                if (starts_with(pos, end, PH_END)) {
+                    pos += PH_END.size();
+                    parse_variadic_pattern(ph, "'%k': %v");
+                    state = whatever;
+                    return ph;
+                } else {
+                    throw_<parser::illformed_t>();
+                }
+            }
+        }
+
+        throw_<parser::illformed_t>();
+    }
+
+    static
+    bool
+    is_variadic_legacy(char ch) {
+        return ch == 'L' || ch == 'E' || ch == 'G' || ch == 'T' || ch == 'U';
+    }
+
+    static
+    void
+    parse_variadic_pattern(placeholder::variadic_t& ph, const std::string& pattern) {
+        ph.pattern.clear();
+
+        std::string literal;
+        auto it = pattern.begin();
+        auto end = pattern.end();
+        for (; it != end; ++it) {
+            if (starts_with(it, end, "%k")) {
+                it++;
+
+                if (!literal.empty()) {
+                    ph.pattern.push_back(literal_t{ literal });
+                    literal.clear();
+                }
+                ph.pattern.push_back(placeholder::variadic_t::key_t());
+                continue;
+            } else if (starts_with(it, end, "%v")) {
+                it++;
+
+                if (!literal.empty()) {
+                    ph.pattern.push_back(literal_t{ literal });
+                    literal.clear();
+                }
+                ph.pattern.push_back(placeholder::variadic_t::value_t());
+                continue;
+            }
+            literal.push_back(*it);
+        }
+
+        if (!literal.empty()) {
+            ph.pattern.push_back(literal_t{ literal });
+        }
+    }
+
+    void
+    parse_variadic_options(placeholder::variadic_t& ph) {
+        std::tie(ph.prefix, std::ignore) = parse({ ":" });
+        std::string breaker;
+        std::tie(ph.suffix, breaker) = parse({ ":", ")s" });
+        if (breaker == ":") {
+            std::tie(ph.separator, std::ignore) = parse({ ")s" });
+        }
+    }
+
+    std::tuple<std::string, std::string>
+    parse(std::initializer_list<std::string> breakers,
+          std::function<int(int)> match = ::isprint) {
+        std::string result;
+        bool escaped = false;
+        while (pos != end) {
+            const char ch = *pos;
+            if (!match(ch)) {
+                throw_<parser::illformed_t>();
+            }
+
+            if (ch == '\\') {
+                pos++;
+                escaped = true;
+                continue;
+            }
+
+            bool matched = false;
+            std::string breaker;
+            for (auto it = breakers.begin(); it != breakers.end(); ++it) {
+                if (starts_with(pos, end, *it)) {
+                    matched = true;
+                    breaker = *it;
+                    break;
+                }
+            }
+
+            if (matched && !escaped) {
+                pos += breaker.size();
+                return std::make_tuple(result, breaker);
+            }
+
+            result.push_back(ch);
+            escaped = false;
+            pos++;
+        }
+
+        throw_<parser::illformed_t>();
+    }
+
+private:
     template<class Exception, class... Args>
-    __attribute__((noreturn)) auto throw_(Args&&... args) -> void;
+    __attribute__((noreturn))
+    void throw_(Args&&... args) {
+        state = broken;
+        throw Exception(
+            std::distance(begin, pos),
+            std::string(begin, end),
+            std::forward<Args>(args)...
+        );
+    }
+
+    template<typename Iterator, class Range>
+    static
+    inline
+    bool
+    starts_with(Iterator first, Iterator last, const Range& range) {
+        return boost::starts_with(
+            boost::make_iterator_range(first, last),
+            range
+        );
+    }
 };
 
 }  // namespace string

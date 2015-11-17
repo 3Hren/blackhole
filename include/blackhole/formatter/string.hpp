@@ -1,114 +1,74 @@
 #pragma once
 
-#include <map>
 #include <string>
 #include <vector>
 
-#include <boost/variant/variant.hpp>
+#include <boost/format.hpp>
+#include <boost/algorithm/string.hpp>
 
+#include "blackhole/extensions/writer.hpp"
 #include "blackhole/formatter.hpp"
 #include "blackhole/record.hpp"
 
 #include "blackhole/detail/formatter/string/parser.hpp"
+#include "blackhole/detail/formatter/string/generator.hpp"
 
 namespace blackhole {
 namespace formatter {
 
-using detail::formatter::string::parser_t;
-
-using namespace detail::formatter::string;
-
-namespace option {
-
-struct optional_t {
-    std::string prefix;
-    std::string suffix;
-};
-
-struct remaining_t {
-    bool unique;
-    std::string prefix;
-    std::string suffix;
-    std::string pattern;
-    std::string separator;
-};
-
-}  // namespace option
-
-typedef boost::variant<
-    option::optional_t,
-    option::remaining_t
-> option_t;
-
-typedef std::function<void(int, writer_t&)> severity_formatter;
-
-class token_visitor_t : public boost::static_visitor<> {
-    const severity_formatter& fn;
-    const record_t& record;
-    writer_t& writer;
-
-public:
-    token_visitor_t(const severity_formatter& fn, const record_t& record, writer_t& writer) :
-        fn(fn),
-        record(record),
-        writer(writer)
-    {}
-
-    auto operator()(const literal_t& token) -> void {
-        writer.inner << token.value;
-    }
-
-    auto operator()(const message_t& token) -> void {
-        writer.write("{" + token.spec + "}", record.formatted());
-    }
-
-    auto operator()(const severity_t& token) -> void {
-        if (token.spec.back() == 'd') {
-            // writer.inner << record.severity();
-        } else {
-            fn(record.severity(), writer);
-        }
-    }
-
-    // timestamp_t,
-    // placeholder_t,
-    // placeholder::leftover_t
-
-    template<typename T>
-    auto operator()(const T& token) -> void {
-        throw std::runtime_error("unimplemented");
-    }
-};
+namespace string = detail::formatter::string;
 
 class string_t : public formatter_t {
+    const bool unique;
     const std::string pattern;
-    const severity_formatter fn;
-    const std::vector<parser_t::token_t> tokens;
+    const std::vector<string::token_t> tokens;
+    string::severity_formatter sfn;
+    string::timestamp_formatter tfn;
 
 public:
-    string_t(std::string pattern, std::map<std::string, option_t> options = {}) :
-        pattern(std::move(pattern)),
-        fn([](int value, writer_t& writer) { writer.inner << value; }),
-        tokens(tokenize(this->pattern))
+    string_t(const std::string& pattern) :
+        unique(true),
+        pattern(pattern),
+        tokens(tokenize(pattern)),
+        sfn([](int value, writer_t& writer) {
+            writer.inner << value;
+        }),
+        tfn([](const record_t::time_point& value, writer_t& writer) {
+            writer.inner << std::chrono::duration_cast<std::chrono::microseconds>(value.time_since_epoch()).count();
+        })
     {}
-    // pattern -> [token].
-    // token.each -> find options[token.name] -> double match & attach options.
+
+    string_t(const std::string& pattern, string::severity_formatter sfn, string::timestamp_formatter tfn) :
+        unique(true),
+        pattern(pattern),
+        tokens(tokenize(pattern)),
+        sfn(std::move(sfn)),
+        tfn(std::move(tfn))
+    {}
 
     auto format(const record_t& record, writer_t& writer) -> void {
-        token_visitor_t visitor(fn, record, writer);
+        try {
+            string::visitor_t visitor(record, writer, unique);
+            visitor.sfn = sfn;
+            visitor.tfn = tfn;
 
-        for (const auto& token : tokens) {
-            boost::apply_visitor(visitor, token);
+            for (const auto& token : tokens) {
+                boost::apply_visitor(visitor, token);
+            }
+        } catch (const std::exception& err) {
+            throw std::runtime_error("bad format string '" + pattern + "': " + err.what());
         }
     }
 
 private:
-    static auto tokenize(const std::string& pattern) -> std::vector<parser_t::token_t> {
-        std::vector<parser_t::token_t> tokens;
+    static
+    std::vector<string::token_t>
+    tokenize(const std::string& pattern) {
+        std::vector<string::token_t> tokens;
 
-        parser_t parser(pattern);
+        string::parser_t parser(pattern);
         while (auto token = parser.next()) {
-            tokens.emplace_back(token.get());
+            tokens.push_back(token.get());
         }
 
         return tokens;
