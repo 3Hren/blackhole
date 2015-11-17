@@ -26,13 +26,14 @@ struct severity {
     std::string spec;
 };
 
-struct numeric_severity_t {
+template<typename T>
+struct timestamp {
+    std::string pattern;
     std::string spec;
 };
 
 template<typename T>
-struct timestamp {
-    std::string pattern;
+struct process {
     std::string spec;
 };
 
@@ -49,7 +50,10 @@ struct literal_t {
 namespace ph = placeholder;
 
 /// Helper named structs for making eye-candy code.
+struct id;
+struct hex;
 struct num;
+struct name;
 struct user;
 
 class parser_t {
@@ -61,8 +65,8 @@ public:
         literal_t,
         ph::generic_t,
         ph::leftover_t,
-        // ph::process<id>,
-        // ph::process<name>,
+        ph::process<id>,
+        ph::process<name>,
         // ph::thread<id>,
         // ph::thread<hex>,
         // ph::thread<name>,

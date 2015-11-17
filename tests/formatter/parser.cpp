@@ -16,12 +16,16 @@ using detail::formatter::string::parser_t;
 
 using detail::formatter::string::literal_t;
 
+using detail::formatter::string::id;
+using detail::formatter::string::hex;
 using detail::formatter::string::num;
+using detail::formatter::string::name;
 using detail::formatter::string::user;
 
 using detail::formatter::string::ph::generic_t;
 using detail::formatter::string::ph::leftover_t;
 using detail::formatter::string::ph::message_t;
+using detail::formatter::string::ph::process;
 using detail::formatter::string::ph::severity;
 using detail::formatter::string::ph::timestamp;
 
@@ -240,6 +244,36 @@ TEST(parser_t, MessageSpec) {
     auto token = parser.next();
     ASSERT_TRUE(!!token);
     EXPECT_EQ("{:<30}", boost::get<message_t>(*token).spec);
+
+    EXPECT_FALSE(parser.next());
+}
+
+TEST(parser_t, Process) {
+    parser_t parser("{process}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("{}", boost::get<process<id>>(*token).spec);
+
+    EXPECT_FALSE(parser.next());
+}
+
+TEST(parser_t, ProcessExplicit) {
+    parser_t parser("{process:d}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("{:d}", boost::get<process<id>>(*token).spec);
+
+    EXPECT_FALSE(parser.next());
+}
+
+TEST(parser_t, ProcessName) {
+    parser_t parser("{process:s}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("{:s}", boost::get<process<name>>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }

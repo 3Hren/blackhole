@@ -123,6 +123,14 @@ parser_t::parse_placeholder() -> token_t {
                     } else {
                         return token;
                     }
+                } else if (name == "process") {
+                    auto token = parse_spec(ph::process<id>{std::move(spec)});
+                    auto transformed = boost::get<ph::process<id>>(token);
+                    if (boost::ends_with(transformed.spec, "s}")) {
+                        return ph::process<string::name>{transformed.spec};
+                    } else {
+                        return token;
+                    }
                 } else {
                     return parse_spec(ph::generic_t{std::move(name), std::move(spec)});
                 }
@@ -139,6 +147,8 @@ parser_t::parse_placeholder() -> token_t {
                     return ph::severity<user>{std::move(spec)};
                 } else if (name == "timestamp") {
                     return ph::timestamp<user>{{}, std::move(spec)};
+                } else if (name == "process") {
+                    return ph::process<id>{std::move(spec)};
                 }
 
                 return ph::generic_t{std::move(name), std::move(spec)};
