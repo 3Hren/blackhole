@@ -21,7 +21,7 @@ static auto starts_with(Iterator first, Iterator last, const Range& range) -> bo
 
 struct spec_factory_t {
 public:
-    virtual ~spec_factory_t() = default;
+    virtual ~spec_factory_t() {};
     virtual auto initialize() const -> parser_t::token_t = 0;
     virtual auto match(std::string spec) -> parser_t::token_t = 0;
 };
