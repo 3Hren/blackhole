@@ -340,5 +340,65 @@ TEST(parser_t, LeftoverNamed) {
     EXPECT_FALSE(parser.next());
 }
 
+TEST(parser_t, RealWorld) {
+    parser_t parser("{severity:s}, {process:d} {thread:x} [{timestamp:{%Y-%m-%dT%H:%M:%S.%f}s}] {source}: {message} {...}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("{:s}", boost::get<severity<user>>(*token).spec);
+
+    token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ(", ", boost::get<literal_t>(*token).value);
+
+    token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("{:d}", boost::get<process<id>>(*token).spec);
+
+    token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ(" ", boost::get<literal_t>(*token).value);
+
+    token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("{:x}", boost::get<thread<hex>>(*token).spec);
+
+    token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ(" [", boost::get<literal_t>(*token).value);
+
+    token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("%Y-%m-%dT%H:%M:%S.%f", boost::get<timestamp<user>>(*token).pattern);
+    EXPECT_EQ("{:s}", boost::get<timestamp<user>>(*token).spec);
+
+    token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("] ", boost::get<literal_t>(*token).value);
+
+    token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("source", boost::get<generic_t>(*token).name);
+    EXPECT_EQ("{}", boost::get<generic_t>(*token).spec);
+
+    token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ(": ", boost::get<literal_t>(*token).value);
+
+    token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("{}", boost::get<message_t>(*token).spec);
+
+    token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ(" ", boost::get<literal_t>(*token).value);
+
+    token = parser.next();
+    ASSERT_TRUE(!!token);
+    ASSERT_EQ("...", boost::get<leftover_t>(*token).name);
+
+    EXPECT_FALSE(parser.next());
+}
+
 }  // namespace testing
 }  // namespace blackhole
