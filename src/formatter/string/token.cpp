@@ -6,49 +6,49 @@ namespace formatter {
 namespace string {
 namespace placeholder {
 
-generic_t::generic_t(std::string name) noexcept :
+generic_t::generic_t(std::string name) :
     name(std::move(name)),
     spec("{}")
 {}
 
-generic_t::generic_t(std::string name, std::string spec) noexcept :
+generic_t::generic_t(std::string name, std::string spec) :
     name(std::move(name)),
     spec(std::move(spec))
 {}
 
-message_t::message_t() noexcept : spec("{}") {}
-message_t::message_t(std::string spec) noexcept : spec(std::move(spec)) {}
+message_t::message_t() : spec("{}") {}
+message_t::message_t(std::string spec) : spec(std::move(spec)) {}
 
 template<typename T>
-severity<T>::severity() noexcept : spec("{}") {}
+severity<T>::severity() : spec("{}") {}
 
 template<typename T>
-severity<T>::severity(std::string spec) noexcept : spec(std::move(spec)) {}
+severity<T>::severity(std::string spec) : spec(std::move(spec)) {}
 
-timestamp<num>::timestamp() noexcept : spec("{}") {}
-timestamp<num>::timestamp(std::string spec) noexcept : spec(std::move(spec)) {}
+timestamp<num>::timestamp() : spec("{}") {}
+timestamp<num>::timestamp(std::string spec) : spec(std::move(spec)) {}
 
-timestamp<user>::timestamp() noexcept :
+timestamp<user>::timestamp() :
     pattern(),
     spec("{}")
 {}
 
-timestamp<user>::timestamp(std::string pattern, std::string spec) noexcept :
+timestamp<user>::timestamp(std::string pattern, std::string spec) :
     pattern(std::move(pattern)),
     spec(std::move(spec))
 {}
 
 template<typename T>
-process<T>::process() noexcept : spec("{}") {}
+process<T>::process() : spec("{}") {}
 
 template<typename T>
-process<T>::process(std::string spec) noexcept : spec(std::move(spec)) {}
+process<T>::process(std::string spec) : spec(std::move(spec)) {}
 
 template<typename T>
-thread<T>::thread() noexcept : spec("{}") {}
+thread<T>::thread() : spec("{}") {}
 
 template<typename T>
-thread<T>::thread(std::string spec) noexcept : spec(std::move(spec)) {}
+thread<T>::thread(std::string spec) : spec(std::move(spec)) {}
 
 template struct severity<num>;
 template struct severity<user>;

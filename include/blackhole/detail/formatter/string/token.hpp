@@ -27,23 +27,23 @@ struct generic_t {
     std::string name;
     std::string spec;
 
-    generic_t(std::string name) noexcept;
-    generic_t(std::string name, std::string spec) noexcept;
+    generic_t(std::string name);
+    generic_t(std::string name, std::string spec);
 };
 
 struct message_t {
     std::string spec;
 
-    message_t() noexcept;
-    message_t(std::string spec) noexcept;
+    message_t();
+    message_t(std::string spec);
 };
 
 template<typename T>
 struct severity {
     std::string spec;
 
-    severity() noexcept;
-    severity(std::string spec) noexcept;
+    severity();
+    severity(std::string spec);
 };
 
 template<typename T>
@@ -53,8 +53,8 @@ template<>
 struct timestamp<num> {
     std::string spec;
 
-    timestamp() noexcept;
-    timestamp(std::string spec) noexcept;
+    timestamp();
+    timestamp(std::string spec);
 };
 
 template<>
@@ -62,24 +62,24 @@ struct timestamp<user> {
     std::string pattern;
     std::string spec;
 
-    timestamp() noexcept;
-    timestamp(std::string pattern, std::string spec) noexcept;
+    timestamp();
+    timestamp(std::string pattern, std::string spec);
 };
 
 template<typename T>
 struct process {
     std::string spec;
 
-    process() noexcept;
-    process(std::string spec) noexcept;
+    process();
+    process(std::string spec);
 };
 
 template<typename T>
 struct thread {
     std::string spec;
 
-    thread() noexcept;
-    thread(std::string spec) noexcept;
+    thread();
+    thread(std::string spec);
 };
 
 struct leftover_t {
