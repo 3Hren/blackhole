@@ -16,6 +16,7 @@ namespace formatter {
 namespace string = blackhole::detail::formatter::string;
 namespace ph = string::ph;
 
+using string::num;
 using string::literal_t;
 
 class token_t {
@@ -51,6 +52,10 @@ public:
 
     auto operator()(const ph::message_t& token) const -> void {
         writer.write(token.spec, record.formatted().data());
+    }
+
+    auto operator()(const ph::severity<num>& token) const -> void {
+        writer.write(token.spec, record.severity());
     }
 
     template<typename T>
@@ -92,6 +97,3 @@ string_t::format(const record_t& record, writer_t& writer) -> void {
 
 }  // namespace formatter
 }  // namespace blackhole
-
-// TODO: Check error when setting an option to reserved name, i.e. timestamp or message.
-// TODO: Check error when ph in pattern was not found.
