@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include <boost/variant/variant_fwd.hpp>
+
 namespace blackhole {
 namespace detail {
 namespace formatter {
@@ -13,6 +15,11 @@ struct hex;
 struct num;
 struct name;
 struct user;
+
+/// Represents string literal.
+struct literal_t {
+    std::string value;
+};
 
 namespace placeholder {
 
@@ -81,11 +88,23 @@ struct leftover_t {
 
 }  // namespace placeholder
 
-struct literal_t {
-    std::string value;
-};
-
 namespace ph = placeholder;
+
+typedef boost::variant<
+    literal_t,
+    ph::generic_t,
+    ph::leftover_t,
+    ph::process<id>,
+    ph::process<name>,
+    ph::thread<id>,
+    ph::thread<hex>,
+    ph::thread<name>,
+    ph::message_t,
+    ph::severity<num>,
+    ph::severity<user>,
+    ph::timestamp<num>,
+    ph::timestamp<user>
+> token_t;
 
 }  // namespace string
 }  // namespace formatter

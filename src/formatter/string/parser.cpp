@@ -1,9 +1,7 @@
 #include "blackhole/detail/formatter/string/parser.hpp"
 
-#include <unordered_map>
-
 #include <boost/algorithm/string.hpp>
-#include <boost/variant/get.hpp>
+#include <boost/variant/variant.hpp>
 
 namespace blackhole {
 namespace detail {
@@ -22,13 +20,13 @@ static auto starts_with(Iterator first, Iterator last, const Range& range) -> bo
 struct spec_factory_t {
 public:
     virtual ~spec_factory_t() {}
-    virtual auto initialize() const -> parser_t::token_t = 0;
-    virtual auto match(std::string spec) -> parser_t::token_t = 0;
+    virtual auto initialize() const -> token_t = 0;
+    virtual auto match(std::string spec) -> token_t = 0;
 };
 
 template<typename T>
 struct default_spec_factory : spec_factory_t {
-    virtual auto initialize() const -> parser_t::token_t {
+    virtual auto initialize() const -> token_t {
         return T();
     }
 };
@@ -38,14 +36,14 @@ struct spec_factory;
 
 template<>
 struct spec_factory<ph::message_t> : public default_spec_factory<ph::message_t> {
-    auto match(std::string spec) -> parser_t::token_t {
+    auto match(std::string spec) -> token_t {
         return ph::message_t(std::move(spec));
     }
 };
 
 template<>
 struct spec_factory<ph::process<id>> : public default_spec_factory<ph::process<id>> {
-    auto match(std::string spec) -> parser_t::token_t {
+    auto match(std::string spec) -> token_t {
         BOOST_ASSERT(spec.size() > 2);
 
         const auto type = spec.at(spec.size() - 2);
@@ -61,7 +59,7 @@ struct spec_factory<ph::process<id>> : public default_spec_factory<ph::process<i
 
 template<>
 struct spec_factory<ph::thread<hex>> : public default_spec_factory<ph::thread<hex>> {
-    auto match(std::string spec) -> parser_t::token_t {
+    auto match(std::string spec) -> token_t {
         BOOST_ASSERT(spec.size() > 2);
 
         const auto type = spec.at(spec.size() - 2);
@@ -80,7 +78,7 @@ struct spec_factory<ph::thread<hex>> : public default_spec_factory<ph::thread<he
 
 template<>
 struct spec_factory<ph::severity<user>> : public default_spec_factory<ph::severity<user>> {
-    auto match(std::string spec) -> parser_t::token_t {
+    auto match(std::string spec) -> token_t {
         BOOST_ASSERT(spec.size() > 2);
 
         const auto type = spec.at(spec.size() - 2);
@@ -96,7 +94,7 @@ struct spec_factory<ph::severity<user>> : public default_spec_factory<ph::severi
 
 template<>
 struct spec_factory<ph::timestamp<user>> : public default_spec_factory<ph::timestamp<user>> {
-    auto match(std::string spec) -> parser_t::token_t {
+    auto match(std::string spec) -> token_t {
         BOOST_ASSERT(spec.size() > 2);
 
         const auto type = spec.at(spec.size() - 2);
