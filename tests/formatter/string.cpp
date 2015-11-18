@@ -88,6 +88,18 @@ TEST(string_t, SeverityNumWithMappingProvided) {
     EXPECT_EQ("[0]", writer.result().to_string());
 }
 
+TEST(string_t, SeverityNumWithSpec) {
+    formatter::string_t formatter("[{severity:*^3d}]");
+
+    const string_view message("-");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ("[*0*]", writer.result().to_string());
+}
+
 TEST(string_t, SeverityUserWithSpec) {
     formatter::string_t formatter("[{severity:<7}]", [](int severity, const std::string& spec, writer_t& writer) {
         writer.write(spec, "DEBUG");
