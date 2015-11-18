@@ -168,6 +168,35 @@ parser_t::next() -> boost::optional<token_t> {
 }
 
 auto
+parser_t::parse_spec() -> std::string {
+    std::string spec("{:");
+    std::size_t open = 1;
+
+    while (pos != std::end(pattern)) {
+        const auto ch = *pos;
+
+        spec.push_back(ch);
+
+        // TODO: Here it's the right place to validate spec format, but now I don't have much
+        // time to implement it.
+        if (exact("{")) {
+            ++open;
+        } else if (exact("}")) {
+            --open;
+
+            if (open == 0) {
+                ++pos;
+                return spec;
+            }
+        }
+
+        ++pos;
+    }
+
+    return spec;
+}
+
+auto
 parser_t::parse_unknown() -> boost::optional<token_t> {
     if (exact("{")) {
         if (exact(std::next(pos), "{")) {
@@ -256,35 +285,6 @@ parser_t::parse_placeholder() -> token_t {
     }
 
     throw_<illformed_t>();
-}
-
-auto
-parser_t::parse_spec() -> std::string {
-    std::string spec("{:");
-    std::size_t open = 1;
-
-    while (pos != std::end(pattern)) {
-        const auto ch = *pos;
-
-        spec.push_back(ch);
-
-        // TODO: Here it's the right place to validate spec format, but now I don't have much
-        // time to implement it.
-        if (exact("{")) {
-            ++open;
-        } else if (exact("}")) {
-            --open;
-
-            if (open == 0) {
-                ++pos;
-                return spec;
-            }
-        }
-
-        ++pos;
-    }
-
-    return spec;
 }
 
 template<typename Range>
