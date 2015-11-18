@@ -8,7 +8,6 @@
 
 #include "blackhole/detail/formatter/string/parser.hpp"
 #include "blackhole/detail/formatter/string/token.hpp"
-#include "blackhole/detail/unimplemented.hpp"
 
 namespace blackhole {
 namespace formatter {
@@ -17,6 +16,8 @@ namespace string = blackhole::detail::formatter::string;
 namespace ph = string::ph;
 
 using string::num;
+using string::user;
+
 using string::literal_t;
 
 class token_t {
@@ -58,9 +59,13 @@ public:
         writer.write(token.spec, record.severity());
     }
 
+    auto operator()(const ph::severity<user>& token) const -> void {
+        sevmap(record.severity(), writer);
+    }
+
     template<typename T>
     auto operator()(const T& token) const -> void {
-        BLACKHOLE_UNIMPLEMENTED();
+        std::terminate();
     }
 };
 
@@ -82,7 +87,11 @@ string_t::string_t(std::string pattern, options_t options) :
     tokens(tokenize(this->pattern))
 {}
 
-string_t::string_t(std::string pattern, severity_map sevmap, options_t options) {}
+string_t::string_t(std::string pattern, severity_map sevmap, options_t options) :
+    pattern(std::move(pattern)),
+    sevmap(std::move(sevmap)),
+    tokens(tokenize(this->pattern))
+{}
 
 string_t::~string_t() {}
 
