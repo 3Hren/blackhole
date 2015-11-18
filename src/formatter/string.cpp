@@ -1,6 +1,7 @@
 #include "blackhole/formatter/string.hpp"
 
 #include <boost/variant/variant.hpp>
+#include <cppformat/format.h>
 
 #include "blackhole/extensions/writer.hpp"
 #include "blackhole/record.hpp"
@@ -49,7 +50,7 @@ public:
     }
 
     auto operator()(const ph::message_t& token) const -> void {
-        writer.write(token.spec, record.formatted());
+        writer.write(token.spec, record.formatted().data());
     }
 
     template<typename T>
