@@ -154,12 +154,12 @@ if (ENABLE_BENCHMARKING)
 	prepare_google_benchmarking()
 
 	add_executable(${LIBRARY_NAME}-benchmarks
-		bench/cpp14formatter
-		bench/logger
 		bench/clock
+		bench/cpp14formatter
+		bench/formatter/string
+		bench/logger
 		bench/main
-		bench/record
-	)
+		bench/record)
 
 	enable_google_benchmarking(${LIBRARY_NAME}-benchmarks)
 
