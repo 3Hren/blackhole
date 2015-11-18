@@ -50,6 +50,15 @@ thread<T>::thread() : spec("{}") {}
 template<typename T>
 thread<T>::thread(std::string spec) : spec(std::move(spec)) {}
 
+leftover_t::leftover_t() :
+    unique(false)
+{}
+
+leftover_t::leftover_t(std::string name) :
+    name(std::move(name)),
+    unique(false)
+{}
+
 template struct severity<num>;
 template struct severity<user>;
 
