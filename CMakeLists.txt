@@ -29,6 +29,7 @@ add_library(${LIBRARY_NAME} SHARED
 	src/attribute
 	src/formatter/string/error
 	src/formatter/string/parser
+	src/formatter/string/token
 	src/logger
 	src/record
 	src/root

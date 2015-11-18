@@ -8,105 +8,14 @@
 #include <boost/variant/variant.hpp>
 
 #include "blackhole/detail/formatter/string/error.hpp"
+#include "blackhole/detail/formatter/string/token.hpp"
 
 namespace blackhole {
 namespace detail {
 namespace formatter {
 namespace string {
 
-/// Helper named structs for making eye-candy code.
-struct id;
-struct hex;
-struct num;
-struct name;
-struct user;
-
-namespace placeholder {
-
-struct generic_t {
-    std::string name;
-    std::string spec;
-
-    generic_t(std::string name) noexcept :
-        name(std::move(name)),
-        spec("{}")
-    {}
-
-    generic_t(std::string name, std::string spec) noexcept :
-        name(std::move(name)),
-        spec(std::move(spec))
-    {}
-};
-
-struct message_t {
-    std::string spec;
-
-    message_t() noexcept : spec("{}") {}
-    message_t(std::string spec) noexcept : spec(std::move(spec)) {}
-};
-
-template<typename T>
-struct severity {
-    std::string spec;
-
-    severity() noexcept : spec("{}") {}
-    severity(std::string spec) noexcept : spec(std::move(spec)) {}
-};
-
-template<typename T>
-struct timestamp;
-
-template<>
-struct timestamp<num> {
-    std::string spec;
-
-    timestamp() noexcept : spec("{}") {}
-    timestamp(std::string spec) noexcept : spec(std::move(spec)) {}
-};
-
-template<>
-struct timestamp<user> {
-    std::string pattern;
-    std::string spec;
-
-    timestamp() noexcept :
-        pattern(),
-        spec("{}")
-    {}
-
-    timestamp(std::string pattern, std::string spec) noexcept :
-        pattern(std::move(pattern)),
-        spec(std::move(spec))
-    {}
-};
-
-template<typename T>
-struct process {
-    std::string spec;
-
-    process() noexcept : spec("{}") {}
-    process(std::string spec) noexcept : spec(std::move(spec)) {}
-};
-
-struct leftover_t {
-    std::string name;
-};
-
-}  // namespace placeholder
-
-struct literal_t {
-    std::string value;
-};
-
-namespace ph = placeholder;
-
 struct spec_factory_t;
-
-template<typename T>
-struct default_spec_factory;
-
-template<typename T>
-struct spec_factory;
 
 class parser_t {
 public:

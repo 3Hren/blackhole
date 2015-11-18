@@ -21,7 +21,7 @@ static auto starts_with(Iterator first, Iterator last, const Range& range) -> bo
 
 struct spec_factory_t {
 public:
-    virtual ~spec_factory_t() {};
+    virtual ~spec_factory_t() {}
     virtual auto initialize() const -> parser_t::token_t = 0;
     virtual auto match(std::string spec) -> parser_t::token_t = 0;
 };
@@ -32,6 +32,9 @@ struct default_spec_factory : spec_factory_t {
         return T();
     }
 };
+
+template<typename T>
+struct spec_factory;
 
 template<>
 struct spec_factory<ph::message_t> : public default_spec_factory<ph::message_t> {
