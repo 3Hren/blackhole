@@ -84,6 +84,7 @@ static auto tokenize(const std::string& pattern) -> std::vector<token_t> {
 
 string_t::string_t(std::string pattern, options_t options) :
     pattern(std::move(pattern)),
+    sevmap([](int severity, writer_t& writer) { writer.inner << severity; }),
     tokens(tokenize(this->pattern))
 {}
 
