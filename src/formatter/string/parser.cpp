@@ -60,6 +60,25 @@ struct spec_factory<ph::process<id>> : public default_spec_factory<ph::process<i
 };
 
 template<>
+struct spec_factory<ph::thread<hex>> : public default_spec_factory<ph::thread<hex>> {
+    auto match(std::string spec) -> parser_t::token_t {
+        BOOST_ASSERT(spec.size() > 2);
+
+        const auto type = spec.at(spec.size() - 2);
+
+        switch (type) {
+        case 'd':
+            return ph::thread<id>(std::move(spec));
+        case 's':
+            return ph::thread<name>(std::move(spec));
+        case 'x':
+        default:
+            return ph::thread<hex>(std::move(spec));
+        }
+    }
+};
+
+template<>
 struct spec_factory<ph::severity<user>> : public default_spec_factory<ph::severity<user>> {
     auto match(std::string spec) -> parser_t::token_t {
         BOOST_ASSERT(spec.size() > 2);
@@ -126,6 +145,7 @@ parser_t::parser_t(std::string pattern) :
 {
     factories["message"]   = std::make_shared<spec_factory<ph::message_t>>();
     factories["process"]   = std::make_shared<spec_factory<ph::process<id>>>();
+    factories["thread"]    = std::make_shared<spec_factory<ph::thread<hex>>>();
     factories["severity"]  = std::make_shared<spec_factory<ph::severity<user>>>();
     factories["timestamp"] = std::make_shared<spec_factory<ph::timestamp<user>>>();
 }

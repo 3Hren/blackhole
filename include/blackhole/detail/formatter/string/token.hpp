@@ -67,6 +67,14 @@ struct process {
     process(std::string spec) noexcept;
 };
 
+template<typename T>
+struct thread {
+    std::string spec;
+
+    thread() noexcept;
+    thread(std::string spec) noexcept;
+};
+
 struct leftover_t {
     std::string name;
 };

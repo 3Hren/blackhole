@@ -27,6 +27,7 @@ using detail::formatter::string::ph::leftover_t;
 using detail::formatter::string::ph::message_t;
 using detail::formatter::string::ph::process;
 using detail::formatter::string::ph::severity;
+using detail::formatter::string::ph::thread;
 using detail::formatter::string::ph::timestamp;
 
 TEST(parser_t, Empty) {
@@ -274,6 +275,46 @@ TEST(parser_t, ProcessName) {
     auto token = parser.next();
     ASSERT_TRUE(!!token);
     EXPECT_EQ("{:s}", boost::get<process<name>>(*token).spec);
+
+    EXPECT_FALSE(parser.next());
+}
+
+TEST(parser_t, Thread) {
+    parser_t parser("{thread}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("{}", boost::get<thread<hex>>(*token).spec);
+
+    EXPECT_FALSE(parser.next());
+}
+
+TEST(parser_t, ThreadExplicit) {
+    parser_t parser("{thread:x}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("{:x}", boost::get<thread<hex>>(*token).spec);
+
+    EXPECT_FALSE(parser.next());
+}
+
+TEST(parser_t, ThreadId) {
+    parser_t parser("{thread:d}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("{:d}", boost::get<thread<id>>(*token).spec);
+
+    EXPECT_FALSE(parser.next());
+}
+
+TEST(parser_t, ThreadName) {
+    parser_t parser("{thread:s}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("{:s}", boost::get<thread<name>>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }

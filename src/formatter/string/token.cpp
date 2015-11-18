@@ -44,11 +44,21 @@ process<T>::process() noexcept : spec("{}") {}
 template<typename T>
 process<T>::process(std::string spec) noexcept : spec(std::move(spec)) {}
 
+template<typename T>
+thread<T>::thread() noexcept : spec("{}") {}
+
+template<typename T>
+thread<T>::thread(std::string spec) noexcept : spec(std::move(spec)) {}
+
 template struct severity<num>;
 template struct severity<user>;
 
 template struct process<id>;
 template struct process<name>;
+
+template struct thread<id>;
+template struct thread<hex>;
+template struct thread<name>;
 
 }  // namespace placeholder
 }  // namespace string
