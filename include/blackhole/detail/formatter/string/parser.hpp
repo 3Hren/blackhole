@@ -1,5 +1,9 @@
 #pragma once
 
+#include <memory>
+#include <string>
+#include <unordered_map>
+
 #include <boost/optional/optional.hpp>
 #include <boost/variant/variant.hpp>
 
@@ -10,31 +14,78 @@ namespace detail {
 namespace formatter {
 namespace string {
 
+/// Helper named structs for making eye-candy code.
+struct id;
+struct hex;
+struct num;
+struct name;
+struct user;
+
 namespace placeholder {
 
 struct generic_t {
     std::string name;
     std::string spec;
+
+    generic_t(std::string name) noexcept :
+        name(std::move(name)),
+        spec("{}")
+    {}
+
+    generic_t(std::string name, std::string spec) noexcept :
+        name(std::move(name)),
+        spec(std::move(spec))
+    {}
 };
 
 struct message_t {
     std::string spec;
+
+    message_t() noexcept : spec("{}") {}
+    message_t(std::string spec) noexcept : spec(std::move(spec)) {}
 };
 
 template<typename T>
 struct severity {
     std::string spec;
+
+    severity() noexcept : spec("{}") {}
+    severity(std::string spec) noexcept : spec(std::move(spec)) {}
 };
 
 template<typename T>
-struct timestamp {
+struct timestamp;
+
+template<>
+struct timestamp<num> {
+    std::string spec;
+
+    timestamp() noexcept : spec("{}") {}
+    timestamp(std::string spec) noexcept : spec(std::move(spec)) {}
+};
+
+template<>
+struct timestamp<user> {
     std::string pattern;
     std::string spec;
+
+    timestamp() noexcept :
+        pattern(),
+        spec("{}")
+    {}
+
+    timestamp(std::string pattern, std::string spec) noexcept :
+        pattern(std::move(pattern)),
+        spec(std::move(spec))
+    {}
 };
 
 template<typename T>
 struct process {
     std::string spec;
+
+    process() noexcept : spec("{}") {}
+    process(std::string spec) noexcept : spec(std::move(spec)) {}
 };
 
 struct leftover_t {
@@ -49,12 +100,13 @@ struct literal_t {
 
 namespace ph = placeholder;
 
-/// Helper named structs for making eye-candy code.
-struct id;
-struct hex;
-struct num;
-struct name;
-struct user;
+struct spec_factory_t;
+
+template<typename T>
+struct default_spec_factory;
+
+template<typename T>
+struct spec_factory;
 
 class parser_t {
 public:
@@ -96,6 +148,8 @@ private:
     const std::string pattern;
     const_iterator pos;
 
+    std::unordered_map<std::string, std::shared_ptr<spec_factory_t>> factories;
+
 public:
     explicit parser_t(std::string pattern);
 
@@ -106,11 +160,7 @@ private:
     auto parse_literal() -> literal_t;
     auto parse_placeholder() -> token_t;
 
-    template<typename T>
-    auto parse_spec(T token) -> token_t;
-
-    template<typename T>
-    auto parse_spec(placeholder::timestamp<T> token) -> token_t;
+    auto parse_spec() -> std::string;
 
     /// Returns `true` on exact match with the given range from the current position.
     ///

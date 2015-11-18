@@ -1,5 +1,7 @@
 #include "blackhole/detail/formatter/string/parser.hpp"
 
+#include <unordered_map>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/variant/get.hpp>
 
@@ -17,11 +19,113 @@ static auto starts_with(Iterator first, Iterator last, const Range& range) -> bo
 
 }  // namespace
 
+struct spec_factory_t {
+public:
+    virtual ~spec_factory_t() = default;
+    virtual auto initialize() const -> parser_t::token_t = 0;
+    virtual auto match(std::string spec) -> parser_t::token_t = 0;
+};
+
+template<typename T>
+struct default_spec_factory : spec_factory_t {
+    virtual auto initialize() const -> parser_t::token_t {
+        return T();
+    }
+};
+
+template<>
+struct spec_factory<ph::message_t> : public default_spec_factory<ph::message_t> {
+    auto match(std::string spec) -> parser_t::token_t {
+        return ph::message_t(std::move(spec));
+    }
+};
+
+template<>
+struct spec_factory<ph::process<id>> : public default_spec_factory<ph::process<id>> {
+    auto match(std::string spec) -> parser_t::token_t {
+        BOOST_ASSERT(spec.size() > 2);
+
+        const auto type = spec.at(spec.size() - 2);
+
+        switch (type) {
+        case 's':
+            return ph::process<name>(std::move(spec));
+        default:
+            return ph::process<id>(std::move(spec));
+        }
+    }
+};
+
+template<>
+struct spec_factory<ph::severity<user>> : public default_spec_factory<ph::severity<user>> {
+    auto match(std::string spec) -> parser_t::token_t {
+        BOOST_ASSERT(spec.size() > 2);
+
+        const auto type = spec.at(spec.size() - 2);
+
+        switch (type) {
+        case 'd':
+            return ph::severity<num>(std::move(spec));
+        default:
+            return ph::severity<user>(std::move(spec));
+        }
+    }
+};
+
+template<>
+struct spec_factory<ph::timestamp<user>> : public default_spec_factory<ph::timestamp<user>> {
+    auto match(std::string spec) -> parser_t::token_t {
+        BOOST_ASSERT(spec.size() > 2);
+
+        const auto type = spec.at(spec.size() - 2);
+
+        switch (type) {
+        case 'd':
+            return ph::timestamp<num>(std::move(spec));
+        default:
+            return extract(spec);;
+        }
+    }
+
+    auto extract(const std::string& spec) -> ph::timestamp<user> {
+        // Spec always starts with "{:".
+        auto pos = spec.begin() + 2;
+
+        ph::timestamp<user> token;
+        token.spec = "{:";
+
+        if (pos != std::end(spec) && *pos == '{') {
+            ++pos;
+
+            while (pos != std::end(spec)) {
+                const auto ch = *pos;
+
+                if (ch == '}') {
+                    ++pos;
+                    break;
+                }
+
+                token.pattern.push_back(*pos);
+                ++pos;
+            }
+        }
+
+        token.spec.append(std::string(pos, std::end(spec)));
+
+        return token;
+    }
+};
+
 parser_t::parser_t(std::string pattern) :
     state(state_t::unknown),
     pattern(std::move(pattern)),
     pos(std::begin(this->pattern))
-{}
+{
+    factories["message"]   = std::make_shared<spec_factory<ph::message_t>>();
+    factories["process"]   = std::make_shared<spec_factory<ph::process<id>>>();
+    factories["severity"]  = std::make_shared<spec_factory<ph::severity<user>>>();
+    factories["timestamp"] = std::make_shared<spec_factory<ph::timestamp<user>>>();
+}
 
 auto
 parser_t::next() -> boost::optional<token_t> {
@@ -92,7 +196,6 @@ parser_t::parse_literal() -> literal_t {
 auto
 parser_t::parse_placeholder() -> token_t {
     std::string name;
-    std::string spec("{");
 
     while (pos != std::end(pattern)) {
         const auto ch = *pos;
@@ -101,57 +204,31 @@ parser_t::parse_placeholder() -> token_t {
             name.push_back(ch);
         } else {
             if (ch == ':') {
-                spec.push_back(ch);
                 ++pos;
 
-                // TODO: Consider token factory.
-                if (name == "message") {
-                    return parse_spec(ph::message_t{std::move(spec)});
-                } else if (name == "severity") {
-                    auto token = parse_spec(ph::severity<user>{std::move(spec)});
-                    auto transformed = boost::get<ph::severity<user>>(token);
-                    if (boost::ends_with(transformed.spec, "d}")) {
-                        return ph::severity<num>{transformed.spec};
-                    } else {
-                        return token;
-                    }
-                } else if (name == "timestamp") {
-                    auto token = parse_spec(ph::timestamp<user>{{}, std::move(spec)});
-                    auto transformed = boost::get<ph::timestamp<user>>(token);
-                    if (boost::ends_with(transformed.spec, "d}")) {
-                        return ph::timestamp<num>{transformed.pattern, transformed.spec};
-                    } else {
-                        return token;
-                    }
-                } else if (name == "process") {
-                    auto token = parse_spec(ph::process<id>{std::move(spec)});
-                    auto transformed = boost::get<ph::process<id>>(token);
-                    if (boost::ends_with(transformed.spec, "s}")) {
-                        return ph::process<string::name>{transformed.spec};
-                    } else {
-                        return token;
-                    }
-                } else {
-                    return parse_spec(ph::generic_t{std::move(name), std::move(spec)});
-                }
-            } else if (exact("}")) {
-                pos += 1;
+                const auto spec = parse_spec();
                 state = state_t::unknown;
 
-                spec.push_back('}');
+                const auto it = factories.find(name);
+                if (it == factories.end()) {
+                    return ph::generic_t(std::move(name), std::move(spec));
+                } else {
+                    return it->second->match(std::move(spec));
+                }
+            } else if (exact("}")) {
+                ++pos;
+                state = state_t::unknown;
+
                 if (boost::starts_with(name, "...")) {
                     return ph::leftover_t{std::move(name)};
-                } else if (name == "message") {
-                    return ph::message_t{std::move(spec)};
-                } else if (name == "severity") {
-                    return ph::severity<user>{std::move(spec)};
-                } else if (name == "timestamp") {
-                    return ph::timestamp<user>{{}, std::move(spec)};
-                } else if (name == "process") {
-                    return ph::process<id>{std::move(spec)};
+                } else {
+                    const auto it = factories.find(name);
+                    if (it == factories.end()) {
+                        return ph::generic_t(std::move(name));
+                    } else {
+                        return it->second->initialize();
+                    }
                 }
-
-                return ph::generic_t{std::move(name), std::move(spec)};
             } else {
                 throw_<invalid_placeholder_t>();
             }
@@ -163,48 +240,33 @@ parser_t::parse_placeholder() -> token_t {
     throw_<illformed_t>();
 }
 
-template<typename T>
 auto
-parser_t::parse_spec(T token) -> token_t {
+parser_t::parse_spec() -> std::string {
+    std::string spec("{:");
+    std::size_t open = 1;
+
     while (pos != std::end(pattern)) {
         const auto ch = *pos;
 
-        token.spec.push_back(ch);
+        spec.push_back(ch);
 
         // TODO: Here it's the right place to validate spec format, but now I don't have much
         // time to implement it.
-        if (exact("}")) {
-            pos += 1;
-            state = state_t::unknown;
-            return token;
-        }
+        if (exact("{")) {
+            ++open;
+        } else if (exact("}")) {
+            --open;
 
-        ++pos;
-    }
-
-    return token;
-}
-
-template<typename T>
-auto
-parser_t::parse_spec(ph::timestamp<T> token) -> token_t {
-    if (exact("{")) {
-        ++pos;
-
-        while (pos != std::end(pattern)) {
-            const auto ch = *pos;
-
-            if (ch == '}') {
+            if (open == 0) {
                 ++pos;
-                break;
+                return spec;
             }
-
-            token.pattern.push_back(*pos);
-            ++pos;
         }
+
+        ++pos;
     }
 
-    return parse_spec<ph::timestamp<T>>(std::move(token));
+    return spec;
 }
 
 template<typename Range>
