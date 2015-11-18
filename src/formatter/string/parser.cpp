@@ -8,15 +8,6 @@ namespace detail {
 namespace formatter {
 namespace string {
 
-namespace {
-
-template<typename Iterator, class Range>
-static auto starts_with(Iterator first, Iterator last, const Range& range) -> bool {
-    return boost::starts_with(boost::make_iterator_range(first, last), range);
-}
-
-}  // namespace
-
 class factory_t {
 public:
     virtual ~factory_t() {}
@@ -305,7 +296,7 @@ parser_t::exact(const Range& range) const -> bool {
 template<typename Range>
 auto
 parser_t::exact(const_iterator pos, const Range& range) const -> bool {
-    return starts_with(pos, std::end(pattern), range);
+    return boost::starts_with(boost::make_iterator_range(pos, std::end(pattern)), range);
 }
 
 template<class Exception, class... Args>
