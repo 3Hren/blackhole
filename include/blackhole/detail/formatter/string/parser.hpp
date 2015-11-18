@@ -14,7 +14,7 @@ namespace detail {
 namespace formatter {
 namespace string {
 
-struct spec_factory_t;
+class factory_t;
 
 class parser_t {
 public:
@@ -40,7 +40,7 @@ private:
     const std::string pattern;
     const_iterator pos;
 
-    std::unordered_map<std::string, std::shared_ptr<spec_factory_t>> factories;
+    std::unordered_map<std::string, std::shared_ptr<factory_t>> factories;
 
 public:
     explicit parser_t(std::string pattern);

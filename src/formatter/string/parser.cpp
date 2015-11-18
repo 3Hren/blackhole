@@ -17,33 +17,36 @@ static auto starts_with(Iterator first, Iterator last, const Range& range) -> bo
 
 }  // namespace
 
-struct spec_factory_t {
+class factory_t {
 public:
-    virtual ~spec_factory_t() {}
+    virtual ~factory_t() {}
     virtual auto initialize() const -> token_t = 0;
-    virtual auto match(std::string spec) -> token_t = 0;
+    virtual auto match(std::string spec) const -> token_t = 0;
 };
 
 template<typename T>
-struct default_spec_factory : spec_factory_t {
-    virtual auto initialize() const -> token_t {
+class factory : public factory_t {
+public:
+    auto initialize() const -> token_t {
         return T();
     }
 };
 
 template<typename T>
-struct spec_factory;
+class spec_factory;
 
 template<>
-struct spec_factory<ph::message_t> : public default_spec_factory<ph::message_t> {
-    auto match(std::string spec) -> token_t {
+class spec_factory<ph::message_t> : public factory<ph::message_t> {
+public:
+    auto match(std::string spec) const -> token_t {
         return ph::message_t(std::move(spec));
     }
 };
 
 template<>
-struct spec_factory<ph::process<id>> : public default_spec_factory<ph::process<id>> {
-    auto match(std::string spec) -> token_t {
+class spec_factory<ph::process<id>> : public factory<ph::process<id>> {
+public:
+    auto match(std::string spec) const -> token_t {
         BOOST_ASSERT(spec.size() > 2);
 
         const auto type = spec.at(spec.size() - 2);
@@ -58,8 +61,9 @@ struct spec_factory<ph::process<id>> : public default_spec_factory<ph::process<i
 };
 
 template<>
-struct spec_factory<ph::thread<hex>> : public default_spec_factory<ph::thread<hex>> {
-    auto match(std::string spec) -> token_t {
+class spec_factory<ph::thread<hex>> : public factory<ph::thread<hex>> {
+public:
+    auto match(std::string spec) const -> token_t {
         BOOST_ASSERT(spec.size() > 2);
 
         const auto type = spec.at(spec.size() - 2);
@@ -77,8 +81,9 @@ struct spec_factory<ph::thread<hex>> : public default_spec_factory<ph::thread<he
 };
 
 template<>
-struct spec_factory<ph::severity<user>> : public default_spec_factory<ph::severity<user>> {
-    auto match(std::string spec) -> token_t {
+class spec_factory<ph::severity<user>> : public factory<ph::severity<user>> {
+public:
+    auto match(std::string spec) const -> token_t {
         BOOST_ASSERT(spec.size() > 2);
 
         const auto type = spec.at(spec.size() - 2);
@@ -93,8 +98,9 @@ struct spec_factory<ph::severity<user>> : public default_spec_factory<ph::severi
 };
 
 template<>
-struct spec_factory<ph::timestamp<user>> : public default_spec_factory<ph::timestamp<user>> {
-    auto match(std::string spec) -> token_t {
+class spec_factory<ph::timestamp<user>> : public factory<ph::timestamp<user>> {
+public:
+    auto match(std::string spec) const -> token_t {
         BOOST_ASSERT(spec.size() > 2);
 
         const auto type = spec.at(spec.size() - 2);
@@ -107,7 +113,7 @@ struct spec_factory<ph::timestamp<user>> : public default_spec_factory<ph::times
         }
     }
 
-    auto extract(const std::string& spec) -> ph::timestamp<user> {
+    auto extract(const std::string& spec) const -> ph::timestamp<user> {
         // Spec always starts with "{:".
         auto pos = spec.begin() + 2;
 
