@@ -9,7 +9,7 @@
 namespace blackhole {
 namespace testing {
 
-TEST(string_t, MessagePlaceholder) {
+TEST(string_t, Message) {
     formatter::string_t formatter("[{message}]");
 
     const string_view message("value");
@@ -21,7 +21,88 @@ TEST(string_t, MessagePlaceholder) {
     EXPECT_EQ("[value]", writer.result().to_string());
 }
 
-TEST(string_t, NumericSeverityWithMessagePlaceholders) {
+TEST(string_t, Severity) {
+    // NOTE: No severity mapping provided, formatter falls back to the numeric case.
+    formatter::string_t formatter("[{severity}]");
+
+    const string_view message("-");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ("[0]", writer.result().to_string());
+}
+
+TEST(string_t, SeverityNum) {
+    formatter::string_t formatter("[{severity:d}]");
+
+    const string_view message("-");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ("[0]", writer.result().to_string());
+}
+
+TEST(string_t, SeverityUser) {
+    formatter::string_t formatter("[{severity}]", [](int severity, const std::string&, writer_t& writer) {
+        writer.write("DEBUG");
+    });
+
+    const string_view message("-");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ("[DEBUG]", writer.result().to_string());
+}
+
+TEST(string_t, SeverityUserExplicit) {
+    formatter::string_t formatter("[{severity:s}]", [](int severity, const std::string&, writer_t& writer) {
+        writer.write("DEBUG");
+    });
+
+    const string_view message("-");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ("[DEBUG]", writer.result().to_string());
+}
+
+TEST(string_t, SeverityNumWithMappingProvided) {
+    formatter::string_t formatter("[{severity:d}]", [](int severity, const std::string&, writer_t& writer) {
+        writer.write("DEBUG");
+    });
+
+    const string_view message("-");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ("[0]", writer.result().to_string());
+}
+
+TEST(string_t, SeverityUserWithSpec) {
+    formatter::string_t formatter("[{severity:<7}]", [](int severity, const std::string& spec, writer_t& writer) {
+        writer.write(spec, "DEBUG");
+    });
+
+    const string_view message("-");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ("[DEBUG  ]", writer.result().to_string());
+}
+
+TEST(string_t, CombinedSeverityNumWithMessage) {
     formatter::string_t formatter("[{severity:d}]: {message}");
 
     const string_view message("value");
@@ -31,32 +112,6 @@ TEST(string_t, NumericSeverityWithMessagePlaceholders) {
     formatter.format(record, writer);
 
     EXPECT_EQ("[0]: value", writer.result().to_string());
-}
-
-TEST(string_t, DefaultUserSeverityWithMessagePlaceholders) {
-    formatter::string_t formatter("[{severity}]: {message}");
-
-    const string_view message("value");
-    const attribute_pack pack;
-    record_t record(0, message, pack);
-    writer_t writer;
-    formatter.format(record, writer);
-
-    EXPECT_EQ("[0]: value", writer.result().to_string());
-}
-
-TEST(string_t, UserSeverityWithMessagePlaceholders) {
-    formatter::string_t formatter("[{severity}]: {message}", [](int severity, writer_t& writer) {
-        writer.write("DEBUG");
-    });
-
-    const string_view message("value");
-    const attribute_pack pack;
-    record_t record(0, message, pack);
-    writer_t writer;
-    formatter.format(record, writer);
-
-    EXPECT_EQ("[DEBUG]: value", writer.result().to_string());
 }
 
 // TODO: Check error when setting an option to reserved name, i.e. timestamp or message.

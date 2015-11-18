@@ -48,7 +48,7 @@ typedef std::map<std::string, option_t> options_t;
 /// Severity mapping function.
 ///
 /// Default value just writes an integer representation.
-typedef std::function<void(int, writer_t&)> severity_map;
+typedef std::function<auto(int, const std::string&, writer_t&) -> void> severity_map;
 
 /// The string formatter is responsible for effective converting the given record to a string using
 /// precompiled pattern and options.

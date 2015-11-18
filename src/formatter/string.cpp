@@ -60,7 +60,7 @@ public:
     }
 
     auto operator()(const ph::severity<user>& token) const -> void {
-        sevmap(record.severity(), writer);
+        sevmap(record.severity(), token.spec, writer);
     }
 
     template<typename T>
@@ -84,7 +84,9 @@ static auto tokenize(const std::string& pattern) -> std::vector<token_t> {
 
 string_t::string_t(std::string pattern, options_t options) :
     pattern(std::move(pattern)),
-    sevmap([](int severity, writer_t& writer) { writer.inner << severity; }),
+    sevmap([](int severity, const std::string& spec, writer_t& writer) {
+        writer.write(spec, severity);
+    }),
     tokens(tokenize(this->pattern))
 {}
 
