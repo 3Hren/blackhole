@@ -86,11 +86,10 @@ public:
 
     auto operator()(const ph::generic_t& token) const -> void {
         if (auto value = find(token.name)) {
-            value->apply(view_visitor_t(writer, token.spec));
-            return;
+            return value->apply(view_visitor_t(writer, token.spec));
         }
 
-        std::terminate();
+        throw std::logic_error("required attribute '" + token.name + "' not found");
     }
 
     template<typename T>

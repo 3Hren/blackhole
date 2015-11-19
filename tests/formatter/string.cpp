@@ -139,6 +139,18 @@ TEST(string_t, Generic) {
     EXPECT_EQ("HTTP/1.1", writer.result().to_string());
 }
 
+TEST(string_t, ThrowsIfGenericAttributeNotFound) {
+    formatter::string_t formatter("{protocol}/{version:.1f}");
+
+    const string_view message("-");
+    const attribute_list attributes{{"protocol", {"HTTP"}}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+
+    EXPECT_THROW(formatter.format(record, writer), std::logic_error);
+}
+
 // TODO: Check error when setting an option to reserved name, i.e. timestamp or message.
 // TODO: Check error when ph in pattern was not found.
 
