@@ -152,6 +152,13 @@ private:
 static auto tokenize(const std::string& pattern, const options_t& options) -> std::vector<token_t> {
     std::vector<token_t> tokens;
 
+    for (const auto& reserved : {"process", "thread", "message", "severity", "timestamp"}) {
+        if (options.count(reserved) != 0) {
+            throw std::logic_error("placeholder '" + std::string(reserved) +
+                "' is reserved and can not be configured");
+        }
+    }
+
     string::parser_t parser(pattern);
     while (auto token = parser.next()) {
         tokens.emplace_back(boost::apply_visitor(transform_visitor_t(options), token.get()));

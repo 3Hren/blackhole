@@ -166,8 +166,12 @@ TEST(string_t, GenericOptional) {
     EXPECT_EQ("HTTP/1.1 - REQUIRED", writer.result().to_string());
 }
 
-// TODO: Check error when setting an option to reserved name, i.e. timestamp or message.
-// TODO: Check error when ph in pattern was not found.
+TEST(string_t, ThrowsIfOptionsContainsReservedPlaceholderNames) {
+    using formatter::option::optional_t;
+
+    EXPECT_THROW((formatter::string_t("{protocol}", {{"message", optional_t{"[", "]"}}})),
+        std::logic_error);
+}
 
 }  // namespace testing
 }  // namespace blackhole
