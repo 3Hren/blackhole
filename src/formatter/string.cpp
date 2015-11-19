@@ -18,7 +18,10 @@ namespace formatter {
 namespace string = blackhole::detail::formatter::string;
 namespace ph = string::ph;
 
+using string::id;
+using string::hex;
 using string::num;
+using string::name;
 using string::user;
 using string::required;
 using string::optional;
@@ -104,6 +107,10 @@ public:
 
     auto operator()(const ph::message_t& token) const -> void {
         writer.write(token.spec, record.formatted().data());
+    }
+
+    auto operator()(const ph::process<id>& token) const -> void {
+        writer.write(token.spec, record.pid());
     }
 
     auto operator()(const ph::severity<num>& token) const -> void {

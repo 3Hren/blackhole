@@ -173,5 +173,29 @@ TEST(string_t, ThrowsIfOptionsContainsReservedPlaceholderNames) {
         std::logic_error);
 }
 
+TEST(string_t, Process) {
+    formatter::string_t formatter("{process}");
+
+    const string_view message("-");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ(std::to_string(::getpid()), writer.result().to_string());
+}
+
+TEST(string_t, ProcessIdExplicitly) {
+    formatter::string_t formatter("{process:d}");
+
+    const string_view message("-");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ(std::to_string(::getpid()), writer.result().to_string());
+}
+
 }  // namespace testing
 }  // namespace blackhole
