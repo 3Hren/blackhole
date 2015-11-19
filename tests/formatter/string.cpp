@@ -126,6 +126,19 @@ TEST(string_t, CombinedSeverityNumWithMessage) {
     EXPECT_EQ("[0]: value", writer.result().to_string());
 }
 
+TEST(string_t, Generic) {
+    formatter::string_t formatter("{protocol}/{version:.1f}");
+
+    const string_view message("-");
+    const attribute_list attributes{{"protocol", {"HTTP"}}, {"version", {1.1}}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ("HTTP/1.1", writer.result().to_string());
+}
+
 // TODO: Check error when setting an option to reserved name, i.e. timestamp or message.
 // TODO: Check error when ph in pattern was not found.
 

@@ -1,6 +1,7 @@
 #include "blackhole/formatter/string.hpp"
 
 #include <boost/variant/variant.hpp>
+
 #include <cppformat/format.h>
 
 #include "blackhole/extensions/writer.hpp"
@@ -35,6 +36,26 @@ public:
 
 namespace {
 
+class view_visitor_t : public boost::static_visitor<> {
+    writer_t& writer;
+    const std::string& spec;
+
+public:
+    view_visitor_t(writer_t& writer, const std::string& spec) noexcept :
+        writer(writer),
+        spec(spec)
+    {}
+
+    template<typename T>
+    auto operator()(T value) const -> void {
+        writer.write(spec, value);
+    }
+
+    auto operator()(const string_view& value) const -> void {
+        writer.write(spec, value.data());
+    }
+};
+
 class visitor_t : public boost::static_visitor<> {
     writer_t& writer;
     const record_t& record;
@@ -63,9 +84,31 @@ public:
         sevmap(record.severity(), token.spec, writer);
     }
 
+    auto operator()(const ph::generic_t& token) const -> void {
+        if (auto value = find(token.name)) {
+            value->apply(view_visitor_t(writer, token.spec));
+            return;
+        }
+
+        std::terminate();
+    }
+
     template<typename T>
     auto operator()(const T& token) const -> void {
         std::terminate();
+    }
+
+private:
+    auto find(const std::string& name) const -> boost::optional<attribute::view_t> {
+        for (const auto& attributes : record.attributes()) {
+            for (const auto& attribute : attributes.get()) {
+                if (attribute.first == name) {
+                    return attribute.second;
+                }
+            }
+        }
+
+        return boost::none;
     }
 };
 
