@@ -197,5 +197,17 @@ TEST(string_t, ProcessIdExplicitly) {
     EXPECT_EQ(std::to_string(::getpid()), writer.result().to_string());
 }
 
+TEST(string_t, ProcessName) {
+    formatter::string_t formatter("{process:s}");
+
+    const string_view message("-");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_TRUE(writer.result().to_string().size() > 0);
+}
+
 }  // namespace testing
 }  // namespace blackhole

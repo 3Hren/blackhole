@@ -34,6 +34,7 @@ add_library(${LIBRARY_NAME} SHARED
 	src/formatter/string/parser
 	src/formatter/string/token
 	src/logger
+	src/procname
 	src/record
 	src/root
 	src/scoped

@@ -11,6 +11,7 @@
 
 #include "blackhole/detail/formatter/string/parser.hpp"
 #include "blackhole/detail/formatter/string/token.hpp"
+#include "blackhole/detail/procname.hpp"
 
 namespace blackhole {
 namespace formatter {
@@ -111,6 +112,10 @@ public:
 
     auto operator()(const ph::process<id>& token) const -> void {
         writer.write(token.spec, record.pid());
+    }
+
+    auto operator()(const ph::process<name>& token) const -> void {
+        writer.write(token.spec, detail::procname().data());
     }
 
     auto operator()(const ph::severity<num>& token) const -> void {
