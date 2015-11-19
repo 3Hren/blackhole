@@ -95,7 +95,7 @@ After applying some log events we expect to receive something like this:
 [  ERROR] [2015-11-19 19:03:12.002127] accept: HTTP/1.1 GET - /info - 503, 829
 ```
 
-As you may notice the severity field is aligned to the right border (see that *>7* spec in pattern?), the timestamp is
+As you may notice the severity field is aligned to the right border (see that *>7* spec in pattern), the timestamp is
 formatted using default representation with a microseconds extension and so on. Because Blackhole is all about
 attributes you can place and format every custom attribute you want, as we just done with *scope* attribute.
 
