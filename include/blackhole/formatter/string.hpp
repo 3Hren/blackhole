@@ -28,7 +28,7 @@ struct optional_t {
     std::string suffix;
 };
 
-struct remaining_t {
+struct leftover_t {
     bool unique;
     std::string prefix;
     std::string suffix;
@@ -40,7 +40,7 @@ struct remaining_t {
 
 typedef boost::variant<
     option::optional_t,
-    option::remaining_t
+    option::leftover_t
 > option_t;
 
 typedef std::map<std::string, option_t> options_t;
