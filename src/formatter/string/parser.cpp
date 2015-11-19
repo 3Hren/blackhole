@@ -258,7 +258,7 @@ parser_t::parse_placeholder() -> token_t {
 
                 const auto it = factories.find(name);
                 if (it == factories.end()) {
-                    return ph::generic_t(std::move(name), std::move(spec));
+                    return ph::generic<required>(std::move(name), std::move(spec));
                 } else {
                     return it->second->match(std::move(spec));
                 }
@@ -271,7 +271,7 @@ parser_t::parse_placeholder() -> token_t {
                 } else {
                     const auto it = factories.find(name);
                     if (it == factories.end()) {
-                        return ph::generic_t(std::move(name));
+                        return ph::generic<required>(std::move(name));
                     } else {
                         return it->second->initialize();
                     }

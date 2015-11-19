@@ -15,6 +15,8 @@ struct hex;
 struct num;
 struct name;
 struct user;
+struct required;
+struct optional;
 
 /// Represents string literal.
 struct literal_t {
@@ -23,14 +25,26 @@ struct literal_t {
 
 namespace placeholder {
 
-struct generic_t {
+template<typename T>
+struct generic;
+
+template<>
+struct generic<required> {
     std::string name;
     std::string spec;
+
+    generic(std::string name);
+    generic(std::string name, std::string spec);
+};
+
+template<>
+struct generic<optional> : public generic<required> {
     std::string prefix;
     std::string suffix;
 
-    generic_t(std::string name);
-    generic_t(std::string name, std::string spec);
+    generic(std::string name);
+    generic(std::string name, std::string spec);
+    generic(generic<required> token, std::string prefix, std::string suffix);
 };
 
 struct message_t {
@@ -103,7 +117,8 @@ namespace ph = placeholder;
 
 typedef boost::variant<
     literal_t,
-    ph::generic_t,
+    ph::generic<required>,
+    ph::generic<optional>,
     ph::leftover_t,
     ph::process<id>,
     ph::process<name>,

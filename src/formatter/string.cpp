@@ -1,5 +1,7 @@
 #include "blackhole/formatter/string.hpp"
 
+#include <boost/type_traits/remove_cv.hpp>
+#include <boost/variant/get.hpp>
 #include <boost/variant/variant.hpp>
 
 #include <cppformat/format.h>
@@ -18,6 +20,8 @@ namespace ph = string::ph;
 
 using string::num;
 using string::user;
+using string::required;
+using string::optional;
 
 using string::literal_t;
 
@@ -35,6 +39,32 @@ public:
 };
 
 namespace {
+
+class transform_visitor_t : public boost::static_visitor<string::token_t> {
+    const options_t& options;
+
+public:
+    transform_visitor_t(const options_t& options) :
+        options(options)
+    {}
+
+    auto operator()(const ph::generic<required>& token) const -> string::token_t {
+        const auto it = options.find(token.name);
+
+        if (it != options.end()) {
+            const auto option = boost::get<option::optional_t>(it->second);
+
+            return ph::generic<optional>(token, option.prefix, option.suffix);
+        }
+
+        return token;
+    }
+
+    template<typename T>
+    auto operator()(const T& token) const -> string::token_t {
+        return token;
+    }
+};
 
 class view_visitor_t : public boost::static_visitor<> {
     writer_t& writer;
@@ -84,12 +114,20 @@ public:
         sevmap(record.severity(), token.spec, writer);
     }
 
-    auto operator()(const ph::generic_t& token) const -> void {
+    auto operator()(const ph::generic<required>& token) const -> void {
         if (auto value = find(token.name)) {
             return value->apply(view_visitor_t(writer, token.spec));
         }
 
         throw std::logic_error("required attribute '" + token.name + "' not found");
+    }
+
+    auto operator()(const ph::generic<optional>& token) const -> void {
+        if (auto value = find(token.name)) {
+            writer.write(token.prefix);
+            value->apply(view_visitor_t(writer, token.spec));
+            writer.write(token.suffix);
+        }
     }
 
     template<typename T>
@@ -111,12 +149,12 @@ private:
     }
 };
 
-static auto tokenize(const std::string& pattern) -> std::vector<token_t> {
+static auto tokenize(const std::string& pattern, const options_t& options) -> std::vector<token_t> {
     std::vector<token_t> tokens;
 
     string::parser_t parser(pattern);
     while (auto token = parser.next()) {
-        tokens.emplace_back(token.get());
+        tokens.emplace_back(boost::apply_visitor(transform_visitor_t(options), token.get()));
     }
 
     return tokens;
@@ -124,18 +162,18 @@ static auto tokenize(const std::string& pattern) -> std::vector<token_t> {
 
 }  // namespace
 
-string_t::string_t(std::string pattern, options_t options) :
+string_t::string_t(std::string pattern, const options_t& options) :
     pattern(std::move(pattern)),
     sevmap([](int severity, const std::string& spec, writer_t& writer) {
         writer.write(spec, severity);
     }),
-    tokens(tokenize(this->pattern))
+    tokens(tokenize(this->pattern, options))
 {}
 
-string_t::string_t(std::string pattern, severity_map sevmap, options_t options) :
+string_t::string_t(std::string pattern, severity_map sevmap, const options_t& options) :
     pattern(std::move(pattern)),
     sevmap(std::move(sevmap)),
-    tokens(tokenize(this->pattern))
+    tokens(tokenize(this->pattern, options))
 {}
 
 string_t::~string_t() {}

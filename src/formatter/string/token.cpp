@@ -6,14 +6,28 @@ namespace formatter {
 namespace string {
 namespace placeholder {
 
-generic_t::generic_t(std::string name) :
+generic<required>::generic(std::string name) :
     name(std::move(name)),
     spec("{}")
 {}
 
-generic_t::generic_t(std::string name, std::string spec) :
+generic<required>::generic(std::string name, std::string spec) :
     name(std::move(name)),
     spec(std::move(spec))
+{}
+
+generic<optional>::generic(std::string name) :
+    generic<required>(std::move(name))
+{}
+
+generic<optional>::generic(std::string name, std::string spec) :
+    generic<required>(std::move(name), std::move(spec))
+{}
+
+generic<optional>::generic(generic<required> token, std::string prefix, std::string suffix) :
+    generic<required>(std::move(token)),
+    prefix(std::move(prefix)),
+    suffix(std::move(suffix))
 {}
 
 message_t::message_t() : spec("{}") {}

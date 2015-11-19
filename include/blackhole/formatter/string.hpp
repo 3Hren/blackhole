@@ -134,8 +134,8 @@ class string_t : public formatter_t {
     const std::vector<token_t> tokens;
 
 public:
-    string_t(std::string pattern, options_t options = options_t());
-    string_t(std::string pattern, severity_map sevmap, options_t options = options_t());
+    string_t(std::string pattern, const options_t& options = options_t());
+    string_t(std::string pattern, severity_map sevmap, const options_t& options = options_t());
     ~string_t();
 
     auto format(const record_t& record, writer_t& writer) -> void;

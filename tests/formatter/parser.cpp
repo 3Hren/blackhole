@@ -21,8 +21,9 @@ using detail::formatter::string::hex;
 using detail::formatter::string::num;
 using detail::formatter::string::name;
 using detail::formatter::string::user;
+using detail::formatter::string::required;
 
-using detail::formatter::string::ph::generic_t;
+using detail::formatter::string::ph::generic;
 using detail::formatter::string::ph::leftover_t;
 using detail::formatter::string::ph::message_t;
 using detail::formatter::string::ph::process;
@@ -51,8 +52,8 @@ TEST(parser_t, Placeholder) {
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("id", boost::get<generic_t>(*token).name);
-    EXPECT_EQ("{}", boost::get<generic_t>(*token).spec);
+    EXPECT_EQ("id", boost::get<generic<required>>(*token).name);
+    EXPECT_EQ("{}", boost::get<generic<required>>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
@@ -62,8 +63,8 @@ TEST(parser_t, PlaceholderWithSpec) {
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("id", boost::get<generic_t>(*token).name);
-    EXPECT_EQ("{:.3f}", boost::get<generic_t>(*token).spec);
+    EXPECT_EQ("id", boost::get<generic<required>>(*token).name);
+    EXPECT_EQ("{:.3f}", boost::get<generic<required>>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
@@ -138,8 +139,8 @@ TEST(parser_t, LiteralFollowedByRequiredPlaceholder) {
 
     token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("id", boost::get<generic_t>(*token).name);
-    EXPECT_EQ("{}", boost::get<generic_t>(*token).spec);
+    EXPECT_EQ("id", boost::get<generic<required>>(*token).name);
+    EXPECT_EQ("{}", boost::get<generic<required>>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
@@ -149,7 +150,7 @@ TEST(parser_t, PlaceholderFollowedByLiteral) {
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("id", boost::get<generic_t>(*token).name);
+    EXPECT_EQ("id", boost::get<generic<required>>(*token).name);
 
     token = parser.next();
     ASSERT_TRUE(!!token);
@@ -168,8 +169,8 @@ TEST(parser_t, PlaceholderSurroundedByLiterals) {
 
     token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("id", boost::get<generic_t>(*token).name);
-    EXPECT_EQ("{:<30}", boost::get<generic_t>(*token).spec);
+    EXPECT_EQ("id", boost::get<generic<required>>(*token).name);
+    EXPECT_EQ("{:<30}", boost::get<generic<required>>(*token).spec);
 
     token = parser.next();
     ASSERT_TRUE(!!token);
@@ -378,8 +379,8 @@ TEST(parser_t, RealWorld) {
 
     token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("source", boost::get<generic_t>(*token).name);
-    EXPECT_EQ("{}", boost::get<generic_t>(*token).spec);
+    EXPECT_EQ("source", boost::get<generic<required>>(*token).name);
+    EXPECT_EQ("{}", boost::get<generic<required>>(*token).spec);
 
     token = parser.next();
     ASSERT_TRUE(!!token);
