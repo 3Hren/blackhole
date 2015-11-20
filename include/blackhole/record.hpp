@@ -13,7 +13,7 @@ using cpp17::string_view;
 
 class record_t {
 public:
-    typedef std::chrono::high_resolution_clock clock_type;
+    typedef std::chrono::system_clock clock_type;
     typedef clock_type::time_point time_point;
 
 private:
