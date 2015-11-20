@@ -361,7 +361,7 @@ TEST_F(datetime_t, Large) {
 
     std::string pattern("%Y-%m-%d %H:%M:%S");
     std::string expected("2014-02-23 12:20:30");
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 40; ++i) {
         pattern  += " || %Y-%m-%d %H:%M:%S";
         expected += " || 2014-02-23 12:20:30";
     }

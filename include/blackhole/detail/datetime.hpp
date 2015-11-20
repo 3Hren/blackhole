@@ -8,6 +8,10 @@
 
 #include <boost/assert.hpp>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/variant/apply_visitor.hpp>
+#include <boost/variant/variant.hpp>
+
 #include "blackhole/detail/datetime/stream.hpp"
 
 namespace blackhole {
@@ -230,27 +234,6 @@ inline void literal_generator_t(context_t& context) {
 }
 
 typedef void(*generator_action_t)(context_t&);
-
-class generator_t {
-    std::vector<std::string> literals;
-    std::vector<generator_action_t> actions;
-
-public:
-    generator_t(std::vector<std::string> literals, std::vector<generator_action_t> actions) :
-        literals(std::move(literals)),
-        actions(std::move(actions))
-    {}
-
-    template<class Stream>
-    void operator()(Stream& stream, const std::tm& tm, std::uint64_t usec = 0) const {
-        context_t context{stream, tm, usec, literals};
-
-        for (auto it = actions.begin(); it != actions.end(); ++it) {
-            const generator_action_t& action = *it;
-            action(context);
-        }
-    }
-};
 
 class generator_handler_t {
     typedef std::string::const_iterator iterator_type;
@@ -588,6 +571,28 @@ public:
     }
 };
 
+#if __APPLE__
+class generator_t {
+    std::vector<std::string> literals;
+    std::vector<generator_action_t> actions;
+
+public:
+    generator_t(std::vector<std::string> literals, std::vector<generator_action_t> actions) :
+        literals(std::move(literals)),
+        actions(std::move(actions))
+    {}
+
+    template<class Stream>
+    void operator()(Stream& stream, const std::tm& tm, std::uint64_t usec = 0) const {
+        context_t context{stream, tm, usec, literals};
+
+        for (auto it = actions.begin(); it != actions.end(); ++it) {
+            const generator_action_t& action = *it;
+            action(context);
+        }
+    }
+};
+
 static auto make_generator(const std::string& pattern) -> generator_t {
     std::vector<std::string> literals;
     std::vector<generator_action_t> actions;
@@ -599,6 +604,83 @@ static auto make_generator(const std::string& pattern) -> generator_t {
 
     return generator_t(std::move(literals), std::move(actions));
 }
+#endif
+
+#ifdef __linux__
+
+struct literal_t {
+    std::string value;
+};
+
+struct usecond_t {};
+
+struct visitor_t : public boost::static_visitor<> {
+    fmt::MemoryWriter& stream;
+    const std::tm& tm;
+    std::uint64_t usec;
+    char buffer[1024];
+
+    visitor_t(fmt::MemoryWriter& stream, const std::tm& tm, std::uint64_t usec) :
+        stream(stream),
+        tm(tm),
+        usec(usec)
+    {}
+
+    auto operator()(const literal_t& value) -> void {
+        std::size_t ret = std::strftime(buffer, sizeof(buffer), value.value.c_str(), &tm);
+        stream << fmt::StringRef(buffer, ret);
+    }
+
+    auto operator()(usecond_t) -> void {
+        stream.write("{:06d}", usec);
+    }
+};
+
+class generator_t {
+    typedef boost::variant<
+        literal_t,
+        usecond_t
+    > type;
+
+    std::vector<type> tokens;
+
+public:
+    generator_t(std::string pattern) {
+        std::string literal;
+
+        auto pos = std::begin(pattern);
+        while (pos != std::end(pattern)) {
+            if (boost::starts_with(boost::make_iterator_range(pos, std::end(pattern)), "%f")) {
+                tokens.emplace_back(literal_t{std::move(literal)});
+                tokens.emplace_back(usecond_t{});
+                literal.clear();
+                ++pos;
+                ++pos;
+            } else {
+                literal.push_back(*pos);
+                ++pos;
+            }
+        }
+
+        if (!literal.empty()) {
+            tokens.emplace_back(literal_t{std::move(literal)});
+        }
+    }
+
+    template<class Stream>
+    void operator()(Stream& stream, const std::tm& tm, std::uint64_t usec = 0) const {
+        visitor_t visitor(stream, tm, usec);
+
+        for (const auto& token : tokens) {
+            boost::apply_visitor(visitor, token);
+        }
+    }
+};
+
+static auto make_generator(const std::string& pattern) -> generator_t {
+    return generator_t(pattern);
+}
+#endif
 
 }  // namespace datetime
 }  // namespace detail
