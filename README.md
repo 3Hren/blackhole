@@ -1,5 +1,6 @@
 Blackhole - eating your logs with pleasure
 ==========================================
+[ ![Codeship Status for 3Hren/blackhole](https://codeship.com/projects/8d0e44f0-64ac-0133-20de-4a7e5d8c8004/status?branch=master)](https://codeship.com/projects/113228)
 
 This is pre-release for Blackhole 1.0.0. For clearness I've dropped all the code and started with empty project.
 
