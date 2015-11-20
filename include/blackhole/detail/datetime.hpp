@@ -588,20 +588,17 @@ public:
     }
 };
 
-class generator_factory_t {
-public:
-    static generator_t make(const std::string& pattern) {
-        std::vector<std::string> literals;
-        std::vector<generator_action_t> actions;
+static auto make_generator(const std::string& pattern) -> generator_t {
+    std::vector<std::string> literals;
+    std::vector<generator_action_t> actions;
 
-        generator_handler_t handler(literals, actions);
+    generator_handler_t handler(literals, actions);
 
-        parser_t<parser::date<parser::time<parser::common<parser::through_t>>>>::parse(
-            pattern, handler);
+    parser_t<parser::date<parser::time<parser::common<parser::through_t>>>>::parse(
+        pattern, handler);
 
-        return generator_t(std::move(literals), std::move(actions));
-    }
-};
+    return generator_t(std::move(literals), std::move(actions));
+}
 
 }  // namespace datetime
 }  // namespace detail

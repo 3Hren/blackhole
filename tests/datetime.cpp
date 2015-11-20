@@ -9,7 +9,7 @@
 namespace blackhole {
 namespace testing {
 
-using blackhole::detail::datetime::generator_factory_t;
+using blackhole::detail::datetime::make_generator;
 
 class datetime_t : public ::testing::Test {
 protected:
@@ -24,7 +24,7 @@ protected:
     auto generate(const std::string& pattern) const -> std::string {
         fmt::MemoryWriter wr;
 
-        const auto generator = generator_factory_t::make(pattern);
+        const auto generator = make_generator(pattern);
         generator(wr, tm, usec);
         return {wr.data(), wr.size()};
     }

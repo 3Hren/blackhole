@@ -35,7 +35,7 @@ static void datetime_strftime_with_locale(::benchmark::State& state) {
 
 static void datetime_wheel(::benchmark::State& state) {
     blackhole::detail::datetime::generator_t generator(
-        blackhole::detail::datetime::generator_factory_t::make("%Y-%m-%d %H:%M:%S")
+        blackhole::detail::datetime::make_generator("%Y-%m-%d %H:%M:%S")
     );
 
     fmt::MemoryWriter wr;
@@ -54,7 +54,7 @@ static void datetime_wheel(::benchmark::State& state) {
 
 static void datetime_wheel_with_locale(::benchmark::State& state) {
     blackhole::detail::datetime::generator_t generator(
-        blackhole::detail::datetime::generator_factory_t::make("%c")
+        blackhole::detail::datetime::make_generator("%c")
     );
 
     fmt::MemoryWriter wr;
