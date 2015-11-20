@@ -79,7 +79,6 @@ struct context_t {
     {}
 };
 
-// TODO: Measure and replace with cppformat functions.
 inline void fill(stream_type& wr, int value, uint length, char filler = '0') {
     char buffer[std::numeric_limits<uint32_t>::digits10 + 2];
     uint digits = 0;
