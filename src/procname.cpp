@@ -4,7 +4,10 @@
 
 #include "blackhole/cpp17/string_view.hpp"
 
-#if __APPLE__
+#ifdef __linux__
+#   include <sys/types.h>
+#   include <unistd.h>
+#elif __APPLE__
 #   include <libproc.h>
 #endif
 
