@@ -33,7 +33,11 @@ public:
     typedef typename base_type::off_type off_type;
 
 public:
-    basic_oformatbuf(fmt::MemoryWriter& wr) : wr(wr) {}
+    basic_oformatbuf(fmt::MemoryWriter& wr) :
+        wr(wr)
+    {
+        base_type::setp(nullptr, nullptr);
+    }
 
     int_type overflow(int_type ch) {
         if (!traits_type::eq_int_type(ch, traits_type::eof())) {
