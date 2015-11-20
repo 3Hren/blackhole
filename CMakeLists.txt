@@ -125,6 +125,7 @@ if (ENABLE_TESTING)
 
     add_executable(${LIBRARY_NAME}-tests
 		tests/attribute
+		tests/datetime
 		tests/facade
 		tests/formatter/parser
 		tests/formatter/string
@@ -157,6 +158,7 @@ if (ENABLE_BENCHMARKING)
 	add_executable(${LIBRARY_NAME}-benchmarks
 		bench/clock
 		bench/cpp14formatter
+		bench/datetime
 		bench/formatter/string
 		bench/logger
 		bench/main

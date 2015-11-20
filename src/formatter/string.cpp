@@ -102,6 +102,13 @@ public:
         sevmap(sevmap)
     {}
 
+    // ph::leftover_t,
+    // ph::thread<id>,
+    // ph::thread<hex>,
+    // ph::thread<name>,
+    // ph::timestamp<num>,
+    // ph::timestamp<user>
+
     auto operator()(const literal_t& token) const -> void {
         writer.inner << token.value;
     }
