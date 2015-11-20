@@ -83,8 +83,13 @@ public:
 
     /// Visitor.
     template<typename Visitor>
-    auto apply(Visitor&& visitor) const -> typename Visitor::result_type {
-        return boost::apply_visitor(std::forward<Visitor>(visitor), inner);
+    auto apply(Visitor& visitor) const -> typename Visitor::result_type {
+        return boost::apply_visitor(visitor, inner);
+    }
+
+    template<typename Visitor>
+    auto apply(const Visitor& visitor) const -> typename Visitor::result_type {
+        return boost::apply_visitor(visitor, inner);
     }
 
     auto operator==(const view_t& other) const -> bool {
