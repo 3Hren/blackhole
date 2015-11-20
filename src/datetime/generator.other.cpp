@@ -1,3 +1,5 @@
+#if __APPLE__
+
 #include "blackhole/detail/datetime/other/generator.hpp"
 
 #include <ctime>
@@ -609,3 +611,5 @@ auto generator_t::operator()<writer_type>(writer_type&, const std::tm&, std::uin
 }  // namespace datetime
 }  // namespace detail
 }  // namespace blackhole
+
+#endif
