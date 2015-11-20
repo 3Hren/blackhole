@@ -71,10 +71,30 @@ static void datetime_wheel_with_locale(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
+static void datetime_wheel_real_world(::benchmark::State& state) {
+    blackhole::detail::datetime::generator_t generator(
+        blackhole::detail::datetime::make_generator("%Y-%m-%d %H:%M:%S.%f")
+    );
+
+    fmt::MemoryWriter wr;
+
+    std::time_t time = std::time(0);
+    std::tm tm;
+    localtime_r(&time, &tm);
+
+    while (state.KeepRunning()) {
+        generator(wr, tm);
+        wr.clear();
+    }
+
+    state.SetItemsProcessed(state.iterations());
+}
+
 BENCHMARK(datetime_strftime);
 BENCHMARK(datetime_strftime_with_locale);
 BENCHMARK(datetime_wheel);
 BENCHMARK(datetime_wheel_with_locale);
+BENCHMARK(datetime_wheel_real_world);
 
 }  // namespace benchmark
 }  // namespace blackhole
