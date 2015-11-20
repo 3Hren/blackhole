@@ -4,16 +4,9 @@
 #include <functional>
 #include <limits>
 #include <locale>
-#include <memory>
-#include <sstream>
 #include <vector>
-#include <ostream>
 
 #include <boost/assert.hpp>
-#include <boost/config.hpp>
-#include <boost/range.hpp>
-#include <boost/version.hpp>
-#include <boost/utility.hpp>
 
 #include "blackhole/detail/datetime/stream.hpp"
 
@@ -279,7 +272,7 @@ public:
 
     virtual void end_partial_literal() {
         if (!m_literal.empty()) {
-            literal(boost::make_iterator_range(m_literal));
+            literal(m_literal);
             m_literal.clear();
         }
     }
@@ -289,13 +282,8 @@ public:
         literals.push_back(lit);
     }
 
-    virtual void literal(const boost::iterator_range<iterator_type>& range) {
-        actions.push_back(&literal_generator_t);
-        literals.push_back(boost::copy_range<std::string>(range));
-    }
-
-    virtual void placeholder(const boost::iterator_range<iterator_type>& range) {
-        literal(range);
+    virtual void placeholder(const std::string& value) {
+        literal(value);
     }
 
     virtual void full_year() {
@@ -433,7 +421,7 @@ public:
 #ifdef BOOST_DISABLE_ASSERTS
         (void)end;
 #endif
-        handler.placeholder(boost::make_iterator_range(it, it + 2));
+        handler.placeholder(std::string(it, it + 2));
         return it + 2;
     }
 };
