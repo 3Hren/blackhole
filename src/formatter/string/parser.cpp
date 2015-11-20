@@ -100,7 +100,7 @@ public:
         case 'd':
             return ph::timestamp<num>(std::move(spec));
         default:
-            return extract(spec);;
+            return extract(spec);
         }
     }
 
