@@ -29,6 +29,7 @@ set_target_properties(cppformat PROPERTIES
 
 add_library(${LIBRARY_NAME} SHARED
 	src/attribute
+	src/datetime/generator.other
 	src/formatter/string.cpp
 	src/formatter/string/error
 	src/formatter/string/parser

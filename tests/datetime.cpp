@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include <boost/assert.hpp>
+
 #include <cppformat/format.h>
 
 #include <blackhole/detail/datetime.hpp>
