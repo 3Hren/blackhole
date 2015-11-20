@@ -60,21 +60,6 @@ public:
         streambuf(wr)
     {}
 
-    stream_type& operator=(char c) {
-        wr << c;
-        return *this;
-    }
-
-    stream_type& put(char_type c) {
-        wr << c;
-        return *this;
-    }
-
-    stream_type& write(const char_type* p, std::streamsize size) {
-        wr << std::string(p, size);
-        return *this;
-    }
-
     template<typename T>
     auto operator<<(const T& value) -> stream_type& {
         wr << value;
