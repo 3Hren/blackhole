@@ -15,67 +15,27 @@
 #include <boost/version.hpp>
 #include <boost/utility.hpp>
 
+#include "blackhole/detail/datetime/stream.hpp"
+
 namespace blackhole {
 namespace detail {
 namespace datetime {
 
-template<typename Char, class Traits = std::char_traits<Char>>
-class basic_oformatbuf : public std::basic_streambuf<Char, Traits> {
-    typedef std::basic_streambuf<Char, Traits> base_type;
-
-    fmt::MemoryWriter& wr;
-
-public:
-    typedef typename base_type::char_type char_type;
-    typedef typename base_type::traits_type traits_type;
-    typedef typename base_type::int_type int_type;
-    typedef typename base_type::pos_type pos_type;
-    typedef typename base_type::off_type off_type;
-
-public:
-    basic_oformatbuf(fmt::MemoryWriter& wr) :
-        wr(wr)
-    {
-        base_type::setp(nullptr, nullptr);
-    }
-
-    int_type overflow(int_type ch) {
-        if (!traits_type::eq_int_type(ch, traits_type::eof())) {
-            wr << traits_type::to_char_type(ch);
-            return ch;
-        }
-
-        return traits_type::not_eof(ch);
-    }
-};
-
-class stream_type : public std::basic_ostream<char> {
-    fmt::MemoryWriter& wr;
-    basic_oformatbuf<char> streambuf;
-
-public:
-    stream_type(fmt::MemoryWriter& wr) :
-        std::basic_ostream<char>(&streambuf),
-        wr(wr),
-        streambuf(wr)
-    {}
-
-    template<typename T>
-    auto operator<<(const T& value) -> stream_type& {
-        wr << value;
-        return *this;
-    }
-};
+typedef ostream_adapter<fmt::MemoryWriter> stream_type;
 
 struct context_t {
     stream_type wr;
     std::tm tm;
     std::uint64_t usec;
+    const std::vector<std::string>& literals;
+    std::vector<std::string>::const_iterator it;
 
-    context_t(fmt::MemoryWriter& wr, std::tm tm, std::uint64_t usec):
+    context_t(fmt::MemoryWriter& wr, std::tm tm, std::uint64_t usec, const std::vector<std::string>& literals):
         wr(wr),
         tm(tm),
-        usec(usec)
+        usec(usec),
+        literals(literals),
+        it(std::begin(this->literals))
     {}
 };
 
@@ -229,10 +189,10 @@ inline void standard(context_t& context) {
     typedef facet_type::iter_type iter_type;
 
     std::use_facet<facet_type>(context.wr.getloc())
-            .put(iter_type(context.wr), context.wr, ' ', &context.tm, 'a');
+        .put(iter_type(context.wr), context.wr, ' ', &context.tm, 'a');
     context.wr << ' ';
     std::use_facet<facet_type>(context.wr.getloc())
-            .put(iter_type(context.wr), context.wr, ' ', &context.tm, 'b');
+        .put(iter_type(context.wr), context.wr, ' ', &context.tm, 'b');
     context.wr << ' ';
     day::month::numeric(context);
     context.wr << ' ';
@@ -271,27 +231,26 @@ inline void time_ISO8601(context_t& context) {
 
 } // namespace visit
 
-struct literal_generator_t {
-    std::string literal;
+inline void literal_generator_t(context_t& context) {
+    context.wr << *context.it;
+    ++context.it;
+}
 
-    void operator()(context_t& context) const {
-        context.wr << literal;
-    }
-};
+typedef void(*generator_action_t)(context_t&);
 
-typedef std::function<void(context_t&)> generator_action_t;
-
-//!@note: copyable, movable.
 class generator_t {
+    std::vector<std::string> literals;
     std::vector<generator_action_t> actions;
+
 public:
-    generator_t(std::vector<generator_action_t>&& actions) :
+    generator_t(std::vector<std::string> literals, std::vector<generator_action_t> actions) :
+        literals(std::move(literals)),
         actions(std::move(actions))
     {}
 
     template<class Stream>
     void operator()(Stream& stream, const std::tm& tm, std::uint64_t usec = 0) const {
-        context_t context{stream, tm, usec};
+        context_t context{stream, tm, usec, literals};
 
         for (auto it = actions.begin(); it != actions.end(); ++it) {
             const generator_action_t& action = *it;
@@ -304,9 +263,11 @@ class generator_handler_t {
     typedef std::string::const_iterator iterator_type;
 
     std::vector<generator_action_t>& actions;
+    std::vector<std::string>& literals;
     std::string m_literal;
 public:
-    generator_handler_t(std::vector<generator_action_t>& actions) :
+    generator_handler_t(std::vector<std::string>& literals, std::vector<generator_action_t>& actions) :
+        literals(literals),
         actions(actions)
     {}
 
@@ -324,11 +285,13 @@ public:
     }
 
     virtual void literal(const std::string& lit) {
-        actions.push_back(literal_generator_t { lit });
+        actions.push_back(&literal_generator_t);
+        literals.push_back(lit);
     }
 
     virtual void literal(const boost::iterator_range<iterator_type>& range) {
-        actions.push_back(literal_generator_t { boost::copy_range<std::string>(range) });
+        actions.push_back(&literal_generator_t);
+        literals.push_back(boost::copy_range<std::string>(range));
     }
 
     virtual void placeholder(const boost::iterator_range<iterator_type>& range) {
@@ -640,10 +603,15 @@ public:
 class generator_factory_t {
 public:
     static generator_t make(const std::string& pattern) {
+        std::vector<std::string> literals;
         std::vector<generator_action_t> actions;
-        generator_handler_t handler(actions);
-        parser_t<parser::date<parser::time<parser::common<parser::through_t>>>>::parse(pattern, handler);
-        return generator_t(std::move(actions));
+
+        generator_handler_t handler(literals, actions);
+
+        parser_t<parser::date<parser::time<parser::common<parser::through_t>>>>::parse(
+            pattern, handler);
+
+        return generator_t(std::move(literals), std::move(actions));
     }
 };
 
