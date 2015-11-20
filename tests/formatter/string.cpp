@@ -1,3 +1,4 @@
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <blackhole/attributes.hpp>
@@ -8,6 +9,9 @@
 
 namespace blackhole {
 namespace testing {
+
+using ::testing::AnyOf;
+using ::testing::Eq;
 
 TEST(string_t, Message) {
     formatter::string_t formatter("[{message}]");
@@ -207,6 +211,22 @@ TEST(string_t, ProcessName) {
     formatter.format(record, writer);
 
     EXPECT_TRUE(writer.result().to_string().size() > 0);
+}
+
+TEST(string_t, Leftover) {
+    formatter::string_t formatter("{...}");
+
+    const string_view message("-");
+    const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_THAT(writer.result().to_string(), AnyOf(
+        Eq("key#1: 42, key#2: value#2"),
+        Eq("key#2: value#2, key#1: 42")
+    ));
 }
 
 }  // namespace testing

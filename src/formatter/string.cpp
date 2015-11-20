@@ -70,12 +70,19 @@ public:
     }
 };
 
-class view_visitor_t : public boost::static_visitor<> {
+struct spec;
+struct unspec;
+
+template<typename Spec>
+class view_visitor;
+
+template<>
+class view_visitor<spec> : public boost::static_visitor<> {
     writer_t& writer;
     const std::string& spec;
 
 public:
-    view_visitor_t(writer_t& writer, const std::string& spec) noexcept :
+    view_visitor(writer_t& writer, const std::string& spec) noexcept :
         writer(writer),
         spec(spec)
     {}
@@ -87,6 +94,25 @@ public:
 
     auto operator()(const string_view& value) const -> void {
         writer.write(spec, value.data());
+    }
+};
+
+template<>
+class view_visitor<unspec> : public boost::static_visitor<> {
+    writer_t& writer;
+
+public:
+    view_visitor(writer_t& writer) noexcept :
+        writer(writer)
+    {}
+
+    template<typename T>
+    auto operator()(T value) const -> void {
+        writer.inner << value;
+    }
+
+    auto operator()(const string_view& value) const -> void {
+        writer.inner << fmt::StringRef(value.data(), value.size());
     }
 };
 
@@ -135,7 +161,7 @@ public:
 
     auto operator()(const ph::generic<required>& token) const -> void {
         if (auto value = find(token.name)) {
-            return value->apply(view_visitor_t(writer, token.spec));
+            return value->apply(view_visitor<spec>(writer, token.spec));
         }
 
         throw std::logic_error("required attribute '" + token.name + "' not found");
@@ -144,8 +170,27 @@ public:
     auto operator()(const ph::generic<optional>& token) const -> void {
         if (auto value = find(token.name)) {
             writer.write(token.prefix);
-            value->apply(view_visitor_t(writer, token.spec));
+            value->apply(view_visitor<spec>(writer, token.spec));
             writer.write(token.suffix);
+        }
+    }
+
+    auto operator()(const ph::leftover_t& token) const -> void {
+        bool first = true;
+        const view_visitor<unspec> visitor(writer);
+
+        for (const auto& attributes : record.attributes()) {
+            for (const auto& attribute : attributes.get()) {
+                if (first) {
+                    first = false;
+                } else {
+                    writer.inner << ", ";
+                }
+
+                writer.inner << fmt::StringRef(attribute.first.data(), attribute.first.size())
+                    << ": ";
+                attribute.second.apply(visitor);
+            }
         }
     }
 
