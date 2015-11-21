@@ -79,6 +79,24 @@ format_message(::benchmark::State& state) {
 
 static
 void
+format_timestamp(::benchmark::State& state) {
+    formatter::string_t formatter("{timestamp}");
+
+    const string_view message("-");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    record.activate();
+    writer_t writer;
+
+    while (state.KeepRunning()) {
+        formatter.format(record, writer);
+    }
+
+    state.SetItemsProcessed(state.iterations());
+}
+
+static
+void
 format_severity_message(::benchmark::State& state) {
     formatter::string_t formatter("{severity:d}: {message}");
 
@@ -98,6 +116,7 @@ BENCHMARK(format_literal);
 BENCHMARK(format_pid);
 BENCHMARK(format_procname);
 BENCHMARK(format_message);
+BENCHMARK(format_timestamp);
 BENCHMARK(format_severity_message);
 
 }  // namespace benchmark

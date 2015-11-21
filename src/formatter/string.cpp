@@ -174,7 +174,10 @@ public:
 
         std::tm tm;
         ::gmtime_r(&time, &tm);
-        token.generator(writer.inner, tm, static_cast<std::uint64_t>(usec));
+
+        fmt::MemoryWriter buffer;
+        token.generator(buffer, tm, static_cast<std::uint64_t>(usec));
+        writer.write(token.spec, fmt::StringRef(buffer.data(), buffer.size()));
     }
 
     auto operator()(const ph::generic<required>& token) const -> void {
