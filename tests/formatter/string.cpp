@@ -228,7 +228,6 @@ TEST(string_t, Timestamp) {
     ::gmtime_r(&time, &tm);
     char buffer[128];
     const auto len = std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &tm);
-    std::string result(buffer);
     fmt::MemoryWriter wr;
     wr << "[" << fmt::StringRef(buffer, len) << "." << fmt::pad(std::chrono::duration_cast<
         std::chrono::microseconds
@@ -254,7 +253,6 @@ TEST(string_t, TimestampExplicit) {
     ::gmtime_r(&time, &tm);
     char buffer[128];
     const auto len = std::strftime(buffer, sizeof(buffer), "%Y", &tm);
-    std::string result(buffer);
     fmt::MemoryWriter wr;
     wr << "[" << fmt::StringRef(buffer, len) << "]";
 
@@ -278,7 +276,6 @@ TEST(string_t, TimestampExplicitWithType) {
     ::gmtime_r(&time, &tm);
     char buffer[128];
     const auto len = std::strftime(buffer, sizeof(buffer), "%H:%M:%S", &tm);
-    std::string result(buffer);
     fmt::MemoryWriter wr;
     wr << "[" << fmt::StringRef(buffer, len) << "]";
 
