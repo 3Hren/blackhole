@@ -44,7 +44,7 @@ struct visitor_t : public boost::static_visitor<> {
 
 }  // namespace
 
-strftime_generator_t::strftime_generator_t(std::string pattern) {
+generator_t::generator_t(std::string pattern) {
     std::string literal;
 
     auto pos = std::begin(pattern);
@@ -66,11 +66,11 @@ strftime_generator_t::strftime_generator_t(std::string pattern) {
     }
 }
 
-strftime_generator_t::~strftime_generator_t() {}
+generator_t::~generator_t() {}
 
 template<typename Stream>
 auto
-strftime_generator_t::operator()(Stream& stream, const std::tm& tm, std::uint64_t usec) const -> void {
+generator_t::operator()(Stream& stream, const std::tm& tm, std::uint64_t usec) const -> void {
     visitor_t visitor(stream, tm, usec);
 
     for (const auto& token : tokens) {
@@ -78,12 +78,12 @@ strftime_generator_t::operator()(Stream& stream, const std::tm& tm, std::uint64_
     }
 }
 
-auto make_generator(const std::string& pattern) -> strftime_generator_t {
-    return strftime_generator_t(pattern);
+auto make_generator(const std::string& pattern) -> generator_t {
+    return generator_t(pattern);
 }
 
 template
-auto strftime_generator_t::operator()<writer_type>(writer_type&, const std::tm&, std::uint64_t) const -> void;
+auto generator_t::operator()<writer_type>(writer_type&, const std::tm&, std::uint64_t) const -> void;
 
 }  // namespace datetime
 }  // namespace detail
