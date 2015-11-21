@@ -128,7 +128,6 @@ public:
         sevmap(sevmap)
     {}
 
-    // ph::leftover_t,
     // ph::thread<id>,
     // ph::thread<hex>,
     // ph::thread<name>,
@@ -157,6 +156,18 @@ public:
 
     auto operator()(const ph::severity<user>& token) const -> void {
         sevmap(record.severity(), token.spec, writer);
+    }
+
+    auto operator()(const ph::timestamp<user>& token) const -> void {
+        const auto timestamp = record.timestamp();
+        const auto time = record_t::clock_type::to_time_t(timestamp);
+        const auto usec = std::chrono::duration_cast<
+            std::chrono::microseconds
+        >(timestamp.time_since_epoch()).count() % 1000000;
+
+        std::tm tm;
+        ::gmtime_r(&time, &tm);
+        token.generator(writer.inner, tm, usec);
     }
 
     auto operator()(const ph::generic<required>& token) const -> void {

@@ -213,6 +213,36 @@ TEST(string_t, ProcessName) {
     EXPECT_TRUE(writer.result().to_string().size() > 0);
 }
 
+TEST(string_t, Timestamp) {
+    // NOTE: By default %Y-%m-%d %H:%M:%S.%f pattern is used.
+    formatter::string_t formatter("[{timestamp}]");
+
+    const string_view message("-");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    record.activate();
+
+    const auto timestamp = record.timestamp();
+    const auto time = record_t::clock_type::to_time_t(timestamp);
+    std::tm tm;
+    ::gmtime_r(&time, &tm);
+    char buffer[128];
+    const auto len = std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &tm);
+    std::string result(buffer);
+    fmt::MemoryWriter wr;
+    wr << "["
+        << fmt::StringRef(buffer, len)
+        << "."
+        << fmt::pad(std::chrono::duration_cast<std::chrono::microseconds>(
+            timestamp.time_since_epoch()).count() % 1000000, 6, '0')
+        << "]";
+
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ(wr.str(), writer.result().to_string());
+}
+
 TEST(string_t, Leftover) {
     formatter::string_t formatter("{...}");
 

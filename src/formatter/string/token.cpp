@@ -43,13 +43,15 @@ timestamp<num>::timestamp() : spec("{}") {}
 timestamp<num>::timestamp(std::string spec) : spec(std::move(spec)) {}
 
 timestamp<user>::timestamp() :
-    pattern(),
-    spec("{}")
+    pattern("%Y-%m-%d %H:%M:%S.%f"),
+    spec("{}"),
+    generator(datetime::make_generator(pattern))
 {}
 
 timestamp<user>::timestamp(std::string pattern, std::string spec) :
     pattern(std::move(pattern)),
-    spec(std::move(spec))
+    spec(std::move(spec)),
+    generator(datetime::make_generator(this->pattern))
 {}
 
 template<typename T>

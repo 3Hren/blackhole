@@ -4,6 +4,8 @@
 
 #include <boost/variant/variant_fwd.hpp>
 
+#include "blackhole/detail/datetime.hpp"
+
 namespace blackhole {
 namespace detail {
 namespace formatter {
@@ -77,6 +79,7 @@ template<>
 struct timestamp<user> {
     std::string pattern;
     std::string spec;
+    datetime::generator_t generator;
 
     timestamp();
     timestamp(std::string pattern, std::string spec);

@@ -108,8 +108,8 @@ public:
         // Spec always starts with "{:".
         auto pos = spec.begin() + 2;
 
-        ph::timestamp<user> token;
-        token.spec = "{:";
+        std::string spec_("{:");
+        std::string pattern;
 
         if (pos != std::end(spec) && *pos == '{') {
             ++pos;
@@ -122,14 +122,14 @@ public:
                     break;
                 }
 
-                token.pattern.push_back(*pos);
+                pattern.push_back(*pos);
                 ++pos;
             }
         }
 
-        token.spec.append(std::string(pos, std::end(spec)));
+        spec_.append(std::string(pos, std::end(spec)));
 
-        return token;
+        return ph::timestamp<user>(std::move(pattern), std::move(spec_));
     }
 };
 
