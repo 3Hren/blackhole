@@ -230,12 +230,9 @@ TEST(string_t, Timestamp) {
     const auto len = std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &tm);
     std::string result(buffer);
     fmt::MemoryWriter wr;
-    wr << "["
-        << fmt::StringRef(buffer, len)
-        << "."
-        << fmt::pad(std::chrono::duration_cast<std::chrono::microseconds>(
-            timestamp.time_since_epoch()).count() % 1000000, 6, '0')
-        << "]";
+    wr << "[" << fmt::StringRef(buffer, len) << "." << fmt::pad(std::chrono::duration_cast<
+        std::chrono::microseconds
+    >(timestamp.time_since_epoch()).count() % 1000000, 6, '0') << "]";
 
     writer_t writer;
     formatter.format(record, writer);
