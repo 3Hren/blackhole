@@ -49,7 +49,7 @@ timestamp<user>::timestamp() :
 {}
 
 timestamp<user>::timestamp(std::string pattern, std::string spec) :
-    pattern(std::move(pattern)),
+    pattern(pattern.empty() ? "%Y-%m-%d %H:%M:%S.%f" : std::move(pattern)),
     spec(std::move(spec)),
     generator(datetime::make_generator(this->pattern))
 {}

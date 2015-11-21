@@ -204,6 +204,9 @@ TEST(parser_t, Timestamp) {
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
+
+    // NOTE: On empty pattern there is default pattern one.
+    EXPECT_EQ("%Y-%m-%d %H:%M:%S.%f", boost::get<timestamp<user>>(*token).pattern);
     EXPECT_EQ("{}", boost::get<timestamp<user>>(*token).spec);
 
     EXPECT_FALSE(parser.next());
@@ -226,6 +229,17 @@ TEST(parser_t, TimestampString) {
     ASSERT_TRUE(!!token);
     EXPECT_EQ("%Y-%m-%d %H:%M:%S.%f %z", boost::get<timestamp<user>>(*token).pattern);
     EXPECT_EQ("{:s}", boost::get<timestamp<user>>(*token).spec);
+
+    EXPECT_FALSE(parser.next());
+}
+
+TEST(parser_t, TimestampSpec) {
+    parser_t parser("{timestamp:<20s}");
+
+    auto token = parser.next();
+    ASSERT_TRUE(!!token);
+    EXPECT_EQ("%Y-%m-%d %H:%M:%S.%f", boost::get<timestamp<user>>(*token).pattern);
+    EXPECT_EQ("{:<20s}", boost::get<timestamp<user>>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
