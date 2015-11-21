@@ -115,6 +115,13 @@ For more information please read the documentation and visit the following links
 - File.
 - Socket.
 
+## Possible bottlenecks
+
+- Timestamp formatting
+ - [ ] Using system clock - can be replaces with OS specific clocks.
+ - [ ] Using `gmtime` - manual `std::tm` generation without mutex shit.
+ - [ ] Temporary buffer - affects, but not so much.
+
 ## Requirements
 
 - C++11/14 compiler
