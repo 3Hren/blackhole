@@ -35,6 +35,16 @@ monotonic_precise(::benchmark::State& state) {
 
 static
 void
+system_clock(::benchmark::State& state) {
+    while (state.KeepRunning()) {
+        std::chrono::system_clock::now();
+    }
+
+    state.SetItemsProcessed(state.iterations());
+}
+
+static
+void
 high_resolution_clock(::benchmark::State& state) {
     while (state.KeepRunning()) {
         std::chrono::high_resolution_clock::now();
@@ -48,6 +58,7 @@ BENCHMARK(monotonic_coarse);
 BENCHMARK(monotonic_precise);
 #endif
 
+BENCHMARK(system_clock);
 BENCHMARK(high_resolution_clock);
 
 }  // namespace benchmark
