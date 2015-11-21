@@ -165,7 +165,7 @@ public:
 
         std::tm tm;
         ::gmtime_r(&time, &tm);
-        token.generator(writer.inner, tm, usec);
+        token.generator(writer.inner, tm, static_cast<std::uint64_t>(usec));
     }
 
     auto operator()(const ph::generic<required>& token) const -> void {
