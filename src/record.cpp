@@ -68,6 +68,7 @@ auto record_t::activate(const string_view& formatted) noexcept -> void {
         inner().formatted = formatted;
     }
 
+    // TODO: I can use coarse clock in linux.
     inner().timestamp = clock_type::now();
 }
 
