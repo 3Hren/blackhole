@@ -285,6 +285,27 @@ TEST(string_t, TimestampExplicitWithType) {
     EXPECT_EQ(wr.str(), writer.result().to_string());
 }
 
+TEST(string_t, TimestampNum) {
+    formatter::string_t formatter("[{timestamp:d}]");
+
+    const string_view message("-");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    record.activate();
+
+    const auto timestamp = record.timestamp();
+    const auto usec = std::chrono::duration_cast<
+        std::chrono::microseconds
+    >(timestamp.time_since_epoch()).count();
+    fmt::MemoryWriter wr;
+    wr << "[" << usec << "]";
+
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ(wr.str(), writer.result().to_string());
+}
+
 TEST(string_t, Leftover) {
     formatter::string_t formatter("{...}");
 

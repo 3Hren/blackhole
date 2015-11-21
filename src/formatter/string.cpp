@@ -156,6 +156,15 @@ public:
         sevmap(record.severity(), token.spec, writer);
     }
 
+    auto operator()(const ph::timestamp<num>& token) const -> void {
+        const auto timestamp = record.timestamp();
+        const auto usec = std::chrono::duration_cast<
+            std::chrono::microseconds
+        >(timestamp.time_since_epoch()).count();
+
+        writer.write(token.spec, usec);
+    }
+
     auto operator()(const ph::timestamp<user>& token) const -> void {
         const auto timestamp = record.timestamp();
         const auto time = record_t::clock_type::to_time_t(timestamp);
