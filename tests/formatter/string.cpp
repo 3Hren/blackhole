@@ -240,6 +240,54 @@ TEST(string_t, Timestamp) {
     EXPECT_EQ(wr.str(), writer.result().to_string());
 }
 
+TEST(string_t, TimestampExplicit) {
+    formatter::string_t formatter("[{timestamp:{%Y}}]");
+
+    const string_view message("-");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    record.activate();
+
+    const auto timestamp = record.timestamp();
+    const auto time = record_t::clock_type::to_time_t(timestamp);
+    std::tm tm;
+    ::gmtime_r(&time, &tm);
+    char buffer[128];
+    const auto len = std::strftime(buffer, sizeof(buffer), "%Y", &tm);
+    std::string result(buffer);
+    fmt::MemoryWriter wr;
+    wr << "[" << fmt::StringRef(buffer, len) << "]";
+
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ(wr.str(), writer.result().to_string());
+}
+
+TEST(string_t, TimestampExplicitWithType) {
+    formatter::string_t formatter("[{timestamp:{%H:%M:%S}s}]");
+
+    const string_view message("-");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    record.activate();
+
+    const auto timestamp = record.timestamp();
+    const auto time = record_t::clock_type::to_time_t(timestamp);
+    std::tm tm;
+    ::gmtime_r(&time, &tm);
+    char buffer[128];
+    const auto len = std::strftime(buffer, sizeof(buffer), "%H:%M:%S", &tm);
+    std::string result(buffer);
+    fmt::MemoryWriter wr;
+    wr << "[" << fmt::StringRef(buffer, len) << "]";
+
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ(wr.str(), writer.result().to_string());
+}
+
 TEST(string_t, Leftover) {
     formatter::string_t formatter("{...}");
 
