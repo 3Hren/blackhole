@@ -128,10 +128,6 @@ public:
         sevmap(sevmap)
     {}
 
-    // ph::thread<id>,
-    // ph::thread<hex>,
-    // ph::thread<name>,
-
     auto operator()(const literal_t& token) const -> void {
         writer.inner << token.value;
     }
@@ -147,6 +143,14 @@ public:
     auto operator()(const ph::process<name>& token) const -> void {
         writer.write(token.spec, detail::procname().data());
     }
+
+    // ph::thread<id>,
+
+    auto operator()(const ph::thread<hex>& token) const -> void {
+        writer.write(token.spec, record.tid());
+    }
+
+    // ph::thread<name>,
 
     auto operator()(const ph::severity<num>& token) const -> void {
         writer.write(token.spec, record.severity());
