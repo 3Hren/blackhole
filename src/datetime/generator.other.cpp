@@ -26,6 +26,8 @@ typedef ostream_adapter<writer_type> stream_type;
 }  // namespace
 
 struct context_t {
+    // TODO: Get rid of intermediate stream for facets. Its construction consumes ~70ns, which is
+    // comparable with other time required to format timestamps.
     stream_type wr;
     std::tm tm;
     std::uint64_t usec;
