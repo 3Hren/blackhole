@@ -38,15 +38,13 @@ static void datetime_wheel(::benchmark::State& state) {
         blackhole::detail::datetime::make_generator("%Y-%m-%d %H:%M:%S")
     );
 
-    fmt::MemoryWriter wr;
-
     std::time_t time = std::time(0);
     std::tm tm;
     localtime_r(&time, &tm);
 
     while (state.KeepRunning()) {
+        fmt::MemoryWriter wr;
         generator(wr, tm);
-        wr.clear();
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -57,15 +55,13 @@ static void datetime_wheel_with_locale(::benchmark::State& state) {
         blackhole::detail::datetime::make_generator("%c")
     );
 
-    fmt::MemoryWriter wr;
-
     std::time_t time = std::time(0);
     std::tm tm;
     localtime_r(&time, &tm);
 
     while (state.KeepRunning()) {
+        fmt::MemoryWriter wr;
         generator(wr, tm);
-        wr.clear();
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -76,20 +72,69 @@ static void datetime_wheel_real_world(::benchmark::State& state) {
         blackhole::detail::datetime::make_generator("%Y-%m-%d %H:%M:%S.%f")
     );
 
-    fmt::MemoryWriter wr;
-
     std::time_t time = std::time(0);
     std::tm tm;
     localtime_r(&time, &tm);
 
     while (state.KeepRunning()) {
+        fmt::MemoryWriter wr;
         generator(wr, tm);
-        wr.clear();
     }
 
     state.SetItemsProcessed(state.iterations());
 }
 
+namespace {
+
+template<std::size_t length, char filler = '0'>
+inline auto fill(int value, char* buffer) -> void {
+    std::size_t digits = 0;
+    do {
+        buffer[length - 1 - digits] = (value % 10) + '0';
+        value /= 10;
+        ++digits;
+    } while (value);
+
+    std::memset(buffer, filler, length - digits);
+}
+
+template<std::size_t length, typename Writer, char filler = '0'>
+inline void fill(Writer& wr, int value) {
+    char buffer[std::numeric_limits<uint32_t>::digits10 + 2];
+    fill<length, filler>(value, buffer);
+    wr << fmt::StringRef(buffer, length);
+}
+
+}  // namespace
+
+static void datetime_pure_real_world(::benchmark::State& state) {
+    // blackhole::detail::datetime::make_generator("%Y-%m-%d %H:%M:%S.%f")
+
+    std::time_t time = std::time(0);
+    std::tm tm;
+    gmtime_r(&time, &tm);
+
+    while (state.KeepRunning()) {
+        fmt::MemoryWriter wr;
+        fill<4>(wr, tm.tm_year + 1900);
+        wr << "-";
+        fill<2>(wr, tm.tm_mon + 1);
+        wr << "-";
+        fill<2>(wr, tm.tm_mday);
+        wr << " ";
+        fill<2>(wr, tm.tm_hour);
+        wr << ":";
+        fill<2>(wr, tm.tm_min);
+        wr << ":";
+        fill<2>(wr, tm.tm_sec);
+        wr << ".";
+        fill<6>(wr, 0);
+    }
+
+    state.SetItemsProcessed(state.iterations());
+}
+
+BENCHMARK(datetime_pure_real_world);
 BENCHMARK(datetime_strftime);
 BENCHMARK(datetime_strftime_with_locale);
 BENCHMARK(datetime_wheel);
