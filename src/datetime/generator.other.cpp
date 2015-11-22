@@ -43,24 +43,23 @@ struct context_t {
 
 namespace {
 
-inline void fill(stream_type& wr, int value, uint length, char filler = '0') {
-    char buffer[std::numeric_limits<uint32_t>::digits10 + 2];
-    uint digits = 0;
+template<std::size_t length, char filler = '0'>
+inline auto fill(int value, char* buffer) -> void {
+    std::size_t digits = 0;
     do {
-        buffer[digits] = (value % 10) + '0';
+        buffer[length - 1 - digits] = (value % 10) + '0';
         value /= 10;
-        digits++;
+        ++digits;
     } while (value);
 
-    BOOST_ASSERT(length >= digits);
-    const uint gap = length - digits;
-    for (uint i = 0; i < gap; ++i) {
-        wr << filler;
-    }
+    std::memset(buffer, filler, length - digits);
+}
 
-    for (uint i = 0; i < digits; ++i) {
-        wr << buffer[digits - 1 - i];
-    }
+template<std::size_t length, char filler = '0'>
+inline void fill(stream_type& wr, int value) {
+    char buffer[std::numeric_limits<uint32_t>::digits10 + 2];
+    fill<length, filler>(value, buffer);
+    wr << fmt::StringRef(buffer, length);
 }
 
 enum class days_t {
@@ -82,15 +81,15 @@ inline void localized(context_t& context) {
 namespace year {
 
 inline void full(context_t& context) {
-    fill(context.wr, context.tm.tm_year + 1900, 4);
+    fill<4>(context.wr, context.tm.tm_year + 1900);
 }
 
 inline void last_two_digits(context_t& context) {
-    fill(context.wr, context.tm.tm_year % 100, 2);
+    fill<2>(context.wr, context.tm.tm_year % 100);
 }
 
 inline void first_two_digits(context_t& context) {
-    fill(context.wr, context.tm.tm_year / 100 + 19, 2);
+    fill<2>(context.wr, context.tm.tm_year / 100 + 19);
 }
 
 } // namespace year
@@ -98,7 +97,7 @@ inline void first_two_digits(context_t& context) {
 namespace month {
 
 inline void numeric(context_t& context) {
-    fill(context.wr, context.tm.tm_mon + 1, 2);
+    fill<2>(context.wr, context.tm.tm_mon + 1);
 }
 
 } // namespace month
@@ -110,12 +109,12 @@ inline void year(context_t& context);
 
 template<>
 inline void year<days_t::sunday>(context_t& context) {
-    fill(context.wr, (context.tm.tm_yday - context.tm.tm_wday + 7) / 7, 2);
+    fill<2>(context.wr, (context.tm.tm_yday - context.tm.tm_wday + 7) / 7);
 }
 
 template<>
 inline void year<days_t::monday>(context_t& context) {
-    fill(context.wr, (context.tm.tm_yday - context.tm.tm_wday + (context.tm.tm_wday ? 8 : 1)) / 7, 2);
+    fill<2>(context.wr, (context.tm.tm_yday - context.tm.tm_wday + (context.tm.tm_wday ? 8 : 1)) / 7);
 }
 
 } // namespace week
@@ -125,16 +124,16 @@ namespace day {
 namespace year {
 
 inline void numeric(context_t& context) {
-    fill(context.wr, context.tm.tm_yday + 1, 3);
+    fill<3>(context.wr, context.tm.tm_yday + 1);
 }
 
 } // namespace year
 
 namespace month {
 
-template<char Filler = '0'>
+template<char filler = '0'>
 inline void numeric(context_t& context) {
-    fill(context.wr, context.tm.tm_mday, 2, Filler);
+    fill<2, filler>(context.wr, context.tm.tm_mday);
 }
 
 } // namespace month
@@ -146,12 +145,12 @@ namespace time {
 namespace hour {
 
 inline void h24(context_t& context) {
-    fill(context.wr, context.tm.tm_hour, 2);
+    fill<2>(context.wr, context.tm.tm_hour);
 }
 
 inline void h12(context_t& context) {
     const int mod = context.tm.tm_hour % 12;
-    fill(context.wr, mod == 0 ? 12 : mod, 2);
+    fill<2>(context.wr, mod == 0 ? 12 : mod);
 }
 
 } // namespace hour
@@ -159,7 +158,7 @@ inline void h12(context_t& context) {
 namespace minute {
 
 inline void normal(context_t& context) {
-    fill(context.wr, context.tm.tm_min, 2);
+    fill<2>(context.wr, context.tm.tm_min);
 }
 
 } // namespace minute
@@ -167,7 +166,7 @@ inline void normal(context_t& context) {
 namespace second {
 
 inline void normal(context_t& context) {
-    fill(context.wr, context.tm.tm_sec, 2);
+    fill<2>(context.wr, context.tm.tm_sec);
 }
 
 } // namespace second
@@ -175,7 +174,7 @@ inline void normal(context_t& context) {
 namespace usecond {
 
 inline void normal(context_t& context) {
-    fill(context.wr, static_cast<int>(context.usec), 6);
+    fill<6>(context.wr, static_cast<int>(context.usec));
 }
 
 } // namespace usecond
