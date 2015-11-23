@@ -35,6 +35,7 @@ add_library(${LIBRARY_NAME} SHARED
 	src/formatter/string/error
 	src/formatter/string/parser
 	src/formatter/string/token
+	src/handler/blocking
 	src/logger
 	src/procname
 	src/record
@@ -131,11 +132,14 @@ if (ENABLE_TESTING)
 		tests/facade
 		tests/formatter/parser
 		tests/formatter/string
+		tests/handler/blocking
 		tests/record
+		tests/root
+		tests/src/mocks/formatter
 		tests/src/mocks/handler
 		tests/src/mocks/logger
-		tests/wrapper
-        tests/root)
+		tests/src/mocks/sink
+		tests/wrapper)
 
 	enable_google_testing(${LIBRARY_NAME}-tests)
 
