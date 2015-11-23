@@ -9,6 +9,7 @@ using cpp17::string_view;
 class record_t;
 
 class sink_t {
+public:
     virtual ~sink_t() {}
 
     virtual auto filter(const record_t& record) -> bool = 0;
