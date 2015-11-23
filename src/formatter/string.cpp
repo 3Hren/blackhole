@@ -144,7 +144,9 @@ public:
         writer.write(token.spec, detail::procname().data());
     }
 
-    // TODO: ph::thread<id>.
+    auto operator()(const ph::thread<id>& token) const -> void {
+        throw std::runtime_error("{thread:d} placeholder is not implemented yet");
+    }
 
     auto operator()(const ph::thread<hex>& token) const -> void {
 #ifdef __linux__
@@ -154,7 +156,9 @@ public:
 #endif
     }
 
-    // TODO: ph::thread<name>.
+    auto operator()(const ph::thread<name>& token) const -> void {
+        throw std::runtime_error("{thread:s} placeholder is not implemented yet");
+    }
 
     auto operator()(const ph::severity<num>& token) const -> void {
         writer.write(token.spec, record.severity());
@@ -221,11 +225,6 @@ public:
                 attribute.second.apply(visitor);
             }
         }
-    }
-
-    template<typename T>
-    auto operator()(const T& token) const -> void {
-        std::terminate();
     }
 
 private:
