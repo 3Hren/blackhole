@@ -144,13 +144,13 @@ public:
         writer.write(token.spec, detail::procname().data());
     }
 
-    // ph::thread<id>,
+    // TODO: ph::thread<id>.
 
     auto operator()(const ph::thread<hex>& token) const -> void {
         writer.write(token.spec, record.tid());
     }
 
-    // ph::thread<name>,
+    // TODO: ph::thread<name>.
 
     auto operator()(const ph::severity<num>& token) const -> void {
         writer.write(token.spec, record.severity());
