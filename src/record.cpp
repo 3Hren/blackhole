@@ -13,8 +13,8 @@ struct record_t::inner_t {
     int severity;
     time_point timestamp;
 
-    pid_t pid;
     std::thread::native_handle_type tid;
+    char __pad[16];
 
     std::reference_wrapper<const attribute_pack> attributes;
 };
@@ -29,7 +29,6 @@ record_t::record_t(int severity, const string_view& message, const attribute_pac
     inner.severity = severity;
     inner.timestamp = time_point();
 
-    inner.pid = ::getpid();
     inner.tid = ::pthread_self();
 
     inner.attributes = attributes;
@@ -48,7 +47,7 @@ auto record_t::timestamp() const noexcept -> time_point {
 }
 
 auto record_t::pid() const noexcept -> std::uint64_t {
-    return static_cast<std::uint64_t>(inner().pid);
+    return static_cast<std::uint64_t>(::getpid());
 }
 
 auto record_t::tid() const noexcept -> std::thread::native_handle_type {
