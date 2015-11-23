@@ -70,12 +70,14 @@ thread<hex>::thread() : spec("{:#x}") {}
 thread<hex>::thread(std::string spec) : spec(std::move(spec)) {}
 
 leftover_t::leftover_t() :
-    unique(false)
+    unique(false),
+    separator(", ")
 {}
 
 leftover_t::leftover_t(std::string name) :
     name(std::move(name)),
-    unique(false)
+    unique(false),
+    separator(", ")
 {}
 
 leftover_t::leftover_t(std::string name, bool unique, std::string prefix, std::string suffix,

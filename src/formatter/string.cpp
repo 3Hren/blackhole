@@ -112,20 +112,20 @@ public:
 
 template<>
 class view_visitor<unspec> : public boost::static_visitor<> {
-    writer_t& writer;
+    fmt::MemoryWriter& writer;
 
 public:
-    view_visitor(writer_t& writer) noexcept :
+    view_visitor(fmt::MemoryWriter& writer) noexcept :
         writer(writer)
     {}
 
     template<typename T>
     auto operator()(T value) const -> void {
-        writer.inner << value;
+        writer << value;
     }
 
     auto operator()(const string_view& value) const -> void {
-        writer.inner << fmt::StringRef(value.data(), value.size());
+        writer << fmt::StringRef(value.data(), value.size());
     }
 };
 
@@ -223,7 +223,8 @@ public:
 
     auto operator()(const ph::leftover_t& token) const -> void {
         bool first = true;
-        const view_visitor<unspec> visitor(writer);
+        fmt::MemoryWriter kv;
+        const view_visitor<unspec> visitor(kv);
 
         for (const auto& attributes : record.attributes()) {
             for (const auto& attribute : attributes.get()) {
@@ -231,12 +232,15 @@ public:
                     first = false;
                     writer.inner << token.prefix;
                 } else {
-                    writer.inner << ", ";
+                    writer.inner << token.separator;
                 }
 
-                writer.inner << fmt::StringRef(attribute.first.data(), attribute.first.size())
-                    << ": ";
+                kv << fmt::StringRef(attribute.first.data(), attribute.first.size()) << ": ";
                 attribute.second.apply(visitor);
+
+                writer.inner << fmt::StringRef(kv.data(), kv.size());
+
+                kv.clear();
             }
         }
 
