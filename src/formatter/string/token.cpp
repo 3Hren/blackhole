@@ -78,6 +78,16 @@ leftover_t::leftover_t(std::string name) :
     unique(false)
 {}
 
+leftover_t::leftover_t(std::string name, bool unique, std::string prefix, std::string suffix,
+    std::string pattern, std::string separator) :
+    name(std::move(name)),
+    unique(unique),
+    prefix(std::move(prefix)),
+    suffix(std::move(suffix)),
+    pattern(std::move(pattern)),
+    separator(std::move(separator))
+{}
+
 template struct severity<num>;
 template struct severity<user>;
 

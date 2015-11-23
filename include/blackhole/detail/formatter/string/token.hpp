@@ -120,6 +120,8 @@ struct leftover_t {
 
     leftover_t();
     leftover_t(std::string name);
+    leftover_t(std::string name, bool unique, std::string prefix, std::string suffix,
+        std::string pattern, std::string separator);
 };
 
 }  // namespace placeholder

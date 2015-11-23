@@ -64,6 +64,19 @@ public:
         return token;
     }
 
+    auto operator()(const ph::leftover_t& token) const -> string::token_t {
+        const auto it = options.find(token.name);
+
+        if (it != options.end()) {
+            const auto option = boost::get<option::leftover_t>(it->second);
+
+            return ph::leftover_t(token.name, option.unique, option.prefix, option.suffix,
+                option.pattern, option.separator);
+        }
+
+        return token;
+    }
+
     template<typename T>
     auto operator()(const T& token) const -> string::token_t {
         return token;
@@ -216,6 +229,7 @@ public:
             for (const auto& attribute : attributes.get()) {
                 if (first) {
                     first = false;
+                    writer.inner << token.prefix;
                 } else {
                     writer.inner << ", ";
                 }
@@ -224,6 +238,10 @@ public:
                     << ": ";
                 attribute.second.apply(visitor);
             }
+        }
+
+        if (!first) {
+            writer.inner << token.suffix;
         }
     }
 
