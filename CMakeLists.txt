@@ -41,6 +41,7 @@ add_library(${LIBRARY_NAME} SHARED
 	src/record
 	src/root
 	src/scoped
+	src/sink/console
 	src/wrapper)
 
 # Set the Standard version.
