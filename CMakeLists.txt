@@ -7,6 +7,7 @@ if (POLICY CMP0042)
 endif (POLICY CMP0042)
 
 OPTION(ENABLE_TESTING "Build the library with tests" OFF)
+OPTION(ENABLE_EXAMPLES "Build examples" OFF)
 OPTION(ENABLE_BENCHMARKING "Build the library with benchmarks" OFF)
 OPTION(ENABLE_TESTING_THREADSAFETY "Build the thread-safety testing suite" OFF)
 
@@ -179,3 +180,11 @@ if (ENABLE_BENCHMARKING)
 		${CMAKE_THREAD_LIBS_INIT}
 	)
 endif (ENABLE_BENCHMARKING)
+
+if (ENABLE_EXAMPLES)
+    add_executable(2-simple
+		examples/2.simple)
+
+	target_link_libraries(2-simple
+		blackhole)
+endif (ENABLE_EXAMPLES)
