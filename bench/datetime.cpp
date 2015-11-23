@@ -1,5 +1,7 @@
 #include <benchmark/benchmark.h>
 
+#include <cstring>
+
 #include <cppformat/format.h>
 
 #include <blackhole/detail/datetime.hpp>
