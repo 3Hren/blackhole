@@ -295,21 +295,22 @@ TEST(parser_t, ProcessName) {
 }
 
 TEST(parser_t, Thread) {
+    // NOTE: Hex representation by default.
     parser_t parser("{thread}");
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("{}", boost::get<thread<hex>>(*token).spec);
+    EXPECT_EQ("{:#x}", boost::get<thread<hex>>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
 
 TEST(parser_t, ThreadExplicit) {
-    parser_t parser("{thread:x}");
+    parser_t parser("{thread:#x}");
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("{:}", boost::get<thread<hex>>(*token).spec);
+    EXPECT_EQ("{:#x}", boost::get<thread<hex>>(*token).spec);
 
     EXPECT_FALSE(parser.next());
 }
@@ -356,7 +357,7 @@ TEST(parser_t, LeftoverNamed) {
 }
 
 TEST(parser_t, RealWorld) {
-    parser_t parser("{severity:s}, {process:d} {thread} [{timestamp:{%Y-%m-%dT%H:%M:%S.%f}s}] {source}: {message} {...}");
+    parser_t parser("{severity:s}, {process:d} {thread:#x} [{timestamp:{%Y-%m-%dT%H:%M:%S.%f}s}] {source}: {message} {...}");
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
@@ -376,7 +377,7 @@ TEST(parser_t, RealWorld) {
 
     token = parser.next();
     ASSERT_TRUE(!!token);
-    EXPECT_EQ("{}", boost::get<thread<hex>>(*token).spec);
+    EXPECT_EQ("{:#x}", boost::get<thread<hex>>(*token).spec);
 
     token = parser.next();
     ASSERT_TRUE(!!token);

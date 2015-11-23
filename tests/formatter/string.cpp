@@ -1,6 +1,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <boost/algorithm/string/predicate.hpp>
+
 #include <blackhole/attributes.hpp>
 #include <blackhole/cpp17/string_view.hpp>
 #include <blackhole/extensions/writer.hpp>
@@ -232,7 +234,7 @@ TEST(string_t, Thread) {
 }
 
 TEST(string_t, ThreadExplicitly) {
-    formatter::string_t formatter("{thread:x}");
+    formatter::string_t formatter("{thread:#x}");
 
     const string_view message("-");
     const attribute_pack pack;
@@ -247,6 +249,24 @@ TEST(string_t, ThreadExplicitly) {
     stream << std::this_thread::get_id();
 
     EXPECT_EQ(stream.str(), writer.result().to_string());
+}
+
+TEST(string_t, ThreadExplicitlySpec) {
+    formatter::string_t formatter("{thread:>#16x}");
+
+    const string_view message("-");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    std::ostringstream stream;
+#ifdef __linux__
+    stream << std::hex << std::internal << std::showbase << std::setw(2) << std::setfill('0');
+#endif
+    stream << std::this_thread::get_id();
+
+    EXPECT_TRUE(boost::ends_with(writer.result().to_string(), stream.str()));
 }
 
 TEST(string_t, Timestamp) {

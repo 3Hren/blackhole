@@ -101,6 +101,14 @@ struct thread {
     thread(std::string spec);
 };
 
+template<>
+struct thread<hex> {
+    std::string spec;
+
+    thread();
+    thread(std::string spec);
+};
+
 struct leftover_t {
     std::string name;
 

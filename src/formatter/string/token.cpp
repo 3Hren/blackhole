@@ -66,6 +66,9 @@ thread<T>::thread() : spec("{}") {}
 template<typename T>
 thread<T>::thread(std::string spec) : spec(std::move(spec)) {}
 
+thread<hex>::thread() : spec("{:#x}") {}
+thread<hex>::thread(std::string spec) : spec(std::move(spec)) {}
+
 leftover_t::leftover_t() :
     unique(false)
 {}
@@ -82,7 +85,6 @@ template struct process<id>;
 template struct process<name>;
 
 template struct thread<id>;
-template struct thread<hex>;
 template struct thread<name>;
 
 }  // namespace placeholder

@@ -65,7 +65,6 @@ public:
         case 's':
             return ph::thread<name>(std::move(spec));
         case 'x':
-            return ph::thread<hex>(spec.substr(0, spec.size() - 2) + spec.back());
         default:
             return ph::thread<hex>(std::move(spec));
         }
