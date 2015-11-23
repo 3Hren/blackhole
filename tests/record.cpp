@@ -44,12 +44,19 @@ TEST(Record, Pid) {
 }
 
 TEST(Record, Tid) {
-    const string_view message("GET /porn.png HTTP/1.1");
-    const attribute_pack pack;
+    std::thread::native_handle_type tid;
+    std::thread thread([&] {
+        const string_view message("GET /porn.png HTTP/1.1");
+        const attribute_pack pack;
 
-    record_t record(42, message, pack);
+        record_t record(42, message, pack);
+        tid = record.tid();
+    });
 
-    EXPECT_EQ(std::this_thread::get_id(), record.tid());
+    auto handle = thread.native_handle();
+    thread.join();
+
+    EXPECT_EQ(handle, tid);
 }
 
 TEST(Record, NullTimestampByDefault) {

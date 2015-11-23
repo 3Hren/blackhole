@@ -36,7 +36,7 @@ public:
     auto timestamp() const noexcept -> time_point;
 
     auto pid() const noexcept -> std::uint64_t;
-    auto tid() const noexcept -> std::thread::id;
+    auto tid() const noexcept -> std::thread::native_handle_type;
 
     auto formatted() const noexcept -> const string_view&;
     auto attributes() const noexcept -> const attribute_pack&;

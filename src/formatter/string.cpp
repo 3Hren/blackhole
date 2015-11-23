@@ -147,11 +147,10 @@ public:
     // TODO: ph::thread<id>.
 
     auto operator()(const ph::thread<hex>& token) const -> void {
-        const auto tid = ::pthread_self();
 #ifdef __linux__
-        writer.write(token.spec, tid);
+        writer.write(token.spec, record.tid());
 #elif __APPLE__
-        writer.write(token.spec, reinterpret_cast<unsigned long>(tid));
+        writer.write(token.spec, reinterpret_cast<unsigned long>(record.tid()));
 #endif
     }
 
