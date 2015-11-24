@@ -9,6 +9,11 @@
 
 namespace blackhole {
 
+class bad_cast : public std::logic_error {
+public:
+    bad_cast() : std::logic_error("bad cast") {}
+};
+
 class bad_optional_access : public std::logic_error {
 public:
     bad_optional_access() : std::logic_error("not engaged") {}
@@ -26,6 +31,7 @@ public:
     virtual auto operator[](const std::string& key) const -> monadic<config_t> = 0;
 
     virtual auto is_nil() const -> bool = 0;
+    virtual auto to_bool() const -> bool = 0;
     virtual auto to_i64() const -> std::int64_t = 0;
     virtual auto to_u64() const -> std::uint64_t = 0;
     virtual auto to_string() const -> std::string = 0;
@@ -41,6 +47,7 @@ public:
     auto operator[](const std::string& key) const -> monadic<config_t>;
 
     auto is_nil() const -> bool;
+    auto to_bool() const -> bool;
     auto to_i64() const -> std::int64_t;
     auto to_u64() const -> std::uint64_t;
     auto to_string() const -> std::string;
@@ -95,6 +102,11 @@ none_t::operator[](const std::string& key) const -> monadic<config_t> {
 auto
 none_t::is_nil() const -> bool {
     return true;
+}
+
+auto
+none_t::to_bool() const -> bool {
+    throw bad_optional_access();
 }
 
 auto
@@ -171,6 +183,14 @@ public:
         return value.IsNull();
     }
 
+    auto to_bool() const -> bool {
+        if (value.IsBool()) {
+            return value.GetBool();
+        }
+
+        throw bad_cast();
+    }
+
     auto to_i64() const -> std::int64_t {
         if (value.IsInt64()) {
             return value.GetInt64();
@@ -214,11 +234,11 @@ TEST(null_t, IsNil) {
     EXPECT_TRUE(config.is_nil());
 }
 
-// TEST(null_t, ThrowsOnEveryGetterInvocation) {
-//     none_t config;
-//
-//     EXPECT_THROW(config.to_nil(), bad_optional_access);
-// }
+TEST(null_t, ThrowsOnEveryGetterInvocation) {
+    none_t config;
+
+    EXPECT_THROW(config.to_bool(), bad_optional_access);
+}
 
 TEST(json_t, IsNil) {
     static const std::string JSON = "null";
@@ -231,6 +251,32 @@ TEST(json_t, IsNil) {
     json_t config(doc);
 
     EXPECT_TRUE(config.is_nil());
+}
+
+TEST(json_t, ToBool) {
+    static const std::string JSON = "true";
+
+    const std::string valid(boost::algorithm::replace_all_copy(JSON, "'", "\""));
+    rapidjson::Document doc;
+    doc.Parse<0>(valid.c_str());
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_TRUE(config.to_bool());
+}
+
+TEST(json_t, ThrowsExceptionOnBoolMismatch) {
+    static const std::string JSON = "42";
+
+    const std::string valid(boost::algorithm::replace_all_copy(JSON, "'", "\""));
+    rapidjson::Document doc;
+    doc.Parse<0>(valid.c_str());
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_THROW(config.to_bool(), bad_cast);
 }
 
 TEST(config_t, json) {
