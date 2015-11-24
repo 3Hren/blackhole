@@ -81,11 +81,3 @@ public:
 };
 
 }  // namespace blackhole
-
-// XML  ->
-// YAML ->
-// JSON -> dynamic -> factory -> handlers -> root_logger_t.
-// d["type"].value_or("") == "string" ...
-
-// builder<T, From = manual>().build()
-// #include <...json.hpp> => builder<T, json>("filename.json").build() -> T
