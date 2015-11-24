@@ -100,7 +100,7 @@ public:
     }
 
     auto to_double() const -> double {
-        if (is_double()) {
+        if (value.IsDouble()) {
             return value.GetDouble();
         }
 
@@ -112,16 +112,24 @@ public:
             return value.GetString();
         }
 
-        throw std::invalid_argument(""); // TODO: Bad cast.
+        throw bad_cast();
     }
 
     auto each(const each_function& fn) -> void {
+        if (!value.IsArray()) {
+            throw bad_cast();
+        }
+
         for (auto it = value.Begin(); it != value.End(); ++it) {
             fn(*make_monadic<json_t>(*it));
         }
     }
 
     auto each_map(const member_function& fn) -> void {
+        if (!value.IsObject()) {
+            throw bad_cast();
+        }
+
         for (auto it = value.MemberBegin(); it != value.MemberEnd(); ++it) {
             fn(it->name.GetString(), *make_monadic<json_t>(it->value));
         }
@@ -170,8 +178,8 @@ TEST(json_t, ToBool) {
     EXPECT_TRUE(config.to_bool());
 }
 
-// TODO: is_double, is_string, is_array, is_object.
-// TODO: to_double, to_string.
+// TODO: is_string, is_array, is_object.
+// TODO: to_string.
 // TODO: to<T>(default) for all cases.
 
 TEST(json_t, ThrowsExceptionOnBoolMismatch) {
@@ -271,6 +279,48 @@ TEST(json_t, ThrowsExceptionOnDoubleMismatch) {
     EXPECT_THROW(config.to_double(), bad_cast);
 }
 
+TEST(json_t, IsString) {
+    const auto json = R"("le value")";
+
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_FALSE(config.is_nil());
+    EXPECT_FALSE(config.is_bool());
+    EXPECT_FALSE(config.is_i64());
+    EXPECT_FALSE(config.is_u64());
+    EXPECT_FALSE(config.is_double());
+    EXPECT_TRUE(config.is_string());
+    EXPECT_FALSE(config.is_vector());
+    EXPECT_FALSE(config.is_object());
+}
+
+TEST(json_t, ToString) {
+    const auto json = R"("le value")";
+
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_EQ("le value", config.to_string());
+}
+
+TEST(json_t, ThrowsExceptionOnStringMismatch) {
+    const auto json = "false";
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_THROW(config.to_string(), bad_cast);
+}
+
 TEST(config_t, json) {
     const auto json = R"({
         "formatter": {
@@ -328,3 +378,5 @@ TEST(config_t, json) {
 
 }  // namespace testing
 }  // namespace blackhole
+
+// TODO: It's likely that I'll drop all is_* methods for unnecessity.
