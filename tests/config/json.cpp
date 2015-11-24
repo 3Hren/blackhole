@@ -100,7 +100,11 @@ public:
     }
 
     auto to_double() const -> double {
+        if (is_double()) {
+            return value.GetDouble();
+        }
 
+        throw bad_cast();
     }
 
     auto to_string() const -> std::string {
@@ -168,7 +172,6 @@ TEST(json_t, ToBool) {
 
 // TODO: is_double, is_string, is_array, is_object.
 // TODO: to_double, to_string.
-// TODO: for null, for json (check also bad casts).
 // TODO: to<T>(default) for all cases.
 
 TEST(json_t, ThrowsExceptionOnBoolMismatch) {
@@ -214,7 +217,7 @@ TEST(json_t, ToInt) {
     EXPECT_EQ(42, config.to_u64());
 }
 
-TEST(json_t, ThrowsExceptionOnIntismatch) {
+TEST(json_t, ThrowsExceptionOnIntMismatch) {
     const auto json = "false";
     rapidjson::Document doc;
     doc.Parse<0>(json);
@@ -224,6 +227,48 @@ TEST(json_t, ThrowsExceptionOnIntismatch) {
 
     EXPECT_THROW(config.to_i64(), bad_cast);
     EXPECT_THROW(config.to_u64(), bad_cast);
+}
+
+TEST(json_t, IsDouble) {
+    const auto json = "42.5";
+
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_FALSE(config.is_nil());
+    EXPECT_FALSE(config.is_bool());
+    EXPECT_FALSE(config.is_i64());
+    EXPECT_FALSE(config.is_u64());
+    EXPECT_TRUE(config.is_double());
+    EXPECT_FALSE(config.is_string());
+    EXPECT_FALSE(config.is_vector());
+    EXPECT_FALSE(config.is_object());
+}
+
+TEST(json_t, ToDouble) {
+    const auto json = "42.5";
+
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_DOUBLE_EQ(42.5, config.to_double());
+}
+
+TEST(json_t, ThrowsExceptionOnDoubleMismatch) {
+    const auto json = "false";
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_THROW(config.to_double(), bad_cast);
 }
 
 TEST(config_t, json) {
