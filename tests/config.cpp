@@ -107,8 +107,6 @@ auto make_monadic(Args&&... args) -> monadic<config_t> {
 
 #include <gtest/gtest.h>
 
-#include <boost/algorithm/string.hpp>
-
 #include <rapidjson/document.h>
 
 namespace blackhole {
@@ -205,11 +203,9 @@ TEST(null_t, ThrowsOnEveryGetterInvocation) {
 }
 
 TEST(json_t, IsNil) {
-    static const std::string JSON = "null";
-
-    const std::string valid(boost::algorithm::replace_all_copy(JSON, "'", "\""));
+    const auto json = "null";
     rapidjson::Document doc;
-    doc.Parse<0>(valid.c_str());
+    doc.Parse<0>(json);
     ASSERT_FALSE(doc.HasParseError());
 
     json_t config(doc);
@@ -218,11 +214,10 @@ TEST(json_t, IsNil) {
 }
 
 TEST(json_t, ToBool) {
-    static const std::string JSON = "true";
+    const auto json = "true";
 
-    const std::string valid(boost::algorithm::replace_all_copy(JSON, "'", "\""));
     rapidjson::Document doc;
-    doc.Parse<0>(valid.c_str());
+    doc.Parse<0>(json);
     ASSERT_FALSE(doc.HasParseError());
 
     json_t config(doc);
@@ -230,12 +225,15 @@ TEST(json_t, ToBool) {
     EXPECT_TRUE(config.to_bool());
 }
 
-TEST(json_t, ThrowsExceptionOnBoolMismatch) {
-    static const std::string JSON = "42";
+// TODO: is_bool, is_i64, is_u64, is_double, is_string, is_array, is_object.
+// TODO: to_i64, to_u64, to_double, to_string.
+// TODO: for null, for json (check also bad casts).
+// TODO: to<T>(default) for all cases.
 
-    const std::string valid(boost::algorithm::replace_all_copy(JSON, "'", "\""));
+TEST(json_t, ThrowsExceptionOnBoolMismatch) {
+    const auto json = "42";
     rapidjson::Document doc;
-    doc.Parse<0>(valid.c_str());
+    doc.Parse<0>(json);
     ASSERT_FALSE(doc.HasParseError());
 
     json_t config(doc);
@@ -244,27 +242,26 @@ TEST(json_t, ThrowsExceptionOnBoolMismatch) {
 }
 
 TEST(config_t, json) {
-    static const std::string JSON = R"({
-        'formatter': {
-            'type': 'string',
-            'pattern': '[%(level)s]: %(message)s'
+    const auto json = R"({
+        "formatter": {
+            "type": "string",
+            "pattern": "[%(level)s]: %(message)s"
         },
-        'sinks': [
+        "sinks": [
             {
-                'type': 'files',
-                'path': 'test.log',
-                'rotation': {
-                    'pattern': 'test.log.%N',
-                    'backups': 5,
-                    'size': 1000000
+                "type": "files",
+                "path": "test.log",
+                "rotation": {
+                    "pattern": "test.log.%N",
+                    "backups": 5,
+                    "size": 1000000
                 }
             }
         ]
     })";
 
-    const std::string valid(boost::algorithm::replace_all_copy(JSON, "'", "\""));
     rapidjson::Document doc;
-    doc.Parse<0>(valid.c_str());
+    doc.Parse<0>(json);
     ASSERT_FALSE(doc.HasParseError());
 
     json_t config(doc);
