@@ -1,5 +1,9 @@
 #include <cstdint>
+#include <functional>
 #include <memory>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 #include <boost/assert.hpp>
 
@@ -10,12 +14,30 @@ class monadic;
 
 class config_t {
 public:
+    typedef std::function<auto(const config_t&) -> void> each_function;
+    typedef std::function<auto(const std::string&, const config_t&) -> void> member_function;
+
     virtual auto operator[](const std::size_t& idx) const -> monadic<config_t> = 0;
     virtual auto operator[](const std::string& key) const -> monadic<config_t> = 0;
 
     virtual auto to_i64() const -> std::int64_t = 0;
     virtual auto to_u64() const -> std::uint64_t = 0;
     virtual auto to_string() const -> std::string = 0;
+
+    virtual auto each(const each_function& fn) -> void = 0;
+    virtual auto each_map(const member_function& fn) -> void = 0;
+};
+
+/// None value. Throws an exception on any get access, but maps to none on subscription.
+class none_t : public config_t {
+    auto operator[](const std::size_t& idx) const -> monadic<config_t>;
+    auto operator[](const std::string& key) const -> monadic<config_t>;
+    auto to_i64() const -> std::int64_t;
+    auto to_u64() const -> std::uint64_t;
+    auto to_string() const -> std::string;
+
+    auto each(const each_function& fn) -> void;
+    auto each_map(const member_function& fn) -> void;
 };
 
 // TODO: Can be hidden for the sake of encapsulation.
@@ -24,6 +46,10 @@ class monadic<config_t> {
     std::unique_ptr<config_t> inner;
 
 public:
+    monadic() :
+        inner(new none_t)
+    {}
+
     explicit monadic(std::unique_ptr<config_t> inner) :
         inner(std::move(inner))
     {
@@ -41,7 +67,46 @@ public:
     auto operator->() -> config_t* {
         return inner.get();
     }
+
+    auto operator*() const -> const config_t& {
+        return *inner;
+    }
 };
+
+auto
+none_t::operator[](const std::size_t& idx) const -> monadic<config_t> {
+    return {};
+}
+
+auto
+none_t::operator[](const std::string& key) const -> monadic<config_t> {
+    return {};
+}
+
+auto
+none_t::to_i64() const -> std::int64_t {
+    throw std::out_of_range("none");
+}
+
+auto
+none_t::to_u64() const -> std::uint64_t {
+    throw std::out_of_range("none");
+}
+
+auto
+none_t::to_string() const -> std::string {
+    throw std::out_of_range("none");
+}
+
+auto
+none_t::each(const each_function& fn) -> void {
+    throw std::out_of_range("none");
+}
+
+auto
+none_t::each_map(const member_function& fn) -> void {
+    throw std::out_of_range("none");
+}
 
 template<typename T, typename... Args>
 auto make_monadic(Args&&... args) -> monadic<config_t> {
@@ -64,29 +129,6 @@ namespace testing {
 //  .build() - ищет ключ "formatter/type" config["formatter"]["type"]
 //             по type делегирует config["formatter"] в нужную фабрику
 
-/// None value. Throws an exception on any get access, but maps to none on subscription.
-class none_t : public config_t {
-    auto operator[](const std::size_t& idx) const -> monadic<config_t> {
-        return make_monadic<none_t>();
-    }
-
-    auto operator[](const std::string& key) const -> monadic<config_t> {
-        return make_monadic<none_t>();
-    }
-
-    auto to_i64() const -> std::int64_t {
-        throw std::out_of_range("none");
-    }
-
-    auto to_u64() const -> std::uint64_t {
-        throw std::out_of_range("none");
-    }
-
-    auto to_string() const -> std::string {
-        throw std::out_of_range("none");
-    }
-};
-
 class json_t : public config_t {
     const rapidjson::Value& value;
 
@@ -100,7 +142,7 @@ public:
             return make_monadic<json_t>(value[idx]);
         }
 
-        return make_monadic<none_t>();
+        return {};
     }
 
     auto operator[](const std::string& key) const -> monadic<config_t> {
@@ -108,7 +150,7 @@ public:
             return make_monadic<json_t>(value[key.c_str()]);
         }
 
-        return make_monadic<none_t>();
+        return {};
     }
 
     auto to_i64() const -> std::int64_t {
@@ -134,22 +176,17 @@ public:
 
         throw std::invalid_argument(""); // TODO: Bad cast.
     }
-};
 
-class json_factory_t {
-    rapidjson::Document doc;
-
-public:
-    explicit json_factory_t(const std::string& value) {
-        doc.Parse<0>(value.c_str());
-        if (doc.HasParseError()) {
-            throw std::runtime_error("parse error");
+    auto each(const each_function& fn) -> void {
+        for (auto it = value.Begin(); it != value.End(); ++it) {
+            fn(*make_monadic<json_t>(*it));
         }
     }
 
-    auto build() -> void {
-        auto config = json_t(doc);
-        const auto type = config["formatter"]["type"]->to_string();
+    auto each_map(const member_function& fn) -> void {
+        for (auto it = value.MemberBegin(); it != value.MemberEnd(); ++it) {
+            fn(it->name.GetString(), *make_monadic<json_t>(it->value));
+        }
     }
 };
 
@@ -187,6 +224,26 @@ TEST(config_t, json) {
     EXPECT_EQ("test.log.%N", config["sinks"][0]["rotation"]["pattern"]->to_string());
     EXPECT_EQ(5, config["sinks"][0]["rotation"]["backups"]->to_i64());
     EXPECT_EQ(1000000, config["sinks"][0]["rotation"]["size"]->to_u64());
+
+    // NOTE: There is only one sink, so it's okay to compare strongly.
+    auto counter = 0;
+    config["sinks"]->each([&](const config_t& sink) {
+        EXPECT_EQ("files", sink["type"]->to_string());
+        EXPECT_EQ("test.log", sink["path"]->to_string());
+        EXPECT_EQ("test.log.%N", sink["rotation"]["pattern"]->to_string());
+        EXPECT_EQ(5, sink["rotation"]["backups"]->to_i64());
+        EXPECT_EQ(1000000, sink["rotation"]["size"]->to_u64());
+        ++counter;
+    });
+
+    EXPECT_EQ(1, counter);
+
+    std::vector<std::string> keys;
+    config.each_map([&](const std::string& key, const config_t& sink) {
+        keys.push_back(key);
+    });
+
+    EXPECT_EQ((std::vector<std::string>{"formatter", "sinks"}), keys);
 }
 
 }  // namespace testing
