@@ -4,3 +4,6 @@
 [submodule "foreign/modules"]
 	path = foreign/modules
 	url = https://github.com/3Hren/modules.git
+[submodule "foreign/rapidjson"]
+	path = foreign/rapidjson
+	url = https://github.com/miloyip/rapidjson.git

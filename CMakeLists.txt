@@ -20,7 +20,8 @@ find_package(Boost 1.46 REQUIRED COMPONENTS
 	thread)
 
 include_directories(BEFORE SYSTEM
-	${PROJECT_SOURCE_DIR}/foreign)
+	${PROJECT_SOURCE_DIR}/foreign
+	${PROJECT_SOURCE_DIR}/rapidjson/include)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
@@ -30,6 +31,7 @@ set_target_properties(cppformat PROPERTIES
 
 add_library(${LIBRARY_NAME} SHARED
 	src/attribute
+	src/config
 	src/datetime/generator.linux
 	src/datetime/generator.other
 	src/formatter/string.cpp
@@ -126,10 +128,13 @@ if (ENABLE_TESTING)
 
 	prepare_google_testing()
 
-	include_directories(${PROJECT_SOURCE_DIR}/tests/include)
+	include_directories(
+		${PROJECT_SOURCE_DIR}/tests/include
+		${PROJECT_SOURCE_DIR}/foreign/rapidjson/include)
 
     add_executable(${LIBRARY_NAME}-tests
 		tests/attribute
+		tests/config
 		tests/datetime
 		tests/facade
 		tests/formatter/parser
