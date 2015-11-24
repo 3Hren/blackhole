@@ -168,7 +168,7 @@ public:
     }
 
     auto is_nil() const -> bool {
-        // return value.IsNull();
+        return value.IsNull();
     }
 
     auto to_i64() const -> std::int64_t {
@@ -219,6 +219,19 @@ TEST(null_t, IsNil) {
 //
 //     EXPECT_THROW(config.to_nil(), bad_optional_access);
 // }
+
+TEST(json_t, IsNil) {
+    static const std::string JSON = "null";
+
+    const std::string valid(boost::algorithm::replace_all_copy(JSON, "'", "\""));
+    rapidjson::Document doc;
+    doc.Parse<0>(valid.c_str());
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_TRUE(config.is_nil());
+}
 
 TEST(config_t, json) {
     static const std::string JSON = R"({
