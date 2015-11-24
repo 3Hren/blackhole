@@ -47,6 +47,7 @@ add_library(${LIBRARY_NAME} SHARED
 	src/root
 	src/scoped
 	src/sink/console
+	src/sink/null
 	src/wrapper)
 
 # Set the Standard version.
@@ -145,6 +146,7 @@ if (ENABLE_TESTING)
 		tests/handler/blocking
 		tests/record
 		tests/root
+		tests/sink/null
 		tests/src/mocks/formatter
 		tests/src/mocks/handler
 		tests/src/mocks/logger
