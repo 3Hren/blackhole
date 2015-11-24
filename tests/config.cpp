@@ -16,12 +16,13 @@ public:
     auto is_u64() const -> bool;
     auto is_double() const -> bool;
     auto is_string() const -> bool;
-    auto is_array() const -> bool;
+    auto is_vector() const -> bool;
     auto is_object() const -> bool;
 
     auto to_bool() const -> bool;
     auto to_i64() const -> std::int64_t;
     auto to_u64() const -> std::uint64_t;
+    auto to_double() const -> double;
     auto to_string() const -> std::string;
 
     auto each(const each_function& fn) -> void;
@@ -102,7 +103,7 @@ none_t::is_string() const -> bool {
 }
 
 auto
-none_t::is_array() const -> bool {
+none_t::is_vector() const -> bool {
     return false;
 }
 
@@ -118,27 +119,32 @@ none_t::to_bool() const -> bool {
 
 auto
 none_t::to_i64() const -> std::int64_t {
-    throw std::out_of_range("none");
+    throw bad_optional_access();
 }
 
 auto
 none_t::to_u64() const -> std::uint64_t {
-    throw std::out_of_range("none");
+    throw bad_optional_access();
+}
+
+auto
+none_t::to_double() const -> double {
+    throw bad_optional_access();
 }
 
 auto
 none_t::to_string() const -> std::string {
-    throw std::out_of_range("none");
+    throw bad_optional_access();
 }
 
 auto
 none_t::each(const each_function& fn) -> void {
-    throw std::out_of_range("none");
+    throw bad_optional_access();
 }
 
 auto
 none_t::each_map(const member_function& fn) -> void {
-    throw std::out_of_range("none");
+    throw bad_optional_access();
 }
 
 template<typename T, typename... Args>
@@ -208,7 +214,7 @@ public:
         return value.IsString();
     }
 
-    auto is_array() const -> bool {
+    auto is_vector() const -> bool {
         return value.IsArray();
     }
 
@@ -238,6 +244,10 @@ public:
         }
 
         throw std::invalid_argument(""); // TODO: Bad cast.
+    }
+
+    auto to_double() const -> double {
+
     }
 
     auto to_string() const -> std::string {
@@ -270,7 +280,7 @@ TEST(null_t, IsNil) {
     EXPECT_FALSE(config.is_u64());
     EXPECT_FALSE(config.is_double());
     EXPECT_FALSE(config.is_string());
-    EXPECT_FALSE(config.is_array());
+    EXPECT_FALSE(config.is_vector());
     EXPECT_FALSE(config.is_object());
 }
 
@@ -278,6 +288,13 @@ TEST(null_t, ThrowsOnEveryGetterInvocation) {
     none_t config;
 
     EXPECT_THROW(config.to_bool(), bad_optional_access);
+    EXPECT_THROW(config.to_i64(), bad_optional_access);
+    EXPECT_THROW(config.to_u64(), bad_optional_access);
+    EXPECT_THROW(config.to_double(), bad_optional_access);
+    EXPECT_THROW(config.to_string(), bad_optional_access);
+
+    EXPECT_THROW(config.each({}), bad_optional_access);
+    EXPECT_THROW(config.each_map({}), bad_optional_access);
 }
 
 TEST(json_t, IsNil) {
@@ -306,7 +323,7 @@ TEST(json_t, IsBool) {
     EXPECT_FALSE(config.is_u64());
     EXPECT_FALSE(config.is_double());
     EXPECT_FALSE(config.is_string());
-    EXPECT_FALSE(config.is_array());
+    EXPECT_FALSE(config.is_vector());
     EXPECT_FALSE(config.is_object());
 }
 

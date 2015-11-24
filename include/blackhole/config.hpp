@@ -34,12 +34,13 @@ public:
     virtual auto is_u64() const -> bool = 0;
     virtual auto is_double() const -> bool = 0;
     virtual auto is_string() const -> bool = 0;
-    virtual auto is_array() const -> bool = 0;
+    virtual auto is_vector() const -> bool = 0;
     virtual auto is_object() const -> bool = 0;
 
     virtual auto to_bool() const -> bool = 0;
     virtual auto to_i64() const -> std::int64_t = 0;
     virtual auto to_u64() const -> std::uint64_t = 0;
+    virtual auto to_double() const -> double = 0;
     virtual auto to_string() const -> std::string = 0;
 
     virtual auto each(const each_function& fn) -> void = 0;
