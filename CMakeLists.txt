@@ -136,7 +136,8 @@ if (ENABLE_TESTING)
 
     add_executable(${LIBRARY_NAME}-tests
 		tests/attribute
-		tests/config
+		tests/config/json
+		tests/config/none
 		tests/datetime
 		tests/facade
 		tests/formatter/parser

@@ -88,7 +88,7 @@ public:
             return value.GetInt64();
         }
 
-        throw std::invalid_argument(""); // TODO: Bad cast.
+        throw bad_cast();
     }
 
     auto to_u64() const -> std::uint64_t {
@@ -96,7 +96,7 @@ public:
             return value.GetUint64();
         }
 
-        throw std::invalid_argument(""); // TODO: Bad cast.
+        throw bad_cast();
     }
 
     auto to_double() const -> double {
@@ -123,32 +123,6 @@ public:
         }
     }
 };
-
-TEST(null_t, IsNil) {
-    none_t config;
-
-    EXPECT_TRUE(config.is_nil());
-    EXPECT_FALSE(config.is_bool());
-    EXPECT_FALSE(config.is_i64());
-    EXPECT_FALSE(config.is_u64());
-    EXPECT_FALSE(config.is_double());
-    EXPECT_FALSE(config.is_string());
-    EXPECT_FALSE(config.is_vector());
-    EXPECT_FALSE(config.is_object());
-}
-
-TEST(null_t, ThrowsOnEveryGetterInvocation) {
-    none_t config;
-
-    EXPECT_THROW(config.to_bool(), bad_optional_access);
-    EXPECT_THROW(config.to_i64(), bad_optional_access);
-    EXPECT_THROW(config.to_u64(), bad_optional_access);
-    EXPECT_THROW(config.to_double(), bad_optional_access);
-    EXPECT_THROW(config.to_string(), bad_optional_access);
-
-    EXPECT_THROW(config.each({}), bad_optional_access);
-    EXPECT_THROW(config.each_map({}), bad_optional_access);
-}
 
 TEST(json_t, IsNil) {
     const auto json = "null";
@@ -192,8 +166,8 @@ TEST(json_t, ToBool) {
     EXPECT_TRUE(config.to_bool());
 }
 
-// TODO: is_bool, is_i64, is_u64, is_double, is_string, is_array, is_object.
-// TODO: to_i64, to_u64, to_double, to_string.
+// TODO: is_double, is_string, is_array, is_object.
+// TODO: to_double, to_string.
 // TODO: for null, for json (check also bad casts).
 // TODO: to<T>(default) for all cases.
 
@@ -206,6 +180,50 @@ TEST(json_t, ThrowsExceptionOnBoolMismatch) {
     json_t config(doc);
 
     EXPECT_THROW(config.to_bool(), bad_cast);
+}
+
+TEST(json_t, IsInt) {
+    const auto json = "42";
+
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_FALSE(config.is_nil());
+    EXPECT_FALSE(config.is_bool());
+    EXPECT_TRUE(config.is_i64());
+    EXPECT_TRUE(config.is_u64());
+    EXPECT_FALSE(config.is_double());
+    EXPECT_FALSE(config.is_string());
+    EXPECT_FALSE(config.is_vector());
+    EXPECT_FALSE(config.is_object());
+}
+
+TEST(json_t, ToInt) {
+    const auto json = "42";
+
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_EQ(42, config.to_i64());
+    EXPECT_EQ(42, config.to_u64());
+}
+
+TEST(json_t, ThrowsExceptionOnIntismatch) {
+    const auto json = "false";
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_THROW(config.to_i64(), bad_cast);
+    EXPECT_THROW(config.to_u64(), bad_cast);
 }
 
 TEST(config_t, json) {
