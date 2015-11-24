@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstdint>
 #include <functional>
 #include <memory>
@@ -6,6 +8,7 @@
 #include <vector>
 
 namespace blackhole {
+namespace config {
 
 class bad_cast : public std::logic_error {
 public:
@@ -25,8 +28,10 @@ public:
     typedef std::function<auto(const config_t&) -> void> each_function;
     typedef std::function<auto(const std::string&, const config_t&) -> void> member_function;
 
-    virtual auto operator[](const std::size_t& idx) const -> monadic<config_t> = 0;
-    virtual auto operator[](const std::string& key) const -> monadic<config_t> = 0;
+    virtual ~config_t() {}
+
+    virtual auto operator[](const std::size_t& idx) const -> config::monadic<config_t> = 0;
+    virtual auto operator[](const std::string& key) const -> config::monadic<config_t> = 0;
 
     virtual auto is_nil() const -> bool = 0;
     virtual auto is_bool() const -> bool = 0;
@@ -46,5 +51,11 @@ public:
     virtual auto each(const each_function& fn) -> void = 0;
     virtual auto each_map(const member_function& fn) -> void = 0;
 };
+
+}  // namespace config
+
+using config::bad_cast;
+using config::bad_optional_access;
+using config::config_t;
 
 }  // namespace blackhole

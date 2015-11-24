@@ -31,7 +31,9 @@ set_target_properties(cppformat PROPERTIES
 
 add_library(${LIBRARY_NAME} SHARED
 	src/attribute
-	src/config
+	src/config.cpp
+	src/config/monadic
+	src/config/none
 	src/datetime/generator.linux
 	src/datetime/generator.other
 	src/formatter/string.cpp

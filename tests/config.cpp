@@ -1,158 +1,8 @@
 #include <blackhole/config.hpp>
+#include <blackhole/config/monadic.hpp>
+#include <blackhole/config/none.hpp>
 
 #include <boost/assert.hpp>
-
-namespace blackhole {
-
-/// None value. Throws an exception on any get access, but maps to none on subscription.
-class none_t : public config_t {
-public:
-    auto operator[](const std::size_t& idx) const -> monadic<config_t>;
-    auto operator[](const std::string& key) const -> monadic<config_t>;
-
-    auto is_nil() const -> bool;
-    auto is_bool() const -> bool;
-    auto is_i64() const -> bool;
-    auto is_u64() const -> bool;
-    auto is_double() const -> bool;
-    auto is_string() const -> bool;
-    auto is_vector() const -> bool;
-    auto is_object() const -> bool;
-
-    auto to_bool() const -> bool;
-    auto to_i64() const -> std::int64_t;
-    auto to_u64() const -> std::uint64_t;
-    auto to_double() const -> double;
-    auto to_string() const -> std::string;
-
-    auto each(const each_function& fn) -> void;
-    auto each_map(const member_function& fn) -> void;
-};
-
-// TODO: Can be hidden for the sake of encapsulation.
-template<>
-class monadic<config_t> {
-    std::unique_ptr<config_t> inner;
-
-public:
-    monadic() :
-        inner(new none_t)
-    {}
-
-    explicit monadic(std::unique_ptr<config_t> inner) :
-        inner(std::move(inner))
-    {
-        BOOST_ASSERT(this->inner);
-    }
-
-    auto operator[](const std::size_t& idx) const -> monadic<config_t> {
-        return inner->operator[](idx);
-    }
-
-    auto operator[](const std::string& key) const -> monadic<config_t> {
-        return inner->operator[](key);
-    }
-
-    auto operator->() -> config_t* {
-        return inner.get();
-    }
-
-    auto operator*() const -> const config_t& {
-        return *inner;
-    }
-};
-
-auto
-none_t::operator[](const std::size_t& idx) const -> monadic<config_t> {
-    return {};
-}
-
-auto
-none_t::operator[](const std::string& key) const -> monadic<config_t> {
-    return {};
-}
-
-auto
-none_t::is_nil() const -> bool {
-    return true;
-}
-
-auto
-none_t::is_bool() const -> bool {
-    return false;
-}
-
-auto
-none_t::is_i64() const -> bool {
-    return false;
-}
-
-auto
-none_t::is_u64() const -> bool {
-    return false;
-}
-
-auto
-none_t::is_double() const -> bool {
-    return false;
-}
-
-auto
-none_t::is_string() const -> bool {
-    return false;
-}
-
-auto
-none_t::is_vector() const -> bool {
-    return false;
-}
-
-auto
-none_t::is_object() const -> bool {
-    return false;
-}
-
-auto
-none_t::to_bool() const -> bool {
-    throw bad_optional_access();
-}
-
-auto
-none_t::to_i64() const -> std::int64_t {
-    throw bad_optional_access();
-}
-
-auto
-none_t::to_u64() const -> std::uint64_t {
-    throw bad_optional_access();
-}
-
-auto
-none_t::to_double() const -> double {
-    throw bad_optional_access();
-}
-
-auto
-none_t::to_string() const -> std::string {
-    throw bad_optional_access();
-}
-
-auto
-none_t::each(const each_function& fn) -> void {
-    throw bad_optional_access();
-}
-
-auto
-none_t::each_map(const member_function& fn) -> void {
-    throw bad_optional_access();
-}
-
-template<typename T, typename... Args>
-auto make_monadic(Args&&... args) -> monadic<config_t> {
-    return monadic<config_t>(std::unique_ptr<T>(new T(std::forward<Args>(args)...)));
-}
-
-}  // namespace blackhole
 
 #include <gtest/gtest.h>
 
@@ -160,6 +10,9 @@ auto make_monadic(Args&&... args) -> monadic<config_t> {
 
 namespace blackhole {
 namespace testing {
+
+using config::none_t;
+using config::make_monadic;
 
 // builder(xml) - читает и генерирует свое дерево и реализации config_t.
 //  .sevmap(...) - просто запоминает
@@ -174,7 +27,7 @@ public:
         value(value)
     {}
 
-    auto operator[](const std::size_t& idx) const -> monadic<config_t> {
+    auto operator[](const std::size_t& idx) const -> config::monadic<config_t> {
         if (value.IsArray() && idx < value.Size()) {
             return make_monadic<json_t>(value[idx]);
         }
@@ -182,7 +35,7 @@ public:
         return {};
     }
 
-    auto operator[](const std::string& key) const -> monadic<config_t> {
+    auto operator[](const std::string& key) const -> config::monadic<config_t> {
         if (value.IsObject() && value.HasMember(key.c_str())) {
             return make_monadic<json_t>(value[key.c_str()]);
         }
