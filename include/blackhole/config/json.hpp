@@ -30,38 +30,6 @@ public:
         return {};
     }
 
-    auto is_nil() const -> bool {
-        return value.IsNull();
-    }
-
-    auto is_bool() const -> bool {
-        return value.IsBool();
-    }
-
-    auto is_i64() const -> bool {
-        return value.IsInt64();
-    }
-
-    auto is_u64() const -> bool {
-        return value.IsUint64();
-    }
-
-    auto is_double() const -> bool {
-        return value.IsDouble();
-    }
-
-    auto is_string() const -> bool {
-        return value.IsString();
-    }
-
-    auto is_vector() const -> bool {
-        return value.IsArray();
-    }
-
-    auto is_object() const -> bool {
-        return value.IsObject();
-    }
-
     auto to_bool() const -> bool {
         if (value.IsBool()) {
             return value.GetBool();

@@ -28,19 +28,11 @@ public:
     typedef std::function<auto(const config_t&) -> void> each_function;
     typedef std::function<auto(const std::string&, const config_t&) -> void> member_function;
 
+public:
     virtual ~config_t() {}
 
     virtual auto operator[](const std::size_t& idx) const -> config::monadic<config_t> = 0;
     virtual auto operator[](const std::string& key) const -> config::monadic<config_t> = 0;
-
-    virtual auto is_nil() const -> bool = 0;
-    virtual auto is_bool() const -> bool = 0;
-    virtual auto is_i64() const -> bool = 0;
-    virtual auto is_u64() const -> bool = 0;
-    virtual auto is_double() const -> bool = 0;
-    virtual auto is_string() const -> bool = 0;
-    virtual auto is_vector() const -> bool = 0;
-    virtual auto is_object() const -> bool = 0;
 
     virtual auto to_bool() const -> bool = 0;
     virtual auto to_i64() const -> std::int64_t = 0;

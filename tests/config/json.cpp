@@ -9,36 +9,6 @@ namespace testing {
 
 using config::json_t;
 
-TEST(json_t, IsNil) {
-    const auto json = "null";
-    rapidjson::Document doc;
-    doc.Parse<0>(json);
-    ASSERT_FALSE(doc.HasParseError());
-
-    json_t config(doc);
-
-    EXPECT_TRUE(config.is_nil());
-}
-
-TEST(json_t, IsBool) {
-    const auto json = "true";
-
-    rapidjson::Document doc;
-    doc.Parse<0>(json);
-    ASSERT_FALSE(doc.HasParseError());
-
-    json_t config(doc);
-
-    EXPECT_FALSE(config.is_nil());
-    EXPECT_TRUE(config.is_bool());
-    EXPECT_FALSE(config.is_i64());
-    EXPECT_FALSE(config.is_u64());
-    EXPECT_FALSE(config.is_double());
-    EXPECT_FALSE(config.is_string());
-    EXPECT_FALSE(config.is_vector());
-    EXPECT_FALSE(config.is_object());
-}
-
 TEST(json_t, ToBool) {
     const auto json = "true";
 
@@ -49,40 +19,6 @@ TEST(json_t, ToBool) {
     json_t config(doc);
 
     EXPECT_TRUE(config.to_bool());
-}
-
-// TODO: is_string, is_array, is_object.
-// TODO: to_string.
-// TODO: to<T>(default) for all cases.
-
-TEST(json_t, ThrowsExceptionOnBoolMismatch) {
-    const auto json = "42";
-    rapidjson::Document doc;
-    doc.Parse<0>(json);
-    ASSERT_FALSE(doc.HasParseError());
-
-    json_t config(doc);
-
-    EXPECT_THROW(config.to_bool(), bad_cast);
-}
-
-TEST(json_t, IsInt) {
-    const auto json = "42";
-
-    rapidjson::Document doc;
-    doc.Parse<0>(json);
-    ASSERT_FALSE(doc.HasParseError());
-
-    json_t config(doc);
-
-    EXPECT_FALSE(config.is_nil());
-    EXPECT_FALSE(config.is_bool());
-    EXPECT_TRUE(config.is_i64());
-    EXPECT_TRUE(config.is_u64());
-    EXPECT_FALSE(config.is_double());
-    EXPECT_FALSE(config.is_string());
-    EXPECT_FALSE(config.is_vector());
-    EXPECT_FALSE(config.is_object());
 }
 
 TEST(json_t, ToInt) {
@@ -98,37 +34,6 @@ TEST(json_t, ToInt) {
     EXPECT_EQ(42, config.to_u64());
 }
 
-TEST(json_t, ThrowsExceptionOnIntMismatch) {
-    const auto json = "false";
-    rapidjson::Document doc;
-    doc.Parse<0>(json);
-    ASSERT_FALSE(doc.HasParseError());
-
-    json_t config(doc);
-
-    EXPECT_THROW(config.to_i64(), bad_cast);
-    EXPECT_THROW(config.to_u64(), bad_cast);
-}
-
-TEST(json_t, IsDouble) {
-    const auto json = "42.5";
-
-    rapidjson::Document doc;
-    doc.Parse<0>(json);
-    ASSERT_FALSE(doc.HasParseError());
-
-    json_t config(doc);
-
-    EXPECT_FALSE(config.is_nil());
-    EXPECT_FALSE(config.is_bool());
-    EXPECT_FALSE(config.is_i64());
-    EXPECT_FALSE(config.is_u64());
-    EXPECT_TRUE(config.is_double());
-    EXPECT_FALSE(config.is_string());
-    EXPECT_FALSE(config.is_vector());
-    EXPECT_FALSE(config.is_object());
-}
-
 TEST(json_t, ToDouble) {
     const auto json = "42.5";
 
@@ -139,36 +44,6 @@ TEST(json_t, ToDouble) {
     json_t config(doc);
 
     EXPECT_DOUBLE_EQ(42.5, config.to_double());
-}
-
-TEST(json_t, ThrowsExceptionOnDoubleMismatch) {
-    const auto json = "false";
-    rapidjson::Document doc;
-    doc.Parse<0>(json);
-    ASSERT_FALSE(doc.HasParseError());
-
-    json_t config(doc);
-
-    EXPECT_THROW(config.to_double(), bad_cast);
-}
-
-TEST(json_t, IsString) {
-    const auto json = R"("le value")";
-
-    rapidjson::Document doc;
-    doc.Parse<0>(json);
-    ASSERT_FALSE(doc.HasParseError());
-
-    json_t config(doc);
-
-    EXPECT_FALSE(config.is_nil());
-    EXPECT_FALSE(config.is_bool());
-    EXPECT_FALSE(config.is_i64());
-    EXPECT_FALSE(config.is_u64());
-    EXPECT_FALSE(config.is_double());
-    EXPECT_TRUE(config.is_string());
-    EXPECT_FALSE(config.is_vector());
-    EXPECT_FALSE(config.is_object());
 }
 
 TEST(json_t, ToString) {
@@ -183,6 +58,40 @@ TEST(json_t, ToString) {
     EXPECT_EQ("le value", config.to_string());
 }
 
+TEST(json_t, ThrowsExceptionOnBoolMismatch) {
+    const auto json = "42";
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_THROW(config.to_bool(), bad_cast);
+}
+
+TEST(json_t, ThrowsExceptionOnIntMismatch) {
+    const auto json = "false";
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_THROW(config.to_i64(), bad_cast);
+    EXPECT_THROW(config.to_u64(), bad_cast);
+}
+
+TEST(json_t, ThrowsExceptionOnDoubleMismatch) {
+    const auto json = "false";
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_THROW(config.to_double(), bad_cast);
+}
+
 TEST(json_t, ThrowsExceptionOnStringMismatch) {
     const auto json = "false";
     rapidjson::Document doc;
@@ -194,7 +103,7 @@ TEST(json_t, ThrowsExceptionOnStringMismatch) {
     EXPECT_THROW(config.to_string(), bad_cast);
 }
 
-TEST(config_t, json) {
+TEST(json_t, complex) {
     const auto json = R"({
         "formatter": {
             "type": "string",
@@ -251,5 +160,3 @@ TEST(config_t, json) {
 
 }  // namespace testing
 }  // namespace blackhole
-
-// TODO: It's likely that I'll drop all is_* methods for unnecessity.

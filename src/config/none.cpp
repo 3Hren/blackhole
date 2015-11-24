@@ -16,46 +16,6 @@ none_t::operator[](const std::string&) const -> monadic<config_t> {
 }
 
 auto
-none_t::is_nil() const -> bool {
-    return true;
-}
-
-auto
-none_t::is_bool() const -> bool {
-    return false;
-}
-
-auto
-none_t::is_i64() const -> bool {
-    return false;
-}
-
-auto
-none_t::is_u64() const -> bool {
-    return false;
-}
-
-auto
-none_t::is_double() const -> bool {
-    return false;
-}
-
-auto
-none_t::is_string() const -> bool {
-    return false;
-}
-
-auto
-none_t::is_vector() const -> bool {
-    return false;
-}
-
-auto
-none_t::is_object() const -> bool {
-    return false;
-}
-
-auto
 none_t::to_bool() const -> bool {
     throw bad_optional_access();
 }
