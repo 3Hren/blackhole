@@ -29,6 +29,14 @@ public:
     virtual auto operator[](const std::string& key) const -> monadic<config_t> = 0;
 
     virtual auto is_nil() const -> bool = 0;
+    virtual auto is_bool() const -> bool = 0;
+    virtual auto is_i64() const -> bool = 0;
+    virtual auto is_u64() const -> bool = 0;
+    virtual auto is_double() const -> bool = 0;
+    virtual auto is_string() const -> bool = 0;
+    virtual auto is_array() const -> bool = 0;
+    virtual auto is_object() const -> bool = 0;
+
     virtual auto to_bool() const -> bool = 0;
     virtual auto to_i64() const -> std::int64_t = 0;
     virtual auto to_u64() const -> std::uint64_t = 0;

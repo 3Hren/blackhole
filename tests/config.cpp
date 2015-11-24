@@ -11,6 +11,14 @@ public:
     auto operator[](const std::string& key) const -> monadic<config_t>;
 
     auto is_nil() const -> bool;
+    auto is_bool() const -> bool;
+    auto is_i64() const -> bool;
+    auto is_u64() const -> bool;
+    auto is_double() const -> bool;
+    auto is_string() const -> bool;
+    auto is_array() const -> bool;
+    auto is_object() const -> bool;
+
     auto to_bool() const -> bool;
     auto to_i64() const -> std::int64_t;
     auto to_u64() const -> std::uint64_t;
@@ -66,6 +74,41 @@ none_t::operator[](const std::string& key) const -> monadic<config_t> {
 auto
 none_t::is_nil() const -> bool {
     return true;
+}
+
+auto
+none_t::is_bool() const -> bool {
+    return false;
+}
+
+auto
+none_t::is_i64() const -> bool {
+    return false;
+}
+
+auto
+none_t::is_u64() const -> bool {
+    return false;
+}
+
+auto
+none_t::is_double() const -> bool {
+    return false;
+}
+
+auto
+none_t::is_string() const -> bool {
+    return false;
+}
+
+auto
+none_t::is_array() const -> bool {
+    return false;
+}
+
+auto
+none_t::is_object() const -> bool {
+    return false;
 }
 
 auto
@@ -145,6 +188,34 @@ public:
         return value.IsNull();
     }
 
+    auto is_bool() const -> bool {
+        return value.IsBool();
+    }
+
+    auto is_i64() const -> bool {
+        return value.IsInt64();
+    }
+
+    auto is_u64() const -> bool {
+        return value.IsUint64();
+    }
+
+    auto is_double() const -> bool {
+        return value.IsDouble();
+    }
+
+    auto is_string() const -> bool {
+        return value.IsString();
+    }
+
+    auto is_array() const -> bool {
+        return value.IsArray();
+    }
+
+    auto is_object() const -> bool {
+        return value.IsObject();
+    }
+
     auto to_bool() const -> bool {
         if (value.IsBool()) {
             return value.GetBool();
@@ -194,6 +265,13 @@ TEST(null_t, IsNil) {
     none_t config;
 
     EXPECT_TRUE(config.is_nil());
+    EXPECT_FALSE(config.is_bool());
+    EXPECT_FALSE(config.is_i64());
+    EXPECT_FALSE(config.is_u64());
+    EXPECT_FALSE(config.is_double());
+    EXPECT_FALSE(config.is_string());
+    EXPECT_FALSE(config.is_array());
+    EXPECT_FALSE(config.is_object());
 }
 
 TEST(null_t, ThrowsOnEveryGetterInvocation) {
@@ -211,6 +289,25 @@ TEST(json_t, IsNil) {
     json_t config(doc);
 
     EXPECT_TRUE(config.is_nil());
+}
+
+TEST(json_t, IsBool) {
+    const auto json = "true";
+
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_FALSE(config.is_nil());
+    EXPECT_TRUE(config.is_bool());
+    EXPECT_FALSE(config.is_i64());
+    EXPECT_FALSE(config.is_u64());
+    EXPECT_FALSE(config.is_double());
+    EXPECT_FALSE(config.is_string());
+    EXPECT_FALSE(config.is_array());
+    EXPECT_FALSE(config.is_object());
 }
 
 TEST(json_t, ToBool) {
