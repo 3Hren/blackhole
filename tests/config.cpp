@@ -9,6 +9,11 @@
 
 namespace blackhole {
 
+class bad_optional_access : public std::logic_error {
+public:
+    bad_optional_access() : std::logic_error("not engaged") {}
+};
+
 template<typename T>
 class monadic;
 
@@ -20,6 +25,7 @@ public:
     virtual auto operator[](const std::size_t& idx) const -> monadic<config_t> = 0;
     virtual auto operator[](const std::string& key) const -> monadic<config_t> = 0;
 
+    virtual auto is_nil() const -> bool = 0;
     virtual auto to_i64() const -> std::int64_t = 0;
     virtual auto to_u64() const -> std::uint64_t = 0;
     virtual auto to_string() const -> std::string = 0;
@@ -30,8 +36,11 @@ public:
 
 /// None value. Throws an exception on any get access, but maps to none on subscription.
 class none_t : public config_t {
+public:
     auto operator[](const std::size_t& idx) const -> monadic<config_t>;
     auto operator[](const std::string& key) const -> monadic<config_t>;
+
+    auto is_nil() const -> bool;
     auto to_i64() const -> std::int64_t;
     auto to_u64() const -> std::uint64_t;
     auto to_string() const -> std::string;
@@ -81,6 +90,11 @@ none_t::operator[](const std::size_t& idx) const -> monadic<config_t> {
 auto
 none_t::operator[](const std::string& key) const -> monadic<config_t> {
     return {};
+}
+
+auto
+none_t::is_nil() const -> bool {
+    return true;
 }
 
 auto
@@ -153,6 +167,10 @@ public:
         return {};
     }
 
+    auto is_nil() const -> bool {
+        // return value.IsNull();
+    }
+
     auto to_i64() const -> std::int64_t {
         if (value.IsInt64()) {
             return value.GetInt64();
@@ -189,6 +207,18 @@ public:
         }
     }
 };
+
+TEST(null_t, IsNil) {
+    none_t config;
+
+    EXPECT_TRUE(config.is_nil());
+}
+
+// TEST(null_t, ThrowsOnEveryGetterInvocation) {
+//     none_t config;
+//
+//     EXPECT_THROW(config.to_nil(), bad_optional_access);
+// }
 
 TEST(config_t, json) {
     static const std::string JSON = R"({
