@@ -4,6 +4,8 @@
 
 #include <blackhole/config/json.hpp>
 
+#include <blackhole/detail/config/json.hpp>
+
 namespace blackhole {
 namespace testing {
 
