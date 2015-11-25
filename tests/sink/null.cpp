@@ -52,6 +52,10 @@ TEST(null_t, FilterOut) {
     EXPECT_FALSE(sink.filter(record));
 }
 
+TEST(null_t, type) {
+    EXPECT_EQ("null", std::string(factory<sink::null_t>::type()));
+}
+
 TEST(null_t, factory) {
     StrictMock<mock::config_t> config;
 

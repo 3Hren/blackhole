@@ -33,6 +33,7 @@ public:
 
 template<>
 struct factory<sink::null_t> {
+    static auto type() -> const char*;
     static auto from(const config_t& config) -> sink::null_t;
 };
 
