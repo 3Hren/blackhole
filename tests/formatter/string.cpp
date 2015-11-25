@@ -485,5 +485,9 @@ TEST(string_t, LeftoverWithSeparator) {
     ));
 }
 
+TEST(string_t, Type) {
+    EXPECT_EQ("string", std::string(factory<formatter::string_t>::type()));
+}
+
 }  // namespace testing
 }  // namespace blackhole

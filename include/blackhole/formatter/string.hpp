@@ -152,7 +152,6 @@ public:
 
 template<>
 struct factory<formatter::string_t> {
-    /// \test
     static auto type() -> const char*;
     /// \test
     static auto from(const config_t& config) -> formatter::string_t;
