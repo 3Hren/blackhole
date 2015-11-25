@@ -5,7 +5,7 @@
 #define FMT_HEADER_ONLY
 #include <cppformat/format.h>
 
-#include <blackhole/sandbox.hpp>
+#include <blackhole/extensions/format.hpp>
 
 namespace blackhole {
 namespace benchmark {
