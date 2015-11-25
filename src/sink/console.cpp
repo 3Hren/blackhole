@@ -17,4 +17,15 @@ auto console_t::execute(const record_t&, const string_view& formatted) -> void {
 }
 
 }  // namespace sink
+
+auto
+factory<sink::console_t>::type() -> const char* {
+    return "console";
+}
+
+auto
+factory<sink::console_t>::from(const config_t&) -> sink::console_t {
+    return {};
+}
+
 }  // namespace blackhole
