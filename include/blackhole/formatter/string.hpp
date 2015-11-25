@@ -129,9 +129,9 @@ typedef std::function<void(int severity, const std::string& spec, writer_t& writ
 /// All visited tokens are written directly into the given writer instance with an internal small
 /// stack-allocated buffer, growing using the heap on overflow.
 class string_t : public formatter_t {
-    const std::string pattern;
-    const severity_map sevmap;
-    const std::vector<token_t> tokens;
+    std::string pattern;
+    severity_map sevmap;
+    std::vector<token_t> tokens;
 
 public:
     string_t(std::string pattern, const options_t& options = options_t());
