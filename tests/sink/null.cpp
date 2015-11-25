@@ -16,16 +16,18 @@ using sink::null_t;
 namespace mock {
 
 class config_t : public ::blackhole::config_t {
-public:
-    MOCK_CONST_METHOD1(subscript, ::blackhole::config_t*(const std::size_t&));
-    MOCK_CONST_METHOD1(subscript, ::blackhole::config_t*(const std::string&));
+    typedef ::blackhole::config_t mocked_type;
 
-    auto operator[](const std::size_t& idx) const -> config::monadic<::blackhole::config_t> {
-        return config::monadic<::blackhole::config_t>(std::unique_ptr<::blackhole::config_t>(subscript(idx)));
+public:
+    MOCK_CONST_METHOD1(subscript, mocked_type*(const std::size_t&));
+    MOCK_CONST_METHOD1(subscript, mocked_type*(const std::string&));
+
+    auto operator[](const std::size_t& idx) const -> config::monadic<mocked_type> {
+        return config::monadic<mocked_type>(std::unique_ptr<mocked_type>(subscript(idx)));
     }
 
-    auto operator[](const std::string& key) const -> config::monadic<::blackhole::config_t> {
-        return config::monadic<::blackhole::config_t>(std::unique_ptr<::blackhole::config_t>(subscript(key)));
+    auto operator[](const std::string& key) const -> config::monadic<mocked_type> {
+        return config::monadic<mocked_type>(std::unique_ptr<mocked_type>(subscript(key)));
     }
 
     MOCK_CONST_METHOD0(to_bool, bool());
