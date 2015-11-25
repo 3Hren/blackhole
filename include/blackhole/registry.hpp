@@ -60,7 +60,6 @@ private:
     std::map<std::string, formatter_factory> formatters;
 
 public:
-    /// \test
     static auto configured() -> registry_t;
 
     /// Returns a logger builder by constructing its configuration factory using the given
