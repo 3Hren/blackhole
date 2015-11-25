@@ -32,6 +32,8 @@ set_target_properties(cppformat PROPERTIES
 add_library(${LIBRARY_NAME} SHARED
 	src/attribute
 	src/config.cpp
+	src/config/factory
+	src/config/json
 	src/config/monadic
 	src/config/none
 	src/datetime/generator.linux
@@ -44,6 +46,7 @@ add_library(${LIBRARY_NAME} SHARED
 	src/logger
 	src/procname
 	src/record
+	src/registry
 	src/root
 	src/scoped
 	src/sink/console
@@ -131,9 +134,11 @@ if (ENABLE_TESTING)
 
 	prepare_google_testing()
 
-	include_directories(
-		${PROJECT_SOURCE_DIR}/tests/include
+	include_directories(BEFORE SYSTEM
 		${PROJECT_SOURCE_DIR}/foreign/rapidjson/include)
+
+	include_directories(
+		${PROJECT_SOURCE_DIR}/tests/include)
 
     add_executable(${LIBRARY_NAME}-tests
 		tests/attribute
@@ -192,9 +197,19 @@ if (ENABLE_BENCHMARKING)
 endif (ENABLE_BENCHMARKING)
 
 if (ENABLE_EXAMPLES)
+	# Configuration using manual builder.
     add_executable(2-simple
 		examples/2.simple)
 
 	target_link_libraries(2-simple
 		blackhole)
+
+	# Configuration using JSON config file.
+	add_executable(3-config
+		examples/3.config)
+
+	target_link_libraries(3-config
+		blackhole)
+
+	file(COPY examples/3.config.json DESTINATION .)
 endif (ENABLE_EXAMPLES)

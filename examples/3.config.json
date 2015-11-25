@@ -1,0 +1,17 @@
+{
+    "root": [
+        {
+            "type": "blocking",
+            "formatter": {
+                "type": "string",
+                "sevmap": ["D", "I", "W", "E"],
+                "pattern": "{severity}, [{timestamp}]: {message}"
+            },
+            "sinks": [
+                {
+                    "type": "console"
+                }
+            ]
+        }
+    ]
+}
