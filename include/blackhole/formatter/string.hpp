@@ -136,7 +136,9 @@ class string_t : public formatter_t {
 public:
     string_t(std::string pattern, const options_t& options = options_t());
     string_t(std::string pattern, severity_map sevmap, const options_t& options = options_t());
+    string_t(const string_t& other) = delete;
     string_t(string_t&& other);
+
     ~string_t();
 
     auto format(const record_t& record, writer_t& writer) -> void;
