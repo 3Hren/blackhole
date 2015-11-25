@@ -15,4 +15,10 @@ auto
 null_t::execute(const record_t&, const string_view&) -> void {}
 
 }  // namespace sink
+
+auto
+factory<sink::null_t>::from(const config_t&) -> sink::null_t {
+    return sink::null_t();
+}
+
 }  // namespace blackhole

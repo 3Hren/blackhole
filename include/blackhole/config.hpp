@@ -23,6 +23,8 @@ public:
 template<typename T>
 class monadic;
 
+}  // namespace config
+
 class config_t {
 public:
     typedef std::function<auto(const config_t&) -> void> each_function;
@@ -44,10 +46,7 @@ public:
     virtual auto each_map(const member_function& fn) -> void = 0;
 };
 
-}  // namespace config
-
 using config::bad_cast;
 using config::bad_optional_access;
-using config::config_t;
 
 }  // namespace blackhole
