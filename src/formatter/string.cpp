@@ -6,6 +6,8 @@
 
 #include <cppformat/format.h>
 
+#include "blackhole/config.hpp"
+#include "blackhole/config/monadic.hpp"
 #include "blackhole/extensions/writer.hpp"
 #include "blackhole/record.hpp"
 
@@ -311,4 +313,15 @@ string_t::format(const record_t& record, writer_t& writer) -> void {
 }
 
 }  // namespace formatter
+
+auto
+factory<formatter::string_t>::type() -> const char* {
+    return "string";
+}
+
+auto
+factory<formatter::string_t>::from(const config_t& config) -> formatter::string_t {
+    return formatter::string_t(config["pattern"]->to_string());
+}
+
 }  // namespace blackhole
