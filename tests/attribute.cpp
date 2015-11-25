@@ -5,8 +5,7 @@
 namespace blackhole {
 namespace testing {
 
-TEST(Attribute, Constructor) {
-}
+// TODO: Write tests.
 
 }  // namespace testing
 }  // namespace blackhole
