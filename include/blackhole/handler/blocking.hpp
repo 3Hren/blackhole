@@ -7,8 +7,10 @@
 
 namespace blackhole {
 
-class formatter_t;
-class sink_t;
+class config_t;
+
+template<typename>
+struct factory;
 
 namespace handler {
 
@@ -24,4 +26,11 @@ public:
 };
 
 }  // namespace handler
+
+template<>
+struct factory<handler::blocking_t> {
+    static auto type() -> const char*;
+    static auto from(const config_t& config) -> handler::blocking_t;
+};
+
 }  // namespace blackhole

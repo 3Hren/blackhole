@@ -30,4 +30,15 @@ blocking_t::add(std::unique_ptr<sink_t> sink) -> void {
 }
 
 }  // namespace handler
+
+auto
+factory<handler::blocking_t>::type() -> const char* {
+    return "blocking";
+}
+
+auto
+factory<handler::blocking_t>::from(const config_t&) -> handler::blocking_t {
+    return {};
+}
+
 }  // namespace blackhole
