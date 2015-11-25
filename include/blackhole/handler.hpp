@@ -10,6 +10,10 @@ class sink_t;
 
 class handler_t {
 public:
+    handler_t() = default;
+    handler_t(const handler_t& other) = default;
+    handler_t(handler_t&& other) = default;
+
     virtual ~handler_t() {}
 
     /// \warning must be thread-safe.
