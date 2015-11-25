@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "blackhole/cpp17/string_view.hpp"
+
 namespace blackhole {
 namespace sink {
 
