@@ -14,6 +14,9 @@ public:
     ~handler_t();
 
     MOCK_METHOD1(execute, void(const record_t&));
+
+    auto set(std::unique_ptr<formatter_t>) -> void {}
+    auto add(std::unique_ptr<sink_t>) -> void {}
 };
 
 }  // namespace mock
