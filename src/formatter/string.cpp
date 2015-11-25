@@ -297,6 +297,8 @@ string_t::string_t(std::string pattern, severity_map sevmap, const options_t& op
     tokens(tokenize(this->pattern, options))
 {}
 
+string_t::string_t(string_t&& other) = default;
+
 string_t::~string_t() {}
 
 auto
