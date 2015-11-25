@@ -6,6 +6,7 @@
 namespace blackhole {
 namespace config {
 
+// TODO: It's a detail!
 class json_t : public config_t {
     const rapidjson::Value& value;
 
