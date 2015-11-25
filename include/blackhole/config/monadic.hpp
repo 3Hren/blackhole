@@ -2,11 +2,10 @@
 
 #include <memory>
 
-#include <boost/assert.hpp>
-
-#include "blackhole/config.hpp"
-
 namespace blackhole {
+
+class config_t;
+
 namespace config {
 
 template<typename>
@@ -18,28 +17,15 @@ class monadic<config_t> {
 
 public:
     monadic();
+    explicit monadic(std::unique_ptr<config_t> inner);
+    monadic(monadic&& other) = default;
 
-    explicit monadic(std::unique_ptr<config_t> inner) :
-        inner(std::move(inner))
-    {
-        BOOST_ASSERT(this->inner);
-    }
+    ~monadic();
 
-    auto operator[](const std::size_t& idx) const -> monadic<config_t> {
-        return inner->operator[](idx);
-    }
-
-    auto operator[](const std::string& key) const -> monadic<config_t> {
-        return inner->operator[](key);
-    }
-
-    auto operator->() -> config_t* {
-        return inner.get();
-    }
-
-    auto operator*() const -> const config_t& {
-        return *inner;
-    }
+    auto operator[](const std::size_t& idx) const -> monadic<config_t>;
+    auto operator[](const std::string& key) const -> monadic<config_t>;
+    auto operator->() -> config_t*;
+    auto operator*() const -> const config_t&;
 };
 
 template<typename T, typename... Args>
