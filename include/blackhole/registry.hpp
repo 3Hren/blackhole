@@ -40,6 +40,10 @@ public:
 
     ~builder_t();
 
+    // TODO: Implement. This requires the signature of formatter factories to be changed to accept
+    // severity_map argument.
+    // auto sevmap(severity_map sevmap) -> void;
+
     auto build(const std::string& name) -> root_logger_t;
 
 private:
