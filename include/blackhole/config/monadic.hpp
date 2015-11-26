@@ -22,6 +22,9 @@ public:
 
     ~monadic();
 
+    /// Checks whether the inner value is initialized.
+    auto valid() const -> bool;
+
     auto operator[](const std::size_t& idx) const -> monadic<config_t>;
     auto operator[](const std::string& key) const -> monadic<config_t>;
     auto operator->() -> config_t*;

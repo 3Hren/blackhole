@@ -21,6 +21,11 @@ monadic<config_t>::monadic(std::unique_ptr<config_t> inner) :
 monadic<config_t>::~monadic() {}
 
 auto
+monadic<config_t>::valid() const -> bool {
+    return inner != nullptr;
+}
+
+auto
 monadic<config_t>::operator[](const std::size_t& idx) const -> monadic<config_t> {
     return inner->operator[](idx);
 }

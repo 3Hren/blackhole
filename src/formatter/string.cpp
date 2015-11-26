@@ -321,7 +321,27 @@ factory<formatter::string_t>::type() -> const char* {
 
 auto
 factory<formatter::string_t>::from(const config_t& config) -> formatter::string_t {
-    return formatter::string_t(config["pattern"]->to_string());
+    auto pattern = config["pattern"]->to_string();
+
+    auto mapping = config["sevmap"];
+    if (mapping.valid()) {
+        std::vector<std::string> sevmap;
+        mapping->each([&](const config_t& config) {
+            sevmap.emplace_back(config.to_string());
+        });
+
+        auto fn = [=](int severity, const std::string& spec, writer_t& writer) {
+            if (severity < sevmap.size()) {
+                writer.write(spec, sevmap[severity]);
+            } else {
+                writer.write(spec, severity);
+            }
+        };
+
+        return formatter::string_t(std::move(pattern), std::move(fn));
+    }
+
+    return formatter::string_t(std::move(pattern));
 }
 
 }  // namespace blackhole
