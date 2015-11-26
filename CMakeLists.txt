@@ -108,6 +108,13 @@ target_link_libraries(${LIBRARY_NAME}
 	cppformat
 )
 
+# The rule is that: any breakage of the ABI must be indicated by incrementing the SOVERSION.
+# So, adding e.g. functions is no problem, modifying argument lists or removing functions would
+# required the SOVERSION to be incremented. Similar rules hold of course for non-opaque
+# data-structures.
+set_target_properties(${LIBRARY_NAME} PROPERTIES VERSION 1.0.0)
+set_target_properties(${LIBRARY_NAME} PROPERTIES SOVERSION 1)
+
 if (ENABLE_TESTING_THREADSAFETY)
 	add_executable(${LIBRARY_NAME}-tests-rc-assign
 		tests/rc/assign)
