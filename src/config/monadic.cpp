@@ -20,8 +20,7 @@ monadic<config_t>::monadic(std::unique_ptr<config_t> inner) :
 
 monadic<config_t>::~monadic() {}
 
-auto
-monadic<config_t>::valid() const -> bool {
+monadic<config_t>::operator bool() const {
     return inner != nullptr;
 }
 

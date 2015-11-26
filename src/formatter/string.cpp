@@ -323,8 +323,7 @@ auto
 factory<formatter::string_t>::from(const config_t& config) -> formatter::string_t {
     auto pattern = config["pattern"]->to_string();
 
-    auto mapping = config["sevmap"];
-    if (mapping.valid()) {
+    if (auto mapping = config["sevmap"]) {
         std::vector<std::string> sevmap;
         mapping->each([&](const config_t& config) {
             sevmap.emplace_back(config.to_string());
