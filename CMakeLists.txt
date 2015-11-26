@@ -213,3 +213,16 @@ if (ENABLE_EXAMPLES)
 
 	file(COPY examples/3.config.json DESTINATION .)
 endif (ENABLE_EXAMPLES)
+
+install(
+    TARGETS
+        blackhole
+    LIBRARY DESTINATION lib COMPONENT runtime
+	ARCHIVE DESTINATION lib COMPONENT development)
+
+install(
+    DIRECTORY
+        include/
+    DESTINATION include
+    COMPONENT development
+    PATTERN "detail" EXCLUDE)
