@@ -6,7 +6,6 @@
 
 #include <cppformat/format.h>
 
-#include "blackhole/cpp17/optional.hpp"
 #include "blackhole/cpp17/string_view.hpp"
 
 using blackhole::cpp17::string_view;
