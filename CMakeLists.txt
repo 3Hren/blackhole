@@ -21,7 +21,7 @@ find_package(Boost 1.46 REQUIRED COMPONENTS
 
 include_directories(BEFORE SYSTEM
 	${PROJECT_SOURCE_DIR}/foreign
-	${PROJECT_SOURCE_DIR}/rapidjson/include)
+	${PROJECT_SOURCE_DIR}/foreign/rapidjson/include)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
