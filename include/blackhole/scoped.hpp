@@ -36,7 +36,13 @@ protected:
 public:
     scoped_t(boost::thread_specific_ptr<scoped_t>* context, attributes_t attributes);
 
+    /// Copying scoped guards is deliberately prohibited.
     scoped_t(const scoped_t& other) = delete;
+
+    /// Move constructor is left default for enabling copy elision. It never takes place in fact.
+    ///
+    /// \warning you should never move scoped guard instances manually, otherwise the behavior is
+    ///     undefined.
     scoped_t(scoped_t&& other) = default;
 
     /// Destroys the current scoped guard with popping early attached attributes from the scoped
