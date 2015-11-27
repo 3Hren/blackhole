@@ -181,8 +181,6 @@ if (ENABLE_BENCHMARKING)
 
 	find_package(Threads)
 
-	set(CMAKE_BUILD_TYPE Release)
-
 	prepare_google_benchmarking()
 
 	add_executable(${LIBRARY_NAME}-benchmarks
