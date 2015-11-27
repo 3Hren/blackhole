@@ -3,7 +3,7 @@
 #include <functional>
 
 #if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
-#include <blackhole/extensions/format.hpp>
+#include <blackhole/extensions/metaformat.hpp>
 #endif
 
 #include "blackhole/extensions/facade.inl.hpp"
