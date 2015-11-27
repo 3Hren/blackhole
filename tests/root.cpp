@@ -79,10 +79,12 @@ TEST(RootLogger, MoveConstructorMovesScopedAttributes) {
 
     root_logger_t original(std::move(handlers));
 
+    // Logger must outlive its scoped attributes, that's why we need such variable.
+    std::unique_ptr<root_logger_t> logger;
     const auto scoped = original.scoped({{"key#1", {42}}});
 
     // All scoped attributes should be assigned to the new owner.
-    root_logger_t logger(std::move(original));
+    logger.reset(new root_logger_t(std::move(original)));
 
     EXPECT_CALL(*view, execute(_))
         .Times(1)
@@ -94,7 +96,7 @@ TEST(RootLogger, MoveConstructorMovesScopedAttributes) {
             EXPECT_EQ((attribute_list{{"key#1", {42}}}), record.attributes().at(0).get());
         }));
 
-    logger.log(0, "GET /porn.png HTTP/1.1");
+    logger->log(0, "GET /porn.png HTTP/1.1");
 }
 
 TEST(RootLogger, MoveConstructorMovesNestedScopedAttributes) {
@@ -116,8 +118,9 @@ TEST(RootLogger, MoveConstructorMovesNestedScopedAttributes) {
             EXPECT_EQ((attribute_list{{"key#1", {42}}}), record.attributes().at(0).get());
         }));;
 
-    root_logger_t original(std::move(handlers));
     std::unique_ptr<root_logger_t> logger;
+
+    root_logger_t original(std::move(handlers));
     const auto s1 = original.scoped({{"key#1", {42}}});
 
     {
