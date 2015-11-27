@@ -25,7 +25,7 @@ include_directories(BEFORE SYSTEM
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-add_library(cppformat STATIC foreign/cppformat/format)
+add_library(cppformat STATIC ${PROJECT_SOURCE_DIR}/foreign/cppformat/format)
 set_target_properties(cppformat PROPERTIES
 	COMPILE_FLAGS "-fPIC")
 
