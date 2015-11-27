@@ -148,7 +148,8 @@ public:
     }
 
     auto operator()(const ph::message_t& token) const -> void {
-        writer.write(token.spec, record.formatted().data());
+        const auto& value = record.formatted();
+        writer.write(token.spec, fmt::StringRef(value.data(), value.size()));
     }
 
     auto operator()(const ph::process<id>& token) const -> void {
