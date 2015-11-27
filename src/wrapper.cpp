@@ -1,5 +1,7 @@
 #include "blackhole/wrapper.hpp"
 
+#include "blackhole/scoped.hpp"
+
 namespace blackhole {
 
 wrapper_t::wrapper_t(logger_t& log, attributes_t attributes):
@@ -27,6 +29,11 @@ auto
 wrapper_t::log(int severity, string_view pattern, attribute_pack& pack, const format_t& fn) -> void {
     pack.push_back(attributes());
     inner.log(severity, pattern, pack, fn);
+}
+
+auto
+wrapper_t::scoped(attributes_t attributes) -> scoped_t {
+    return inner.scoped(std::move(attributes));
 }
 
 }  // namespace blackhole

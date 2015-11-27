@@ -1,6 +1,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <boost/thread/tss.hpp>
+
 #include <blackhole/logger.hpp>
 #include <blackhole/wrapper.hpp>
 
@@ -13,6 +15,7 @@
 namespace blackhole {
 namespace testing {
 
+using ::testing::Return;
 using ::testing::_;
 
 TEST(Wrapper, Constructor) {
@@ -29,6 +32,23 @@ TEST(Wrapper, Constructor) {
     };
 
     EXPECT_EQ(expected, wrapper.attributes());
+}
+
+TEST(wrapper_t, DelegatesScoped) {
+    // NOTE: This hack is required to test scoped attributes mechanics.
+    boost::thread_specific_ptr<scoped_t> context([](scoped_t*) {});
+
+    mock::logger_t logger;
+    wrapper_t wrapper(logger, {});
+
+    // TODO: Implement operator== for attribute. Refactor all tests to check.
+    EXPECT_CALL(logger, _scoped(_))
+        .Times(1)
+        .WillOnce(Return([&]() -> scoped_t {
+            return scoped_t(&context, {});
+        }));
+
+    wrapper.scoped({});
 }
 
 }  // namespace testing

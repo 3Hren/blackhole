@@ -10,9 +10,8 @@ logger_t::logger_t() {}
 
 logger_t::~logger_t() {}
 
-auto logger_t::scoped(attributes_t) -> scoped_t {
-    BLACKHOLE_UNIMPLEMENTED();
-    std::abort();
+auto logger_t::scoped(attributes_t attributes) -> scoped_t {
+    return _scoped(std::move(attributes))();
 }
 
 }  // namespace mock

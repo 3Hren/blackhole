@@ -18,6 +18,7 @@ public:
     MOCK_METHOD3(log, void(int, string_view, attribute_pack&));
     MOCK_METHOD4(log, void(int, string_view, attribute_pack&, const format_t&));
 
+    MOCK_METHOD1(_scoped, std::function<scoped_t()>(attributes_t));
     auto scoped(attributes_t attributes) -> scoped_t;
 };
 

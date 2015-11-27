@@ -27,7 +27,7 @@ public:
     /// Calling this method multiple times results in attributes stacking.
     ///
     /// \returns scoped guard which will detach attributes on its destruction.
-    virtual auto scoped(attributes_t attributes) -> scoped_t;
+    virtual auto scoped(attributes_t attributes) -> scoped_t = 0;
 };
 
 }  // namespace blackhole
