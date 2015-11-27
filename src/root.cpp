@@ -81,6 +81,17 @@ root_logger_t::root_logger_t(filter_t filter, std::vector<std::unique_ptr<handle
     inner(std::make_shared<inner_t>(std::move(filter), std::move(handlers)))
 {}
 
+root_logger_t::root_logger_t(root_logger_t&& other) noexcept :
+    sync(new sync_t),
+    inner(std::move(other.sync->load(other.inner)))
+{
+    sync->context.reset(other.sync->context.get());
+
+    if (sync->context.get()) {
+        sync->context.get()->rebind(&sync->context);
+    }
+}
+
 root_logger_t::~root_logger_t() {}
 
 auto

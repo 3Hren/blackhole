@@ -33,6 +33,103 @@ TEST(RootLogger, FilterConstructor) {
     EXPECT_EQ(1, passed);
 }
 
+TEST(RootLogger, MoveConstructorMovesFilter) {
+    int passed = 0;
+
+    root_logger_t original([&](const record_t&) -> bool {
+        passed += 1;
+        return true;
+    }, {});
+
+    root_logger_t logger(std::move(original));
+
+    EXPECT_EQ(0, passed);
+    logger.log(0, "-");
+
+    EXPECT_EQ(1, passed);
+}
+
+TEST(RootLogger, MoveConstructorMovesHandlers) {
+    typedef view_of<attributes_t>::type attribute_list;
+
+    std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
+    mock::handler_t* view = handler.get();
+
+    std::vector<std::unique_ptr<handler_t>> handlers;
+    handlers.push_back(std::move(handler));
+
+    root_logger_t original(std::move(handlers));
+
+    EXPECT_CALL(*view, execute(_))
+        .Times(1);
+
+    root_logger_t logger(std::move(original));
+
+    logger.log(0, "GET /porn.png HTTP/1.1");
+}
+
+TEST(RootLogger, MoveConstructorMovesScopedAttributes) {
+    typedef view_of<attributes_t>::type attribute_list;
+
+    std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
+    mock::handler_t* view = handler.get();
+
+    std::vector<std::unique_ptr<handler_t>> handlers;
+    handlers.push_back(std::move(handler));
+
+    root_logger_t original(std::move(handlers));
+
+    const auto scoped = original.scoped({{"key#1", {42}}});
+
+    // All scoped attributes should be assigned to the new owner.
+    root_logger_t logger(std::move(original));
+
+    EXPECT_CALL(*view, execute(_))
+        .Times(1)
+        .WillOnce(Invoke([](const record_t& record) {
+            EXPECT_EQ("GET /porn.png HTTP/1.1", record.message().to_string());
+            EXPECT_EQ("GET /porn.png HTTP/1.1", record.formatted().to_string());
+            EXPECT_EQ(0, record.severity());
+            ASSERT_EQ(1, record.attributes().size());
+            EXPECT_EQ((attribute_list{{"key#1", {42}}}), record.attributes().at(0).get());
+        }));
+
+    logger.log(0, "GET /porn.png HTTP/1.1");
+}
+
+TEST(RootLogger, MoveConstructorMovesNestedScopedAttributes) {
+    std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
+    mock::handler_t* view = handler.get();
+
+    std::vector<std::unique_ptr<handler_t>> handlers;
+    handlers.push_back(std::move(handler));
+
+    EXPECT_CALL(*view, execute(_))
+        .Times(2)
+        .WillOnce(Invoke([](const record_t& record) {
+            ASSERT_EQ(2, record.attributes().size());
+            EXPECT_EQ((attribute_list{{"key#2", {"value#2"}}}), record.attributes().at(0).get());
+            EXPECT_EQ((attribute_list{{"key#1", {42}}}), record.attributes().at(1).get());
+        }))
+        .WillOnce(Invoke([](const record_t& record) {
+            ASSERT_EQ(1, record.attributes().size());
+            EXPECT_EQ((attribute_list{{"key#1", {42}}}), record.attributes().at(0).get());
+        }));;
+
+    root_logger_t original(std::move(handlers));
+    std::unique_ptr<root_logger_t> logger;
+    const auto s1 = original.scoped({{"key#1", {42}}});
+
+    {
+        const auto s2 = original.scoped({{"key#2", {"value#2"}}});
+        // All scoped attributes should be assigned to the new owner.
+        logger.reset(new root_logger_t(std::move(original)));
+        logger->log(0, "-");
+    }
+
+    logger->log(0, "-");
+}
+
 TEST(RootLogger, LogInvokesDispatchingRecordToHandlers) {
     std::vector<std::unique_ptr<handler_t>> handlers;
     std::vector<mock::handler_t*> handlers_view;

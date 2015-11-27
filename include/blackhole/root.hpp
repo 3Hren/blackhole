@@ -40,6 +40,8 @@ public:
     root_logger_t(filter_t filter, std::vector<std::unique_ptr<handler_t>> handlers);
 
     root_logger_t(const root_logger_t& other) = delete;
+
+    /// Constructs a root level logger by consuming another existing logger.
     root_logger_t(root_logger_t&& other) noexcept;
 
     ~root_logger_t();
