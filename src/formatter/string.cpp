@@ -244,6 +244,8 @@ public:
                     writer.inner << token.separator;
                 }
 
+                // TODO: To correctly implement kv patterns we need a visitor with parameters. Or
+                // attribute (pair) type, instead of that `std::pair`.
                 kv << string_ref(attribute.first.data(), attribute.first.size()) << ": ";
                 attribute.second.apply(visitor);
 
