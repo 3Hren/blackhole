@@ -31,6 +31,12 @@ using string::optional;
 
 using string::literal_t;
 
+namespace {
+
+typedef fmt::StringRef string_ref;
+
+}  // namespace
+
 class token_t {
     string::token_t inner;
 
@@ -127,7 +133,7 @@ public:
     }
 
     auto operator()(const string_view& value) const -> void {
-        writer << fmt::StringRef(value.data(), value.size());
+        writer << string_ref(value.data(), value.size());
     }
 };
 
@@ -149,7 +155,7 @@ public:
 
     auto operator()(const ph::message_t& token) const -> void {
         const auto& value = record.formatted();
-        writer.write(token.spec, fmt::StringRef(value.data(), value.size()));
+        writer.write(token.spec, string_ref(value.data(), value.size()));
     }
 
     auto operator()(const ph::process<id>& token) const -> void {
@@ -205,7 +211,7 @@ public:
 
         fmt::MemoryWriter buffer;
         token.generator(buffer, tm, static_cast<std::uint64_t>(usec));
-        writer.write(token.spec, fmt::StringRef(buffer.data(), buffer.size()));
+        writer.write(token.spec, string_ref(buffer.data(), buffer.size()));
     }
 
     auto operator()(const ph::generic<required>& token) const -> void {
@@ -238,10 +244,10 @@ public:
                     writer.inner << token.separator;
                 }
 
-                kv << fmt::StringRef(attribute.first.data(), attribute.first.size()) << ": ";
+                kv << string_ref(attribute.first.data(), attribute.first.size()) << ": ";
                 attribute.second.apply(visitor);
 
-                writer.inner << fmt::StringRef(kv.data(), kv.size());
+                writer.inner << string_ref(kv.data(), kv.size());
 
                 kv.clear();
             }
