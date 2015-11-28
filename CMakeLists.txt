@@ -158,6 +158,7 @@ if (ENABLE_TESTING)
 		tests/handler/blocking
 		tests/record
 		tests/root
+		tests/sink/console
 		tests/sink/null
 		tests/src/mocks/formatter
 		tests/src/mocks/handler

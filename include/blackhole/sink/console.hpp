@@ -16,8 +16,8 @@ namespace sink {
 
 class console_t : public sink_t {
 public:
-    auto filter(const record_t&) -> bool;
-    auto execute(const record_t&, const string_view& formatted) -> void;
+    auto filter(const record_t& record) -> bool;
+    auto execute(const record_t& record, const string_view& formatted) -> void;
 };
 
 }  // namespace sink
