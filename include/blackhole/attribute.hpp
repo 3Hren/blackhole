@@ -76,6 +76,9 @@ public:
     // Conversion constructors.
     view_t(int val): inner(static_cast<std::int64_t>(val)) {}
     view_t(double val): inner(val) {}
+    template<std::size_t N>
+    view_t(const char(&val)[N]): inner(string_view(val, N - 1)) {}
+    view_t(const std::string& val): inner(string_view(val.data(), val.size())) {}
     view_t(string_view val): inner(val) {}
 
     /// Conversion constructor from an owned type.
