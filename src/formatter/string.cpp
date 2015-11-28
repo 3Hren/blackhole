@@ -336,7 +336,7 @@ factory<formatter::string_t>::from(const config_t& config) -> formatter::string_
             sevmap.emplace_back(config.to_string());
         });
 
-        auto fn = [=](int severity, const std::string& spec, writer_t& writer) {
+        auto fn = [=](std::size_t severity, const std::string& spec, writer_t& writer) {
             if (severity < sevmap.size()) {
                 writer.write(spec, sevmap[severity]);
             } else {
