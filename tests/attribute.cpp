@@ -4,8 +4,8 @@
 
 namespace blackhole {
 namespace testing {
+namespace attribute {
 
-// TODO: Write tests.
-
+}  // namespace attribute
 }  // namespace testing
 }  // namespace blackhole
