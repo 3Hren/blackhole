@@ -55,6 +55,7 @@ Of course there are disadvantages, such as virtual function call cost and closed
 - [x] Shared library.
 - [ ] Inline namespaces (?).
 - [x] Optional compile-time inline messages transformation (C++14).
+  - [ ] Compile-time placeholder type checking.
 - [x] Python-like formatting (no printf-like formatting support) both inline and result messages.
 - [x] Attributes.
 - [ ] Scatter-gathered IO (?)
@@ -63,12 +64,15 @@ Of course there are disadvantages, such as virtual function call cost and closed
 - [x] Custom verbosity.
 - [x] Custom attributes formatting.
 - [ ] Optional asynchronous pipelining.
--   [ ] Queue with block on overload.
--   [ ] Queue with drop on overload (count dropped message).
-- [ ] Colored terminal output.
-- [ ] Logger builder.
+  - [ ] Queue with block on overload.
+  - [ ] Queue with drop on overload (count dropped message).
+- [ ] Sinks.
+  - [ ] Colored terminal output.
+  - [ ] Syslog.  
+  - [ ] Files.
+- [x] Logger builder.
 - [ ] Macro with line and filename attributes.
-- [ ] Initializer from json (filename, string).
+- [x] Initializer from json (filename, string).
 
 ## Formatters
 
@@ -122,6 +126,71 @@ For more information please read the documentation and visit the following links
  - [ ] Using `gmtime` - manual `std::tm` generation without mutex shit.
  - [ ] Temporary buffer - affects, but not so much.
 
-## Requirements
+# Why another logging library?
 
-- C++11/14 compiler
+That's the first question I ask myself when see *yet another silver-buller library*.
+
+First of all, we required a logger with attributes support. Here `boost::log` was fine, but it didn't compile in our compilers. Sad. After that we've realized that one of our bottlenecks is located in logging part, that's why `boost::log` and `log4cxx` weren't fit in our requirements. Thirdly we are developing for stable, but old linux distributives with relatively old compilers that supports only basic part of C++11.
+
+At last, but not least, all that libraries has one fatal disadvantage - [NIH](https://en.wikipedia.org/wiki/Not_invented_here).
+
+So here we are.
+
+To be honest, let's describe some popular logging libraries, its advantages and disadvantages as one of them may fit your requirements and you may want to use them instead. It's okay.
+
+### Boost.LogV2
+Developed by another crazy Russian programmer using dark template magic and Vodka (not sure what was first). It's a perfect and powerful library, seriously.
+
+**Pros:**
+- It's a fucking **boost**! Many people don't want to depend on another library, wishing to just `apt get install` instead.
+- Have attributes too.
+- Large community, less bugs.
+- Highly configurable.
+- Good documentation.
+
+**Cons:**
+- Sadly, but you are restricted with the latest boost versions.
+- Hard to hack and extend unless you are fine with templates, template of templates and variadic templates of a templated templates with templates. Or you are Andrei Alexandrescu.
+- Relatively poor performance. Higher than `log4cxx` have, but not enough for us.
+
+### Log4cxx
+Logging framework for C++ patterned after Apache log4j. Yeah, Java.
+
+**Pros:**
+- Absolutely zero barrier to entry. Really, you just copy-paste the code from tutorial and it works. Amazing!
+
+**Cons:**
+- Leaking.
+- APR.
+- Have no attributes.
+- Really slow performance.
+- Seems like it's not really supported now.
+
+### Spdlog
+Extremely ultra bloody fucking fast logging library. At least the documentation says that. Faster than speed of light!
+
+But everyone knows that even the light is unable to leave from blackhole.
+
+**Pros:**
+- Really fast, I checked.
+- Header only. Not sure it's an advantage, but for small projects it's fine.
+- Easy to extend, because the code itself is plain, straightforward and magically easy to understand.
+- No dependencies.
+- Nice kitty in author's avatar.
+
+**Cons:**
+- Again no attributes, no custom filtering, no custom verbosity levels. You are restricted to functionality provided by this library, nothing more.
+
+# Notable changes
+First of all, the entire library was completely rewritten for performance reasons.
+
+- No more attribute copying unless it's really required (for asynchronous logging for example). Nested attributes are now organized in flattened range.
+- Dropped `boost::format` into the Hell. It's hard to find more slower library for formatting both in compilation stage and runtime. Instead, the perfect [cppformat](https://github.com/cppformat/cppformat) library with an own compile-time constexpr extensions is used.
+- There are predefined attributes with fast read access, like `message`, `severity`, `timestmap` etc.
+- With **cppformat** participation there is new Python-like format syntax using placeholder replacement.
+- ...
+
+# Requirements
+
+- C++11/14/17 compiler (yep, using C++17 opens additional functionalities).
+- Boost.Thread - for TLS.
