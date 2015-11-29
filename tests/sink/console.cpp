@@ -38,6 +38,10 @@ TEST(console_t, AcceptsAll) {
     EXPECT_TRUE(sink.filter(record));
 }
 
+TEST(console_t, Type) {
+    EXPECT_EQ("console", std::string(factory<sink::console_t>::type()));
+}
+
 }  // namespace sink
 }  // namespace testing
 }  // namespace blackhole
