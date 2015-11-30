@@ -22,8 +22,8 @@ enum severity {
 };
 
 /// Severity mapping function.
-static auto sevmap(int severity, const std::string& spec, blackhole::writer_t& writer) -> void {
-    static const std::array<const char*, 4> mapping = {"D", "I", "W", "E"};
+static auto sevmap(std::size_t severity, const std::string& spec, blackhole::writer_t& writer) -> void {
+    static const std::array<const char*, 4> mapping = {{"D", "I", "W", "E"}};
 
     if (severity < mapping.size()) {
         writer.write(spec, mapping[severity]);
