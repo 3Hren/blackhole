@@ -20,6 +20,7 @@ class sink_t {
 public:
     sink_t() = default;
     sink_t(const sink_t& other) = default;
+    sink_t(sink_t&& other) = default;
 
     virtual ~sink_t() {}
 
