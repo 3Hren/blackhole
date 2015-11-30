@@ -48,7 +48,7 @@ TEST(Record, Tid) {
     const attribute_pack pack;
 
     record_t record(42, message, pack);
-    record.tid();
+    EXPECT_EQ(::pthread_self(), record.tid());
 }
 
 TEST(Record, NullTimestampByDefault) {
