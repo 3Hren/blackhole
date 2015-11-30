@@ -1,5 +1,7 @@
 #include "blackhole/formatter/string.hpp"
 
+#include <array>
+
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/variant/get.hpp>
 #include <boost/variant/variant.hpp>
@@ -179,7 +181,14 @@ public:
     }
 
     auto operator()(const ph::thread<name>& token) const -> void {
-        throw std::runtime_error("{thread:s} placeholder is not implemented yet");
+        std::array<char, 16> buffer;
+        const auto rc = ::pthread_getname_np(record.tid(), buffer.data(), buffer.size());
+
+        if (rc == 0) {
+            writer.write(token.spec, buffer.data());
+        } else {
+            writer.write(token.spec, "<unnamed>");
+        }
     }
 
     auto operator()(const ph::severity<num>& token) const -> void {

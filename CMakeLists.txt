@@ -191,7 +191,8 @@ if (ENABLE_BENCHMARKING)
 		bench/formatter/string
 		bench/logger
 		bench/main
-		bench/record)
+		bench/record
+		bench/system/thread)
 
 	enable_google_benchmarking(${LIBRARY_NAME}-benchmarks)
 

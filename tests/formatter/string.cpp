@@ -269,6 +269,57 @@ TEST(string_t, ThreadExplicitlySpec) {
     EXPECT_TRUE(boost::ends_with(writer.result().to_string(), stream.str()));
 }
 
+struct threadname_guard {
+    template<std::size_t N>
+    threadname_guard(const char(&name)[N]) {
+        #ifdef __linux__
+            ::pthread_setname_np(::pthread_self(), name);
+        #elif __APPLE__
+            ::pthread_setname_np(name);
+        #else
+        #error "Not implemented. Please write an implementation for your OS."
+        #endif
+    }
+
+    ~threadname_guard() {
+        #ifdef __linux__
+            ::pthread_setname_np(::pthread_self(), "");
+        #elif __APPLE__
+            ::pthread_setname_np("");
+        #else
+        #error "Not implemented. Please write an implementation for your OS."
+        #endif
+    }
+};
+
+TEST(string_t, ThreadName) {
+    formatter::string_t formatter("{thread:s}");
+
+    threadname_guard guard("thread#0");
+
+    const string_view message("-");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ("thread#0", writer.result().to_string());
+}
+
+TEST(string_t, ThreadNameWithSpec) {
+    formatter::string_t formatter("{thread:>10s}");
+
+    threadname_guard guard("thread#0");
+
+    const string_view message("-");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ("  thread#0", writer.result().to_string());
+}
+
 TEST(string_t, Timestamp) {
     // NOTE: By default %Y-%m-%d %H:%M:%S.%f pattern is used.
     formatter::string_t formatter("[{timestamp}]");
