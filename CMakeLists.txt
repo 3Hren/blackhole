@@ -202,10 +202,25 @@ if (ENABLE_BENCHMARKING)
 	)
 endif (ENABLE_BENCHMARKING)
 
+function(enable_all_warnings TARGET)
+	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		target_compile_options(${TARGET} PRIVATE
+			-Weverything
+			-Wno-c++98-compat
+			-Wno-padded
+			-Wno-shadow
+			-Wno-weak-vtables
+			-pedantic
+			-pedantic-errors)
+	endif ()
+endfunction()
+
 if (ENABLE_EXAMPLES)
 	# Configuration using manual builder.
     add_executable(2-simple
 		examples/2.simple)
+
+	enable_all_warnings(2-simple)
 
 	target_link_libraries(2-simple
 		blackhole)
@@ -213,6 +228,8 @@ if (ENABLE_EXAMPLES)
 	# Configuration using JSON config file.
 	add_executable(3-config
 		examples/3.config)
+
+	enable_all_warnings(3-config)
 
 	target_link_libraries(3-config
 		blackhole)
