@@ -76,6 +76,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	target_compile_options(${LIBRARY_NAME} PRIVATE
 		-Weverything
 		-Wno-c++98-compat
+		-Wno-c++98-compat-pedantic
 		-Wno-padded
 		-Wno-shadow
 		-Wno-weak-vtables
