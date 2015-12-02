@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include <boost/variant/variant_fwd.hpp>
+#include <boost/variant/variant.hpp>
 
 #include "blackhole/formatter.hpp"
 

@@ -1,5 +1,7 @@
 #include "blackhole/attribute.hpp"
 
+#include <boost/type_traits/remove_cv.hpp>
+#include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/get.hpp>
 
 #include "blackhole/detail/attribute.hpp"
@@ -19,7 +21,125 @@ struct into_view {
 
 }  // namespace
 
+static_assert(sizeof(value_t::inner_t) <= sizeof(value_t), "padding or alignment violation");
 static_assert(sizeof(view_t::inner_t) <= sizeof(view_t), "padding or alignment violation");
+
+value_t::value_t() {
+    construct(nullptr);
+}
+
+value_t::value_t(bool value) {
+    construct(value);
+}
+
+value_t::value_t(char value) {
+    construct(static_cast<std::int64_t>(value));
+}
+
+value_t::value_t(short value) {
+    construct(static_cast<std::int64_t>(value));
+}
+
+value_t::value_t(int value) {
+    construct(static_cast<std::int64_t>(value));
+}
+
+value_t::value_t(long value) {
+    construct(static_cast<std::int64_t>(value));
+}
+
+value_t::value_t(long long value) {
+    construct(static_cast<std::int64_t>(value));
+}
+
+value_t::value_t(unsigned char value) {
+    construct(static_cast<std::uint64_t>(value));
+}
+
+value_t::value_t(unsigned short value) {
+    construct(static_cast<std::uint64_t>(value));
+}
+
+value_t::value_t(unsigned int value) {
+    construct(static_cast<std::uint64_t>(value));
+}
+
+value_t::value_t(unsigned long value) {
+    construct(static_cast<std::uint64_t>(value));
+}
+
+value_t::value_t(unsigned long long value) {
+    construct(static_cast<std::uint64_t>(value));
+}
+
+value_t::value_t(double value) {
+    construct(value);
+}
+
+value_t::value_t(std::string value) {
+    construct(std::move(value));
+}
+
+value_t::value_t(const value_t& other) {
+    construct(other.inner().value);
+}
+
+value_t::value_t(value_t&& other) {
+    construct(std::move(other.inner().value));
+}
+
+auto value_t::operator=(const value_t& other) -> value_t& {
+    if (this != &other) {
+        inner() = other.inner();
+    }
+
+    return *this;
+}
+
+auto value_t::operator=(value_t&& other) -> value_t& {
+    if (this != &other) {
+        inner() = std::move(other.inner());
+    }
+
+    return *this;
+}
+
+value_t::~value_t() {
+    inner().~inner_t();
+}
+
+auto value_t::inner() noexcept -> inner_t& {
+    return reinterpret_cast<inner_t&>(storage);
+}
+
+auto value_t::inner() const noexcept -> const inner_t& {
+    return reinterpret_cast<const inner_t&>(storage);
+}
+
+template<typename T>
+auto value_t::construct(T&& value) -> void {
+    new(static_cast<void*>(&storage)) inner_t{std::forward<T>(value)};
+}
+
+template<typename T>
+auto get(const value_t& value) ->
+    typename std::enable_if<boost::mpl::contains<value_t::types, T>::value, const T&>::type
+{
+    if (auto result = boost::get<T>(&value.inner().value)) {
+        return *result;
+    } else {
+        throw std::bad_cast();
+    }
+}
+
+template auto value_t::construct<std::string>(std::string&& value) -> void;
+
+template auto get<value_t::null_type>(const value_t& value) -> const value_t::null_type&;
+template auto get<value_t::bool_type>(const value_t& value) -> const value_t::bool_type&;
+template auto get<value_t::sint64_type>(const value_t& value) -> const value_t::sint64_type&;
+template auto get<value_t::uint64_type>(const value_t& value) -> const value_t::uint64_type&;
+template auto get<value_t::double_type>(const value_t& value) -> const value_t::double_type&;
+template auto get<value_t::string_type>(const value_t& value) -> const value_t::string_type&;
 
 view_t::view_t() {
     construct(nullptr);
@@ -82,7 +202,7 @@ view_t::view_t(const std::string& value) {
 }
 
 view_t::view_t(const value_t& value) {
-    construct(boost::apply_visitor(into_view(), value.inner));
+    construct(boost::apply_visitor(into_view(), value.inner().value));
 }
 
 auto view_t::operator==(const view_t& other) const -> bool {

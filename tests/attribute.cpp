@@ -6,6 +6,7 @@ namespace blackhole {
 namespace testing {
 namespace attribute {
 
+using ::blackhole::attribute::value_t;
 using ::blackhole::attribute::view_t;
 
 TEST(view_t, Default) {
@@ -115,6 +116,89 @@ TEST(view_t, FromStringView) {
     view_t v(value);
 
     EXPECT_EQ(value, blackhole::attribute::get<string_view>(v).to_string());
+}
+
+TEST(value_t, Default) {
+    value_t v;
+
+    EXPECT_EQ(nullptr, blackhole::attribute::get<std::nullptr_t>(v));
+}
+
+TEST(value_t, FromBool) {
+    value_t v(true);
+
+    EXPECT_EQ(true, blackhole::attribute::get<bool>(v));
+}
+
+TEST(value_t, FromChar) {
+    char value = 42;
+    value_t v(value);
+
+    EXPECT_EQ(value, blackhole::attribute::get<std::int64_t>(v));
+}
+
+TEST(value_t, FromShort) {
+    short value = 42;
+    value_t v(value);
+
+    EXPECT_EQ(value, blackhole::attribute::get<std::int64_t>(v));
+}
+
+TEST(value_t, FromInt) {
+    value_t v(42);
+
+    EXPECT_EQ(42, blackhole::attribute::get<std::int64_t>(v));
+}
+
+TEST(value_t, FromLong) {
+    value_t v(42L);
+
+    EXPECT_EQ(42L, blackhole::attribute::get<std::int64_t>(v));
+}
+
+TEST(value_t, FromLongLong) {
+    value_t v(42LL);
+
+    EXPECT_EQ(42LL, blackhole::attribute::get<std::int64_t>(v));
+}
+
+TEST(value_t, FromUnsignedChar) {
+    unsigned char value = 42;
+    value_t v(value);
+
+    EXPECT_EQ(value, blackhole::attribute::get<std::uint64_t>(v));
+}
+
+TEST(value_t, FromUnsignedShort) {
+    unsigned short value = 42;
+    value_t v(value);
+
+    EXPECT_EQ(value, blackhole::attribute::get<std::uint64_t>(v));
+}
+
+TEST(value_t, FromUnsignedInt) {
+    unsigned int value = 42;
+    value_t v(value);
+
+    EXPECT_EQ(value, blackhole::attribute::get<std::uint64_t>(v));
+}
+
+TEST(value_t, FromUnsignedLong) {
+    value_t v(42UL);
+
+    EXPECT_EQ(42UL, blackhole::attribute::get<std::uint64_t>(v));
+}
+
+TEST(value_t, FromUnsignedLongLong) {
+    value_t v(42ULL);
+
+    EXPECT_EQ(42ULL, blackhole::attribute::get<std::uint64_t>(v));
+}
+
+TEST(value_t, FromString) {
+    value_t v("le message");
+
+    EXPECT_EQ("le message", blackhole::attribute::get<std::string>(v));
 }
 
 }  // namespace attribute
