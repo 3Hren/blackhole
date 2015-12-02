@@ -124,6 +124,12 @@ public:
             throw std::out_of_range("out of range");
     }
 
+    /// Compares two views.
+    ///
+    /// All comparisons are done via the `compare()` member function, which itself is defined in
+    /// terms of `Traits::compare()`.
+    /// Two views are equal if both the size of `this` and `other` are equal and each character in
+    /// `this` has an equivalent character in `other` at the same position.
     constexpr auto operator==(const basic_string_view& other) const noexcept -> bool {
         return size() == other.size() && traits_type::compare(data(), other.data(), size()) == 0;
     }
