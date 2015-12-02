@@ -210,6 +210,7 @@ function(enable_all_warnings TARGET)
 		target_compile_options(${TARGET} PRIVATE
 			-Weverything
 			-Wno-c++98-compat
+			-Wno-c++98-compat-pedantic
 			-Wno-padded
 			-Wno-shadow
 			-Wno-weak-vtables
