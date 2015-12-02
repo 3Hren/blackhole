@@ -11,6 +11,12 @@
 
 namespace blackhole {
 
+/// Represents a trait for mapping an owned types to their associated lightweight view types.
+///
+/// By default all types are transparently mapped to itself, but Blackhole provides some
+/// specializations.
+///
+/// \warning it is undefined behavior to add specializations for this trait.
 template<typename T>
 struct view_of {
     typedef T type;
@@ -25,6 +31,15 @@ class value_t;
 class view_t;
 
 /// Represents an attribute value holder.
+///
+/// Attribute value is an algebraic data type that can be initialized with one of six predefined
+/// primitive types:
+///     - none marker;
+///     - boolean type (true or false);
+///     - signed integer types up to 64-bit size;
+///     - unsigned integer types up to 64-bit size;
+///     - floating point type;
+///     - and an owned string type.
 class value_t {
 public:
     /// Available types.
