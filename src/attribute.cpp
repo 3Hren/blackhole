@@ -29,6 +29,10 @@ view_t::view_t(long value) {
     new(static_cast<void*>(&storage)) inner_t{static_cast<std::int64_t>(value)};
 }
 
+view_t::view_t(long long value) {
+    new(static_cast<void*>(&storage)) inner_t{static_cast<std::int64_t>(value)};
+}
+
 view_t::view_t(double value) {
     new(static_cast<void*>(&storage)) inner_t{value};
 }

@@ -110,7 +110,7 @@ public:
     view_t(int value);
     // view_t(char value);
     view_t(long value);
-    // view_t(long long value);
+    view_t(long long value);
 
     // view_t(unsigned int value);
     // view_t(unsigned char value);

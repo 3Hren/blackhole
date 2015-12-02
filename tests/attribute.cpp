@@ -20,6 +20,12 @@ TEST(view_t, FromLong) {
     EXPECT_EQ(42L, blackhole::attribute::get<std::int64_t>(v));
 }
 
+TEST(view_t, FromLongLong) {
+    view_t v(42LL);
+
+    EXPECT_EQ(42LL, blackhole::attribute::get<std::int64_t>(v));
+}
+
 }  // namespace attribute
 }  // namespace testing
 }  // namespace blackhole
