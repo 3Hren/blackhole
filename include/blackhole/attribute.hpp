@@ -4,6 +4,7 @@
 #include <string>
 #include <type_traits>
 
+#include <boost/mpl/contains.hpp>
 #include <boost/mpl/vector.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/static_visitor.hpp>
@@ -79,6 +80,7 @@ public:
 
     typedef boost::mpl::vector<
         sint64_type,
+        uint64_type,
         double_type,
         string_type
     > types;
@@ -108,16 +110,17 @@ public:
 
     /// Conversion constructors.
     view_t(char value);
+    view_t(short value);
     view_t(int value);
     view_t(long value);
     view_t(long long value);
 
-    view_t(unsigned int value);
     view_t(unsigned char value);
+    view_t(unsigned short value);
+    view_t(unsigned int value);
     view_t(unsigned long value);
     view_t(unsigned long long value);
 
-    // view_t(float value);
     view_t(double value);
 
     view_t(const string_type& value);
@@ -145,14 +148,8 @@ public:
 
 /// Retrieves a value of a specified, but yet restricted type, from a given attribute value view.
 template<typename T>
-auto get(const view_t& value) -> const T&;
-
-template<> auto get<view_t::null_type>(const view_t& value) -> const view_t::null_type&;
-template<> auto get<view_t::bool_type>(const view_t& value) -> const view_t::bool_type&;
-template<> auto get<view_t::sint64_type>(const view_t& value) -> const view_t::sint64_type&;
-template<> auto get<view_t::uint64_type>(const view_t& value) -> const view_t::uint64_type&;
-template<> auto get<view_t::double_type>(const view_t& value) -> const view_t::double_type&;
-template<> auto get<view_t::string_type>(const view_t& value) -> const view_t::string_type&;
+auto get(const view_t& value) ->
+    typename std::enable_if<boost::mpl::contains<view_t::types, T>::value, const T&>::type;
 
 }  // namespace attribute
 }  // namespace blackhole

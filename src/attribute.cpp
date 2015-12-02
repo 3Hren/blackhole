@@ -25,6 +25,10 @@ view_t::view_t(char value) {
     new(static_cast<void*>(&storage)) inner_t{static_cast<std::int64_t>(value)};
 }
 
+view_t::view_t(short value) {
+    new(static_cast<void*>(&storage)) inner_t{static_cast<std::int64_t>(value)};
+}
+
 view_t::view_t(int value) {
     new(static_cast<void*>(&storage)) inner_t{static_cast<std::int64_t>(value)};
 }
@@ -35,6 +39,26 @@ view_t::view_t(long value) {
 
 view_t::view_t(long long value) {
     new(static_cast<void*>(&storage)) inner_t{static_cast<std::int64_t>(value)};
+}
+
+view_t::view_t(unsigned char value) {
+    new(static_cast<void*>(&storage)) inner_t{static_cast<std::uint64_t>(value)};
+}
+
+view_t::view_t(unsigned short value) {
+    new(static_cast<void*>(&storage)) inner_t{static_cast<std::uint64_t>(value)};
+}
+
+view_t::view_t(unsigned int value) {
+    new(static_cast<void*>(&storage)) inner_t{static_cast<std::uint64_t>(value)};
+}
+
+view_t::view_t(unsigned long value) {
+    new(static_cast<void*>(&storage)) inner_t{static_cast<std::uint64_t>(value)};
+}
+
+view_t::view_t(unsigned long long value) {
+    new(static_cast<void*>(&storage)) inner_t{static_cast<std::uint64_t>(value)};
 }
 
 view_t::view_t(double value) {
@@ -61,14 +85,23 @@ auto view_t::inner() const noexcept -> const inner_t& {
     return reinterpret_cast<const inner_t&>(storage);
 }
 
-template<>
-auto get<std::int64_t>(const view_t& value) -> const std::int64_t& {
-    if (auto result = boost::get<std::int64_t>(&value.inner().value)) {
+template<typename T>
+auto get(const view_t& value) ->
+    typename std::enable_if<boost::mpl::contains<view_t::types, T>::value, const T&>::type
+{
+    if (auto result = boost::get<T>(&value.inner().value)) {
         return *result;
     } else {
         throw bad_get();
     }
 }
+
+// template<> auto get<view_t::null_type>(const view_t& value) -> const view_t::null_type&;
+// template<> auto get<view_t::bool_type>(const view_t& value) -> const view_t::bool_type&;
+template auto get<view_t::sint64_type>(const view_t& value) -> const view_t::sint64_type&;
+template auto get<view_t::uint64_type>(const view_t& value) -> const view_t::uint64_type&;
+template auto get<view_t::double_type>(const view_t& value) -> const view_t::double_type&;
+// template<> auto get<view_t::string_type>(const view_t& value) -> const view_t::string_type&;
 
 }  // namespace attribute
 }  // namespace blackhole
