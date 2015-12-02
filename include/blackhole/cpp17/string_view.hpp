@@ -124,9 +124,8 @@ public:
             throw std::out_of_range("out of range");
     }
 
-    constexpr
-    auto operator==(const basic_string_view& other) const -> bool {
-        return size() == other.size() && to_string() == other.to_string();
+    constexpr auto operator==(const basic_string_view& other) const noexcept -> bool {
+        return size() == other.size() && traits_type::compare(data(), other.data(), size()) == 0;
     }
 };
 
