@@ -145,6 +145,32 @@ TEST(string_t, Generic) {
     EXPECT_EQ("HTTP/1.1", writer.result().to_string());
 }
 
+TEST(string_t, GenericNull) {
+    formatter::string_t formatter("{protocol}");
+
+    const string_view message("-");
+    const attribute_list attributes{{"protocol", {}}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ("none", writer.result().to_string());
+}
+
+TEST(string_t, GenericNullWithSpec) {
+    formatter::string_t formatter("{protocol:>5}");
+
+    const string_view message("-");
+    const attribute_list attributes{{"protocol", {}}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ(" none", writer.result().to_string());
+}
+
 TEST(string_t, ThrowsIfGenericAttributeNotFound) {
     formatter::string_t formatter("{protocol}/{version:.1f}");
 

@@ -8,6 +8,12 @@ namespace attribute {
 
 using ::blackhole::attribute::view_t;
 
+TEST(view_t, Default) {
+    view_t v;
+
+    EXPECT_EQ(nullptr, blackhole::attribute::get<std::nullptr_t>(v));
+}
+
 TEST(view_t, FromChar) {
     char value = 42;
     view_t v(value);

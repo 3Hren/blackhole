@@ -111,6 +111,10 @@ public:
         spec(spec)
     {}
 
+    auto operator()(std::nullptr_t) const -> void {
+        writer.write(spec, "none");
+    }
+
     template<typename T>
     auto operator()(T value) const -> void {
         writer.write(spec, value);
@@ -129,6 +133,10 @@ public:
     view_visitor(fmt::MemoryWriter& writer) noexcept :
         writer(writer)
     {}
+
+    auto operator()(std::nullptr_t) const -> void {
+        writer << "none";
+    }
 
     template<typename T>
     auto operator()(T value) const -> void {

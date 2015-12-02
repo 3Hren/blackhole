@@ -74,6 +74,7 @@ public:
     typedef string_view    string_type;
 
     typedef boost::mpl::vector<
+        null_type,
         sint64_type,
         uint64_type,
         double_type,

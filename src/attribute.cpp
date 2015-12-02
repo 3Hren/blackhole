@@ -21,6 +21,10 @@ struct into_view {
 
 static_assert(sizeof(view_t::inner_t) <= sizeof(view_t), "padding or alignment violation");
 
+view_t::view_t() {
+    construct(nullptr);
+}
+
 view_t::view_t(char value) {
     construct(static_cast<std::int64_t>(value));
 }
@@ -103,7 +107,7 @@ auto get(const view_t& value) ->
     }
 }
 
-// template auto get<view_t::null_type>(const view_t& value) -> const view_t::null_type&;
+template auto get<view_t::null_type>(const view_t& value) -> const view_t::null_type&;
 // template auto get<view_t::bool_type>(const view_t& value) -> const view_t::bool_type&;
 template auto get<view_t::sint64_type>(const view_t& value) -> const view_t::sint64_type&;
 template auto get<view_t::uint64_type>(const view_t& value) -> const view_t::uint64_type&;
