@@ -25,6 +25,10 @@ view_t::view_t() {
     construct(nullptr);
 }
 
+view_t::view_t(bool value) {
+    construct(value);
+}
+
 view_t::view_t(char value) {
     construct(static_cast<std::int64_t>(value));
 }
@@ -73,10 +77,12 @@ view_t::view_t(const string_type& value) {
     construct(value);
 }
 
-auto view_t::from(const value_t& value) -> view_t {
-    view_t view(0);
-    view.construct(boost::apply_visitor(into_view(), value.inner));
-    return view;
+view_t::view_t(const std::string& value) {
+    construct(value);
+}
+
+view_t::view_t(const value_t& value) {
+    construct(boost::apply_visitor(into_view(), value.inner));
 }
 
 auto view_t::operator==(const view_t& other) const -> bool {
@@ -107,8 +113,10 @@ auto get(const view_t& value) ->
     }
 }
 
+template auto view_t::construct<string_view>(string_view&& value) -> void;
+
 template auto get<view_t::null_type>(const view_t& value) -> const view_t::null_type&;
-// template auto get<view_t::bool_type>(const view_t& value) -> const view_t::bool_type&;
+template auto get<view_t::bool_type>(const view_t& value) -> const view_t::bool_type&;
 template auto get<view_t::sint64_type>(const view_t& value) -> const view_t::sint64_type&;
 template auto get<view_t::uint64_type>(const view_t& value) -> const view_t::uint64_type&;
 template auto get<view_t::double_type>(const view_t& value) -> const view_t::double_type&;

@@ -12,7 +12,7 @@ wrapper_t::wrapper_t(logger_t& log, attributes_t attributes):
 {
     // TODO: Replace somewhere near `view_of`.
     for (const auto& attribute : storage) {
-        attributes_view.emplace_back(attribute.first, view_t::from(attribute.second));
+        attributes_view.emplace_back(attribute);
     }
 }
 

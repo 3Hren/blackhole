@@ -14,6 +14,12 @@ TEST(view_t, Default) {
     EXPECT_EQ(nullptr, blackhole::attribute::get<std::nullptr_t>(v));
 }
 
+TEST(view_t, FromBool) {
+    view_t v(true);
+
+    EXPECT_EQ(true, blackhole::attribute::get<bool>(v));
+}
+
 TEST(view_t, FromChar) {
     char value = 42;
     view_t v(value);
@@ -99,6 +105,13 @@ TEST(view_t, FromStringLiteral) {
 
 TEST(view_t, FromString) {
     std::string value("le message");
+    view_t v(value);
+
+    EXPECT_EQ(value, blackhole::attribute::get<string_view>(v).to_string());
+}
+
+TEST(view_t, FromStringView) {
+    string_view value("le message");
     view_t v(value);
 
     EXPECT_EQ(value, blackhole::attribute::get<string_view>(v).to_string());

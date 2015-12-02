@@ -12,7 +12,7 @@ namespace {
 auto transform(const attributes_t& source) -> attribute_list {
     attribute_list result;
     for (const auto& attribute : source) {
-        result.emplace_back(attribute.first, view_t::from(attribute.second));
+        result.emplace_back(attribute);
     }
 
     return result;

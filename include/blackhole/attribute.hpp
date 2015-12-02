@@ -75,6 +75,7 @@ public:
 
     typedef boost::mpl::vector<
         null_type,
+        bool_type,
         sint64_type,
         uint64_type,
         double_type,
@@ -101,29 +102,44 @@ private:
     storage_type storage;
 
 public:
-    /// Constructs a null view value.
+    /// Constructs a null value view containing tagged nullptr value.
     view_t();
 
-    /// Integer conversion constructors.
+    /// Constructs a value view initialized with the given boolean value.
+    view_t(bool value);
+
+    /// Constructs a value view initialized with the given signed integer.
     view_t(char value);
     view_t(short value);
     view_t(int value);
     view_t(long value);
     view_t(long long value);
 
+    /// Constructs a value view initialized with the given unsigned integer.
     view_t(unsigned char value);
     view_t(unsigned short value);
     view_t(unsigned int value);
     view_t(unsigned long value);
     view_t(unsigned long long value);
 
-    /// Constructs an attribute view from the given floating point value.
+    /// Constructs a value view from the given floating point value.
     view_t(double value);
 
+    /// Constructs a value view from the given string literal not including the terminating null
+    /// character.
+    ///
+    /// \note this overload is required to prevent implicit conversion literal values to bool.
+    template<std::size_t N>
+    view_t(const char(&value)[N]) { construct(string_view{value, N - 1}); }
+
+    /// Constructs a value view from the given string view.
     view_t(const string_type& value);
 
-    /// Constructs an attribute view from the given owned attribute value.
-    static auto from(const value_t& value) -> view_t;
+    /// Constructs a value view from the given string.
+    view_t(const std::string& value);
+
+    /// Constructs a value view from the given owned attribute value.
+    view_t(const value_t& value);
 
     view_t(const view_t& other) = default;
     view_t(view_t&& other) = default;
@@ -139,6 +155,7 @@ public:
     auto operator==(const view_t& other) const -> bool;
     auto operator!=(const view_t& other) const -> bool;
 
+    /// Returns the internal underlying value.
     auto inner() noexcept -> inner_t&;
     auto inner() const noexcept -> const inner_t&;
 
