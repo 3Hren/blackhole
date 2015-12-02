@@ -28,7 +28,7 @@ TEST(console_t, ByDefaultUseStandardOutput) {
     EXPECT_EQ("expected\n", actual);
 }
 
-TEST(console_t, AcceptsAll) {
+TEST(console_t, FilterAcceptsAll) {
     const string_view message("");
     const attribute_pack pack;
     record_t record(42, message, pack);
