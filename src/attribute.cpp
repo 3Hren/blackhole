@@ -22,55 +22,55 @@ struct into_view {
 static_assert(sizeof(view_t::inner_t) <= sizeof(view_t), "padding or alignment violation");
 
 view_t::view_t(char value) {
-    new(static_cast<void*>(&storage)) inner_t{static_cast<std::int64_t>(value)};
+    construct(static_cast<std::int64_t>(value));
 }
 
 view_t::view_t(short value) {
-    new(static_cast<void*>(&storage)) inner_t{static_cast<std::int64_t>(value)};
+    construct(static_cast<std::int64_t>(value));
 }
 
 view_t::view_t(int value) {
-    new(static_cast<void*>(&storage)) inner_t{static_cast<std::int64_t>(value)};
+    construct(static_cast<std::int64_t>(value));
 }
 
 view_t::view_t(long value) {
-    new(static_cast<void*>(&storage)) inner_t{static_cast<std::int64_t>(value)};
+    construct(static_cast<std::int64_t>(value));
 }
 
 view_t::view_t(long long value) {
-    new(static_cast<void*>(&storage)) inner_t{static_cast<std::int64_t>(value)};
+    construct(static_cast<std::int64_t>(value));
 }
 
 view_t::view_t(unsigned char value) {
-    new(static_cast<void*>(&storage)) inner_t{static_cast<std::uint64_t>(value)};
+    construct(static_cast<std::uint64_t>(value));
 }
 
 view_t::view_t(unsigned short value) {
-    new(static_cast<void*>(&storage)) inner_t{static_cast<std::uint64_t>(value)};
+    construct(static_cast<std::uint64_t>(value));
 }
 
 view_t::view_t(unsigned int value) {
-    new(static_cast<void*>(&storage)) inner_t{static_cast<std::uint64_t>(value)};
+    construct(static_cast<std::uint64_t>(value));
 }
 
 view_t::view_t(unsigned long value) {
-    new(static_cast<void*>(&storage)) inner_t{static_cast<std::uint64_t>(value)};
+    construct(static_cast<std::uint64_t>(value));
 }
 
 view_t::view_t(unsigned long long value) {
-    new(static_cast<void*>(&storage)) inner_t{static_cast<std::uint64_t>(value)};
+    construct(static_cast<std::uint64_t>(value));
 }
 
 view_t::view_t(double value) {
-    new(static_cast<void*>(&storage)) inner_t{value};
+    construct(value);
 }
 
 view_t::view_t(const string_type& value) {
-    new(static_cast<void*>(&storage)) inner_t{value};
+    construct(value);
 }
 
 view_t::view_t(const value_t& value) {
-    new(static_cast<void*>(&storage)) inner_t{boost::apply_visitor(into_view(), value.inner)};
+    construct(boost::apply_visitor(into_view(), value.inner));
 }
 
 auto view_t::operator==(const view_t& other) const -> bool {
@@ -83,6 +83,11 @@ auto view_t::inner() noexcept -> inner_t& {
 
 auto view_t::inner() const noexcept -> const inner_t& {
     return reinterpret_cast<const inner_t&>(storage);
+}
+
+template<typename T>
+auto view_t::construct(T&& value) -> void {
+    new(static_cast<void*>(&storage)) inner_t{std::forward<T>(value)};
 }
 
 template<typename T>

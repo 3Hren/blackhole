@@ -144,6 +144,10 @@ public:
 
     auto inner() noexcept -> inner_t&;
     auto inner() const noexcept -> const inner_t&;
+
+private:
+    template<typename T>
+    auto construct(T&& value) -> void;
 };
 
 /// Retrieves a value of a specified, but yet restricted type, from a given attribute value view.
