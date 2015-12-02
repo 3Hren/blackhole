@@ -186,6 +186,7 @@ if (ENABLE_BENCHMARKING)
 	prepare_google_benchmarking()
 
 	add_executable(${LIBRARY_NAME}-benchmarks
+		bench/attribute
 		bench/clock
 		bench/cpp14formatter
 		bench/datetime

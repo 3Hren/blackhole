@@ -13,6 +13,7 @@
 #include "blackhole/extensions/writer.hpp"
 #include "blackhole/record.hpp"
 
+#include "blackhole/detail/attribute.hpp"
 #include "blackhole/detail/formatter/string/parser.hpp"
 #include "blackhole/detail/formatter/string/token.hpp"
 #include "blackhole/detail/procname.hpp"
@@ -225,7 +226,7 @@ public:
 
     auto operator()(const ph::generic<required>& token) const -> void {
         if (auto value = find(token.name)) {
-            return value->apply(view_visitor<spec>(writer, token.spec));
+            return boost::apply_visitor(view_visitor<spec>(writer, token.spec), value->inner().value);
         }
 
         throw std::logic_error("required attribute '" + token.name + "' not found");
@@ -234,7 +235,7 @@ public:
     auto operator()(const ph::generic<optional>& token) const -> void {
         if (auto value = find(token.name)) {
             writer.write(token.prefix);
-            value->apply(view_visitor<spec>(writer, token.spec));
+            boost::apply_visitor(view_visitor<spec>(writer, token.spec), value->inner().value);
             writer.write(token.suffix);
         }
     }
@@ -256,7 +257,7 @@ public:
                 // TODO: To correctly implement kv patterns we need a visitor with parameters. Or
                 // attribute (pair) type, instead of that `std::pair`.
                 kv << string_ref(attribute.first.data(), attribute.first.size()) << ": ";
-                attribute.second.apply(visitor);
+                boost::apply_visitor(visitor, attribute.second.inner().value);
 
                 writer.inner << string_ref(kv.data(), kv.size());
 
