@@ -69,8 +69,10 @@ view_t::view_t(const string_type& value) {
     construct(value);
 }
 
-view_t::view_t(const value_t& value) {
-    construct(boost::apply_visitor(into_view(), value.inner));
+auto view_t::from(const value_t& value) -> view_t {
+    view_t view(0);
+    view.construct(boost::apply_visitor(into_view(), value.inner));
+    return view;
 }
 
 auto view_t::operator==(const view_t& other) const -> bool {
@@ -97,16 +99,16 @@ auto get(const view_t& value) ->
     if (auto result = boost::get<T>(&value.inner().value)) {
         return *result;
     } else {
-        throw bad_get();
+        throw std::bad_cast();
     }
 }
 
-// template<> auto get<view_t::null_type>(const view_t& value) -> const view_t::null_type&;
-// template<> auto get<view_t::bool_type>(const view_t& value) -> const view_t::bool_type&;
+// template auto get<view_t::null_type>(const view_t& value) -> const view_t::null_type&;
+// template auto get<view_t::bool_type>(const view_t& value) -> const view_t::bool_type&;
 template auto get<view_t::sint64_type>(const view_t& value) -> const view_t::sint64_type&;
 template auto get<view_t::uint64_type>(const view_t& value) -> const view_t::uint64_type&;
 template auto get<view_t::double_type>(const view_t& value) -> const view_t::double_type&;
-// template<> auto get<view_t::string_type>(const view_t& value) -> const view_t::string_type&;
+template auto get<view_t::string_type>(const view_t& value) -> const view_t::string_type&;
 
 }  // namespace attribute
 }  // namespace blackhole

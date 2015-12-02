@@ -85,6 +85,19 @@ TEST(view_t, FromDouble) {
     EXPECT_FLOAT_EQ(42.5, blackhole::attribute::get<double>(v));
 }
 
+TEST(view_t, FromStringLiteral) {
+    view_t v("le message");
+
+    EXPECT_EQ("le message", blackhole::attribute::get<string_view>(v).to_string());
+}
+
+TEST(view_t, FromString) {
+    std::string value("le message");
+    view_t v(value);
+
+    EXPECT_EQ(value, blackhole::attribute::get<string_view>(v).to_string());
+}
+
 }  // namespace attribute
 }  // namespace testing
 }  // namespace blackhole

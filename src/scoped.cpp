@@ -4,13 +4,15 @@
 
 namespace blackhole {
 
+using attribute::view_t;
+
 namespace {
 
 // TODO: Replace somewhere near `view_of`.
 auto transform(const attributes_t& source) -> attribute_list {
     attribute_list result;
     for (const auto& attribute : source) {
-        result.emplace_back(attribute);
+        result.emplace_back(attribute.first, view_t::from(attribute.second));
     }
 
     return result;

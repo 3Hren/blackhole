@@ -33,11 +33,6 @@ class bad_get;
 class value_t;
 class view_t;
 
-class bad_get : public std::logic_error {
-public:
-    bad_get() : std::logic_error("bad get") {}
-};
-
 /// Represents an attribute value holder.
 class value_t {
 public:
@@ -108,7 +103,7 @@ public:
     /// Constructs a null view value.
     view_t();
 
-    /// Conversion constructors.
+    /// Integer conversion constructors.
     view_t(char value);
     view_t(short value);
     view_t(int value);
@@ -121,12 +116,13 @@ public:
     view_t(unsigned long value);
     view_t(unsigned long long value);
 
+    /// Constructs an attribute view from the given floating point value.
     view_t(double value);
 
     view_t(const string_type& value);
 
-    /// Conversion constructor from an owned type.
-    view_t(const value_t& value);
+    /// Constructs an attribute view from the given owned attribute value.
+    static auto from(const value_t& value) -> view_t;
 
     view_t(const view_t& other) = default;
     view_t(view_t&& other) = default;
@@ -136,7 +132,7 @@ public:
     auto operator=(const view_t& other) -> view_t& = default;
     auto operator=(view_t&& other) -> view_t& = default;
 
-    /// Visitor.
+    /// Applies the given visitor to perform pattern matching.
     auto apply(const visitor_t& visitor) const -> void;
 
     auto operator==(const view_t& other) const -> bool;
