@@ -16,11 +16,6 @@ struct view_of {
     typedef T type;
 };
 
-template<>
-struct view_of<std::string> {
-    typedef string_view type;
-};
-
 }  // namespace blackhole
 
 namespace blackhole {
