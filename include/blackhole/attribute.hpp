@@ -143,8 +143,20 @@ private:
     auto construct(T&& value) -> void;
 };
 
-/// Represents an attribute value holder view, containing only lightweight references to the actual
+/// Represents an attribute value holder view, containing only lightweight views of the actual
 /// values.
+///
+/// If an owned value is small enough to keep its copy - this class does it, otherwise keeping only
+/// view proxy values. For example for `std::string` values there is a lightweight mapping that
+/// holds only two members: a pointer to constant char and a size.
+///
+/// The underlying value can also be obtained through `blackhole::attribute::get` function with
+/// providing the desired result type. For example:
+///     blackhole::attribute::view_t value("le vinegret");
+///     const auto actual = blackhole::attribute::get<std::int64_t>(value);
+///
+///     assert("le vinegret" == actual);
+///
 class view_t {
 public:
     /// Available types.
@@ -155,6 +167,7 @@ public:
     typedef double         double_type;
     typedef string_view    string_type;
 
+    /// The type sequence of all available types.
     typedef boost::mpl::vector<
         null_type,
         bool_type,
@@ -164,6 +177,7 @@ public:
         string_type
     > types;
 
+    /// Visitor interface.
     class visitor_t {
     public:
         virtual ~visitor_t() = 0;
@@ -247,11 +261,15 @@ private:
 };
 
 /// Retrieves a value of a specified, but yet restricted type, from a given attribute value.
+///
+/// \throws std::bad_cast if the content is not of the specified type T.
 template<typename T>
 auto get(const value_t& value) ->
     typename std::enable_if<boost::mpl::contains<value_t::types, T>::value, const T&>::type;
 
 /// Retrieves a value of a specified, but yet restricted type, from a given attribute value view.
+///
+/// \throws std::bad_cast if the content is not of the specified type T.
 template<typename T>
 auto get(const view_t& value) ->
     typename std::enable_if<boost::mpl::contains<view_t::types, T>::value, const T&>::type;
