@@ -107,15 +107,15 @@ public:
     view_t();
 
     /// Conversion constructors.
+    view_t(char value);
     view_t(int value);
-    // view_t(char value);
     view_t(long value);
     view_t(long long value);
 
-    // view_t(unsigned int value);
-    // view_t(unsigned char value);
-    // view_t(unsigned long value);
-    // view_t(unsigned long long value);
+    view_t(unsigned int value);
+    view_t(unsigned char value);
+    view_t(unsigned long value);
+    view_t(unsigned long long value);
 
     // view_t(float value);
     view_t(double value);

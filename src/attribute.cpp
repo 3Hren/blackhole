@@ -21,6 +21,10 @@ struct into_view {
 
 static_assert(sizeof(view_t::inner_t) <= sizeof(view_t), "padding or alignment violation");
 
+view_t::view_t(char value) {
+    new(static_cast<void*>(&storage)) inner_t{static_cast<std::int64_t>(value)};
+}
+
 view_t::view_t(int value) {
     new(static_cast<void*>(&storage)) inner_t{static_cast<std::int64_t>(value)};
 }
