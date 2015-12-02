@@ -40,6 +40,17 @@ class view_t;
 ///     - unsigned integer types up to 64-bit size;
 ///     - floating point type;
 ///     - and an owned string type.
+///
+/// The underlying value can be obtained through `blackhole::attribute::get` function with providing
+/// the desired result type. For example:
+///     blackhole::attribute::value_t value(42);
+///     const auto actual = blackhole::attribute::get<std::int64_t>(value);
+///
+///     assert(42 == actual);
+///
+/// As an alternative a visitor pattern is provided for enabling underlying value visitation. To
+/// enable this feature, implement the `value_t::visitor_t` interface and provide an instance of
+/// this implementation to the `apply` method.
 class value_t {
 public:
     /// Available types.
@@ -50,6 +61,7 @@ public:
     typedef double         double_type;
     typedef std::string    string_type;
 
+    /// The type sequence of all available types.
     typedef boost::mpl::vector<
         null_type,
         bool_type,
@@ -59,6 +71,7 @@ public:
         string_type
     > types;
 
+    /// Visitor interface.
     class visitor_t {
     public:
         virtual ~visitor_t() = 0;
@@ -79,8 +92,10 @@ private:
     storage_type storage;
 
 public:
+    /// Constructs a null value containing tagged nullptr value.
     value_t();
 
+    /// Constructs a value initialized with the given boolean value.
     value_t(bool value);
 
     /// Constructs a value initialized with the given signed integer.
