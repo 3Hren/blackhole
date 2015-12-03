@@ -38,6 +38,7 @@ add_library(${LIBRARY_NAME} SHARED
 	src/config/none
 	src/datetime/generator.linux
 	src/datetime/generator.other
+	src/formatter/json
 	src/formatter/string.cpp
 	src/formatter/string/error
 	src/formatter/string/parser
@@ -154,6 +155,7 @@ if (ENABLE_TESTING)
 		tests/config/none
 		tests/datetime
 		tests/facade
+		tests/formatter/json
 		tests/formatter/parser
 		tests/formatter/string
 		tests/handler/blocking
