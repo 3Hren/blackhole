@@ -67,21 +67,31 @@ private:
     color_t(int attr, int code);
 };
 
-typedef std::function<auto(const record_t&) -> color_t> color_map;
+typedef std::function<auto(const record_t&) -> color_t> termcolor_map;
 
-/// Hierarchy: console_t (colormap) -> base_console_t (color) -> stream_t (flush + mutex) -> sink_t.
 class console_t : public sink_t {
-    color_map colormap;
+public:
+    enum class type_t { stdout, stderr };
+
+private:
+    std::ostream& stream;
+    termcolor_map colormap;
 
 public:
     console_t();
-    explicit console_t(color_map colormap);
+    explicit console_t(termcolor_map colormap);
+    console_t(type_t type, termcolor_map colormap);
 
     auto filter(const record_t& record) -> bool;
     auto execute(const record_t& record, const string_view& formatted) -> void;
 
 protected:
-    virtual auto color(const record_t& record) -> color_t;
+    console_t(std::ostream& stream, termcolor_map colormap);
+
+    auto color(const record_t& record) -> color_t;
+
+private:
+    static auto output(type_t type) -> std::ostream&;
 };
 
 }  // namespace sink

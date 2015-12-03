@@ -15,6 +15,21 @@ using ::testing::internal::GetCapturedStdout;
 using ::blackhole::sink::color_t;
 using ::blackhole::sink::console_t;
 
+namespace mock {
+namespace {
+
+class console_t : public ::blackhole::sink::console_t {
+public:
+    std::ostringstream stream;
+
+    explicit console_t(::blackhole::sink::termcolor_map colmap) :
+        ::blackhole::sink::console_t(stream, std::move(colmap))
+    {}
+};
+
+}  // namespace
+}  // namespace mock
+
 TEST(color_t, Default) {
     std::ostringstream stream;
     stream << color_t();
@@ -71,6 +86,19 @@ TEST(console_t, WriteIntoStandardOutputByDefault) {
     EXPECT_EQ("expected\n", actual);
 }
 
+class cout_redirector_t {
+    std::streambuf* prev;
+
+public:
+    cout_redirector_t(std::streambuf* buffer) :
+        prev(std::cout.rdbuf(buffer))
+    {}
+
+    ~cout_redirector_t() {
+        std::cout.rdbuf(prev);
+    }
+};
+
 TEST(console_t, ColoredOutput) {
     console_t sink([](const record_t&) -> color_t {
         return color_t::red();
@@ -80,11 +108,25 @@ TEST(console_t, ColoredOutput) {
     const attribute_pack pack;
     record_t record(42, message, pack);
 
-    CaptureStdout();
+    std::ostringstream stream;
+    cout_redirector_t lock(stream.rdbuf());
     sink.execute(record, "expected");
 
-    const std::string actual = GetCapturedStdout();
-    EXPECT_EQ("\033[31mexpected\033[0m\n", actual);
+    EXPECT_EQ("\033[31mexpected\033[0m\n", stream.str());
+}
+
+TEST(console_t, NonColoredOutputToNonTTY) {
+    mock::console_t sink([](const record_t&) -> color_t {
+        return color_t::red();
+    });
+
+    const string_view message("");
+    const attribute_pack pack;
+    record_t record(42, message, pack);
+
+    sink.execute(record, "expected");
+
+    EXPECT_EQ("expected\n", sink.stream.str());
 }
 
 TEST(console_t, FilterAcceptsAll) {

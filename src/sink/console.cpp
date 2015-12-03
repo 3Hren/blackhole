@@ -1,6 +1,7 @@
 #include "blackhole/sink/console.hpp"
 
 #include <iostream>
+#include <mutex>
 
 #include "blackhole/cpp17/string_view.hpp"
 
@@ -89,21 +90,47 @@ auto operator<<(std::ostream& stream, const color_t& color) -> std::ostream& {
 
 namespace {
 
-auto get_standard_stream(const std::ostream& stream) -> FILE* {
-    return nullptr;
+auto streamfd(const std::ostream& stream) -> FILE* {
+    if (&stream == &std::cout) {
+        return stdout;
+    } else if (&stream == &std::cerr) {
+        return stderr;
+    } else {
+        return nullptr;
+    }
 }
 
 auto isatty(const std::ostream& stream) -> bool {
-    return true;
+    if (auto file = streamfd(stream)) {
+#if defined(__linux__) || defined(__APPLE__)
+        return ::isatty(::fileno(file));
+#else
+#error unsupported platform
+#endif
+    } else {
+        return false;
+    }
 }
 
 }  // namespace
 
 console_t::console_t() :
+    stream(std::cout),
     colormap([](const record_t&) -> color_t { return {}; })
 {}
 
-console_t::console_t(color_map colormap) :
+console_t::console_t(termcolor_map colormap) :
+    stream(std::cout),
+    colormap(std::move(colormap))
+{}
+
+console_t::console_t(type_t type, termcolor_map colormap) :
+    stream(output(type)),
+    colormap(std::move(colormap))
+{}
+
+console_t::console_t(std::ostream& stream, termcolor_map colormap) :
+    stream(stream),
     colormap(std::move(colormap))
 {}
 
@@ -112,19 +139,23 @@ auto console_t::filter(const record_t&) -> bool {
 }
 
 auto console_t::execute(const record_t& record, const string_view& formatted) -> void {
-    if (isatty(std::cout)) {
+    if (isatty(stream)) {
         std::lock_guard<std::mutex> lock(mutex);
-        color(record).apply(std::cout, formatted.data(), formatted.size());
-        std::cout << std::endl;
+        color(record).apply(stream, formatted.data(), formatted.size());
+        stream << std::endl;
     } else {
         std::lock_guard<std::mutex> lock(mutex);
-        std::cout.write(formatted.data(), static_cast<std::streamsize>(formatted.size()));
-        std::cout << std::endl;
+        stream.write(formatted.data(), static_cast<std::streamsize>(formatted.size()));
+        stream << std::endl;
     }
 }
 
 auto console_t::color(const record_t& record) -> color_t {
     return colormap(record);
+}
+
+auto console_t::output(type_t type) -> std::ostream& {
+    return type == type_t::stdout ? std::cout : std::cerr;
 }
 
 }  // namespace sink
