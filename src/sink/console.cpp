@@ -11,8 +11,8 @@ namespace sink {
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 
-// Standard output & error access mutex. Messages written with Blackhole will be synchronized,
-// otherwise an intermixing can occur.
+// Both standard output and error access mutex. Messages written with Blackhole will be
+// synchronized, otherwise an intermixing can occur.
 static std::mutex mutex;
 
 #pragma clang diagnostic pop
