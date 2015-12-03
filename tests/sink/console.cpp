@@ -1,6 +1,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <unistd.h>
+
 #include <blackhole/record.hpp>
 #include <blackhole/sink/console.hpp>
 
@@ -112,7 +114,11 @@ TEST(console_t, ColoredOutput) {
     cout_redirector_t lock(stream.rdbuf());
     sink.execute(record, "expected");
 
-    EXPECT_EQ("\033[31mexpected\033[0m\n", stream.str());
+    if (::isatty(1)) {
+        EXPECT_EQ("\033[31mexpected\033[0m\n", stream.str());
+    } else {
+        EXPECT_EQ("expected\n", stream.str());
+    }
 }
 
 TEST(console_t, NonColoredOutputToNonTTY) {
