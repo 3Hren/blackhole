@@ -7,6 +7,16 @@
 namespace blackhole {
 namespace sink {
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+
+// Standard output & error access mutex. Messages written with Blackhole will be synchronized,
+// otherwise an intermixing can occur.
+static std::mutex mutex;
+
+#pragma clang diagnostic pop
+
 class color_t::scope_t {
     std::ostream& stream;
 
@@ -103,11 +113,11 @@ auto console_t::filter(const record_t&) -> bool {
 
 auto console_t::execute(const record_t& record, const string_view& formatted) -> void {
     if (isatty(std::cout)) {
-        // std::lock_guard<std::mutex> lock(mutex);
+        std::lock_guard<std::mutex> lock(mutex);
         color(record).apply(std::cout, formatted.data(), formatted.size());
         std::cout << std::endl;
     } else {
-        // std::lock_guard<std::mutex> lock(mutex);
+        std::lock_guard<std::mutex> lock(mutex);
         std::cout.write(formatted.data(), static_cast<std::streamsize>(formatted.size()));
         std::cout << std::endl;
     }
