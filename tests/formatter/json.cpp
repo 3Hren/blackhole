@@ -48,6 +48,27 @@ TEST(json_t, FormatAttribute) {
     EXPECT_EQ(42, doc["counter"].GetInt());
 }
 
+TEST(json_t, FormatAttributeString) {
+    json_t formatter;
+
+    const string_view message("value");
+    const attribute_list attributes{{"endpoint", "127.0.0.1:8080"}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+    ASSERT_TRUE(doc.HasMember("message"));
+    ASSERT_TRUE(doc["message"].IsString());
+    EXPECT_STREQ("value", doc["message"].GetString());
+
+    ASSERT_TRUE(doc.HasMember("endpoint"));
+    ASSERT_TRUE(doc["endpoint"].IsString());
+    EXPECT_STREQ("127.0.0.1:8080", doc["endpoint"].GetString());
+}
+
 }  // namespace formatter
 }  // namespace testing
 }  // namespace blackhole

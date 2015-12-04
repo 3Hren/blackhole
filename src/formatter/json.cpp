@@ -33,6 +33,11 @@ struct visitor_t {
     auto operator()(std::int64_t value) -> void {
         root.AddMember(rapidjson::StringRef(name.data(), name.size()), value, root.GetAllocator());
     }
+
+    auto operator()(const string_view& value) -> void {
+        root.AddMember(rapidjson::StringRef(name.data(), name.size()),
+            rapidjson::StringRef(value.data(), value.size()), root.GetAllocator());
+    }
 };
 
 }  // namespace
@@ -56,7 +61,7 @@ auto json_t::format(const record_t& record, writer_t& writer) -> void {
         }
     }
 
-    // TODO: Update my knowledge how to properly to this. Anything might change.
+    // TODO: Update my knowledge how to properly do this. Anything might change.
     rapidjson::GenericStringBuffer<rapidjson::UTF8<>> buffer;
     // TODO: Leave this implementation for now. Measure. Then replace with cppformat writer.
     rapidjson::Writer<rapidjson::GenericStringBuffer<rapidjson::UTF8<>>> resultwriter(buffer);
