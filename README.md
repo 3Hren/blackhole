@@ -194,3 +194,13 @@ First of all, the entire library was completely rewritten for performance reason
 
 - C++11/14/17 compiler (yep, using C++17 opens additional functionalities).
 - Boost.Thread - for TLS.
+
+# Development
+## Git workflow
+
+Each feature and fix is developed in a separate branch. Bugs which are discovered during development of a certain feature, may be fixed in the same branch as their parent issue. This is also true for small features.
+
+### Branch structure:
+- `master`: master branch - contains stable, working version of VM code.
+- `develop`: development branch - all fixes and features are first merged here.
+- `issue/<number>/<slug>` or `issue/<slug>`: for issues (both enhancement and bug fixes).
