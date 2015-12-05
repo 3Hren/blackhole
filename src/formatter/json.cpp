@@ -128,6 +128,7 @@ auto json_t::format(const record_t& record, writer_t& writer) -> void {
             //     } else {}
             // }
 
+            // TODO: Here `to_string` is a bottleneck!
             const auto it = routing.find(attribute.first.to_string());
             if (it != routing.end()) {
                 auto& node = it->second.pointer.GetWithDefault(root, rapidjson::kObjectType);
