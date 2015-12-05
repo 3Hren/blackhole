@@ -70,7 +70,7 @@ TEST(json_t, FormatAttributeString) {
     EXPECT_STREQ("127.0.0.1:8080", doc["endpoint"].GetString());
 }
 
-TEST(json_t, MessageRouting) {
+TEST(json_t, FormatMessageWithRouting) {
     json_t formatter(routing_t().spec("/fields", {"message"}));
 
     const string_view message("value");
@@ -80,6 +80,30 @@ TEST(json_t, MessageRouting) {
     formatter.format(record, writer);
 
     EXPECT_EQ(R"({"fields":{"message":"value"}})", writer.result().to_string());
+}
+
+TEST(json_t, FormatAttributeStringWithRouting) {
+    json_t formatter(routing_t().spec("/fields", {"endpoint"}));
+
+    const string_view message("value");
+    const attribute_list attributes{{"endpoint", "127.0.0.1:8080"}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    std::cout << writer.result().to_string() << std::endl;
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+    ASSERT_TRUE(doc.HasMember("message"));
+    ASSERT_TRUE(doc["message"].IsString());
+    EXPECT_STREQ("value", doc["message"].GetString());
+
+    ASSERT_TRUE(doc.HasMember("fields"));
+    ASSERT_TRUE(doc["fields"].HasMember("endpoint"));
+    ASSERT_TRUE(doc["fields"]["endpoint"].IsString());
+    EXPECT_STREQ("127.0.0.1:8080", doc["fields"]["endpoint"].GetString());
 }
 
 }  // namespace formatter

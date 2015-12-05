@@ -19,10 +19,13 @@ namespace formatter {
 
 namespace {
 
+template<typename Allocator>
 struct visitor_t {
     typedef void result_type;
 
-    rapidjson::Document& root;
+    rapidjson::Value& node;
+    Allocator& allocator;
+
     const record_t& record;
 
     const string_view& name;
@@ -33,12 +36,12 @@ struct visitor_t {
     }
 
     auto operator()(std::int64_t value) -> void {
-        root.AddMember(rapidjson::StringRef(name.data(), name.size()), value, root.GetAllocator());
+        node.AddMember(rapidjson::StringRef(name.data(), name.size()), value, allocator);
     }
 
     auto operator()(const string_view& value) -> void {
-        root.AddMember(rapidjson::StringRef(name.data(), name.size()),
-            rapidjson::StringRef(value.data(), value.size()), root.GetAllocator());
+        node.AddMember(rapidjson::StringRef(name.data(), name.size()),
+            rapidjson::StringRef(value.data(), value.size()), allocator);
     }
 };
 
@@ -65,7 +68,7 @@ json_t::json_t(routing_t routing) :
 {
     for (const auto& route : routing.specified) {
         for (const auto& attribute : route.second) {
-            this->routing.insert({attribute, route_t(route.first).append(attribute)});
+            this->routing.insert({attribute, route_t(route.first)});
         }
     }
 }
@@ -92,11 +95,17 @@ auto json_t::format(const record_t& record, writer_t& writer) -> void {
     //    +: setter overloads(root).
     //    -: setter overloads(node)
 
+    // routing.get(name) ->
+    //  pointer if route is static.
+    //  pointer if route is dynamic.
+    //  pointer if route is default.
+
     /// fn apply(...)
     const auto it = routing.find("message");
     // TODO: Replace with find with default.
     if (it != routing.end()) {
-        it->second.pointer.Set(root, rapidjson::StringRef(message.data(), message.size()));
+        it->second.pointer.GetWithDefault(root, rapidjson::kObjectType)
+            .AddMember("message", rapidjson::StringRef(message.data(), message.size()), root.GetAllocator());
     } else {
         base->pointer.GetWithDefault(root, rapidjson::kObjectType)
             .AddMember("message", rapidjson::StringRef(message.data(), message.size()), root.GetAllocator());
@@ -118,8 +127,17 @@ auto json_t::format(const record_t& record, writer_t& writer) -> void {
             //         boost::apply_visitor(visitor_t{node}, attribute.value.inner().value);
             //     } else {}
             // }
-            visitor_t visitor{root, record, attribute.first};
-            boost::apply_visitor(visitor, attribute.second.inner().value);
+
+            const auto it = routing.find(attribute.first.to_string());
+            if (it != routing.end()) {
+                auto& node = it->second.pointer.GetWithDefault(root, rapidjson::kObjectType);
+                visitor_t<decltype(root.GetAllocator())> visitor{node, root.GetAllocator(), record, attribute.first};
+                boost::apply_visitor(visitor, attribute.second.inner().value);
+            } else {
+                auto& node = base->pointer.GetWithDefault(root, rapidjson::kObjectType);
+                visitor_t<decltype(root.GetAllocator())> visitor{node, root.GetAllocator(), record, attribute.first};
+                boost::apply_visitor(visitor, attribute.second.inner().value);
+            }
         }
     }
 
