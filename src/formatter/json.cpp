@@ -2,9 +2,11 @@
 
 #include <boost/variant/apply_visitor.hpp>
 
+#define RAPIDJSON_HAS_STDSTRING 1
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
+#include <rapidjson/pointer.h>
 
 #include "blackhole/record.hpp"
 #include "blackhole/extensions/writer.hpp"
@@ -42,6 +44,34 @@ struct visitor_t {
 
 }  // namespace
 
+class json_t::route_t {
+public:
+    rapidjson::Pointer pointer;
+
+    route_t(const std::string& source) : pointer(source) {}
+    route_t(rapidjson::Pointer pointer) : pointer(pointer) {}
+
+    auto append(const std::string& name) const -> route_t {
+        return {pointer.Append(name)};
+    }
+};
+
+json_t::json_t() :
+    base(new route_t(""))
+{}
+
+json_t::json_t(routing_t routing) :
+    base(new route_t(routing.unspecified))
+{
+    for (const auto& route : routing.specified) {
+        for (const auto& attribute : route.second) {
+            this->routing.insert({attribute, route_t(route.first).append(attribute)});
+        }
+    }
+}
+
+json_t::~json_t() {}
+
 auto json_t::format(const record_t& record, writer_t& writer) -> void {
     rapidjson::Document root;
     root.SetObject();
@@ -52,10 +82,42 @@ auto json_t::format(const record_t& record, writer_t& writer) -> void {
     // TODO: Try to use `AutoUTF<>` or `AutoUTFOutputStream` for UTF-8 validation.
 
     const auto& message = record.message();
-    root.AddMember("message", rapidjson::StringRef(message.data(), message.size()), root.GetAllocator());
+    // root.AddMember("message", rapidjson::StringRef(message.data(), message.size()), root.GetAllocator());
+
+    // for NAME and VALUE do apply.
+    //  find ROUTE by NAME in ROUTING
+    //   +: ROUTE.Set(NAME, VALUE).
+    //       map NAME, then setter overloads(node).
+    //   -: DEFAULT_ROUTE == nullptr?
+    //    +: setter overloads(root).
+    //    -: setter overloads(node)
+
+    /// fn apply(...)
+    const auto it = routing.find("message");
+    // TODO: Replace with find with default.
+    if (it != routing.end()) {
+        it->second.pointer.Set(root, rapidjson::StringRef(message.data(), message.size()));
+    } else {
+        base->pointer.GetWithDefault(root, rapidjson::kObjectType)
+            .AddMember("message", rapidjson::StringRef(message.data(), message.size()), root.GetAllocator());
+    }
 
     for (const auto& attributes : record.attributes()) {
         for (const auto& attribute : attributes.get()) {
+            /// mapping ::= [attribute.name -> attribute.name].
+            /// routing ::= [route -> [attribute.name]] if config,
+            ///         ::= [attribute.name -> route] otherwise.
+            ///                                variant ::= record -> attribute.
+
+            // auto it = routing.find(attribute.name);
+            // if (it != routing.end()) {
+            //     auto (pointer, map) = *it;
+            //     // Pointer value.
+            //     if (auto node = pointer.Get()) {
+            //         auto name = mapped(attribute.name);
+            //         boost::apply_visitor(visitor_t{node}, attribute.value.inner().value);
+            //     } else {}
+            // }
             visitor_t visitor{root, record, attribute.first};
             boost::apply_visitor(visitor, attribute.second.inner().value);
         }

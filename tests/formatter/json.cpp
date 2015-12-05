@@ -14,6 +14,7 @@ namespace testing {
 namespace formatter {
 
 using ::blackhole::formatter::json_t;
+using ::blackhole::formatter::routing_t;
 
 TEST(json_t, FormatMessage) {
     json_t formatter;
@@ -67,6 +68,18 @@ TEST(json_t, FormatAttributeString) {
     ASSERT_TRUE(doc.HasMember("endpoint"));
     ASSERT_TRUE(doc["endpoint"].IsString());
     EXPECT_STREQ("127.0.0.1:8080", doc["endpoint"].GetString());
+}
+
+TEST(json_t, MessageRouting) {
+    json_t formatter(routing_t().spec("/fields", {"message"}));
+
+    const string_view message("value");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ(R"({"fields":{"message":"value"}})", writer.result().to_string());
 }
 
 }  // namespace formatter
