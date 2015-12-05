@@ -192,6 +192,7 @@ if (ENABLE_BENCHMARKING)
 		bench/clock
 		bench/cpp14formatter
 		bench/datetime
+		bench/formatter/json
 		bench/formatter/string
 		bench/logger
 		bench/main
