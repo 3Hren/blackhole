@@ -32,6 +32,7 @@ typedef std::unordered_map<std::string, std::string> mapping_t;
 
 // TODO: Add severity mapping support.
 // TODO: Add timestamp mapping support.
+// TODO: Take a doc from site.
 class json_t : public formatter_t {
     class route_t;
 
