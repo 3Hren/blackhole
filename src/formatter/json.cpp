@@ -21,21 +21,32 @@ namespace formatter {
 
 namespace {
 
-template<typename Allocator>
 struct visitor_t {
     typedef void result_type;
 
     rapidjson::Value& node;
-    Allocator& allocator;
+    rapidjson::MemoryPoolAllocator<>& allocator;
+
     const string_view& name;
 
-    template<typename T>
-    auto operator()(T value) -> void {
+    auto operator()(std::nullptr_t) -> void {
+        BLACKHOLE_UNIMPLEMENTED();
+    }
+
+    auto operator()(bool) -> void {
         BLACKHOLE_UNIMPLEMENTED();
     }
 
     auto operator()(std::int64_t value) -> void {
         node.AddMember(rapidjson::StringRef(name.data(), name.size()), value, allocator);
+    }
+
+    auto operator()(std::uint64_t value) -> void {
+        node.AddMember(rapidjson::StringRef(name.data(), name.size()), value, allocator);
+    }
+
+    auto operator()(double value) -> void {
+        BLACKHOLE_UNIMPLEMENTED();
     }
 
     auto operator()(const string_view& value) -> void {
@@ -46,16 +57,33 @@ struct visitor_t {
 
 }  // namespace
 
+class json_t::inner_t {
+public:
+    route_t rest;
+    std::unordered_map<std::string, route_t> routing;
+
+    inner_t(std::string rest) : rest(std::move(rest)) {}
+
+    auto get(const string_view& name, rapidjson::Document& root) -> rapidjson::Value& {
+        const auto it = routing.find(name.to_string());
+        if (it == routing.end()) {
+            return rest.pointer.GetWithDefault(root, rapidjson::kObjectType);
+        } else {
+            return it->second.pointer.GetWithDefault(root, rapidjson::kObjectType);
+        }
+    }
+};
+
 json_t::json_t() :
-    base(new route_t(""))
+    inner(new inner_t(""))
 {}
 
 json_t::json_t(routing_t routing) :
-    base(new route_t(routing.unspecified))
+    inner(new inner_t(routing.unspecified))
 {
     for (const auto& route : routing.specified) {
         for (const auto& attribute : route.second) {
-            this->routing.insert({attribute, route_t(route.first)});
+            inner->routing.insert({attribute, route_t(route.first)});
         }
     }
 }
@@ -70,8 +98,6 @@ auto json_t::format(const record_t& record, writer_t& writer) -> void {
     // TODO: Make uniqued range.
     // TODO: Try to use Pointer API. Measure.
     // TODO: Try to use `AutoUTF<>` or `AutoUTFOutputStream` for UTF-8 validation.
-
-    const auto& message = record.message();
 
     // apply("message", record.message(), allocator) -> void =>
     //   auto& node = routing.get("message", root);
@@ -90,52 +116,28 @@ auto json_t::format(const record_t& record, writer_t& writer) -> void {
     // }
 
     {
-        const auto it = routing.find("message");
-        // TODO: Replace with find with default.
-        if (it != routing.end()) {
-            it->second.pointer.GetWithDefault(root, rapidjson::kObjectType)
-                .AddMember("message", rapidjson::StringRef(message.data(), message.size()), root.GetAllocator());
-        } else {
-            base->pointer.GetWithDefault(root, rapidjson::kObjectType)
-                .AddMember("message", rapidjson::StringRef(message.data(), message.size()), root.GetAllocator());
-        }
+        auto& node = inner->get("message", root);
+        visitor_t visitor{node, root.GetAllocator(), "message"};
+        visitor(record.message());
     }
 
     {
-        const auto it = routing.find("severity");
-        if (it != routing.end()) {
-            it->second.pointer.GetWithDefault(root, rapidjson::kObjectType)
-                .AddMember("severity", record.severity(), root.GetAllocator());
-        } else {
-            base->pointer.GetWithDefault(root, rapidjson::kObjectType)
-                .AddMember("severity", record.severity(), root.GetAllocator());
-        }
+        auto& node = inner->get("severity", root);
+        visitor_t visitor{node, root.GetAllocator(), "severity"};
+        visitor(static_cast<std::int64_t>(record.severity()));
     }
 
     {
-        const auto it = routing.find("timestamp");
-        if (it != routing.end()) {
-            it->second.pointer.GetWithDefault(root, rapidjson::kObjectType)
-                .AddMember("timestamp", std::chrono::duration_cast<std::chrono::microseconds>(record.timestamp().time_since_epoch()).count(), root.GetAllocator());
-        } else {
-            base->pointer.GetWithDefault(root, rapidjson::kObjectType)
-                .AddMember("timestamp", std::chrono::duration_cast<std::chrono::microseconds>(record.timestamp().time_since_epoch()).count(), root.GetAllocator());
-        }
+        auto& node = inner->get("timestamp", root);
+        visitor_t visitor{node, root.GetAllocator(), "timestamp"};
+        visitor(std::chrono::duration_cast<std::chrono::microseconds>(record.timestamp().time_since_epoch()).count());
     }
 
     for (const auto& attributes : record.attributes()) {
         for (const auto& attribute : attributes.get()) {
-            // TODO: Here `to_string` is a bottleneck!
-            const auto it = routing.find(attribute.first.to_string());
-            if (it != routing.end()) {
-                auto& node = it->second.pointer.GetWithDefault(root, rapidjson::kObjectType);
-                visitor_t<decltype(root.GetAllocator())> visitor{node, root.GetAllocator(), attribute.first};
-                boost::apply_visitor(visitor, attribute.second.inner().value);
-            } else {
-                auto& node = base->pointer.GetWithDefault(root, rapidjson::kObjectType);
-                visitor_t<decltype(root.GetAllocator())> visitor{node, root.GetAllocator(), attribute.first};
-                boost::apply_visitor(visitor, attribute.second.inner().value);
-            }
+            auto& node = inner->get(attribute.first, root);
+            visitor_t visitor{node, root.GetAllocator(), attribute.first};
+            boost::apply_visitor(visitor, attribute.second.inner().value);
         }
     }
 

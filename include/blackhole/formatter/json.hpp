@@ -51,13 +51,8 @@ typedef std::unordered_map<std::string, std::string> mapping_t;
 // TODO: Add timestamp mapping support.
 // TODO: Take a doc from site.
 class json_t : public formatter_t {
-    std::unique_ptr<route_t> base;
-
-    /// Mapping from attribute name to its route.
-    std::unordered_map<std::string, route_t> routing;
-
-    /// Mapping from attribute name to its key.
-    mapping_t mapping;
+    class inner_t;
+    std::unique_ptr<inner_t> inner;
 
 public:
     json_t();
