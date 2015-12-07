@@ -49,6 +49,24 @@ TEST(json_t, FormatSeverity) {
     EXPECT_EQ(4, doc["severity"].GetInt());
 }
 
+TEST(json_t, FormatTimestamp) {
+    json_t formatter;
+
+    const string_view message("value");
+    const attribute_pack pack;
+    record_t record(4, message, pack);
+    record.activate();
+    writer_t writer;
+    formatter.format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+
+    ASSERT_TRUE(doc.HasMember("timestamp"));
+    ASSERT_TRUE(doc["timestamp"].IsUint64());
+    EXPECT_TRUE(doc["timestamp"].GetUint64() > 0);
+}
+
 TEST(json_t, FormatAttribute) {
     json_t formatter;
 
@@ -117,8 +135,6 @@ TEST(json_t, FormatAttributeStringWithRouting) {
     record_t record(0, message, pack);
     writer_t writer;
     formatter.format(record, writer);
-
-    std::cout << writer.result().to_string() << std::endl;
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());

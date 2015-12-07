@@ -100,26 +100,37 @@ auto json_t::format(const record_t& record, writer_t& writer) -> void {
     // }
 
     {
-    const auto it = routing.find("message");
-    // TODO: Replace with find with default.
-    if (it != routing.end()) {
-        it->second.pointer.GetWithDefault(root, rapidjson::kObjectType)
-            .AddMember("message", rapidjson::StringRef(message.data(), message.size()), root.GetAllocator());
-    } else {
-        base->pointer.GetWithDefault(root, rapidjson::kObjectType)
-            .AddMember("message", rapidjson::StringRef(message.data(), message.size()), root.GetAllocator());
-    }
+        const auto it = routing.find("message");
+        // TODO: Replace with find with default.
+        if (it != routing.end()) {
+            it->second.pointer.GetWithDefault(root, rapidjson::kObjectType)
+                .AddMember("message", rapidjson::StringRef(message.data(), message.size()), root.GetAllocator());
+        } else {
+            base->pointer.GetWithDefault(root, rapidjson::kObjectType)
+                .AddMember("message", rapidjson::StringRef(message.data(), message.size()), root.GetAllocator());
+        }
     }
 
     {
-    const auto it = routing.find("severity");
-    if (it != routing.end()) {
-        it->second.pointer.GetWithDefault(root, rapidjson::kObjectType)
-            .AddMember("severity", record.severity(), root.GetAllocator());
-    } else {
-        base->pointer.GetWithDefault(root, rapidjson::kObjectType)
-            .AddMember("severity", record.severity(), root.GetAllocator());
+        const auto it = routing.find("severity");
+        if (it != routing.end()) {
+            it->second.pointer.GetWithDefault(root, rapidjson::kObjectType)
+                .AddMember("severity", record.severity(), root.GetAllocator());
+        } else {
+            base->pointer.GetWithDefault(root, rapidjson::kObjectType)
+                .AddMember("severity", record.severity(), root.GetAllocator());
+        }
     }
+
+    {
+        const auto it = routing.find("timestamp");
+        if (it != routing.end()) {
+            it->second.pointer.GetWithDefault(root, rapidjson::kObjectType)
+                .AddMember("timestamp", std::chrono::duration_cast<std::chrono::microseconds>(record.timestamp().time_since_epoch()).count(), root.GetAllocator());
+        } else {
+            base->pointer.GetWithDefault(root, rapidjson::kObjectType)
+                .AddMember("timestamp", std::chrono::duration_cast<std::chrono::microseconds>(record.timestamp().time_since_epoch()).count(), root.GetAllocator());
+        }
     }
 
     for (const auto& attributes : record.attributes()) {
