@@ -145,6 +145,10 @@ view_t::view_t() {
     construct(nullptr);
 }
 
+view_t::view_t(std::nullptr_t) {
+    construct(nullptr);
+}
+
 view_t::view_t(bool value) {
     construct(value);
 }

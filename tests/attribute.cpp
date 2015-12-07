@@ -2,6 +2,8 @@
 
 #include <blackhole/attribute.hpp>
 
+#include <blackhole/detail/attribute.hpp>
+
 namespace blackhole {
 namespace testing {
 namespace attribute {
@@ -11,6 +13,12 @@ using ::blackhole::attribute::view_t;
 
 TEST(view_t, Default) {
     view_t v;
+
+    EXPECT_EQ(nullptr, blackhole::attribute::get<std::nullptr_t>(v));
+}
+
+TEST(view_t, FromNullptr) {
+    view_t v(nullptr);
 
     EXPECT_EQ(nullptr, blackhole::attribute::get<std::nullptr_t>(v));
 }
@@ -199,6 +207,23 @@ TEST(value_t, FromString) {
     value_t v("le message");
 
     EXPECT_EQ("le message", blackhole::attribute::get<std::string>(v));
+}
+
+struct visitor_t : public boost::static_visitor<bool> {
+    auto operator()(std::nullptr_t) const -> bool {
+        return true;
+    }
+
+    template<typename T>
+    auto operator()(const T&) const -> bool {
+        return false;
+    }
+};
+
+TEST(view_t, DefaultVisit) {
+    view_t v;
+
+    EXPECT_TRUE(boost::apply_visitor(visitor_t(), v.inner().value));
 }
 
 }  // namespace attribute

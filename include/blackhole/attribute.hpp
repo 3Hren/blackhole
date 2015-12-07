@@ -95,6 +95,8 @@ public:
     /// Constructs a null value containing tagged nullptr value.
     value_t();
 
+    value_t(std::nullptr_t);
+
     /// Constructs a value initialized with the given boolean value.
     value_t(bool value);
 
@@ -200,6 +202,8 @@ private:
 public:
     /// Constructs a null value view containing tagged nullptr value.
     view_t();
+
+    view_t(std::nullptr_t);
 
     /// Constructs a value view initialized with the given boolean value.
     view_t(bool value);
