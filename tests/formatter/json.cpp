@@ -98,8 +98,6 @@ TEST(json_t, FormatAttributeNull) {
     writer_t writer;
     formatter.format(record, writer);
 
-    std::cout << writer.result().to_string() << std::endl;
-
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
     ASSERT_TRUE(doc.HasMember("endpoint"));
