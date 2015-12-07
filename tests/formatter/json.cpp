@@ -25,7 +25,28 @@ TEST(json_t, FormatMessage) {
     writer_t writer;
     formatter.format(record, writer);
 
-    EXPECT_EQ(R"({"message":"value"})", writer.result().to_string());
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+    ASSERT_TRUE(doc.HasMember("message"));
+    ASSERT_TRUE(doc["message"].IsString());
+    EXPECT_STREQ("value", doc["message"].GetString());
+}
+
+TEST(json_t, FormatSeverity) {
+    json_t formatter;
+
+    const string_view message("value");
+    const attribute_pack pack;
+    record_t record(4, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+
+    ASSERT_TRUE(doc.HasMember("severity"));
+    ASSERT_TRUE(doc["severity"].IsInt());
+    EXPECT_EQ(4, doc["severity"].GetInt());
 }
 
 TEST(json_t, FormatAttribute) {
@@ -79,7 +100,12 @@ TEST(json_t, FormatMessageWithRouting) {
     writer_t writer;
     formatter.format(record, writer);
 
-    EXPECT_EQ(R"({"fields":{"message":"value"}})", writer.result().to_string());
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+    ASSERT_TRUE(doc.HasMember("fields"));
+    ASSERT_TRUE(doc["fields"].HasMember("message"));
+    ASSERT_TRUE(doc["fields"]["message"].IsString());
+    EXPECT_STREQ("value", doc["fields"]["message"].GetString());
 }
 
 TEST(json_t, FormatAttributeStringWithRouting) {

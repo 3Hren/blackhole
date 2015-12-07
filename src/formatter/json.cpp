@@ -25,9 +25,6 @@ struct visitor_t {
 
     rapidjson::Value& node;
     Allocator& allocator;
-
-    const record_t& record;
-
     const string_view& name;
 
     template<typename T>
@@ -85,22 +82,24 @@ auto json_t::format(const record_t& record, writer_t& writer) -> void {
     // TODO: Try to use `AutoUTF<>` or `AutoUTFOutputStream` for UTF-8 validation.
 
     const auto& message = record.message();
-    // root.AddMember("message", rapidjson::StringRef(message.data(), message.size()), root.GetAllocator());
 
-    // for NAME and VALUE do apply.
-    //  find ROUTE by NAME in ROUTING
-    //   +: ROUTE.Set(NAME, VALUE).
-    //       map NAME, then setter overloads(node).
-    //   -: DEFAULT_ROUTE == nullptr?
-    //    +: setter overloads(root).
-    //    -: setter overloads(node)
+    // apply("message", record.message(), allocator) -> void =>
+    //   auto& node = routing.get("message", root);
+    //     const auto it = map.find("message");
+    //     if (it == map.end())
+    //       return rest.pointer.GetWithDefault(root, rapidjson::kObjectType);
+    //     else
+    //       return it->second.pointer.GetWithDefault(root, rapidjson::kObjectType);
+    //   visitor_t visitor(node, mapped("message"), allocator);
+    //   visitor(record.message());
+    //     node.AddMember("message", rapidjson::StringRef(message.data(), message.size()), allocator);
+    // apply("severity", record.severity(), allocator);
+    // ...
+    // for (const auto& attribute : record.attributes().flattened()) {
+    //   apply(attribute.name, attribute.value, allocator);
+    // }
 
-    // routing.get(name) ->
-    //  pointer if route is static.
-    //  pointer if route is dynamic.
-    //  pointer if route is default.
-
-    /// fn apply(...)
+    {
     const auto it = routing.find("message");
     // TODO: Replace with find with default.
     if (it != routing.end()) {
@@ -110,33 +109,30 @@ auto json_t::format(const record_t& record, writer_t& writer) -> void {
         base->pointer.GetWithDefault(root, rapidjson::kObjectType)
             .AddMember("message", rapidjson::StringRef(message.data(), message.size()), root.GetAllocator());
     }
+    }
+
+    {
+    const auto it = routing.find("severity");
+    if (it != routing.end()) {
+        it->second.pointer.GetWithDefault(root, rapidjson::kObjectType)
+            .AddMember("severity", record.severity(), root.GetAllocator());
+    } else {
+        base->pointer.GetWithDefault(root, rapidjson::kObjectType)
+            .AddMember("severity", record.severity(), root.GetAllocator());
+    }
+    }
 
     for (const auto& attributes : record.attributes()) {
         for (const auto& attribute : attributes.get()) {
-            /// mapping ::= [attribute.name -> attribute.name].
-            /// routing ::= [route -> [attribute.name]] if config,
-            ///         ::= [attribute.name -> route] otherwise.
-            ///                                variant ::= record -> attribute.
-
-            // auto it = routing.find(attribute.name);
-            // if (it != routing.end()) {
-            //     auto (pointer, map) = *it;
-            //     // Pointer value.
-            //     if (auto node = pointer.Get()) {
-            //         auto name = mapped(attribute.name);
-            //         boost::apply_visitor(visitor_t{node}, attribute.value.inner().value);
-            //     } else {}
-            // }
-
             // TODO: Here `to_string` is a bottleneck!
             const auto it = routing.find(attribute.first.to_string());
             if (it != routing.end()) {
                 auto& node = it->second.pointer.GetWithDefault(root, rapidjson::kObjectType);
-                visitor_t<decltype(root.GetAllocator())> visitor{node, root.GetAllocator(), record, attribute.first};
+                visitor_t<decltype(root.GetAllocator())> visitor{node, root.GetAllocator(), attribute.first};
                 boost::apply_visitor(visitor, attribute.second.inner().value);
             } else {
                 auto& node = base->pointer.GetWithDefault(root, rapidjson::kObjectType);
-                visitor_t<decltype(root.GetAllocator())> visitor{node, root.GetAllocator(), record, attribute.first};
+                visitor_t<decltype(root.GetAllocator())> visitor{node, root.GetAllocator(), attribute.first};
                 boost::apply_visitor(visitor, attribute.second.inner().value);
             }
         }
