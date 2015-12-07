@@ -46,7 +46,7 @@ struct visitor_t {
     }
 
     auto operator()(double value) -> void {
-        BLACKHOLE_UNIMPLEMENTED();
+        node.AddMember(rapidjson::StringRef(name.data(), name.size()), value, allocator);
     }
 
     auto operator()(const string_view& value) -> void {

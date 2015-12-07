@@ -123,6 +123,23 @@ TEST(json_t, FormatAttributeBool) {
     EXPECT_TRUE(doc["available"].GetBool());
 }
 
+TEST(json_t, FormatAttributeDouble) {
+    json_t formatter;
+
+    const string_view message("value");
+    const attribute_list attributes{{"pi", 3.1415}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+    ASSERT_TRUE(doc.HasMember("pi"));
+    ASSERT_TRUE(doc["pi"].IsDouble());
+    EXPECT_DOUBLE_EQ(3.1415, doc["pi"].GetDouble());
+}
+
 TEST(json_t, FormatAttributeString) {
     json_t formatter;
 
