@@ -6,27 +6,10 @@
 #include <unordered_map>
 #include <vector>
 
-#ifndef RAPIDJSON_HAS_STDSTRING
-#define RAPIDJSON_HAS_STDSTRING 1
-#endif
-#include <rapidjson/pointer.h>
-
 #include "blackhole/formatter.hpp"
 
 namespace blackhole {
 namespace formatter {
-
-class route_t {
-public:
-    rapidjson::Pointer pointer;
-
-    route_t(const std::string& source) : pointer(source) {}
-    route_t(rapidjson::Pointer pointer) : pointer(pointer) {}
-
-    auto append(const std::string& name) const -> route_t {
-        return {pointer.Append(name)};
-    }
-};
 
 struct routing_t {
     typedef std::map<std::string, std::vector<std::string>> specified_type;

@@ -1,9 +1,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#ifndef RAPIDJSON_HAS_STDSTRING
-#define RAPIDJSON_HAS_STDSTRING 1
-#endif
 #include <rapidjson/document.h>
 
 #include <blackhole/attributes.hpp>
