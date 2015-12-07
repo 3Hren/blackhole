@@ -79,8 +79,6 @@ struct stream_t {
     auto Flush() -> void {}
 };
 
-template<typename> class builder;
-
 }  // namespace
 
 class json_t::factory_t {
