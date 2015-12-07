@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <boost/variant/apply_visitor.hpp>
+
 #include <blackhole/attribute.hpp>
 
 #include <blackhole/detail/attribute.hpp>
