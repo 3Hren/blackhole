@@ -30,11 +30,11 @@ struct visitor_t {
     const string_view& name;
 
     auto operator()(std::nullptr_t) -> void {
-        BLACKHOLE_UNIMPLEMENTED();
+        node.AddMember(rapidjson::StringRef(name.data(), name.size()), rapidjson::kNullType, allocator);
     }
 
-    auto operator()(bool) -> void {
-        BLACKHOLE_UNIMPLEMENTED();
+    auto operator()(bool value) -> void {
+        node.AddMember(rapidjson::StringRef(name.data(), name.size()), value, allocator);
     }
 
     auto operator()(std::int64_t value) -> void {

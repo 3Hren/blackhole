@@ -88,6 +88,41 @@ TEST(json_t, FormatAttribute) {
     EXPECT_EQ(42, doc["counter"].GetInt());
 }
 
+TEST(json_t, FormatAttributeNull) {
+    json_t formatter;
+
+    const string_view message("value");
+    const attribute_list attributes{{"endpoint", nullptr}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    std::cout << writer.result().to_string() << std::endl;
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+    ASSERT_TRUE(doc.HasMember("endpoint"));
+    ASSERT_TRUE(doc["endpoint"].IsNull());
+}
+
+TEST(json_t, FormatAttributeBool) {
+    json_t formatter;
+
+    const string_view message("value");
+    const attribute_list attributes{{"available", true}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+    ASSERT_TRUE(doc.HasMember("available"));
+    ASSERT_TRUE(doc["available"].IsBool());
+    EXPECT_TRUE(doc["available"].GetBool());
+}
+
 TEST(json_t, FormatAttributeString) {
     json_t formatter;
 
