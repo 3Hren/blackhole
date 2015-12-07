@@ -52,18 +52,6 @@ struct visitor_t {
     }
 };
 
-template<typename Map, typename F>
-inline auto find(const Map& map, const typename Map::key_type& key, const F& fn) ->
-    typename Map::mapped_type
-{
-    const auto it = map.find(key);
-    if (it == map.end()) {
-        return fn();
-    } else {
-        return it->second;
-    }
-}
-
 /// A RapidJSON Stream concept implementation required to avoid intermediate buffer allocation.
 struct stream_t {
     typedef char Ch;
@@ -86,7 +74,7 @@ public:
     // A JSON routing pointer for attributes that weren't mentioned in `routing` map.
     rapidjson::Pointer rest;
     // Routing map from attribute name to its JSON pointer.
-    std::unordered_map<std::string, rapidjson::Pointer> routing;
+    std::map<std::string, rapidjson::Pointer> routing;
 
     factory_t() :
         rest("")
@@ -104,11 +92,14 @@ public:
 
     template<typename Document>
     auto get(const string_view& name, Document& root) -> rapidjson::Value& {
-        const auto& route = find(routing, name.to_string(), [&]() -> const rapidjson::Pointer& {
-            return rest;
-        });
-
-        return route.GetWithDefault(root, rapidjson::kObjectType);
+        // TODO: Here we can avoid a temporary string construction by using multi indexed
+        // containers.
+        const auto it = routing.find(name.to_string());
+        if (it == routing.end()) {
+            return rest.GetWithDefault(root, rapidjson::kObjectType);
+        } else {
+            return it->second.GetWithDefault(root, rapidjson::kObjectType);
+        }
     }
 
     template<typename Document>
