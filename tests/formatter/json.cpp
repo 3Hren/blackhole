@@ -188,10 +188,6 @@ TEST(json_t, FormatAttributeStringWithRouting) {
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
-    ASSERT_TRUE(doc.HasMember("message"));
-    ASSERT_TRUE(doc["message"].IsString());
-    EXPECT_STREQ("value", doc["message"].GetString());
-
     ASSERT_TRUE(doc.HasMember("fields"));
     ASSERT_TRUE(doc["fields"].HasMember("endpoint"));
     ASSERT_TRUE(doc["fields"]["endpoint"].IsString());
