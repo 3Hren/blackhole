@@ -194,6 +194,26 @@ TEST(json_t, FormatAttributeStringWithRouting) {
     EXPECT_STREQ("127.0.0.1:8080", doc["fields"]["endpoint"].GetString());
 }
 
+TEST(json_t, FormatAttributeStringWithNestedRouting) {
+    json_t formatter(routing_t().spec("/fields/external", {"endpoint"}));
+
+    const string_view message("value");
+    const attribute_list attributes{{"endpoint", "127.0.0.1:8080"}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+    ASSERT_TRUE(doc.HasMember("fields"));
+    ASSERT_TRUE(doc["fields"].HasMember("external"));
+    ASSERT_TRUE(doc["fields"]["external"].IsObject());
+    ASSERT_TRUE(doc["fields"]["external"].HasMember("endpoint"));
+    ASSERT_TRUE(doc["fields"]["external"]["endpoint"].IsString());
+    EXPECT_STREQ("127.0.0.1:8080", doc["fields"]["external"]["endpoint"].GetString());
+}
+
 }  // namespace formatter
 }  // namespace testing
 }  // namespace blackhole
