@@ -2,7 +2,9 @@
 
 #include <boost/variant/apply_visitor.hpp>
 
+#ifndef RAPIDJSON_HAS_STDSTRING
 #define RAPIDJSON_HAS_STDSTRING 1
+#endif
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
@@ -43,18 +45,6 @@ struct visitor_t {
 };
 
 }  // namespace
-
-class json_t::route_t {
-public:
-    rapidjson::Pointer pointer;
-
-    route_t(const std::string& source) : pointer(source) {}
-    route_t(rapidjson::Pointer pointer) : pointer(pointer) {}
-
-    auto append(const std::string& name) const -> route_t {
-        return {pointer.Append(name)};
-    }
-};
 
 json_t::json_t() :
     base(new route_t(""))
