@@ -34,7 +34,9 @@ typedef std::unordered_map<std::string, std::string> mapping_t;
 // TODO: Add timestamp mapping support.
 // TODO: Take a doc from site.
 class json_t : public formatter_t {
-    class builder_t;
+    template<typename>
+    class builder;
+
     class factory_t;
     std::unique_ptr<factory_t> factory;
 

@@ -1,5 +1,7 @@
 #include "blackhole/formatter/json.hpp"
 
+#include <array>
+
 #include <boost/variant/apply_visitor.hpp>
 
 #ifndef RAPIDJSON_HAS_STDSTRING
@@ -82,6 +84,8 @@ struct stream_t {
     auto Flush() -> void {}
 };
 
+template<typename> class builder;
+
 }  // namespace
 
 class json_t::factory_t {
@@ -105,7 +109,8 @@ public:
         }
     }
 
-    auto get(const string_view& name, rapidjson::Document& root) -> rapidjson::Value& {
+    template<typename Document>
+    auto get(const string_view& name, Document& root) -> rapidjson::Value& {
         const auto& route = find(routing, name.to_string(), [&]() -> const rapidjson::Pointer& {
             return rest;
         });
@@ -113,19 +118,21 @@ public:
         return route.GetWithDefault(root, rapidjson::kObjectType);
     }
 
-    auto create(rapidjson::Document& root, const record_t& record) -> builder_t;
+    template<typename Document>
+    auto create(Document& root, const record_t& record) -> builder<Document>;
 };
 
-class json_t::builder_t {
-    factory_t& factory;
+template<typename Document>
+class json_t::builder {
+    Document& root;
     const record_t& record;
-    rapidjson::Document& root;
+    factory_t& factory;
 
 public:
-    builder_t(factory_t& factory, const record_t& record, rapidjson::Document& root) :
-        factory(factory),
+    builder(Document& root, const record_t& record, factory_t& factory) :
+        root(root),
         record(record),
-        root(root)
+        factory(factory)
     {}
 
     auto message() -> void {
@@ -171,8 +178,11 @@ private:
     }
 };
 
-auto json_t::factory_t::create(rapidjson::Document& root, const record_t& record) -> builder_t {
-    return builder_t{*this, record, root};
+template<typename Document>
+auto json_t::factory_t::create(Document& root, const record_t& record) ->
+    builder<Document>
+{
+    return builder<Document>{root, record, *this};
 }
 
 json_t::json_t() :
@@ -186,7 +196,18 @@ json_t::json_t(routing_t routing) :
 json_t::~json_t() {}
 
 auto json_t::format(const record_t& record, writer_t& writer) -> void {
-    rapidjson::Document root;
+    typedef rapidjson::GenericDocument<
+        rapidjson::UTF8<>,
+        rapidjson::MemoryPoolAllocator<>,
+        rapidjson::MemoryPoolAllocator<>
+    > document_type;
+
+    std::array<char, 4096> value_buffer;
+    std::array<char, 1024> parse_buffer;
+    rapidjson::MemoryPoolAllocator<> value_allocator(value_buffer.data(), value_buffer.size());
+    rapidjson::MemoryPoolAllocator<> parse_allocator(parse_buffer.data(), parse_buffer.size());
+
+    document_type root(&value_allocator, parse_buffer.size(), &parse_allocator);
     root.SetObject();
 
     // TODO: Try to use `AutoUTF<>` or `AutoUTFOutputStream` for UTF-8 validation.
