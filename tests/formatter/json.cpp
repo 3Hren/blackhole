@@ -15,6 +15,7 @@ namespace formatter {
 
 using ::blackhole::formatter::json_t;
 using ::blackhole::formatter::routing_t;
+using ::blackhole::formatter::json::config_t;
 
 TEST(json_t, FormatMessage) {
     json_t formatter;
@@ -212,6 +213,22 @@ TEST(json_t, FormatAttributeStringWithNestedRouting) {
     ASSERT_TRUE(doc["fields"]["external"].HasMember("endpoint"));
     ASSERT_TRUE(doc["fields"]["external"]["endpoint"].IsString());
     EXPECT_STREQ("127.0.0.1:8080", doc["fields"]["external"]["endpoint"].GetString());
+}
+
+TEST(json_t, FormatMessageWithRenaming) {
+    json_t formatter(std::move(config_t().rename("message", "#message")));
+
+    const string_view message("value");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+    ASSERT_TRUE(doc.HasMember("#message"));
+    ASSERT_TRUE(doc["#message"].IsString());
+    EXPECT_STREQ("value", doc["#message"].GetString());
 }
 
 }  // namespace formatter

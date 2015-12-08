@@ -20,6 +20,46 @@
 
 namespace blackhole {
 namespace formatter {
+namespace json {
+
+class config_t::inner_t {
+public:
+    bool unique;
+    bool newline;
+
+    struct {
+        std::map<std::string, std::vector<std::string>> specified;
+        std::string unspecified;
+    } routing;
+
+    std::unordered_map<std::string, std::string> mapping;
+
+    inner_t() :
+        unique(false),
+        newline(false)
+    {}
+};
+
+config_t::config_t() :
+    inner(new inner_t)
+{}
+
+config_t::config_t(config_t&& other) = default;
+
+config_t::~config_t() = default;
+
+auto config_t::operator=(config_t&& other) -> config_t& = default;
+
+auto config_t::rename(std::string from, std::string to) -> config_t& {
+    inner->mapping[std::move(from)] = std::move(to);
+    return *this;
+}
+
+auto config_t::config() const noexcept -> const inner_t& {
+    return *inner;
+}
+
+}  // namespace json
 
 namespace {
 
@@ -67,6 +107,18 @@ struct stream_t {
     auto Flush() -> void {}
 };
 
+auto transform(const std::map<std::string, std::vector<std::string>>& source) ->
+    std::map<std::string, rapidjson::Pointer>
+{
+    std::map<std::string, rapidjson::Pointer> result;
+
+    for (const auto& route : source) {
+        for (const auto& name : route.second) {
+            result.insert({name, rapidjson::Pointer(route.first)});
+        }
+    }
+}
+
 }  // namespace
 
 class json_t::factory_t {
@@ -76,16 +128,31 @@ public:
     // Routing map from attribute name to its JSON pointer.
     std::map<std::string, rapidjson::Pointer> routing;
 
+    std::unordered_map<std::string, std::string> mapping;
+
+    [[deprecated]]
     factory_t() :
         rest("")
     {}
 
+    [[deprecated]]
     factory_t(routing_t routing) :
         rest(routing.unspecified)
     {
         for (const auto& route : routing.specified) {
             for (const auto& name : route.second) {
                 this->routing.insert({name, rapidjson::Pointer(route.first)});
+            }
+        }
+    }
+
+    factory_t(config_type config) :
+        rest(config.config().routing.unspecified),
+        mapping(std::move(config.config().mapping))
+    {
+        for (const auto& route : config.config().routing.specified) {
+            for (const auto& name : route.second) {
+                routing.insert({name, rapidjson::Pointer(route.first)});
             }
         }
     }
@@ -104,6 +171,16 @@ public:
 
     template<typename Document>
     auto create(Document& root, const record_t& record) -> builder<Document>;
+
+    auto renamed(const string_view& name) const -> string_view {
+        const auto it = mapping.find(name.to_string());
+
+        if (it == mapping.end()) {
+            return name;
+        } else {
+            return it->second;
+        }
+    }
 };
 
 template<typename Document>
@@ -152,7 +229,8 @@ public:
 private:
     template<typename T>
     auto apply(const string_view& name, const T& value) -> void {
-        visitor_t visitor{factory.get(name, root), root.GetAllocator(), name};
+        const auto renamed = factory.renamed(name);
+        visitor_t visitor{factory.get(name, root), root.GetAllocator(), renamed};
         visitor(value);
     }
 
@@ -175,6 +253,10 @@ json_t::json_t() :
 
 json_t::json_t(routing_t routing) :
     factory(new factory_t(std::move(routing)))
+{}
+
+json_t::json_t(config_type config) :
+    factory(new factory_t(std::move(config)))
 {}
 
 json_t::~json_t() {}
