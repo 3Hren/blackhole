@@ -41,25 +41,6 @@ public:
 
 }  // namespace json
 
-struct routing_t {
-    typedef std::map<std::string, std::vector<std::string>> specified_type;
-    typedef std::string unspecified_type;
-
-    specified_type specified;
-    unspecified_type unspecified;
-
-    routing_t(unspecified_type unspecified = "") :
-        unspecified(std::move(unspecified))
-    {}
-
-    auto spec(std::string route, std::vector<std::string> attributes) -> routing_t& {
-        specified[std::move(route)] = std::move(attributes);
-        return *this;
-    }
-};
-
-typedef std::unordered_map<std::string, std::string> mapping_t;
-
 // TODO: Add severity mapping support.
 // TODO: Add timestamp mapping support.
 // TODO: Take a doc from site.
@@ -76,9 +57,6 @@ private:
 
 public:
     json_t();
-    [[deprecated]] json_t(routing_t routing);
-    [[deprecated]] json_t(routing_t routing, mapping_t mapping);
-
     json_t(config_type config);
 
     ~json_t();

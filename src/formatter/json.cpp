@@ -50,6 +50,16 @@ config_t::~config_t() = default;
 
 auto config_t::operator=(config_t&& other) -> config_t& = default;
 
+auto config_t::route(std::string rest) -> config_t& {
+    inner->routing.unspecified = std::move(rest);
+    return *this;
+}
+
+auto config_t::route(std::string route, std::vector<std::string> attributes) -> config_t& {
+    inner->routing.specified[std::move(route)] = std::move(attributes);
+    return *this;
+}
+
 auto config_t::rename(std::string from, std::string to) -> config_t& {
     inner->mapping[std::move(from)] = std::move(to);
     return *this;
@@ -107,18 +117,6 @@ struct stream_t {
     auto Flush() -> void {}
 };
 
-auto transform(const std::map<std::string, std::vector<std::string>>& source) ->
-    std::map<std::string, rapidjson::Pointer>
-{
-    std::map<std::string, rapidjson::Pointer> result;
-
-    for (const auto& route : source) {
-        for (const auto& name : route.second) {
-            result.insert({name, rapidjson::Pointer(route.first)});
-        }
-    }
-}
-
 }  // namespace
 
 class json_t::factory_t {
@@ -129,22 +127,6 @@ public:
     std::map<std::string, rapidjson::Pointer> routing;
 
     std::unordered_map<std::string, std::string> mapping;
-
-    [[deprecated]]
-    factory_t() :
-        rest("")
-    {}
-
-    [[deprecated]]
-    factory_t(routing_t routing) :
-        rest(routing.unspecified)
-    {
-        for (const auto& route : routing.specified) {
-            for (const auto& name : route.second) {
-                this->routing.insert({name, rapidjson::Pointer(route.first)});
-            }
-        }
-    }
 
     factory_t(config_type config) :
         rest(config.config().routing.unspecified),
@@ -248,11 +230,7 @@ auto json_t::factory_t::create(Document& root, const record_t& record) ->
 }
 
 json_t::json_t() :
-    factory(new factory_t)
-{}
-
-json_t::json_t(routing_t routing) :
-    factory(new factory_t(std::move(routing)))
+    factory(new factory_t(json::config_t()))
 {}
 
 json_t::json_t(config_type config) :

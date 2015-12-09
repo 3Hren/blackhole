@@ -14,7 +14,6 @@ namespace testing {
 namespace formatter {
 
 using ::blackhole::formatter::json_t;
-using ::blackhole::formatter::routing_t;
 using ::blackhole::formatter::json::config_t;
 
 TEST(json_t, FormatMessage) {
@@ -161,7 +160,7 @@ TEST(json_t, FormatAttributeString) {
 }
 
 TEST(json_t, FormatMessageWithRouting) {
-    json_t formatter(routing_t().spec("/fields", {"message"}));
+    json_t formatter(std::move(config_t().route("/fields", {"message"})));
 
     const string_view message("value");
     const attribute_pack pack;
@@ -178,7 +177,7 @@ TEST(json_t, FormatMessageWithRouting) {
 }
 
 TEST(json_t, FormatAttributeStringWithRouting) {
-    json_t formatter(routing_t().spec("/fields", {"endpoint"}));
+    json_t formatter(std::move(config_t().route("/fields", {"endpoint"})));
 
     const string_view message("value");
     const attribute_list attributes{{"endpoint", "127.0.0.1:8080"}};
@@ -196,7 +195,7 @@ TEST(json_t, FormatAttributeStringWithRouting) {
 }
 
 TEST(json_t, FormatAttributeStringWithNestedRouting) {
-    json_t formatter(routing_t().spec("/fields/external", {"endpoint"}));
+    json_t formatter(std::move(config_t().route("/fields/external", {"endpoint"})));
 
     const string_view message("value");
     const attribute_list attributes{{"endpoint", "127.0.0.1:8080"}};
