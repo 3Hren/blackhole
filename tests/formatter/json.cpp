@@ -230,6 +230,23 @@ TEST(json_t, FormatMessageWithRenaming) {
     EXPECT_STREQ("value", doc["#message"].GetString());
 }
 
+TEST(json_t, FormatAttributeWithRenaming) {
+    json_t formatter(std::move(config_t().rename("source", "#source")));
+
+    const string_view message("value");
+    const attribute_list attributes{{"source", "storage"}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+    ASSERT_TRUE(doc.HasMember("#source"));
+    ASSERT_TRUE(doc["#source"].IsString());
+    EXPECT_STREQ("storage", doc["#source"].GetString());
+}
+
 }  // namespace formatter
 }  // namespace testing
 }  // namespace blackhole

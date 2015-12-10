@@ -217,7 +217,8 @@ private:
     }
 
     auto apply(const string_view& name, const attribute::view_t& value) -> void {
-        visitor_t visitor{factory.get(name, root), root.GetAllocator(), name};
+        const auto renamed = factory.renamed(name);
+        visitor_t visitor{factory.get(name, root), root.GetAllocator(), renamed};
         boost::apply_visitor(visitor, value.inner().value);
     }
 };
