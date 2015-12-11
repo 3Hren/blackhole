@@ -1,6 +1,7 @@
 #include "blackhole/formatter/json.hpp"
 
 #include <array>
+#include <unordered_map>
 
 #include <boost/variant/apply_visitor.hpp>
 
@@ -16,7 +17,6 @@
 #include "blackhole/extensions/writer.hpp"
 
 #include "blackhole/detail/attribute.hpp"
-#include "blackhole/detail/unimplemented.hpp"
 
 namespace blackhole {
 namespace formatter {
