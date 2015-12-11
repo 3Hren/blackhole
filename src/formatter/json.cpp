@@ -120,6 +120,8 @@ struct stream_t {
 }  // namespace
 
 class json_t::factory_t {
+    template<typename> class builder;
+
 public:
     // A JSON routing pointer for attributes that weren't mentioned in `routing` map.
     rapidjson::Pointer rest;
@@ -166,7 +168,7 @@ public:
 };
 
 template<typename Document>
-class json_t::builder {
+class json_t::factory_t::builder {
     Document& root;
     const record_t& record;
     factory_t& factory;

@@ -49,9 +49,6 @@ public:
     typedef json::config_t config_type;
 
 private:
-    template<typename>
-    class builder;
-
     class factory_t;
     std::unique_ptr<factory_t> factory;
 
