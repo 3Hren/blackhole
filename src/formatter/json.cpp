@@ -20,57 +20,6 @@
 
 namespace blackhole {
 namespace formatter {
-namespace json {
-
-class config_t::inner_t {
-public:
-    bool unique;
-    bool newline;
-
-    struct {
-        std::map<std::string, std::vector<std::string>> specified;
-        std::string unspecified;
-    } routing;
-
-    std::unordered_map<std::string, std::string> mapping;
-
-    inner_t() :
-        unique(false),
-        newline(false)
-    {}
-};
-
-config_t::config_t() :
-    inner(new inner_t)
-{}
-
-config_t::config_t(config_t&& other) = default;
-
-config_t::~config_t() = default;
-
-auto config_t::operator=(config_t&& other) -> config_t& = default;
-
-auto config_t::route(std::string rest) -> config_t& {
-    inner->routing.unspecified = std::move(rest);
-    return *this;
-}
-
-auto config_t::route(std::string route, std::vector<std::string> attributes) -> config_t& {
-    inner->routing.specified[std::move(route)] = std::move(attributes);
-    return *this;
-}
-
-auto config_t::rename(std::string from, std::string to) -> config_t& {
-    inner->mapping[std::move(from)] = std::move(to);
-    return *this;
-}
-
-auto config_t::config() const noexcept -> const inner_t& {
-    return *inner;
-}
-
-}  // namespace json
-
 namespace {
 
 struct visitor_t {
@@ -119,7 +68,25 @@ struct stream_t {
 
 }  // namespace
 
-class json_t::factory_t {
+class json_t::properties_t {
+public:
+    bool unique;
+    bool newline;
+
+    struct {
+        std::map<std::string, std::vector<std::string>> specified;
+        std::string unspecified;
+    } routing;
+
+    std::unordered_map<std::string, std::string> mapping;
+
+    properties_t() :
+        unique(false),
+        newline(false)
+    {}
+};
+
+class json_t::inner_t {
     template<typename> class builder;
 
 public:
@@ -130,11 +97,11 @@ public:
 
     std::unordered_map<std::string, std::string> mapping;
 
-    factory_t(config_type config) :
-        rest(config.config().routing.unspecified),
-        mapping(std::move(config.config().mapping))
+    inner_t(json_t::properties_t properties) :
+        rest(properties.routing.unspecified),
+        mapping(std::move(properties.mapping))
     {
-        for (const auto& route : config.config().routing.specified) {
+        for (const auto& route : properties.routing.specified) {
             for (const auto& name : route.second) {
                 routing.insert({name, rapidjson::Pointer(route.first)});
             }
@@ -146,6 +113,7 @@ public:
         // TODO: Here we can avoid a temporary string construction by using multi indexed
         // containers.
         const auto it = routing.find(name.to_string());
+
         if (it == routing.end()) {
             return rest.GetWithDefault(root, rapidjson::kObjectType);
         } else {
@@ -168,16 +136,16 @@ public:
 };
 
 template<typename Document>
-class json_t::factory_t::builder {
+class json_t::inner_t::builder {
     Document& root;
     const record_t& record;
-    factory_t& factory;
+    inner_t& inner;
 
 public:
-    builder(Document& root, const record_t& record, factory_t& factory) :
+    builder(Document& root, const record_t& record, inner_t& inner) :
         root(root),
         record(record),
-        factory(factory)
+        inner(inner)
     {}
 
     auto message() -> void {
@@ -213,31 +181,31 @@ public:
 private:
     template<typename T>
     auto apply(const string_view& name, const T& value) -> void {
-        const auto renamed = factory.renamed(name);
-        visitor_t visitor{factory.get(name, root), root.GetAllocator(), renamed};
+        const auto renamed = inner.renamed(name);
+        visitor_t visitor{inner.get(name, root), root.GetAllocator(), renamed};
         visitor(value);
     }
 
     auto apply(const string_view& name, const attribute::view_t& value) -> void {
-        const auto renamed = factory.renamed(name);
-        visitor_t visitor{factory.get(name, root), root.GetAllocator(), renamed};
+        const auto renamed = inner.renamed(name);
+        visitor_t visitor{inner.get(name, root), root.GetAllocator(), renamed};
         boost::apply_visitor(visitor, value.inner().value);
     }
 };
 
 template<typename Document>
-auto json_t::factory_t::create(Document& root, const record_t& record) ->
+auto json_t::inner_t::create(Document& root, const record_t& record) ->
     builder<Document>
 {
     return builder<Document>{root, record, *this};
 }
 
 json_t::json_t() :
-    factory(new factory_t(json::config_t()))
+    inner(new inner_t(properties_t()))
 {}
 
-json_t::json_t(config_type config) :
-    factory(new factory_t(std::move(config)))
+json_t::json_t(properties_t properties) :
+    inner(new inner_t(std::move(properties)))
 {}
 
 json_t::~json_t() {}
@@ -259,7 +227,7 @@ auto json_t::format(const record_t& record, writer_t& writer) -> void {
 
     // TODO: Try to use `AutoUTF<>` or `AutoUTFOutputStream` for UTF-8 validation.
 
-    auto builder = factory->create(root, record);
+    auto builder = inner->create(root, record);
     builder.message();
     builder.severity();
     builder.timestamp();
@@ -271,6 +239,31 @@ auto json_t::format(const record_t& record, writer_t& writer) -> void {
     // if (config.newline) {
     //     writer << '\n';
     // }
+}
+
+json_t::builder_t::builder_t() :
+    properties(new properties_t)
+{}
+
+json_t::builder_t::~builder_t() = default;
+
+auto json_t::builder_t::route(std::string route) -> builder_t& {
+    properties->routing.unspecified = std::move(route);
+    return *this;
+}
+
+auto json_t::builder_t::route(std::string route, std::vector<std::string> attributes) -> builder_t& {
+    properties->routing.specified[std::move(route)] = std::move(attributes);
+    return *this;
+}
+
+auto json_t::builder_t::rename(std::string from, std::string to) -> builder_t& {
+    properties->mapping[std::move(from)] = std::move(to);
+    return *this;
+}
+
+auto json_t::builder_t::build() const -> json_t {
+    return {std::move(*properties)};
 }
 
 }  // namespace formatter

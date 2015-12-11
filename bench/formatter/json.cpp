@@ -9,10 +9,10 @@
 namespace blackhole {
 namespace benchmark {
 
-using ::blackhole::formatter::json::config_t;
+using ::blackhole::formatter::json_t;
 
 static void format_json(::benchmark::State& state) {
-    formatter::json_t formatter;;
+    json_t formatter;
 
     const string_view message("value");
     const attribute_pack pack;
@@ -27,7 +27,9 @@ static void format_json(::benchmark::State& state) {
 }
 
 static void format_json_message_routed(::benchmark::State& state) {
-    formatter::json_t formatter(std::move(config_t().route("/fields", {"message"})));
+    auto formatter = json_t::builder_t()
+        .route("/fields", {"message"})
+        .build();
 
     const string_view message("value");
     const attribute_pack pack;
@@ -42,7 +44,9 @@ static void format_json_message_routed(::benchmark::State& state) {
 }
 
 static void format_json_1(::benchmark::State& state) {
-    formatter::json_t formatter(std::move(config_t().route("/fields", {"endpoint"})));
+    auto formatter = json_t::builder_t()
+        .route("/fields", {"endpoint"})
+        .build();
 
     const string_view message("value");
     const attribute_list attributes{{"endpoint", "127.0.0.1:8080"}};

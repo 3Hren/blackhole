@@ -14,7 +14,6 @@ namespace testing {
 namespace formatter {
 
 using ::blackhole::formatter::json_t;
-using ::blackhole::formatter::json::config_t;
 
 TEST(json_t, FormatMessage) {
     json_t formatter;
@@ -160,7 +159,9 @@ TEST(json_t, FormatAttributeString) {
 }
 
 TEST(json_t, FormatMessageWithRouting) {
-    json_t formatter(std::move(config_t().route("/fields", {"message"})));
+    auto formatter = json_t::builder_t()
+        .route("/fields", {"message"})
+        .build();
 
     const string_view message("value");
     const attribute_pack pack;
@@ -177,7 +178,9 @@ TEST(json_t, FormatMessageWithRouting) {
 }
 
 TEST(json_t, FormatAttributeStringWithRouting) {
-    json_t formatter(std::move(config_t().route("/fields", {"endpoint"})));
+    auto formatter = json_t::builder_t()
+        .route("/fields", {"endpoint"})
+        .build();
 
     const string_view message("value");
     const attribute_list attributes{{"endpoint", "127.0.0.1:8080"}};
@@ -195,7 +198,9 @@ TEST(json_t, FormatAttributeStringWithRouting) {
 }
 
 TEST(json_t, FormatAttributeStringWithNestedRouting) {
-    json_t formatter(std::move(config_t().route("/fields/external", {"endpoint"})));
+    auto formatter = json_t::builder_t()
+        .route("/fields/external", {"endpoint"})
+        .build();
 
     const string_view message("value");
     const attribute_list attributes{{"endpoint", "127.0.0.1:8080"}};
@@ -215,7 +220,9 @@ TEST(json_t, FormatAttributeStringWithNestedRouting) {
 }
 
 TEST(json_t, FormatMessageWithRenaming) {
-    json_t formatter(std::move(config_t().rename("message", "#message")));
+    auto formatter = json_t::builder_t()
+        .rename("message", "#message")
+        .build();
 
     const string_view message("value");
     const attribute_pack pack;
@@ -231,7 +238,9 @@ TEST(json_t, FormatMessageWithRenaming) {
 }
 
 TEST(json_t, FormatAttributeWithRenaming) {
-    json_t formatter(std::move(config_t().rename("source", "#source")));
+    auto formatter = json_t::builder_t()
+        .rename("source", "#source")
+        .build();
 
     const string_view message("value");
     const attribute_list attributes{{"source", "storage"}};
