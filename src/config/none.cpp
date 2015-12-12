@@ -21,12 +21,12 @@ none_t::to_bool() const -> bool {
 }
 
 auto
-none_t::to_i64() const -> std::int64_t {
+none_t::to_int64() const -> std::int64_t {
     throw bad_optional_access();
 }
 
 auto
-none_t::to_u64() const -> std::uint64_t {
+none_t::to_uint64() const -> std::uint64_t {
     throw bad_optional_access();
 }
 

@@ -15,8 +15,8 @@ public:
     auto operator[](const std::string& key) const -> monadic<config_t>;
 
     auto to_bool() const -> bool;
-    auto to_i64() const -> std::int64_t;
-    auto to_u64() const -> std::uint64_t;
+    auto to_int64() const -> std::int64_t;
+    auto to_uint64() const -> std::uint64_t;
     auto to_double() const -> double;
     auto to_string() const -> std::string;
 

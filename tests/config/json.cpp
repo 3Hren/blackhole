@@ -32,8 +32,8 @@ TEST(json_t, ToInt) {
 
     json_t config(doc);
 
-    EXPECT_EQ(42, config.to_i64());
-    EXPECT_EQ(42, config.to_u64());
+    EXPECT_EQ(42, config.to_int64());
+    EXPECT_EQ(42, config.to_uint64());
 }
 
 TEST(json_t, ToDouble) {
@@ -79,8 +79,8 @@ TEST(json_t, ThrowsExceptionOnIntMismatch) {
 
     json_t config(doc);
 
-    EXPECT_THROW(config.to_i64(), bad_cast);
-    EXPECT_THROW(config.to_u64(), bad_cast);
+    EXPECT_THROW(config.to_int64(), bad_cast);
+    EXPECT_THROW(config.to_uint64(), bad_cast);
 }
 
 TEST(json_t, ThrowsExceptionOnDoubleMismatch) {
@@ -136,8 +136,8 @@ TEST(json_t, complex) {
     EXPECT_EQ("files", config["sinks"][0]["type"]->to_string());
     EXPECT_EQ("test.log", config["sinks"][0]["path"]->to_string());
     EXPECT_EQ("test.log.%N", config["sinks"][0]["rotation"]["pattern"]->to_string());
-    EXPECT_EQ(5, config["sinks"][0]["rotation"]["backups"]->to_i64());
-    EXPECT_EQ(1000000, config["sinks"][0]["rotation"]["size"]->to_u64());
+    EXPECT_EQ(5, config["sinks"][0]["rotation"]["backups"]->to_int64());
+    EXPECT_EQ(1000000, config["sinks"][0]["rotation"]["size"]->to_uint64());
 
     // NOTE: There is only one sink, so it's okay to compare strongly.
     auto counter = 0;
@@ -145,8 +145,8 @@ TEST(json_t, complex) {
         EXPECT_EQ("files", sink["type"]->to_string());
         EXPECT_EQ("test.log", sink["path"]->to_string());
         EXPECT_EQ("test.log.%N", sink["rotation"]["pattern"]->to_string());
-        EXPECT_EQ(5, sink["rotation"]["backups"]->to_i64());
-        EXPECT_EQ(1000000, sink["rotation"]["size"]->to_u64());
+        EXPECT_EQ(5, sink["rotation"]["backups"]->to_int64());
+        EXPECT_EQ(1000000, sink["rotation"]["size"]->to_uint64());
         ++counter;
     });
 

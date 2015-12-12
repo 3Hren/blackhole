@@ -31,8 +31,8 @@ public:
     }
 
     MOCK_CONST_METHOD0(to_bool, bool());
-    MOCK_CONST_METHOD0(to_i64, std::int64_t());
-    MOCK_CONST_METHOD0(to_u64, std::uint64_t());
+    MOCK_CONST_METHOD0(to_int64, std::int64_t());
+    MOCK_CONST_METHOD0(to_uint64, std::uint64_t());
     MOCK_CONST_METHOD0(to_double, double());
     MOCK_CONST_METHOD0(to_string, std::string());
 

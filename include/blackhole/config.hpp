@@ -37,8 +37,8 @@ public:
     virtual auto operator[](const std::string& key) const -> config::monadic<config_t> = 0;
 
     virtual auto to_bool() const -> bool = 0;
-    virtual auto to_i64() const -> std::int64_t = 0;
-    virtual auto to_u64() const -> std::uint64_t = 0;
+    virtual auto to_int64() const -> std::int64_t = 0;
+    virtual auto to_uint64() const -> std::uint64_t = 0;
     virtual auto to_double() const -> double = 0;
     virtual auto to_string() const -> std::string = 0;
 

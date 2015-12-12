@@ -44,7 +44,7 @@ public:
         throw bad_cast();
     }
 
-    auto to_i64() const -> std::int64_t {
+    auto to_int64() const -> std::int64_t {
         if (value.IsInt64()) {
             return value.GetInt64();
         }
@@ -52,7 +52,7 @@ public:
         throw bad_cast();
     }
 
-    auto to_u64() const -> std::uint64_t {
+    auto to_uint64() const -> std::uint64_t {
         if (value.IsUint64()) {
             return value.GetUint64();
         }
