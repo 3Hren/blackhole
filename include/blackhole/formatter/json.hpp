@@ -57,7 +57,7 @@ namespace formatter {
 ///     "ip": "[::]"
 /// }
 ///
-/// Attribute renaming occurs after routing, so mapping "message" => "@message" just replaces the
+/// Attribute renaming occurs after routing, so mapping "message" => "#message" just replaces the
 /// old name with its new alternative.
 ///
 /// To gain maximum speed at the tree construction no filtering occurs, so this formatter by default
@@ -75,8 +75,8 @@ namespace formatter {
 ///     auto formatter = json_t::builder_t()
 ///         .route("/fields", {"message", "severity", "timestamp"})
 ///         .route("/other")
-///         .rename("message", "@message")
-///         .rename("timestamp", "@timestamp")
+///         .rename("message", "#message")
+///         .rename("timestamp", "#timestamp")
 ///         .newline()
 ///         .unique()
 ///         .build();
