@@ -66,7 +66,7 @@ Of course there are disadvantages, such as virtual function call cost and closed
 - [ ] Optional asynchronous pipelining.
   - [ ] Queue with block on overload.
   - [ ] Queue with drop on overload (count dropped message).
-- Formatters.
+- [x] Formatters.
   - [x] String by pattern.
   - [x] JSON with tree reconstruction.
 - [ ] Sinks.
