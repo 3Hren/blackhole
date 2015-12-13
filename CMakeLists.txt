@@ -149,6 +149,48 @@ if (ENABLE_TESTING)
 	include_directories(
 		${PROJECT_SOURCE_DIR}/tests/include)
 
+	if (CMAKE_BUILD_TYPE STREQUAL "Coverage")
+		include(CodeCoverage)
+
+		find_program(GCOV_PATH gcov)
+		find_program(LCOV_PATH lcov)
+		find_program(GENHTML_PATH genhtml)
+
+		if (NOT(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "Coverage"))
+			message(WARNING "Code coverage results with an optimized (non-Debug) build may be misleading")
+		endif ()
+
+		function(setup_target_for_coverage _targetname _testrunner _outputname)
+		    ADD_CUSTOM_TARGET(${_targetname}
+		        # Reset all execution counts to zero.
+		        ${LCOV_PATH} --directory . --zerocounters
+
+		        # Run tests.
+		        COMMAND ${_testrunner} ${ARGV3}
+
+		        # Capture coverage data.
+		        COMMAND ${LCOV_PATH} --compat-libtool --directory . --capture --output-file ${_outputname}.info
+		        COMMAND ${LCOV_PATH} --remove ${_outputname}.info 'tests/*' '/usr/*' 'foreign/*' --output-file ${_outputname}.info.cleaned
+
+		        # Generating the report.
+		        COMMAND ${GENHTML_PATH} -o ${_outputname} ${_outputname}.info.cleaned
+		        # COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info ${_outputname}.info.cleaned
+		        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+		        COMMENT "Resetting code coverage counters to zero.\nProcessing code coverage counters and generating report."
+		    )
+
+		    # Show info where to find the report
+		    ADD_CUSTOM_COMMAND(TARGET ${_targetname} POST_BUILD
+		        COMMAND ;
+		        COMMENT "Open ./${_outputname}/index.html in your browser to view the coverage report."
+		    )
+		ENDFUNCTION() # SETUP_TARGET_FOR_COVERAGE
+		setup_target_for_coverage(coverage ${LIBRARY_NAME}-tests .coverage)
+
+		set(CMAKE_C_FLAGS   "-g -O0 -fprofile-arcs -ftest-coverage")
+		set(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
+	endif ()
+
     add_executable(${LIBRARY_NAME}-tests
 		tests/attribute
 		tests/config/json
