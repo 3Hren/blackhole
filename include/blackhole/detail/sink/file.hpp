@@ -18,9 +18,11 @@ struct backend_t {
 
     backend_t(const std::string& filename, std::size_t interval) :
         counter(0),
-        interval(interval > 0 ? interval : std::numeric_limits<std::size_t>::max()),
+        interval(interval),
         stream(new std::ofstream(filename))
-    {}
+    {
+        BOOST_ASSERT(interval > 0);
+    }
 
     backend_t(const backend_t& other) = delete;
     backend_t(backend_t&& other) = default;
@@ -47,19 +49,23 @@ struct backend_t {
 };
 
 class file_t::inner_t {
-public:
     struct {
         std::string filename;
         std::size_t interval;
         std::map<std::string, backend_t> backends;
     } data;
 
+public:
     inner_t(std::string filename, std::size_t interval) {
         data.filename = std::move(filename);
-        data.interval = interval;
+        data.interval = interval > 0 ? interval : std::numeric_limits<std::size_t>::max();
     }
 
     virtual ~inner_t() {}
+
+    auto interval() const noexcept -> std::size_t {
+        return data.interval;
+    }
 
     virtual auto filename(const record_t&) const -> std::string {
         // TODO: Generate path from tokens, for now just return static path.
@@ -70,7 +76,7 @@ public:
         const auto it = data.backends.find(filename);
 
         if (it == data.backends.end()) {
-            return data.backends.insert(it, std::make_pair(filename, backend_t(filename, data.interval)))->second;
+            return data.backends.insert(it, std::make_pair(filename, backend_t(filename, interval())))->second;
         }
 
         return it->second;
