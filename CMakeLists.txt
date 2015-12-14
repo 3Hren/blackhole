@@ -51,6 +51,7 @@ add_library(${LIBRARY_NAME} SHARED
 	src/root
 	src/scoped
 	src/sink/console
+	src/sink/file
 	src/sink/null
 	src/wrapper)
 
@@ -204,6 +205,7 @@ if (ENABLE_TESTING)
 		tests/record
 		tests/root
 		tests/sink/console
+		tests/sink/file
 		tests/sink/null
 		tests/src/mocks/formatter
 		tests/src/mocks/handler
