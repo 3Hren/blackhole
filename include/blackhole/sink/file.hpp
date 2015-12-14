@@ -28,6 +28,7 @@ class file_t : public sink_t {
     std::unique_ptr<file::inner_t> inner;
 
 public:
+    /// Represents a file sink object builder to ease its configuration.
     class builder_t;
 
     /// Constructs a file sink, which will write all incoming events to the file or files located at
