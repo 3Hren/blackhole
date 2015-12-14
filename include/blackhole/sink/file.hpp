@@ -2,6 +2,8 @@
 
 #include "blackhole/sink.hpp"
 
+#include <memory>
+
 namespace blackhole {
 
 class config_t;
