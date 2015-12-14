@@ -18,7 +18,7 @@ file_t::file_t(std::unique_ptr<file::inner_t> inner) noexcept :
 
 file_t::~file_t() = default;
 
-auto file_t::filter(const record_t& record) -> bool {
+auto file_t::filter(const record_t&) -> bool {
     return true;
 }
 
