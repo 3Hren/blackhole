@@ -23,14 +23,10 @@ auto file_t::filter(const record_t& record) -> bool {
 }
 
 auto file_t::execute(const record_t& record, const string_view& formatted) -> void {
-    // TODO: Obtain the proper filename: record, inner -> filename.
     const auto filename = inner->filename(record);
 
-    // TODO: Obtain the proper I/O stream: filename -> ofstream.
-    auto& backend = inner->backend(filename);
-
-    // TODO: Write to the stream.
-    backend.write(formatted);
+    std::lock_guard<std::mutex> lock(inner->mutex);
+    inner->backend(filename).write(formatted);
 }
 
 }  // namespace sink

@@ -5,6 +5,7 @@
 #include <fstream>
 #include <limits>
 #include <map>
+#include <mutex>
 
 #include <boost/assert.hpp>
 
@@ -51,6 +52,8 @@ class inner_t {
     } data;
 
 public:
+    std::mutex mutex;
+
     inner_t(std::string filename, std::size_t interval) {
         data.filename = std::move(filename);
         data.interval = interval > 0 ? interval : std::numeric_limits<std::size_t>::max();
