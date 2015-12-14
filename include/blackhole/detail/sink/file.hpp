@@ -27,15 +27,7 @@ struct backend_t {
         BOOST_ASSERT(interval > 0);
     }
 
-    backend_t(const backend_t& other) = delete;
-    backend_t(backend_t&& other) = default;
-
-    virtual ~backend_t() {}
-
-    auto operator=(const backend_t& other) -> backend_t& = delete;
-    auto operator=(backend_t&& other) -> backend_t& = default;
-
-    virtual auto write(const string_view& message) -> void {
+    auto write(const string_view& message) -> void {
         stream->write(message.data(), static_cast<std::streamsize>(message.size()));
         stream->put('\n');
 
@@ -46,7 +38,7 @@ struct backend_t {
         }
     }
 
-    virtual auto flush() -> void {
+    auto flush() -> void {
         stream->flush();
     }
 };

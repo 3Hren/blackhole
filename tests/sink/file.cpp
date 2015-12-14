@@ -22,6 +22,20 @@ TEST(inner_t, IntervalSanitizer) {
     EXPECT_EQ(std::numeric_limits<std::size_t>::max(), inner.interval());
 }
 
+TEST(inner_t, IntervalOverflow) {
+    std::size_t interval = 3;
+    std::size_t counter = 0;
+
+    counter = (counter + 1) % interval;
+    EXPECT_EQ(1, counter);
+
+    counter = (counter + 1) % interval;
+    EXPECT_EQ(2, counter);
+
+    counter = (counter + 1) % interval;
+    EXPECT_EQ(0, counter);
+}
+
 }  // namespace file
 
 TEST(file_t, FilterAcceptsAll) {
