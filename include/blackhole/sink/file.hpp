@@ -26,16 +26,19 @@ public:
     /// Constructs a file sink, which will write all incoming events to the file or files located at
     /// the specified path.
     ///
-    /// No real file will be opened at construction time.
-    explicit file_t(const std::string& path);
+    /// The path can contain attribute placeholders, meaning that the real destination name will be
+    /// deduced at runtime using provided log record. No real file will be opened at construction
+    /// time.
+    explicit file_t(const std::string& filename);
 
+    /// Destroys the current file sink instance, freeing all its resources.
     ~file_t();
 
     auto filter(const record_t& record) -> bool;
     auto execute(const record_t& record, const string_view& formatted) -> void;
 
 private:
-    file_t(std::unique_ptr<inner_t> inner);
+    file_t(std::unique_ptr<inner_t> inner) noexcept;
     file_t(std::unique_ptr<properties_t> properties);
 };
 
