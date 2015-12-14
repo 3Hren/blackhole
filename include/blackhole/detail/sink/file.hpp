@@ -6,6 +6,8 @@
 #include <limits>
 #include <map>
 
+#include <boost/assert.hpp>
+
 #include "blackhole/cpp17/string_view.hpp"
 
 namespace blackhole {
