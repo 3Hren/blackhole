@@ -9,10 +9,10 @@ namespace blackhole {
 namespace sink {
 
 file_t::file_t(const std::string& filename) :
-    inner(new inner_t(filename, 0))
+    inner(new file::inner_t(filename, 0))
 {}
 
-file_t::file_t(std::unique_ptr<inner_t> inner) noexcept :
+file_t::file_t(std::unique_ptr<file::inner_t> inner) noexcept :
     inner(std::move(inner))
 {}
 

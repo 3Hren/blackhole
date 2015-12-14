@@ -16,11 +16,16 @@ struct factory;
 namespace blackhole {
 namespace sink {
 
+namespace file {
+
+class inner_t;
+
+}  // namespace file
+
 class file_t : public sink_t {
-    class inner_t;
     class properties_t;
 
-    std::unique_ptr<inner_t> inner;
+    std::unique_ptr<file::inner_t> inner;
 
 public:
     class builder_t;
@@ -40,7 +45,7 @@ public:
     auto execute(const record_t& record, const string_view& formatted) -> void;
 
 private:
-    file_t(std::unique_ptr<inner_t> inner) noexcept;
+    file_t(std::unique_ptr<file::inner_t> inner) noexcept;
     file_t(std::unique_ptr<properties_t> properties);
 };
 

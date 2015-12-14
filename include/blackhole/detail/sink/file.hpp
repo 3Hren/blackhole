@@ -10,6 +10,7 @@
 
 namespace blackhole {
 namespace sink {
+namespace file {
 
 struct backend_t {
     std::size_t counter;
@@ -48,7 +49,7 @@ struct backend_t {
     }
 };
 
-class file_t::inner_t {
+class inner_t {
     struct {
         std::string filename;
         std::size_t interval;
@@ -83,5 +84,6 @@ public:
     }
 };
 
+}  // namespace file
 }  // namespace sink
 }  // namespace blackhole

@@ -7,12 +7,24 @@
 
 namespace blackhole {
 namespace testing {
-
-using ::testing::StrictMock;
+namespace sink {
 
 using ::blackhole::sink::file_t;
 
-TEST(console_t, FilterAcceptsAll) {
+namespace file {
+
+using ::blackhole::sink::file::inner_t;
+
+TEST(inner_t, IntervalSanitizer) {
+    inner_t inner("", 0);
+
+    EXPECT_NE(0, inner.interval());
+    EXPECT_EQ(std::numeric_limits<std::size_t>::max(), inner.interval());
+}
+
+}  // namespace file
+
+TEST(file_t, FilterAcceptsAll) {
     const string_view message("");
     const attribute_pack pack;
     record_t record(42, message, pack);
@@ -23,8 +35,9 @@ TEST(console_t, FilterAcceptsAll) {
 }
 
 TEST(file_t, type) {
-    EXPECT_EQ("file", std::string(factory<sink::file_t>::type()));
+    EXPECT_EQ("file", std::string(blackhole::factory<file_t>::type()));
 }
 
+}  // namespace sink
 }  // namespace testing
 }  // namespace blackhole
