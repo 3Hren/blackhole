@@ -16,7 +16,11 @@ file_t::file_t(std::unique_ptr<file::inner_t> inner) noexcept :
     inner(std::move(inner))
 {}
 
+file_t::file_t(file_t&& other) noexcept = default;
+
 file_t::~file_t() = default;
+
+auto file_t::operator=(file_t&& other) noexcept -> file_t& = default;
 
 auto file_t::filter(const record_t&) -> bool {
     return true;

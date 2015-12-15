@@ -24,6 +24,9 @@ public:
 
     virtual ~sink_t() {}
 
+    auto operator=(const sink_t& other) -> sink_t& = default;
+    auto operator=(sink_t&& other) -> sink_t& = default;
+
     virtual auto filter(const record_t& record) -> bool = 0;
 
     virtual auto execute(const record_t& record, const string_view& formatted) -> void = 0;

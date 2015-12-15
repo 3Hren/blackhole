@@ -39,8 +39,20 @@ public:
     /// time.
     explicit file_t(const std::string& filename);
 
+    /// Copy constructing is explicitly prohibited.
+    file_t(const file_t& other) = delete;
+
+    /// Constructs a file sink using the given other file sink by moving its content.
+    file_t(file_t&& other) noexcept;
+
     /// Destroys the current file sink instance, freeing all its resources.
     ~file_t();
+
+    /// Copy assignment is explicitly prohibited.
+    auto operator=(const file_t& other) -> file_t& = delete;
+
+    /// Assigns the given file sink to the current one by moving its content.
+    auto operator=(file_t&& other) noexcept -> file_t&;
 
     /// Filters the given log record determining if it is allowed to be consumed by this sink.
     ///
