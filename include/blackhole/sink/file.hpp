@@ -73,9 +73,17 @@ class file_t::builder_t {
     std::unique_ptr<file_t::properties_t> properties;
 
 public:
-    explicit builder_t(const std::string& path);
+    explicit builder_t(const std::string& filename);
+    builder_t(const builder_t& other) = delete;
+    builder_t(builder_t&& other) noexcept;
+
+    ~builder_t();
+
+    auto operator=(const builder_t& other) -> builder_t& = delete;
+    auto operator=(builder_t&& other) noexcept -> builder_t&;
 
     auto interval(std::size_t count) -> builder_t&;
+
     auto build() -> file_t;
 };
 

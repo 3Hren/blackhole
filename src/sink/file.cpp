@@ -8,12 +8,22 @@
 namespace blackhole {
 namespace sink {
 
+class file_t::properties_t {
+public:
+    std::string filename;
+    std::size_t interval;
+};
+
 file_t::file_t(const std::string& filename) :
     inner(new file::inner_t(filename, 0))
 {}
 
 file_t::file_t(std::unique_ptr<file::inner_t> inner) noexcept :
     inner(std::move(inner))
+{}
+
+file_t::file_t(std::unique_ptr<file_t::properties_t> properties) :
+    inner(new file::inner_t(properties->filename, properties->interval))
 {}
 
 file_t::file_t(file_t&& other) noexcept = default;
@@ -31,6 +41,25 @@ auto file_t::execute(const record_t& record, const string_view& formatted) -> vo
 
     std::lock_guard<std::mutex> lock(inner->mutex);
     inner->backend(filename).write(formatted);
+}
+
+file_t::builder_t::builder_t(const std::string& filename) :
+    properties(new properties_t{filename, 0})
+{}
+
+file_t::builder_t::builder_t(builder_t&& other) noexcept = default;
+
+file_t::builder_t::~builder_t() = default;
+
+auto file_t::builder_t::operator=(builder_t&& other) noexcept -> builder_t& = default;
+
+auto file_t::builder_t::interval(std::size_t count) -> builder_t& {
+    properties->interval = count;
+    return *this;
+}
+
+auto file_t::builder_t::build() -> file_t {
+    return file_t(std::move(properties));
 }
 
 }  // namespace sink
