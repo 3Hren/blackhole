@@ -160,6 +160,10 @@ auto console_t::output(type_t type) -> std::ostream& {
     return type == type_t::stdout ? std::cout : std::cerr;
 }
 
+auto console_t::builder_t::build() const -> console_t {
+    return {};
+}
+
 }  // namespace sink
 
 auto

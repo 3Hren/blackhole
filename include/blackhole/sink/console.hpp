@@ -91,6 +91,8 @@ private:
     termcolor_map colormap;
 
 public:
+    class builder_t;
+
     /// Constructs a default console sink, which will write all incoming events to the standard
     /// output.
     ///
@@ -138,6 +140,11 @@ protected:
 
 private:
     static auto output(type_t type) -> std::ostream&;
+};
+
+class console_t::builder_t {
+public:
+    auto build() const -> console_t;
 };
 
 }  // namespace sink
