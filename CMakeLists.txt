@@ -53,6 +53,7 @@ add_library(${LIBRARY_NAME} SHARED
 	src/sink/console
 	src/sink/file
 	src/sink/null
+	src/sink/socket/udp
 	src/wrapper)
 
 # Set the Standard version.
@@ -207,6 +208,7 @@ if (ENABLE_TESTING)
 		tests/sink/console
 		tests/sink/file
 		tests/sink/null
+		tests/sink/udp
 		tests/src/mocks/formatter
 		tests/src/mocks/handler
 		tests/src/mocks/logger
