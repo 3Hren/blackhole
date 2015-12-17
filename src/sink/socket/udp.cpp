@@ -30,10 +30,11 @@ public:
         boost::asio::ip::udp::resolver resolver(io_service);
         boost::asio::ip::udp::resolver::query query(host, boost::lexical_cast<std::string>(port),
             boost::asio::ip::udp::resolver::query::flags::numeric_service);
+        endpoint = *resolver.resolve(query);
     }
 
     auto write(const string_view& data) -> void {
-        // socket.send_to(data, endpoint);
+        socket.send_to(boost::asio::buffer(data.data(), data.size()), endpoint);
     }
 };
 
