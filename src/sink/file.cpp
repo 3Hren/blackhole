@@ -10,6 +10,11 @@ namespace sink {
 
 class file_t::properties_t {
 public:
+    properties_t(std::string filename, std::size_t interval) :
+        filename(std::move(filename)),
+        interval(interval)
+    {}
+
     std::string filename;
     std::size_t interval;
 };
@@ -44,7 +49,7 @@ auto file_t::execute(const record_t& record, const string_view& formatted) -> vo
 }
 
 file_t::builder_t::builder_t(const std::string& filename) :
-    properties(new properties_t{filename, 0})
+    properties(new properties_t(filename, 0))
 {}
 
 file_t::builder_t::builder_t(builder_t&& other) noexcept = default;
