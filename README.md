@@ -71,9 +71,12 @@ Of course there are disadvantages, such as virtual function call cost and closed
   - [x] JSON with tree reconstruction.
 - [ ] Sinks.
   - [x] Colored terminal output.
-  - [ ] Files.
+  - [x] Files.
   - [ ] Syslog.  
-  - [ ] Socket.
+  - [x] Socket UDP.
+  - [ ] Socket TCP.
+    - [ ] Blocking.
+    - [ ] Non blocking.
 - [x] Logger builder.
 - [ ] Macro with line and filename attributes.
 - [x] Initializer from json (filename, string).
