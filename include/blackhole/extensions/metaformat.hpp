@@ -4,9 +4,8 @@
 #include <iostream>
 #include <string>
 
-#include <cppformat/format.h>
-
 #include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/extensions/format.hpp"
 
 using blackhole::cpp17::string_view;
 

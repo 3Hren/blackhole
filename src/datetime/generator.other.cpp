@@ -10,7 +10,7 @@
 
 #include <boost/assert.hpp>
 
-#include <cppformat/format.h>
+#include "blackhole/extensions/format.hpp"
 
 #include "blackhole/detail/datetime/other/stream.hpp"
 

@@ -20,14 +20,9 @@ find_package(Boost 1.46 REQUIRED COMPONENTS
 	thread)
 
 include_directories(BEFORE SYSTEM
-	${PROJECT_SOURCE_DIR}/foreign
 	${PROJECT_SOURCE_DIR}/foreign/rapidjson/include)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
-
-add_library(cppformat STATIC ${PROJECT_SOURCE_DIR}/foreign/cppformat/format)
-set_target_properties(cppformat PROPERTIES
-	COMPILE_FLAGS "-fPIC")
 
 add_library(${LIBRARY_NAME} SHARED
 	src/attribute
@@ -38,6 +33,7 @@ add_library(${LIBRARY_NAME} SHARED
 	src/config/none
 	src/datetime/generator.linux
 	src/datetime/generator.other
+	src/format
 	src/formatter/json
 	src/formatter/string.cpp
 	src/formatter/string/error
@@ -109,7 +105,6 @@ endif ()
 
 target_link_libraries(${LIBRARY_NAME}
 	${Boost_LIBRARIES}
-	cppformat
 )
 
 # The rule is that: any breakage of the ABI must be indicated by incrementing the SOVERSION.

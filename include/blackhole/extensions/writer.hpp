@@ -1,8 +1,7 @@
 #pragma once
 
-#include <cppformat/format.h>
-
 #include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/extensions/format.hpp"
 
 namespace blackhole {
 

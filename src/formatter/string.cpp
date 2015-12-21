@@ -6,10 +6,9 @@
 #include <boost/variant/get.hpp>
 #include <boost/variant/variant.hpp>
 
-#include <cppformat/format.h>
-
 #include "blackhole/config.hpp"
 #include "blackhole/config/monadic.hpp"
+#include "blackhole/extensions/format.hpp"
 #include "blackhole/extensions/writer.hpp"
 #include "blackhole/record.hpp"
 

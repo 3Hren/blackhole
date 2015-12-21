@@ -6,7 +6,7 @@
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/variant.hpp>
 
-#include <cppformat/format.h>
+#include "blackhole/extensions/format.hpp"
 
 namespace blackhole {
 namespace detail {

@@ -2,7 +2,7 @@
 
 #include <cstring>
 
-#include <cppformat/format.h>
+#include <blackhole/extensions/format.hpp>
 
 #include <blackhole/detail/datetime.hpp>
 
