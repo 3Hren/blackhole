@@ -1,0 +1,25 @@
+Source: blackhole
+Priority: extra
+Maintainer: Evgeny Safronov <division494@gmail.com>
+Build-Depends: debhelper (>= 8.0.0), cmake,
+ libboost-dev | libboost1.48-dev,
+ libboost-thread-dev | libboost-thread1.48-dev
+Standards-Version: 3.9.3
+Section: libs
+Homepage: https://github.com/3Hren/blackhole
+Vcs-Git: git://github.com/3Hren/blackhole.git
+Vcs-Browser: https://github.com/3Hren/blackhole.git
+
+Package: blackhole-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends}, libblackhole1 (= ${binary:Version})
+Description: Blackhole C++ Logger - Development Headers
+ Development files for Blackhole C++ logging library.
+
+Package: libblackhole1
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Blackhole C++ Logger
+ Fast C++ logging library with dynamic attributes.
