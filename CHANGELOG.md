@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - The Blackhole is completely rewritten from the scratch, there is no need to duplicate README here.
 - Integration with CodeCov ([#66]).
 - Keep a changelog ([#67]).
+- Embed libcppformat directly into the Blackhole ([#68]).
 
 ## [0.5.0] - The Infinite Corruptor - 2015-04-09
 ### Added
@@ -251,6 +252,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [#36]: (https://github.com/3Hren/blackhole/issues/36)
 [#42]: (https://github.com/3Hren/blackhole/issues/42)
 [#66]: (https://github.com/3Hren/blackhole/issues/66)
+[#67]: (https://github.com/3Hren/blackhole/issues/67)
+[#68]: (https://github.com/3Hren/blackhole/issues/68)
 
 [#38]: (https://github.com/3Hren/blackhole/pull/38)
 [#40]: (https://github.com/3Hren/blackhole/pull/40)
