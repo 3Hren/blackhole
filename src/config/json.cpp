@@ -29,12 +29,11 @@ factory<json_t>::factory(const std::string& path) :
     }
 }
 
-factory<json_t>::factory(factory&& other) = default;
+factory<json_t>::factory(factory&& other) noexcept = default;
 
 factory<json_t>::~factory() = default;
 
-auto
-factory<json_t>::config() const -> const config_t& {
+auto factory<json_t>::config() const noexcept -> const config_t& {
     return inner->config;
 }
 

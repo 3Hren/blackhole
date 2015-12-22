@@ -34,13 +34,13 @@ public:
     explicit factory(const std::string& path);
 
     factory(const factory& other) = delete;
-    factory(factory&& other);
+    factory(factory&& other) noexcept;
 
     /// Destroys the factory with freeing all its associated resources.
     ~factory();
 
     /// Returns a const lvalue reference to the root configuration.
-    auto config() const -> const config_t&;
+    auto config() const noexcept -> const config_t&;
 };
 
 }  // namespace config
