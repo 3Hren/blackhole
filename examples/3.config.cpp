@@ -2,6 +2,7 @@
 /// builder.
 /// In this case the entire logging pipeline is initializaed from file including severity mapping.
 
+#include <fstream>
 #include <iostream>
 
 #include <blackhole/config/json.hpp>
@@ -31,7 +32,7 @@ auto main(int argc, char** argv) -> int {
     auto log = blackhole::registry_t::configured()
         /// Specify the concrete builder type we want to use. It may be JSON, XML, YAML or whatever
         /// else.
-        .builder<blackhole::config::json_t>(argv[1])
+        .builder<blackhole::config::json_t>(std::ifstream(argv[1]))
             /// Build the logger named "root".
             .build("root");
 
