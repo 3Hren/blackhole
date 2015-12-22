@@ -19,10 +19,9 @@ builder_t::builder_t(const registry_t& registry, std::unique_ptr<config::factory
     factory(std::move(factory))
 {}
 
-builder_t::~builder_t() {}
+builder_t::~builder_t() = default;
 
-auto
-builder_t::build(const std::string& name) -> root_logger_t {
+auto builder_t::build(const std::string& name) -> root_logger_t {
     const auto& config = factory->config();
 
     std::vector<std::unique_ptr<handler_t>> handlers;
@@ -48,23 +47,19 @@ builder_t::build(const std::string& name) -> root_logger_t {
     return root_logger_t(std::move(handlers));
 }
 
-auto
-builder_t::sink(const config_t& config) const -> std::unique_ptr<sink_t> {
+auto builder_t::sink(const config_t& config) const -> std::unique_ptr<sink_t> {
     return registry.sink(config["type"]->to_string())(config);
 }
 
-auto
-builder_t::handler(const config_t& config) const -> std::unique_ptr<handler_t> {
+auto builder_t::handler(const config_t& config) const -> std::unique_ptr<handler_t> {
     return registry.handler(config["type"]->to_string())(config);
 }
 
-auto
-builder_t::formatter(const config_t& config) const -> std::unique_ptr<formatter_t> {
+auto builder_t::formatter(const config_t& config) const -> std::unique_ptr<formatter_t> {
     return registry.formatter(config["type"]->to_string())(config);
 }
 
-auto
-registry_t::configured() -> registry_t {
+auto registry_t::configured() -> registry_t {
     registry_t registry;
 
     registry.add<formatter::string_t>();
@@ -77,18 +72,15 @@ registry_t::configured() -> registry_t {
     return registry;
 }
 
-auto
-registry_t::sink(const std::string& type) const -> sink_factory {
+auto registry_t::sink(const std::string& type) const -> sink_factory {
     return sinks.at(type);
 }
 
-auto
-registry_t::handler(const std::string& type) const -> handler_factory {
+auto registry_t::handler(const std::string& type) const -> handler_factory {
     return handlers.at(type);
 }
 
-auto
-registry_t::formatter(const std::string& type) const -> formatter_factory {
+auto registry_t::formatter(const std::string& type) const -> formatter_factory {
     return formatters.at(type);
 }
 

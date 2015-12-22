@@ -18,7 +18,7 @@ monadic<config_t>::monadic(std::unique_ptr<config_t> inner) :
     BOOST_ASSERT(this->inner);
 }
 
-monadic<config_t>::~monadic() {}
+monadic<config_t>::~monadic() = default;
 
 monadic<config_t>::operator bool() const {
     return inner != nullptr;
