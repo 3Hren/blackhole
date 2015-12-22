@@ -22,6 +22,9 @@ public:
     /// Destroys the factory with freeing all its associated resources.
     virtual ~factory_t() = 0;
 
+    auto operator=(const factory_t& other) -> factory_t& = default;
+    auto operator=(factory_t&& other) -> factory_t& = default;
+
     /// Returns a const lvalue reference to the root configuration.
     virtual auto config() const -> const config_t& = 0;
 };
