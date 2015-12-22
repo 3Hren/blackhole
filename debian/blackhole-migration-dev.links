@@ -1,0 +1,3 @@
+usr/include/blackhole/logger.hpp usr/include/blackhole/v1/logger.hpp
+usr/include/blackhole/attribute.hpp usr/include/blackhole/v1/attribute.hpp
+usr/include/blackhole/attributes.hpp usr/include/blackhole/v1/attributes.hpp

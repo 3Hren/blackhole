@@ -23,3 +23,10 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Blackhole C++ Logger
  Fast C++ logging library with dynamic attributes.
+
+Package: blackhole-migration-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends}, blackhole-dev
+Description: Blackhole C++ Logger - Development Headers
+ Development files with migration symlinks for Blackhole C++ logging library.
