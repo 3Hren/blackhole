@@ -33,6 +33,9 @@ public:
     /// The file should contain valid JSON object.
     explicit factory(const std::string& path);
 
+    /// Constructs and initializes the JSON config factory by reading the given stream.
+    explicit factory(std::istream& stream);
+
     factory(const factory& other) = delete;
     factory(factory&& other) noexcept;
 
@@ -41,6 +44,9 @@ public:
 
     /// Returns a const lvalue reference to the root configuration.
     auto config() const noexcept -> const config_t&;
+
+private:
+    auto initialize(std::istream& stream) -> void;
 };
 
 }  // namespace config

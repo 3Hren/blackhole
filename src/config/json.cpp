@@ -21,12 +21,13 @@ factory<json_t>::factory(const std::string& path) :
     inner(new inner_t)
 {
     std::ifstream stream(path);
-    std::string content((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-    inner->doc.Parse<0>(content.c_str());
+    initialize(stream);
+}
 
-    if (inner->doc.HasParseError()) {
-        throw std::invalid_argument("parse error");
-    }
+factory<json_t>::factory(std::istream& stream) :
+    inner(new inner_t)
+{
+    initialize(stream);
 }
 
 factory<json_t>::factory(factory&& other) noexcept = default;
@@ -35,6 +36,16 @@ factory<json_t>::~factory() = default;
 
 auto factory<json_t>::config() const noexcept -> const config_t& {
     return inner->config;
+}
+
+auto factory<json_t>::initialize(std::istream& stream) -> void {
+    std::string content((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    inner->doc.Parse<0>(content.c_str());
+
+    if (inner->doc.HasParseError()) {
+        // TODO: More verbose error message (i.e line:column where error occurred).
+        throw std::invalid_argument("parse error");
+    }
 }
 
 }  // namespace config
