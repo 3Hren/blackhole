@@ -54,7 +54,7 @@ auto builder_t::sink(const config::node_t& config) const -> std::unique_ptr<sink
 }
 
 auto builder_t::handler(const config::node_t& config) const -> std::unique_ptr<handler_t> {
-    return registry.handler(config["type"].to_string().value_or("blocking"))(config);
+    return registry.handler(config["type"].to_string().get_value_or("blocking"))(config);
 }
 
 auto builder_t::formatter(const config::node_t& config) const -> std::unique_ptr<formatter_t> {

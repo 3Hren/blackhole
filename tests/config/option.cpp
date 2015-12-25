@@ -56,7 +56,7 @@ TEST(option, GetBool) {
     const auto actual = root.to_bool();
 
     ASSERT_TRUE(!!actual);
-    EXPECT_EQ(true, actual.value());
+    EXPECT_EQ(true, actual.get());
 }
 
 TEST(option, GetIntNone) {
@@ -77,7 +77,7 @@ TEST(option, GetInt) {
     const auto actual = root.to_sint64();
 
     ASSERT_TRUE(!!actual);
-    EXPECT_EQ(42, actual.value());
+    EXPECT_EQ(42, actual.get());
 }
 
 TEST(option, GetUIntNone) {
@@ -98,7 +98,7 @@ TEST(option, GetUInt) {
     const auto actual = root.to_uint64();
 
     ASSERT_TRUE(!!actual);
-    EXPECT_EQ(42, actual.value());
+    EXPECT_EQ(42, actual.get());
 }
 
 TEST(option, GetDoubleNone) {
@@ -119,7 +119,7 @@ TEST(option, GetDouble) {
     const auto actual = root.to_double();
 
     ASSERT_TRUE(!!actual);
-    EXPECT_DOUBLE_EQ(3.1415, actual.value());
+    EXPECT_DOUBLE_EQ(3.1415, actual.get());
 }
 
 TEST(option, GetStringNone) {
@@ -140,7 +140,7 @@ TEST(option, GetString) {
     const auto actual = root.to_string();
 
     ASSERT_TRUE(!!actual);
-    EXPECT_EQ("value", actual.value());
+    EXPECT_EQ("value", actual.get());
 }
 
 TEST(option, EachNone) {
@@ -237,7 +237,7 @@ TEST(option, Index) {
     const auto actual = o1[0].to_string();
 
     ASSERT_TRUE(!!actual);
-    EXPECT_EQ("value", actual.value());
+    EXPECT_EQ("value", actual.get());
 }
 
 TEST(option, IndexKey) {
@@ -257,7 +257,7 @@ TEST(option, IndexKey) {
     const auto actual = o1["k1"].to_string();
 
     ASSERT_TRUE(!!actual);
-    EXPECT_EQ("value", actual.value());
+    EXPECT_EQ("value", actual.get());
 }
 
 }  // namespace testing

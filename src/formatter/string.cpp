@@ -347,7 +347,7 @@ factory<formatter::string_t>::type() -> const char* {
 
 auto
 factory<formatter::string_t>::from(const config::node_t& config) -> formatter::string_t {
-    auto pattern = config["pattern"].to_string().value();
+    auto pattern = config["pattern"].to_string().get();
 
     if (auto mapping = config["sevmap"]) {
         std::vector<std::string> sevmap;

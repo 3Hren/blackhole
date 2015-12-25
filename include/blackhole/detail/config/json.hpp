@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdexcept>
+
 #include <rapidjson/document.h>
 
 #include "blackhole/config/node.hpp"
@@ -9,11 +11,10 @@ namespace blackhole {
 namespace detail {
 namespace config {
 
-template<typename T>
-using option = blackhole::config::option<T>;
-
 using blackhole::config::make_option;
 using blackhole::config::node_t;
+
+typedef blackhole::config::option<node_t> option_t;
 
 class bad_cast : public std::logic_error {
 public:
@@ -90,7 +91,7 @@ public:
         }
     }
 
-    auto operator[](const std::size_t& idx) const -> option<node_t> {
+    auto operator[](const std::size_t& idx) const -> option_t {
         if (value.IsArray() && idx < value.Size()) {
             return make_option<json_t>(value[static_cast<rapidjson::SizeType>(idx)]);
         }
@@ -98,7 +99,7 @@ public:
         return {};
     }
 
-    auto operator[](const std::string& key) const -> option<node_t> {
+    auto operator[](const std::string& key) const -> option_t {
         if (value.IsObject() && value.HasMember(key.c_str())) {
             return make_option<json_t>(value[key.c_str()]);
         }
