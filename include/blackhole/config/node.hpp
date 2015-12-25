@@ -11,6 +11,12 @@ template<typename T>
 class option;
 
 /// Represents the configuration tree node.
+///
+/// Blackhole operates with instances of this class while configuring the logging system from some
+/// generic source, from file for example. It assumes that the whole configuration can be described
+/// using tree data structure, like JSON, XML or YAML.
+/// To be able to initialize from your own data format you must create subclass and implement its
+/// converting methods as like as tree traversing using subscription operators.
 class node_t {
 public:
     typedef std::function<auto(const node_t& node) -> void> each_function;
@@ -46,7 +52,18 @@ public:
     /// Should do nothing either if there is no underlying map or it is empty.
     virtual auto each_map(const member_function& fn) -> void = 0;
 
+    /// Assuming that the underlying object is an array performs index operation returning the
+    /// option object with some node at the given index on success, none otherwise.
+    ///
+    /// Depending on the concrete implementation it may or not throw exceptions on out of range
+    /// access.
     virtual auto operator[](const std::size_t& idx) const -> option<node_t> = 0;
+
+    /// Assuming that the underlying object is a map performs tree traversing operation returning
+    /// option object with some node at the given key on success, none otherwise.
+    ///
+    /// Depending on the concrete implementation it may or not throw exceptions on out of range
+    /// access.
     virtual auto operator[](const std::string& key) const -> option<node_t> = 0;
 };
 
