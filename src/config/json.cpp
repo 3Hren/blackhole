@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include <rapidjson/document.h>
+#include <rapidjson/error/en.h>
 
 #include "blackhole/detail/config/json.hpp"
 
@@ -24,8 +25,9 @@ factory<json_t>::factory(std::istream& stream) :
     inner->doc.Parse<0>(content.c_str());
 
     if (inner->doc.HasParseError()) {
-        // TODO: More verbose error message (i.e line:column where error occurred).
-        throw std::invalid_argument("parse error");
+        throw std::invalid_argument("parse error at offset " +
+            boost::lexical_cast<std::string>(inner->doc.GetErrorOffset()) +
+            ": " + rapidjson::GetParseError_En(inner->doc.GetParseError()));
     }
 }
 

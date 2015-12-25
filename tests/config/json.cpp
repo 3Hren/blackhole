@@ -214,5 +214,17 @@ TEST(json_t, ToNumberActualStringWithMultipleIndex) {
     }
 }
 
+TEST(factory, FromInvalidJson) {
+    std::stringstream stream;
+    stream << R"({"key": "value)";
+
+    try {
+        config::factory<json_t> factory(stream);
+        FAIL();
+    } catch (const std::invalid_argument& err) {
+        EXPECT_STREQ("parse error at offset 13: Missing a closing quotation mark in string.", err.what());
+    }
+}
+
 }  // namespace testing
 }  // namespace blackhole
