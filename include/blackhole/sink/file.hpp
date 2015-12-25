@@ -45,7 +45,9 @@ public:
     /// time.
     explicit file_t(const std::string& filename);
 
-    /// Copy constructing is explicitly prohibited.
+    /// Copy construction is explicitly prohibited.
+    ///
+    /// The file sink operates with file descriptor resources which cannot be safely copied.
     file_t(const file_t& other) = delete;
 
     /// Constructs a file sink using the given other file sink by moving its content.
@@ -55,6 +57,8 @@ public:
     ~file_t();
 
     /// Copy assignment is explicitly prohibited.
+    ///
+    /// The file sink operates with file descriptor resources which cannot be safely copied.
     auto operator=(const file_t& other) -> file_t& = delete;
 
     /// Assigns the given file sink to the current one by moving its content.
