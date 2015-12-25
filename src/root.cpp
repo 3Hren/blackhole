@@ -186,7 +186,13 @@ root_logger_t::consume(int severity, const string_view& pattern, attribute_pack&
 
         record.activate(formatted);
         for (auto& handler : inner->handlers) {
-            handler->execute(record);
+            try {
+                handler->execute(record);
+            } catch (const std::exception& err) {
+                std::cout << "logging core error occurred: " << err.what() << std::endl;
+            } catch (...) {
+                std::cout << "logging core error occurred: unknown" << std::endl;
+            }
         }
     }
 }

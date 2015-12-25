@@ -13,7 +13,10 @@ namespace blackhole {
 namespace testing {
 
 using ::testing::Invoke;
+using ::testing::Throw;
 using ::testing::_;
+using ::testing::internal::CaptureStdout;
+using ::testing::internal::GetCapturedStdout;
 
 TEST(RootLogger, Constructor) {
     root_logger_t logger({});
@@ -419,6 +422,24 @@ TEST(RootLogger, AssignmentMovesNestedTripleScopedAttributes) {
         logger1.log(0, "-");
     }
     logger1.log(0, "-");
+}
+
+TEST(RootLogger, IgnoresExceptionsFromHandlers) {
+    auto handler = new mock::handler_t;
+    std::vector<std::unique_ptr<handler_t>> handlers;
+    handlers.emplace_back(handler);
+
+    root_logger_t logger(std::move(handlers));
+
+    EXPECT_CALL(*handler, execute(_))
+        .Times(1)
+        .WillOnce(Throw(std::runtime_error("...")));
+
+    CaptureStdout();
+    EXPECT_NO_THROW(logger.log(0, "GET /porn.png HTTP/1.1"));
+
+    const std::string actual = GetCapturedStdout();
+    EXPECT_EQ("logging core error occurred: ...\n", actual);
 }
 
 }  // namespace testing
