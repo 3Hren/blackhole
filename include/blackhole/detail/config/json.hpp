@@ -35,6 +35,8 @@ public:
         data.actual = std::move(actual);
     }
 
+    ~type_mismatch() throw() {}
+
     auto expected() const -> std::string {
         return data.expected;
     }

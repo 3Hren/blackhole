@@ -204,7 +204,7 @@ TEST(json_t, ToNumberActualStringWithMultipleIndex) {
     json_t config(doc);
 
     try {
-        config["sinks"][0]["rotation"]["pattern"].to_sint64().value();
+        config["sinks"][0]["rotation"]["pattern"].to_sint64().get();
         FAIL();
     } catch (const detail::config::type_mismatch& err) {
         EXPECT_EQ("/sinks/0/rotation/pattern", err.cursor());
