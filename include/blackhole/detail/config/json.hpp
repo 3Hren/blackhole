@@ -35,7 +35,10 @@ public:
         data.actual = std::move(actual);
     }
 
-    ~type_mismatch() throw() {}
+    type_mismatch(const type_mismatch& other) = default;
+    type_mismatch(type_mismatch&& other) = default;
+
+    ~type_mismatch() noexcept {}
 
     auto expected() const -> std::string {
         return data.expected;
@@ -50,7 +53,6 @@ public:
     }
 };
 
-// TODO: Separate hpp/cpp.
 class json_t : public node_t {
     const rapidjson::Value& value;
     std::string cursor;
