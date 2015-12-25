@@ -19,7 +19,10 @@ struct record_t::inner_t {
     std::reference_wrapper<const attribute_pack> attributes;
 };
 
-record_t::record_t(int severity, const string_view& message, const attribute_pack& attributes) {
+record_t::record_t(int severity,
+    std::reference_wrapper<const string_view> message,
+    std::reference_wrapper<const attribute_pack> attributes)
+{
     static_assert(sizeof(inner_t) <= sizeof(record_t), "padding or alignment violation");
 
     auto& inner = this->inner();

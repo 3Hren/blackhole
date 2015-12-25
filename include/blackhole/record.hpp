@@ -29,7 +29,12 @@ public:
     /// the timestamp and formatted message.
     ///
     /// These missing attributes are set right after filtering pass with `activate` method.
-    record_t(int severity, const string_view& message, const attribute_pack& attributes);
+    ///
+    /// \warning constructing from rvalue references is explicitly forbidden, specified objects must
+    ///     outlive the record created.
+    record_t(int severity,
+        std::reference_wrapper<const string_view> message,
+        std::reference_wrapper<const attribute_pack> attributes);
 
     auto message() const noexcept -> const string_view&;
     auto severity() const noexcept -> int;
@@ -46,12 +51,6 @@ public:
     auto activate(const string_view& formatted = string_view()) noexcept -> void;
 
 private:
-    // Constructing from rvalue references is explicitly forbidden.
-    // TODO: Consider more elegant solution.
-    record_t(int severity, const string_view&, attribute_pack&&) = delete;
-    record_t(int severity, string_view&&, const attribute_pack&) = delete;
-    record_t(int severity, string_view&&, attribute_pack&&) = delete;
-
     auto inner() noexcept -> inner_t&;
     auto inner() const noexcept -> const inner_t&;
 };
