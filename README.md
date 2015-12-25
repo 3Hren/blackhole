@@ -195,6 +195,7 @@ First of all, the entire library was completely rewritten for performance reason
 - Dropped `boost::format` into the Hell. It's hard to find more slower library for formatting both in compilation stage and runtime. Instead, the perfect [cppformat](https://github.com/cppformat/cppformat) library with an own compile-time constexpr extensions is used.
 - There are predefined attributes with fast read access, like `message`, `severity`, `timestmap` etc.
 - With **cppformat** participation there is new Python-like format syntax using placeholder replacement.
+- Severity mapping from its numeric representation to strings can now be configured from generic configuration source (from file for example).
 - ...
 
 # Requirements
