@@ -21,26 +21,13 @@ public:
 factory<json_t>::factory(std::istream& stream) :
     inner(new inner_t)
 {
-    std::string content((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-    inner->doc.Parse<0>(content.c_str());
-
-    if (inner->doc.HasParseError()) {
-        throw std::invalid_argument("parse error at offset " +
-            boost::lexical_cast<std::string>(inner->doc.GetErrorOffset()) +
-            ": " + rapidjson::GetParseError_En(inner->doc.GetParseError()));
-    }
+    initialize(stream);
 }
 
 factory<json_t>::factory(std::istream&& stream) :
     inner(new inner_t)
 {
-    std::string content((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-    inner->doc.Parse<0>(content.c_str());
-
-    if (inner->doc.HasParseError()) {
-        // TODO: More verbose error message (i.e line:column where error occurred).
-        throw std::invalid_argument("parse error");
-    }
+    initialize(stream);
 }
 
 factory<json_t>::factory(factory&& other) noexcept = default;
@@ -51,6 +38,17 @@ auto factory<json_t>::operator=(factory&& other) noexcept -> factory& = default;
 
 auto factory<json_t>::config() const noexcept -> const node_t& {
     return inner->node;
+}
+
+auto factory<json_t>::initialize(std::istream& stream) -> void {
+    std::string content((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    inner->doc.Parse<0>(content.c_str());
+
+    if (inner->doc.HasParseError()) {
+        throw std::invalid_argument("parse error at offset " +
+            boost::lexical_cast<std::string>(inner->doc.GetErrorOffset()) +
+            ": " + rapidjson::GetParseError_En(inner->doc.GetParseError()));
+    }
 }
 
 }  // namespace config

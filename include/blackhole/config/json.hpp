@@ -62,6 +62,9 @@ public:
 
     /// Returns a const lvalue reference to the root configuration.
     auto config() const noexcept -> const node_t&;
+
+private:
+    auto initialize(std::istream& stream) -> void;
 };
 
 }  // namespace config
