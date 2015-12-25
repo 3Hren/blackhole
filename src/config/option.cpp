@@ -12,6 +12,14 @@ option<node_t>::option(std::unique_ptr<node_t> node) noexcept :
     node(std::move(node))
 {}
 
+option<node_t>::operator bool() const noexcept {
+    return node != nullptr;
+}
+
+auto option<node_t>::unwrap() const -> const node_t& {
+    return *node;
+}
+
 auto option<node_t>::to_bool() const -> boost::optional<bool> {
     return to([&]() -> boost::optional<bool> {
         return node->to_bool();

@@ -61,7 +61,7 @@ public:
     auto operator=(factory&& other) noexcept -> factory&;
 
     /// Returns a const lvalue reference to the root configuration.
-    auto config() const noexcept -> const config_t&;
+    auto config() const noexcept -> const node_t&;
 };
 
 }  // namespace config

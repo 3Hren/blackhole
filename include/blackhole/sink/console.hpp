@@ -6,11 +6,17 @@
 
 namespace blackhole {
 
-class config_t;
-
 template<typename>
 struct factory;
 
+}  // namespace blackhole
+
+namespace blackhole {
+namespace config {
+
+class node_t;
+
+}  // namespace config
 }  // namespace blackhole
 
 namespace blackhole {
@@ -152,7 +158,7 @@ public:
 template<>
 struct factory<sink::console_t> {
     static auto type() -> const char*;
-    static auto from(const config_t& config) -> sink::console_t;
+    static auto from(const config::node_t& config) -> sink::console_t;
 };
 
 }  // namespace blackhole

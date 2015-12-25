@@ -12,9 +12,9 @@ namespace config {
 class factory<json_t>::inner_t {
 public:
     rapidjson::Document doc;
-    const config::json_t config;
+    const config::json_t node;
 
-    inner_t() : config(doc) {}
+    inner_t() : node(doc) {}
 };
 
 factory<json_t>::factory(std::istream& stream) :
@@ -47,8 +47,8 @@ factory<json_t>::~factory() = default;
 
 auto factory<json_t>::operator=(factory&& other) noexcept -> factory& = default;
 
-auto factory<json_t>::config() const noexcept -> const config_t& {
-    return inner->config;
+auto factory<json_t>::config() const noexcept -> const node_t& {
+    return inner->node;
 }
 
 }  // namespace config

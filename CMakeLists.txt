@@ -26,12 +26,9 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_library(${LIBRARY_NAME} SHARED
 	src/attribute
-	src/config.cpp
 	src/config/factory
 	src/config/json
-	src/config/monadic
 	src/config/node
-	src/config/none
 	src/config/option
 	src/datetime/generator.linux
 	src/datetime/generator.other
@@ -193,7 +190,6 @@ if (ENABLE_TESTING)
     add_executable(${LIBRARY_NAME}-tests
 		tests/attribute
 		tests/config/json
-		tests/config/none
 		tests/config/option
 		tests/datetime
 		tests/facade

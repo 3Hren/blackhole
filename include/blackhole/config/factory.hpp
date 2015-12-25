@@ -2,15 +2,10 @@
 
 #include <string>
 
-/// Forwards.
-namespace blackhole {
-
-class config_t;
-
-}  // namespace blackhole
-
 namespace blackhole {
 namespace config {
+
+class node_t;
 
 /// Represents an interface for logger configuration factory.
 class factory_t {
@@ -26,7 +21,7 @@ public:
     auto operator=(factory_t&& other) -> factory_t& = default;
 
     /// Returns a const lvalue reference to the root configuration.
-    virtual auto config() const -> const config_t& = 0;
+    virtual auto config() const -> const node_t& = 0;
 };
 
 /// Concrete factory implementations template.

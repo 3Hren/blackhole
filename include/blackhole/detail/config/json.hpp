@@ -2,39 +2,33 @@
 
 #include <rapidjson/document.h>
 
-#include "blackhole/config.hpp"
-#include "blackhole/config/monadic.hpp"
+#include "blackhole/config/node.hpp"
+#include "blackhole/config/option.hpp"
 
 namespace blackhole {
 namespace detail {
 namespace config {
 
-using blackhole::config::make_monadic;
+template<typename T>
+using option = blackhole::config::option<T>;
+
+using blackhole::config::make_option;
+using blackhole::config::node_t;
+
+class bad_cast : public std::logic_error {
+public:
+    // TODO: Add line:column.
+    bad_cast() : std::logic_error("bad cast") {}
+};
 
 // TODO: Separate hpp/cpp.
-class json_t : public config_t {
+class json_t : public node_t {
     const rapidjson::Value& value;
 
 public:
     explicit json_t(const rapidjson::Value& value) :
         value(value)
     {}
-
-    auto operator[](const std::size_t& idx) const -> blackhole::config::monadic<config_t> {
-        if (value.IsArray() && idx < value.Size()) {
-            return make_monadic<json_t>(value[static_cast<rapidjson::SizeType>(idx)]);
-        }
-
-        return {};
-    }
-
-    auto operator[](const std::string& key) const -> blackhole::config::monadic<config_t> {
-        if (value.IsObject() && value.HasMember(key.c_str())) {
-            return make_monadic<json_t>(value[key.c_str()]);
-        }
-
-        return {};
-    }
 
     auto to_bool() const -> bool {
         if (value.IsBool()) {
@@ -44,7 +38,7 @@ public:
         throw bad_cast();
     }
 
-    auto to_int64() const -> std::int64_t {
+    auto to_sint64() const -> std::int64_t {
         if (value.IsInt64()) {
             return value.GetInt64();
         }
@@ -82,7 +76,7 @@ public:
         }
 
         for (auto it = value.Begin(); it != value.End(); ++it) {
-            fn(*make_monadic<json_t>(*it));
+            fn(json_t(*it));
         }
     }
 
@@ -92,8 +86,24 @@ public:
         }
 
         for (auto it = value.MemberBegin(); it != value.MemberEnd(); ++it) {
-            fn(it->name.GetString(), *make_monadic<json_t>(it->value));
+            fn(it->name.GetString(), json_t(it->value));
         }
+    }
+
+    auto operator[](const std::size_t& idx) const -> option<node_t> {
+        if (value.IsArray() && idx < value.Size()) {
+            return make_option<json_t>(value[static_cast<rapidjson::SizeType>(idx)]);
+        }
+
+        return {};
+    }
+
+    auto operator[](const std::string& key) const -> option<node_t> {
+        if (value.IsObject() && value.HasMember(key.c_str())) {
+            return make_option<json_t>(value[key.c_str()]);
+        }
+
+        return {};
     }
 };
 

@@ -172,7 +172,7 @@ factory<sink::console_t>::type() -> const char* {
 }
 
 auto
-factory<sink::console_t>::from(const config_t&) -> sink::console_t {
+factory<sink::console_t>::from(const config::node_t&) -> sink::console_t {
     return {};
 }
 

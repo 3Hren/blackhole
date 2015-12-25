@@ -6,38 +6,7 @@
 #include <blackhole/config/node.hpp>
 #include <blackhole/config/option.hpp>
 
-namespace blackhole {
-namespace config {
-namespace testing {
-namespace mock {
-
-class node_t : public config::node_t {
-public:
-    MOCK_CONST_METHOD0(to_bool, bool());
-    MOCK_CONST_METHOD0(to_sint64, std::int64_t());
-    MOCK_CONST_METHOD0(to_uint64, std::uint64_t());
-    MOCK_CONST_METHOD0(to_double, double());
-    MOCK_CONST_METHOD0(to_string, std::string());
-
-    MOCK_METHOD1(each, void(const each_function&));
-    MOCK_METHOD1(each_map, void(const member_function&));
-
-    MOCK_CONST_METHOD1(subscript_idx, config::node_t*(const std::size_t&));
-    MOCK_CONST_METHOD1(subscript_key, config::node_t*(const std::string&));
-
-    auto operator[](const std::size_t& idx) const -> option<config::node_t> {
-        return option<config::node_t>(std::unique_ptr<config::node_t>(subscript_idx(idx)));
-    }
-
-    auto operator[](const std::string& key) const -> option<config::node_t> {
-        return option<config::node_t>(std::unique_ptr<config::node_t>(subscript_key(key)));
-    }
-};
-
-}  // namespace mock
-}  // namespace testing
-}  // namespace config
-}  // namespace blackhole
+#include "mocks/node.hpp"
 
 namespace blackhole {
 namespace config {
@@ -46,6 +15,28 @@ namespace testing {
 using ::testing::Invoke;
 using ::testing::Return;
 using ::testing::_;
+
+TEST(option, None) {
+    option<node_t> root;
+
+    EXPECT_TRUE(!root);
+}
+
+TEST(option, Some) {
+    auto node = new mock::node_t;
+
+    option<node_t> root((std::unique_ptr<node_t>(node)));
+
+    EXPECT_TRUE(!!root);
+}
+
+TEST(option, Unwrap) {
+    auto node = new mock::node_t;
+
+    option<node_t> root((std::unique_ptr<node_t>(node)));
+
+    EXPECT_EQ(node, &root.unwrap());
+}
 
 TEST(option, GetBoolNone) {
     option<node_t> root;

@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <boost/optional/optional.hpp>
+
 #include <rapidjson/document.h>
 
 #include <blackhole/config/json.hpp>
@@ -32,7 +34,7 @@ TEST(json_t, ToInt) {
 
     json_t config(doc);
 
-    EXPECT_EQ(42, config.to_int64());
+    EXPECT_EQ(42, config.to_sint64());
     EXPECT_EQ(42, config.to_uint64());
 }
 
@@ -68,7 +70,7 @@ TEST(json_t, ThrowsExceptionOnBoolMismatch) {
 
     json_t config(doc);
 
-    EXPECT_THROW(config.to_bool(), bad_cast);
+    EXPECT_THROW(config.to_bool(), std::logic_error);
 }
 
 TEST(json_t, ThrowsExceptionOnIntMismatch) {
@@ -79,8 +81,8 @@ TEST(json_t, ThrowsExceptionOnIntMismatch) {
 
     json_t config(doc);
 
-    EXPECT_THROW(config.to_int64(), bad_cast);
-    EXPECT_THROW(config.to_uint64(), bad_cast);
+    EXPECT_THROW(config.to_sint64(), std::logic_error);
+    EXPECT_THROW(config.to_uint64(), std::logic_error);
 }
 
 TEST(json_t, ThrowsExceptionOnDoubleMismatch) {
@@ -91,7 +93,7 @@ TEST(json_t, ThrowsExceptionOnDoubleMismatch) {
 
     json_t config(doc);
 
-    EXPECT_THROW(config.to_double(), bad_cast);
+    EXPECT_THROW(config.to_double(), std::logic_error);
 }
 
 TEST(json_t, ThrowsExceptionOnStringMismatch) {
@@ -102,7 +104,7 @@ TEST(json_t, ThrowsExceptionOnStringMismatch) {
 
     json_t config(doc);
 
-    EXPECT_THROW(config.to_string(), bad_cast);
+    EXPECT_THROW(config.to_string(), std::logic_error);
 }
 
 TEST(json_t, complex) {
@@ -130,30 +132,30 @@ TEST(json_t, complex) {
 
     json_t config(doc);
 
-    EXPECT_EQ("string", config["formatter"]["type"]->to_string());
-    EXPECT_EQ("[%(level)s]: %(message)s", config["formatter"]["pattern"]->to_string());
+    EXPECT_EQ("string", *config["formatter"]["type"].to_string());
+    EXPECT_EQ("[%(level)s]: %(message)s", *config["formatter"]["pattern"].to_string());
 
-    EXPECT_EQ("files", config["sinks"][0]["type"]->to_string());
-    EXPECT_EQ("test.log", config["sinks"][0]["path"]->to_string());
-    EXPECT_EQ("test.log.%N", config["sinks"][0]["rotation"]["pattern"]->to_string());
-    EXPECT_EQ(5, config["sinks"][0]["rotation"]["backups"]->to_int64());
-    EXPECT_EQ(1000000, config["sinks"][0]["rotation"]["size"]->to_uint64());
+    EXPECT_EQ("files", *config["sinks"][0]["type"].to_string());
+    EXPECT_EQ("test.log", *config["sinks"][0]["path"].to_string());
+    EXPECT_EQ("test.log.%N", *config["sinks"][0]["rotation"]["pattern"].to_string());
+    EXPECT_EQ(5, *config["sinks"][0]["rotation"]["backups"].to_sint64());
+    EXPECT_EQ(1000000, *config["sinks"][0]["rotation"]["size"].to_uint64());
 
     // NOTE: There is only one sink, so it's okay to compare strongly.
     auto counter = 0;
-    config["sinks"]->each([&](const config_t& sink) {
-        EXPECT_EQ("files", sink["type"]->to_string());
-        EXPECT_EQ("test.log", sink["path"]->to_string());
-        EXPECT_EQ("test.log.%N", sink["rotation"]["pattern"]->to_string());
-        EXPECT_EQ(5, sink["rotation"]["backups"]->to_int64());
-        EXPECT_EQ(1000000, sink["rotation"]["size"]->to_uint64());
+    config["sinks"].each([&](const config::node_t& sink) {
+        EXPECT_EQ("files", *sink["type"].to_string());
+        EXPECT_EQ("test.log", *sink["path"].to_string());
+        EXPECT_EQ("test.log.%N", *sink["rotation"]["pattern"].to_string());
+        EXPECT_EQ(5, *sink["rotation"]["backups"].to_sint64());
+        EXPECT_EQ(1000000, *sink["rotation"]["size"].to_uint64());
         ++counter;
     });
 
     EXPECT_EQ(1, counter);
 
     std::vector<std::string> keys;
-    config.each_map([&](const std::string& key, const config_t& sink) {
+    config.each_map([&](const std::string& key, const config::node_t& sink) {
         keys.push_back(key);
     });
 

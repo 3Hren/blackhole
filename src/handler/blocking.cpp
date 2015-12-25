@@ -37,7 +37,7 @@ factory<handler::blocking_t>::type() -> const char* {
 }
 
 auto
-factory<handler::blocking_t>::from(const config_t&) -> handler::blocking_t {
+factory<handler::blocking_t>::from(const config::node_t&) -> handler::blocking_t {
     return {};
 }
 

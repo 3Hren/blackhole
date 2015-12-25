@@ -7,11 +7,20 @@
 
 namespace blackhole {
 
-class config_t;
-
 template<typename>
 struct factory;
 
+}  // namespace blackhole
+
+namespace blackhole {
+namespace config {
+
+class node_t;
+
+}  // namespace config
+}  // namespace blackhole
+
+namespace blackhole {
 namespace handler {
 
 class blocking_t : public handler_t {
@@ -30,7 +39,7 @@ public:
 template<>
 struct factory<handler::blocking_t> {
     static auto type() -> const char*;
-    static auto from(const config_t& config) -> handler::blocking_t;
+    static auto from(const config::node_t& config) -> handler::blocking_t;
 };
 
 }  // namespace blackhole

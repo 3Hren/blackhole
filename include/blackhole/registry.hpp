@@ -8,8 +8,6 @@
 
 namespace blackhole {
 
-class config_t;
-
 template<typename>
 struct factory;
 
@@ -22,6 +20,7 @@ class root_logger_t;
 namespace config {
 
 class factory_t;
+class node_t;
 
 template<typename>
 class factory;
@@ -47,16 +46,16 @@ public:
     auto build(const std::string& name) -> root_logger_t;
 
 private:
-    auto sink(const config_t& config) const -> std::unique_ptr<sink_t>;
-    auto handler(const config_t& config) const -> std::unique_ptr<handler_t>;
-    auto formatter(const config_t& config) const -> std::unique_ptr<formatter_t>;
+    auto sink(const config::node_t& config) const -> std::unique_ptr<sink_t>;
+    auto handler(const config::node_t& config) const -> std::unique_ptr<handler_t>;
+    auto formatter(const config::node_t& config) const -> std::unique_ptr<formatter_t>;
 };
 
 class registry_t {
 public:
-    typedef std::function<std::unique_ptr<sink_t>(const config_t&)> sink_factory;
-    typedef std::function<std::unique_ptr<handler_t>(const config_t&)> handler_factory;
-    typedef std::function<std::unique_ptr<formatter_t>(const config_t&)> formatter_factory;
+    typedef std::function<std::unique_ptr<sink_t>(const config::node_t&)> sink_factory;
+    typedef std::function<std::unique_ptr<handler_t>(const config::node_t&)> handler_factory;
+    typedef std::function<std::unique_ptr<formatter_t>(const config::node_t&)> formatter_factory;
 
 private:
     std::map<std::string, sink_factory> sinks;
@@ -93,7 +92,7 @@ private:
         typedef factory<T> factory_type;
 
         const auto type = factory_type::type();
-        sinks[type] = [](const config_t& config) -> std::unique_ptr<sink_t> {
+        sinks[type] = [](const config::node_t& config) -> std::unique_ptr<sink_t> {
             return std::unique_ptr<sink_t>(new T(factory_type::from(config)));
         };
     }
@@ -103,7 +102,7 @@ private:
         typedef factory<T> factory_type;
 
         const auto type = factory_type::type();
-        handlers[type] = [](const config_t& config) -> std::unique_ptr<handler_t> {
+        handlers[type] = [](const config::node_t& config) -> std::unique_ptr<handler_t> {
             return std::unique_ptr<handler_t>(new T(factory_type::from(config)));
         };
     }
@@ -113,7 +112,7 @@ private:
         typedef factory<T> factory_type;
 
         const auto type = factory_type::type();
-        formatters[type] = [](const config_t& config) -> std::unique_ptr<formatter_t> {
+        formatters[type] = [](const config::node_t& config) -> std::unique_ptr<formatter_t> {
             return std::unique_ptr<formatter_t>(new T(factory_type::from(config)));
         };
     }

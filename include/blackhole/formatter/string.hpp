@@ -11,13 +11,20 @@
 
 namespace blackhole {
 
-class config_t;
 class record_t;
 class writer_t;
 
 template<typename>
 struct factory;
 
+}  // namespace blackhole
+
+namespace blackhole {
+namespace config {
+
+class node_t;
+
+}  // namespace config
 }  // namespace blackhole
 
 namespace blackhole {
@@ -153,7 +160,7 @@ public:
 template<>
 struct factory<formatter::string_t> {
     static auto type() -> const char*;
-    static auto from(const config_t& config) -> formatter::string_t;
+    static auto from(const config::node_t& config) -> formatter::string_t;
 };
 
 }  // namespace blackhole

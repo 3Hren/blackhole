@@ -6,8 +6,8 @@
 #include <boost/variant/get.hpp>
 #include <boost/variant/variant.hpp>
 
-#include "blackhole/config.hpp"
-#include "blackhole/config/monadic.hpp"
+#include "blackhole/config/node.hpp"
+#include "blackhole/config/option.hpp"
 #include "blackhole/extensions/format.hpp"
 #include "blackhole/extensions/writer.hpp"
 #include "blackhole/record.hpp"
@@ -346,12 +346,12 @@ factory<formatter::string_t>::type() -> const char* {
 }
 
 auto
-factory<formatter::string_t>::from(const config_t& config) -> formatter::string_t {
-    auto pattern = config["pattern"]->to_string();
+factory<formatter::string_t>::from(const config::node_t& config) -> formatter::string_t {
+    auto pattern = config["pattern"].to_string().value();
 
     if (auto mapping = config["sevmap"]) {
         std::vector<std::string> sevmap;
-        mapping->each([&](const config_t& config) {
+        mapping.each([&](const config::node_t& config) {
             sevmap.emplace_back(config.to_string());
         });
 

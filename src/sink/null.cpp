@@ -22,7 +22,7 @@ factory<sink::null_t>::type() -> const char* {
 }
 
 auto
-factory<sink::null_t>::from(const config_t&) -> sink::null_t {
+factory<sink::null_t>::from(const config::node_t&) -> sink::null_t {
     return sink::null_t();
 }
 

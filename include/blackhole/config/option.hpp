@@ -31,6 +31,10 @@ public:
     /// Constructs an option object that will contain the specified configuration node.
     explicit option(std::unique_ptr<node_t> node) noexcept;
 
+    explicit operator bool() const noexcept;
+
+    auto unwrap() const -> const node_t&;
+
     auto to_bool() const -> boost::optional<bool>;
     auto to_sint64() const -> boost::optional<std::int64_t>;
     auto to_uint64() const -> boost::optional<std::uint64_t>;
