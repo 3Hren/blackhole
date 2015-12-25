@@ -2,6 +2,8 @@
 
 #include <stdexcept>
 
+#include <boost/lexical_cast.hpp>
+
 #include <rapidjson/document.h>
 
 #include "blackhole/config/node.hpp"
@@ -16,19 +18,49 @@ using blackhole::config::node_t;
 
 typedef blackhole::config::option<node_t> option_t;
 
-class bad_cast : public std::logic_error {
+class type_mismatch : public std::logic_error {
+    struct {
+        std::string cursor;
+        std::string expected;
+        std::string actual;
+    } data;
+
 public:
-    // TODO: Add line:column.
-    bad_cast() : std::logic_error("bad cast") {}
+    type_mismatch(std::string cursor, std::string expected, std::string actual) :
+        std::logic_error("type mismatch at \"" + cursor + "\": " +
+            "expected \"" + expected + "\", actual \"" + actual + "\"")
+    {
+        data.cursor = std::move(cursor);
+        data.expected = std::move(expected);
+        data.actual = std::move(actual);
+    }
+
+    auto expected() const -> std::string {
+        return data.expected;
+    }
+
+    auto actual() const -> std::string {
+        return data.actual;
+    }
+
+    auto cursor() const -> std::string {
+        return data.cursor;
+    }
 };
 
 // TODO: Separate hpp/cpp.
 class json_t : public node_t {
     const rapidjson::Value& value;
+    std::string cursor;
 
 public:
     explicit json_t(const rapidjson::Value& value) :
         value(value)
+    {}
+
+    json_t(const rapidjson::Value& value, std::string cursor) :
+        value(value),
+        cursor(std::move(cursor))
     {}
 
     auto to_bool() const -> bool {
@@ -36,7 +68,7 @@ public:
             return value.GetBool();
         }
 
-        throw bad_cast();
+        type_mismatch("bool");
     }
 
     auto to_sint64() const -> std::int64_t {
@@ -44,7 +76,7 @@ public:
             return value.GetInt64();
         }
 
-        throw bad_cast();
+        type_mismatch("int64");
     }
 
     auto to_uint64() const -> std::uint64_t {
@@ -52,7 +84,7 @@ public:
             return value.GetUint64();
         }
 
-        throw bad_cast();
+        type_mismatch("uint64");
     }
 
     auto to_double() const -> double {
@@ -60,7 +92,7 @@ public:
             return value.GetDouble();
         }
 
-        throw bad_cast();
+        type_mismatch("double");
     }
 
     auto to_string() const -> std::string {
@@ -68,32 +100,32 @@ public:
             return value.GetString();
         }
 
-        throw bad_cast();
+        type_mismatch("string");
     }
 
     auto each(const each_function& fn) -> void {
         if (!value.IsArray()) {
-            throw bad_cast();
+            type_mismatch("array");
         }
 
         for (auto it = value.Begin(); it != value.End(); ++it) {
-            fn(json_t(*it));
+            fn(json_t(*it, advance(static_cast<std::size_t>(std::distance(value.Begin(), it)))));
         }
     }
 
     auto each_map(const member_function& fn) -> void {
         if (!value.IsObject()) {
-            throw bad_cast();
+            type_mismatch("object");
         }
 
         for (auto it = value.MemberBegin(); it != value.MemberEnd(); ++it) {
-            fn(it->name.GetString(), json_t(it->value));
+            fn(it->name.GetString(), json_t(it->value, advance(it->name.GetString())));
         }
     }
 
     auto operator[](const std::size_t& idx) const -> option_t {
         if (value.IsArray() && idx < value.Size()) {
-            return make_option<json_t>(value[static_cast<rapidjson::SizeType>(idx)]);
+            return make_option<json_t>(value[static_cast<rapidjson::SizeType>(idx)], advance(idx));
         }
 
         return {};
@@ -101,10 +133,41 @@ public:
 
     auto operator[](const std::string& key) const -> option_t {
         if (value.IsObject() && value.HasMember(key.c_str())) {
-            return make_option<json_t>(value[key.c_str()]);
+            return make_option<json_t>(value[key.c_str()], advance(key));
         }
 
         return {};
+    }
+
+private:
+    auto advance(const std::size_t& idx) const -> std::string {
+        return cursor + "/" + boost::lexical_cast<std::string>(idx);
+    }
+
+    auto advance(const std::string& key) const -> std::string {
+        return cursor + "/" + key;
+    }
+
+    __attribute((noreturn)) auto type_mismatch(const std::string& expected) const -> void {
+        throw config::type_mismatch(cursor.empty() ? "/" : cursor, expected, type());
+    }
+
+    auto type() const -> std::string {
+        switch (value.GetType()) {
+        case rapidjson::kNullType:
+            return "null";
+        case rapidjson::kTrueType:
+        case rapidjson::kFalseType:
+            return "bool";
+        case rapidjson::kNumberType:
+            return "number";
+        case rapidjson::kStringType:
+            return "string";
+        case rapidjson::kArrayType:
+            return "array";
+        case rapidjson::kObjectType:
+            return "object";
+        }
     }
 };
 

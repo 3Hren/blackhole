@@ -162,5 +162,57 @@ TEST(json_t, complex) {
     EXPECT_EQ((std::vector<std::string>{"formatter", "sinks"}), keys);
 }
 
+TEST(json_t, ToBoolActualInt) {
+    const auto json = "3.1415";
+
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    try {
+        config.to_bool();
+        FAIL();
+    } catch (const detail::config::type_mismatch& err) {
+        EXPECT_EQ("/", err.cursor());
+        EXPECT_EQ("bool", err.expected());
+        EXPECT_EQ("number", err.actual());
+        EXPECT_STREQ(R"(type mismatch at "/": expected "bool", actual "number")", err.what());
+    }
+}
+
+TEST(json_t, ToNumberActualStringWithMultipleIndex) {
+    const auto json = R"({
+        "sinks": [
+            {
+                "type": "files",
+                "path": "test.log",
+                "rotation": {
+                    "pattern": "test.log.%N",
+                    "backups": 5,
+                    "size": 1000000
+                }
+            }
+        ]
+    })";
+
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    try {
+        config["sinks"][0]["rotation"]["pattern"].to_sint64().value();
+        FAIL();
+    } catch (const detail::config::type_mismatch& err) {
+        EXPECT_EQ("/sinks/0/rotation/pattern", err.cursor());
+        EXPECT_EQ("int64", err.expected());
+        EXPECT_EQ("string", err.actual());
+        EXPECT_STREQ(R"(type mismatch at "/sinks/0/rotation/pattern": expected "int64", actual "string")", err.what());
+    }
+}
+
 }  // namespace testing
 }  // namespace blackhole
