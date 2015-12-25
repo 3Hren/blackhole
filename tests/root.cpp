@@ -442,5 +442,23 @@ TEST(RootLogger, IgnoresExceptionsFromHandlers) {
     EXPECT_EQ("logging core error occurred: ...\n", actual);
 }
 
+TEST(RootLogger, IgnoresMarginalExceptionsFromHandlers) {
+    auto handler = new mock::handler_t;
+    std::vector<std::unique_ptr<handler_t>> handlers;
+    handlers.emplace_back(handler);
+
+    root_logger_t logger(std::move(handlers));
+
+    EXPECT_CALL(*handler, execute(_))
+        .Times(1)
+        .WillOnce(Throw(42));
+
+    CaptureStdout();
+    EXPECT_NO_THROW(logger.log(0, "GET /porn.png HTTP/1.1"));
+
+    const std::string actual = GetCapturedStdout();
+    EXPECT_EQ("logging core error occurred: unknown\n", actual);
+}
+
 }  // namespace testing
 }  // namespace blackhole
