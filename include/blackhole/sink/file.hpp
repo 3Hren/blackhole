@@ -43,6 +43,9 @@ public:
     /// The path can contain attribute placeholders, meaning that the real destination name will be
     /// deduced at runtime using provided log record. No real file will be opened at construction
     /// time.
+    ///
+    /// \param filename actually a path with final destination file to open. All files are opened
+    ///     with append mode.
     explicit file_t(const std::string& filename);
 
     /// Copy construction is explicitly prohibited.
