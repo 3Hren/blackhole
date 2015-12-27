@@ -5,11 +5,16 @@
 #include <blackhole/sink/file.hpp>
 #include <blackhole/detail/sink/file.hpp>
 
+#include "mocks/node.hpp"
+
 namespace blackhole {
 namespace testing {
 namespace sink {
 
 using ::blackhole::sink::file_t;
+
+using ::testing::Return;
+using ::testing::StrictMock;
 
 namespace file {
 
@@ -36,8 +41,6 @@ TEST(inner_t, IntervalOverflow) {
     EXPECT_EQ(0, counter);
 }
 
-}  // namespace file
-
 TEST(file_t, FilterAcceptsAll) {
     const string_view message("");
     const attribute_pack pack;
@@ -48,8 +51,20 @@ TEST(file_t, FilterAcceptsAll) {
     EXPECT_TRUE(sink.filter(record));
 }
 
-TEST(file_t, type) {
+}  // namespace file
+
+TEST(file_t, Type) {
     EXPECT_EQ("file", std::string(blackhole::factory<file_t>::type()));
+}
+
+TEST(file_t, FromRequiresFilename) {
+    StrictMock<config::testing::mock::node_t> config;
+
+    EXPECT_CALL(config, subscript_key("path"))
+        .Times(1)
+        .WillOnce(Return(nullptr));
+
+    EXPECT_THROW(factory<sink::file_t>::from(config), std::logic_error);
 }
 
 }  // namespace sink

@@ -1,5 +1,8 @@
 #include <gmock/gmock.h>
 
+#include <blackhole/config/node.hpp>
+#include <blackhole/config/option.hpp>
+
 namespace blackhole {
 namespace config {
 namespace testing {
@@ -20,11 +23,19 @@ public:
     MOCK_CONST_METHOD1(subscript_key, config::node_t*(const std::string&));
 
     auto operator[](const std::size_t& idx) const -> option<config::node_t> {
-        return option<config::node_t>(std::unique_ptr<config::node_t>(subscript_idx(idx)));
+        if (auto node = subscript_idx(idx)) {
+            return option<config::node_t>(std::unique_ptr<config::node_t>(node));
+        } else {
+            return {};
+        }
     }
 
     auto operator[](const std::string& key) const -> option<config::node_t> {
-        return option<config::node_t>(std::unique_ptr<config::node_t>(subscript_key(key)));
+        if (auto node = subscript_key(key)) {
+            return option<config::node_t>(std::unique_ptr<config::node_t>(node));
+        } else {
+            return {};
+        }
     }
 };
 

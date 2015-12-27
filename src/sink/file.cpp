@@ -1,5 +1,9 @@
 #include "blackhole/sink/file.hpp"
 
+#include <boost/optional/optional.hpp>
+
+#include "blackhole/config/node.hpp"
+#include "blackhole/config/option.hpp"
 #include "blackhole/cpp17/string_view.hpp"
 #include "blackhole/record.hpp"
 
@@ -71,6 +75,16 @@ auto file_t::builder_t::build() -> file_t {
 
 auto factory<sink::file_t>::type() -> const char* {
     return "file";
+}
+
+auto factory<sink::file_t>::from(const config::node_t& config) -> sink::file_t {
+    auto filename = config["path"].to_string();
+
+    if (!filename) {
+        throw std::logic_error("field 'path' is required");
+    }
+
+    return sink::file_t(std::move(filename.get()));
 }
 
 }  // namespace blackhole
