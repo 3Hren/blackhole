@@ -152,7 +152,7 @@ auto console_t::execute(const record_t& record, const string_view& formatted) ->
     }
 }
 
-auto console_t::color(const record_t& record) -> color_t {
+auto console_t::color(const record_t& record) const -> color_t {
     return colormap(record);
 }
 

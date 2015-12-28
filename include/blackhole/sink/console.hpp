@@ -142,7 +142,7 @@ protected:
     /// output message.
     ///
     /// The implementation uses `colormap` variable provided with construction.
-    auto color(const record_t& record) -> color_t;
+    virtual auto color(const record_t& record) const -> color_t;
 
 private:
     static auto output(type_t type) -> std::ostream&;
