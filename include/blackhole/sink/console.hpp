@@ -134,8 +134,8 @@ protected:
     /// stream using the given terminal color mapping to colorize the output.
     ///
     /// This constructor is protected, because it accepts a generic stream instead of predefined
-    /// one making it possible to write anywhere that implements stream protocol, which is useful
-    /// for testing reasons for example.
+    /// one making it possible to write into anything that implements stream protocol, which is
+    /// useful for testing reasons for example.
     console_t(std::ostream& stream, termcolor_map colormap);
 
     /// Maps the given log record returning the color that is used for colored formatting the result
