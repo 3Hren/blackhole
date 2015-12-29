@@ -9,16 +9,22 @@ namespace blackhole {
 
 class scoped_t;
 
+/// Represents common logging interface.
 class logger_t {
 public:
-    // TODO: Rename: interpolator_t, expander_t?
     typedef std::function<auto() -> string_view> format_t;
 
 public:
     virtual ~logger_t() = 0;
 
+    /// Logs the given message with the specified severity level.
     virtual auto log(int severity, string_view pattern) -> void = 0;
+
+    /// Logs the given message with the specified severity level and attributes pack attached.
     virtual auto log(int severity, string_view pattern, attribute_pack& pack) -> void = 0;
+
+    /// Logs the given message with the specified severity level, attributes pack attached and with
+    /// special message provider callback.
     virtual auto log(int severity, string_view pattern, attribute_pack& pack, const format_t& fn) -> void = 0;
 
     /// Attaches the given attributes to the logger, making every further log event to contain them
