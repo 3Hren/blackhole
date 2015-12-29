@@ -3,6 +3,7 @@
 
 #include <benchmark/benchmark.h>
 
+#include <blackhole/attribute.hpp>
 #include <blackhole/extensions/facade.hpp>
 #include <blackhole/handler.hpp>
 #include <blackhole/logger.hpp>

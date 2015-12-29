@@ -13,6 +13,7 @@
 #include <rapidjson/writer.h>
 #include <rapidjson/pointer.h>
 
+#include "blackhole/attribute.hpp"
 #include "blackhole/record.hpp"
 #include "blackhole/extensions/writer.hpp"
 

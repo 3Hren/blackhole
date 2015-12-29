@@ -2,7 +2,7 @@
 
 #include <thread>
 
-#include <iostream>
+#include "blackhole/attribute.hpp"
 
 namespace blackhole {
 

@@ -6,6 +6,7 @@
 #include <boost/variant/get.hpp>
 #include <boost/variant/variant.hpp>
 
+#include "blackhole/attribute.hpp"
 #include "blackhole/config/node.hpp"
 #include "blackhole/config/option.hpp"
 #include "blackhole/extensions/format.hpp"

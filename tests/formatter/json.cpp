@@ -3,6 +3,7 @@
 
 #include <rapidjson/document.h>
 
+#include <blackhole/attribute.hpp>
 #include <blackhole/attributes.hpp>
 #include <blackhole/cpp17/string_view.hpp>
 #include <blackhole/extensions/writer.hpp>

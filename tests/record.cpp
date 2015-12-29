@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <blackhole/attribute.hpp>
 #include <blackhole/record.hpp>
 
 namespace blackhole {

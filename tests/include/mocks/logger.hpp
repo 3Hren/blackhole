@@ -2,6 +2,7 @@
 
 #include <gmock/gmock.h>
 
+#include <blackhole/attribute.hpp>
 #include <blackhole/logger.hpp>
 #include <blackhole/scoped.hpp>
 

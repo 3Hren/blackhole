@@ -3,6 +3,7 @@
 
 #include <unistd.h>
 
+#include <blackhole/attribute.hpp>
 #include <blackhole/record.hpp>
 #include <blackhole/sink/console.hpp>
 

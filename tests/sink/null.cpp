@@ -1,6 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <blackhole/attribute.hpp>
 #include <blackhole/config/node.hpp>
 #include <blackhole/config/option.hpp>
 #include <blackhole/record.hpp>

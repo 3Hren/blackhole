@@ -2,6 +2,8 @@
 
 #include "blackhole/logger.hpp"
 
+#include "blackhole/attribute.hpp"
+
 namespace blackhole {
 
 class wrapper_t : public logger_t {

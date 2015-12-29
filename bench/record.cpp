@@ -1,5 +1,6 @@
 #include <benchmark/benchmark.h>
 
+#include <blackhole/attribute.hpp>
 #include <blackhole/record.hpp>
 
 namespace blackhole {

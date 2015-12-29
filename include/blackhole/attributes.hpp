@@ -16,7 +16,23 @@
     #include <vector>
 #endif
 
-#include "blackhole/attribute.hpp"
+#include "blackhole/cpp17/string_view.hpp"
+
+namespace blackhole {
+
+template<typename T>
+struct view_of;
+
+}  // namespace blackhole
+
+namespace blackhole {
+namespace attribute {
+
+class value_t;
+class view_t;
+
+}  // namespace attribute
+}  // namespace blackhole
 
 namespace blackhole {
 

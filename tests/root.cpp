@@ -1,7 +1,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "blackhole/extensions/writer.hpp"
+#include <blackhole/attribute.hpp>
+#include <blackhole/extensions/writer.hpp>
 #include <blackhole/logger.hpp>
 #include <blackhole/record.hpp>
 #include <blackhole/root.hpp>

@@ -1,3 +1,4 @@
+#include "blackhole/attribute.hpp"
 #include "blackhole/scoped.hpp"
 
 #include <boost/thread/tss.hpp>

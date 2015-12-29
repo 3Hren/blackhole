@@ -5,6 +5,7 @@
 
 #include <boost/thread/tss.hpp>
 
+#include "blackhole/attribute.hpp"
 #include "blackhole/extensions/facade.hpp"
 #include "blackhole/handler.hpp"
 #include "blackhole/record.hpp"

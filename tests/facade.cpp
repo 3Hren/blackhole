@@ -1,6 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <blackhole/attribute.hpp>
 #include <blackhole/extensions/facade.hpp>
 
 #include "mocks/logger.hpp"
