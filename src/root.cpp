@@ -127,22 +127,8 @@ root_logger_t::filter(filter_t fn) -> void {
 namespace {
 
 struct null_format_t {
-    typedef struct {} writer_type;
-
-    constexpr
-    auto operator()(writer_type&) const -> string_view {
+    constexpr auto operator()() const -> string_view {
         return string_view();
-    }
-};
-
-struct real_format_t {
-    typedef writer_t writer_type;
-
-    const logger_t::format_t& fn;
-
-    auto operator()(writer_type& writer) const -> string_view {
-        fn(writer);
-        return string_view(writer.inner.data(), writer.inner.size());
     }
 };
 
@@ -161,7 +147,7 @@ root_logger_t::log(int severity, string_view pattern, attribute_pack& pack) -> v
 
 auto
 root_logger_t::log(int severity, string_view pattern, attribute_pack& pack, const format_t& fn) -> void {
-    consume(severity, pattern, pack, real_format_t{fn});
+    consume(severity, pattern, pack, fn);
 }
 
 template<typename F>
@@ -179,11 +165,7 @@ root_logger_t::consume(int severity, const string_view& pattern, attribute_pack&
 
     record_t record(severity, pattern, pack);
     if (filter(record)) {
-        typedef typename F::writer_type writer_type;
-
-        // Keep this writer on stack to be sure that formatted message is alive.
-        writer_type writer;
-        const auto formatted = fn(writer);
+        const auto formatted = fn();
 
         record.activate(formatted);
         for (auto& handler : inner->handlers) {

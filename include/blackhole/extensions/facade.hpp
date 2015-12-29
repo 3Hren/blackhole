@@ -120,8 +120,10 @@ template<std::size_t N, typename T, typename... Args>
 inline
 auto
 logger_facade<Logger>::log(int severity, const detail::formatter<N>& pattern, const T& arg, const Args&... args) -> void {
-    const auto fn = [&](writer_t& wr) {
-        pattern.format(wr.inner, arg, args...);
+    fmt::MemoryWriter wr;
+    const auto fn = [&]() -> string_view {
+        pattern.format(wr, arg, args...);
+        return {wr.data(), wr.size()};
     };
 
     attribute_pack pack;
@@ -138,7 +140,8 @@ auto
 logger_facade<Logger>::select(int severity, const string_view& pattern, const Args&... args) ->
     typename std::enable_if<!detail::with_attributes<Args...>::value>::type
 {
-    const auto fn = std::bind(&detail::gcc::write_all<Args...>, ph::_1, pattern.data(), std::cref(args)...);
+    fmt::MemoryWriter wr;
+    const auto fn = std::bind(&detail::gcc::write_all<Args...>, std::ref(wr), pattern.data(), std::cref(args)...);
 
     attribute_pack pack;
     inner().log(severity, pattern, pack, std::cref(fn));

@@ -8,11 +8,11 @@
 namespace blackhole {
 
 class scoped_t;
-class writer_t;
 
 class logger_t {
 public:
-    typedef std::function<auto(writer_t&) -> void> format_t;
+    // TODO: Rename: interpolator_t, expander_t?
+    typedef std::function<auto() -> string_view> format_t;
 
 public:
     virtual ~logger_t();

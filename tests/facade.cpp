@@ -24,8 +24,8 @@ auto operator==(const std::reference_wrapper<T>& lhs, const std::reference_wrapp
 namespace blackhole {
 namespace testing {
 
-using ::testing::ByRef;
-using ::testing::InvokeArgument;
+using ::testing::Invoke;
+using ::testing::WithArg;
 using ::testing::_;
 
 typedef mock::logger_t logger_type;
@@ -71,11 +71,11 @@ TEST(Facade, FormattedLog) {
 
     EXPECT_CALL(inner, log(0, string_view("GET /porn.png HTTP/1.0 - {}"), expected, _))
         .Times(1)
-        .WillOnce(InvokeArgument<3>(ByRef(writer)));
+        .WillOnce(WithArg<3>(Invoke([](logger_type::format_t fn) {
+            EXPECT_EQ("GET /porn.png HTTP/1.0 - 42", fn().to_string());
+        })));
 
     logger.log(0, "GET /porn.png HTTP/1.0 - {}", 42);
-
-    EXPECT_EQ("GET /porn.png HTTP/1.0 - 42", writer.inner.str());
 }
 
 TEST(Facade, FormattedAttributeLog) {
@@ -84,17 +84,16 @@ TEST(Facade, FormattedAttributeLog) {
 
     const attribute_list attributes{{"key#1", {42}}};
     attribute_pack expected{attributes};
-    writer_t writer;
 
     EXPECT_CALL(inner, log(0, string_view("GET /porn.png HTTP/1.0 - {}"), expected, _))
         .Times(1)
-        .WillOnce(InvokeArgument<3>(ByRef(writer)));
+        .WillOnce(WithArg<3>(Invoke([](logger_type::format_t fn) {
+            EXPECT_EQ("GET /porn.png HTTP/1.0 - 2345", fn().to_string());
+        })));
 
     logger.log(0, "GET /porn.png HTTP/1.0 - {}", 2345, attribute_list{
         {"key#1", {42}}
     });
-
-    EXPECT_EQ("GET /porn.png HTTP/1.0 - 2345", writer.inner.str());
 }
 
 }  // namespace testing

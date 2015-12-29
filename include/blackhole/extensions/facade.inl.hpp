@@ -16,8 +16,9 @@ namespace gcc {
 
 /// Workaround for GCC versions up to 4.9, which fails to expand variadic pack inside lambdas.
 template<class... Args>
-inline void write_all(writer_t& wr, const char* pattern, const Args&... args) {
+inline auto write_all(fmt::MemoryWriter& wr, const char* pattern, const Args&... args) -> string_view {
     wr.write(pattern, args...);
+    return {wr.data(), wr.size()};
 }
 
 }  // namespace gcc
@@ -84,7 +85,8 @@ struct select_t {
     auto apply(Logger& log, int severity, const string_view& pattern, const Args&... args,
         const attribute_list& attributes) -> void
     {
-        const auto fn = std::bind(&gcc::write_all<Args...>, ph::_1, pattern.data(), std::cref(args)...);
+        fmt::MemoryWriter wr;
+        const auto fn = std::bind(&gcc::write_all<Args...>, std::ref(wr), pattern.data(), std::cref(args)...);
 
         attribute_pack pack{attributes};
         log.log(severity, pattern, pack, std::cref(fn));

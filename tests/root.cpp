@@ -223,8 +223,8 @@ TEST(RootLogger, LogWithAttributesAndFormatterInvokesDispatchingRecordToHandlers
     attribute_list attributes{{"key#1", {42}}};
     attribute_pack pack{attributes};
 
-    logger.log(0, "GET /porn.png HTTP/1.1 - {}/{}", pack, [](writer_t& writer) {
-        writer.write("GET /porn.png HTTP/1.1 - {}/{}", 42, 2345);
+    logger.log(0, "GET /porn.png HTTP/1.1 - {}/{}", pack, []() -> string_view {
+        return {"GET /porn.png HTTP/1.1 - 42/2345"};
     });
 }
 
