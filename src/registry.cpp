@@ -17,6 +17,38 @@
 
 namespace blackhole {
 
+namespace {
+
+template<typename T>
+class result {
+    boost::optional<T> value;
+
+public:
+    result() {}
+    result(const T& value) : value(value) {}
+    result(const boost::optional<T>& value) : value(value) {}
+
+    template<typename E, typename... Args>
+    auto expect(const Args&... args) -> T {
+        if (value) {
+            return *value;
+        }
+
+        throw E(fmt::format(args...));
+    }
+};
+
+template<typename V>
+auto get(std::map<std::string, V>* map, const std::string& key) -> result<V> {
+    try {
+        return {map->at(key)};
+    } catch (const std::out_of_range&) {
+        return {};
+    }
+}
+
+}  // namespace
+
 builder_t::builder_t(const registry_t& registry, std::unique_ptr<config::factory_t> factory) :
     registry(registry),
     factory(std::move(factory))
@@ -59,7 +91,10 @@ auto builder_t::handler(const config::node_t& config) const -> std::unique_ptr<h
 }
 
 auto builder_t::formatter(const config::node_t& config) const -> std::unique_ptr<formatter_t> {
-    return registry.formatter(*config["type"].to_string())(config);
+    const auto type = result<std::string>(config["type"].to_string())
+        .expect<std::logic_error>("formatter must have a type");
+
+    return registry.formatter(type)(config);
 }
 
 auto registry_t::configured() -> registry_t {
@@ -74,37 +109,6 @@ auto registry_t::configured() -> registry_t {
 
     return registry;
 }
-
-namespace {
-
-template<typename T>
-class result {
-    boost::optional<T> value;
-
-public:
-    result() {}
-    result(const T& value) : value(value) {}
-
-    template<typename E, typename... Args>
-    auto expect(const Args&... args) -> T {
-        if (value) {
-            return *value;
-        }
-
-        throw E(fmt::format(args...));
-    }
-};
-
-template<typename C>
-auto get(C* map, const typename C::key_type& key) -> result<decltype(map->at(key))> {
-    try {
-        return {map->at(key)};
-    } catch (const std::out_of_range&) {
-        return {};
-    }
-}
-
-}  // namespace
 
 auto registry_t::sink(const std::string& type) const -> sink_factory {
     return sinks.at(type);
