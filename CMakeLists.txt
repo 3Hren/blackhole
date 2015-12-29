@@ -198,6 +198,7 @@ if (ENABLE_TESTING)
 		tests/formatter/string
 		tests/handler/blocking
 		tests/record
+		tests/registry
 		tests/root
 		tests/sink/console
 		tests/sink/file

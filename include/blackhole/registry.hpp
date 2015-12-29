@@ -46,6 +46,10 @@ public:
 
     auto build(const std::string& name) -> root_logger_t;
 
+    auto configurator() -> config::factory_t& {
+        return *factory;
+    }
+
 private:
     auto sink(const config::node_t& config) const -> std::unique_ptr<sink_t>;
     auto handler(const config::node_t& config) const -> std::unique_ptr<handler_t>;

@@ -33,7 +33,16 @@ public:
 
     explicit operator bool() const noexcept;
 
+    /// Unwraps an option, yielding the content of an underlying config node object.
+    ///
+    /// \pre !!*this.
+    /// \warning this method will probably crash your application if the value is a none.
     auto unwrap() const -> const node_t&;
+
+    /// Unwraps an option, yielding the content of an underlying config node object.
+    ///
+    /// \throws std::logic_error if the value is a none with a custom message provided by `reason`.
+    auto expect(std::string reason) const -> const node_t&;
 
     auto to_bool() const -> boost::optional<bool>;
     auto to_sint64() const -> boost::optional<std::int64_t>;

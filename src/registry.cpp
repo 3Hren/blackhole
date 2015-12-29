@@ -5,6 +5,7 @@
 #include "blackhole/config/factory.hpp"
 #include "blackhole/config/node.hpp"
 #include "blackhole/config/option.hpp"
+#include "blackhole/extensions/format.hpp"
 #include "blackhole/formatter.hpp"
 #include "blackhole/formatter/string.hpp"
 #include "blackhole/handler.hpp"
@@ -29,7 +30,7 @@ auto builder_t::build(const std::string& name) -> root_logger_t {
     std::vector<std::unique_ptr<handler_t>> handlers;
 
     config[name].each([&](const config::node_t& config) {
-        auto formatter = this->formatter(config["formatter"].unwrap());
+        auto formatter = this->formatter(config["formatter"].expect("each handler must have a formatter"));
 
         std::vector<std::unique_ptr<sink_t>> sinks;
         config["sinks"].each([&](const config::node_t& config) {
@@ -74,8 +75,40 @@ auto registry_t::configured() -> registry_t {
     return registry;
 }
 
+namespace {
+
+template<typename T>
+class result {
+    boost::optional<T> value;
+
+public:
+    result() {}
+    result(const T& value) : value(value) {}
+
+    template<typename E, typename... Args>
+    auto expect(const Args&... args) -> T {
+        if (value) {
+            return *value;
+        }
+
+        throw E(fmt::format(args...));
+    }
+};
+
+template<typename C>
+auto get(C* map, const typename C::key_type& key) -> result<decltype(map->at(key))> {
+    try {
+        return {map->at(key)};
+    } catch (const std::out_of_range&) {
+        return {};
+    }
+}
+
+}  // namespace
+
 auto registry_t::sink(const std::string& type) const -> sink_factory {
     return sinks.at(type);
+    // return get(&sinks, type).expect(R"(sink "{}" is not registered)", type);
 }
 
 auto registry_t::handler(const std::string& type) const -> handler_factory {

@@ -43,3 +43,17 @@ public:
 }  // namespace testing
 }  // namespace config
 }  // namespace blackhole
+
+#include <blackhole/config/factory.hpp>
+
+namespace blackhole {
+namespace config {
+
+template<>
+class factory<testing::mock::node_t> : public factory_t {
+public:
+    MOCK_CONST_METHOD0(config, const node_t&());
+};
+
+}  // namespace config
+}  // namespace blackhole
