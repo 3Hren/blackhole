@@ -15,7 +15,7 @@ public:
     typedef std::function<auto() -> string_view> format_t;
 
 public:
-    virtual ~logger_t();
+    virtual ~logger_t() = 0;
 
     virtual auto log(int severity, string_view pattern) -> void = 0;
     virtual auto log(int severity, string_view pattern, attribute_pack& pack) -> void = 0;
