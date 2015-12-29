@@ -16,16 +16,10 @@ option<node_t>::operator bool() const noexcept {
     return node != nullptr;
 }
 
-auto option<node_t>::unwrap() const -> const node_t& {
-    return *node;
-}
-
-auto option<node_t>::expect(std::string reason) const -> const node_t& {
-    if (node) {
-        return unwrap();
-    }
-
-    throw std::logic_error(std::move(reason));
+auto option<node_t>::unwrap() const -> boost::optional<const node_t&> {
+    return to([&]() -> boost::optional<const node_t&> {
+        return *node;
+    });
 }
 
 auto option<node_t>::to_bool() const -> boost::optional<bool> {

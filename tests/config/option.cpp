@@ -35,7 +35,7 @@ TEST(option, Unwrap) {
 
     option<node_t> root((std::unique_ptr<node_t>(node)));
 
-    EXPECT_EQ(node, &root.unwrap());
+    EXPECT_EQ(node, &root.unwrap().get());
 }
 
 TEST(option, GetBoolNone) {

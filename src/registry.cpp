@@ -26,9 +26,9 @@ class result {
 public:
     result() {}
     result(const T& value) : value(value) {}
-    result(const boost::optional<T>& value) : value(value) {}
+    result(boost::optional<T> value) : value(std::move(value)) {}
 
-    template<typename E, typename... Args>
+    template<typename E = std::logic_error, typename... Args>
     auto expect(const char* message, const Args&... args) -> T {
         if (value) {
             return *value;
@@ -62,7 +62,8 @@ auto builder_t::build(const std::string& name) -> root_logger_t {
     std::vector<std::unique_ptr<handler_t>> handlers;
 
     config[name].each([&](const config::node_t& config) {
-        auto formatter = this->formatter(config["formatter"].expect("each handler must have a formatter"));
+        auto formatter = this->formatter(result<const config::node_t&>(config["formatter"].unwrap())
+            .expect("each handler must have a formatter"));
 
         std::vector<std::unique_ptr<sink_t>> sinks;
         config["sinks"].each([&](const config::node_t& config) {
@@ -92,7 +93,7 @@ auto builder_t::handler(const config::node_t& config) const -> std::unique_ptr<h
 
 auto builder_t::formatter(const config::node_t& config) const -> std::unique_ptr<formatter_t> {
     const auto type = result<std::string>(config["type"].to_string())
-        .expect<std::logic_error>("formatter must have a type");
+        .expect("formatter must have a type");
 
     return registry.formatter(type)(config);
 }
