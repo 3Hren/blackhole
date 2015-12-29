@@ -84,11 +84,17 @@ auto builder_t::build(const std::string& name) -> root_logger_t {
 }
 
 auto builder_t::sink(const config::node_t& config) const -> std::unique_ptr<sink_t> {
-    return registry.sink(*config["type"].to_string())(config);
+    const auto type = result<std::string>(config["type"].to_string())
+        .expect("sink must have a type");
+
+    return registry.sink(type)(config);
 }
 
 auto builder_t::handler(const config::node_t& config) const -> std::unique_ptr<handler_t> {
-    return registry.handler(config["type"].to_string().get_value_or("blocking"))(config);
+    const auto type = config["type"].to_string()
+        .get_value_or("blocking");
+
+    return registry.handler(type)(config);
 }
 
 auto builder_t::formatter(const config::node_t& config) const -> std::unique_ptr<formatter_t> {
@@ -112,11 +118,13 @@ auto registry_t::configured() -> registry_t {
 }
 
 auto registry_t::sink(const std::string& type) const -> sink_factory {
-    return sinks.at(type);
+    return get(&sinks, type)
+        .expect<std::out_of_range>(R"(sink with type "{}" is not registered)", type);
 }
 
 auto registry_t::handler(const std::string& type) const -> handler_factory {
-    return handlers.at(type);
+    return get(&handlers, type)
+        .expect<std::out_of_range>(R"(handler with type "{}" is not registered)", type);
 }
 
 auto registry_t::formatter(const std::string& type) const -> formatter_factory {

@@ -14,13 +14,6 @@ using ::testing::Return;
 using ::testing::ReturnRef;
 using ::testing::_;
 
-// TEST(registry_t, ThrowsOnUnregisteredHandler) {
-// EXPECT_STREQ(R"(handler with type "unknown" isn't registered)", err.what());
-
-// - тип не указан для синка
-// - синк заданного типа не зарегистрирован
-// - тип не указан для хендлера - блокинг по-умолчанию
-// - хендлер заданного типа не зарегистрирован
 TEST(registry_t, ThrowsOnAbsentFormatter) {
     using config::testing::mock::node_t;
 
