@@ -29,17 +29,17 @@ public:
     result(const boost::optional<T>& value) : value(value) {}
 
     template<typename E, typename... Args>
-    auto expect(const Args&... args) -> T {
+    auto expect(const char* message, const Args&... args) -> T {
         if (value) {
             return *value;
+        } else {
+            throw E(fmt::format(message, args...));
         }
-
-        throw E(fmt::format(args...));
     }
 };
 
 template<typename V>
-auto get(std::map<std::string, V>* map, const std::string& key) -> result<V> {
+auto get(const std::map<std::string, V>* map, const std::string& key) -> result<V> {
     try {
         return {map->at(key)};
     } catch (const std::out_of_range&) {
@@ -112,7 +112,6 @@ auto registry_t::configured() -> registry_t {
 
 auto registry_t::sink(const std::string& type) const -> sink_factory {
     return sinks.at(type);
-    // return get(&sinks, type).expect(R"(sink "{}" is not registered)", type);
 }
 
 auto registry_t::handler(const std::string& type) const -> handler_factory {
@@ -120,7 +119,8 @@ auto registry_t::handler(const std::string& type) const -> handler_factory {
 }
 
 auto registry_t::formatter(const std::string& type) const -> formatter_factory {
-    return formatters.at(type);
+    return get(&formatters, type)
+        .expect<std::out_of_range>(R"(formatter with type "{}" is not registered)", type);
 }
 
 }  // namespace blackhole
