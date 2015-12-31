@@ -31,12 +31,11 @@ class scoped_t;
 ///
 /// If you want to configure a logger programmically, there are typed builder classes that provide
 /// chained interface for simplifying and making the code eye-candy.
-/// For example see: \example examples/2.simple.cpp
 ///
 /// On the other hand sometimes you can't build a logger programmically, because its configuration
 /// is unknown at compile time and is obtained from some config file for example. Or if you have a
 /// configuration object (JSON, XML, folly dynamic) you may want to create a logger using it. For
-/// these cases there is a \sa registry_t class. Its usage: \example examples/3.config.cpp
+/// these cases there is a \sa registry_t class.
 ///
 /// Otherwise you can always build logger instances directly using its constructors.
 class logger_t {
