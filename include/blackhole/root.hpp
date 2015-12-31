@@ -58,7 +58,7 @@ public:
 
     auto log(int severity, string_view pattern) -> void;
     auto log(int severity, string_view pattern, attribute_pack& pack) -> void;
-    auto log(int severity, string_view pattern, attribute_pack& pack, const format_t& fn) -> void;
+    auto log(int severity, string_view pattern, attribute_pack& pack, const supplier_t& supplier) -> void;
 
     auto scoped(attributes_t attributes) -> scoped_t;
 

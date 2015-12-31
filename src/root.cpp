@@ -126,7 +126,7 @@ root_logger_t::filter(filter_t fn) -> void {
 
 namespace {
 
-struct null_format_t {
+struct null_supplier_t {
     constexpr auto operator()() const -> string_view {
         return string_view();
     }
@@ -142,17 +142,17 @@ root_logger_t::log(int severity, string_view pattern) -> void {
 
 auto
 root_logger_t::log(int severity, string_view pattern, attribute_pack& pack) -> void {
-    consume(severity, pattern, pack, null_format_t());
+    consume(severity, pattern, pack, null_supplier_t());
 }
 
 auto
-root_logger_t::log(int severity, string_view pattern, attribute_pack& pack, const format_t& fn) -> void {
-    consume(severity, pattern, pack, fn);
+root_logger_t::log(int severity, string_view pattern, attribute_pack& pack, const supplier_t& supplier) -> void {
+    consume(severity, pattern, pack, supplier);
 }
 
 template<typename F>
 auto
-root_logger_t::consume(int severity, const string_view& pattern, attribute_pack& pack, const F& fn) -> void {
+root_logger_t::consume(int severity, const string_view& pattern, attribute_pack& pack, const F& supplier) -> void {
     const auto inner = sync->load(this->inner);
     const auto filter = inner->apply([&](inner_t& inner) -> filter_t {
         return inner.filter;
@@ -165,7 +165,7 @@ root_logger_t::consume(int severity, const string_view& pattern, attribute_pack&
 
     record_t record(severity, pattern, pack);
     if (filter(record)) {
-        const auto formatted = fn();
+        const auto formatted = supplier();
 
         record.activate(formatted);
         for (auto& handler : inner->handlers) {

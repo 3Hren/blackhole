@@ -71,7 +71,7 @@ TEST(Facade, FormattedLog) {
 
     EXPECT_CALL(inner, log(0, string_view("GET /porn.png HTTP/1.0 - {}"), expected, _))
         .Times(1)
-        .WillOnce(WithArg<3>(Invoke([](logger_type::format_t fn) {
+        .WillOnce(WithArg<3>(Invoke([](logger_type::supplier_t fn) {
             EXPECT_EQ("GET /porn.png HTTP/1.0 - 42", fn().to_string());
         })));
 
@@ -87,7 +87,7 @@ TEST(Facade, FormattedAttributeLog) {
 
     EXPECT_CALL(inner, log(0, string_view("GET /porn.png HTTP/1.0 - {}"), expected, _))
         .Times(1)
-        .WillOnce(WithArg<3>(Invoke([](logger_type::format_t fn) {
+        .WillOnce(WithArg<3>(Invoke([](logger_type::supplier_t fn) {
             EXPECT_EQ("GET /porn.png HTTP/1.0 - 2345", fn().to_string());
         })));
 

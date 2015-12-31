@@ -29,9 +29,9 @@ wrapper_t::log(int severity, string_view pattern, attribute_pack& pack) -> void 
 }
 
 auto
-wrapper_t::log(int severity, string_view pattern, attribute_pack& pack, const format_t& fn) -> void {
+wrapper_t::log(int severity, string_view pattern, attribute_pack& pack, const supplier_t& supplier) -> void {
     pack.push_back(attributes());
-    inner.log(severity, pattern, pack, fn);
+    inner.log(severity, pattern, pack, supplier);
 }
 
 auto

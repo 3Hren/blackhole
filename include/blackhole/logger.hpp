@@ -40,7 +40,7 @@ class scoped_t;
 /// Otherwise you can always build logger instances directly using its constructors.
 class logger_t {
 public:
-    typedef std::function<auto() -> string_view> format_t;
+    typedef std::function<auto() -> string_view> supplier_t;
 
 public:
     virtual ~logger_t() = 0;
@@ -53,7 +53,7 @@ public:
 
     /// Logs the given message with the specified severity level, attributes pack attached and with
     /// special message supplier callback.
-    virtual auto log(int severity, string_view pattern, attribute_pack& pack, const format_t& fn) -> void = 0;
+    virtual auto log(int severity, string_view pattern, attribute_pack& pack, const supplier_t& supplier) -> void = 0;
 
     /// Attaches the given attributes to the logger, making every further log event to contain them
     /// until returned scoped guard keeped alive.
