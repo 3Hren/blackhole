@@ -48,8 +48,8 @@ public:
     /// of failed filtering for example. For these cases we allow the client code to provide
     /// messages lazily.
     /// Note, that string view semantics requires the real message storage that is pointed by view
-    /// to outlive the function call. Default implementation in facade just allocates large buffer
-    /// on stack and fills it on function invocation.
+    /// to outlive the function call. Default implementation in the facade just allocates large
+    /// buffer on stack and fills it on function invocation.
     typedef std::function<auto() -> string_view> supplier_t;
 
 public:
