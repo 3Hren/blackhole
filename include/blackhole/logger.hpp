@@ -41,7 +41,7 @@ class scoped_t;
 class logger_t {
 public:
     /// Message supplier callback, that should be called only when the logging event passes
-    /// filtering.
+    /// filtering to obtain the final formatted message.
     ///
     /// Sometimes obtaining a logging message requires heavyweight operation to be performed and
     /// there is no guarantee that the result of this operation won't be immediately dropped because
