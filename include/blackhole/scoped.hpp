@@ -10,7 +10,7 @@ namespace blackhole {
 
 class logger_t;
 
-/// Represents scoped attributes guard.
+/// Represents scoped attributes guard interface.
 ///
 /// Scoped attributes is the mechanism allowing to attach thread-local attributes to any logger
 /// implementation until associated instance of this guard lives on the stack.
@@ -22,22 +22,16 @@ class logger_t;
 /// \warning explicit moving instances of this class will probably invoke an undefined behavior,
 ///     because it can violate construction/destruction order, which is strict.
 class scoped_t {
-    // TODO: Experiment with reference wrappers?
     boost::thread_specific_ptr<scoped_t>* context;
     scoped_t* prev;
 
 public:
+    /// Constructs a scoped attributes guard which will be associated with the specified logger.
     explicit scoped_t(logger_t& logger);
 
-    /// Copying scoped guards is deliberately prohibited.
+    /// Both copy and move construction are deliberately prohibited.
     scoped_t(const scoped_t& other) = delete;
-
-    /// Move constructor is left default for enabling copy elision for factory initialization,
-    /// it never takes place in fact.
-    ///
-    /// \warning you should never move scoped guard instances manually, otherwise the behavior
-    ///     is undefined.
-    scoped_t(scoped_t&& other) = default;
+    scoped_t(scoped_t&& other) = delete;
 
     /// Destroys the current scoped guard with popping early attached attributes from the scoped
     /// attributes stack.
