@@ -1,7 +1,5 @@
 #include "mocks/logger.hpp"
 
-#include <blackhole/detail/unimplemented.hpp>
-
 namespace blackhole {
 namespace testing {
 namespace mock {
