@@ -3,9 +3,6 @@
 namespace blackhole {
 namespace scoped {
 
-// TODO: Clean?
-using attribute::view_t;
-
 namespace {
 
 // TODO: Move somewhere near `view_of`.
