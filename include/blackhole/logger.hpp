@@ -11,6 +11,8 @@ namespace boost {
 
 namespace blackhole {
 
+class scoped_t;
+
 /// Represents the common logging interface in the library.
 ///
 /// # Severity
@@ -53,55 +55,6 @@ public:
     /// to outlive the function call. Default implementation in the facade just allocates large
     /// buffer on stack and fills it on function invocation.
     typedef std::function<auto() -> string_view> supplier_t;
-
-    /// Represents scoped attributes guard.
-    ///
-    /// Scoped attributes is the mechanism allowing to attach thread-local attributes to any logger
-    /// implementation until associated instance of this guard lives on the stack.
-    ///
-    /// Internally scoped attributes are organized in a thread-local linked list ordering by least
-    /// living to most ones. This means, that the least attached attributes have more priority, but
-    /// they don't override each other, i.e duplicates are allowed.
-    ///
-    /// \warning explicit moving instances of this class will probably invoke an undefined behavior,
-    ///     because it can violate construction/destruction order, which is strict.
-    class scoped_t {
-        boost::thread_specific_ptr<scoped_t>* context;
-        scoped_t* prev;
-
-    public:
-        explicit scoped_t(logger_t& logger);
-
-        /// Copying scoped guards is deliberately prohibited.
-        scoped_t(const scoped_t& other) = delete;
-
-        /// Move constructor is left default for enabling copy elision for factory initialization,
-        /// it never takes place in fact.
-        ///
-        /// \warning you should never move scoped guard instances manually, otherwise the behavior
-        ///     is undefined.
-        scoped_t(scoped_t&& other) = default;
-
-        /// Destroys the current scoped guard with popping early attached attributes from the scoped
-        /// attributes stack.
-        ///
-        /// \warning scoped guards **must** be destroyed in reversed order they were created,
-        ///     otherwise the behavior is undefined.
-        virtual ~scoped_t();
-
-        /// Both copy and move assignment are deliberately prohibited.
-        auto operator=(const scoped_t& other) -> scoped_t& = delete;
-        auto operator=(scoped_t&& other) -> scoped_t& = delete;
-
-        /// Recursively collects all scoped attributes into the given attributes pack.
-        auto collect(attribute_pack* pack) const -> void;
-
-        /// Recursively rebind all scoped attributes with the new logger context.
-        auto rebind(boost::thread_specific_ptr<scoped_t>* context) -> void;
-
-        /// Returns an immutable reference to the internal attribute list.
-        virtual auto attributes() const -> const attribute_list& = 0;
-    };
 
 public:
     virtual ~logger_t() = 0;

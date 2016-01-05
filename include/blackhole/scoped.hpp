@@ -1,8 +1,14 @@
 #pragma once
 
-#include "blackhole/logger.hpp"
+#include "blackhole/attributes.hpp"
+
+namespace boost {
+    template<typename> class thread_specific_ptr;
+}  // namespace boost
 
 namespace blackhole {
+
+class logger_t;
 
 /// Represents scoped attributes guard.
 ///
@@ -13,39 +19,45 @@ namespace blackhole {
 /// living to most ones. This means, that the least attached attributes have more priority, but
 /// they don't override each other, i.e duplicates are allowed.
 ///
-/// Blackhole doesn't allow to create this object manually. Instead it can be obtained from any
-/// logger implementation by calling `scoped(...)` method providing attributes list you want to
-/// attach.
-///
 /// \warning explicit moving instances of this class will probably invoke an undefined behavior,
 ///     because it can violate construction/destruction order, which is strict.
-///     However I can't just delete move constructor, because there won't be any way to return
-///     objects from factory methods and that's the way they are created.
-class scoped_t : public logger_t::scoped_t {
-    attributes_t storage;
-    attribute_list list;
+class scoped_t {
+    // TODO: Experiment with reference wrappers?
+    boost::thread_specific_ptr<scoped_t>* context;
+    scoped_t* prev;
 
 public:
-    /// Constructs a scoped guard which will attach the given attributes to the specified logger on
-    /// construction making every further log event to contain them until keeped alive.
-    ///
-    /// Creating multiple scoped guards results in attributes stacking.
-    scoped_t(logger_t& logger, attributes_t attributes);
+    explicit scoped_t(logger_t& logger);
 
     /// Copying scoped guards is deliberately prohibited.
     scoped_t(const scoped_t& other) = delete;
 
-    /// Move constructor is left default for enabling copy elision. It never takes place in fact.
+    /// Move constructor is left default for enabling copy elision for factory initialization,
+    /// it never takes place in fact.
     ///
-    /// \warning you should never move scoped guard instances manually, otherwise the behavior is
-    ///     undefined.
+    /// \warning you should never move scoped guard instances manually, otherwise the behavior
+    ///     is undefined.
     scoped_t(scoped_t&& other) = default;
 
-    /// Assignment is deliberately prohibited.
+    /// Destroys the current scoped guard with popping early attached attributes from the scoped
+    /// attributes stack.
+    ///
+    /// \warning scoped guards **must** be destroyed in reversed order they were created,
+    ///     otherwise the behavior is undefined.
+    virtual ~scoped_t();
+
+    /// Both copy and move assignment are deliberately prohibited.
     auto operator=(const scoped_t& other) -> scoped_t& = delete;
     auto operator=(scoped_t&& other) -> scoped_t& = delete;
 
-    auto attributes() const -> const attribute_list&;
+    /// Recursively collects all scoped attributes into the given attributes pack.
+    auto collect(attribute_pack* pack) const -> void;
+
+    /// Recursively rebind all scoped attributes with the new logger context.
+    auto rebind(boost::thread_specific_ptr<scoped_t>* context) -> void;
+
+    /// Returns an immutable reference to the internal attribute list.
+    virtual auto attributes() const -> const attribute_list& = 0;
 };
 
 }  // namespace blackhole

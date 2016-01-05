@@ -4,6 +4,7 @@
 #include <boost/thread/tss.hpp>
 
 #include <blackhole/logger.hpp>
+#include <blackhole/scoped/keeper.hpp>
 #include <blackhole/wrapper.hpp>
 
 #include <blackhole/extensions/facade.hpp>
@@ -36,7 +37,7 @@ TEST(Wrapper, Constructor) {
 
 TEST(wrapper_t, DelegatesScoped) {
     // NOTE: This hack is required to test scoped attributes mechanics.
-    boost::thread_specific_ptr<logger_t::scoped_t> context([](logger_t::scoped_t*) {});
+    boost::thread_specific_ptr<scoped_t> context([](scoped_t*) {});
 
     mock::logger_t logger;
     wrapper_t wrapper(logger, {});
@@ -46,7 +47,7 @@ TEST(wrapper_t, DelegatesScoped) {
         .Times(1)
         .WillOnce(Return(&context));
 
-    const scoped_t scoped(wrapper, {});
+    const scoped::keeper_t scoped(wrapper, {});
 }
 
 }  // namespace testing
