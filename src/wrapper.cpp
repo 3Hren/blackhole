@@ -34,9 +34,8 @@ wrapper_t::log(int severity, string_view pattern, attribute_pack& pack, const su
     inner.log(severity, pattern, pack, supplier);
 }
 
-auto
-wrapper_t::scoped(attributes_t attributes) -> scoped_t {
-    return inner.scoped(std::move(attributes));
+auto wrapper_t::context() -> boost::thread_specific_ptr<scoped_t>* {
+    return inner.context();
 }
 
 }  // namespace blackhole

@@ -180,9 +180,8 @@ root_logger_t::consume(int severity, const string_view& pattern, attribute_pack&
     }
 }
 
-auto
-root_logger_t::scoped(attributes_t attributes) -> scoped_t {
-    return scoped_t(&sync->context, std::move(attributes));
+auto root_logger_t::context() -> boost::thread_specific_ptr<scoped_t>* {
+    return &sync->context;
 }
 
 }  // namespace blackhole

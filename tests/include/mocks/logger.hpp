@@ -18,9 +18,7 @@ public:
     MOCK_METHOD2(log, void(int, string_view));
     MOCK_METHOD3(log, void(int, string_view, attribute_pack&));
     MOCK_METHOD4(log, void(int, string_view, attribute_pack&, const supplier_t&));
-
-    MOCK_METHOD1(_scoped, std::function<scoped_t()>(attributes_t));
-    auto scoped(attributes_t attributes) -> scoped_t;
+    MOCK_METHOD0(context, boost::thread_specific_ptr<scoped_t>*());
 };
 
 }  // namespace mock

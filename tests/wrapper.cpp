@@ -36,19 +36,17 @@ TEST(Wrapper, Constructor) {
 
 TEST(wrapper_t, DelegatesScoped) {
     // NOTE: This hack is required to test scoped attributes mechanics.
-    boost::thread_specific_ptr<scoped_t> context([](scoped_t*) {});
+    boost::thread_specific_ptr<logger_t::scoped_t> context([](logger_t::scoped_t*) {});
 
     mock::logger_t logger;
     wrapper_t wrapper(logger, {});
 
     // TODO: Implement operator== for attribute. Refactor all tests to check.
-    EXPECT_CALL(logger, _scoped(_))
+    EXPECT_CALL(logger, context())
         .Times(1)
-        .WillOnce(Return([&]() -> scoped_t {
-            return scoped_t(&context, {});
-        }));
+        .WillOnce(Return(&context));
 
-    wrapper.scoped({});
+    const scoped_t scoped(wrapper, {});
 }
 
 }  // namespace testing

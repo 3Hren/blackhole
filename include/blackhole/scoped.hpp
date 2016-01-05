@@ -1,10 +1,6 @@
 #pragma once
 
-#include "blackhole/attributes.hpp"
-
-namespace boost {
-    template<typename> class thread_specific_ptr;
-}  // namespace boost
+#include "blackhole/logger.hpp"
 
 namespace blackhole {
 
@@ -25,16 +21,16 @@ namespace blackhole {
 ///     because it can violate construction/destruction order, which is strict.
 ///     However I can't just delete move constructor, because there won't be any way to return
 ///     objects from factory methods and that's the way they are created.
-class scoped_t {
-    scoped_t* prev;
-    boost::thread_specific_ptr<scoped_t>* context;
-
-protected:
+class scoped_t : public logger_t::scoped_t {
     attributes_t storage;
-    attribute_list attributes;
+    attribute_list list;
 
 public:
-    scoped_t(boost::thread_specific_ptr<scoped_t>* context, attributes_t attributes);
+    /// Constructs a scoped guard which will attach the given attributes to the specified logger on
+    /// construction making every further log event to contain them until keeped alive.
+    ///
+    /// Creating multiple scoped guards results in attributes stacking.
+    scoped_t(logger_t& logger, attributes_t attributes);
 
     /// Copying scoped guards is deliberately prohibited.
     scoped_t(const scoped_t& other) = delete;
@@ -45,22 +41,11 @@ public:
     ///     undefined.
     scoped_t(scoped_t&& other) = default;
 
-    /// Destroys the current scoped guard with popping early attached attributes from the scoped
-    /// attributes stack.
-    ///
-    /// \warning scoped guards **must** be destroyed in reversed order they were created, otherwise
-    ///     the behavior is undefined.
-    ~scoped_t();
-
     /// Assignment is deliberately prohibited.
     auto operator=(const scoped_t& other) -> scoped_t& = delete;
     auto operator=(scoped_t&& other) -> scoped_t& = delete;
 
-    /// Recursively collects all scoped attributes into the given attributes pack.
-    auto collect(attribute_pack* pack) const -> void;
-
-    /// Recursively rebind all scoped attributes with the new logger context.
-    auto rebind(boost::thread_specific_ptr<scoped_t>* context) -> void;
+    auto attributes() const -> const attribute_list&;
 };
 
 }  // namespace blackhole

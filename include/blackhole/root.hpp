@@ -60,7 +60,7 @@ public:
     auto log(int severity, string_view pattern, attribute_pack& pack) -> void;
     auto log(int severity, string_view pattern, attribute_pack& pack, const supplier_t& supplier) -> void;
 
-    auto scoped(attributes_t attributes) -> scoped_t;
+    auto context() -> boost::thread_specific_ptr<scoped_t>*;
 
 private:
     template<typename F>
