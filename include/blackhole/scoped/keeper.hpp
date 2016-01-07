@@ -8,7 +8,8 @@
 namespace blackhole {
 namespace scoped {
 
-/// Implementation of scoped attributes guard that keeps attributes provided on construction.
+/// Implementation of scoped attributes guard that keeps attributes provided on construction and
+/// provides them each time on demand.
 class keeper_t : public scoped_t {
     attributes_t storage;
     attribute_list list;
