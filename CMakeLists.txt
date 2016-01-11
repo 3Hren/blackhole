@@ -229,6 +229,9 @@ if (ENABLE_BENCHMARKING)
 
 	prepare_google_benchmarking()
 
+	include_directories(
+		${PROJECT_SOURCE_DIR}/bench)
+
 	add_executable(${LIBRARY_NAME}-benchmarks
 		bench/attribute
 		bench/clock

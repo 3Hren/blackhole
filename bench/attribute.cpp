@@ -2,11 +2,12 @@
 
 #include <blackhole/attribute.hpp>
 
+#include "mod.hpp"
+
 namespace blackhole {
 namespace benchmark {
-namespace {
 
-void view_ctor_int64(::benchmark::State& state) {
+static void view_ctor_get_int64(::benchmark::State& state) {
     while (state.KeepRunning()) {
         blackhole::attribute::view_t v(42);
         blackhole::attribute::get<std::int64_t>(v);
@@ -15,8 +16,7 @@ void view_ctor_int64(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-BENCHMARK(view_ctor_int64);
+NBENCHMARK("attribute.view_t[ctor + get<i64>]", view_ctor_get_int64);
 
-}  // namespace
 }  // namespace benchmark
 }  // namespace blackhole

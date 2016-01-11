@@ -6,6 +6,8 @@
 #   include <sys/time.h>
 #endif
 
+#include "mod.hpp"
+
 namespace blackhole {
 namespace benchmark {
 
@@ -54,12 +56,12 @@ high_resolution_clock(::benchmark::State& state) {
 }
 
 #ifdef __linux__
-BENCHMARK(monotonic_coarse);
-BENCHMARK(monotonic_precise);
+NBENCHMARK("clock.coarse", monotonic_coarse);
+NBENCHMARK("clock.precise", monotonic_precise);
 #endif
 
-BENCHMARK(system_clock);
-BENCHMARK(high_resolution_clock);
+NBENCHMARK("clock.system", system_clock);
+NBENCHMARK("clock.high_resolution", high_resolution_clock);
 
 }  // namespace benchmark
 }  // namespace blackhole

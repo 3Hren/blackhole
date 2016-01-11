@@ -5,6 +5,8 @@
 #include <blackhole/extensions/format.hpp>
 #include <blackhole/extensions/metaformat.hpp>
 
+#include "mod.hpp"
+
 namespace blackhole {
 namespace benchmark {
 
@@ -23,7 +25,7 @@ cpp14formatter(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-BENCHMARK(cpp14formatter);
+NBENCHMARK("c++14::fmt", cpp14formatter);
 
 }  // namespace benchmark
 }  // namespace blackhole

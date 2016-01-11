@@ -7,6 +7,8 @@
 #include <blackhole/formatter/json.hpp>
 #include <blackhole/record.hpp>
 
+#include "mod.hpp"
+
 namespace blackhole {
 namespace benchmark {
 
@@ -44,7 +46,7 @@ static void format_json_message_routed(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-static void format_json_1(::benchmark::State& state) {
+static void format_json_message_routed_attr(::benchmark::State& state) {
     auto formatter = json_t::builder_t()
         .route("/fields", {"endpoint"})
         .build();
@@ -62,9 +64,9 @@ static void format_json_1(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-BENCHMARK(format_json);
-BENCHMARK(format_json_message_routed);
-BENCHMARK(format_json_1);
+NBENCHMARK("formatter.json", format_json);
+NBENCHMARK("formatter.json[route]", format_json_message_routed);
+NBENCHMARK("formatter.json[route + attr: 1]", format_json_message_routed_attr);
 
 }  // namespace benchmark
 }  // namespace blackhole

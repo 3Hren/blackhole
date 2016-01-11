@@ -2,6 +2,8 @@
 
 #include <pthread.h>
 
+#include "mod.hpp"
+
 namespace blackhole {
 namespace benchmark {
 namespace {
@@ -16,7 +18,7 @@ void thread_name(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-BENCHMARK(thread_name);
+NBENCHMARK("thread.name", thread_name);
 
 }  // namespace
 }  // namespace benchmark

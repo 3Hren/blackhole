@@ -10,6 +10,8 @@
 #include <blackhole/root.hpp>
 #include <blackhole/wrapper.hpp>
 
+#include "mod.hpp"
+
 namespace blackhole {
 namespace benchmark {
 
@@ -187,7 +189,13 @@ literal_with_args_and_attributes_and_two_wrappers(::benchmark::State& state) {
 
     while (state.KeepRunning()) {
         logger.log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
-            "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326);
+            "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326,
+            attribute_list{
+                {"key#4", {42}},
+                {"key#5", {3.1415}},
+                {"key#6", {"value"}}
+            }
+        );
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -229,33 +237,34 @@ literal_with_args_and_attributes_and_three_wrappers(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-BENCHMARK(literal);
-BENCHMARK(literal_reject);
-BENCHMARK(string);
-BENCHMARK(literal_with_arg);
-BENCHMARK(literal_with_args);
+NBENCHMARK("log.string", string);
+
+NBENCHMARK("log.lit", literal);
+NBENCHMARK("log.lit[reject]", literal_reject);
+NBENCHMARK("log.lit[args: 1]", literal_with_arg);
+NBENCHMARK("log.lit[args: 6]", literal_with_args);
 
 #if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
-BENCHMARK(literal_with_args_using_cpp14_formatter);
+NBENCHMARK("log.lit[args: 6 + c++14::fmt]", literal_with_args_using_cpp14_formatter);
 #endif
 
-BENCHMARK(literal_with_attributes);
-BENCHMARK(literal_with_args_and_attributes);
+NBENCHMARK("log.lit[args: 0 + attr: 3]", literal_with_attributes);
+NBENCHMARK("log.lit[args: 6 + attr: 3]", literal_with_args_and_attributes);
 
-BENCHMARK(literal_with_args_and_attributes_and_wrapper);
-BENCHMARK(literal_with_args_and_attributes_and_two_wrappers);
-BENCHMARK(literal_with_args_and_attributes_and_three_wrappers);
+NBENCHMARK("log.lit[args: 6 + attr: 3 + wrap: 1 * 2]", literal_with_args_and_attributes_and_wrapper);
+NBENCHMARK("log.lit[args: 6 + attr: 3 + wrap: 2 * 2]", literal_with_args_and_attributes_and_two_wrappers);
+NBENCHMARK("log.lit[args: 6 + attr: 3 + wrap: 3 * 2]", literal_with_args_and_attributes_and_three_wrappers);
 
-class threaded_fixture_t: public ::benchmark::Fixture {
+class threaded_t: public ::benchmark::Fixture {
 protected:
     root_logger_t root;
     logger_facade<root_logger_t> logger;
 
 public:
-    threaded_fixture_t(): root({}), logger(root) {}
+    threaded_t(): root({}), logger(root) {}
 };
 
-BENCHMARK_DEFINE_F(threaded_fixture_t, facade)(::benchmark::State& state) {
+BENCHMARK_DEFINE_F(threaded_t, facade)(::benchmark::State& state) {
    while (state.KeepRunning()) {
        logger.log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
            "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326,
@@ -270,7 +279,7 @@ BENCHMARK_DEFINE_F(threaded_fixture_t, facade)(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-BENCHMARK_REGISTER_F(threaded_fixture_t, facade)
+BENCHMARK_REGISTER_F(threaded_t, facade)
     ->ThreadRange(1, 2 * std::thread::hardware_concurrency());
 
 }  // namespace benchmark

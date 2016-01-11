@@ -6,6 +6,8 @@
 
 #include <blackhole/detail/datetime.hpp>
 
+#include "mod.hpp"
+
 namespace blackhole {
 namespace benchmark {
 
@@ -69,7 +71,7 @@ static void datetime_wheel_with_locale(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-static void datetime_wheel_real_world(::benchmark::State& state) {
+static void datetime_wheel_microseconds(::benchmark::State& state) {
     blackhole::detail::datetime::generator_t generator(
         blackhole::detail::datetime::make_generator("%Y-%m-%d %H:%M:%S.%f")
     );
@@ -110,7 +112,7 @@ inline void fill(Writer& wr, int value) {
 }  // namespace
 
 static void datetime_pure_real_world(::benchmark::State& state) {
-    // blackhole::detail::datetime::make_generator("%Y-%m-%d %H:%M:%S.%f")
+    // The same as blackhole::detail::datetime::make_generator("%Y-%m-%d %H:%M:%S.%f").
 
     std::time_t time = std::time(0);
     std::tm tm;
@@ -136,12 +138,12 @@ static void datetime_pure_real_world(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-BENCHMARK(datetime_pure_real_world);
-BENCHMARK(datetime_strftime);
-BENCHMARK(datetime_strftime_with_locale);
-BENCHMARK(datetime_wheel);
-BENCHMARK(datetime_wheel_with_locale);
-BENCHMARK(datetime_wheel_real_world);
+NBENCHMARK("datetime.manual[real]", datetime_pure_real_world);
+NBENCHMARK("datetime.strftime", datetime_strftime);
+NBENCHMARK("datetime.strftime[locale]", datetime_strftime_with_locale);
+NBENCHMARK("datetime.blackhole", datetime_wheel);
+NBENCHMARK("datetime.blackhole[locale]", datetime_wheel_with_locale);
+NBENCHMARK("datetime.blackhole[with microseconds]", datetime_wheel_microseconds);
 
 }  // namespace benchmark
 }  // namespace blackhole

@@ -7,12 +7,12 @@
 #include <blackhole/formatter/string.hpp>
 #include <blackhole/record.hpp>
 
+#include "mod.hpp"
+
 namespace blackhole {
 namespace benchmark {
 
-static
-void
-format_literal(::benchmark::State& state) {
+static void format_literal(::benchmark::State& state) {
     formatter::string_t formatter("message: value");
 
     const string_view message("-");
@@ -27,9 +27,7 @@ format_literal(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-static
-void
-format_pid(::benchmark::State& state) {
+static void format_pid(::benchmark::State& state) {
     formatter::string_t formatter("{process}");
 
     const string_view message("-");
@@ -44,9 +42,7 @@ format_pid(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-static
-void
-format_procname(::benchmark::State& state) {
+static void format_procname(::benchmark::State& state) {
     formatter::string_t formatter("{process:s}");
 
     const string_view message("-");
@@ -61,9 +57,7 @@ format_procname(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-static
-void
-format_tid(::benchmark::State& state) {
+static void format_tid(::benchmark::State& state) {
     formatter::string_t formatter("{thread}");
 
     const string_view message("-");
@@ -78,9 +72,7 @@ format_tid(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-static
-void
-format_message(::benchmark::State& state) {
+static void format_message(::benchmark::State& state) {
     formatter::string_t formatter("message: {message}");
 
     const string_view message("value");
@@ -95,9 +87,7 @@ format_message(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-static
-void
-format_timestamp(::benchmark::State& state) {
+static void format_timestamp(::benchmark::State& state) {
     formatter::string_t formatter("{timestamp}");
 
     const string_view message("-");
@@ -113,9 +103,7 @@ format_timestamp(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-static
-void
-format_leftover(::benchmark::State& state) {
+static void format_leftover(::benchmark::State& state) {
     formatter::string_t formatter("{...}", {
         {"...", formatter::option::leftover_t{false, "[", "]", "{k}={v}", ", "}}
     });
@@ -133,9 +121,7 @@ format_leftover(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-static
-void
-format_severity_message(::benchmark::State& state) {
+static void format_severity_message(::benchmark::State& state) {
     formatter::string_t formatter("{severity:d}: {message}");
 
     const string_view message("value");
@@ -150,14 +136,14 @@ format_severity_message(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-BENCHMARK(format_literal);
-BENCHMARK(format_pid);
-BENCHMARK(format_procname);
-BENCHMARK(format_tid);
-BENCHMARK(format_message);
-BENCHMARK(format_timestamp);
-BENCHMARK(format_leftover);
-BENCHMARK(format_severity_message);
+NBENCHMARK("formatter.string[lit]", format_literal);
+NBENCHMARK("formatter.string[pid]", format_pid);
+NBENCHMARK("formatter.string[tid]", format_tid);
+NBENCHMARK("formatter.string[procname]", format_procname);
+NBENCHMARK("formatter.string[message]", format_message);
+NBENCHMARK("formatter.string[timestamp]", format_timestamp);
+NBENCHMARK("formatter.string[severity + message]", format_severity_message);
+NBENCHMARK("formatter.string[...]", format_leftover);
 
 }  // namespace benchmark
 }  // namespace blackhole
