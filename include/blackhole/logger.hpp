@@ -33,7 +33,7 @@ struct lazy_message_t {
 
 /// Represents the common logging interface in the library.
 ///
-// TODO: Brief introduction why interface is so, when each method is used and when and how it
+// TODO: Brief introduction why interface is so, when each method is used and when and how they
 //     should be implemented.
 /// The library introduces severity levels as an integer number which real meaning depends on the
 /// context of your application.
