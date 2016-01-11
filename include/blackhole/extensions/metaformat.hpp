@@ -9,6 +9,8 @@
 
 using blackhole::cpp17::string_view;
 
+#if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
+
 constexpr
 std::size_t
 parse_argument(const string_view& string, std::size_t& pos) {
@@ -259,3 +261,5 @@ public:
 
 }  // namespace v1
 }  // namespace blackhole
+
+#endif
