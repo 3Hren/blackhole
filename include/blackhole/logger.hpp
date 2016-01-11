@@ -61,14 +61,14 @@ public:
     virtual ~logger_t() = 0;
 
     /// Logs the given message with the specified severity level.
-    virtual auto log(int severity, string_view pattern) -> void = 0;
+    virtual auto log(int severity, const string_view& message) -> void = 0;
 
     /// Logs the given message with the specified severity level and attributes pack attached.
-    virtual auto log(int severity, string_view pattern, attribute_pack& pack) -> void = 0;
+    virtual auto log(int severity, const string_view& message, attribute_pack& pack) -> void = 0;
 
     /// Logs the given message with the specified severity level, attributes pack attached and with
     /// special message supplier callback.
-    virtual auto log(int severity, string_view pattern, attribute_pack& pack, const supplier_t& supplier) -> void = 0;
+    virtual auto log(int severity, const string_view& message, attribute_pack& pack, const supplier_t& supplier) -> void = 0;
 
     /// Attaches the given attributes to the logger, making every further log event to contain them
     /// until returned scoped guard keeped alive.

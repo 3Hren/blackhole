@@ -135,25 +135,21 @@ struct null_supplier_t {
 
 }  // namespace
 
-auto
-root_logger_t::log(int severity, string_view pattern) -> void {
+auto root_logger_t::log(int severity, const string_view& message) -> void {
     attribute_pack pack;
-    log(severity, pattern, pack);
+    log(severity, message, pack);
 }
 
-auto
-root_logger_t::log(int severity, string_view pattern, attribute_pack& pack) -> void {
-    consume(severity, pattern, pack, null_supplier_t());
+auto root_logger_t::log(int severity, const string_view& message, attribute_pack& pack) -> void {
+    consume(severity, message, pack, null_supplier_t());
 }
 
-auto
-root_logger_t::log(int severity, string_view pattern, attribute_pack& pack, const supplier_t& supplier) -> void {
+auto root_logger_t::log(int severity, const string_view& pattern, attribute_pack& pack, const supplier_t& supplier) -> void {
     consume(severity, pattern, pack, supplier);
 }
 
 template<typename F>
-auto
-root_logger_t::consume(int severity, const string_view& pattern, attribute_pack& pack, const F& supplier) -> void {
+auto root_logger_t::consume(int severity, const string_view& pattern, attribute_pack& pack, const F& supplier) -> void {
     const auto inner = sync->load(this->inner);
     const auto filter = inner->apply([&](inner_t& inner) -> filter_t {
         return inner.filter;

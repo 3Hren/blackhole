@@ -59,9 +59,9 @@ public:
     /// \warning the function must be thread-safe.
     auto filter(filter_t fn) -> void;
 
-    auto log(int severity, string_view pattern) -> void;
-    auto log(int severity, string_view pattern, attribute_pack& pack) -> void;
-    auto log(int severity, string_view pattern, attribute_pack& pack, const supplier_t& supplier) -> void;
+    auto log(int severity, const string_view& message) -> void;
+    auto log(int severity, const string_view& message, attribute_pack& pack) -> void;
+    auto log(int severity, const string_view& pattern, attribute_pack& pack, const supplier_t& supplier) -> void;
 
     auto context() -> boost::thread_specific_ptr<scoped_t>*;
 
