@@ -21,19 +21,10 @@ struct lazy_message_t {
 
 /// Represents the common logging interface in the library.
 ///
-/// # Severity
-///
+// TODO: Brief introduction why interface is so, when each method is used and when and how it
+//     should be implemented.
 /// The library introduces severity levels as an integer number which real meaning depends on the
-/// context of your application. Usually there are about 4-5 severity levels and it's important to
-/// understand that every logging event contains an information with some severity level and the
-/// reaction time for that event differs.
-/// For example:
-/// - Debug: "parsing HTTP request"
-/// - Debug: "accepted new TCP connection"
-/// - Info : "service Elasticsearch has been exposed on 9200 port"
-/// - Warn : "unable to enqueue event with no name"
-/// - Error: "unable to process proxy request: proxy is down"
-/// - Fatal: "unable to load the MQ module: permission denied"
+/// context of your application.
 ///
 /// # Construction
 ///
