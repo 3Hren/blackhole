@@ -24,6 +24,7 @@ auto operator==(const std::reference_wrapper<T>& lhs, const std::reference_wrapp
 namespace blackhole {
 namespace testing {
 
+using ::testing::An;
 using ::testing::Invoke;
 using ::testing::WithArg;
 using ::testing::_;
@@ -62,39 +63,41 @@ TEST(Facade, AttributeLog) {
     });
 }
 
-// TEST(Facade, FormattedLog) {
-//     logger_type inner;
-//     logger_facade<logger_type> logger(inner);
-//
-//     attribute_pack expected;
-//     writer_t writer;
-//
-//     EXPECT_CALL(inner, log(0, string_view("GET /porn.png HTTP/1.0 - {}"), expected, _))
-//         .Times(1)
-//         .WillOnce(WithArg<3>(Invoke([](logger_type::supplier_t fn) {
-//             EXPECT_EQ("GET /porn.png HTTP/1.0 - 42", fn().to_string());
-//         })));
-//
-//     logger.log(0, "GET /porn.png HTTP/1.0 - {}", 42);
-// }
-//
-// TEST(Facade, FormattedAttributeLog) {
-//     logger_type inner;
-//     logger_facade<logger_type> logger(inner);
-//
-//     const attribute_list attributes{{"key#1", {42}}};
-//     attribute_pack expected{attributes};
-//
-//     EXPECT_CALL(inner, log(0, string_view("GET /porn.png HTTP/1.0 - {}"), expected, _))
-//         .Times(1)
-//         .WillOnce(WithArg<3>(Invoke([](logger_type::supplier_t fn) {
-//             EXPECT_EQ("GET /porn.png HTTP/1.0 - 2345", fn().to_string());
-//         })));
-//
-//     logger.log(0, "GET /porn.png HTTP/1.0 - {}", 2345, attribute_list{
-//         {"key#1", {42}}
-//     });
-// }
+TEST(Facade, FormattedLog) {
+    logger_type inner;
+    logger_facade<logger_type> logger(inner);
+
+    attribute_pack expected;
+    writer_t writer;
+
+    EXPECT_CALL(inner, log(0, An<const lazy_message_t&>(), expected))
+        .Times(1)
+        .WillOnce(WithArg<1>(Invoke([](const lazy_message_t& message) {
+            EXPECT_EQ("GET /porn.png HTTP/1.0 - {}", message.pattern.to_string());
+            EXPECT_EQ("GET /porn.png HTTP/1.0 - 42", message.supplier().to_string());
+        })));
+
+    logger.log(0, "GET /porn.png HTTP/1.0 - {}", 42);
+}
+
+TEST(Facade, FormattedAttributeLog) {
+    logger_type inner;
+    logger_facade<logger_type> logger(inner);
+
+    const attribute_list attributes{{"key#1", {42}}};
+    attribute_pack expected{attributes};
+
+    EXPECT_CALL(inner, log(0, An<const lazy_message_t&>(), expected))
+        .Times(1)
+        .WillOnce(WithArg<1>(Invoke([](const lazy_message_t& message) {
+            EXPECT_EQ("GET /porn.png HTTP/1.0 - {}", message.pattern.to_string());
+            EXPECT_EQ("GET /porn.png HTTP/1.0 - 2345", message.supplier().to_string());
+        })));
+
+    logger.log(0, "GET /porn.png HTTP/1.0 - {}", 2345, attribute_list{
+        {"key#1", {42}}
+    });
+}
 
 }  // namespace testing
 }  // namespace blackhole

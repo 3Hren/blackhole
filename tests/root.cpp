@@ -194,39 +194,40 @@ TEST(RootLogger, LogWithAttributesInvokesDispatchingRecordToHandlers) {
     logger.log(0, "GET /porn.png HTTP/1.1", pack);
 }
 
-// TEST(RootLogger, LogWithAttributesAndFormatterInvokesDispatchingRecordToHandlers) {
-//     typedef view_of<attributes_t>::type attribute_list;
-//
-//     std::vector<std::unique_ptr<handler_t>> handlers;
-//     std::vector<mock::handler_t*> handlers_view;
-//
-//     for (int i = 0; i < 4; ++i) {
-//         std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
-//         handlers_view.push_back(handler.get());
-//         handlers.push_back(std::move(handler));
-//     }
-//
-//     for (auto handler : handlers_view) {
-//         EXPECT_CALL(*handler, execute(_))
-//             .Times(1)
-//             .WillOnce(Invoke([&](const record_t& record) {
-//                 EXPECT_EQ("GET /porn.png HTTP/1.1 - {}/{}", record.message().to_string());
-//                 EXPECT_EQ("GET /porn.png HTTP/1.1 - 42/2345", record.formatted().to_string());
-//                 EXPECT_EQ(0, record.severity());
-//                 ASSERT_EQ(1, record.attributes().size());
-//                 EXPECT_EQ((attribute_list{{"key#1", {42}}}), record.attributes().at(0).get());
-//             }));
-//     }
-//
-//     root_logger_t logger(std::move(handlers));
-//
-//     attribute_list attributes{{"key#1", {42}}};
-//     attribute_pack pack{attributes};
-//
-//     logger.log(0, "GET /porn.png HTTP/1.1 - {}/{}", pack, []() -> string_view {
-//         return {"GET /porn.png HTTP/1.1 - 42/2345"};
-//     });
-// }
+TEST(RootLogger, LogWithAttributesAndFormatterInvokesDispatchingRecordToHandlers) {
+    typedef view_of<attributes_t>::type attribute_list;
+
+    std::vector<std::unique_ptr<handler_t>> handlers;
+    std::vector<mock::handler_t*> handlers_view;
+
+    for (int i = 0; i < 4; ++i) {
+        std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
+        handlers_view.push_back(handler.get());
+        handlers.push_back(std::move(handler));
+    }
+
+    for (auto handler : handlers_view) {
+        EXPECT_CALL(*handler, execute(_))
+            .Times(1)
+            .WillOnce(Invoke([&](const record_t& record) {
+                EXPECT_EQ("GET /porn.png HTTP/1.1 - {}/{}", record.message().to_string());
+                EXPECT_EQ("GET /porn.png HTTP/1.1 - 42/2345", record.formatted().to_string());
+                EXPECT_EQ(0, record.severity());
+                ASSERT_EQ(1, record.attributes().size());
+                EXPECT_EQ((attribute_list{{"key#1", {42}}}), record.attributes().at(0).get());
+            }));
+    }
+
+    root_logger_t logger(std::move(handlers));
+
+    attribute_list attributes{{"key#1", {42}}};
+    attribute_pack pack{attributes};
+
+    lazy_message_t message{{"GET /porn.png HTTP/1.1 - {}/{}"}, []() -> string_view {
+        return {"GET /porn.png HTTP/1.1 - 42/2345"};
+    }};
+    logger.log(0, message, pack);
+}
 
 TEST(RootLogger, AssignmentMovesFilter) {
     int passed = 0;
