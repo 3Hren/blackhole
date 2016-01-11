@@ -10,6 +10,7 @@
 #include "blackhole/config/option.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 namespace detail {
 namespace config {
 
@@ -177,4 +178,5 @@ private:
 
 }  // namespace config
 }  // namespace detail
+}  // namespace v1
 }  // namespace blackhole

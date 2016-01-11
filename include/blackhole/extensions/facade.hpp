@@ -9,6 +9,7 @@
 #include "blackhole/extensions/facade.inl.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 
 /// Logging facade wraps the underlying logger and provides convenient formatting methods.
 ///
@@ -157,4 +158,5 @@ logger_facade<Logger>::select(int severity, const string_view& pattern, const Ar
     detail::without_tail<detail::select_t, Args...>::type::apply(inner(), severity, pattern, args...);
 }
 
+}  // namespace blackhole
 }  // namespace blackhole

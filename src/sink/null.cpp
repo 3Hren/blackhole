@@ -4,6 +4,7 @@
 #include "blackhole/record.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 namespace sink {
 
 auto
@@ -26,4 +27,5 @@ factory<sink::null_t>::from(const config::node_t&) -> sink::null_t {
     return sink::null_t();
 }
 
+}  // namespace v1
 }  // namespace blackhole

@@ -5,6 +5,7 @@
 #include "blackhole/attribute.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 
 class wrapper_t : public logger_t {
     logger_t& inner;
@@ -28,4 +29,5 @@ public:
     auto context() -> boost::thread_specific_ptr<scoped_t>*;
 };
 
+}  // namespace v1
 }  // namespace blackhole

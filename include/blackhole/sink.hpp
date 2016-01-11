@@ -3,6 +3,7 @@
 #include <string>
 
 namespace blackhole {
+inline namespace v1 {
 namespace cpp17 {
 
 template<typename Char, typename Traits>
@@ -32,4 +33,5 @@ public:
     virtual auto execute(const record_t& record, const string_view& formatted) -> void = 0;
 };
 
+}  // namespace v1
 }  // namespace blackhole

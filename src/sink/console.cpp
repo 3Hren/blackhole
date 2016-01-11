@@ -8,6 +8,7 @@
 #include "blackhole/cpp17/string_view.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 namespace sink {
 
 #pragma clang diagnostic push
@@ -176,4 +177,5 @@ factory<sink::console_t>::from(const config::node_t&) -> sink::console_t {
     return {};
 }
 
+}  // namespace v1
 }  // namespace blackhole

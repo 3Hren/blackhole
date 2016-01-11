@@ -1,6 +1,7 @@
 #pragma once
 
 namespace blackhole {
+inline namespace v1 {
 
 class record_t;
 
@@ -17,4 +18,5 @@ public:
     virtual auto format(const record_t& record, writer_t& writer) -> void = 0;
 };
 
+}  // namespace v1
 }  // namespace blackhole

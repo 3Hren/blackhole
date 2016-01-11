@@ -8,6 +8,7 @@
 #include "blackhole/cpp17/string_view.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 
 using cpp17::string_view;
 
@@ -55,4 +56,5 @@ private:
     auto inner() const noexcept -> const inner_t&;
 };
 
+}  // namespace v1
 }  // namespace blackhole

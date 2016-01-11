@@ -7,6 +7,7 @@
 #include <vector>
 
 namespace blackhole {
+inline namespace v1 {
 
 template<typename>
 struct factory;
@@ -135,4 +136,5 @@ registry_t::builder(Args&&... args) const -> builder_t {
     return {*this, std::unique_ptr<config::factory<T>>(new config::factory<T>(std::forward<Args>(args)...))};
 }
 
+}  // namespace v1
 }  // namespace blackhole

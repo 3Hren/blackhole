@@ -5,6 +5,7 @@
 #include "blackhole/sink.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 namespace handler {
 
 auto
@@ -41,4 +42,5 @@ factory<handler::blocking_t>::from(const config::node_t&) -> handler::blocking_t
     return {};
 }
 
+}  // namespace v1
 }  // namespace blackhole

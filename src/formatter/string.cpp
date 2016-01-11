@@ -19,6 +19,7 @@
 #include "blackhole/detail/procname.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 namespace formatter {
 
 namespace string = blackhole::detail::formatter::string;
@@ -370,4 +371,5 @@ factory<formatter::string_t>::from(const config::node_t& config) -> formatter::s
     return formatter::string_t(std::move(pattern));
 }
 
+}  // namespace v1
 }  // namespace blackhole

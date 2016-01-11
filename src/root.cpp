@@ -14,6 +14,7 @@
 #include "blackhole/detail/spinlock.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 
 using detail::spinlock_t;
 
@@ -184,4 +185,5 @@ auto root_logger_t::context() -> boost::thread_specific_ptr<scoped_t>* {
     return &sync->context;
 }
 
+}  // namespace v1
 }  // namespace blackhole

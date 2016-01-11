@@ -21,6 +21,7 @@ parse_argument(const string_view& string, std::size_t& pos) {
 }
 
 namespace blackhole {
+inline namespace v1 {
 namespace detail {
 
 namespace cppformat = fmt;
@@ -88,6 +89,7 @@ literal_count(const string_view& format) {
 }
 
 }  // namespace detail
+}  // namespace v1
 }  // namespace blackhole
 
 struct literal_t {
@@ -152,6 +154,7 @@ next_literal(const string_view& string) {
 }
 
 namespace blackhole {
+inline namespace v1 {
 namespace detail {
 
 template<class T>
@@ -254,4 +257,5 @@ public:
 //     return formatter;
 // }
 
+}  // namespace v1
 }  // namespace blackhole

@@ -5,21 +5,26 @@
 #include "blackhole/sink.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 
 template<typename>
 struct factory;
 
+}  // namespace v1
 }  // namespace blackhole
 
 namespace blackhole {
+inline namespace v1 {
 namespace config {
 
 class node_t;
 
 }  // namespace config
+}  // namespace v1
 }  // namespace blackhole
 
 namespace blackhole {
+inline namespace v1 {
 namespace sink {
 
 /// Terminal color manipulator.
@@ -161,4 +166,5 @@ struct factory<sink::console_t> {
     static auto from(const config::node_t& config) -> sink::console_t;
 };
 
+}  // namespace v1
 }  // namespace blackhole

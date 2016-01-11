@@ -10,6 +10,7 @@
 #include "blackhole/detail/sink/file.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 namespace sink {
 
 class file_t::properties_t {
@@ -87,4 +88,5 @@ auto factory<sink::file_t>::from(const config::node_t& config) -> sink::file_t {
     return sink::file_t(std::move(filename.get()));
 }
 
+}  // namespace v1
 }  // namespace blackhole

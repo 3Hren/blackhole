@@ -6,6 +6,7 @@
 #include "blackhole/cpp17/string_view.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 namespace sink {
 namespace socket {
 
@@ -65,4 +66,5 @@ auto factory<sink::socket::udp_t>::type() -> const char* {
     return "udp";
 }
 
+}  // namespace v1
 }  // namespace blackhole

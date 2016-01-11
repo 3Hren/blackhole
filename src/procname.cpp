@@ -12,6 +12,7 @@
 #endif
 
 namespace blackhole {
+inline namespace v1 {
 namespace detail {
 
 namespace {
@@ -39,4 +40,5 @@ auto procname() -> cpp17::string_view {
 }
 
 }  // namespace detail
+}  // namespace v1
 }  // namespace blackhole

@@ -7,6 +7,7 @@
 #include "blackhole/formatter.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 namespace formatter {
 
 /// The JSON formatter is responsible for effective converting the given log record into a
@@ -143,4 +144,5 @@ public:
 };
 
 }  // namespace formatter
+}  // namespace v1
 }  // namespace blackhole

@@ -1,6 +1,7 @@
 #include "blackhole/scoped/keeper.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 namespace scoped {
 
 namespace {
@@ -28,4 +29,5 @@ auto keeper_t::attributes() const -> const attribute_list& {
 }
 
 }  // namespace scoped
+}  // namespace v1
 }  // namespace blackhole

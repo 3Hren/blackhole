@@ -6,21 +6,26 @@
 #include "blackhole/handler.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 
 template<typename>
 struct factory;
 
+}  // namespace v1
 }  // namespace blackhole
 
 namespace blackhole {
+inline namespace v1 {
 namespace config {
 
 class node_t;
 
 }  // namespace config
+}  // namespace v1
 }  // namespace blackhole
 
 namespace blackhole {
+inline namespace v1 {
 namespace handler {
 
 class blocking_t : public handler_t {
@@ -42,4 +47,5 @@ struct factory<handler::blocking_t> {
     static auto from(const config::node_t& config) -> handler::blocking_t;
 };
 
+}  // namespace v1
 }  // namespace blackhole

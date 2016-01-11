@@ -7,6 +7,7 @@
 #include "blackhole/detail/attribute.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 namespace attribute {
 namespace {
 
@@ -247,4 +248,5 @@ template auto get<view_t::double_type>(const view_t& value) -> const view_t::dou
 template auto get<view_t::string_type>(const view_t& value) -> const view_t::string_type&;
 
 }  // namespace attribute
+}  // namespace v1
 }  // namespace blackhole

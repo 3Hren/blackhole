@@ -6,6 +6,7 @@
 #include <string>
 
 namespace blackhole {
+inline namespace v1 {
 namespace cpp17 {
 
 /// The class template `basic_string_view` describes an object that can refer to a constant
@@ -149,4 +150,5 @@ typedef basic_string_view<char> string_view;
 
 using cpp17::string_view;
 
+}  // namespace v1
 }  // namespace blackhole

@@ -7,6 +7,7 @@
 #include "blackhole/extensions/writer.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 
 namespace ph = std::placeholders;
 
@@ -94,4 +95,5 @@ struct select_t {
 };
 
 }  // namespace detail
+}  // namespace v1
 }  // namespace blackhole

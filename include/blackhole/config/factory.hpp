@@ -1,6 +1,7 @@
 #pragma once
 
 namespace blackhole {
+inline namespace v1 {
 namespace config {
 
 class node_t;
@@ -27,4 +28,5 @@ template<typename>
 class factory;
 
 }  // namespace config
+}  // namespace v1
 }  // namespace blackhole

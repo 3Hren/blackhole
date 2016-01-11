@@ -4,14 +4,17 @@
 #include <vector>
 
 namespace blackhole {
+inline namespace v1 {
 
 template<typename> class builder; // temp.
 class handler_t;
 class logger_t;
 
-}
+}  // namespace v1
+}  // namespace blackhole
 
 namespace blackhole {
+inline namespace v1 {
 
 template<typename L, typename T>
 class handler_builder {
@@ -80,4 +83,5 @@ public:
     }
 };
 
+}  // namespace v1
 }  // namespace blackhole

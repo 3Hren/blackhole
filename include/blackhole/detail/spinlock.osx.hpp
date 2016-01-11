@@ -3,6 +3,7 @@
 #include <libkern/OSAtomic.h>
 
 namespace blackhole {
+inline namespace v1 {
 namespace detail {
 
 class spinlock_t {
@@ -27,4 +28,5 @@ public:
 };
 
 }  // namespace detail
+}  // namespace v1
 }  // namespace blackhole

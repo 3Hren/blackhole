@@ -6,6 +6,7 @@
 #include "blackhole/attributes.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 namespace scoped {
 
 /// Implementation of scoped attributes guard that keeps attributes provided on construction and
@@ -26,4 +27,5 @@ public:
 };
 
 }  // namespace scoped
+}  // namespace v1
 }  // namespace blackhole

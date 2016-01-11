@@ -4,6 +4,7 @@
 #include "blackhole/extensions/format.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 
 using cpp17::string_view;
 
@@ -23,4 +24,5 @@ public:
     }
 };
 
+}  // namespace v1
 }  // namespace blackhole

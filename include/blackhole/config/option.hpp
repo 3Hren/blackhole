@@ -8,6 +8,7 @@
 #include <boost/optional/optional_fwd.hpp>
 
 namespace blackhole {
+inline namespace v1 {
 namespace config {
 
 class node_t;
@@ -60,4 +61,5 @@ auto make_option(Args&&... args) -> option<node_t> {
 }
 
 }  // namespace config
+}  // namespace v1
 }  // namespace blackhole

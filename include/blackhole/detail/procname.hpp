@@ -3,6 +3,7 @@
 #include <string>
 
 namespace blackhole {
+inline namespace v1 {
 namespace cpp17 {
 
 template<typename Char, typename Traits> class basic_string_view;
@@ -15,4 +16,5 @@ namespace detail {
 auto procname() -> cpp17::string_view;
 
 }  // namespace detail
+}  // namespace v1
 }  // namespace blackhole

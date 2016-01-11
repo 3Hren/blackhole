@@ -8,6 +8,7 @@
 #include "blackhole/detail/config/json.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 namespace config {
 
 class factory<json_t>::inner_t {
@@ -52,4 +53,5 @@ auto factory<json_t>::initialize(std::istream& stream) -> void {
 }
 
 }  // namespace config
+}  // namespace v1
 }  // namespace blackhole

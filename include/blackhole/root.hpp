@@ -7,14 +7,17 @@
 #include "blackhole/logger.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 
 class handler_t;
 class record_t;
 class scoped_t;
 
+}  // namespace v1
 }  // namespace blackhole
 
 namespace blackhole {
+inline namespace v1 {
 
 class root_logger_t : public logger_t {
 public:
@@ -67,4 +70,5 @@ private:
     auto consume(int severity, const string_view& pattern, attribute_pack& pack, const F& fn) -> void;
 };
 
+}  // namespace v1
 }  // namespace blackhole

@@ -7,6 +7,7 @@
 #include "blackhole/detail/datetime.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 namespace detail {
 namespace formatter {
 namespace string {
@@ -148,4 +149,5 @@ typedef boost::variant<
 }  // namespace string
 }  // namespace formatter
 }  // namespace detail
+}  // namespace v1
 }  // namespace blackhole

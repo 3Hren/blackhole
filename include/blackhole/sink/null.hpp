@@ -3,21 +3,26 @@
 #include "blackhole/sink.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 
 template<typename>
 struct factory;
 
+}  // namespace v1
 }  // namespace blackhole
 
 namespace blackhole {
+inline namespace v1 {
 namespace config {
 
 class node_t;
 
 }  // namespace config
+}  // namespace v1
 }  // namespace blackhole
 
 namespace blackhole {
+inline namespace v1 {
 namespace sink {
 
 /// A null sink merely exists, it never outputs a message to any device.
@@ -43,4 +48,5 @@ struct factory<sink::null_t> {
     static auto from(const config::node_t& config) -> sink::null_t;
 };
 
+}  // namespace v1
 }  // namespace blackhole

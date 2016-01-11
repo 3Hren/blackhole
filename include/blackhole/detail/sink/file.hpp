@@ -12,6 +12,7 @@
 #include "blackhole/cpp17/string_view.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 namespace sink {
 namespace file {
 
@@ -83,4 +84,5 @@ public:
 
 }  // namespace file
 }  // namespace sink
+}  // namespace v1
 }  // namespace blackhole

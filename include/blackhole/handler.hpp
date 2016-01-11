@@ -3,6 +3,7 @@
 #include <memory>
 
 namespace blackhole {
+inline namespace v1 {
 
 class formatter_t;
 class record_t;
@@ -23,4 +24,5 @@ public:
     virtual auto add(std::unique_ptr<sink_t> sink) -> void = 0;
 };
 
+}  // namespace v1
 }  // namespace blackhole

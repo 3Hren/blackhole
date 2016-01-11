@@ -20,6 +20,7 @@
 #include "blackhole/detail/attribute.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 namespace formatter {
 namespace {
 
@@ -268,4 +269,5 @@ auto json_t::builder_t::build() const -> json_t {
 }
 
 }  // namespace formatter
+}  // namespace v1
 }  // namespace blackhole

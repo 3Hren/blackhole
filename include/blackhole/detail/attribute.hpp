@@ -3,6 +3,7 @@
 #pragma once
 
 namespace blackhole {
+inline namespace v1 {
 namespace attribute {
 
 struct value_t::inner_t {
@@ -24,4 +25,5 @@ struct view_t::inner_t {
 };
 
 }  // namespace attribute
+}  // namespace v1
 }  // namespace blackhole

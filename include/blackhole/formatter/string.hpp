@@ -10,6 +10,7 @@
 #include "blackhole/formatter.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 
 class record_t;
 class writer_t;
@@ -17,17 +18,21 @@ class writer_t;
 template<typename>
 struct factory;
 
+}  // namespace v1
 }  // namespace blackhole
 
 namespace blackhole {
+inline namespace v1 {
 namespace config {
 
 class node_t;
 
 }  // namespace config
+}  // namespace v1
 }  // namespace blackhole
 
 namespace blackhole {
+inline namespace v1 {
 namespace formatter {
 
 class token_t;
@@ -163,4 +168,5 @@ struct factory<formatter::string_t> {
     static auto from(const config::node_t& config) -> formatter::string_t;
 };
 
+}  // namespace v1
 }  // namespace blackhole

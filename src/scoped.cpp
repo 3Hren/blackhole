@@ -5,6 +5,7 @@
 #include <boost/thread/tss.hpp>
 
 namespace blackhole {
+inline namespace v1 {
 
 scoped_t::scoped_t(logger_t& logger) :
     context(logger.context()),
@@ -34,4 +35,5 @@ auto scoped_t::rebind(boost::thread_specific_ptr<scoped_t>* context) -> void {
     }
 }
 
+}  // namespace v1
 }  // namespace blackhole

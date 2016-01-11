@@ -10,6 +10,7 @@ namespace boost {
 }  // namespace boost
 
 namespace blackhole {
+inline namespace v1 {
 
 class scoped_t;
 
@@ -74,4 +75,5 @@ public:
     virtual auto context() -> boost::thread_specific_ptr<scoped_t>* = 0;
 };
 
+}  // namespace v1
 }  // namespace blackhole

@@ -10,6 +10,7 @@
 #include "blackhole/cpp17/string_view.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 
 /// Represents a trait for mapping an owned types to their associated lightweight view types.
 ///
@@ -22,9 +23,11 @@ struct view_of {
     typedef T type;
 };
 
+}  // namespace v1
 }  // namespace blackhole
 
 namespace blackhole {
+inline namespace v1 {
 namespace attribute {
 
 class value_t;
@@ -279,4 +282,5 @@ auto get(const view_t& value) ->
     typename std::enable_if<boost::mpl::contains<view_t::types, T>::value, const T&>::type;
 
 }  // namespace attribute
+}  // namespace v1
 }  // namespace blackhole

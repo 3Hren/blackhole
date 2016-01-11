@@ -19,22 +19,27 @@
 #include "blackhole/cpp17/string_view.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 
 template<typename T>
 struct view_of;
 
+}  // namespace v1
 }  // namespace blackhole
 
 namespace blackhole {
+inline namespace v1 {
 namespace attribute {
 
 class value_t;
 class view_t;
 
 }  // namespace attribute
+}  // namespace v1
 }  // namespace blackhole
 
 namespace blackhole {
+inline namespace v1 {
 
 typedef std::pair<std::string, attribute::value_t> attribute_t;
 
@@ -73,4 +78,5 @@ typedef boost::container::small_vector<std::reference_wrapper<const view_of<attr
 typedef std::vector<std::reference_wrapper<const view_of<attributes_t>::type>> attribute_pack;
 #endif
 
+}  // namespace v1
 }  // namespace blackhole

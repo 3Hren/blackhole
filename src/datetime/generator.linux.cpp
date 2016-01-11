@@ -9,6 +9,7 @@
 #include "blackhole/extensions/format.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 namespace detail {
 namespace datetime {
 
@@ -87,6 +88,7 @@ auto generator_t::operator()<writer_type>(writer_type&, const std::tm&, std::uin
 
 }  // namespace datetime
 }  // namespace detail
+}  // namespace v1
 }  // namespace blackhole
 
 #endif

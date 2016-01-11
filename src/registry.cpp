@@ -16,6 +16,7 @@
 #include "blackhole/sink/null.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 
 namespace {
 
@@ -132,4 +133,5 @@ auto registry_t::formatter(const std::string& type) const -> formatter_factory {
         .expect<std::out_of_range>(R"(formatter with type "{}" is not registered)", type);
 }
 
+}  // namespace v1
 }  // namespace blackhole

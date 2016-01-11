@@ -7,6 +7,7 @@
 
 /// Forwards.
 namespace blackhole {
+inline namespace v1 {
 namespace detail {
 namespace config {
 
@@ -14,9 +15,11 @@ class json_t;
 
 }  // namespace config
 }  // namespace detail
+}  // namespace v1
 }  // namespace blackhole
 
 namespace blackhole {
+inline namespace v1 {
 namespace config {
 
 using detail::config::json_t;
@@ -25,6 +28,7 @@ using detail::config::json_t;
 template<>
 class factory<json_t> : public factory_t {
     class inner_t;
+    // TODO: Use implementation_ptr<inner_t> instead.
     std::unique_ptr<inner_t> inner;
 
 public:
@@ -68,4 +72,5 @@ private:
 };
 
 }  // namespace config
+}  // namespace v1
 }  // namespace blackhole

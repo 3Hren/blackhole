@@ -5,6 +5,7 @@
 #include <string>
 
 namespace blackhole {
+inline namespace v1 {
 namespace detail {
 namespace formatter {
 namespace string {
@@ -41,4 +42,5 @@ public:
 }  // namespace string
 }  // namespace formatter
 }  // namespace detail
+}  // namespace v1
 }  // namespace blackhole

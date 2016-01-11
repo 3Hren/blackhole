@@ -5,6 +5,7 @@
 #include <string>
 
 namespace blackhole {
+inline namespace v1 {
 namespace config {
 
 template<typename T>
@@ -68,4 +69,5 @@ public:
 };
 
 }  // namespace config
+}  // namespace v1
 }  // namespace blackhole

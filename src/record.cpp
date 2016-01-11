@@ -5,6 +5,7 @@
 #include "blackhole/attribute.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 
 struct record_t::inner_t {
     std::reference_wrapper<const string_view> message;
@@ -82,4 +83,5 @@ auto record_t::inner() const noexcept -> const inner_t& {
     return reinterpret_cast<const inner_t&>(storage);
 }
 
+}  // namespace v1
 }  // namespace blackhole

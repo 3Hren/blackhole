@@ -5,6 +5,7 @@
 #include "blackhole/config/node.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 namespace config {
 
 option<node_t>::option() noexcept = default;
@@ -86,4 +87,5 @@ auto option<node_t>::to(F&& fn) const -> decltype(fn()) {
 }
 
 }  // namespace config
+}  // namespace v1
 }  // namespace blackhole

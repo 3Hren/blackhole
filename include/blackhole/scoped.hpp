@@ -7,6 +7,7 @@ namespace boost {
 }  // namespace boost
 
 namespace blackhole {
+inline namespace v1 {
 
 class logger_t;
 
@@ -54,4 +55,5 @@ public:
     virtual auto attributes() const -> const attribute_list& = 0;
 };
 
+}  // namespace v1
 }  // namespace blackhole

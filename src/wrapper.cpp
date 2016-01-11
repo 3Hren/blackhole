@@ -3,6 +3,7 @@
 #include "blackhole/scoped.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 
 using attribute::view_t;
 
@@ -38,4 +39,5 @@ auto wrapper_t::context() -> boost::thread_specific_ptr<scoped_t>* {
     return inner.context();
 }
 
+}  // namespace v1
 }  // namespace blackhole

@@ -5,21 +5,26 @@
 #include <memory>
 
 namespace blackhole {
+inline namespace v1 {
 
 template<typename>
 struct factory;
 
+}  // namespace v1
 }  // namespace blackhole
 
 namespace blackhole {
+inline namespace v1 {
 namespace config {
 
 class node_t;
 
 }  // namespace config
+}  // namespace v1
 }  // namespace blackhole
 
 namespace blackhole {
+inline namespace v1 {
 namespace sink {
 namespace socket {
 
@@ -63,4 +68,5 @@ struct factory<sink::socket::udp_t> {
     static auto from(const config::node_t& config) -> sink::socket::udp_t;
 };
 
+}  // namespace v1
 }  // namespace blackhole

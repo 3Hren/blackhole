@@ -4,6 +4,7 @@
 #include <vector>
 
 namespace blackhole {
+inline namespace v1 {
 namespace detail {
 namespace datetime {
 
@@ -25,4 +26,5 @@ auto make_generator(const std::string& pattern) -> generator_t;
 
 }  // namespace datetime
 }  // namespace detail
+}  // namespace v1
 }  // namespace blackhole

@@ -9,6 +9,7 @@
 #include "mocks/node.hpp"
 
 namespace blackhole {
+inline namespace v1 {
 namespace config {
 namespace testing {
 
@@ -262,4 +263,5 @@ TEST(option, IndexKey) {
 
 }  // namespace testing
 }  // namespace config
+}  // namespace v1
 }  // namespace blackhole

@@ -4,6 +4,7 @@
 #include <boost/variant/variant.hpp>
 
 namespace blackhole {
+inline namespace v1 {
 namespace detail {
 namespace formatter {
 namespace string {
@@ -311,4 +312,5 @@ parser_t::throw_(Args&&... args) -> void {
 }  // namespace string
 }  // namespace formatter
 }  // namespace detail
+}  // namespace v1
 }  // namespace blackhole
