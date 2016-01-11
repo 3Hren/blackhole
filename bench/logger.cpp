@@ -213,7 +213,7 @@ literal_with_args_and_attributes_and_three_wrappers(::benchmark::State& state) {
 
     wrapper_t wrapper2{wrapper1, {
         {"key#2", {500}},
-        {"key#3", {"value#1"}}
+        {"key#3", {"value#3"}}
     }};
 
     wrapper_t wrapper3{wrapper2, {
