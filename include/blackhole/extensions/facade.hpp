@@ -129,7 +129,7 @@ logger_facade<Logger>::log(int severity, const detail::formatter<N>& pattern, co
 
     attribute_pack pack;
     // TODO: Pass non-empty pattern.
-    inner().log(severity, "", pack, std::cref(fn));
+    inner().log(severity, {"", std::cref(fn)}, pack);
 }
 
 #endif
@@ -145,7 +145,7 @@ logger_facade<Logger>::select(int severity, const string_view& pattern, const Ar
     const auto fn = std::bind(&detail::gcc::write_all<Args...>, std::ref(wr), pattern.data(), std::cref(args)...);
 
     attribute_pack pack;
-    inner().log(severity, pattern, pack, std::cref(fn));
+    inner().log(severity, {pattern, std::cref(fn)}, pack);
 }
 
 template<typename Logger>

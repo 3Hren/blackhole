@@ -27,9 +27,9 @@ auto wrapper_t::log(int severity, const string_view& message, attribute_pack& pa
     inner.log(severity, message, pack);
 }
 
-auto wrapper_t::log(int severity, const string_view& pattern, attribute_pack& pack, const supplier_t& supplier) -> void {
+auto wrapper_t::log(int severity, const lazy_message_t& message, attribute_pack& pack) -> void {
     pack.push_back(attributes());
-    inner.log(severity, pattern, pack, supplier);
+    inner.log(severity, message, pack);
 }
 
 auto wrapper_t::context() -> boost::thread_specific_ptr<scoped_t>* {

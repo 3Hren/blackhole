@@ -14,6 +14,11 @@ inline namespace v1 {
 
 class scoped_t;
 
+struct lazy_message_t {
+    string_view pattern;
+    std::function<auto() -> string_view> supplier;
+};
+
 /// Represents the common logging interface in the library.
 ///
 /// # Severity
@@ -43,8 +48,11 @@ class scoped_t;
 /// these cases there is a \sa registry_t class.
 ///
 /// Otherwise you can always build logger instances directly using its constructors.
+// TODO: Wrap severity with class and provide both implicit constructor and operator int().
 class logger_t {
 public:
+    typedef int severity_t;
+
     /// Message supplier callback, that should be called only when the logging event passes
     /// filtering to obtain the final formatted message.
     ///
@@ -61,14 +69,14 @@ public:
     virtual ~logger_t() = 0;
 
     /// Logs the given message with the specified severity level.
-    virtual auto log(int severity, const string_view& message) -> void = 0;
+    virtual auto log(severity_t severity, const string_view& message) -> void = 0;
 
     /// Logs the given message with the specified severity level and attributes pack attached.
-    virtual auto log(int severity, const string_view& message, attribute_pack& pack) -> void = 0;
+    virtual auto log(severity_t severity, const string_view& message, attribute_pack& pack) -> void = 0;
 
     /// Logs the given message with the specified severity level, attributes pack attached and with
     /// special message supplier callback.
-    virtual auto log(int severity, const string_view& message, attribute_pack& pack, const supplier_t& supplier) -> void = 0;
+    virtual auto log(severity_t severity, const lazy_message_t& message, attribute_pack& pack) -> void = 0;
 
     /// Attaches the given attributes to the logger, making every further log event to contain them
     /// until returned scoped guard keeped alive.

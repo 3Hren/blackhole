@@ -90,7 +90,7 @@ struct select_t {
         const auto fn = std::bind(&gcc::write_all<Args...>, std::ref(wr), pattern.data(), std::cref(args)...);
 
         attribute_pack pack{attributes};
-        log.log(severity, pattern, pack, std::cref(fn));
+        log.log(severity, {pattern, std::cref(fn)}, pack);
     }
 };
 

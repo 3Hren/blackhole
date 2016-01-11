@@ -61,7 +61,7 @@ public:
 
     auto log(int severity, const string_view& message) -> void;
     auto log(int severity, const string_view& message, attribute_pack& pack) -> void;
-    auto log(int severity, const string_view& pattern, attribute_pack& pack, const supplier_t& supplier) -> void;
+    auto log(int severity, const lazy_message_t& message, attribute_pack& pack) -> void;
 
     auto context() -> boost::thread_specific_ptr<scoped_t>*;
 
