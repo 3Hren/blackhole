@@ -10,6 +10,28 @@
 #include <blackhole/formatter/json.hpp>
 #include <blackhole/record.hpp>
 
+namespace {
+
+struct endpoint_t {
+    std::string host;
+    std::uint16_t port;
+};
+
+}  // namespace
+
+namespace blackhole {
+inline namespace v1 {
+
+template<>
+struct display_traits<endpoint_t> {
+    static auto apply(const endpoint_t& endpoint, writer_t& wr) -> void {
+        wr.write("{}:{}", endpoint.host, endpoint.port);
+    }
+};
+
+}  // namespace v1
+}  // namespace blackhole
+
 namespace blackhole {
 namespace testing {
 namespace formatter {
@@ -143,6 +165,29 @@ TEST(json_t, FormatAttributeString) {
 
     const string_view message("value");
     const attribute_list attributes{{"endpoint", "127.0.0.1:8080"}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+    ASSERT_TRUE(doc.HasMember("message"));
+    ASSERT_TRUE(doc["message"].IsString());
+    EXPECT_STREQ("value", doc["message"].GetString());
+
+    ASSERT_TRUE(doc.HasMember("endpoint"));
+    ASSERT_TRUE(doc["endpoint"].IsString());
+    EXPECT_STREQ("127.0.0.1:8080", doc["endpoint"].GetString());
+}
+
+TEST(json_t, FormatAttributeUser) {
+    endpoint_t endpoint{"127.0.0.1", 8080};
+
+    json_t formatter;
+
+    const string_view message("value");
+    const attribute_list attributes{{"endpoint", endpoint}};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;

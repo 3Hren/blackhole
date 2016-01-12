@@ -53,7 +53,11 @@ struct visitor_t {
     }
 
     auto operator()(const attribute::view_t::function_type& value) -> void {
-        #pragma message "not implemented yet"
+        writer_t wr;
+        value(wr);
+
+        node.AddMember(rapidjson::StringRef(name.data(), name.size()),
+            wr.result().to_string(), allocator);
     }
 };
 
