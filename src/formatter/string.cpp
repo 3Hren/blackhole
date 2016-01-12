@@ -126,34 +126,34 @@ public:
     }
 
     auto operator()(const attribute::view_t::function_type& value) const -> void {
-        #pragma message "not implemented yet"
+        value(writer);
     }
 };
 
 template<>
 class view_visitor<unspec> : public boost::static_visitor<> {
-    fmt::MemoryWriter& writer;
+    writer_t& writer;
 
 public:
-    view_visitor(fmt::MemoryWriter& writer) noexcept :
+    view_visitor(writer_t& writer) noexcept :
         writer(writer)
     {}
 
     auto operator()(std::nullptr_t) const -> void {
-        writer << "none";
+        writer.inner << "none";
     }
 
     template<typename T>
     auto operator()(T value) const -> void {
-        writer << value;
+        writer.inner << value;
     }
 
     auto operator()(const string_view& value) const -> void {
-        writer << string_ref(value.data(), value.size());
+        writer.inner << string_ref(value.data(), value.size());
     }
 
     auto operator()(const attribute::view_t::function_type& value) const -> void {
-        #pragma message "not implemented yet"
+        value(writer);
     }
 };
 
@@ -259,7 +259,7 @@ public:
 
     auto operator()(const ph::leftover_t& token) const -> void {
         bool first = true;
-        fmt::MemoryWriter kv;
+        writer_t kv;
         const view_visitor<unspec> visitor(kv);
 
         for (const auto& attributes : record.attributes()) {
@@ -273,12 +273,13 @@ public:
 
                 // TODO: To correctly implement kv patterns we need a visitor with parameters. Or
                 // attribute (pair) type, instead of that `std::pair`.
-                kv << string_ref(attribute.first.data(), attribute.first.size()) << ": ";
+                kv.inner << string_ref(attribute.first.data(), attribute.first.size()) << ": ";
                 boost::apply_visitor(visitor, attribute.second.inner().value);
 
-                writer.inner << string_ref(kv.data(), kv.size());
+                const auto view = kv.result();
+                writer.inner << string_ref(view.data(), view.size());
 
-                kv.clear();
+                kv.inner.clear();
             }
         }
 

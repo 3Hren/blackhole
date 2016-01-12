@@ -10,6 +10,28 @@
 #include <blackhole/formatter/string.hpp>
 #include <blackhole/record.hpp>
 
+namespace {
+
+struct version_t {
+    int major;
+    int minor;
+};
+
+}  // namespace
+
+namespace blackhole {
+inline namespace v1 {
+
+template<>
+struct display_traits<version_t> {
+    static auto apply(const version_t& version, writer_t& wr) -> void {
+        wr.write("{}.{}", version.major, version.minor);
+    }
+};
+
+}  // namespace v1
+}  // namespace blackhole
+
 namespace blackhole {
 namespace testing {
 
@@ -197,6 +219,36 @@ TEST(string_t, GenericOptional) {
     formatter.format(record, writer);
 
     EXPECT_EQ("HTTP/1.1 - REQUIRED", writer.result().to_string());
+}
+
+TEST(string_t, GenericLazyUnspec) {
+    formatter::string_t formatter("{protocol}/{version}");
+
+    version_t version{1, 1};
+
+    const string_view message("-");
+    const attribute_list attributes{{"protocol", {"HTTP"}}, {"version", version}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ("HTTP/1.1", writer.result().to_string());
+}
+
+TEST(string_t, GenericLazySpec) {
+    formatter::string_t formatter("{protocol}/{version:>4s} - alpha");
+
+    version_t version{1, 1};
+
+    const string_view message("-");
+    const attribute_list attributes{{"protocol", {"HTTP"}}, {"version", version}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ("HTTP/1.1 - alpha", writer.result().to_string());
 }
 
 TEST(string_t, ThrowsIfOptionsContainsReservedPlaceholderNames) {

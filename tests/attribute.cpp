@@ -20,8 +20,6 @@ inline namespace v1 {
 
 template<>
 struct display_traits<user_t> {
-    // typedef user_t type;
-
     static auto apply(const user_t& user, writer_t& wr) -> void {
         wr.write("user_t(name: {})", user.name);
     }
