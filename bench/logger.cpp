@@ -265,7 +265,7 @@ public:
 };
 
 BENCHMARK_DEFINE_F(threaded_t, facade)(::benchmark::State& state) {
-   while (state.KeepRunning()) {
+    while (state.KeepRunning()) {
        logger.log(0, "{} - {} [{}] 'GET {} HTTP/1.0' {} {}",
            "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326,
            attribute_list{
