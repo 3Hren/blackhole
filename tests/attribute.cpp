@@ -3,8 +3,32 @@
 #include <boost/variant/apply_visitor.hpp>
 
 #include <blackhole/attribute.hpp>
+#include "blackhole/extensions/writer.hpp"
 
 #include <blackhole/detail/attribute.hpp>
+
+namespace {
+
+struct user_t {
+    std::string name;
+};
+
+}  // namespace
+
+namespace blackhole {
+inline namespace v1 {
+
+template<>
+struct display_traits<user_t> {
+    // typedef user_t type;
+
+    static auto apply(const user_t& user, writer_t& wr) -> void {
+        wr.write("user_t(name: {})", user.name);
+    }
+};
+
+}  // namespace v1
+}  // namespace blackhole
 
 namespace blackhole {
 namespace testing {
@@ -126,6 +150,16 @@ TEST(view_t, FromStringView) {
     view_t v(value);
 
     EXPECT_EQ(value, blackhole::attribute::get<string_view>(v).to_string());
+}
+
+TEST(view_t, FromUserType) {
+    user_t user{"Ivan"};
+    view_t v(user);
+
+    writer_t wr;
+    blackhole::attribute::get<view_t::function_type>(v)(wr);
+
+    EXPECT_EQ("user_t(name: Ivan)", wr.result().to_string());
 }
 
 TEST(value_t, Default) {

@@ -51,6 +51,10 @@ struct visitor_t {
         node.AddMember(rapidjson::StringRef(name.data(), name.size()),
             rapidjson::StringRef(value.data(), value.size()), allocator);
     }
+
+    auto operator()(const attribute::view_t::function_type& value) -> void {
+        #pragma message "not implemented yet"
+    }
 };
 
 /// A RapidJSON Stream concept implementation required to avoid intermediate buffer allocation.

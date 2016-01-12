@@ -124,6 +124,10 @@ public:
     auto operator()(const string_view& value) const -> void {
         writer.write(spec, value.data());
     }
+
+    auto operator()(const attribute::view_t::function_type& value) const -> void {
+        #pragma message "not implemented yet"
+    }
 };
 
 template<>
@@ -146,6 +150,10 @@ public:
 
     auto operator()(const string_view& value) const -> void {
         writer << string_ref(value.data(), value.size());
+    }
+
+    auto operator()(const attribute::view_t::function_type& value) const -> void {
+        #pragma message "not implemented yet"
     }
 };
 
