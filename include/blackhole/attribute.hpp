@@ -94,6 +94,7 @@ public:
         virtual auto operator()(const uint64_type&) -> void = 0;
         virtual auto operator()(const double_type&) -> void = 0;
         virtual auto operator()(const string_type&) -> void = 0;
+        virtual auto operator()(const function_type&) -> void = 0;
     };
 
     struct inner_t;
