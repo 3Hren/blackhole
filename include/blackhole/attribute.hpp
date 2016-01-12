@@ -271,6 +271,9 @@ public:
     /// Constructs a value view from the given owned attribute value.
     view_t(const value_t& value);
 
+    /// Constructs a value view from a custom type that implements `display_traits` trait.
+    ///
+    /// \sa display_traits for more information.
     template<typename T>
     view_t(const T& value, decltype(&display_traits<T>::apply)* = nullptr) {
         construct(function_type{static_cast<const void*>(&value), std::ref(display<T>)});
