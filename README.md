@@ -126,6 +126,10 @@ For more information please read the documentation and visit the following links
 - File.
 - Socket.
 
+## Runtime Type Information
+
+The library can be successfully compiled and used without RTTI (with *-fno-rtti* flag).
+
 ## Possible bottlenecks
 
 - Timestamp formatting
