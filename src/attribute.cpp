@@ -11,8 +11,17 @@ inline namespace v1 {
 namespace attribute {
 namespace {
 
+auto call(const void* value, writer_t& wr) -> void {
+    auto fn = *static_cast<const std::function<auto(writer_t&) -> void>*>(value);
+    fn(wr);
+}
+
 struct into_view {
     typedef view_t::inner_t::type result_type;
+
+    auto operator()(const value_t::function_type& value) const -> result_type {
+        return view_t::function_type{static_cast<const void*>(&value), std::ref(call)};
+    }
 
     template<typename T>
     auto operator()(const T& value) const -> result_type {
@@ -194,6 +203,10 @@ view_t::view_t(unsigned long long value) {
     construct(static_cast<std::uint64_t>(value));
 }
 
+view_t::view_t(float value) {
+    construct(static_cast<double>(value));
+}
+
 view_t::view_t(double value) {
     construct(value);
 }
@@ -239,6 +252,7 @@ auto get(const view_t& value) ->
 }
 
 template auto view_t::construct<string_view>(string_view&& value) -> void;
+template auto view_t::construct<view_t::function_type>(view_t::function_type&& value) -> void;
 
 template auto get<view_t::null_type>(const view_t& value) -> const view_t::null_type&;
 template auto get<view_t::bool_type>(const view_t& value) -> const view_t::bool_type&;
@@ -246,6 +260,7 @@ template auto get<view_t::sint64_type>(const view_t& value) -> const view_t::sin
 template auto get<view_t::uint64_type>(const view_t& value) -> const view_t::uint64_type&;
 template auto get<view_t::double_type>(const view_t& value) -> const view_t::double_type&;
 template auto get<view_t::string_type>(const view_t& value) -> const view_t::string_type&;
+template auto get<view_t::function_type>(const view_t& value) -> const view_t::function_type&;
 
 }  // namespace attribute
 }  // namespace v1

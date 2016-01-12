@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <string>
 #include <type_traits>
 
@@ -12,6 +13,10 @@
 namespace blackhole {
 inline namespace v1 {
 
+/// Trait that describes how to format user defined types provided as attributes.
+template<typename T>
+struct display_traits;
+
 /// Represents a trait for mapping an owned types to their associated lightweight view types.
 ///
 /// By default all types are transparently mapped to itself, but Blackhole provides some
@@ -22,6 +27,9 @@ template<typename T>
 struct view_of {
     typedef T type;
 };
+
+/// Forward.
+class writer_t;
 
 }  // namespace v1
 }  // namespace blackhole
@@ -63,6 +71,7 @@ public:
     typedef std::uint64_t  uint64_type;
     typedef double         double_type;
     typedef std::string    string_type;
+    typedef std::function<auto(writer_t& writer) -> void> function_type;
 
     /// The type sequence of all available types.
     typedef boost::mpl::vector<
@@ -71,7 +80,8 @@ public:
         sint64_type,
         uint64_type,
         double_type,
-        string_type
+        string_type,
+        function_type
     > types;
 
     /// Visitor interface.
@@ -89,7 +99,7 @@ public:
     struct inner_t;
 
 private:
-    typedef std::aligned_storage<sizeof(std::string) + sizeof(int)>::type storage_type;
+    typedef std::aligned_storage<sizeof(function_type) + sizeof(int)>::type storage_type;
 
     /// The underlying type.
     storage_type storage;
@@ -172,6 +182,19 @@ public:
     typedef double         double_type;
     typedef string_view    string_type;
 
+    struct function_type {
+        const void* value;
+        std::reference_wrapper<auto(const void* value, writer_t& writer) -> void> fn;
+
+        auto operator()(writer_t& wr) const -> void {
+            fn(value, wr);
+        }
+
+        auto operator==(const function_type& other) const noexcept -> bool {
+            return value == other.value && fn.get() == other.fn.get();
+        }
+    };
+
     /// The type sequence of all available types.
     typedef boost::mpl::vector<
         null_type,
@@ -179,7 +202,8 @@ public:
         sint64_type,
         uint64_type,
         double_type,
-        string_type
+        string_type,
+        function_type
     > types;
 
     /// Visitor interface.
@@ -192,6 +216,7 @@ public:
         virtual auto operator()(const uint64_type&) -> void = 0;
         virtual auto operator()(const double_type&) -> void = 0;
         virtual auto operator()(const string_type&) -> void = 0;
+        virtual auto operator()(const function_type&) -> void = 0;
     };
 
     struct inner_t;
@@ -226,6 +251,7 @@ public:
     view_t(unsigned long long value);
 
     /// Constructs a value view from the given floating point value.
+    view_t(float value);
     view_t(double value);
 
     /// Constructs a value view from the given string literal not including the terminating null
@@ -243,6 +269,11 @@ public:
 
     /// Constructs a value view from the given owned attribute value.
     view_t(const value_t& value);
+
+    template<typename T>
+    view_t(const T& value, decltype(&display_traits<T>::apply)* = nullptr) {
+        construct(function_type{static_cast<const void*>(&value), std::ref(display<T>)});
+    }
 
     view_t(const view_t& other) = default;
     view_t(view_t&& other) = default;
@@ -265,6 +296,11 @@ public:
 private:
     template<typename T>
     auto construct(T&& value) -> void;
+
+    template<typename T>
+    static auto display(const void* value, writer_t& wr) -> void {
+        display_traits<T>::apply(*static_cast<const T*>(value), wr);
+    }
 };
 
 /// Retrieves a value of a specified, but yet restricted type, from a given attribute value.
