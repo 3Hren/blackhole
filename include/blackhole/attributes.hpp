@@ -10,7 +10,6 @@
 #endif
 
 #ifdef BLACKHOLE_HAVE_SMALL_VECTOR
-    // TODO: Use stack composable allocator instead.
     #include <boost/container/small_vector.hpp>
 #else
     #include <vector>
@@ -74,7 +73,6 @@ typedef view_of<attributes_t>::type attribute_list;
 #ifdef BLACKHOLE_HAVE_SMALL_VECTOR
 typedef boost::container::small_vector<std::reference_wrapper<const view_of<attributes_t>::type>, 16> attribute_pack;
 #else
-// TODO: I can use stack allocator with fallback for portability.
 typedef std::vector<std::reference_wrapper<const view_of<attributes_t>::type>> attribute_pack;
 #endif
 
