@@ -53,7 +53,7 @@ Of course there are disadvantages, such as virtual function call cost and closed
 ## Planning
 
 - [x] Shared library.
-- [ ] Inline namespaces (?).
+- [x] Inline namespaces.
 - [x] Optional compile-time inline messages transformation (C++14).
   - [ ] Compile-time placeholder type checking.
 - [x] Python-like formatting (no printf-like formatting support) both inline and result messages.
