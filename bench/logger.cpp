@@ -8,6 +8,7 @@
 #include <blackhole/handler.hpp>
 #include <blackhole/logger.hpp>
 #include <blackhole/root.hpp>
+#include <blackhole/scoped/keeper.hpp>
 #include <blackhole/wrapper.hpp>
 
 #include "mod.hpp"
@@ -120,6 +121,25 @@ literal_with_attributes(::benchmark::State& state) {
             {"key#2", {3.1415}},
             {"key#3", {"value"}}
         });
+    }
+
+    state.SetItemsProcessed(state.iterations());
+}
+
+static
+void
+literal_with_scoped_attributes(::benchmark::State& state) {
+    root_logger_t root({});
+    logger_facade<root_logger_t> logger(root);
+
+    const scoped::keeper_t scoped(root, {
+        {"key#1", {42}},
+        {"key#2", {3.1415}},
+        {"key#3", "value"}
+    });
+
+    while (state.KeepRunning()) {
+        logger.log(0, "[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326");
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -244,11 +264,13 @@ NBENCHMARK("log.lit[reject]", literal_reject);
 NBENCHMARK("log.lit[args: 1]", literal_with_arg);
 NBENCHMARK("log.lit[args: 6]", literal_with_args);
 
+
 #if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
 NBENCHMARK("log.lit[args: 6 + c++14::fmt]", literal_with_args_using_cpp14_formatter);
 #endif
 
 NBENCHMARK("log.lit[args: 0 + attr: 3]", literal_with_attributes);
+NBENCHMARK("log.lit[args: 0 + attr(scope): 3]", literal_with_scoped_attributes);
 NBENCHMARK("log.lit[args: 6 + attr: 3]", literal_with_args_and_attributes);
 
 NBENCHMARK("log.lit[args: 6 + attr: 3 + wrap: 1 * 2]", literal_with_args_and_attributes_and_wrapper);
