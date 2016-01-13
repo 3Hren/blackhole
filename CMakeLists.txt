@@ -201,6 +201,7 @@ if (ENABLE_TESTING)
 		tests/record
 		tests/registry
 		tests/root
+		tests/severity
 		tests/sink/console
 		tests/sink/file
 		tests/sink/null

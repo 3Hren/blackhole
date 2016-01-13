@@ -4,6 +4,7 @@
 
 #include "blackhole/attributes.hpp"
 #include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/severity.hpp"
 
 namespace boost {
     template<typename> class thread_specific_ptr;
@@ -53,9 +54,6 @@ struct lazy_message_t {
 /// Otherwise you can always build logger instances directly using its constructors.
 // TODO: Wrap severity with class and provide both implicit constructor and operator int().
 class logger_t {
-public:
-    typedef int severity_t;
-
 public:
     virtual ~logger_t() = 0;
 
