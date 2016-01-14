@@ -1,5 +1,7 @@
 #include "mocks/logger.hpp"
 
+#include <blackhole/scope/manager.hpp>
+
 namespace blackhole {
 namespace testing {
 namespace mock {

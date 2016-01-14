@@ -9,7 +9,8 @@
 #include "blackhole/extensions/facade.hpp"
 #include "blackhole/handler.hpp"
 #include "blackhole/record.hpp"
-#include "blackhole/scoped.hpp"
+#include "blackhole/scope/manager.hpp"
+#include "blackhole/scope/watcher.hpp"
 
 #include "blackhole/detail/spinlock.hpp"
 
@@ -18,15 +19,34 @@ inline namespace v1 {
 
 using detail::spinlock_t;
 
+namespace {
+
+using scope::watcher_t;
+
+class thread_manager_t : public scope::manager_t {
+    boost::thread_specific_ptr<watcher_t> inner;
+
+public:
+    thread_manager_t() : inner([](watcher_t*) {}) {}
+
+    auto get() const -> watcher_t* {
+        return inner.get();
+    }
+
+    auto reset(watcher_t* value) -> void {
+        inner.reset(value);
+    }
+};
+
+}  // namespace
+
 struct root_logger_t::sync_t {
 #ifndef __clang__
     typedef spinlock_t mutex_type;
     mutable mutex_type mutex;
 #endif
 
-    boost::thread_specific_ptr<scoped_t> context;
-
-    sync_t(): context([](scoped_t*) {}) {}
+    thread_manager_t manager;
 
     auto load(const std::shared_ptr<inner_t>& source) const noexcept -> std::shared_ptr<inner_t> {
 #ifdef __clang__
@@ -87,10 +107,10 @@ root_logger_t::root_logger_t(root_logger_t&& other) noexcept :
     sync(new sync_t),
     inner(std::move(other.sync->load(other.inner)))
 {
-    sync->context.reset(other.sync->context.get());
+    sync->manager.reset(other.sync->manager.get());
 
-    if (sync->context.get()) {
-        sync->context.get()->rebind(&sync->context);
+    if (sync->manager.get()) {
+        sync->manager.get()->rebind(sync->manager);
     }
 }
 
@@ -105,10 +125,10 @@ root_logger_t::operator=(root_logger_t&& other) noexcept -> root_logger_t& {
     const auto inner = std::move(other.sync->load(other.inner));
     sync->store(this->inner, std::move(inner));
 
-    sync->context.reset(other.sync->context.get());
+    sync->manager.reset(other.sync->manager.get());
 
-    if (sync->context.get()) {
-        sync->context.get()->rebind(&sync->context);
+    if (sync->manager.get()) {
+        sync->manager.get()->rebind(sync->manager);
     }
 
     return *this;
@@ -157,9 +177,8 @@ auto root_logger_t::consume(severity_t severity, const string_view& pattern, att
         return inner.filter;
     });
 
-    // TODO: Consider "null object" pattern.
-    if (sync->context.get()) {
-        sync->context.get()->collect(&pack);
+    if (sync->manager.get()) {
+        sync->manager.get()->collect(pack);
     }
 
     record_t record(severity, pattern, pack);
@@ -179,8 +198,8 @@ auto root_logger_t::consume(severity_t severity, const string_view& pattern, att
     }
 }
 
-auto root_logger_t::context() -> boost::thread_specific_ptr<scoped_t>* {
-    return &sync->context;
+auto root_logger_t::manager() -> scope::manager_t& {
+    return sync->manager;
 }
 
 }  // namespace v1

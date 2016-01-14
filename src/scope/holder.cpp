@@ -1,8 +1,8 @@
-#include "blackhole/scoped/keeper.hpp"
+#include "blackhole/scope/holder.hpp"
 
 namespace blackhole {
 inline namespace v1 {
-namespace scoped {
+namespace scope {
 
 namespace {
 
@@ -18,16 +18,16 @@ auto transform(const attributes_t& source) -> attribute_list {
 
 }  // namespace
 
-keeper_t::keeper_t(logger_t& logger, attributes_t attributes):
-    scoped_t(logger),
+holder_t::holder_t(logger_t& logger, attributes_t attributes):
+    watcher_t(logger),
     storage(std::move(attributes)),
     list(transform(storage))
 {}
 
-auto keeper_t::attributes() const -> const attribute_list& {
+auto holder_t::attributes() const -> const attribute_list& {
     return list;
 }
 
-}  // namespace scoped
+}  // namespace scope
 }  // namespace v1
 }  // namespace blackhole

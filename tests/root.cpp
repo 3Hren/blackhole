@@ -6,7 +6,7 @@
 #include <blackhole/logger.hpp>
 #include <blackhole/record.hpp>
 #include <blackhole/root.hpp>
-#include <blackhole/scoped/keeper.hpp>
+#include <blackhole/scope/holder.hpp>
 
 #include "mocks/handler.hpp"
 
@@ -72,7 +72,7 @@ TEST(RootLogger, MoveConstructorMovesHandlers) {
     logger.log(0, "GET /porn.png HTTP/1.1");
 }
 
-TEST(RootLogger, MoveConstructorMovesScopedAttributes) {
+TEST(RootLogger, MoveConstructorMovesscopeAttributes) {
     typedef view_of<attributes_t>::type attribute_list;
 
     std::unique_ptr<mock::handler_t> handler(new mock::handler_t);
@@ -85,7 +85,7 @@ TEST(RootLogger, MoveConstructorMovesScopedAttributes) {
 
     // Logger must outlive its scoped attributes, that's why we need such variable.
     std::unique_ptr<root_logger_t> logger;
-    const scoped::keeper_t scoped(original, {{"key#1", {42}}});
+    const scope::holder_t scoped(original, {{"key#1", {42}}});
 
     // All scoped attributes should be assigned to the new owner.
     logger.reset(new root_logger_t(std::move(original)));
@@ -125,10 +125,10 @@ TEST(RootLogger, MoveConstructorMovesNestedScopedAttributes) {
     std::unique_ptr<root_logger_t> logger;
 
     root_logger_t original(std::move(handlers));
-    const scoped::keeper_t s1(original, {{"key#1", {42}}});
+    const scope::holder_t s1(original, {{"key#1", {42}}});
 
     {
-        const scoped::keeper_t s2(original, {{"key#2", {"value#2"}}});
+        const scope::holder_t s2(original, {{"key#2", {"value#2"}}});
         // All scoped attributes should be assigned to the new owner.
         logger.reset(new root_logger_t(std::move(original)));
         logger->log(0, "-");
@@ -285,7 +285,7 @@ TEST(RootLogger, LogWithScopedAttributes) {
         }));
 
     root_logger_t logger(std::move(handlers));
-    const scoped::keeper_t scoped(logger, {{"key#1", {42}}});
+    const scope::holder_t scoped(logger, {{"key#1", {42}}});
 
     logger.log(0, "GET /porn.png HTTP/1.1");
 }
@@ -312,11 +312,11 @@ TEST(RootLogger, LogWithNestedScopedAttributes) {
         }));
 
     root_logger_t logger(std::move(handlers));
-    const scoped::keeper_t s1(logger, {{"key#1", {42}}});
+    const scope::holder_t s1(logger, {{"key#1", {42}}});
 
     // NOTE: The following log will contain flattened attributes list.
     {
-        const scoped::keeper_t s2(logger, {{"key#2", {100}}});
+        const scope::holder_t s2(logger, {{"key#2", {100}}});
         logger.log(0, "GET /porn.png HTTP/1.1");
     }
 
@@ -344,7 +344,7 @@ TEST(RootLogger, AssignmentMovesScopedAttributes) {
 
     root_logger_t logger1({});
     root_logger_t logger2(std::move(handlers));
-    const scoped::keeper_t scoped(logger2, {{"key#1", {42}}});
+    const scope::holder_t scoped(logger2, {{"key#1", {42}}});
 
     // All scoped attributes should be assigned to the new owner.
     logger1 = std::move(logger2);
@@ -373,10 +373,10 @@ TEST(RootLogger, AssignmentMovesNestedScopedAttributes) {
 
     root_logger_t logger1({});
     root_logger_t logger2(std::move(handlers));
-    const scoped::keeper_t s1(logger2, {{"key#1", {42}}});
+    const scope::holder_t s1(logger2, {{"key#1", {42}}});
 
     {
-        const scoped::keeper_t s2(logger2, {{"key#2", "value#2"}});
+        const scope::holder_t s2(logger2, {{"key#2", "value#2"}});
         // All scoped attributes should be assigned to the new owner.
         logger1 = std::move(logger2);
         logger1.log(0, "-");
@@ -412,12 +412,12 @@ TEST(RootLogger, AssignmentMovesNestedTripleScopedAttributes) {
 
     root_logger_t logger1({});
     root_logger_t logger2(std::move(handlers));
-    const scoped::keeper_t s1(logger2, {{"key#1", {42}}});
+    const scope::holder_t s1(logger2, {{"key#1", {42}}});
 
     {
-        const scoped::keeper_t s2(logger2, {{"key#2", {"value#2"}}});
+        const scope::holder_t s2(logger2, {{"key#2", {"value#2"}}});
         {
-            const scoped::keeper_t s3(logger2, {{"key#3", {100}}});
+            const scope::holder_t s3(logger2, {{"key#3", {100}}});
             logger1 = std::move(logger2);
             logger1.log(0, "-");
         }

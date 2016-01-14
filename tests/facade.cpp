@@ -3,6 +3,7 @@
 
 #include <blackhole/attribute.hpp>
 #include <blackhole/extensions/facade.hpp>
+#include <blackhole/scope/manager.hpp>
 
 #include "mocks/logger.hpp"
 

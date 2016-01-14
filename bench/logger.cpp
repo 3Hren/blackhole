@@ -8,7 +8,7 @@
 #include <blackhole/handler.hpp>
 #include <blackhole/logger.hpp>
 #include <blackhole/root.hpp>
-#include <blackhole/scoped/keeper.hpp>
+#include <blackhole/scope/holder.hpp>
 #include <blackhole/wrapper.hpp>
 
 #include "mod.hpp"
@@ -132,7 +132,7 @@ literal_with_scoped_attributes(::benchmark::State& state) {
     root_logger_t root({});
     logger_facade<root_logger_t> logger(root);
 
-    const scoped::keeper_t scoped(root, {
+    const scope::holder_t scoped(root, {
         {"key#1", {42}},
         {"key#2", {3.1415}},
         {"key#3", "value"}
@@ -150,7 +150,7 @@ static void literal_with_scoped_attributes_everytime(::benchmark::State& state) 
     logger_facade<root_logger_t> logger(root);
 
     while (state.KeepRunning()) {
-        const scoped::keeper_t scoped(root, {
+        const scope::holder_t scoped(root, {
             {"key#1", {42}},
             {"key#2", {3.1415}},
             {"key#3", "value"}

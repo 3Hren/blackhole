@@ -1,7 +1,5 @@
 #include "blackhole/wrapper.hpp"
 
-#include "blackhole/scoped.hpp"
-
 namespace blackhole {
 inline namespace v1 {
 
@@ -32,8 +30,8 @@ auto wrapper_t::log(severity_t severity, const lazy_message_t& message, attribut
     inner.log(severity, message, pack);
 }
 
-auto wrapper_t::context() -> boost::thread_specific_ptr<scoped_t>* {
-    return inner.context();
+auto wrapper_t::manager() -> scope::manager_t& {
+    return inner.manager();
 }
 
 }  // namespace v1

@@ -4,7 +4,8 @@
 #include <boost/thread/tss.hpp>
 
 #include <blackhole/logger.hpp>
-#include <blackhole/scoped/keeper.hpp>
+#include <blackhole/scope/holder.hpp>
+#include <blackhole/scope/manager.hpp>
 #include <blackhole/wrapper.hpp>
 
 #include <blackhole/extensions/facade.hpp>
@@ -12,11 +13,16 @@
 #include <blackhole/root.hpp>
 
 #include "mocks/logger.hpp"
+#include "mocks/scope/manager.hpp"
 
 namespace blackhole {
 namespace testing {
 
+using ::testing::AtLeast;
+using ::testing::Invoke;
 using ::testing::Return;
+using ::testing::ReturnRef;
+using ::testing::SaveArg;
 using ::testing::_;
 
 TEST(Wrapper, Constructor) {
@@ -35,19 +41,33 @@ TEST(Wrapper, Constructor) {
     EXPECT_EQ(expected, wrapper.attributes());
 }
 
-TEST(wrapper_t, DelegatesScoped) {
-    // NOTE: This hack is required to test scoped attributes mechanics.
-    boost::thread_specific_ptr<scoped_t> context([](scoped_t*) {});
+TEST(wrapper_t, DelegatesScopeManager) {
+    mock::scope::manager_t manager;
 
     mock::logger_t logger;
     wrapper_t wrapper(logger, {});
 
-    // TODO: Implement operator== for attribute. Refactor all tests to check.
-    EXPECT_CALL(logger, context())
+    EXPECT_CALL(logger, manager())
         .Times(1)
-        .WillOnce(Return(&context));
+        .WillOnce(ReturnRef(manager));
 
-    const scoped::keeper_t scoped(wrapper, {});
+    scope::watcher_t* watcher = nullptr;
+
+    EXPECT_CALL(manager, get())
+        .Times(AtLeast(1))
+        .WillOnce(Return(nullptr))
+        .WillOnce(Invoke([&]() -> scope::watcher_t* {
+            return watcher;
+        }));
+
+    EXPECT_CALL(manager, reset(_))
+        .Times(1)
+        .WillOnce(SaveArg<0>(&watcher));
+
+    EXPECT_CALL(manager, reset(nullptr))
+        .Times(1);
+
+    const scope::holder_t scoped(wrapper, {});
 }
 
 }  // namespace testing

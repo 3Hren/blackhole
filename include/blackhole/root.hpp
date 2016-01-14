@@ -63,7 +63,7 @@ public:
     auto log(severity_t severity, const string_view& message, attribute_pack& pack) -> void;
     auto log(severity_t severity, const lazy_message_t& message, attribute_pack& pack) -> void;
 
-    auto context() -> boost::thread_specific_ptr<scoped_t>*;
+    auto manager() -> scope::manager_t&;
 
 private:
     template<typename F>

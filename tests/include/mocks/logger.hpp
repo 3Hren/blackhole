@@ -4,7 +4,6 @@
 
 #include <blackhole/attribute.hpp>
 #include <blackhole/logger.hpp>
-#include <blackhole/scoped.hpp>
 
 namespace blackhole {
 namespace testing {
@@ -18,7 +17,7 @@ public:
     MOCK_METHOD2(log, void(severity_t, const string_view&));
     MOCK_METHOD3(log, void(severity_t, const string_view&, attribute_pack&));
     MOCK_METHOD3(log, void(severity_t, const lazy_message_t&, attribute_pack&));
-    MOCK_METHOD0(context, boost::thread_specific_ptr<scoped_t>*());
+    MOCK_METHOD0(manager, scope::manager_t&());
 };
 
 }  // namespace mock
