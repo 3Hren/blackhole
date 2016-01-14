@@ -11,7 +11,6 @@ inline namespace v1 {
 
 class handler_t;
 class record_t;
-class scoped_t;
 
 }  // namespace v1
 }  // namespace blackhole
