@@ -6,6 +6,7 @@
 
 #include "blackhole/attributes.hpp"
 #include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/severity.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -33,12 +34,12 @@ public:
     ///
     /// \warning constructing from rvalue references is explicitly forbidden, specified objects must
     ///     outlive the record created.
-    record_t(int severity,
+    record_t(severity_t severity,
         std::reference_wrapper<const string_view> message,
         std::reference_wrapper<const attribute_pack> attributes);
 
     auto message() const noexcept -> const string_view&;
-    auto severity() const noexcept -> int;
+    auto severity() const noexcept -> severity_t;
     auto timestamp() const noexcept -> time_point;
 
     auto pid() const noexcept -> std::uint64_t;

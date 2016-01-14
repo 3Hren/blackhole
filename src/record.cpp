@@ -11,7 +11,7 @@ struct record_t::inner_t {
     std::reference_wrapper<const string_view> message;
     std::reference_wrapper<const string_view> formatted;
 
-    int severity;
+    severity_t severity;
     time_point timestamp;
 
     std::thread::native_handle_type tid;
@@ -20,7 +20,7 @@ struct record_t::inner_t {
     std::reference_wrapper<const attribute_pack> attributes;
 };
 
-record_t::record_t(int severity,
+record_t::record_t(severity_t severity,
     std::reference_wrapper<const string_view> message,
     std::reference_wrapper<const attribute_pack> attributes)
 {
@@ -42,7 +42,7 @@ auto record_t::message() const noexcept -> const string_view& {
     return inner().message.get();
 }
 
-auto record_t::severity() const noexcept -> int {
+auto record_t::severity() const noexcept -> severity_t {
     return inner().severity;
 }
 
