@@ -47,9 +47,8 @@ public:
     /// Logs the given message with the specified severity level and attributes pack attached.
     virtual auto log(severity_t severity, const message_t& message, attribute_pack& pack) -> void = 0;
 
-    /// Logs the given message with the specified severity level, attributes pack attached and with
-    /// special message supplier callback.
-    // TODO: Update docs.
+    /// Logs a message which is only to be constructed if the result record passes filtering with
+    /// the specified severity and including the attributes pack provided.
     virtual auto log(severity_t severity, const lazy_message_t& message, attribute_pack& pack) -> void = 0;
 
     /// Returns a scoped attributes manager reference.
