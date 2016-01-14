@@ -19,8 +19,8 @@ public:
         return attributes_view;
     }
 
-    auto log(severity_t severity, const string_view& message) -> void;
-    auto log(severity_t severity, const string_view& message, attribute_pack& pack) -> void;
+    auto log(severity_t severity, const message_t& message) -> void;
+    auto log(severity_t severity, const message_t& message, attribute_pack& pack) -> void;
     auto log(severity_t severity, const lazy_message_t& message, attribute_pack& pack) -> void;
 
     auto manager() -> scope::manager_t&;

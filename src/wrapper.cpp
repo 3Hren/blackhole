@@ -15,12 +15,12 @@ wrapper_t::wrapper_t(logger_t& log, attributes_t attributes):
     }
 }
 
-auto wrapper_t::log(severity_t severity, const string_view& message) -> void {
+auto wrapper_t::log(severity_t severity, const message_t& message) -> void {
     attribute_pack pack{attributes()};
     inner.log(severity, message, pack);
 }
 
-auto wrapper_t::log(severity_t severity, const string_view& message, attribute_pack& pack) -> void {
+auto wrapper_t::log(severity_t severity, const message_t& message, attribute_pack& pack) -> void {
     pack.push_back(attributes());
     inner.log(severity, message, pack);
 }

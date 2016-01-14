@@ -157,12 +157,12 @@ struct null_message_t {
 
 }  // namespace
 
-auto root_logger_t::log(severity_t severity, const string_view& message) -> void {
+auto root_logger_t::log(severity_t severity, const message_t& message) -> void {
     attribute_pack pack;
     log(severity, message, pack);
 }
 
-auto root_logger_t::log(severity_t severity, const string_view& message, attribute_pack& pack) -> void {
+auto root_logger_t::log(severity_t severity, const message_t& message, attribute_pack& pack) -> void {
     consume(severity, message, pack, null_message_t());
 }
 
