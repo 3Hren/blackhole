@@ -164,6 +164,7 @@ Developed by another crazy Russian programmer using dark template magic and Vodk
 - Sadly, but you are restricted with the latest boost versions.
 - Hard to hack and extend unless you are fine with templates, template of templates and variadic templates of a templated templates with templates. Or you are Andrei Alexandrescu.
 - Relatively poor performance. Higher than `log4cxx` have, but not enough for us.
+- Requires RTTI.
 
 ### Log4cxx
 Logging framework for C++ patterned after Apache log4j. Yeah, Java.
