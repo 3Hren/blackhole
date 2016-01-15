@@ -56,9 +56,9 @@ Of course there are disadvantages, such as virtual function call cost and closed
 - [x] Inline namespaces.
 - [x] Optional compile-time inline messages transformation (C++14).
   - [ ] Compile-time placeholder type checking.
+  - [ ] Compile-time placeholder spec checking (?).
 - [x] Python-like formatting (no printf-like formatting support) both inline and result messages.
 - [x] Attributes.
-- [ ] Scatter-gathered IO (?)
 - [x] Scoped attributes.
 - [x] Wrappers.
 - [x] Custom verbosity.
@@ -77,6 +77,7 @@ Of course there are disadvantages, such as virtual function call cost and closed
   - [ ] Socket TCP.
     - [ ] Blocking.
     - [ ] Non blocking.
+- [ ] Scatter-gathered IO (?)
 - [x] Logger builder.
 - [ ] Macro with line and filename attributes.
 - [x] Initializer from json (filename, string).
