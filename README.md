@@ -116,8 +116,8 @@ The Blackhole supports several predefined attributes, with convenient specificat
 
 | Placeholder              | Description                                                   |
 |--------------------------|---------------------------------------------------------------|
-|{severity:s}              | User provided string representation                           |
-|{severity}, {severity:d}  | Numeric value                                                 |
+|{severity:s}              | User provided severity string representation                  |
+|{severity}, {severity:d}  | Numeric severity value                                        |
 |{timestamp:d}             | Number of microseconds since Unix epoch                       |
 |{timestamp:{spec}s}       | String representation using *strftime* specification          |
 |{timestamp}, {timestamp:s}| The same as *{timestamp:{%Y-%m-%d %H:%M:%S.%f}s}*             |
