@@ -112,6 +112,22 @@ As you may notice the severity field is aligned to the right border (see that *>
 formatted using default representation with a microseconds extension and so on. Because Blackhole is all about
 attributes you can place and format every custom attribute you want, as we just done with *scope* attribute.
 
+The Blackhole supports several predefined attributes, with convenient specifications:
+
+| Placeholder              | Description                                                   |
+|--------------------------|---------------------------------------------------------------|
+|{severity:s}              | User provided string representation                           |
+|{severity}, {severity:d}  | Numeric value                                                 |
+|{timestamp:d}             | Number of microseconds since Unix epoch                       |
+|{timestamp:{spec}s}       | String representation using *strftime* specification          |
+|{timestamp}, {timestamp:s}| The same as *{timestamp:{%Y-%m-%d %H:%M:%S.%f}s}*             |
+|{process:s}               | Process name                                                  |
+|{process}, {process:d}    | PID                                                           |
+|{thread}, {thread::x}     | Thread hex id as an opaque value returned by *pthread_self(3)*|
+|{thread:s}                | Thread name or *unnnamed*                                     |
+|{message}                 | Logging message                                               |
+|{...}                     | All user declared attributes                                  |
+
 For more information please read the documentation and visit the following links:
 
  - http://cppformat.github.io/latest/syntax.html - general syntax.
