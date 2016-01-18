@@ -1,6 +1,6 @@
-#include <boost/variant/variant.hpp>
-
 #pragma once
+
+#include <boost/variant/variant.hpp>
 
 namespace blackhole {
 inline namespace v1 {
