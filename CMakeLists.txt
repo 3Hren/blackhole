@@ -38,6 +38,7 @@ add_library(${LIBRARY_NAME} SHARED
 	src/formatter/string/error
 	src/formatter/string/parser
 	src/formatter/string/token
+	src/handler.cpp
 	src/handler/blocking
 	src/logger
 	src/procname

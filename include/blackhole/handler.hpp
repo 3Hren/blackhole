@@ -15,7 +15,7 @@ public:
     handler_t(const handler_t& other) = default;
     handler_t(handler_t&& other) = default;
 
-    virtual ~handler_t() {}
+    virtual ~handler_t() = 0;
 
     /// \warning must be thread-safe.
     virtual auto execute(const record_t& record) -> void = 0;
