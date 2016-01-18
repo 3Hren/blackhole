@@ -64,7 +64,7 @@ TEST(RootLogger, MoveConstructorMovesHandlers) {
 
     root_logger_t original(std::move(handlers));
 
-    EXPECT_CALL(*view, execute(_))
+    EXPECT_CALL(*view, handle(_))
         .Times(1);
 
     root_logger_t logger(std::move(original));
@@ -90,7 +90,7 @@ TEST(RootLogger, MoveConstructorMovesscopeAttributes) {
     // All scoped attributes should be assigned to the new owner.
     logger.reset(new root_logger_t(std::move(original)));
 
-    EXPECT_CALL(*view, execute(_))
+    EXPECT_CALL(*view, handle(_))
         .Times(1)
         .WillOnce(Invoke([](const record_t& record) {
             EXPECT_EQ("GET /porn.png HTTP/1.1", record.message().to_string());
@@ -110,7 +110,7 @@ TEST(RootLogger, MoveConstructorMovesNestedScopedAttributes) {
     std::vector<std::unique_ptr<handler_t>> handlers;
     handlers.push_back(std::move(handler));
 
-    EXPECT_CALL(*view, execute(_))
+    EXPECT_CALL(*view, handle(_))
         .Times(2)
         .WillOnce(Invoke([](const record_t& record) {
             ASSERT_EQ(2, record.attributes().size());
@@ -148,7 +148,7 @@ TEST(RootLogger, LogInvokesDispatchingRecordToHandlers) {
     }
 
     for (auto handler : handlers_view) {
-        EXPECT_CALL(*handler, execute(_))
+        EXPECT_CALL(*handler, handle(_))
             .Times(1)
             .WillOnce(Invoke([](const record_t& record) {
                 EXPECT_EQ("GET /porn.png HTTP/1.1", record.message().to_string());
@@ -176,7 +176,7 @@ TEST(RootLogger, LogWithAttributesInvokesDispatchingRecordToHandlers) {
     }
 
     for (auto handler : handlers_view) {
-        EXPECT_CALL(*handler, execute(_))
+        EXPECT_CALL(*handler, handle(_))
             .Times(1)
             .WillOnce(Invoke([&](const record_t& record) {
                 EXPECT_EQ("GET /porn.png HTTP/1.1", record.message().to_string());
@@ -207,7 +207,7 @@ TEST(RootLogger, LogWithAttributesAndFormatterInvokesDispatchingRecordToHandlers
     }
 
     for (auto handler : handlers_view) {
-        EXPECT_CALL(*handler, execute(_))
+        EXPECT_CALL(*handler, handle(_))
             .Times(1)
             .WillOnce(Invoke([&](const record_t& record) {
                 EXPECT_EQ("GET /porn.png HTTP/1.1 - {}/{}", record.message().to_string());
@@ -257,7 +257,7 @@ TEST(RootLogger, AssignmentMovesHandlers) {
     std::vector<std::unique_ptr<handler_t>> handlers;
     handlers.push_back(std::move(handler));
 
-    EXPECT_CALL(*view, execute(_))
+    EXPECT_CALL(*view, handle(_))
         .Times(1);
 
     root_logger_t logger1({});
@@ -277,7 +277,7 @@ TEST(RootLogger, LogWithScopedAttributes) {
     std::vector<std::unique_ptr<handler_t>> handlers;
     handlers.push_back(std::move(handler));
 
-    EXPECT_CALL(*view, execute(_))
+    EXPECT_CALL(*view, handle(_))
         .Times(1)
         .WillOnce(Invoke([](const record_t& record) {
             ASSERT_EQ(1, record.attributes().size());
@@ -299,7 +299,7 @@ TEST(RootLogger, LogWithNestedScopedAttributes) {
     std::vector<std::unique_ptr<handler_t>> handlers;
     handlers.push_back(std::move(handler));
 
-    EXPECT_CALL(*view, execute(_))
+    EXPECT_CALL(*view, handle(_))
         .Times(2)
         .WillOnce(Invoke([](const record_t& record) {
             ASSERT_EQ(2, record.attributes().size());
@@ -332,7 +332,7 @@ TEST(RootLogger, AssignmentMovesScopedAttributes) {
     std::vector<std::unique_ptr<handler_t>> handlers;
     handlers.push_back(std::move(handler));
 
-    EXPECT_CALL(*view, execute(_))
+    EXPECT_CALL(*view, handle(_))
         .Times(1)
         .WillOnce(Invoke([](const record_t& record) {
             EXPECT_EQ("GET /porn.png HTTP/1.1", record.message().to_string());
@@ -359,7 +359,7 @@ TEST(RootLogger, AssignmentMovesNestedScopedAttributes) {
     std::vector<std::unique_ptr<handler_t>> handlers;
     handlers.push_back(std::move(handler));
 
-    EXPECT_CALL(*view, execute(_))
+    EXPECT_CALL(*view, handle(_))
         .Times(2)
         .WillOnce(Invoke([](const record_t& record) {
             ASSERT_EQ(2, record.attributes().size());
@@ -392,7 +392,7 @@ TEST(RootLogger, AssignmentMovesNestedTripleScopedAttributes) {
     std::vector<std::unique_ptr<handler_t>> handlers;
     handlers.push_back(std::move(handler));
 
-    EXPECT_CALL(*view, execute(_))
+    EXPECT_CALL(*view, handle(_))
         .Times(3)
         .WillOnce(Invoke([](const record_t& record) {
             ASSERT_EQ(3, record.attributes().size());
@@ -433,7 +433,7 @@ TEST(RootLogger, IgnoresExceptionsFromHandlers) {
 
     root_logger_t logger(std::move(handlers));
 
-    EXPECT_CALL(*handler, execute(_))
+    EXPECT_CALL(*handler, handle(_))
         .Times(1)
         .WillOnce(Throw(std::runtime_error("...")));
 
@@ -451,7 +451,7 @@ TEST(RootLogger, IgnoresMarginalExceptionsFromHandlers) {
 
     root_logger_t logger(std::move(handlers));
 
-    EXPECT_CALL(*handler, execute(_))
+    EXPECT_CALL(*handler, handle(_))
         .Times(1)
         .WillOnce(Throw(42));
 

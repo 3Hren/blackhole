@@ -188,7 +188,7 @@ auto root_logger_t::consume(severity_t severity, const string_view& pattern, att
         record.activate(formatted);
         for (auto& handler : inner->handlers) {
             try {
-                handler->execute(record);
+                handler->handle(record);
             } catch (const std::exception& err) {
                 std::cout << "logging core error occurred: " << err.what() << std::endl;
             } catch (...) {

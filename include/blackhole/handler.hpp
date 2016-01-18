@@ -9,6 +9,7 @@ class formatter_t;
 class record_t;
 class sink_t;
 
+/// Represents logging handler interface.
 class handler_t {
 public:
     handler_t() = default;
@@ -17,8 +18,13 @@ public:
 
     virtual ~handler_t() = 0;
 
+    /// Handles the given record.
+    ///
+    /// By handling a record we usually mean doing at least three actions over it: filtering,
+    /// formatting and emitting to the targets.
+    ///
     /// \warning must be thread-safe.
-    virtual auto execute(const record_t& record) -> void = 0;
+    virtual auto handle(const record_t& record) -> void = 0;
 
     virtual auto set(std::unique_ptr<formatter_t> formatter) -> void = 0;
     virtual auto add(std::unique_ptr<sink_t> sink) -> void = 0;

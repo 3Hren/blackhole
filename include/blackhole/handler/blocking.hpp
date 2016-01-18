@@ -33,7 +33,7 @@ class blocking_t : public handler_t {
     std::vector<std::unique_ptr<sink_t>> sinks;
 
 public:
-    auto execute(const record_t& record) -> void;
+    auto handle(const record_t& record) -> void;
 
     auto set(std::unique_ptr<formatter_t> formatter) -> void;
     auto add(std::unique_ptr<sink_t> sink) -> void;

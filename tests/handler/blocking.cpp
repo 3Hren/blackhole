@@ -16,7 +16,7 @@ using ::testing::_;
 
 using blackhole::handler::blocking_t;
 
-TEST(Handler, Execute) {
+TEST(Handler, Handle) {
     std::unique_ptr<mock::formatter_t> formatter_(new mock::formatter_t);
     mock::formatter_t& formatter = *formatter_;
 
@@ -44,7 +44,7 @@ TEST(Handler, Execute) {
     const attribute_pack pack;
     record_t record(42, message, pack);
 
-    handler.execute(record);
+    handler.handle(record);
 }
 
 }  // namespace testing

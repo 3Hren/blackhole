@@ -9,7 +9,7 @@ inline namespace v1 {
 namespace handler {
 
 auto
-blocking_t::execute(const record_t& record) -> void {
+blocking_t::handle(const record_t& record) -> void {
     writer_t writer;
 
     formatter->format(record, writer);
