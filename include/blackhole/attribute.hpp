@@ -43,14 +43,15 @@ class view_t;
 
 /// Represents an attribute value holder.
 ///
-/// Attribute value is an algebraic data type that can be initialized with one of six predefined
-/// primitive types:
+/// Attribute value is an algebraic data type that can be initialized with one of the following
+/// predefined primitive types:
 ///     - none marker;
 ///     - boolean type (true or false);
 ///     - signed integer types up to 64-bit size;
 ///     - unsigned integer types up to 64-bit size;
 ///     - floating point type;
-///     - and an owned string type.
+///     - owned string type;
+///     - and a function type, which can fill the specified writer with the value lazily.
 ///
 /// The underlying value can be obtained through `blackhole::attribute::get` function with providing
 /// the desired result type. For example:
