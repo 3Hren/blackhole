@@ -80,11 +80,12 @@ Of course there are disadvantages, such as virtual function call cost and closed
 - [ ] Scatter-gathered IO (?)
 - [x] Logger builder.
 - [ ] Macro with line and filename attributes.
-- [x] Initializer from json (filename, string).
+- [x] Initializer from JSON (filename, string).
+- [ ] Inflector.
 
 ## Formatters
 
-Formatters in Blackhole are responsible for converting every log record passing into some byte array representation. It can be either human-readable string, json tree or even [protobuf](https://github.com/google/protobuf) packed frame.
+Formatters in Blackhole are responsible for converting every log record passing into some byte array representation. It can be either human-readable string, JSON tree or even [protobuf](https://github.com/google/protobuf) packed frame.
 
 ### String
 
