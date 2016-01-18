@@ -13,7 +13,7 @@ public:
     formatter_t(const formatter_t& other) = default;
     formatter_t(formatter_t&& other) = default;
 
-    virtual ~formatter_t() {}
+    virtual ~formatter_t() = 0;
 
     virtual auto format(const record_t& record, writer_t& writer) -> void = 0;
 };

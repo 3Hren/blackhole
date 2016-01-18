@@ -34,6 +34,7 @@ add_library(${LIBRARY_NAME} SHARED
 	src/datetime/generator.other
 	src/format
 	src/formatter/json
+	src/formatter/mod
 	src/formatter/string.cpp
 	src/formatter/string/error
 	src/formatter/string/parser
