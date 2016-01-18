@@ -37,7 +37,7 @@ TEST(Handler, Handle) {
             writer.write("---");
         }));
 
-    EXPECT_CALL(sink, execute(_, _))
+    EXPECT_CALL(sink, emit(_, _))
         .Times(1);
 
     const string_view message("-");

@@ -130,9 +130,11 @@ public:
     /// accepted.
     auto filter(const record_t& record) -> bool;
 
-    /// Consumes the log record with the given formatted string with its further writing to the
-    /// stream attached.
-    auto execute(const record_t& record, const string_view& formatted) -> void;
+    /// Writes the formatted message into the attached output stream.
+    ///
+    /// Note that the message may be anticipatorily colored using severity information from the
+    /// associated record.
+    auto emit(const record_t& record, const string_view& formatted) -> void;
 
 protected:
     /// Constructs a new console sink, which will write all incoming events to the specified

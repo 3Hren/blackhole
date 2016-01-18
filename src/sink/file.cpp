@@ -46,7 +46,7 @@ auto file_t::filter(const record_t&) -> bool {
     return true;
 }
 
-auto file_t::execute(const record_t& record, const string_view& formatted) -> void {
+auto file_t::emit(const record_t& record, const string_view& formatted) -> void {
     const auto filename = inner->filename(record);
 
     std::lock_guard<std::mutex> lock(inner->mutex);

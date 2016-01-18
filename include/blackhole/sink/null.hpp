@@ -37,7 +37,7 @@ public:
     auto filter(const record_t& record) -> bool;
 
     /// Drops any incoming log event.
-    auto execute(const record_t& record, const string_view& formatted) -> void;
+    auto emit(const record_t& record, const string_view& formatted) -> void;
 };
 
 }  // namespace sink

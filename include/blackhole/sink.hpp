@@ -30,7 +30,7 @@ public:
 
     virtual auto filter(const record_t& record) -> bool = 0;
 
-    virtual auto execute(const record_t& record, const string_view& formatted) -> void = 0;
+    virtual auto emit(const record_t& record, const string_view& message) -> void = 0;
 };
 
 }  // namespace v1

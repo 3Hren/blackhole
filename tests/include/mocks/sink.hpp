@@ -14,7 +14,7 @@ public:
     ~sink_t();
 
     MOCK_METHOD1(filter, bool(const record_t&));
-    MOCK_METHOD2(execute, void(const record_t&, const string_view&));
+    MOCK_METHOD2(emit, void(const record_t&, const string_view&));
 };
 
 }  // namespace mock

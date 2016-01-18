@@ -50,7 +50,7 @@ public:
 
     auto filter(const record_t& record) -> bool;
 
-    auto execute(const record_t& record, const string_view& formatted) -> void;
+    auto emit(const record_t& record, const string_view& message) -> void;
 };
 
 // builder<socket::udp_t>()

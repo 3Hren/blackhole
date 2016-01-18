@@ -83,7 +83,7 @@ TEST(console_t, WriteIntoStandardOutputByDefault) {
     record_t record(42, message, pack);
 
     CaptureStdout();
-    sink.execute(record, "expected");
+    sink.emit(record, "expected");
 
     const std::string actual = GetCapturedStdout();
     EXPECT_EQ("expected\n", actual);
@@ -113,7 +113,7 @@ TEST(console_t, ColoredOutput) {
 
     std::ostringstream stream;
     cout_redirector_t lock(stream.rdbuf());
-    sink.execute(record, "expected");
+    sink.emit(record, "expected");
 
     if (::isatty(1)) {
         EXPECT_EQ("\033[31mexpected\033[0m\n", stream.str());
@@ -131,7 +131,7 @@ TEST(console_t, NonColoredOutputToNonTTY) {
     const attribute_pack pack;
     record_t record(42, message, pack);
 
-    sink.execute(record, "expected");
+    sink.emit(record, "expected");
 
     EXPECT_EQ("expected\n", sink.stream.str());
 }

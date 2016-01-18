@@ -78,9 +78,10 @@ public:
     /// be accepted.
     auto filter(const record_t& record) -> bool;
 
-    /// Consumes the log record with the given formatted string with its further writing to the
-    /// files associated.
-    auto execute(const record_t& record, const string_view& formatted) -> void;
+    /// Outputs the formatted message with its associated record to the file.
+    ///
+    /// Depending on the filename pattern it is possible to write into multiple destinations.
+    auto emit(const record_t& record, const string_view& formatted) -> void;
 
 private:
     file_t(std::unique_ptr<file::inner_t> inner) noexcept;

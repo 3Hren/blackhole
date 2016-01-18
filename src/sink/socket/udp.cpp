@@ -55,7 +55,7 @@ auto udp_t::filter(const record_t&) -> bool {
     return true;
 }
 
-auto udp_t::execute(const record_t&, const string_view& formatted) -> void {
+auto udp_t::emit(const record_t&, const string_view& formatted) -> void {
     inner->write(formatted);
 }
 

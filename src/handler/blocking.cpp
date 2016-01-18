@@ -16,7 +16,7 @@ blocking_t::handle(const record_t& record) -> void {
 
     for (const auto& sink : sinks) {
         // TODO: Check for filter.
-        sink->execute(record, writer.result());
+        sink->emit(record, writer.result());
     }
 }
 

@@ -13,7 +13,7 @@ null_t::filter(const record_t&) -> bool {
 }
 
 auto
-null_t::execute(const record_t&, const string_view&) -> void {}
+null_t::emit(const record_t&, const string_view&) -> void {}
 
 }  // namespace sink
 

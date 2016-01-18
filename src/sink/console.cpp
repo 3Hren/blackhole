@@ -141,7 +141,7 @@ auto console_t::filter(const record_t&) -> bool {
     return true;
 }
 
-auto console_t::execute(const record_t& record, const string_view& formatted) -> void {
+auto console_t::emit(const record_t& record, const string_view& formatted) -> void {
     if (isatty(stream)) {
         std::lock_guard<std::mutex> lock(mutex);
         color(record).apply(stream, formatted.data(), formatted.size());
