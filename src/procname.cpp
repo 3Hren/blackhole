@@ -1,9 +1,5 @@
 #include "blackhole/detail/procname.hpp"
 
-#include <cstring>
-
-#include "blackhole/cpp17/string_view.hpp"
-
 #ifdef __linux__
 #   include <sys/types.h>
 #elif __APPLE__
@@ -11,6 +7,10 @@
 #endif
 
 #include <unistd.h>
+
+#include <cstring>
+
+#include "blackhole/cpp17/string_view.hpp"
 
 namespace blackhole {
 inline namespace v1 {
