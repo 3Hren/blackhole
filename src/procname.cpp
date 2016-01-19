@@ -6,10 +6,11 @@
 
 #ifdef __linux__
 #   include <sys/types.h>
-#   include <unistd.h>
 #elif __APPLE__
 #   include <libproc.h>
 #endif
+
+#include <unistd.h>
 
 namespace blackhole {
 inline namespace v1 {
