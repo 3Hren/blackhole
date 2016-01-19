@@ -1,7 +1,7 @@
 Summary:	Blackhole
 Name:		libblackhole
-Version:	0.2.3
-Release:	2%{?dist}
+Version:	0.2.4
+Release:	1%{?dist}
 
 License:	MIT
 Group:		System Environment/Libraries
@@ -65,6 +65,9 @@ rm -rf %{buildroot}
 %{_includedir}/blackhole/*
 
 %changelog
+* Fri Jan 15 2016 Evgeny Safronov <division494@gmail.com> - 0.2.4-1
+- Bug fix: decay the desired type for dynamic.
+
 * Tue Jul 21 2015 Evgeny Safronov <division494@gmail.com> - 0.2.3-2
 - Bug fix: fixed compiler version determiner macro to be usable with GCC5.
 

@@ -393,7 +393,7 @@ typename std::enable_if<
     T
 >::type
 dynamic_t::to() const {
-    if (auto result = boost::get<T>(&value)) {
+    if (auto result = boost::get<typename std::decay<T>::type>(&value)) {
         return *result;
     }
 

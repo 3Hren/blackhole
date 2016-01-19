@@ -1,3 +1,9 @@
+blackhole (0.2.4-1) unstable; urgency=low
+
+  * Bug fix: decay the desired type for dynamic.
+
+ -- Evgeny Safronov <division494@gmail.com>  Fri, 15 Jan 2016 13:28:37 +0300
+
 blackhole (0.2.3-2) unstable; urgency=low
 
   * Bug fix: fixed compiler version determiner macro to be usable with GCC5.
