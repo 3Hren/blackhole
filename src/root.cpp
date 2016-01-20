@@ -41,7 +41,11 @@ public:
 }  // namespace
 
 struct root_logger_t::sync_t {
-#ifndef __clang__
+    // NOTE: Actually we need to check for `std::atomic_*_explicit` overloads for `std::shared_ptr`,
+    // but it seems there is no simple way to do this.
+    // The given solution works both on OS X with clang compiler and on linux with GCC and clang.
+    // Feel free to hack and send a PR with better solution.
+#ifndef __APPLE__
     typedef spinlock_t mutex_type;
     mutable mutex_type mutex;
 #endif
@@ -49,7 +53,7 @@ struct root_logger_t::sync_t {
     thread_manager_t manager;
 
     auto load(const std::shared_ptr<inner_t>& source) const noexcept -> std::shared_ptr<inner_t> {
-#ifdef __clang__
+#ifdef __APPLE__
         return std::atomic_load_explicit(&source, std::memory_order_acquire);
 #else
         std::lock_guard<mutex_type> lock(mutex);
@@ -58,7 +62,7 @@ struct root_logger_t::sync_t {
     }
 
     auto store(std::shared_ptr<inner_t>& source, std::shared_ptr<inner_t> value) noexcept -> void {
-#ifdef __clang__
+#ifdef __APPLE__
         std::atomic_store_explicit(&source, std::move(value), std::memory_order_release);
 #else
         std::lock_guard<mutex_type> lock(mutex);
