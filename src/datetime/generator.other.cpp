@@ -1,4 +1,4 @@
-#if __APPLE__
+#ifdef __APPLE__
 
 #include "blackhole/detail/datetime/other/generator.hpp"
 
