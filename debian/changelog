@@ -1,3 +1,11 @@
+blackhole (1.0.0-0alpha2) unstable; urgency=low
+
+  * Bug fix: fix build on linux with clang.
+  * Bug fix: fix undefined variable warnings on linux.
+  * Bug fix: suppress sometimes unused variable on linux.
+
+ -- Evgeny Safronov <division494@gmail.com>  Wed, 20 Jan 2016 17:25:59 +0300
+
 blackhole (1.0.0-0alpha1) unstable; urgency=low
 
   * Blackhole as a shared library.
