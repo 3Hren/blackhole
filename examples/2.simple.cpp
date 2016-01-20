@@ -34,7 +34,7 @@ static auto sevmap(std::size_t severity, const std::string& spec, blackhole::wri
 
 auto main(int, char**) -> int {
     /// Here we are going to configure our string/console handler and to build the logger.
-    auto log = blackhole::builder<blackhole::root_logger_t>()
+    auto log = blackhole::experimental::builder<blackhole::root_logger_t>()
         /// Add the blocking handler.
         .handler<blackhole::handler::blocking_t>()
             /// Configure string formatter.

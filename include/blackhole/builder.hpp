@@ -6,7 +6,6 @@
 namespace blackhole {
 inline namespace v1 {
 
-template<typename> class builder; // temp.
 class handler_t;
 class logger_t;
 
@@ -15,6 +14,17 @@ class logger_t;
 
 namespace blackhole {
 inline namespace v1 {
+namespace experimental {
+
+template<typename> class builder; // temp.
+
+}  // namespace experimental
+}  // namespace v1
+}  // namespace blackhole
+
+namespace blackhole {
+inline namespace v1 {
+namespace experimental {
 
 template<typename L, typename T>
 class handler_builder {
@@ -83,5 +93,6 @@ public:
     }
 };
 
+}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole
