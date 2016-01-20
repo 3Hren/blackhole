@@ -109,7 +109,7 @@ root_logger_t::root_logger_t(filter_t filter, std::vector<std::unique_ptr<handle
 
 root_logger_t::root_logger_t(root_logger_t&& other) noexcept :
     sync(new sync_t),
-    inner(std::move(other.sync->load(other.inner)))
+    inner(other.sync->load(other.inner))
 {
     sync->manager.reset(other.sync->manager.get());
 
@@ -126,7 +126,7 @@ root_logger_t::operator=(root_logger_t&& other) noexcept -> root_logger_t& {
         return *this;
     }
 
-    const auto inner = std::move(other.sync->load(other.inner));
+    const auto inner = other.sync->load(other.inner);
     sync->store(this->inner, std::move(inner));
 
     sync->manager.reset(other.sync->manager.get());
