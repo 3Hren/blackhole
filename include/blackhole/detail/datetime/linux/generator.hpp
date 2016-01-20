@@ -24,7 +24,6 @@ class generator_t {
 
 public:
     explicit generator_t(std::string pattern);
-    ~generator_t();
 
     template<typename Stream>
     void operator()(Stream& stream, const std::tm& tm, std::uint64_t usec = 0) const;

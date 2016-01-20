@@ -67,8 +67,6 @@ generator_t::generator_t(std::string pattern) {
     }
 }
 
-generator_t::~generator_t() {}
-
 template<typename Stream>
 auto
 generator_t::operator()(Stream& stream, const std::tm& tm, std::uint64_t usec) const -> void {
