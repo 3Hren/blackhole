@@ -20,6 +20,7 @@ namespace {
 
 auto procname(pid_t pid) -> cpp17::string_view {
 #ifdef __linux__
+    (void)pid;
     return cpp17::string_view(program_invocation_short_name, ::strlen(program_invocation_short_name));
 #elif __APPLE__
     static char path[PROC_PIDPATHINFO_MAXSIZE];
