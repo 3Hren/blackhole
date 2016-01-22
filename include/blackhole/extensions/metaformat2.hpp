@@ -193,7 +193,6 @@ public:
 
         std::size_t id = 0;
         std::size_t prev = 0;
-        // Current literal view.
 
         while (true) {
             if (id == pattern.size()) {
@@ -328,26 +327,35 @@ public:
     }
 };
 
+/// \warning requires precise placeholders and total tokens count, otherwise the behavior is
+///     undefined, probably won't compile.
 template<std::size_t P, std::size_t N>
 struct tokenizer {
     static constexpr auto L = N - P;
 
-    string_view pattern_;
+    string_view pattern;
     std::array<token_t, N> tokens;
 
     constexpr explicit tokenizer(string_view pattern) :
-        pattern_(pattern),
+        pattern(pattern),
         tokens(tokenizer_t(pattern).tokens<N>())
     {}
+
+    constexpr auto unparsed() const noexcept -> string_view {
+        return pattern;
+    }
 
     template<typename W, typename... Args>
     __attribute__((always_inline))
     constexpr auto format(W& wr, const Args&... args) const -> void {
-        static_assert(sizeof...(Args) == P, "");
+        // TODO: Check arguments count mismatch: static_assert(sizeof...(Args) == P, "");
+        // TODO: Check arguments type mismatch based on exceptions.
         fmt<0, sizeof...(Args)>(wr, args...);
     }
 
 private:
+    /// \note that it's critical to always inline this method, because then constexpr magic may
+    ///     occur in compile-time branch elimination.
     template<std::size_t I, std::size_t PP, typename W, typename T, typename... Args>
     __attribute__((always_inline))
     constexpr auto fmt(W& wr, const T& arg, const Args&... args) const ->
@@ -371,6 +379,7 @@ private:
         fmt<I + 1, PP>(wr, args...);
     }
 
+    // Terminal case when the current index is out of the given token range.
     template<std::size_t I, std::size_t PP, typename W, typename... Args>
     __attribute__((always_inline))
     constexpr auto fmt(W&, const Args&...) const ->
@@ -473,57 +482,6 @@ template<typename T, std::size_t N>
 constexpr auto collect(string_view pattern) -> std::array<T, N> {
     return collect_traits<T>::apply(pattern, std::make_index_sequence<N>());
 }
-
-template<std::size_t L, std::size_t P>
-class pattern {
-    string_view pattern_;
-    std::array<literal_t, L> literals_;
-    std::array<placeholder_t, P> placeholders_;
-
-public:
-    constexpr explicit pattern(string_view pattern) :
-        pattern_(pattern),
-        literals_(collect<literal_t, L>(pattern)),
-        placeholders_(collect<placeholder_t, P>(pattern))
-    {
-        if (count<literal_t>(pattern) != L) {
-            throw std::invalid_argument("number of literals mismatch");
-        }
-
-        if (count<placeholder_t>(pattern) != P) {
-            throw std::invalid_argument("number of placeholders mismatch");
-        }
-    }
-
-    constexpr auto get() const noexcept -> const string_view& {
-        return pattern_;
-    }
-
-    constexpr auto literals() const noexcept -> const std::array<literal_t, L>& {
-        // TODO: Need to rewrite to squash "{{" and "}}" cases.
-        return literals_;
-    }
-
-    constexpr auto placeholders() const noexcept -> const std::array<placeholder_t, P>& {
-        return placeholders_;
-    }
-
-    template<typename W, typename... Args>
-    constexpr auto format(W& wr, const Args&...) const ->
-        typename std::enable_if<sizeof...(Args) == P>::type
-    {
-        // Always start with literal (even if it is empty).
-        // Then chain `<< literal << placeholder;`
-        // Always finish with literal (even if it is empty).
-        //  make_index_sequence<sizeof...(Args) + 2>()
-        //   (display<typename tuple_element<I, (decltype(tuple))>::type>::display(wr, get<I>(tuple)), ... );
-        //  ^ Requires template tricks.
-        // for (auto token : tokens) {
-        //    if (token.literal()) { wr << token; fold<N + 1>(wr, arg, args...); }
-        //      else { display<T>::format(wr, token, arg); fold<N + 1>(wr, args...); }
-        // }
-    }
-};
 
 }  // namespace detail
 

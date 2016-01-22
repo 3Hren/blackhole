@@ -11,7 +11,6 @@ using namespace blackhole::experimental;
 using blackhole::experimental::detail::collect;
 using blackhole::experimental::detail::count;
 using blackhole::experimental::detail::get;
-using blackhole::experimental::detail::pattern;
 using blackhole::experimental::detail::tokenizer;
 using blackhole::experimental::detail::tokenizer_t;
 
@@ -193,27 +192,6 @@ TEST(CollectPlaceholders, Three) {
     };
 
     EXPECT_EQ(expected, c);
-}
-
-TEST(Pattern, Pattern) {
-    constexpr auto p = pattern<4, 3>("remote {} id mismatch: '{}' vs. '{}'");
-
-    const std::array<literal_t, 4> literals = {
-        literal_t{"remote "},
-        literal_t{" id mismatch: '"},
-        literal_t{"' vs. '"},
-        literal_t{"'"}
-    };
-
-    const std::array<placeholder_t, 3> placeholders = {
-        placeholder_t{"{}"},
-        placeholder_t{"{}"},
-        placeholder_t{"{}"}
-    };
-
-    EXPECT_EQ(string_view("remote {} id mismatch: '{}' vs. '{}'"), p.get());
-    EXPECT_EQ(literals, p.literals());
-    EXPECT_EQ(placeholders, p.placeholders());
 }
 
 TEST(TokenCount, Empty) {
