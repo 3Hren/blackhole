@@ -195,7 +195,6 @@ public:
 
         std::size_t id = 0;
         std::size_t prev = 0;
-        // Current literal view.
 
         while (true) {
             if (id == pattern.size()) {
