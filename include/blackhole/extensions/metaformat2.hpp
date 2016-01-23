@@ -8,6 +8,9 @@
 
 #include "blackhole/cpp17/string_view.hpp"
 
+/// \warning this module is experimental and doesn't adhers Semantic Versioning and you shouldn't
+///     depend on it no matter what. Everything may change, including sudden death.
+
 namespace blackhole {
 inline namespace v1 {
 namespace experimental {
