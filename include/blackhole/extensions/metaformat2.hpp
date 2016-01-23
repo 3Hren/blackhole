@@ -42,45 +42,16 @@ public:
         return value == other.value && type == other.type;
     }
 
+    constexpr auto operator!=(const token_t& other) const noexcept -> bool {
+        return !(*this == other);
+    }
+
 private:
     constexpr token_t(string_view value, type_t type) :
         value(value),
         type(type)
     {}
 };
-
-class literal_t {
-    /// The value can contain "{{" and "}}" sequences, which however will be correctly handled by
-    /// the writer runtime.
-    string_view value;
-
-public:
-    constexpr literal_t(string_view value) noexcept : value(value) {}
-
-    constexpr auto get() const noexcept -> string_view {
-        return value;
-    }
-
-    constexpr auto operator==(const literal_t& other) const noexcept -> bool {
-        return value == other.value;
-    }
-};
-
-class placeholder_t {
-    string_view value;
-
-public:
-    constexpr placeholder_t(string_view value) noexcept : value(value) {}
-
-    constexpr auto get() const noexcept -> string_view {
-        return value;
-    }
-
-    constexpr auto operator==(const placeholder_t& other) const noexcept -> bool {
-        return value == other.value;
-    }
-};
-
 
 namespace detail {
 
@@ -93,86 +64,6 @@ constexpr auto parse_placeholder(string_view pattern) -> std::size_t {
     throw std::runtime_error("only \"{}\" is supported right now");
 }
 
-template<typename>
-constexpr auto count(string_view pattern) -> std::size_t;
-
-// Plan:
-//  Given: "pattern with {} some {:d} placeholders"_pattern.
-//   -> struct ::=
-//      constexpr pattern() -> string_view;
-//      constexpr literals() -> array<literal_t, N>;
-//      constexpr placeholders() -> array<placeholder_t, M>;
-//      format(stream&, args...);
-
-/// Finds the number of literal expressions in the given pattern.
-///
-/// The pattern must be a valid logging expression, otherwise an exception will be thrown.
-template<>
-constexpr auto count<literal_t>(string_view pattern) -> std::size_t {
-    std::size_t count = 0;
-
-    std::size_t id = 0;
-    while (true) {
-        if (id == pattern.size()) {
-            break;
-        }
-
-        // Possible placeholder begins, but also can be double "{{" mark.
-        if (pattern[id] == '{') {
-            if (id + 1 < pattern.size() && pattern[id + 1] == '{') {
-                // Produces a single "{".
-                id += 1;
-            } else {
-                // Placeholder begins.
-                if (id != 0) {
-                    ++count;
-                }
-
-                id += 1;
-                id += parse_placeholder(pattern.substr(id));
-
-                if (id == pattern.size()) {
-                    return count;
-                }
-            }
-        }
-
-        id += 1;
-    }
-
-    return count + 1;
-}
-
-template<>
-constexpr auto count<placeholder_t>(string_view pattern) -> std::size_t {
-    std::size_t count = 0;
-
-    std::size_t id = 0;
-    while (true) {
-        if (id == pattern.size()) {
-            break;
-        }
-
-        // Possible placeholder begins, but also can be double "{{" mark.
-        if (pattern[id] == '{') {
-            ++id;
-
-            if (id < pattern.size() && pattern[id] == '{') {
-                // Produces a single "{".
-                id += 1;
-            } else {
-                // Placeholder begins.
-                id += parse_placeholder(pattern.substr(id));
-                ++count;
-            }
-        } else {
-            ++id;
-        }
-    }
-
-    return count;
-}
-
 template<typename T>
 struct display {
     template<typename W>
@@ -182,12 +73,30 @@ struct display {
 };
 
 class tokenizer_t {
+public:
+    struct count_t {
+        std::tuple<std::size_t, std::size_t> value;
+
+        constexpr auto tokens() const noexcept -> std::size_t {
+            return literals() + placeholders();
+        }
+
+        constexpr auto literals() const noexcept -> std::size_t {
+            return std::get<0>(value);
+        }
+
+        constexpr auto placeholders() const noexcept -> std::size_t {
+            return std::get<1>(value);
+        }
+    };
+
+private:
     string_view pattern;
 
 public:
-    constexpr explicit tokenizer_t(string_view pattern) : pattern(pattern) {}
+    constexpr explicit tokenizer_t(string_view pattern) noexcept : pattern(pattern) {}
 
-    constexpr auto count() const -> std::tuple<std::size_t, std::size_t> {
+    constexpr auto count() const -> count_t {
         std::size_t nliterals = 0;
         std::size_t nplaceholders = 0;
 
@@ -239,7 +148,45 @@ public:
             ++id;
         }
 
-        return {nliterals, nplaceholders};
+        return {{nliterals, nplaceholders}};
+    }
+
+    constexpr auto literal(std::size_t id) const -> string_view {
+        std::size_t counter = 0;
+        std::size_t hits = 0;
+
+        while (true) {
+            const auto token = get(counter);
+
+            if (token.is_literal()) {
+                if (hits == id) {
+                    return token.get();
+                }
+
+                ++hits;
+            }
+
+            ++counter;
+        }
+    }
+
+    constexpr auto placeholder(std::size_t id) const -> string_view {
+        std::size_t counter = 0;
+        std::size_t hits = 0;
+
+        while (true) {
+            const auto token = get(counter);
+
+            if (!token.is_literal()) {
+                if (hits == id) {
+                    return token.get();
+                }
+
+                ++hits;
+            }
+
+            ++counter;
+        }
     }
 
     constexpr auto get(std::size_t n) const -> token_t {
@@ -321,6 +268,34 @@ public:
         return apply(std::make_index_sequence<N>());
     }
 
+    template<std::size_t N, std::size_t T>
+    constexpr auto literals() const -> std::array<string_view, N> {
+        std::size_t id = 0;
+        std::array<string_view, N> result;
+
+        for (auto token : tokens<T>()) {
+            if (token.is_literal()) {
+                result[id++] = token.get();
+            }
+        }
+
+        return result;
+    }
+
+    template<std::size_t N, std::size_t T>
+    constexpr auto placeholders() const -> std::array<string_view, N> {
+        std::size_t id = 0;
+        std::array<string_view, N> result;
+
+        for (auto token : tokens<T>()) {
+            if (!token.is_literal()) {
+                result[id++] = token.get();
+            }
+        }
+
+        return result;
+    }
+
     template<std::size_t... I>
     constexpr auto apply(std::index_sequence<I...>) const -> std::array<token_t, sizeof...(I)> {
         return {{get(I)...}};
@@ -354,8 +329,8 @@ struct tokenizer {
     }
 
 private:
-    /// \note that it's critical to always inline this method, because then constexpr magic may
-    ///     occur in compile-time branch elimination.
+    /// \note that it's important to always inline this method, because then constexpr magic may
+    ///     result in compile-time branch elimination.
     template<std::size_t I, std::size_t PP, typename W, typename T, typename... Args>
     __attribute__((always_inline))
     constexpr auto fmt(W& wr, const T& arg, const Args&... args) const ->
@@ -386,102 +361,6 @@ private:
         typename std::enable_if<I >= N>::type
     {}
 };
-
-template<typename T>
-constexpr auto get(string_view pattern, std::size_t n) -> T;
-
-template<>
-constexpr auto get<literal_t>(string_view pattern, std::size_t n) -> literal_t {
-    std::size_t count = 0;
-
-    std::size_t id = 0;
-    std::size_t from = 0;
-    while (true) {
-        if (id == pattern.size()) {
-            break;
-        }
-
-        // Possible placeholder begins, but also can be double "{{" mark.
-        if (pattern[id] == '{') {
-            if (id + 1 < pattern.size() && pattern[id + 1] == '{') {
-                // Produces a single "{".
-                id += 1;
-            } else {
-                // Placeholder begins.
-                if (count == n) {
-                    return {pattern.substr(from, id - from)};
-                }
-
-                if (id != 0) {
-                    ++count;
-                }
-
-                id += 1;
-                id += parse_placeholder(pattern.substr(id));
-                from = id;
-            }
-        }
-
-        id += 1;
-    }
-
-    return {pattern.substr(from)};
-}
-
-template<>
-constexpr auto get<placeholder_t>(string_view pattern, std::size_t n) -> placeholder_t {
-    std::size_t count = 0;
-
-    std::size_t id = 0;
-    std::size_t from = 0;
-    while (true) {
-        if (id == pattern.size()) {
-            break;
-        }
-
-        // Possible placeholder begins, but also can be double "{{" mark.
-        if (pattern[id] == '{') {
-            ++id;
-
-            if (id < pattern.size() && pattern[id] == '{') {
-                // Produces a single "{".
-                id += 1;
-            } else {
-                // Placeholder begins.
-                const auto nread = parse_placeholder(pattern.substr(id));
-                if (count == n) {
-                    return pattern.substr(id - 1, nread + 1);
-                }
-
-                ++count;
-                id += nread;
-            }
-        } else {
-            ++id;
-        }
-    }
-
-    if (n >= count) {
-        throw std::out_of_range("out of range");
-    }
-
-    return {pattern.substr(from)};
-}
-
-template<typename T>
-struct collect_traits {
-    template<std::size_t... I>
-    static constexpr auto apply(string_view pattern, std::index_sequence<I...>) ->
-        std::array<T, sizeof...(I)>
-    {
-        return {get<T>(pattern, I)...};
-    }
-};
-
-template<typename T, std::size_t N>
-constexpr auto collect(string_view pattern) -> std::array<T, N> {
-    return collect_traits<T>::apply(pattern, std::make_index_sequence<N>());
-}
 
 }  // namespace detail
 

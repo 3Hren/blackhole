@@ -8,245 +8,204 @@ namespace testing {
 
 using namespace blackhole::experimental;
 
-using blackhole::experimental::detail::collect;
-using blackhole::experimental::detail::count;
-using blackhole::experimental::detail::get;
 using blackhole::experimental::detail::tokenizer;
 using blackhole::experimental::detail::tokenizer_t;
 
-TEST(CountOfLiteral, Empty) {
-    constexpr auto actual = count<literal_t>("");
-    EXPECT_EQ(1, actual);
-}
-
-TEST(CountOfLiteral, Single) {
-    constexpr auto actual = count<literal_t>("exposing service on local endpoint");
-    EXPECT_EQ(1, actual);
-}
-
-TEST(CountOfLiteral, SingleWithBraceSymbols) {
-    constexpr auto actual = count<literal_t>("service {{ name: storage }}");
-    EXPECT_EQ(1, actual);
-}
-
-TEST(CountOfLiteral, WithSinglePlaceholderAtTheEnd) {
-    constexpr auto actual = count<literal_t>("exposing service on local endpoint {}");
-    EXPECT_EQ(1, actual);
-}
-
-TEST(CountOfLiteral, WithSinglePlaceholderAtTheBeginning) {
-    constexpr auto actual = count<literal_t>("{} services total");
-    EXPECT_EQ(1, actual);
-}
-
-TEST(CountOfLiteral, TwoLiterals) {
-    constexpr auto actual = count<literal_t>("exposing {} services total");
-    EXPECT_EQ(2, actual);
-}
-
-TEST(CountOfLiteral, ThreeLiterals) {
-    constexpr auto actual = count<literal_t>("failed to expose service on local endpoint {}:{}: {}");
-    EXPECT_EQ(3, actual);
-}
-
-TEST(CountOfPlaceholders, Empty) {
-    constexpr auto actual = count<placeholder_t>("");
-    EXPECT_EQ(0, actual);
-}
-
-TEST(CountOfPlaceholders, WithBraceSymbols) {
-    constexpr auto actual = count<placeholder_t>("service {{ name: storage }}");
-    EXPECT_EQ(0, actual);
-}
-
-TEST(CountOfPlaceholders, Single) {
-    constexpr auto actual = count<placeholder_t>("{}");
-    EXPECT_EQ(1, actual);
-}
-
-TEST(CountOfPlaceholders, WithSinglePlaceholderAtTheEnd) {
-    constexpr auto actual = count<placeholder_t>("exposing service on local endpoint {}");
-    EXPECT_EQ(1, actual);
-}
-
-TEST(CountOfPlaceholders, Two) {
-    constexpr auto actual = count<placeholder_t>("{}{}");
-    EXPECT_EQ(2, actual);
-}
-
-TEST(CountOfPlaceholders, WithSinglePlaceholderAtTheBeginning) {
-    constexpr auto actual = count<placeholder_t>("{} services total");
-    EXPECT_EQ(1, actual);
-}
-
-TEST(CountOfPlaceholders, TwoLiterals) {
-    constexpr auto actual = count<placeholder_t>("exposing {} services total");
-    EXPECT_EQ(1, actual);
-}
-
-TEST(CountOfPlaceholders, Three) {
-    constexpr auto actual = count<placeholder_t>("failed to expose service on local endpoint {}:{}: {}");
-    EXPECT_EQ(3, actual);
-}
-
-TEST(GetLiteral, Empty) {
-    constexpr auto actual = get<literal_t>("", 0);
-    EXPECT_EQ(string_view(""), actual.get());
-}
-
-TEST(GetLiteral, Single) {
-    constexpr auto actual = get<literal_t>("exposing service on local endpoint", 0);
-    EXPECT_EQ(string_view("exposing service on local endpoint"), actual.get());
-}
-
-TEST(GetLiteral, SingleWithBraceSymbols) {
-    constexpr auto actual = get<literal_t>("service {{ name: storage }}", 0);
-    EXPECT_EQ(string_view("service {{ name: storage }}"), actual.get());
-}
-
-TEST(GetLiteral, GetOneOfOne) {
-    constexpr auto actual = get<literal_t>("exposing service on local endpoint {}", 0);
-    EXPECT_EQ(string_view("exposing service on local endpoint "), actual.get());
-}
-
-TEST(GetLiteral, GetOfTwo) {
-    constexpr auto a0 = get<literal_t>("exposing service on local endpoint {}:{}", 0);
-    EXPECT_EQ(string_view("exposing service on local endpoint "), a0.get());
-
-    constexpr auto a1 = get<literal_t>("exposing service on local endpoint {}:{}", 1);
-    EXPECT_EQ(string_view(":"), a1.get());
-}
-
-TEST(GetLiteral, GetOfThree) {
-    constexpr auto a0 = get<literal_t>("failed to expose service on local endpoint {}:{}: {}", 0);
-    EXPECT_EQ(string_view("failed to expose service on local endpoint "), a0.get());
-
-    constexpr auto a1 = get<literal_t>("failed to expose service on local endpoint {}:{}: {}", 1);
-    EXPECT_EQ(string_view(":"), a1.get());
-
-    constexpr auto a2 = get<literal_t>("failed to expose service on local endpoint {}:{}: {}", 2);
-    EXPECT_EQ(string_view(": "), a2.get());
-}
-
-TEST(GetLiteral, GetOfFour) {
-    constexpr auto a0 = get<literal_t>("remote {} id mismatch: '{}' vs. '{}'", 0);
-    EXPECT_EQ(string_view("remote "), a0.get());
-
-    constexpr auto a1 = get<literal_t>("remote {} id mismatch: '{}' vs. '{}'", 1);
-    EXPECT_EQ(string_view(" id mismatch: '"), a1.get());
-
-    constexpr auto a2 = get<literal_t>("remote {} id mismatch: '{}' vs. '{}'", 2);
-    EXPECT_EQ(string_view("' vs. '"), a2.get());
-
-    constexpr auto a3 = get<literal_t>("remote {} id mismatch: '{}' vs. '{}'", 3);
-    EXPECT_EQ(string_view("'"), a3.get());
-}
-
-TEST(GetPlaceholder, Single) {
-    constexpr auto actual = get<placeholder_t>("exposing service on local endpoint {}", 0);
-    EXPECT_EQ(string_view("{}"), actual.get());
-}
-
-TEST(GetPlaceholder, GetOfTwo) {
-    constexpr auto a0 = get<placeholder_t>("exposing service on local endpoint {}:{}", 0);
-    EXPECT_EQ(string_view("{}"), a0.get());
-
-    constexpr auto a1 = get<placeholder_t>("exposing service on local endpoint {}:{}", 1);
-    EXPECT_EQ(string_view("{}"), a1.get());
-}
-
-TEST(CollectLiteral, Four) {
-    constexpr auto n = count<literal_t>("remote {} id mismatch: '{}' vs. '{}'");
-    constexpr auto c = collect<literal_t, n>("remote {} id mismatch: '{}' vs. '{}'");
-
-    const std::array<literal_t, 4> expected = {
-        literal_t{"remote "},
-        literal_t{" id mismatch: '"},
-        literal_t{"' vs. '"},
-        literal_t{"'"}
-    };
-
-    EXPECT_EQ(expected, c);
-}
-
-TEST(CollectLiteral, FourWithBraceSymbols) {
-    constexpr auto c = collect<literal_t, 4>("remote {} {{id}} mismatch: '{}' vs. '{}'");
-
-    const std::array<literal_t, 4> expected = {
-        literal_t{"remote "},
-        literal_t{" {{id}} mismatch: '"},
-        literal_t{"' vs. '"},
-        literal_t{"'"}
-    };
-
-    EXPECT_EQ(expected, c);
-}
-
-TEST(CollectPlaceholders, Three) {
-    constexpr auto c = collect<placeholder_t, 3>("remote {} id mismatch: '{}' vs. '{}'");
-
-    const std::array<placeholder_t, 3> expected = {
-        placeholder_t{"{}"},
-        placeholder_t{"{}"},
-        placeholder_t{"{}"}
-    };
-
-    EXPECT_EQ(expected, c);
-}
-
-TEST(TokenCount, Empty) {
+TEST(Tokenizer, Empty) {
     constexpr auto actual = tokenizer_t("").count();
-    const std::tuple<std::size_t, std::size_t> expected(0, 0);
-    EXPECT_EQ(expected, actual);
+
+    EXPECT_EQ(0, actual.tokens());
+    EXPECT_EQ(0, actual.literals());
+    EXPECT_EQ(0, actual.placeholders());
 }
 
-TEST(TokenCount, SingleLiteral) {
-    // Result: ["exposing service on local endpoint"].
-
+TEST(Tokenizer, SingleLiteral) {
     constexpr auto actual = tokenizer_t("exposing service on local endpoint").count();
-    const std::tuple<std::size_t, std::size_t> expected(1, 0);
-    EXPECT_EQ(expected, actual);
+
+    EXPECT_EQ(1, actual.tokens());
+    EXPECT_EQ(1, actual.literals());
+    EXPECT_EQ(0, actual.placeholders());
 }
 
 TEST(TokenCount, SingleWithBraceSymbols) {
-    // Result: ["service {", " name: storage }"].
-
     constexpr auto actual = tokenizer_t("service {{ name: storage }}").count();
-    const std::tuple<std::size_t, std::size_t> expected(2, 0);
-    EXPECT_EQ(expected, actual);
+
+    EXPECT_EQ(2, actual.tokens());
+    EXPECT_EQ(2, actual.literals());
+    EXPECT_EQ(0, actual.placeholders());
 }
 
-TEST(TokenCount, SingleWithBraceSymbolsNotInTheEnd) {
-    // Result: ["service {", " name: storage }", "."].
+TEST(Tokenizer, SingleWithBraceSymbolsNotInTheEnd) {
+    constexpr auto actual = tokenizer_t("service {{ name: storage }} has been started").count();
 
-    constexpr auto actual = tokenizer_t("service {{ name: storage }}.").count();
-    const std::tuple<std::size_t, std::size_t> expected(3, 0);
-    EXPECT_EQ(expected, actual);
+    EXPECT_EQ(3, actual.tokens());
+    EXPECT_EQ(3, actual.literals());
+    EXPECT_EQ(0, actual.placeholders());
 }
 
-TEST(TokenCount, SinglePlaceholder) {
+TEST(Tokenizer, SinglePlaceholder) {
     constexpr auto actual = tokenizer_t("{}").count();
-    const std::tuple<std::size_t, std::size_t> expected(0, 1);
-    EXPECT_EQ(expected, actual);
+
+    EXPECT_EQ(1, actual.tokens());
+    EXPECT_EQ(0, actual.literals());
+    EXPECT_EQ(1, actual.placeholders());
 }
 
-TEST(TokenCount, SinglePlaceholderAtTheEnd) {
+TEST(Tokenizer, TwoPlaceholders) {
+    constexpr auto actual = tokenizer_t("{}{}").count();
+
+    EXPECT_EQ(2, actual.tokens());
+    EXPECT_EQ(0, actual.literals());
+    EXPECT_EQ(2, actual.placeholders());
+}
+
+TEST(Tokenizer, SinglePlaceholderAtTheEnd) {
     constexpr auto actual = tokenizer_t("exposing service on local endpoint {}").count();
-    const std::tuple<std::size_t, std::size_t> expected(1, 1);
-    EXPECT_EQ(expected, actual);
+
+    EXPECT_EQ(2, actual.tokens());
+    EXPECT_EQ(1, actual.literals());
+    EXPECT_EQ(1, actual.placeholders());
 }
 
-TEST(TokenCount, TwoLiteralsOnePlaceholder) {
+TEST(Tokenizer, SinglePlaceholderAtTheBeginning) {
+    constexpr auto actual = tokenizer_t("{} services total").count();
+
+    EXPECT_EQ(2, actual.tokens());
+    EXPECT_EQ(1, actual.literals());
+    EXPECT_EQ(1, actual.placeholders());
+}
+
+TEST(Tokenizer, TwoLiteralsWithPlaceholderInTheMiddle) {
     constexpr auto actual = tokenizer_t("exposing {} services total").count();
-    const std::tuple<std::size_t, std::size_t> expected(2, 1);
-    EXPECT_EQ(expected, actual);
+
+    EXPECT_EQ(3, actual.tokens());
+    EXPECT_EQ(2, actual.literals());
+    EXPECT_EQ(1, actual.placeholders());
+}
+
+TEST(Tokenizer, Mixed) {
+    constexpr auto actual = tokenizer_t("failed to expose service on local endpoint {}:{}: {}").count();
+
+    EXPECT_EQ(6, actual.tokens());
+    EXPECT_EQ(3, actual.literals());
+    EXPECT_EQ(3, actual.placeholders());
+}
+
+TEST(Tokenizer, ThrowsOnGetLiteralEmpty) {
+    constexpr auto t = tokenizer_t("");
+
+    EXPECT_THROW(t.literal(0), std::out_of_range);
+}
+
+TEST(Tokenizer, GetLiteralSingle) {
+    constexpr auto t = tokenizer_t("exposing service on local endpoint");
+
+    EXPECT_EQ(string_view("exposing service on local endpoint"), t.literal(0));
+    EXPECT_THROW(t.literal(1), std::out_of_range);
+}
+
+TEST(Tokenizer, GetLiteralWithBraceSymbols) {
+    constexpr auto t = tokenizer_t("service {{ name: storage }}");
+
+    EXPECT_EQ(string_view("service {"), t.literal(0));
+    EXPECT_EQ(string_view(" name: storage }"), t.literal(1));
+    EXPECT_THROW(t.literal(2), std::out_of_range);
+}
+
+TEST(Tokenizer, GetLiteralWithPlaceholder) {
+    constexpr auto t = tokenizer_t("exposing service on local endpoint {}");
+
+    EXPECT_EQ(string_view("exposing service on local endpoint "), t.literal(0));
+    EXPECT_THROW(t.literal(1), std::out_of_range);
+}
+
+TEST(Tokenizer, GetLiteralWithTwoPlaceholders) {
+    constexpr auto t = tokenizer_t("exposing service on local endpoint {}:{}");
+
+    EXPECT_EQ(string_view("exposing service on local endpoint "), t.literal(0));
+    EXPECT_EQ(string_view(":"), t.literal(1));
+    EXPECT_THROW(t.literal(2), std::out_of_range);
+}
+
+TEST(Tokenizer, GetLiteralOfThree) {
+    constexpr auto t = tokenizer_t("failed to expose service on local endpoint {}:{}: {}");
+
+    EXPECT_EQ(string_view("failed to expose service on local endpoint "), t.literal(0));
+    EXPECT_EQ(string_view(":"), t.literal(1));
+    EXPECT_EQ(string_view(": "), t.literal(2));
+    EXPECT_THROW(t.literal(3), std::out_of_range);
+}
+
+TEST(Tokenizer, GetLiteralOfFour) {
+    constexpr auto t = tokenizer_t("remote {} id mismatch: '{}' vs. '{}'");
+
+    EXPECT_EQ(string_view("remote "), t.literal(0));
+    EXPECT_EQ(string_view(" id mismatch: '"), t.literal(1));
+    EXPECT_EQ(string_view("' vs. '"), t.literal(2));
+    EXPECT_EQ(string_view("'"), t.literal(3));
+    EXPECT_THROW(t.literal(4), std::out_of_range);
+}
+
+TEST(Tokenizer, GetPlaceholderSingle) {
+    constexpr auto t = tokenizer_t("exposing service on local endpoint {}");
+
+    EXPECT_EQ(string_view("{}"), t.placeholder(0));
+    EXPECT_THROW(t.placeholder(1), std::out_of_range);
+}
+
+TEST(Tokenizer, GetPlaceholderOfTwo) {
+    constexpr auto t = tokenizer_t("exposing service on local endpoint {}:{}");
+
+    EXPECT_EQ(string_view("{}"), t.placeholder(0));
+    EXPECT_EQ(string_view("{}"), t.placeholder(1));
+    EXPECT_THROW(t.placeholder(2), std::out_of_range);
+}
+
+TEST(Tokenizer, CollectLiterals) {
+    constexpr auto t = tokenizer_t("remote {} id mismatch: '{}' vs. '{}'");
+
+    const std::array<string_view, 4> expected = {{
+        string_view("remote "),
+        string_view(" id mismatch: '"),
+        string_view("' vs. '"),
+        string_view("'")
+    }};
+
+    EXPECT_EQ(expected, (t.literals<4, 7>()));
+}
+
+TEST(Tokenizer, CollectLiteralsFourWithBraceSymbols) {
+    constexpr auto t = tokenizer_t("remote {} {{id}} mismatch: '{}' vs. '{}'");
+
+    const std::array<string_view, 6> expected = {{
+        string_view("remote "),
+        string_view(" {"),
+        string_view("id}"),
+        string_view(" mismatch: '"),
+        string_view("' vs. '"),
+        string_view("'")
+    }};
+
+    EXPECT_EQ(expected, (t.literals<6, 9>()));
+}
+
+TEST(Tokenizer, CollectPlaceholders) {
+    constexpr auto t = tokenizer_t("remote {} id mismatch: '{}' vs. '{}'");
+
+    const std::array<string_view, 3> expected = {{
+        string_view("{}"),
+        string_view("{}"),
+        string_view("{}")
+    }};
+
+    EXPECT_EQ(expected, (t.placeholders<3, 7>()));
 }
 
 TEST(TokenGet, GetOfFour) {
     constexpr auto t = tokenizer_t("remote {} {{id}} mismatch: '{}' vs. '{}'");
 
-    const std::tuple<std::size_t, std::size_t> expected(6, 3);
-    EXPECT_EQ(expected, t.count());
+    EXPECT_EQ(6, t.count().literals());
+    EXPECT_EQ(3, t.count().placeholders());
 
     EXPECT_EQ(token_t::literal("remote "), t.get(0));
     EXPECT_EQ(token_t::placeholder("{}"), t.get(1));
@@ -268,6 +227,22 @@ TEST(Tokenizer, Format) {
     EXPECT_EQ(string_view("[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326"),
         string_view(wr.data(), wr.size()));
 }
+
+// TEST(Pattern, Final) {
+//     constexpr auto count = tokenizer_t("{} - {} [{}] 'GET {} HTTP/1.0' {} {}").count();
+//     constexpr auto token = tokenizer<count.placeholders(), count.total()>("{} - {} [{}] 'GET {} HTTP/1.0' {} {}");
+//
+//     EXPECT_EQ(string_view("{} - {} [{}] 'GET {} HTTP/1.0' {} {}"), token.pattern());
+//
+//     // TODO: EQ literals.
+//     // TODO: EQ placeholders.
+//
+//     fmt::MemoryWriter wr;
+//     token.format(wr, "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326);
+//
+//     EXPECT_EQ(string_view("[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326"),
+//         string_view(wr.data(), wr.size()));
+// }
 
 }  // namespace testing
 }  // namespace blackhole
