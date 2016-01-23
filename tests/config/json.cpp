@@ -263,7 +263,7 @@ TEST(json_t, complex) {
     EXPECT_EQ(1, counter);
 
     std::vector<std::string> keys;
-    config.each_map([&](const std::string& key, const config::node_t& sink) {
+    config.each_map([&](const std::string& key, const config::node_t&) {
         keys.push_back(key);
     });
 
