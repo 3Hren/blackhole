@@ -252,7 +252,6 @@ private:
 
 auto tokenize(const std::string& pattern) -> std::vector<string::token_t> {
     std::vector<string::token_t> tokens;
-    //
     // for (const auto& reserved : {"process", "thread", "message", "severity", "timestamp"}) {
     //     if (options.count(reserved) != 0) {
     //         throw std::logic_error("placeholder '" + std::string(reserved) +
@@ -266,31 +265,6 @@ auto tokenize(const std::string& pattern) -> std::vector<string::token_t> {
     }
 
     return tokens;
-}
-
-}  // namespace
-
-class string_t::inner_t {
-public:
-    severity_map sevmap;
-    std::vector<string::token_t> tokens;
-};
-
-string_t::string_t(const std::string& pattern) :
-    inner(new inner_t, [](inner_t* d) { delete d; })
-{
-    inner->sevmap = [](int severity, const std::string& spec, writer_t& writer) {
-        writer.write(spec, severity);
-    };
-
-    inner->tokens = tokenize(pattern);
-}
-
-string_t::string_t(const std::string& pattern, severity_map sevmap) :
-    inner(new inner_t, [](inner_t* d) { delete d; })
-{
-    inner->sevmap = std::move(sevmap);
-    inner->tokens = tokenize(pattern);
 }
 
 struct option_visitor {
@@ -352,11 +326,35 @@ struct leftover_visitor {
     }
 };
 
+}  // namespace
+
+class string_t::inner_t {
+public:
+    severity_map sevmap;
+    std::vector<string::token_t> tokens;
+};
+
+string_t::string_t(const std::string& pattern) :
+    inner(new inner_t, [](inner_t* d) { delete d; })
+{
+    inner->sevmap = [](int severity, const std::string& spec, writer_t& writer) {
+        writer.write(spec, severity);
+    };
+
+    inner->tokens = tokenize(pattern);
+}
+
+string_t::string_t(const std::string& pattern, severity_map sevmap) :
+    inner(new inner_t, [](inner_t* d) { delete d; })
+{
+    inner->sevmap = std::move(sevmap);
+    inner->tokens = tokenize(pattern);
+}
+
 // TODO: Decompose `throw std::invalid_argument("token not found");` case.
 // TODO: Check and decompose name is not reserved. Maybe by wrapping `name` with type. Test.
 // TODO: Both algorithms are similar. Decompose.
 auto string_t::optional(const std::string& name, std::string prefix, std::string suffix) -> void {
-
     const option_visitor visitor{name, prefix, suffix};
 
     for (auto& token : inner->tokens) {
