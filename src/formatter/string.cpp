@@ -274,28 +274,27 @@ struct option_visitor {
     std::string& prefix;
     std::string& suffix;
 
-    auto operator()(const ph::generic<required>& token) const -> boost::optional<string::token_t> {
+    auto operator()(const ph::generic<required>& token) const -> result_type {
         if (token.name == name) {
-            return boost::optional<string::token_t>(
-                ph::generic<optional>(token, std::move(prefix), std::move(suffix)));
+            return result_type(ph::generic<optional>(token, std::move(prefix), std::move(suffix)));
         }
 
         return boost::none;
     }
 
-    auto operator()(const ph::generic<optional>& token) const -> boost::optional<string::token_t> {
+    auto operator()(const ph::generic<optional>& token) const -> result_type {
         if (token.name == name) {
             ph::generic<optional> result(token);
             result.prefix = std::move(prefix);
             result.suffix = std::move(suffix);
-            return boost::optional<string::token_t>(result);
+            return result_type(result);
         }
 
         return boost::none;
     }
 
     template<typename T>
-    auto operator()(const T& token) const -> boost::optional<string::token_t> {
+    auto operator()(const T&) const -> result_type {
         return boost::none;
     }
 };
@@ -310,18 +309,16 @@ struct leftover_visitor {
     std::string& separator;
     bool unique;
 
-    auto operator()(const ph::leftover_t& token) const -> boost::optional<string::token_t> {
+    auto operator()(const ph::leftover_t& token) const -> result_type {
         if (token.name == name) {
-            return boost::optional<string::token_t>(
-                ph::leftover_t(token.name, unique, prefix, suffix, pattern, separator));
+            return result_type(ph::leftover_t(token.name, unique, prefix, suffix, pattern, separator));
         }
 
         return boost::none;
     }
 
-
     template<typename T>
-    auto operator()(const T& token) const -> boost::optional<string::token_t> {
+    auto operator()(const T&) const -> result_type {
         return boost::none;
     }
 };
