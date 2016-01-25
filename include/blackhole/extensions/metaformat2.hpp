@@ -265,9 +265,18 @@ public:
         throw std::out_of_range("out of range");
     }
 
+    /// Returns an array with parsed tokens.
+    ///
+    /// \tparam N total number of tokens, required to statically allocate an array with required
+    ///     size.
+    /// \throws std::invalid_argument if the N isn't equal with number of tokens.
     template<std::size_t N>
     constexpr auto tokens() const -> std::array<token_t, N> {
-        return apply(std::make_index_sequence<N>());
+        if (N == count().tokens()) {
+            return apply(std::make_index_sequence<N>());
+        } else {
+            throw std::invalid_argument("invalid count of tokens");
+        }
     }
 
     template<std::size_t N, std::size_t T>
