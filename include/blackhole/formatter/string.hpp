@@ -1,13 +1,11 @@
 #pragma once
 
 #include <functional>
-#include <map>
+#include <memory>
 #include <string>
-#include <vector>
-
-#include <boost/variant/variant.hpp>
 
 #include "blackhole/formatter.hpp"
+#include "blackhole/severity.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -34,32 +32,6 @@ class node_t;
 namespace blackhole {
 inline namespace v1 {
 namespace formatter {
-
-class token_t;
-
-namespace option {
-
-struct optional_t {
-    std::string prefix;
-    std::string suffix;
-};
-
-struct leftover_t {
-    bool unique;
-    std::string prefix;
-    std::string suffix;
-    std::string pattern;
-    std::string separator;
-};
-
-}  // namespace option
-
-typedef boost::variant<
-    option::optional_t,
-    option::leftover_t
-> option_t;
-
-typedef std::map<std::string, option_t> options_t;
 
 /// Severity mapping function.
 ///
@@ -145,17 +117,20 @@ typedef std::function<void(int severity, const std::string& spec, writer_t& writ
 /// All visited tokens are written directly into the given writer instance with an internal small
 /// stack-allocated buffer, growing using the heap on overflow.
 class string_t : public formatter_t {
-    std::string pattern;
-    severity_map sevmap;
-    std::vector<token_t> tokens;
+    class inner_t;
+    std::unique_ptr<inner_t, auto(*)(inner_t*) -> void> inner;
 
 public:
-    string_t(std::string pattern, const options_t& options = options_t());
-    string_t(std::string pattern, severity_map sevmap, const options_t& options = options_t());
-    string_t(const string_t& other) = delete;
-    string_t(string_t&& other);
+    explicit string_t(const std::string& pattern);
+    string_t(const std::string& pattern, severity_map sevmap);
 
-    ~string_t();
+    /// Configuration.
+
+    auto optional(const std::string& name, std::string prefix, std::string suffix) -> void;
+    auto leftover(const std::string& name, std::string prefix, std::string suffix,
+        std::string pattern, std::string separator, bool unique) -> void;
+
+    /// Formatting.
 
     auto format(const record_t& record, writer_t& writer) -> void;
 };

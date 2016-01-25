@@ -41,59 +41,7 @@ typedef fmt::StringRef string_ref;
 
 }  // namespace
 
-class token_t {
-    string::token_t inner;
-
-public:
-    token_t(string::token_t inner) :
-        inner(std::move(inner))
-    {}
-
-    auto operator*() const noexcept -> const string::token_t& {
-        return inner;
-    }
-};
-
 namespace {
-
-class transform_visitor_t : public boost::static_visitor<string::token_t> {
-    const options_t& options;
-
-public:
-    transform_visitor_t(const options_t& options) :
-        options(options)
-    {}
-
-    auto operator()(const ph::generic<required>& token) const -> string::token_t {
-        const auto it = options.find(token.name);
-
-        if (it != options.end()) {
-            const auto option = boost::get<option::optional_t>(it->second);
-
-            return ph::generic<optional>(token, option.prefix, option.suffix);
-        }
-
-        return token;
-    }
-
-    auto operator()(const ph::leftover_t& token) const -> string::token_t {
-        const auto it = options.find(token.name);
-
-        if (it != options.end()) {
-            const auto option = boost::get<option::leftover_t>(it->second);
-
-            return ph::leftover_t(token.name, option.unique, option.prefix, option.suffix,
-                option.pattern, option.separator);
-        }
-
-        return token;
-    }
-
-    template<typename T>
-    auto operator()(const T& token) const -> string::token_t {
-        return token;
-    }
-};
 
 struct spec;
 struct unspec;
@@ -302,19 +250,19 @@ private:
     }
 };
 
-static auto tokenize(const std::string& pattern, const options_t& options) -> std::vector<token_t> {
-    std::vector<token_t> tokens;
-
-    for (const auto& reserved : {"process", "thread", "message", "severity", "timestamp"}) {
-        if (options.count(reserved) != 0) {
-            throw std::logic_error("placeholder '" + std::string(reserved) +
-                "' is reserved and can not be configured");
-        }
-    }
+auto tokenize(const std::string& pattern) -> std::vector<string::token_t> {
+    std::vector<string::token_t> tokens;
+    //
+    // for (const auto& reserved : {"process", "thread", "message", "severity", "timestamp"}) {
+    //     if (options.count(reserved) != 0) {
+    //         throw std::logic_error("placeholder '" + std::string(reserved) +
+    //             "' is reserved and can not be configured");
+    //     }
+    // }
 
     string::parser_t parser(pattern);
     while (auto token = parser.next()) {
-        tokens.emplace_back(boost::apply_visitor(transform_visitor_t(options), token.get()));
+        tokens.emplace_back(token.get());
     }
 
     return tokens;
@@ -322,42 +270,135 @@ static auto tokenize(const std::string& pattern, const options_t& options) -> st
 
 }  // namespace
 
-string_t::string_t(std::string pattern, const options_t& options) :
-    pattern(std::move(pattern)),
-    sevmap([](int severity, const std::string& spec, writer_t& writer) {
+class string_t::inner_t {
+public:
+    severity_map sevmap;
+    std::vector<string::token_t> tokens;
+};
+
+string_t::string_t(const std::string& pattern) :
+    inner(new inner_t, [](inner_t* d) { delete d; })
+{
+    inner->sevmap = [](int severity, const std::string& spec, writer_t& writer) {
         writer.write(spec, severity);
-    }),
-    tokens(tokenize(this->pattern, options))
-{}
+    };
 
-string_t::string_t(std::string pattern, severity_map sevmap, const options_t& options) :
-    pattern(std::move(pattern)),
-    sevmap(std::move(sevmap)),
-    tokens(tokenize(this->pattern, options))
-{}
+    inner->tokens = tokenize(pattern);
+}
 
-string_t::string_t(string_t&& other) = default;
+string_t::string_t(const std::string& pattern, severity_map sevmap) :
+    inner(new inner_t, [](inner_t* d) { delete d; })
+{
+    inner->sevmap = std::move(sevmap);
+    inner->tokens = tokenize(pattern);
+}
 
-string_t::~string_t() {}
+struct option_visitor {
+    typedef boost::optional<string::token_t> result_type;
 
-auto
-string_t::format(const record_t& record, writer_t& writer) -> void {
-    const visitor_t visitor(writer, record, sevmap);
+    const std::string& name;
+    std::string& prefix;
+    std::string& suffix;
 
-    for (const auto& token : tokens) {
-        boost::apply_visitor(visitor, *token);
+    auto operator()(const ph::generic<required>& token) const -> boost::optional<string::token_t> {
+        if (token.name == name) {
+            return boost::optional<string::token_t>(
+                ph::generic<optional>(token, std::move(prefix), std::move(suffix)));
+        }
+
+        return boost::none;
+    }
+
+    auto operator()(const ph::generic<optional>& token) const -> boost::optional<string::token_t> {
+        if (token.name == name) {
+            ph::generic<optional> result(token);
+            result.prefix = std::move(prefix);
+            result.suffix = std::move(suffix);
+            return boost::optional<string::token_t>(result);
+        }
+
+        return boost::none;
+    }
+
+    template<typename T>
+    auto operator()(const T& token) const -> boost::optional<string::token_t> {
+        return boost::none;
+    }
+};
+
+struct leftover_visitor {
+    typedef boost::optional<string::token_t> result_type;
+
+    const std::string& name;
+    std::string& prefix;
+    std::string& suffix;
+    std::string& pattern;
+    std::string& separator;
+    bool unique;
+
+    auto operator()(const ph::leftover_t& token) const -> boost::optional<string::token_t> {
+        if (token.name == name) {
+            return boost::optional<string::token_t>(
+                ph::leftover_t(token.name, unique, prefix, suffix, pattern, separator));
+        }
+
+        return boost::none;
+    }
+
+
+    template<typename T>
+    auto operator()(const T& token) const -> boost::optional<string::token_t> {
+        return boost::none;
+    }
+};
+
+// TODO: Decompose `throw std::invalid_argument("token not found");` case.
+// TODO: Check and decompose name is not reserved. Maybe by wrapping `name` with type. Test.
+// TODO: Both algorithms are similar. Decompose.
+auto string_t::optional(const std::string& name, std::string prefix, std::string suffix) -> void {
+
+    const option_visitor visitor{name, prefix, suffix};
+
+    for (auto& token : inner->tokens) {
+        if (auto value = boost::apply_visitor(visitor, token)) {
+            token = value.get();
+            return;
+        }
+    }
+
+    throw std::invalid_argument("token not found");
+}
+
+auto string_t::leftover(const std::string& name, std::string prefix, std::string suffix,
+    std::string pattern, std::string separator, bool unique) -> void
+{
+    const leftover_visitor visitor{name, prefix, suffix, pattern, separator, unique};
+
+    for (auto& token : inner->tokens) {
+        if (auto value = boost::apply_visitor(visitor, token)) {
+            token = value.get();
+            return;
+        }
+    }
+
+    throw std::invalid_argument("token not found");
+}
+
+auto string_t::format(const record_t& record, writer_t& writer) -> void {
+    const visitor_t visitor(writer, record, inner->sevmap);
+
+    for (const auto& token : inner->tokens) {
+        boost::apply_visitor(visitor, token);
     }
 }
 
 }  // namespace formatter
 
-auto
-factory<formatter::string_t>::type() -> const char* {
+auto factory<formatter::string_t>::type() -> const char* {
     return "string";
 }
 
-auto
-factory<formatter::string_t>::from(const config::node_t& config) -> formatter::string_t {
+auto factory<formatter::string_t>::from(const config::node_t& config) -> formatter::string_t {
     auto pattern = config["pattern"].to_string().get();
 
     if (auto mapping = config["sevmap"]) {
@@ -374,7 +415,7 @@ factory<formatter::string_t>::from(const config::node_t& config) -> formatter::s
             }
         };
 
-        return formatter::string_t(std::move(pattern), std::move(fn));
+        return formatter::string_t(std::move(pattern));
     }
 
     return formatter::string_t(std::move(pattern));
