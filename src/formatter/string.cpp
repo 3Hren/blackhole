@@ -410,7 +410,7 @@ auto factory<formatter::string_t>::from(const config::node_t& config) -> formatt
             }
         };
 
-        return formatter::string_t(std::move(pattern));
+        return formatter::string_t(std::move(pattern), std::move(fn));
     }
 
     return formatter::string_t(std::move(pattern));
