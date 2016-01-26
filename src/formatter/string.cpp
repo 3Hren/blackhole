@@ -34,6 +34,7 @@ using string::required;
 using string::optional;
 
 using string::literal_t;
+using string::token_t;
 
 namespace {
 
@@ -250,8 +251,8 @@ private:
     }
 };
 
-auto tokenize(const std::string& pattern) -> std::vector<string::token_t> {
-    std::vector<string::token_t> tokens;
+auto tokenize(const std::string& pattern) -> std::vector<token_t> {
+    std::vector<token_t> tokens;
     // for (const auto& reserved : {"process", "thread", "message", "severity", "timestamp"}) {
     //     if (options.count(reserved) != 0) {
     //         throw std::logic_error("placeholder '" + std::string(reserved) +
@@ -268,7 +269,7 @@ auto tokenize(const std::string& pattern) -> std::vector<string::token_t> {
 }
 
 struct option_visitor {
-    typedef boost::optional<string::token_t> result_type;
+    typedef boost::optional<token_t> result_type;
 
     const std::string& name;
     std::string& prefix;
@@ -300,7 +301,7 @@ struct option_visitor {
 };
 
 struct leftover_visitor {
-    typedef boost::optional<string::token_t> result_type;
+    typedef boost::optional<token_t> result_type;
 
     const std::string& name;
     std::string& prefix;
@@ -328,7 +329,7 @@ struct leftover_visitor {
 class string_t::inner_t {
 public:
     severity_map sevmap;
-    std::vector<string::token_t> tokens;
+    std::vector<token_t> tokens;
 };
 
 string_t::string_t(const std::string& pattern) :
