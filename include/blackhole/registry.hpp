@@ -47,6 +47,7 @@ public:
 
     auto build(const std::string& name) -> root_logger_t;
 
+    // TODO: Hide?
     auto configurator() -> config::factory_t& {
         return *factory;
     }

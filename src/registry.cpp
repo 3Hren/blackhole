@@ -62,6 +62,7 @@ auto builder_t::build(const std::string& name) -> root_logger_t {
 
     std::vector<std::unique_ptr<handler_t>> handlers;
 
+    // TODO: Check `config.contains(name)`.
     config[name].each([&](const config::node_t& config) {
         auto formatter = this->formatter(result<const config::node_t&>(config["formatter"].unwrap())
             .expect("each handler must have a formatter"));
