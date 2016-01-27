@@ -278,20 +278,17 @@ struct option_visitor {
     auto operator()(const ph::generic<required>& token) const -> result_type {
         if (token.name == name) {
             return result_type(ph::generic<optional>(token, std::move(prefix), std::move(suffix)));
+        } else {
+            return boost::none;
         }
-
-        return boost::none;
     }
 
     auto operator()(const ph::generic<optional>& token) const -> result_type {
         if (token.name == name) {
-            ph::generic<optional> result(token);
-            result.prefix = std::move(prefix);
-            result.suffix = std::move(suffix);
-            return result_type(result);
+            return result_type(ph::generic<optional>(token, std::move(prefix), std::move(suffix)));
+        } else {
+            return boost::none;
         }
-
-        return boost::none;
     }
 
     template<typename T>
@@ -313,9 +310,9 @@ struct leftover_visitor {
     auto operator()(const ph::leftover_t& token) const -> result_type {
         if (token.name == name) {
             return result_type(ph::leftover_t(token.name, unique, prefix, suffix, pattern, separator));
+        } else {
+            return boost::none;
         }
-
-        return boost::none;
     }
 
     template<typename T>
