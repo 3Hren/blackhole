@@ -134,6 +134,10 @@ public:
     constexpr auto operator==(const basic_string_view& other) const noexcept -> bool {
         return size() == other.size() && traits_type::compare(data(), other.data(), size()) == 0;
     }
+
+    constexpr auto operator<(const basic_string_view& other) const noexcept -> bool {
+        return std::lexicographical_compare(data(), data() + size(), other.data(), other.data() + other.size());
+    }
 };
 
 template<class Char, class Traits>

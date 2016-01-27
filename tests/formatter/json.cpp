@@ -300,6 +300,8 @@ TEST(json_t, FormatAttributeWithRenaming) {
     ASSERT_TRUE(doc.HasMember("#source"));
     ASSERT_TRUE(doc["#source"].IsString());
     EXPECT_STREQ("storage", doc["#source"].GetString());
+
+    formatter.format(record, writer);
 }
 
 }  // namespace formatter

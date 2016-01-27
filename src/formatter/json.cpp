@@ -103,7 +103,8 @@ public:
     // A JSON routing pointer for attributes that weren't mentioned in `routing` map.
     rapidjson::Pointer rest;
     // Routing map from attribute name to its JSON pointer.
-    std::map<std::string, rapidjson::Pointer> routing;
+    std::map<std::string, rapidjson::Pointer> routing_storage;
+    std::map<string_view, rapidjson::Pointer> routing;
 
     std::unordered_map<std::string, std::string> mapping;
 
@@ -113,22 +114,22 @@ public:
     {
         for (const auto& route : properties.routing.specified) {
             for (const auto& name : route.second) {
-                routing.insert({name, rapidjson::Pointer(route.first)});
+                routing_storage.insert({name, rapidjson::Pointer(route.first)});
             }
+        }
+
+        for (const auto& kv : routing_storage) {
+            this->routing.insert({kv.first, kv.second});
         }
     }
 
     template<typename Document>
     auto get(const string_view& name, Document& root) -> rapidjson::Value& {
-        // TODO: Here we can avoid a temporary string construction by using multi indexed
-        // containers.
-        const auto it = routing.find(name.to_string());
+        const auto& route = find(routing, name, [&]() -> const rapidjson::Pointer& {
+            return rest;
+        });
 
-        if (it == routing.end()) {
-            return rest.GetWithDefault(root, rapidjson::kObjectType);
-        } else {
-            return it->second.GetWithDefault(root, rapidjson::kObjectType);
-        }
+        return route.GetWithDefault(root, rapidjson::kObjectType);
     }
 
     template<typename Document>
