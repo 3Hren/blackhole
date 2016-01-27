@@ -291,6 +291,15 @@ if (ENABLE_EXAMPLES)
 		blackhole)
 
 	file(COPY examples/3.config.json DESTINATION .)
+
+	# TEST
+    add_executable(4-file
+		examples/4.file)
+
+	enable_all_warnings(4-file)
+
+	target_link_libraries(4-file
+		blackhole)
 endif (ENABLE_EXAMPLES)
 
 install(
