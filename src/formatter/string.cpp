@@ -1,6 +1,7 @@
 #include "blackhole/formatter/string.hpp"
 
 #include <array>
+#include <set>
 
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/get.hpp>
@@ -249,33 +250,62 @@ public:
         }
     }
 
-    auto operator()(const ph::leftover_t& token) const -> void {
-        bool first = true;
-        fmt::MemoryWriter kv;
-        const view_visitor<unspec> visitor(kv);
+    struct unique_t {
+        std::set<string_view> names;
 
-        for (const auto& attributes : record.attributes()) {
-            for (const auto& attribute : attributes.get()) {
-                if (first) {
-                    first = false;
-                    writer.inner << token.prefix;
-                } else {
-                    writer.inner << token.separator;
+        auto operator()(const view_of<attribute_t>::type& attribute) -> bool {
+            return names.insert(attribute.first).second;
+        }
+    };
+
+    struct repeat_t {
+        constexpr auto operator()(const view_of<attribute_t>::type&) const noexcept -> bool {
+            return true;
+        }
+    };
+
+    template<typename U>
+    struct leftover_builder {
+        writer_t& writer;
+        const ph::leftover_t& token;
+
+        auto apply(const record_t& record) -> void {
+            bool first = true;
+            U unique;
+            fmt::MemoryWriter kv;
+            const view_visitor<unspec> visitor(kv);
+
+            for (const auto& attributes : record.attributes()) {
+                for (const auto& attribute : attributes.get()) {
+                    if (unique(attribute)) {
+                        if (first) {
+                            first = false;
+                            writer.inner << token.prefix;
+                        } else {
+                            writer.inner << token.separator;
+                        }
+
+                        kv << string_ref(attribute.first.data(), attribute.first.size()) << ": ";
+                        boost::apply_visitor(visitor, attribute.second.inner().value);
+
+                        writer.inner << string_ref(kv.data(), kv.size());
+
+                        kv.clear();
+                    }
                 }
+            }
 
-                // TODO: To correctly implement kv patterns we need a visitor with parameters. Or
-                // attribute (pair) type, instead of that `std::pair`.
-                kv << string_ref(attribute.first.data(), attribute.first.size()) << ": ";
-                boost::apply_visitor(visitor, attribute.second.inner().value);
-
-                writer.inner << string_ref(kv.data(), kv.size());
-
-                kv.clear();
+            if (!first) {
+                writer.inner << token.suffix;
             }
         }
+    };
 
-        if (!first) {
-            writer.inner << token.suffix;
+    auto operator()(const ph::leftover_t& token) const -> void {
+        if (token.unique) {
+            leftover_builder<unique_t>{writer, token}.apply(record);
+        } else {
+            leftover_builder<repeat_t>{writer, token}.apply(record);
         }
     }
 

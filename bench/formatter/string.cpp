@@ -105,11 +105,29 @@ static void format_timestamp(::benchmark::State& state) {
 
 static void format_leftover(::benchmark::State& state) {
     formatter::string_t formatter("{...}", {
-        {"...", formatter::option::leftover_t{false, "[", "]", "{k}={v}", ", "}}
+        {"...", formatter::option::leftover_t{false, "[", "]", "{k}: {v}", ", "}}
     });
 
     const string_view message("-");
     const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+
+    while (state.KeepRunning()) {
+        formatter.format(record, writer);
+    }
+
+    state.SetItemsProcessed(state.iterations());
+}
+
+static void format_leftover_unique(::benchmark::State& state) {
+    formatter::string_t formatter("{...}", {
+        {"...", formatter::option::leftover_t{true, "[", "]", "{k}: {v}", ", "}}
+    });
+
+    const string_view message("-");
+    const attribute_list attributes{{"key#1", {42}}, {"key#1", {"value#2"}}};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
@@ -144,6 +162,7 @@ NBENCHMARK("formatter.string[message]", format_message);
 NBENCHMARK("formatter.string[timestamp]", format_timestamp);
 NBENCHMARK("formatter.string[severity + message]", format_severity_message);
 NBENCHMARK("formatter.string[...]", format_leftover);
+NBENCHMARK("formatter.string[... + unique]", format_leftover_unique);
 
 }  // namespace benchmark
 }  // namespace blackhole

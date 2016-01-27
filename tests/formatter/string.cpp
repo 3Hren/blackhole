@@ -547,7 +547,7 @@ TEST(DISABLED_string_t, LeftoverWithPattern) {
 
 TEST(string_t, LeftoverWithSeparator) {
     formatter::string_t formatter("{...}", {
-        {"...", formatter::option::leftover_t{false, "", "", "{k}={v}", " | "}}
+        {"...", formatter::option::leftover_t{false, "", "", "{k}: {v}", " | "}}
     });
 
     const string_view message("-");
@@ -565,6 +565,21 @@ TEST(string_t, LeftoverWithSeparator) {
 
 TEST(string_t, Type) {
     EXPECT_EQ("string", std::string(factory<formatter::string_t>::type()));
+}
+
+TEST(string_t, LeftoverUnique) {
+    formatter::string_t formatter("{...}", {
+        {"...", formatter::option::leftover_t{true, "", "", "{k}: {v}", ", "}}
+    });
+
+    const string_view message("-");
+    const attribute_list attributes{{"key#1", {42}}, {"key#1", {"value#2"}}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ("key#1: 42", writer.result().to_string());
 }
 
 }  // namespace testing

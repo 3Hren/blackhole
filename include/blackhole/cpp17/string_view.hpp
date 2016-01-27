@@ -136,6 +136,14 @@ public:
     }
 };
 
+template<typename Char, typename Traits >
+constexpr auto operator<(basic_string_view<Char, Traits> lhs, basic_string_view<Char, Traits> rhs) ->
+    bool
+{
+    return std::lexicographical_compare(lhs.data(), lhs.data() + lhs.size(),
+        rhs.data(), rhs.data() + rhs.size());
+}
+
 template<class Char, class Traits>
 auto operator<<(std::basic_ostream<Char, Traits>& stream, const basic_string_view<Char, Traits>& value) ->
     std::basic_ostream<Char, Traits>&
