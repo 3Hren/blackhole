@@ -22,7 +22,10 @@ namespace blackhole {
 inline namespace v1 {
 namespace formatter {
 
+namespace {
+
 namespace string = blackhole::detail::formatter::string;
+
 namespace ph = string::ph;
 
 using string::id;
@@ -32,11 +35,10 @@ using string::name;
 using string::user;
 using string::required;
 using string::optional;
-
 using string::literal_t;
-using string::token_t;
 
-namespace {
+using string::token_t;
+using string::parser_t;
 
 typedef fmt::StringRef string_ref;
 
@@ -260,7 +262,7 @@ auto tokenize(const std::string& pattern) -> std::vector<token_t> {
     //     }
     // }
 
-    string::parser_t parser(pattern);
+    parser_t parser(pattern);
     while (auto token = parser.next()) {
         tokens.emplace_back(token.get());
     }
