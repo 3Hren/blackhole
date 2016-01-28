@@ -104,8 +104,10 @@ static void format_timestamp(::benchmark::State& state) {
 }
 
 static void format_leftover(::benchmark::State& state) {
+    using formatter::string::leftover_t;
+
     formatter::string_t formatter("{...}");
-    formatter.leftover("...", "[", "]", "{k}={v}", ", ", false);
+    formatter.set("...", leftover_t{{}, "[", "]", "{k}={v}", ", "});
 
     const string_view message("-");
     const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};

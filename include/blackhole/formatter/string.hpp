@@ -32,6 +32,20 @@ class node_t;
 namespace blackhole {
 inline namespace v1 {
 namespace formatter {
+namespace token {
+
+class token_t;
+class option_t;
+
+}  // namespace string
+}  // namespace formatter
+}  // namespace v1
+}  // namespace blackhole
+
+
+namespace blackhole {
+inline namespace v1 {
+namespace formatter {
 
 /// Severity mapping function.
 ///
@@ -41,6 +55,54 @@ namespace formatter {
 /// \param spec the format specification as it was provided with the initial pattern.
 /// \param writer result writer.
 typedef std::function<void(int severity, const std::string& spec, writer_t& writer)> severity_map;
+
+namespace string {
+
+/// Represents configuration for a single optional placeholder.
+///
+/// Optional placeholders allows to nicely format some patterns where there are non-reserved
+/// attributes used and its presents is undetermined. Unlike required placeholders it does not throw
+/// an exception if there are no attribute with the given name in the set.
+/// Also it provides additional functionality with optional surrounding a present attribute with
+/// some prefix and suffix.
+struct optional_t {
+    /// Prefix string that will be prepended before an associated attribute if it exists.
+    std::string prefix;
+
+    /// Suffix string that will be appended after an associated attribute if it exists.
+    std::string suffix;
+};
+
+/// Represents configuration for a single leftover placeholder.
+struct leftover_t {
+    /// Represents filtering policy for duplicated attributes in placeholder.
+    enum class filter_t {
+        /// No filtering, allow duplicate attributes.
+        none,
+        /// Filter duplicate attributes locally, meaning that there will be only the last attribute
+        /// with unique name in the given leftover placeholder.
+        local
+    };
+
+    /// Filtering policy.
+    filter_t filter;
+
+    /// Prefix string that will be prepended before a placeholder if there are at least one
+    /// non-reserved attribute in a set.
+    std::string prefix;
+
+    /// Suffix string that will be appended after a placeholder if there are at least one
+    /// non-reserved attribute in a set.
+    std::string suffix;
+
+    /// Key-value pattern.
+    std::string pattern;
+
+    /// Separator between each attribute representation.
+    std::string separator;
+};
+
+}  // namespace string
 
 /// The string formatter is responsible for effective converting the given record to a string using
 /// precompiled pattern and options.
@@ -122,13 +184,12 @@ class string_t : public formatter_t {
 
 public:
     explicit string_t(const std::string& pattern);
-    string_t(const std::string& pattern, severity_map sevmap);
+    explicit string_t(const std::string& pattern, severity_map sevmap);
 
     /// Configuration.
 
-    auto optional(const std::string& name, std::string prefix, std::string suffix) -> void;
-    auto leftover(const std::string& name, std::string prefix, std::string suffix,
-        std::string pattern, std::string separator, bool unique) -> void;
+    auto set(const std::string& name, const string::optional_t& option) -> void;
+    auto set(const std::string& name, const string::leftover_t& option) -> void;
 
     /// Formatting.
 

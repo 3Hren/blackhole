@@ -24,6 +24,9 @@ namespace formatter {
 
 namespace {
 
+using blackhole::formatter::string::optional_t;
+using blackhole::formatter::string::leftover_t;
+
 namespace string = blackhole::detail::formatter::string;
 
 namespace ph = string::ph;
@@ -274,12 +277,11 @@ struct option_visitor {
     typedef boost::optional<token_t> result_type;
 
     const std::string& name;
-    std::string& prefix;
-    std::string& suffix;
+    const optional_t& option;
 
     auto operator()(const ph::generic<required>& token) const -> result_type {
         if (token.name == name) {
-            return result_type(ph::generic<optional>(token, std::move(prefix), std::move(suffix)));
+            return result_type(ph::generic<optional>(token, option.prefix, option.suffix));
         } else {
             return boost::none;
         }
@@ -287,7 +289,7 @@ struct option_visitor {
 
     auto operator()(const ph::generic<optional>& token) const -> result_type {
         if (token.name == name) {
-            return result_type(ph::generic<optional>(token, std::move(prefix), std::move(suffix)));
+            return result_type(ph::generic<optional>(token, option.prefix, option.suffix));
         } else {
             return boost::none;
         }
@@ -303,15 +305,13 @@ struct leftover_visitor {
     typedef boost::optional<token_t> result_type;
 
     const std::string& name;
-    std::string& prefix;
-    std::string& suffix;
-    std::string& pattern;
-    std::string& separator;
-    bool unique;
+    const leftover_t& option;
 
     auto operator()(const ph::leftover_t& token) const -> result_type {
         if (token.name == name) {
-            return result_type(ph::leftover_t(token.name, unique, prefix, suffix, pattern, separator));
+            return result_type(ph::leftover_t(token.name,
+                option.filter == leftover_t::filter_t::local,
+                option.prefix, option.suffix, option.pattern, option.separator));
         } else {
             return boost::none;
         }
@@ -351,8 +351,8 @@ string_t::string_t(const std::string& pattern, severity_map sevmap) :
 // TODO: Decompose `throw std::invalid_argument("token not found");` case.
 // TODO: Check and decompose name is not reserved. Maybe by wrapping `name` with type. Test.
 // TODO: Both algorithms are similar. Decompose.
-auto string_t::optional(const std::string& name, std::string prefix, std::string suffix) -> void {
-    const option_visitor visitor{name, prefix, suffix};
+auto string_t::set(const std::string& name, const optional_t& option) -> void {
+    const option_visitor visitor{name, option};
 
     for (auto& token : inner->tokens) {
         if (auto value = boost::apply_visitor(visitor, token)) {
@@ -362,12 +362,11 @@ auto string_t::optional(const std::string& name, std::string prefix, std::string
     }
 
     throw std::invalid_argument("token not found");
+
 }
 
-auto string_t::leftover(const std::string& name, std::string prefix, std::string suffix,
-    std::string pattern, std::string separator, bool unique) -> void
-{
-    const leftover_visitor visitor{name, prefix, suffix, pattern, separator, unique};
+auto string_t::set(const std::string& name, const leftover_t& option) -> void {
+    const leftover_visitor visitor{name, option};
 
     for (auto& token : inner->tokens) {
         if (auto value = boost::apply_visitor(visitor, token)) {

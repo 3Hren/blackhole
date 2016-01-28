@@ -38,6 +38,9 @@ namespace testing {
 using ::testing::AnyOf;
 using ::testing::Eq;
 
+using formatter::string::optional_t;
+using formatter::string::leftover_t;
+
 TEST(string_t, Message) {
     formatter::string_t formatter("[{message}]");
 
@@ -208,7 +211,7 @@ TEST(string_t, ThrowsIfGenericAttributeNotFound) {
 
 TEST(string_t, GenericOptional) {
     formatter::string_t formatter("{protocol}{version:.1f}");
-    formatter.optional("version", "/", " - REQUIRED");
+    formatter.set("version", optional_t{"/", " - REQUIRED"});
 
     const string_view message("-");
     const attribute_list attributes{{"protocol", {"HTTP"}}, {"version", {1.1}}};
@@ -253,7 +256,7 @@ TEST(string_t, GenericLazySpec) {
 TEST(string_t, ThrowsIfOptionsContainsReservedPlaceholderNames) {
     formatter::string_t formatter("{protocol}");
 
-    EXPECT_THROW(formatter.optional("message", "[", "]"), std::logic_error);
+    EXPECT_THROW(formatter.set("message", optional_t{"[", "]"}), std::logic_error);
 }
 
 TEST(string_t, Process) {
@@ -546,7 +549,7 @@ TEST(string_t, LeftoverEmpty) {
 
 TEST(string_t, LeftoverWithPrefixAndSuffix) {
     formatter::string_t formatter("{...}");
-    formatter.leftover("...", "[", "]", "{k}: {v}", ", ", false);
+    formatter.set("...", leftover_t{{}, "[", "]", "{k}: {v}", ", "});
 
     const string_view message("-");
     const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};
@@ -563,7 +566,7 @@ TEST(string_t, LeftoverWithPrefixAndSuffix) {
 
 TEST(string_t, LeftoverEmptyWithPrefixAndSuffix) {
     formatter::string_t formatter("{...}");
-    formatter.leftover("...", "[", "]", "{k}: {v}", ", ", false);
+    formatter.set("...", leftover_t{{}, "[", "]", "{k}: {v}", ", "});
 
     const string_view message("-");
     const attribute_list attributes{};
@@ -577,7 +580,7 @@ TEST(string_t, LeftoverEmptyWithPrefixAndSuffix) {
 
 TEST(DISABLED_string_t, LeftoverWithPattern) {
     formatter::string_t formatter("{...}");
-    formatter.leftover("...", "", "", "{k}={v}", ", ", false);
+    formatter.set("...", leftover_t{{}, "", "", "{k}={v}", ", "});
 
     const string_view message("-");
     const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};
@@ -594,7 +597,7 @@ TEST(DISABLED_string_t, LeftoverWithPattern) {
 
 TEST(string_t, LeftoverWithSeparator) {
     formatter::string_t formatter("{...}");
-    formatter.leftover("...", "", "", "{k}={v}", " | ", false);
+    formatter.set("...", leftover_t{{}, "", "", "{k}={v}", " | "});
 
     const string_view message("-");
     const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};
