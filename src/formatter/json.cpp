@@ -1,6 +1,7 @@
 #include "blackhole/formatter/json.hpp"
 
 #include <array>
+#include <set>
 #include <unordered_map>
 
 #include <boost/variant/apply_visitor.hpp>
@@ -68,6 +69,8 @@ struct stream_t {
     writer_t& wr;
 
     /// Writes a character directly into the underlying buffer.
+    // TODO: Seems like writing string one-by-one affects the performance. See similar benchmarks
+    // that differs only with input string length.
     auto Put(Ch c) -> void {
         wr.inner << c;
     }
@@ -107,9 +110,12 @@ public:
 
     std::unordered_map<std::string, std::string> mapping;
 
+    bool unique;
+
     inner_t(json_t::properties_t properties) :
         rest(properties.routing.unspecified),
-        mapping(std::move(properties.mapping))
+        mapping(std::move(properties.mapping)),
+        unique(properties.unique)
     {
         for (const auto& route : properties.routing.specified) {
             for (const auto& name : route.second) {
@@ -179,6 +185,20 @@ public:
     }
 
     auto attributes() -> void {
+        if (inner.unique) {
+            // TODO: Small buffer optimization is possible here (see stack allocator with arena).
+            std::set<string_view> set;
+
+            for (const auto& attributes : record.attributes()) {
+                for (const auto& attribute : attributes.get()) {
+                    if (set.insert(attribute.first).second) {
+                        apply(attribute.first, attribute.second);
+                    }
+                }
+            }
+            return;
+        }
+
         // TODO: Make flattened range
         // TODO: Make uniqued range.
         for (const auto& attributes : record.attributes()) {
@@ -269,6 +289,11 @@ auto json_t::builder_t::route(std::string route, std::vector<std::string> attrib
 
 auto json_t::builder_t::rename(std::string from, std::string to) -> builder_t& {
     properties->mapping[std::move(from)] = std::move(to);
+    return *this;
+}
+
+auto json_t::builder_t::unique() -> builder_t& {
+    properties->unique = true;
     return *this;
 }
 

@@ -204,6 +204,60 @@ TEST(json_t, FormatAttributeUser) {
     EXPECT_STREQ("127.0.0.1:8080", doc["endpoint"].GetString());
 }
 
+TEST(json_t, FormatDuplicateAttributesDefault) {
+    auto formatter = json_t::builder_t()
+        .build();
+
+    const string_view message("value");
+    const attribute_list a1{{"counter", 42}};
+    const attribute_list a2{{"counter", 100}};
+    const attribute_pack pack{a1, a2};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+    ASSERT_TRUE(doc.HasMember("message"));
+    ASSERT_TRUE(doc["message"].IsString());
+    EXPECT_STREQ("value", doc["message"].GetString());
+
+    ASSERT_TRUE(doc.HasMember("counter"));
+    ASSERT_TRUE(doc["counter"].IsInt());
+    EXPECT_EQ(42, doc["counter"].GetInt());
+
+    EXPECT_TRUE(writer.result().to_string().find("\"counter\":42") != std::string::npos);
+    EXPECT_TRUE(writer.result().to_string().find("\"counter\":100") != std::string::npos);
+}
+
+TEST(json_t, FormatDuplicateAttributesUnique) {
+    auto formatter = json_t::builder_t()
+        .unique()
+        .build();
+
+    const string_view message("value");
+    // Earlier attribute list has more precedence than the later ones.
+    const attribute_list a1{{"counter", 42}};
+    const attribute_list a2{{"counter", 100}};
+    const attribute_pack pack{a1, a2};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+    ASSERT_TRUE(doc.HasMember("message"));
+    ASSERT_TRUE(doc["message"].IsString());
+    EXPECT_STREQ("value", doc["message"].GetString());
+
+    ASSERT_TRUE(doc.HasMember("counter"));
+    ASSERT_TRUE(doc["counter"].IsInt());
+    EXPECT_EQ(42, doc["counter"].GetInt());
+
+    EXPECT_TRUE(writer.result().to_string().find("\"counter\":42") != std::string::npos);
+    EXPECT_TRUE(writer.result().to_string().find("\"counter\":100") == std::string::npos);
+}
+
 TEST(json_t, FormatMessageWithRouting) {
     auto formatter = json_t::builder_t()
         .route("/fields", {"message"})
