@@ -24,6 +24,7 @@ static void format_json(::benchmark::State& state) {
 
     while (state.KeepRunning()) {
         formatter.format(record, writer);
+        writer.inner.clear();
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -41,6 +42,7 @@ static void format_json_message_routed(::benchmark::State& state) {
 
     while (state.KeepRunning()) {
         formatter.format(record, writer);
+        writer.inner.clear();
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -59,6 +61,7 @@ static void format_json_message_routed_attr(::benchmark::State& state) {
 
     while (state.KeepRunning()) {
         formatter.format(record, writer);
+        writer.inner.clear();
     }
 
     state.SetItemsProcessed(state.iterations());

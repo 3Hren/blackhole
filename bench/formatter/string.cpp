@@ -22,6 +22,7 @@ static void format_literal(::benchmark::State& state) {
 
     while (state.KeepRunning()) {
         formatter.format(record, writer);
+        writer.inner.clear();
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -37,6 +38,7 @@ static void format_pid(::benchmark::State& state) {
 
     while (state.KeepRunning()) {
         formatter.format(record, writer);
+        writer.inner.clear();
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -52,6 +54,7 @@ static void format_procname(::benchmark::State& state) {
 
     while (state.KeepRunning()) {
         formatter.format(record, writer);
+        writer.inner.clear();
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -67,6 +70,7 @@ static void format_tid(::benchmark::State& state) {
 
     while (state.KeepRunning()) {
         formatter.format(record, writer);
+        writer.inner.clear();
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -82,6 +86,7 @@ static void format_message(::benchmark::State& state) {
 
     while (state.KeepRunning()) {
         formatter.format(record, writer);
+        writer.inner.clear();
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -98,6 +103,7 @@ static void format_timestamp(::benchmark::State& state) {
 
     while (state.KeepRunning()) {
         formatter.format(record, writer);
+        writer.inner.clear();
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -117,6 +123,7 @@ static void format_leftover(::benchmark::State& state) {
 
     while (state.KeepRunning()) {
         formatter.format(record, writer);
+        writer.inner.clear();
     }
 
     state.SetItemsProcessed(state.iterations());
@@ -132,6 +139,7 @@ static void format_severity_message(::benchmark::State& state) {
 
     while (state.KeepRunning()) {
         formatter.format(record, writer);
+        writer.inner.clear();
     }
 
     state.SetItemsProcessed(state.iterations());
