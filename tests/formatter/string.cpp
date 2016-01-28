@@ -549,7 +549,7 @@ TEST(string_t, LeftoverEmpty) {
 
 TEST(string_t, LeftoverWithPrefixAndSuffix) {
     formatter::string_t formatter("{...}");
-    formatter.set("...", leftover_t{{}, "[", "]", "{k}: {v}", ", "});
+    formatter.set("...", leftover_t{leftover_t::filter_t::none, "[", "]", "{k}: {v}", ", "});
 
     const string_view message("-");
     const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};
@@ -566,7 +566,7 @@ TEST(string_t, LeftoverWithPrefixAndSuffix) {
 
 TEST(string_t, LeftoverEmptyWithPrefixAndSuffix) {
     formatter::string_t formatter("{...}");
-    formatter.set("...", leftover_t{{}, "[", "]", "{k}: {v}", ", "});
+    formatter.set("...", leftover_t{leftover_t::filter_t::none, "[", "]", "{k}: {v}", ", "});
 
     const string_view message("-");
     const attribute_list attributes{};
@@ -580,7 +580,7 @@ TEST(string_t, LeftoverEmptyWithPrefixAndSuffix) {
 
 TEST(DISABLED_string_t, LeftoverWithPattern) {
     formatter::string_t formatter("{...}");
-    formatter.set("...", leftover_t{{}, "", "", "{k}={v}", ", "});
+    formatter.set("...", leftover_t{leftover_t::filter_t::none, "", "", "{k}={v}", ", "});
 
     const string_view message("-");
     const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};
@@ -597,7 +597,7 @@ TEST(DISABLED_string_t, LeftoverWithPattern) {
 
 TEST(string_t, LeftoverWithSeparator) {
     formatter::string_t formatter("{...}");
-    formatter.set("...", leftover_t{{}, "", "", "{k}={v}", " | "});
+    formatter.set("...", leftover_t{leftover_t::filter_t::none, "", "", "{k}={v}", " | "});
 
     const string_view message("-");
     const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};
