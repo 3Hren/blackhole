@@ -4,6 +4,7 @@
 #include <set>
 #include <unordered_map>
 
+#include <boost/optional/optional.hpp>
 #include <boost/variant/apply_visitor.hpp>
 
 #ifndef RAPIDJSON_HAS_STDSTRING
@@ -15,6 +16,8 @@
 #include <rapidjson/pointer.h>
 
 #include "blackhole/attribute.hpp"
+#include "blackhole/config/node.hpp"
+#include "blackhole/config/option.hpp"
 #include "blackhole/record.hpp"
 #include "blackhole/extensions/writer.hpp"
 
@@ -304,5 +307,47 @@ auto json_t::builder_t::build() const -> json_t {
 }
 
 }  // namespace formatter
+
+auto factory<formatter::json_t>::type() noexcept -> const char* {
+    return "json";
+}
+
+auto factory<formatter::json_t>::from(const config::node_t& config) -> formatter::json_t {
+    formatter::json_t::builder_t builder;
+
+    if (auto unique = config["unique"].to_bool()) {
+        if (unique.get()) {
+            builder.unique();
+        }
+    }
+
+    if (auto mapping = config["mapping"]) {
+        mapping.each_map([&](const std::string& key, const config::node_t& value) {
+            builder.rename(key, value.to_string());
+        });
+    }
+
+    if (auto routing = config["routing"]) {
+        routing.each_map([&](const std::string& key, const config::node_t& value) {
+            try {
+                // TODO: Probably it's right thing to explicitly check whether the value is string.
+                value.to_string();
+                builder.route(key);
+                return;
+            } catch (const std::logic_error&) {
+                // Eat.
+            }
+
+            std::vector<std::string> attributes;
+            value.each([&](const config::node_t& config) {
+                attributes.emplace_back(config.to_string());
+            });
+            builder.route(key, std::move(attributes));
+        });
+    }
+
+    return builder.build();
+}
+
 }  // namespace v1
 }  // namespace blackhole

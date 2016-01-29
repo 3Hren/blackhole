@@ -375,6 +375,10 @@ TEST(json_t, FormatAttributeWithRenaming) {
     EXPECT_STREQ("storage", doc["#source"].GetString());
 }
 
+TEST(json_t, FactoryType) {
+    EXPECT_EQ("json", std::string(factory<formatter::json_t>::type()));
+}
+
 }  // namespace formatter
 }  // namespace testing
 }  // namespace blackhole

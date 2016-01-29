@@ -8,6 +8,25 @@
 
 namespace blackhole {
 inline namespace v1 {
+
+template<typename>
+struct factory;
+
+}  // namespace v1
+}  // namespace blackhole
+
+namespace blackhole {
+inline namespace v1 {
+namespace config {
+
+class node_t;
+
+}  // namespace config
+}  // namespace v1
+}  // namespace blackhole
+
+namespace blackhole {
+inline namespace v1 {
 namespace formatter {
 
 /// The JSON formatter is responsible for effective converting the given log record into a
@@ -152,5 +171,12 @@ public:
 };
 
 }  // namespace formatter
+
+template<>
+struct factory<formatter::json_t> {
+    static auto type() noexcept -> const char*;
+    static auto from(const config::node_t& config) -> formatter::json_t;
+};
+
 }  // namespace v1
 }  // namespace blackhole
