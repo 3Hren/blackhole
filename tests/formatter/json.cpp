@@ -54,6 +54,23 @@ TEST(json_t, FormatMessage) {
     EXPECT_STREQ("value", doc["message"].GetString());
 }
 
+TEST(json_t, FormatFormattedMessage) {
+    json_t formatter;
+
+    const string_view message("value {}");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    record.activate("value 42");
+    writer_t writer;
+    formatter.format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+    ASSERT_TRUE(doc.HasMember("message"));
+    ASSERT_TRUE(doc["message"].IsString());
+    EXPECT_STREQ("value 42", doc["message"].GetString());
+}
+
 TEST(json_t, FormatSeverity) {
     json_t formatter;
 

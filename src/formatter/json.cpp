@@ -168,7 +168,7 @@ public:
     {}
 
     auto message() -> void {
-        apply("message", record.message());
+        apply("message", record.formatted());
     }
 
     auto severity() -> void {
