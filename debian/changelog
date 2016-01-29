@@ -3,11 +3,16 @@ blackhole (1.0.0-0alpha2) UNRELEASED; urgency=low
   * API: change the interface (and ABI) of the string formatter to
     make it possible to change the implementation or add functionality
     without further breaking.
+  * API: make possible to handle nested configuration nodes. This change was
+    required to add const qualifier to several methods of option and node
+    classes.
   * Feature: enable filtering attributes by name for JSON formatter.
   * Feature: enable JSON formatter configuration from factory.
   * Bug fix: fix build on linux with clang.
   * Bug fix: fix undefined variable warnings on linux.
   * Bug fix: suppress sometimes unused variable on linux.
+  * Bug fix: fix a JSON formatter bug where message attribute’s value was left
+    unformatted.
 
  -- Evgeny Safronov <division494@gmail.com>  Thu, 28 Jan 2016 15:21:36 +0300
 
