@@ -4,6 +4,7 @@ blackhole (1.0.0-0alpha2) UNRELEASED; urgency=low
     make it possible to change the implementation or add functionality
     without further breaking.
   * Feature: enable filtering attributes by name for JSON formatter.
+  * Feature: enable JSON formatter configuration from factory.
   * Bug fix: fix build on linux with clang.
   * Bug fix: fix undefined variable warnings on linux.
   * Bug fix: suppress sometimes unused variable on linux.
