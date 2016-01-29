@@ -43,8 +43,8 @@ public:
     auto to_double() const -> boost::optional<double>;
     auto to_string() const -> boost::optional<std::string>;
 
-    auto each(const each_function& fn) -> void;
-    auto each_map(const member_function& fn) -> void;
+    auto each(const each_function& fn) const -> void;
+    auto each_map(const member_function& fn) const -> void;
 
     auto operator[](const std::size_t& idx) const -> option<node_t>;
     auto operator[](const std::string& key) const -> option<node_t>;

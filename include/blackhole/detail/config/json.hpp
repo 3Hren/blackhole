@@ -108,7 +108,7 @@ public:
         type_mismatch("string");
     }
 
-    auto each(const each_function& fn) -> void {
+    auto each(const each_function& fn) const -> void {
         if (!value.IsArray()) {
             type_mismatch("array");
         }
@@ -118,7 +118,7 @@ public:
         }
     }
 
-    auto each_map(const member_function& fn) -> void {
+    auto each_map(const member_function& fn) const -> void {
         if (!value.IsObject()) {
             type_mismatch("object");
         }

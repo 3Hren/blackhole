@@ -19,8 +19,8 @@ public:
     MOCK_CONST_METHOD0(to_double, double());
     MOCK_CONST_METHOD0(to_string, std::string());
 
-    MOCK_METHOD1(each, void(const each_function&));
-    MOCK_METHOD1(each_map, void(const member_function&));
+    MOCK_CONST_METHOD1(each, void(const each_function&));
+    MOCK_CONST_METHOD1(each_map, void(const member_function&));
 
     MOCK_CONST_METHOD1(subscript_idx, super*(const std::size_t&));
     MOCK_CONST_METHOD1(subscript_key, super*(const std::string&));

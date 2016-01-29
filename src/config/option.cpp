@@ -53,13 +53,13 @@ auto option<node_t>::to_string() const -> boost::optional<std::string> {
     });
 }
 
-auto option<node_t>::each(const each_function& fn) -> void {
+auto option<node_t>::each(const each_function& fn) const -> void {
     if (node) {
         node->each(fn);
     }
 }
 
-auto option<node_t>::each_map(const member_function& fn) -> void {
+auto option<node_t>::each_map(const member_function& fn) const -> void {
     if (node) {
         node->each_map(fn);
     }

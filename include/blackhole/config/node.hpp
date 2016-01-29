@@ -45,13 +45,13 @@ public:
     /// applying the given function to each element.
     ///
     /// Should do nothing either if there is no underlying array or it is empty.
-    virtual auto each(const each_function& fn) -> void = 0;
+    virtual auto each(const each_function& fn) const -> void = 0;
 
     /// Assuming that the underlying object is a map, performs inner iteration over it by applying
     /// the given function to each key-value element.
     ///
     /// Should do nothing either if there is no underlying map or it is empty.
-    virtual auto each_map(const member_function& fn) -> void = 0;
+    virtual auto each_map(const member_function& fn) const -> void = 0;
 
     /// Assuming that the underlying object is an array performs index operation returning the
     /// option object with some node at the given index on success, none otherwise.
