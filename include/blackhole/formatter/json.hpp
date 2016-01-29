@@ -153,10 +153,10 @@ public:
     builder_t();
     ~builder_t();
 
-    /// Configures routing for all other attributes.
+    /// Configures attribute routing for all not mentioned attributes.
     auto route(std::string route) -> builder_t&;
 
-    /// Configures routing for the given set of attributes.
+    /// Configures attribute routing for the given set of attributes.
     ///
     /// Routing feature allows to build a JSON tree using simple key -> set representation. Each
     /// attribute in the set will be traversed into the specified route.
