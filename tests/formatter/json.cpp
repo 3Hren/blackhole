@@ -319,6 +319,25 @@ TEST(json_t, FormatAttributeStringWithNestedRouting) {
     EXPECT_STREQ("127.0.0.1:8080", doc["fields"]["external"]["endpoint"].GetString());
 }
 
+TEST(json_t, FormatAttributeStringWithRootRouting) {
+    auto formatter = json_t::builder_t()
+        .route("", {"endpoint"})
+        .build();
+
+    const string_view message("value");
+    const attribute_list attributes{{"endpoint", "127.0.0.1:8080"}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+    ASSERT_TRUE(doc.HasMember("endpoint"));
+    ASSERT_TRUE(doc["endpoint"].IsString());
+    EXPECT_STREQ("127.0.0.1:8080", doc["endpoint"].GetString());
+}
+
 TEST(json_t, FormatMessageWithRenaming) {
     auto formatter = json_t::builder_t()
         .rename("message", "#message")
