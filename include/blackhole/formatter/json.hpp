@@ -134,7 +134,15 @@ public:
     builder_t();
     ~builder_t();
 
+    /// Configures routing for all other attributes.
     auto route(std::string route) -> builder_t&;
+
+    /// Configures routing for the given set of attributes.
+    ///
+    /// Routing feature allows to build a JSON tree using simple key -> set representation. Each
+    /// attribute in the set will be traversed into the specified route.
+    /// Route parameter adheres JSON Pointer RFC, see https://tools.ietf.org/html/rfc6901 for more
+    /// information.
     auto route(std::string route, std::vector<std::string> attributes) -> builder_t&;
     auto rename(std::string from, std::string to) -> builder_t&;
     auto unique() -> builder_t&;
