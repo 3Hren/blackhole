@@ -29,6 +29,18 @@ struct into_view {
     }
 };
 
+template<typename Value>
+struct from {
+    typedef void result_type;
+
+    typename Value::visitor_t& visitor;
+
+    template<typename T>
+    auto operator()(const T& value) const -> void {
+        visitor(value);
+    }
+};
+
 }  // namespace
 
 static_assert(sizeof(value_t::inner_t) <= sizeof(value_t), "padding or alignment violation");
@@ -116,6 +128,10 @@ auto value_t::operator=(value_t&& other) -> value_t& {
 
 value_t::~value_t() {
     inner().~inner_t();
+}
+
+auto value_t::apply(visitor_t& visitor) const -> void {
+    boost::apply_visitor(from<value_t>{visitor}, inner().value);
 }
 
 auto value_t::inner() noexcept -> inner_t& {
@@ -225,6 +241,10 @@ view_t::view_t(const value_t& value) {
 
 auto view_t::operator==(const view_t& other) const -> bool {
     return inner().value == other.inner().value;
+}
+
+auto view_t::apply(visitor_t& visitor) const -> void {
+    boost::apply_visitor(from<view_t>{visitor}, inner().value);
 }
 
 auto view_t::inner() noexcept -> inner_t& {
