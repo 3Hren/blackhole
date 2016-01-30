@@ -46,6 +46,8 @@ struct from {
 static_assert(sizeof(value_t::inner_t) <= sizeof(value_t), "padding or alignment violation");
 static_assert(sizeof(view_t::inner_t) <= sizeof(view_t), "padding or alignment violation");
 
+value_t::visitor_t::~visitor_t() = default;
+
 value_t::value_t() {
     construct(nullptr);
 }
@@ -166,6 +168,8 @@ template auto get<value_t::sint64_type>(const value_t& value) -> const value_t::
 template auto get<value_t::uint64_type>(const value_t& value) -> const value_t::uint64_type&;
 template auto get<value_t::double_type>(const value_t& value) -> const value_t::double_type&;
 template auto get<value_t::string_type>(const value_t& value) -> const value_t::string_type&;
+
+view_t::visitor_t::~visitor_t() = default;
 
 view_t::view_t() {
     construct(nullptr);
