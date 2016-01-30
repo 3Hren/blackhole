@@ -3,6 +3,7 @@
 #include <atomic>
 #include <iostream>
 #include <mutex>
+#include <iostream>
 
 #include <boost/thread/tss.hpp>
 
