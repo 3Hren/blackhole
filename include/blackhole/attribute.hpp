@@ -149,7 +149,7 @@ public:
     auto operator=(value_t&& other) -> value_t&;
 
     /// Applies the given visitor to perform pattern matching.
-    auto apply(const visitor_t& visitor) const -> void;
+    auto apply(visitor_t& visitor) const -> void;
 
     /// Returns the internal underlying value.
     auto inner() noexcept -> inner_t&;
@@ -289,7 +289,7 @@ public:
     auto operator=(view_t&& other) -> view_t& = default;
 
     /// Applies the given visitor to perform pattern matching.
-    auto apply(const visitor_t& visitor) const -> void;
+    auto apply(visitor_t& visitor) const -> void;
 
     auto operator==(const view_t& other) const -> bool;
     auto operator!=(const view_t& other) const -> bool;
