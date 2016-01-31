@@ -191,7 +191,7 @@ if (ENABLE_TESTING)
 		set(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
 	endif ()
 
-    add_executable(${LIBRARY_NAME}-tests
+  add_executable(${LIBRARY_NAME}-tests
 		tests/attribute
 		tests/config/json
 		tests/config/option
