@@ -1,12 +1,12 @@
 #include "blackhole/root.hpp"
 
 #include <atomic>
+#include <iostream>
 #include <mutex>
 
 #include <boost/thread/tss.hpp>
 
 #include "blackhole/attribute.hpp"
-#include "blackhole/extensions/facade.hpp"
 #include "blackhole/handler.hpp"
 #include "blackhole/record.hpp"
 #include "blackhole/scope/manager.hpp"
