@@ -35,6 +35,8 @@ public:
         boost::asio::ip::udp::resolver::query query(host, boost::lexical_cast<std::string>(port),
             boost::asio::ip::udp::resolver::query::flags::numeric_service);
         endpoint = *resolver.resolve(query);
+
+        socket.open(endpoint.protocol());
     }
 
     auto write(const string_view& data) -> void {
