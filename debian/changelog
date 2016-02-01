@@ -1,4 +1,4 @@
-blackhole (1.0.0-0alpha2) UNRELEASED; urgency=low
+blackhole (1.0.0-0alpha2) unstable; urgency=low
 
   * API: change the interface (and ABI) of the string formatter to
     make it possible to change the implementation or add functionality
