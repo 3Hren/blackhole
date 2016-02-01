@@ -1,3 +1,9 @@
+blackhole (1.0.0-0alpha3) unstable; urgency=low
+
+  * Bug fix: fix writing into a non opened UDP socket when using UDP sink.
+
+ -- Evgeny Safronov <division494@gmail.com>  Mon, 01 Feb 2016 14:00:45 +0300
+
 blackhole (1.0.0-0alpha2) unstable; urgency=low
 
   * API: change the interface (and ABI) of the string formatter to
