@@ -8,11 +8,15 @@ blackhole (1.0.0-0alpha2) UNRELEASED; urgency=low
     classes.
   * Feature: enable filtering attributes by name for JSON formatter.
   * Feature: enable JSON formatter configuration from factory.
+  * Feature: JSON formatter can now optionally append a newline sequence to the
+    end of the generated output.
+  * Feature: enable UDP sink configuration from factory.
   * Bug fix: fix build on linux with clang.
   * Bug fix: fix undefined variable warnings on linux.
   * Bug fix: suppress sometimes unused variable on linux.
   * Bug fix: fix a JSON formatter bug where message attribute’s value was left
     unformatted.
+  * Bug fix: fix build on linux using GCC 5.3.2 with Boost 1.58.
 
  -- Evgeny Safronov <division494@gmail.com>  Thu, 28 Jan 2016 15:21:36 +0300
 
