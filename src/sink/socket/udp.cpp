@@ -2,7 +2,10 @@
 
 #include <boost/asio/ip/udp.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/optional/optional.hpp>
 
+#include "blackhole/config/node.hpp"
+#include "blackhole/config/option.hpp"
 #include "blackhole/cpp17/string_view.hpp"
 
 namespace blackhole {
@@ -64,6 +67,13 @@ auto udp_t::emit(const record_t&, const string_view& formatted) -> void {
 
 auto factory<sink::socket::udp_t>::type() -> const char* {
     return "udp";
+}
+
+auto factory<sink::socket::udp_t>::from(const config::node_t& config) -> sink::socket::udp_t {
+    const auto host = config["host"].to_string().get();
+    const auto port = config["port"].to_uint64().get();
+
+    return {host, static_cast<std::uint16_t>(port)};
 }
 
 }  // namespace v1
