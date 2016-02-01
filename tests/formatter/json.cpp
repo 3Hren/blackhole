@@ -392,6 +392,33 @@ TEST(json_t, FormatAttributeWithRenaming) {
     EXPECT_STREQ("storage", doc["#source"].GetString());
 }
 
+TEST(json_t, FormatMessageWithoutNewlineByDefault) {
+    auto formatter = json_t::builder_t()
+        .build();
+
+    const string_view message("");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_NE('\n', writer.result().to_string().back());
+}
+
+TEST(json_t, FormatMessageWithNewline) {
+    auto formatter = json_t::builder_t()
+        .newline()
+        .build();
+
+    const string_view message("");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ('\n', writer.result().to_string().back());
+}
+
 TEST(json_t, FactoryType) {
     EXPECT_EQ("json", std::string(factory<formatter::json_t>::type()));
 }

@@ -114,11 +114,13 @@ public:
     std::unordered_map<std::string, std::string> mapping;
 
     bool unique;
+    bool newline;
 
     inner_t(json_t::properties_t properties) :
         rest(properties.routing.unspecified),
         mapping(std::move(properties.mapping)),
-        unique(properties.unique)
+        unique(properties.unique),
+        newline(properties.newline)
     {
         for (const auto& route : properties.routing.specified) {
             for (const auto& name : route.second) {
@@ -270,10 +272,9 @@ auto json_t::format(const record_t& record, writer_t& writer) -> void {
 
     builder.build(writer);
 
-    // TODO: Add newline if required. Obtained through config.
-    // if (config.newline) {
-    //     writer << '\n';
-    // }
+    if (inner->newline) {
+        writer.inner << '\n';
+    }
 }
 
 json_t::builder_t::builder_t() :
@@ -299,6 +300,11 @@ auto json_t::builder_t::rename(std::string from, std::string to) -> builder_t& {
 
 auto json_t::builder_t::unique() -> builder_t& {
     properties->unique = true;
+    return *this;
+}
+
+auto json_t::builder_t::newline() -> builder_t& {
+    properties->newline = true;
     return *this;
 }
 
