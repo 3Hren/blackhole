@@ -160,6 +160,59 @@ TEST(view_t, FromUserType) {
     EXPECT_EQ("user_t(name: Ivan)", wr.result().to_string());
 }
 
+namespace {
+
+struct visitor_t : public boost::static_visitor<bool> {
+    auto operator()(std::nullptr_t) const -> bool {
+        return true;
+    }
+
+    template<typename T>
+    auto operator()(const T&) const -> bool {
+        return false;
+    }
+};
+
+}  // namespace
+
+TEST(view_t, DefaultVisit) {
+    view_t v;
+
+    EXPECT_TRUE(boost::apply_visitor(visitor_t(), v.inner().value));
+}
+
+namespace {
+
+struct view_visitor : public view_t::visitor_t {
+    int value;
+
+    view_visitor() : value(0) {}
+
+    auto operator()(const view_t::null_type&) -> void {}
+    auto operator()(const view_t::bool_type&) -> void {}
+    auto operator()(const view_t::sint64_type& value) -> void {
+        this->value = value;
+    }
+    auto operator()(const view_t::uint64_type&) -> void {}
+    auto operator()(const view_t::double_type&) -> void {}
+    auto operator()(const view_t::string_type&) -> void {}
+    auto operator()(const view_t::function_type&) -> void {}
+};
+
+}  // namespace
+
+TEST(view_t, Visitor) {
+    view_t v(42);
+
+    view_visitor visitor;
+
+    EXPECT_EQ(0, visitor.value);
+
+    v.apply(visitor);
+
+    EXPECT_EQ(42, visitor.value);
+}
+
 TEST(value_t, Default) {
     value_t v;
 
@@ -243,21 +296,36 @@ TEST(value_t, FromString) {
     EXPECT_EQ("le message", blackhole::attribute::get<std::string>(v));
 }
 
-struct visitor_t : public boost::static_visitor<bool> {
-    auto operator()(std::nullptr_t) const -> bool {
-        return true;
-    }
+namespace {
 
-    template<typename T>
-    auto operator()(const T&) const -> bool {
-        return false;
+struct value_visitor : public value_t::visitor_t {
+    int value;
+
+    value_visitor() : value(0) {}
+
+    auto operator()(const value_t::null_type&) -> void {}
+    auto operator()(const value_t::bool_type&) -> void {}
+    auto operator()(const value_t::sint64_type& value) -> void {
+        this->value = value;
     }
+    auto operator()(const value_t::uint64_type&) -> void {}
+    auto operator()(const value_t::double_type&) -> void {}
+    auto operator()(const value_t::string_type&) -> void {}
+    auto operator()(const value_t::function_type&) -> void {}
 };
 
-TEST(view_t, DefaultVisit) {
-    view_t v;
+}  // namespace
 
-    EXPECT_TRUE(boost::apply_visitor(visitor_t(), v.inner().value));
+TEST(value_t, Visitor) {
+    value_t v(42);
+
+    value_visitor visitor;
+
+    EXPECT_EQ(0, visitor.value);
+
+    v.apply(visitor);
+
+    EXPECT_EQ(42, visitor.value);
 }
 
 }  // namespace attribute

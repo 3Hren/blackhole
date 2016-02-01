@@ -149,7 +149,6 @@ public:
     auto operator=(value_t&& other) -> value_t&;
 
     /// Applies the given visitor to perform pattern matching.
-    // TODO: Test with value & view.
     auto apply(visitor_t& visitor) const -> void;
 
     /// Returns the internal underlying value.
