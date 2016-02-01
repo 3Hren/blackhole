@@ -327,6 +327,12 @@ auto factory<formatter::json_t>::from(const config::node_t& config) -> formatter
         }
     }
 
+    if (auto newline = config["newline"].to_bool()) {
+        if (newline.get()) {
+            builder.newline();
+        }
+    }
+
     if (auto mapping = config["mapping"]) {
         mapping.each_map([&](const std::string& key, const config::node_t& value) {
             builder.rename(key, value.to_string());
