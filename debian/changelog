@@ -1,3 +1,11 @@
+blackhole (1.0.0-0alpha4) UNRELEASED; urgency=low
+
+  * Bug fix: attribute visitors now can properly be destructed using pointer to
+    to the interface.
+  * Bug fix: implement applying visitors for attributes.
+
+ -- Evgeny Safronov <division494@gmail.com>  Tue, 02 Feb 2016 12:15:39 +0300
+
 blackhole (1.0.0-0alpha3) unstable; urgency=low
 
   * Bug fix: fix writing into a non opened UDP socket when using UDP sink.
