@@ -197,6 +197,21 @@ TEST(string_t, GenericNullWithSpec) {
     EXPECT_EQ(" none", writer.result().to_string());
 }
 
+TEST(string_t, GenericDuplicated) {
+    formatter::string_t formatter("{protocol}/{version}");
+
+    const string_view message("-");
+    const attribute_list wrapper{{"protocol", {"HTTP"}}, {"version", {1.1}}};
+    const attribute_list scoped{{"protocol", {"FTP"}}, {"version", {42}}};
+    const attribute_list user{{"protocol", {"TCP"}}, {"version", {1}}};
+    const attribute_pack pack{user, scoped, wrapper};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    EXPECT_EQ("TCP/1", writer.result().to_string());
+}
+
 TEST(string_t, ThrowsIfGenericAttributeNotFound) {
     formatter::string_t formatter("{protocol}/{version:.1f}");
 
