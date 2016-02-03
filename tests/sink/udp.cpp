@@ -7,9 +7,14 @@
 #include <blackhole/record.hpp>
 #include <blackhole/sink/socket/udp.hpp>
 
+#include "mocks/node.hpp"
+
 namespace blackhole {
 namespace testing {
 namespace sink {
+
+using ::testing::Return;
+using ::testing::StrictMock;
 
 using blackhole::sink::socket::udp_t;
 
@@ -44,6 +49,75 @@ TEST(udp_t, SendsData) {
 TEST(udp_t, type) {
     EXPECT_EQ("udp", std::string(blackhole::factory<udp_t>::type()));
 }
+
+TEST(udp_t, ThrowsIfHostParameterIsMissing) {
+    StrictMock<config::testing::mock::node_t> config;
+
+    EXPECT_CALL(config, subscript_key("host"))
+        .Times(1)
+        .WillOnce(Return(nullptr));
+
+    try {
+        factory<udp_t>::from(config);
+    } catch (const std::invalid_argument& err) {
+        EXPECT_STREQ(R"(parameter "host" is required)", err.what());
+    }
+}
+
+TEST(udp_t, ThrowsIfPortParameterIsMissing) {
+    using config::testing::mock::node_t;
+
+    StrictMock<node_t> config;
+
+    auto n1 = new node_t;
+    EXPECT_CALL(config, subscript_key("host"))
+        .Times(1)
+        .WillOnce(Return(n1));
+
+    EXPECT_CALL(*n1, to_string())
+        .Times(1)
+        .WillOnce(Return("localhost"));
+
+    EXPECT_CALL(config, subscript_key("port"))
+        .Times(1)
+        .WillOnce(Return(nullptr));
+
+    try {
+        factory<udp_t>::from(config);
+    } catch (const std::invalid_argument& err) {
+        EXPECT_STREQ(R"(parameter "port" is required)", err.what());
+    }
+}
+
+TEST(udp_t, Config) {
+    using config::testing::mock::node_t;
+
+    StrictMock<node_t> config;
+
+    auto n1 = new node_t;
+    EXPECT_CALL(config, subscript_key("host"))
+        .Times(1)
+        .WillOnce(Return(n1));
+
+    EXPECT_CALL(*n1, to_string())
+        .Times(1)
+        .WillOnce(Return("0.0.0.0"));
+
+    auto n2 = new node_t;
+    EXPECT_CALL(config, subscript_key("port"))
+        .Times(1)
+        .WillOnce(Return(n2));
+
+    EXPECT_CALL(*n2, to_uint64())
+        .Times(1)
+        .WillOnce(Return(20000));
+
+    const auto sink = factory<udp_t>::from(config);
+
+    EXPECT_EQ(boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 20000), sink.endpoint());
+}
+
+//test config - check endpoint.
 
 }  // namespace sink
 }  // namespace testing

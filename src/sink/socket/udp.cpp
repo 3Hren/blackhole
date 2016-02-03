@@ -80,9 +80,22 @@ auto factory<sink::socket::udp_t>::type() -> const char* {
     return "udp";
 }
 
+namespace {
+
+template<typename T>
+auto expect(const boost::optional<T>& optional, const std::string& description) -> T {
+    if (optional) {
+        return optional.get();
+    } else {
+        throw std::invalid_argument(description);
+    }
+}
+
+}  // namespace
+
 auto factory<sink::socket::udp_t>::from(const config::node_t& config) -> sink::socket::udp_t {
-    const auto host = config["host"].to_string().get();
-    const auto port = config["port"].to_uint64().get();
+    const auto host = expect(config["host"].to_string(), "parameter \"host\" is required");
+    const auto port = expect(config["port"].to_uint64(), "parameter \"port\" is required");
 
     return {host, static_cast<std::uint16_t>(port)};
 }
