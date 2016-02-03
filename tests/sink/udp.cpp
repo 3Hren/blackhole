@@ -17,6 +17,12 @@ TEST(udp_t, type) {
     EXPECT_EQ("udp", std::string(blackhole::factory<udp_t>::type()));
 }
 
+TEST(udp_t, Endpoint) {
+    udp_t sink("0.0.0.0", 20000);
+
+    EXPECT_EQ(boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 20000), sink.endpoint());
+}
+
 TEST(udp_t, SendsData) {
     boost::asio::io_service io_service;
     boost::asio::ip::udp::socket socket(io_service,

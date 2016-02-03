@@ -4,6 +4,19 @@
 
 #include <memory>
 
+namespace boost {
+namespace asio {
+namespace ip {
+
+struct udp;
+
+template<typename>
+struct basic_endpoint;
+
+}  // namespace ip
+}  // namespace asio
+}  // namespace boost
+
 namespace blackhole {
 inline namespace v1 {
 
@@ -35,6 +48,11 @@ class inner_t;
 }  // namespace udp
 
 class udp_t : public sink_t {
+public:
+    /// The endpoint type.
+    typedef boost::asio::ip::basic_endpoint<boost::asio::ip::udp> endpoint_type;
+
+private:
     std::unique_ptr<udp::inner_t> inner;
 
 public:
@@ -47,6 +65,11 @@ public:
 
     auto operator=(const udp_t& other) -> udp_t& = delete;
     auto operator=(udp_t&& other) noexcept -> udp_t&;
+
+    /// Returns a const lvalue reference to the destination endpoint.
+    ///
+    /// \note you should manually include the appropriate boost header files when using this method.
+    auto endpoint() const -> const endpoint_type&;
 
     auto filter(const record_t& record) -> bool;
 
