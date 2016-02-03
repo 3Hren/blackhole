@@ -13,10 +13,6 @@ namespace sink {
 
 using blackhole::sink::socket::udp_t;
 
-TEST(udp_t, type) {
-    EXPECT_EQ("udp", std::string(blackhole::factory<udp_t>::type()));
-}
-
 TEST(udp_t, Endpoint) {
     udp_t sink("0.0.0.0", 20000);
 
@@ -43,6 +39,10 @@ TEST(udp_t, SendsData) {
 
     EXPECT_EQ('{', buffer[0]);
     EXPECT_EQ('}', buffer[1]);
+}
+
+TEST(udp_t, type) {
+    EXPECT_EQ("udp", std::string(blackhole::factory<udp_t>::type()));
 }
 
 }  // namespace sink
