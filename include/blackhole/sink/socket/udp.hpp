@@ -47,6 +47,8 @@ class inner_t;
 
 }  // namespace udp
 
+/// The UDP sink is a sink that writes its output to a remote destination specified by a host and
+/// port.
 class udp_t : public sink_t {
 public:
     /// The endpoint type.
@@ -73,6 +75,7 @@ public:
 
     auto filter(const record_t& record) -> bool;
 
+    /// Emits a datagram to the specified endpoint.
     auto emit(const record_t& record, const string_view& message) -> void;
 };
 
