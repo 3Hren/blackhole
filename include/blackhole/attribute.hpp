@@ -140,10 +140,10 @@ public:
 
     value_t(std::string value);
 
-    ~value_t();
-
     value_t(const value_t& other);
     value_t(value_t&& other);
+
+    ~value_t();
 
     auto operator=(const value_t& other) -> value_t&;
     auto operator=(value_t&& other) -> value_t&;

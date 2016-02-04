@@ -112,6 +112,10 @@ value_t::value_t(value_t&& other) {
     construct(std::move(other.inner().value));
 }
 
+value_t::~value_t() {
+    inner().~inner_t();
+}
+
 auto value_t::operator=(const value_t& other) -> value_t& {
     if (this != &other) {
         inner() = other.inner();
@@ -126,10 +130,6 @@ auto value_t::operator=(value_t&& other) -> value_t& {
     }
 
     return *this;
-}
-
-value_t::~value_t() {
-    inner().~inner_t();
 }
 
 auto value_t::apply(visitor_t& visitor) const -> void {
