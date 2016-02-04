@@ -82,20 +82,27 @@ auto factory<sink::socket::udp_t>::type() -> const char* {
 
 namespace {
 
-template<typename T>
-auto expect(const boost::optional<T>& optional, const std::string& description) -> T {
+/// This hack is required because of `boost::optional` 1.46, which I have to support and which
+/// can not map on none value.
+template<typename T, typename F>
+auto value_or(const boost::optional<T>& optional, F fn) -> T {
     if (optional) {
         return optional.get();
     } else {
-        throw std::invalid_argument(description);
+        return fn();
     }
 }
 
 }  // namespace
 
 auto factory<sink::socket::udp_t>::from(const config::node_t& config) -> sink::socket::udp_t {
-    const auto host = expect(config["host"].to_string(), "parameter \"host\" is required");
-    const auto port = expect(config["port"].to_uint64(), "parameter \"port\" is required");
+    const auto host = value_or(config["host"].to_string(), []() -> std::string {
+        throw std::invalid_argument("parameter \"host\" is required");
+    });
+
+    const auto port = value_or(config["port"].to_uint64(), []() -> std::uint64_t {
+        throw std::invalid_argument("parameter \"port\" is required");
+    });
 
     return {host, static_cast<std::uint16_t>(port)};
 }
