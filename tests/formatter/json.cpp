@@ -1,3 +1,5 @@
+#include <array>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -419,9 +421,38 @@ TEST(json_t, FormatMessageWithNewline) {
     EXPECT_EQ('\n', writer.result().to_string().back());
 }
 
+TEST(json_t, MutateTimestamp) {
+    json_t formatter;
+    formatter.timestamp("%Y!");
+
+    const string_view message("value");
+    const attribute_pack pack;
+    record_t record(4, message, pack);
+    record.activate();
+    writer_t writer;
+    formatter.format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+
+    ASSERT_TRUE(doc.HasMember("timestamp"));
+    ASSERT_TRUE(doc["timestamp"].IsString());
+
+    std::array<char, 128> buffer;
+    const auto time = record_t::clock_type::to_time_t(record.timestamp());
+    std::tm tm;
+    ::gmtime_r(&time, &tm);
+    const auto size = std::strftime(buffer.data(), buffer.size(), "%Y!", &tm);
+    ASSERT_TRUE(size > 0);
+
+    EXPECT_EQ(std::string(buffer.data(), size), std::string(doc["timestamp"].GetString()));
+}
+
 TEST(json_t, FactoryType) {
     EXPECT_EQ("json", std::string(factory<formatter::json_t>::type()));
 }
+
+// TODO: Test json factory.
 
 }  // namespace formatter
 }  // namespace testing

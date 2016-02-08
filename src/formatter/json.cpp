@@ -22,6 +22,7 @@
 #include "blackhole/extensions/writer.hpp"
 
 #include "blackhole/detail/attribute.hpp"
+#include "blackhole/detail/datetime.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -54,6 +55,12 @@ struct visitor_t {
     auto operator()(const string_view& value) -> void {
         node.AddMember(rapidjson::StringRef(name.data(), name.size()),
             rapidjson::StringRef(value.data(), value.size()), allocator);
+    }
+
+    // For non-owning buffers.
+    auto operator()(const char* data, std::size_t size) -> void {
+        node.AddMember(rapidjson::StringRef(name.data(), name.size()),
+            rapidjson::Value(data, static_cast<unsigned int>(size), allocator), allocator);
     }
 
     auto operator()(const attribute::view_t::function_type& value) -> void {
@@ -112,6 +119,8 @@ public:
     std::map<std::string, rapidjson::Pointer> routing;
 
     std::unordered_map<std::string, std::string> mapping;
+
+    std::function<void(const record_t::time_point& time, writer_t& wr)> timestamp;
 
     bool unique;
     bool newline;
@@ -178,9 +187,15 @@ public:
     }
 
     auto timestamp() -> void {
-        apply("timestamp", std::chrono::duration_cast<
-            std::chrono::microseconds
-        >(record.timestamp().time_since_epoch()).count());
+        if (inner.timestamp) {
+            writer_t wr;
+            inner.timestamp(record.timestamp(), wr);
+            apply("timestamp", wr.inner.data(), wr.inner.size());
+        } else {
+            apply("timestamp", std::chrono::duration_cast<
+                std::chrono::microseconds
+            >(record.timestamp().time_since_epoch()).count());
+        }
     }
 
     auto build(writer_t& writer) -> void {
@@ -223,6 +238,12 @@ private:
         visitor(value);
     }
 
+    auto apply(const string_view& name, const char* data, std::size_t size) -> void {
+        const auto renamed = inner.renamed(name);
+        visitor_t visitor{inner.get(name, root), root.GetAllocator(), renamed};
+        visitor(data, size);
+    }
+
     auto apply(const string_view& name, const attribute::view_t& value) -> void {
         const auto renamed = inner.renamed(name);
         visitor_t visitor{inner.get(name, root), root.GetAllocator(), renamed};
@@ -245,7 +266,22 @@ json_t::json_t(properties_t properties) :
     inner(new inner_t(std::move(properties)))
 {}
 
-json_t::~json_t() {}
+json_t::~json_t() = default;
+
+auto json_t::timestamp(const std::string& pattern) -> void {
+    auto generator = detail::datetime::make_generator(pattern);
+    inner->timestamp = [=](const record_t::time_point& timestamp, writer_t& wr) {
+        const auto time = record_t::clock_type::to_time_t(timestamp);
+        const auto usec = std::chrono::duration_cast<
+            std::chrono::microseconds
+        >(timestamp.time_since_epoch()).count() % 1000000;
+
+        std::tm tm;
+        ::gmtime_r(&time, &tm);
+
+        generator(wr.inner, tm, static_cast<std::uint64_t>(usec));
+    };
+}
 
 auto json_t::format(const record_t& record, writer_t& writer) -> void {
     typedef rapidjson::GenericDocument<

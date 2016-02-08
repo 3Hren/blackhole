@@ -104,6 +104,9 @@ namespace formatter {
 /// This allow to avoid hundreds of constructors and to make a formatter creation to look eye-candy.
 // TODO: Add severity mapping support.
 // TODO: Add timestamp mapping support.
+// TODO: Idea. Make class private. Export only forward with factory and builder specializations. It
+//      saves from that hundreds of PIMPLS.
+// builder<T>::build() -> std::unique_ptr<formatter_t>;
 class json_t : public formatter_t {
     class inner_t;
     class properties_t;
@@ -132,6 +135,8 @@ public:
 
     /// Assigns the given JSON formatter to the current one by moving its content.
     auto operator=(json_t&& other) noexcept -> json_t&;
+
+    auto timestamp(const std::string& pattern) -> void;
 
     /// Formats the given record by constructing a JSON tree with further serializing into the
     /// specified writer.
@@ -166,6 +171,7 @@ public:
     auto rename(std::string from, std::string to) -> builder_t&;
     auto unique() -> builder_t&;
     auto newline() -> builder_t&;
+    // TODO: auto mutate(...) -> builder_t&;
 
     auto build() const -> json_t;
 };
