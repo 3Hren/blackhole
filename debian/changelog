@@ -1,5 +1,7 @@
 blackhole (1.0.0-0alpha4) UNRELEASED; urgency=low
 
+  * Feature: JSON formatter can now mutate the timestamp field using standard
+    patterns.
   * Bug fix: attribute visitors now can properly be destructed using pointer to
     to the interface.
   * Bug fix: implement applying visitors for attributes.
