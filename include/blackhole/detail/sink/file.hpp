@@ -24,7 +24,7 @@ struct backend_t {
     backend_t(const std::string& filename, std::size_t interval) :
         counter(0),
         interval(interval),
-        stream(new std::ofstream(filename))
+        stream(new std::ofstream(filename, std::ios::app))
     {
         BOOST_ASSERT(interval > 0);
     }
