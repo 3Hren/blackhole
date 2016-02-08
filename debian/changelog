@@ -1,3 +1,9 @@
+blackhole (1.0.0-0alpha5) unstable; urgency=low
+
+  * Bug fix: file sink will now append by default instead of truncating.
+
+ -- Evgeny Safronov <division494@gmail.com>  Mon, 08 Feb 2016 14:48:11 +0300
+
 blackhole (1.0.0-0alpha4) unstable; urgency=low
 
   * Feature: JSON formatter can now mutate the timestamp field using standard
