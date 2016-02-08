@@ -96,6 +96,8 @@ public:
     bool unique;
     bool newline;
 
+    std::function<void(const record_t::time_point& time, writer_t& wr)> timestamp;
+
     struct {
         std::map<std::string, std::vector<std::string>> specified;
         std::string unspecified;
@@ -120,16 +122,17 @@ public:
 
     std::unordered_map<std::string, std::string> mapping;
 
-    std::function<void(const record_t::time_point& time, writer_t& wr)> timestamp;
-
     bool unique;
     bool newline;
+
+    std::function<void(const record_t::time_point& time, writer_t& wr)> timestamp;
 
     inner_t(json_t::properties_t properties) :
         rest(properties.routing.unspecified),
         mapping(std::move(properties.mapping)),
         unique(properties.unique),
-        newline(properties.newline)
+        newline(properties.newline),
+        timestamp(properties.timestamp)
     {
         for (const auto& route : properties.routing.specified) {
             for (const auto& name : route.second) {
@@ -344,6 +347,24 @@ auto json_t::builder_t::newline() -> builder_t& {
     return *this;
 }
 
+auto json_t::builder_t::timestamp(const std::string& pattern) -> builder_t& {
+    auto generator = detail::datetime::make_generator(pattern);
+
+    properties->timestamp = [=](const record_t::time_point& timestamp, writer_t& wr) {
+        const auto time = record_t::clock_type::to_time_t(timestamp);
+        const auto usec = std::chrono::duration_cast<
+            std::chrono::microseconds
+        >(timestamp.time_since_epoch()).count() % 1000000;
+
+        std::tm tm;
+        ::gmtime_r(&time, &tm);
+
+        generator(wr.inner, tm, static_cast<std::uint64_t>(usec));
+    };
+
+    return *this;
+}
+
 auto json_t::builder_t::build() const -> json_t {
     return {std::move(*properties)};
 }
@@ -391,6 +412,16 @@ auto factory<formatter::json_t>::from(const config::node_t& config) -> formatter
                 attributes.emplace_back(config.to_string());
             });
             builder.route(key, std::move(attributes));
+        });
+    }
+
+    if (auto mutate = config["mutate"]) {
+        mutate.each_map([&](const std::string& key, const config::node_t& config) {
+            if (key == "timestamp") {
+                builder.timestamp(config.to_string());
+            } else {
+                throw std::invalid_argument("only \"timestamp\" mutations is allowed now");
+            }
         });
     }
 
