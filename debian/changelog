@@ -1,4 +1,4 @@
-blackhole (1.0.0-0alpha4) UNRELEASED; urgency=low
+blackhole (1.0.0-0alpha4) unstable; urgency=low
 
   * Feature: JSON formatter can now mutate the timestamp field using standard
     patterns.
