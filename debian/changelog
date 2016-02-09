@@ -1,3 +1,9 @@
+blackhole (1.0.0-0alpha6) unstable; urgency=low
+
+  * Feature: completely hide rapidjson symbols.
+
+ -- Evgeny Safronov <division494@gmail.com>  Tue, 09 Feb 2016 16:56:32 +0300
+
 blackhole (1.0.0-0alpha5) unstable; urgency=low
 
   * Bug fix: file sink will now append by default instead of truncating.
