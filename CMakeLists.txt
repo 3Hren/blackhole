@@ -103,7 +103,9 @@ else ()
 		COMPILE_FLAGS "-Wswitch"
 		COMPILE_FLAGS "-Wunreachable-code"
 		COMPILE_FLAGS "-pedantic"
-		COMPILE_FLAGS "-pedantic-errors")
+		COMPILE_FLAGS "-pedantic-errors"
+		LINK_FLAGS -Wl,--version-script=${PROJECT_SOURCE_DIR}/libblackhole1.version
+	)
 endif ()
 
 target_link_libraries(${LIBRARY_NAME}
