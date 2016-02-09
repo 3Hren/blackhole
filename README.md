@@ -134,7 +134,8 @@ For more information please read the documentation and visit the following links
  - http://cppformat.github.io/latest/syntax.html - general syntax.
  - http://en.cppreference.com/w/cpp/chrono/c/strftime - timestamp spec extension.
 
-### Json.
+### JSON.
+JSON formatter provides an ability to format a logging record into a structured JSON tree with attribute handling features, like renaming, routing, mutating and much more.
 
 ## Sinks
 
