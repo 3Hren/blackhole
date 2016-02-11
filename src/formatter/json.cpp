@@ -189,6 +189,17 @@ public:
         apply("process", record.pid());
     }
 
+    auto thread() -> void {
+        writer_t wr;
+        // TODO: Encapsulate.
+#ifdef __linux__
+            wr.write("{:#x}", record.tid());
+#elif __APPLE__
+            wr.write("{:#x}", reinterpret_cast<unsigned long>(record.tid()));
+#endif
+        apply("thread", wr.inner.data(), wr.inner.size());
+    }
+
     auto severity() -> void {
         apply("severity", static_cast<std::int64_t>(record.severity()));
     }
@@ -309,6 +320,7 @@ auto json_t::format(const record_t& record, writer_t& writer) -> void {
 
     auto builder = inner->create(root, record);
     builder.message();
+    builder.thread();
     builder.process();
     builder.severity();
     builder.timestamp();

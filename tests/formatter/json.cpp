@@ -125,6 +125,30 @@ TEST(json_t, FormatProcess) {
     EXPECT_EQ(::getpid(), doc["process"].GetInt());
 }
 
+TEST(json_t, FormatThread) {
+    json_t formatter;
+
+    const string_view message("value");
+    const attribute_pack pack;
+    record_t record(4, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+
+    ASSERT_TRUE(doc.HasMember("thread"));
+    ASSERT_TRUE(doc["thread"].IsString());
+
+    std::ostringstream stream;
+#ifdef __linux
+    stream << std::hex << std::internal << std::showbase << std::setw(2) << std::setfill('0');
+#endif
+    stream << std::this_thread::get_id();
+
+    EXPECT_EQ(stream.str(), doc["thread"].GetString());
+}
+
 TEST(json_t, FormatAttribute) {
     json_t formatter;
 
