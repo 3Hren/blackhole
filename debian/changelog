@@ -1,3 +1,9 @@
+blackhole (1.0.0-0alpha7) UNRELEASED; urgency=low
+
+  * Feature: JSON formatter now inserts process and thread id fields.
+
+ -- Evgeny Safronov <division494@gmail.com>  Thu, 11 Feb 2016 21:18:38 +0300
+
 blackhole (1.0.0-0alpha6) unstable; urgency=low
 
   * Feature: completely hide rapidjson symbols.
