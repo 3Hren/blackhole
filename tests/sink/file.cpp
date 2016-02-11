@@ -68,6 +68,24 @@ TEST(file_t, FromRequiresFilename) {
     EXPECT_THROW(factory<sink::file_t>::from(config), std::logic_error);
 }
 
+TEST(file_t, PatternFromConfig) {
+    using config::testing::mock::node_t;
+
+    StrictMock<config::testing::mock::node_t> config;
+
+    auto n1 = new node_t;
+
+    EXPECT_CALL(config, subscript_key("path"))
+        .Times(1)
+        .WillOnce(Return(n1));
+
+    EXPECT_CALL(*n1, to_string())
+        .Times(1)
+        .WillOnce(Return("/tmp/blackhole.log"));
+
+    factory<sink::file_t>::from(config);
+}
+
 }  // namespace sink
 }  // namespace testing
 }  // namespace blackhole
