@@ -83,7 +83,9 @@ TEST(file_t, PatternFromConfig) {
         .Times(1)
         .WillOnce(Return("/tmp/blackhole.log"));
 
-    factory<sink::file_t>::from(config);
+    const auto file = factory<sink::file_t>::from(config);
+
+    EXPECT_EQ("/tmp/blackhole.log", file.path());
 }
 
 }  // namespace sink

@@ -62,6 +62,10 @@ public:
 
     virtual ~inner_t() {}
 
+    auto path() const noexcept -> const std::string& {
+        return data.filename;
+    }
+
     auto interval() const noexcept -> std::size_t {
         return data.interval;
     }

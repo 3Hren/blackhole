@@ -72,6 +72,13 @@ public:
     /// Assigns the given file sink to the current one by moving its content.
     auto operator=(file_t&& other) noexcept -> file_t&;
 
+    /// Returns a const lvalue referente to destination path pattern.
+    ///
+    /// The path can contain attribute placeholders, meaning that the real destination name will be
+    /// deduced at runtime using provided log record. No real file will be opened at construction
+    /// time.
+    auto path() const -> const std::string&;
+
     /// Filters the given log record determining if it is allowed to be consumed by this sink.
     ///
     /// The file sink implementation always returns `true`, meaning that all logging events should

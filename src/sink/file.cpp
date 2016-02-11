@@ -42,6 +42,10 @@ file_t::~file_t() = default;
 
 auto file_t::operator=(file_t&& other) noexcept -> file_t& = default;
 
+auto file_t::path() const -> const std::string& {
+    return inner->path();
+}
+
 auto file_t::filter(const record_t&) -> bool {
     return true;
 }
