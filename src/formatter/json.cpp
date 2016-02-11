@@ -185,6 +185,10 @@ public:
         apply("message", record.formatted());
     }
 
+    auto process() -> void {
+        apply("process", record.pid());
+    }
+
     auto severity() -> void {
         apply("severity", static_cast<std::int64_t>(record.severity()));
     }
@@ -305,6 +309,7 @@ auto json_t::format(const record_t& record, writer_t& writer) -> void {
 
     auto builder = inner->create(root, record);
     builder.message();
+    builder.process();
     builder.severity();
     builder.timestamp();
     builder.attributes();

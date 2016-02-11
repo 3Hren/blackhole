@@ -108,6 +108,23 @@ TEST(json_t, FormatTimestamp) {
     EXPECT_TRUE(doc["timestamp"].GetUint64() > 0);
 }
 
+TEST(json_t, FormatProcess) {
+    json_t formatter;
+
+    const string_view message("value");
+    const attribute_pack pack;
+    record_t record(4, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+
+    ASSERT_TRUE(doc.HasMember("process"));
+    ASSERT_TRUE(doc["process"].IsInt());
+    EXPECT_EQ(::getpid(), doc["process"].GetInt());
+}
+
 TEST(json_t, FormatAttribute) {
     json_t formatter;
 
