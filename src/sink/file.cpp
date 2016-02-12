@@ -83,13 +83,21 @@ auto factory<sink::file_t>::type() -> const char* {
 }
 
 auto factory<sink::file_t>::from(const config::node_t& config) -> sink::file_t {
-    auto filename = config["path"].to_string();
+    const auto filename = config["path"].to_string();
 
     if (!filename) {
-        throw std::logic_error("field 'path' is required");
+        throw std::invalid_argument("field 'path' is required");
     }
 
-    return sink::file_t(std::move(filename.get()));
+    sink::file_t::builder_t builder(filename.get());
+
+    if (auto flush = config["flush"]) {
+        if (auto value = flush.to_uint64()) {
+            builder.interval(value.get());
+        }
+    }
+
+    return builder.build();
 }
 
 }  // namespace v1

@@ -108,7 +108,17 @@ public:
     auto operator=(const builder_t& other) -> builder_t& = delete;
     auto operator=(builder_t&& other) noexcept -> builder_t&;
 
+    /// Specifies a flush interval in terms of write operations.
+    ///
+    /// Logging backend will flush its internal buffers after at least every count writes, but the
+    /// underlying implementation can decide to do it more often. Note that 0 value means automatic
+    /// policy.
+    ///
+    /// \param count flush interval.
     auto interval(std::size_t count) -> builder_t&;
+
+    // TODO:
+    // auto interval(bytesize_t size) -> builder_t&
 
     auto build() -> file_t;
 };

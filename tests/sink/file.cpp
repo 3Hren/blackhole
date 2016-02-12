@@ -65,7 +65,7 @@ TEST(file_t, FromRequiresFilename) {
         .Times(1)
         .WillOnce(Return(nullptr));
 
-    EXPECT_THROW(factory<sink::file_t>::from(config), std::logic_error);
+    EXPECT_THROW(factory<sink::file_t>::from(config), std::invalid_argument);
 }
 
 TEST(file_t, PatternFromConfig) {
@@ -73,19 +73,47 @@ TEST(file_t, PatternFromConfig) {
 
     StrictMock<config::testing::mock::node_t> config;
 
-    auto n1 = new node_t;
+    auto npath = new node_t;
 
     EXPECT_CALL(config, subscript_key("path"))
         .Times(1)
-        .WillOnce(Return(n1));
+        .WillOnce(Return(npath));
 
-    EXPECT_CALL(*n1, to_string())
+    EXPECT_CALL(*npath, to_string())
         .Times(1)
         .WillOnce(Return("/tmp/blackhole.log"));
 
-    const auto file = factory<sink::file_t>::from(config);
+    EXPECT_CALL(config, subscript_key("flush"))
+        .Times(1)
+        .WillOnce(Return(nullptr));
 
-    EXPECT_EQ("/tmp/blackhole.log", file.path());
+    EXPECT_EQ("/tmp/blackhole.log", factory<sink::file_t>::from(config).path());
+}
+
+TEST(file_t, FlushIntervalFromConfig) {
+    using config::testing::mock::node_t;
+
+    StrictMock<config::testing::mock::node_t> config;
+
+    auto npath = new node_t;
+    EXPECT_CALL(config, subscript_key("path"))
+        .Times(1)
+        .WillOnce(Return(npath));
+
+    EXPECT_CALL(*npath, to_string())
+        .Times(1)
+        .WillOnce(Return("/tmp/blackhole.log"));
+
+    auto nflush = new node_t;
+    EXPECT_CALL(config, subscript_key("flush"))
+        .Times(1)
+        .WillOnce(Return(nflush));
+
+    EXPECT_CALL(*nflush, to_uint64())
+        .Times(1)
+        .WillOnce(Return(30));
+
+    factory<sink::file_t>::from(config);
 }
 
 }  // namespace sink
