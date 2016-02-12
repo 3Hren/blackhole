@@ -139,7 +139,9 @@ JSON formatter provides an ability to format a logging record into a structured 
 
 ## Sinks
 
-- Null.
+### Null
+Sometimes we need to just drop all logging events no matter what, for example to benchmarking purposes. For these cases there is null appender, which just ignores all records.
+
 - Stream.
 - Term.
 - File.
