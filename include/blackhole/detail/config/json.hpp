@@ -68,8 +68,36 @@ public:
         cursor(std::move(cursor))
     {}
 
+    auto is_bool() const noexcept -> bool {
+        return value.IsBool();
+    }
+
+    auto is_sint64() const noexcept -> bool {
+        return value.IsInt64();
+    }
+
+    auto is_uint64() const noexcept -> bool {
+        return value.IsUint64();
+    }
+
+    auto is_double() const noexcept -> bool {
+        return value.IsDouble();
+    }
+
+    auto is_string() const noexcept -> bool {
+        return value.IsString();
+    }
+
+    auto is_vector() const noexcept -> bool {
+        return value.IsArray();
+    }
+
+    auto is_object() const noexcept -> bool {
+        return value.IsObject();
+    }
+
     auto to_bool() const -> bool {
-        if (value.IsBool()) {
+        if (is_bool()) {
             return value.GetBool();
         }
 
@@ -77,7 +105,7 @@ public:
     }
 
     auto to_sint64() const -> std::int64_t {
-        if (value.IsInt64()) {
+        if (is_sint64()) {
             return value.GetInt64();
         }
 
@@ -85,7 +113,7 @@ public:
     }
 
     auto to_uint64() const -> std::uint64_t {
-        if (value.IsUint64()) {
+        if (is_uint64()) {
             return value.GetUint64();
         }
 
@@ -93,7 +121,7 @@ public:
     }
 
     auto to_double() const -> double {
-        if (value.IsDouble()) {
+        if (is_double()) {
             return value.GetDouble();
         }
 
@@ -101,7 +129,7 @@ public:
     }
 
     auto to_string() const -> std::string {
-        if (value.IsString()) {
+        if (is_string()) {
             return value.GetString();
         }
 

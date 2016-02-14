@@ -26,6 +26,14 @@ public:
 public:
     virtual ~node_t() = 0;
 
+    virtual auto is_bool() const noexcept -> bool = 0;
+    virtual auto is_sint64() const noexcept -> bool = 0;
+    virtual auto is_uint64() const noexcept -> bool = 0;
+    virtual auto is_double() const noexcept -> bool = 0;
+    virtual auto is_string() const noexcept -> bool { return false; }
+    virtual auto is_vector() const noexcept -> bool { return false; }
+    virtual auto is_object() const noexcept -> bool { return false; }
+
     /// Tries to convert the underlying object to bool.
     ///
     /// Implementations are free to throw exceptions on either type mismatch or whatever else.

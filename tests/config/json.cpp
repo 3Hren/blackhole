@@ -13,6 +13,114 @@ namespace testing {
 
 using config::json_t;
 
+TEST(json_t, IsBool) {
+    const auto json = "true";
+
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_TRUE(config.is_bool());
+    EXPECT_FALSE(config.is_sint64());
+    EXPECT_FALSE(config.is_uint64());
+    EXPECT_FALSE(config.is_double());
+    EXPECT_FALSE(config.is_string());
+    EXPECT_FALSE(config.is_vector());
+    EXPECT_FALSE(config.is_object());
+}
+
+TEST(json_t, IsInt) {
+    const auto json = "42";
+
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_FALSE(config.is_bool());
+    EXPECT_TRUE(config.is_sint64());
+    EXPECT_TRUE(config.is_uint64());
+    EXPECT_FALSE(config.is_double());
+    EXPECT_FALSE(config.is_string());
+    EXPECT_FALSE(config.is_vector());
+    EXPECT_FALSE(config.is_object());
+}
+
+TEST(json_t, IsDouble) {
+    const auto json = "42.5";
+
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_FALSE(config.is_bool());
+    EXPECT_FALSE(config.is_sint64());
+    EXPECT_FALSE(config.is_uint64());
+    EXPECT_TRUE(config.is_double());
+    EXPECT_FALSE(config.is_string());
+    EXPECT_FALSE(config.is_vector());
+    EXPECT_FALSE(config.is_object());
+}
+
+TEST(json_t, IsString) {
+    const auto json = R"("le value")";
+
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_FALSE(config.is_bool());
+    EXPECT_FALSE(config.is_sint64());
+    EXPECT_FALSE(config.is_uint64());
+    EXPECT_FALSE(config.is_double());
+    EXPECT_TRUE(config.is_string());
+    EXPECT_FALSE(config.is_vector());
+    EXPECT_FALSE(config.is_object());
+}
+
+TEST(json_t, IsVector) {
+    const auto json = "[1,2,3]";
+
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_FALSE(config.is_bool());
+    EXPECT_FALSE(config.is_sint64());
+    EXPECT_FALSE(config.is_uint64());
+    EXPECT_FALSE(config.is_double());
+    EXPECT_FALSE(config.is_string());
+    EXPECT_TRUE(config.is_vector());
+    EXPECT_FALSE(config.is_object());
+}
+
+TEST(json_t, IsObject) {
+    const auto json = "{}";
+
+    rapidjson::Document doc;
+    doc.Parse<0>(json);
+    ASSERT_FALSE(doc.HasParseError());
+
+    json_t config(doc);
+
+    EXPECT_FALSE(config.is_bool());
+    EXPECT_FALSE(config.is_sint64());
+    EXPECT_FALSE(config.is_uint64());
+    EXPECT_FALSE(config.is_double());
+    EXPECT_FALSE(config.is_string());
+    EXPECT_FALSE(config.is_vector());
+    EXPECT_TRUE(config.is_object());
+}
+
 TEST(json_t, ToBool) {
     const auto json = "true";
 
