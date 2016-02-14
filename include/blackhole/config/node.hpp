@@ -27,30 +27,42 @@ public:
     virtual ~node_t() = 0;
 
     /// Tries to convert the underlying object to bool.
+    ///
+    /// Implementations are free to throw exceptions on either type mismatch or whatever else.
     virtual auto to_bool() const -> bool = 0;
 
     /// Tries to convert the underlying object to signed integer.
+    ///
+    /// Implementations are free to throw exceptions on either type mismatch or whatever else.
     virtual auto to_sint64() const -> std::int64_t = 0;
 
     /// Tries to convert the underlying object to unsigned integer.
+    ///
+    /// Implementations are free to throw exceptions on either type mismatch or whatever else.
     virtual auto to_uint64() const -> std::uint64_t = 0;
 
     /// Tries to convert the underlying object to double.
+    ///
+    /// Implementations are free to throw exceptions on either type mismatch or whatever else.
     virtual auto to_double() const -> double = 0;
 
     /// Tries to convert the underlying object to string.
+    ///
+    /// Implementations are free to throw exceptions on either type mismatch or whatever else.
     virtual auto to_string() const -> std::string = 0;
 
     /// Assuming that the underlying object is an array, performs inner iteration over it by
     /// applying the given function to each element.
     ///
-    /// Should do nothing either if there is no underlying array or it is empty.
+    /// Implementations are free to throw exceptions on either type mismatch or whatever else.
+    /// Should do nothing if the underlying array is empty.
     virtual auto each(const each_function& fn) const -> void = 0;
 
     /// Assuming that the underlying object is a map, performs inner iteration over it by applying
     /// the given function to each key-value element.
     ///
-    /// Should do nothing either if there is no underlying map or it is empty.
+    /// Implementations are free to throw exceptions on either type mismatch or whatever else.
+    /// Should do nothing if the underlying map is empty.
     virtual auto each_map(const member_function& fn) const -> void = 0;
 
     /// Assuming that the underlying object is an array performs index operation returning the
