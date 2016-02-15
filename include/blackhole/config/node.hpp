@@ -18,6 +18,9 @@ class option;
 /// using tree data structure, like JSON, XML or YAML.
 /// To be able to initialize from your own data format you must create subclass and implement its
 /// converting methods as like as tree traversing using subscription operators.
+///
+/// Implementations are free to throw exceptions inside conversion methods on either type mismatch
+/// or whatever else.
 class node_t {
 public:
     typedef std::function<auto(const node_t& node) -> void> each_function;
@@ -35,41 +38,29 @@ public:
     virtual auto is_object() const noexcept -> bool { return false; }
 
     /// Tries to convert the underlying object to bool.
-    ///
-    /// Implementations are free to throw exceptions on either type mismatch or whatever else.
     virtual auto to_bool() const -> bool = 0;
 
     /// Tries to convert the underlying object to signed integer.
-    ///
-    /// Implementations are free to throw exceptions on either type mismatch or whatever else.
     virtual auto to_sint64() const -> std::int64_t = 0;
 
     /// Tries to convert the underlying object to unsigned integer.
-    ///
-    /// Implementations are free to throw exceptions on either type mismatch or whatever else.
     virtual auto to_uint64() const -> std::uint64_t = 0;
 
     /// Tries to convert the underlying object to double.
-    ///
-    /// Implementations are free to throw exceptions on either type mismatch or whatever else.
     virtual auto to_double() const -> double = 0;
 
     /// Tries to convert the underlying object to string.
-    ///
-    /// Implementations are free to throw exceptions on either type mismatch or whatever else.
     virtual auto to_string() const -> std::string = 0;
 
     /// Assuming that the underlying object is an array, performs inner iteration over it by
     /// applying the given function to each element.
     ///
-    /// Implementations are free to throw exceptions on either type mismatch or whatever else.
     /// Should do nothing if the underlying array is empty.
     virtual auto each(const each_function& fn) const -> void = 0;
 
     /// Assuming that the underlying object is a map, performs inner iteration over it by applying
     /// the given function to each key-value element.
     ///
-    /// Implementations are free to throw exceptions on either type mismatch or whatever else.
     /// Should do nothing if the underlying map is empty.
     virtual auto each_map(const member_function& fn) const -> void = 0;
 
