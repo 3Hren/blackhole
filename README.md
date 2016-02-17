@@ -145,7 +145,20 @@ Sometimes we need to just drop all logging events no matter what, for example to
 - Stream.
 - Term.
 - File.
-- Socket.
+
+### Socket
+The socket sinks category contains sinks that write their output to a remote destination specified by a host and port. Currently the data can be sent over either TCP or UDP.
+
+#### TCP
+This appender emits formatted logging events using connected TCP socket.
+
+| Option | Type  | Description|
+|--------|:-----:|------------|
+|host    |string | **Required**.<br/> The name or address of the system that is listening for log events. |
+|port    |u16    | **Required**.<br/> The port on the host that is listening for log events. |
+
+#### UDP
+Nuff said.
 
 ## Runtime Type Information
 

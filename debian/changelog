@@ -3,6 +3,8 @@ blackhole (1.0.0-0alpha7) UNRELEASED; urgency=low
   * Feature: JSON formatter now inserts process and thread id fields.
   * Feature: flush interval option can now be specified in a config to the file
     appender.
+  * Feature: added blocking TCP appender to be able to emit log messages via
+    TCP socket.
 
  -- Evgeny Safronov <division494@gmail.com>  Thu, 11 Feb 2016 21:18:38 +0300
 
