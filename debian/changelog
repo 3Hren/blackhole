@@ -7,9 +7,9 @@ blackhole (1.0.0-0alpha7) UNRELEASED; urgency=low
     TCP socket.
   * API: remove filtering from sink interface, because the filtering concept
     needed to reviewed completely.
-    For example before this change every sink just returned `true` regardless
-    whatever. This information gave nothing, because otherwise all users must
-    check before emitting messages while they can just emit. Furthermore we
+    Before this change every sink just returned `true` no matter what. This
+    information gave nothing, because otherwise all users must check before
+    emitting messages while they can just emit. Instead of this we'd better
     introduce custom filters for sinks that can be applied using special
     filtering decorator.
 
