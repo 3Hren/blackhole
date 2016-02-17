@@ -52,6 +52,7 @@ add_library(${LIBRARY_NAME} SHARED
 	src/sink/console
 	src/sink/file
 	src/sink/null
+	src/sink/socket/tcp
 	src/sink/socket/udp
 	src/wrapper)
 
@@ -205,6 +206,7 @@ if (ENABLE_TESTING)
 		tests/handler/blocking
 		tests/record
 		tests/registry
+		tests/sink/tcp
 		tests/root
 		tests/severity
 		tests/sink/console
