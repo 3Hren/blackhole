@@ -5,6 +5,13 @@ blackhole (1.0.0-0alpha7) UNRELEASED; urgency=low
     appender.
   * Feature: added blocking TCP appender to be able to emit log messages via
     TCP socket.
+  * API: remove filtering from sink interface, because the filtering concept
+    needed to reviewed completely.
+    For example before this change every sink just returned `true` regardless
+    whatever. This information gave nothing, because otherwise all users must
+    check before emitting messages while they can just emit. Furthermore we
+    introduce custom filters for sinks that can be applied using special
+    filtering decorator.
 
  -- Evgeny Safronov <division494@gmail.com>  Thu, 11 Feb 2016 21:18:38 +0300
 
