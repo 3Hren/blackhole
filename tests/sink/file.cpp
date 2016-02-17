@@ -42,16 +42,6 @@ TEST(inner_t, IntervalOverflow) {
     EXPECT_EQ(0, counter);
 }
 
-TEST(file_t, FilterAcceptsAll) {
-    const string_view message("");
-    const attribute_pack pack;
-    record_t record(42, message, pack);
-
-    file_t sink("");
-
-    EXPECT_TRUE(sink.filter(record));
-}
-
 }  // namespace file
 
 TEST(file_t, Type) {

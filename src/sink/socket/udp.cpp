@@ -67,10 +67,6 @@ auto udp_t::endpoint() const -> const endpoint_type& {
     return inner->endpoint();
 }
 
-auto udp_t::filter(const record_t&) -> bool {
-    return true;
-}
-
 auto udp_t::emit(const record_t&, const string_view& formatted) -> void {
     inner->write(formatted);
 }

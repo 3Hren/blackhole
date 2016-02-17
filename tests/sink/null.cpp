@@ -16,16 +16,6 @@ using ::testing::StrictMock;
 
 using sink::null_t;
 
-TEST(null_t, FilterOut) {
-    const string_view message("-");
-    const attribute_pack pack;
-    record_t record(42, message, pack);
-
-    null_t sink;
-
-    EXPECT_FALSE(sink.filter(record));
-}
-
 TEST(null_t, type) {
     EXPECT_EQ("null", std::string(factory<sink::null_t>::type()));
 }

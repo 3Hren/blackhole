@@ -73,8 +73,6 @@ public:
     /// \note you should manually include the appropriate boost header files when using this method.
     auto endpoint() const -> const endpoint_type&;
 
-    auto filter(const record_t& record) -> bool;
-
     /// Emits a datagram to the specified endpoint.
     auto emit(const record_t& record, const string_view& message) -> void;
 };

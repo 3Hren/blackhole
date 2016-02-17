@@ -124,12 +124,6 @@ public:
     /// \param colormap color mappings from logging level to terminal color.
     console_t(type_t type, termcolor_map colormap);
 
-    /// Filters the given log record determining if it is allowed to be consumed by this sink.
-    ///
-    /// The console implementation always returns `true`, meaning that all logging events should be
-    /// accepted.
-    auto filter(const record_t& record) -> bool;
-
     /// Writes the formatted message into the attached output stream.
     ///
     /// Note that the message may be anticipatorily colored using severity information from the

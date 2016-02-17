@@ -82,10 +82,6 @@ public:
         return data->port;
     }
 
-    auto filter(const record_t&) -> bool {
-        return true;
-    }
-
     auto emit(const record_t&, const string_view& message) -> void {
         std::lock_guard<std::mutex> lock(data->mutex);
 

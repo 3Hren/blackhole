@@ -136,16 +136,6 @@ TEST(console_t, NonColoredOutputToNonTTY) {
     EXPECT_EQ("expected\n", sink.stream.str());
 }
 
-TEST(console_t, FilterAcceptsAll) {
-    const string_view message("");
-    const attribute_pack pack;
-    record_t record(42, message, pack);
-
-    console_t sink;
-
-    EXPECT_TRUE(sink.filter(record));
-}
-
 TEST(console_t, Type) {
     EXPECT_EQ("console", std::string(factory<sink::console_t>::type()));
 }

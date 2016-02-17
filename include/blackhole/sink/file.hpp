@@ -79,12 +79,6 @@ public:
     /// time.
     auto path() const -> const std::string&;
 
-    /// Filters the given log record determining if it is allowed to be consumed by this sink.
-    ///
-    /// The file sink implementation always returns `true`, meaning that all logging events should
-    /// be accepted.
-    auto filter(const record_t& record) -> bool;
-
     /// Outputs the formatted message with its associated record to the file.
     ///
     /// Depending on the filename pattern it is possible to write into multiple destinations.

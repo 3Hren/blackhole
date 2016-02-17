@@ -46,10 +46,6 @@ auto file_t::path() const -> const std::string& {
     return inner->path();
 }
 
-auto file_t::filter(const record_t&) -> bool {
-    return true;
-}
-
 auto file_t::emit(const record_t& record, const string_view& formatted) -> void {
     const auto filename = inner->filename(record);
 

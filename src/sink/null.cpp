@@ -7,23 +7,15 @@ namespace blackhole {
 inline namespace v1 {
 namespace sink {
 
-auto
-null_t::filter(const record_t&) -> bool {
-    return false;
-}
-
-auto
-null_t::emit(const record_t&, const string_view&) -> void {}
+auto null_t::emit(const record_t&, const string_view&) -> void {}
 
 }  // namespace sink
 
-auto
-factory<sink::null_t>::type() -> const char* {
+auto factory<sink::null_t>::type() -> const char* {
     return "null";
 }
 
-auto
-factory<sink::null_t>::from(const config::node_t&) -> sink::null_t {
+auto factory<sink::null_t>::from(const config::node_t&) -> sink::null_t {
     return sink::null_t();
 }
 
