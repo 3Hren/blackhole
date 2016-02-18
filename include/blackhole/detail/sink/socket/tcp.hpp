@@ -20,7 +20,8 @@ namespace blackhole {
 inline namespace v1 {
 namespace sink {
 namespace socket {
-namespace {
+
+namespace detail {
 
 /// Resolves specified host and tries to connect to the socket.
 template<typename Protocol>
@@ -100,7 +101,7 @@ public:
 private:
     auto reconnect(std::lock_guard<std::mutex>&) -> std::unique_ptr<socket_type> {
         auto socket = std::unique_ptr<socket_type>(new socket_type(data->io_service));
-        connect<protocol_type>(data->io_service, *socket, host(), port());
+        detail::connect<protocol_type>(data->io_service, *socket, host(), port());
 
         return socket;
     }
