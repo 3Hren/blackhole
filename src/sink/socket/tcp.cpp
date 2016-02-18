@@ -1,6 +1,5 @@
 #include <mutex>
 
-#include <boost/asio/connect.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/write.hpp>
@@ -37,6 +36,40 @@ struct tcp_t::data_t {
 
 namespace {
 
+template<typename Protocol, typename SocketService, typename Iterator>
+auto do_connect(boost::asio::basic_socket<Protocol, SocketService>& s,
+             Iterator begin,
+             Iterator end,
+             boost::system::error_code& ec) -> Iterator
+{
+    ec = boost::system::error_code();
+
+    for (Iterator iter = begin; iter != end; ++iter) {
+        if (iter != end) {
+            s.close(ec);
+            s.connect(*iter, ec);
+            if (!ec) {
+                return iter;
+            }
+        }
+    }
+
+    if (!ec) {
+        ec = boost::asio::error::not_found;
+    }
+
+    return end;
+}
+
+template <typename Protocol, typename SocketService, typename Iterator>
+auto do_connect(boost::asio::basic_socket<Protocol, SocketService>& s, Iterator begin) -> Iterator {
+    boost::system::error_code ec;
+    Iterator end = typename Protocol::resolver::iterator();
+    Iterator result = do_connect(s, begin, end, ec);
+    boost::asio::detail::throw_error(ec);
+    return result;
+}
+
 /// Resolves specified host and tries to connect to the socket.
 template<typename Protocol>
 auto connect(boost::asio::io_service& ev, typename Protocol::socket& socket,
@@ -55,7 +88,7 @@ auto connect(boost::asio::io_service& ev, typename Protocol::socket& socket,
     }
 
     try {
-        boost::asio::connect(socket, endpoint);
+        do_connect(socket, endpoint);
     } catch (const boost::system::system_error& err) {
         throw std::system_error(err.code().value(), std::system_category(),
             fmt::format("failed to connect to {}:{} - {}", host, port, err.what()));
