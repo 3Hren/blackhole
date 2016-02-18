@@ -16,7 +16,19 @@ static void view_ctor_get_int64(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
+static void from_owned(::benchmark::State& state) {
+    blackhole::attribute::value_t owned(42);
+
+    while (state.KeepRunning()) {
+        blackhole::attribute::view_t view(owned);
+        ::benchmark::DoNotOptimize(view);
+    }
+
+    state.SetItemsProcessed(state.iterations());
+}
+
 NBENCHMARK("attribute.view_t[ctor + get<i64>]", view_ctor_get_int64);
+NBENCHMARK("attribute.view_t[ctor + from owned]", from_owned);
 
 }  // namespace benchmark
 }  // namespace blackhole
