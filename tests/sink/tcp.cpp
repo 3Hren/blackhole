@@ -6,8 +6,7 @@
 
 #include <blackhole/attribute.hpp>
 #include <blackhole/record.hpp>
-
-#include <blackhole/detail/sink/socket/tcp.hpp>
+#include <blackhole/sink/socket/tcp.hpp>
 
 #include "mocks/node.hpp"
 

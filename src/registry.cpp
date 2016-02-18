@@ -14,9 +14,6 @@
 #include "blackhole/sink.hpp"
 #include "blackhole/sink/console.hpp"
 #include "blackhole/sink/null.hpp"
-#include "blackhole/sink/socket/tcp.hpp"
-
-#include "blackhole/detail/sink/socket/tcp.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -116,7 +113,6 @@ auto registry_t::configured() -> registry_t {
 
     registry.add<sink::console_t>();
     registry.add<sink::null_t>();
-    registry.add<sink::socket::tcp_t>();
 
     registry.add<handler::blocking_t>();
 
