@@ -33,9 +33,9 @@ public:
     virtual auto is_sint64() const noexcept -> bool = 0;
     virtual auto is_uint64() const noexcept -> bool = 0;
     virtual auto is_double() const noexcept -> bool = 0;
-    virtual auto is_string() const noexcept -> bool { return false; }
-    virtual auto is_vector() const noexcept -> bool { return false; }
-    virtual auto is_object() const noexcept -> bool { return false; }
+    virtual auto is_string() const noexcept -> bool = 0;
+    virtual auto is_vector() const noexcept -> bool = 0;
+    virtual auto is_object() const noexcept -> bool = 0;
 
     /// Tries to convert the underlying object to bool.
     virtual auto to_bool() const -> bool = 0;
