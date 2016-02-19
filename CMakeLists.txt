@@ -249,8 +249,10 @@ if (ENABLE_BENCHMARKING)
 		bench/formatter/string
 		bench/logger
 		bench/main
+		bench/queue
 		bench/record
-		bench/system/thread)
+		bench/system/thread
+	)
 
 	enable_google_benchmarking(${LIBRARY_NAME}-benchmarks)
 
