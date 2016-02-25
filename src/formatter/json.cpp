@@ -295,6 +295,10 @@ json_t::json_t(properties_t properties) :
 
 json_t::~json_t() = default;
 
+auto json_t::unique() const noexcept -> bool {
+    return inner->unique;
+}
+
 auto json_t::severity(std::vector<std::string> sevmap) -> void {
     inner->severity = std::move(sevmap);
 }

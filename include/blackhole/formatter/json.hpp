@@ -136,6 +136,9 @@ public:
     /// Assigns the given JSON formatter to the current one by moving its content.
     auto operator=(json_t&& other) noexcept -> json_t&;
 
+    /// Returns true if the filtering policy is enabled.
+    auto unique() const noexcept -> bool;
+
     /// Saves the given severity mapping array.
     ///
     /// Each formatting iteration will trigger a severity mutation by changing its integral

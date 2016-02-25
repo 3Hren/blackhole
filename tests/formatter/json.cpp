@@ -290,6 +290,10 @@ TEST(json_t, FormatDuplicateAttributesDefault) {
     EXPECT_TRUE(writer.result().to_string().find("\"counter\":100") != std::string::npos);
 }
 
+TEST(json_t, UniqueDisabledByDefault) {
+    EXPECT_EQ(false, json_t().unique());
+}
+
 TEST(json_t, FormatDuplicateAttributesUnique) {
     auto formatter = json_t::builder_t()
         .unique()
