@@ -187,6 +187,9 @@ public:
     // TODO: auto mutate(...) -> builder_t&;
 
     /// \warning experimental, may be dropped until 1.0.
+    auto severity(std::vector<std::string> sevmap) -> builder_t&;
+
+    /// \warning experimental, may be dropped until 1.0.
     auto timestamp(const std::string& pattern) -> builder_t&;
 
     auto build() const -> json_t;

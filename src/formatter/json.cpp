@@ -205,7 +205,7 @@ public:
 
     auto severity() -> void {
         const auto id = static_cast<std::size_t>(record.severity());
-        
+
         if (inner.severity.empty() || id >= inner.severity.size()) {
             apply("severity", static_cast<std::int64_t>(record.severity()));
         } else {
@@ -377,6 +377,11 @@ auto json_t::builder_t::newline() -> builder_t& {
     return *this;
 }
 
+auto json_t::builder_t::severity(std::vector<std::string> sevmap) -> builder_t& {
+    properties->severity = std::move(sevmap);
+    return *this;
+}
+
 auto json_t::builder_t::timestamp(const std::string& pattern) -> builder_t& {
     auto generator = detail::datetime::make_generator(pattern);
 
@@ -449,8 +454,14 @@ auto factory<formatter::json_t>::from(const config::node_t& config) -> formatter
         mutate.each_map([&](const std::string& key, const config::node_t& config) {
             if (key == "timestamp") {
                 builder.timestamp(config.to_string());
+            } else if (key == "severity") {
+                std::vector<std::string> mapping;
+                config.each([&](const config::node_t& severity) {
+                    mapping.emplace_back(severity.to_string());
+                });
+                builder.severity(std::move(mapping));
             } else {
-                throw std::invalid_argument("only \"timestamp\" mutations is allowed now");
+                throw std::invalid_argument("only \"timestamp\" and \"severity\" mutations are allowed now");
             }
         });
     }
