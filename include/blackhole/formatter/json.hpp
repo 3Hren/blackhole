@@ -136,10 +136,23 @@ public:
     /// Assigns the given JSON formatter to the current one by moving its content.
     auto operator=(json_t&& other) noexcept -> json_t&;
 
+    /// Saves the given severity mapping array.
+    ///
+    /// Each formatting iteration will trigger a severity mutation by changing its integral
+    /// representation with the corresponding string.
+    ///
+    /// \param sevmap severity mapping array.
+    /// \note setting an empty array resets the behavior.
+    /// \remark this method is not thread safe; setting a severity mapping while formatting will
+    ///     result in undefined behavior.
+    auto severity(std::vector<std::string> sevmap) -> void;
+
     auto timestamp(const std::string& pattern) -> void;
 
     /// Formats the given record by constructing a JSON tree with further serializing into the
     /// specified writer.
+    ///
+    /// \remark this method is thread safe.
     auto format(const record_t& record, writer_t& writer) -> void;
 
 private:

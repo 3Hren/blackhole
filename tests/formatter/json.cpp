@@ -489,6 +489,24 @@ TEST(json_t, MutateTimestamp) {
     EXPECT_EQ(std::string(buffer.data(), size), std::string(doc["timestamp"].GetString()));
 }
 
+TEST(json_t, MutateSeverity) {
+    json_t formatter;
+    formatter.severity({"D", "I", "W", "E"});
+
+    const string_view message("");
+    const attribute_pack pack;
+    record_t record(2, message, pack);
+    writer_t writer;
+    formatter.format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+
+    ASSERT_TRUE(doc.HasMember("severity"));
+    ASSERT_TRUE(doc["severity"].IsString());
+    EXPECT_EQ("W", std::string(doc["severity"].GetString()));
+}
+
 TEST(json_t, FactoryType) {
     EXPECT_EQ("json", std::string(factory<formatter::json_t>::type()));
 }

@@ -97,6 +97,7 @@ public:
     bool newline;
 
     std::function<void(const record_t::time_point& time, writer_t& wr)> timestamp;
+    std::vector<std::string> severity;
 
     struct {
         std::map<std::string, std::vector<std::string>> specified;
@@ -126,13 +127,15 @@ public:
     bool newline;
 
     std::function<void(const record_t::time_point& time, writer_t& wr)> timestamp;
+    std::vector<std::string> severity;
 
     inner_t(json_t::properties_t properties) :
         rest(properties.routing.unspecified),
         mapping(std::move(properties.mapping)),
         unique(properties.unique),
         newline(properties.newline),
-        timestamp(properties.timestamp)
+        timestamp(properties.timestamp),
+        severity(std::move(properties.severity))
     {
         for (const auto& route : properties.routing.specified) {
             for (const auto& name : route.second) {
@@ -201,7 +204,13 @@ public:
     }
 
     auto severity() -> void {
-        apply("severity", static_cast<std::int64_t>(record.severity()));
+        const auto id = static_cast<std::size_t>(record.severity());
+        
+        if (inner.severity.empty() || id >= inner.severity.size()) {
+            apply("severity", static_cast<std::int64_t>(record.severity()));
+        } else {
+            apply("severity", string_view(inner.severity[id].data(), inner.severity[id].size()));
+        }
     }
 
     auto timestamp() -> void {
@@ -285,6 +294,10 @@ json_t::json_t(properties_t properties) :
 {}
 
 json_t::~json_t() = default;
+
+auto json_t::severity(std::vector<std::string> sevmap) -> void {
+    inner->severity = std::move(sevmap);
+}
 
 auto json_t::timestamp(const std::string& pattern) -> void {
     auto generator = detail::datetime::make_generator(pattern);
