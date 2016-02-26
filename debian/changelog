@@ -1,3 +1,10 @@
+blackhole (1.0.0-0alpha8) UNRELEASED; urgency=low
+
+  * Feature: JSON formatter can now mutate severity fields into their string
+    representation.
+
+ -- Evgeny Safronov <division494@gmail.com>  Fri, 26 Feb 2016 09:59:38 +0300
+
 blackhole (1.0.0-0alpha7) unstable; urgency=low
 
   * Feature: JSON formatter now inserts process and thread id fields.
