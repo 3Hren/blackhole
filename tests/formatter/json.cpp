@@ -12,6 +12,8 @@
 #include <blackhole/formatter/json.hpp>
 #include <blackhole/record.hpp>
 
+#include "mocks/node.hpp"
+
 namespace {
 
 struct endpoint_t {
@@ -39,6 +41,9 @@ namespace testing {
 namespace formatter {
 
 using ::blackhole::formatter::json_t;
+
+using ::testing::StrictMock;
+using ::testing::Return;
 
 TEST(json_t, FormatMessage) {
     json_t formatter;
@@ -294,6 +299,14 @@ TEST(json_t, UniqueDisabledByDefault) {
     EXPECT_EQ(false, json_t().unique());
 }
 
+TEST(builder_t, Unique) {
+    const auto layout = json_t::builder_t()
+        .unique()
+        .build();
+
+    EXPECT_EQ(true, layout.unique());
+}
+
 TEST(json_t, FormatDuplicateAttributesUnique) {
     auto formatter = json_t::builder_t()
         .unique()
@@ -439,6 +452,18 @@ TEST(json_t, FormatAttributeWithRenaming) {
     EXPECT_STREQ("storage", doc["#source"].GetString());
 }
 
+TEST(json_t, NoNewlineByDefault) {
+    EXPECT_EQ(false, json_t().newline());
+}
+
+TEST(builder_t, Newline) {
+    const auto layout = json_t::builder_t()
+        .newline()
+        .build();
+
+    EXPECT_EQ(true, layout.newline());
+}
+
 TEST(json_t, FormatMessageWithoutNewlineByDefault) {
     auto formatter = json_t::builder_t()
         .build();
@@ -512,7 +537,7 @@ TEST(json_t, MutateSeverity) {
 }
 
 TEST(json_t, FactoryType) {
-    EXPECT_EQ("json", std::string(factory<formatter::json_t>::type()));
+    EXPECT_EQ("json", std::string(factory<json_t>::type()));
 }
 
 // TODO: Test json factory.
