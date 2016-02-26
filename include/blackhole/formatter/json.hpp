@@ -136,6 +136,7 @@ public:
     /// Assigns the given JSON formatter to the current one by moving its content.
     auto operator=(json_t&& other) noexcept -> json_t&;
 
+    /// Returns true if there will be newline sequence added after each formatted message.
     auto newline() const noexcept -> bool;
 
     /// Returns true if the filtering policy is enabled.
