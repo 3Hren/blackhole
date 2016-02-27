@@ -15,7 +15,7 @@
 namespace blackhole {
 inline namespace v1 {
 namespace sink {
-namespace testing {
+namespace {
 
 using sink::socket::tcp_t;
 
@@ -139,7 +139,7 @@ TEST(tcp_t, Config) {
     EXPECT_EQ(20000, sink.port());
 }
 
-}  // namespace testing
+}  // namespace
 }  // namespace sink
 }  // namespace v1
 }  // namespace blackhole

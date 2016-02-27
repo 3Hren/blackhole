@@ -205,7 +205,6 @@ if (ENABLE_TESTING)
 		tests/handler/blocking
 		tests/record
 		tests/registry
-		tests/sink/tcp
 		tests/root
 		tests/severity
 		tests/sink/console
@@ -216,8 +215,9 @@ if (ENABLE_TESTING)
 		tests/src/mocks/handler
 		tests/src/mocks/logger
 		tests/src/mocks/sink
-		tests/wrapper
 		tests/src/unit/formatter/json
+		tests/src/unit/sink/tcp
+		tests/wrapper
 	)
 
 	enable_google_testing(${LIBRARY_NAME}-tests)
