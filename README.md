@@ -74,14 +74,15 @@ Of course there are disadvantages, such as virtual function call cost and closed
   - [x] Files.
   - [ ] Syslog.  
   - [x] Socket UDP.
-  - [ ] Socket TCP.
-    - [ ] Blocking.
+  - [x] Socket TCP.
+    - [x] Blocking.
     - [ ] Non blocking.
 - [ ] Scatter-gathered IO (?)
 - [x] Logger builder.
 - [ ] Macro with line and filename attributes.
 - [x] Initializer from JSON (filename, string).
 - [ ] Inflector.
+- [ ] Filter category for sinks, handlers and loggers.
 
 ## Formatters
 
