@@ -200,7 +200,6 @@ if (ENABLE_TESTING)
 		tests/config/option
 		tests/datetime
 		tests/facade
-		tests/formatter/json
 		tests/formatter/parser
 		tests/formatter/string
 		tests/handler/blocking
@@ -217,7 +216,9 @@ if (ENABLE_TESTING)
 		tests/src/mocks/handler
 		tests/src/mocks/logger
 		tests/src/mocks/sink
-		tests/wrapper)
+		tests/wrapper
+		tests/src/unit/formatter/json
+	)
 
 	enable_google_testing(${LIBRARY_NAME}-tests)
 
