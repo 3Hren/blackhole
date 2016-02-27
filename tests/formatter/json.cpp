@@ -37,8 +37,9 @@ struct display_traits<endpoint_t> {
 }  // namespace blackhole
 
 namespace blackhole {
-namespace testing {
+inline namespace v1 {
 namespace formatter {
+namespace {
 
 using ::blackhole::formatter::json_t;
 
@@ -542,6 +543,7 @@ TEST(json_t, FactoryType) {
 
 // TODO: Test json factory.
 
+}  // namespace
 }  // namespace formatter
-}  // namespace testing
+}  // namespace v1
 }  // namespace blackhole
