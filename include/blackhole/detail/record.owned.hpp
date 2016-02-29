@@ -98,6 +98,10 @@ public:
         inner.attributes = attributes_pack;
     }
 
+    // TODO: Implement and test move constructor.
+    // TODO: Implement and test move assignment.
+    // TODO: Forbid and test copy constructor and assignment (YAGNI).
+
     auto into_view() const noexcept -> record_t {
         return {inner()};
     }
