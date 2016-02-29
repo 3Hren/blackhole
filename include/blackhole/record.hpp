@@ -15,12 +15,12 @@ using cpp17::string_view;
 
 class record_t {
 public:
+    struct inner_t;
+
     typedef std::chrono::system_clock clock_type;
     typedef clock_type::time_point time_point;
 
 private:
-    struct inner_t;
-
     typedef std::aligned_storage<64>::type storage_type;
     storage_type storage;
 
@@ -37,6 +37,9 @@ public:
     record_t(severity_t severity,
         std::reference_wrapper<const string_view> message,
         std::reference_wrapper<const attribute_pack> attributes);
+
+    /// Constructs a log record from its internal state.
+    record_t(inner_t inner) noexcept;
 
     auto message() const noexcept -> const string_view&;
     auto severity() const noexcept -> severity_t;
