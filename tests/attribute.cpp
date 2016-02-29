@@ -219,6 +219,12 @@ TEST(value_t, Default) {
     EXPECT_EQ(nullptr, blackhole::attribute::get<std::nullptr_t>(v));
 }
 
+TEST(value_t, FromNullptr) {
+    value_t v(nullptr);
+
+    EXPECT_EQ(nullptr, blackhole::attribute::get<std::nullptr_t>(v));
+}
+
 TEST(value_t, FromBool) {
     value_t v(true);
 

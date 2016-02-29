@@ -54,6 +54,10 @@ value_t::value_t() {
     construct(nullptr);
 }
 
+value_t::value_t(std::nullptr_t) {
+    construct(nullptr);
+}
+
 value_t::value_t(bool value) {
     construct(value);
 }
