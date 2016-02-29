@@ -1,4 +1,4 @@
-#include <boost/optional/optional.hpp>
+#include <memory>
 
 #include <gtest/gtest.h>
 
@@ -10,7 +10,7 @@ namespace detail {
 namespace {
 
 TEST(owned, FromRecordMessage) {
-    boost::optional<owned<record_t>> result;
+    std::unique_ptr<owned<record_t>> result;
 
     {
         const string_view message("GET");
@@ -18,45 +18,43 @@ TEST(owned, FromRecordMessage) {
 
         const record_t record(0, message, pack);
 
-        result.reset(owned<record_t>(record));
+        result.reset(new owned<record_t>(record));
     }
 
     EXPECT_EQ(string_view("GET"), result->into_view().message());
 }
 
 TEST(owned, FromRecordFormattedMessage) {
-    boost::optional<owned<record_t>> result;
+    std::unique_ptr<owned<record_t>> result;
 
     {
         const string_view message("GET: {}");
         const attribute_pack pack;
-
         record_t record(0, message, pack);
         record.activate("GET: 42");
 
-        result.reset(owned<record_t>(record));
+        result.reset(new owned<record_t>(record));
     }
 
     EXPECT_EQ(string_view("GET: 42"), result->into_view().formatted());
 }
 
 TEST(owned, FromRecordSeverity) {
-    boost::optional<owned<record_t>> result;
+    std::unique_ptr<owned<record_t>> result;
 
     {
         const string_view message("");
         const attribute_pack pack;
+        const record_t record(42, message, pack);
 
-        record_t record(42, message, pack);
-
-        result.reset(owned<record_t>(record));
+        result.reset(new owned<record_t>(record));
     }
 
     EXPECT_EQ(42, result->into_view().severity());
 }
 
 TEST(owned, FromRecordTimestamp) {
-    boost::optional<owned<record_t>> result;
+    std::unique_ptr<owned<record_t>> result;
 
     record_t::clock_type::time_point min = {};
     record_t::clock_type::time_point max = {};
@@ -69,7 +67,7 @@ TEST(owned, FromRecordTimestamp) {
         record.activate();
         max = record_t::clock_type::now();
 
-        result.reset(owned<record_t>(record));
+        result.reset(new owned<record_t>(record));
     }
 
     EXPECT_TRUE(min <= result->into_view().timestamp());
@@ -77,31 +75,29 @@ TEST(owned, FromRecordTimestamp) {
 }
 
 TEST(owned, FromRecordThreadId) {
-    boost::optional<owned<record_t>> result;
+    std::unique_ptr<owned<record_t>> result;
 
     {
         const string_view message("");
         const attribute_pack pack;
+        const record_t record(0, message, pack);
 
-        record_t record(0, message, pack);
-
-        result.reset(owned<record_t>(record));
+        result.reset(new owned<record_t>(record));
     }
 
     EXPECT_EQ(::pthread_self(), result->into_view().tid());
 }
 
 TEST(owned, FromRecordAttributes) {
-    boost::optional<owned<record_t>> result;
+    std::unique_ptr<owned<record_t>> result;
 
     {
         const string_view message("");
         const attribute_list attributes{{"key#1", "value#1"}};
         const attribute_pack pack{attributes};
+        const record_t record(0, message, pack);
 
-        record_t record(0, message, pack);
-
-        result.reset(owned<record_t>(record));
+        result.reset(new owned<record_t>(record));
     }
 
     const attribute_list attributes{{"key#1", "value#1"}};
