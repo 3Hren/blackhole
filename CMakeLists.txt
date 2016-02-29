@@ -259,6 +259,7 @@ if (ENABLE_BENCHMARKING)
 		bench/main
 		bench/queue
 		bench/record
+		bench/record.owned
 		bench/system/thread
 	)
 
