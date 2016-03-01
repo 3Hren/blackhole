@@ -40,6 +40,58 @@ struct into_owned_t {
 };
 
 template<typename T>
+struct twin_traits;
+
+template<>
+struct twin_traits<std::string> {
+    typedef string_view view_type;
+
+    static auto view_from(const std::string& value) -> view_type {
+        return {value};
+    }
+};
+
+template<>
+struct twin_traits<attributes_t> {
+    typedef attribute_list view_type;
+
+    static auto view_from(const attributes_t& value) -> view_type {
+        view_type result;
+
+        for (const auto& item : value) {
+            result.emplace_back(item);
+        }
+
+        return result;
+    }
+};
+
+template<typename T>
+struct twins {
+    T data;
+    typename twin_traits<T>::view_type view;
+
+    explicit twins(T value) :
+        data(std::move(value)),
+        view(twin_traits<T>::view_from(data))
+    {}
+
+    twins(twins&& other) :
+        data(std::move(other.data)),
+        view(twin_traits<T>::view_from(data))
+    {}
+
+    auto operator=(twins&& other) -> twins& {
+        if (this != &other) {
+            data = std::move(other.data);
+            view = twin_traits<T>::view_from(data);
+        }
+
+        return *this;
+    }
+};
+
+template<typename T>
 class owned;
 
 // TODO: Consider better naming for both class and file.
@@ -51,15 +103,11 @@ public:
 private:
     typedef record_t::inner_t inner_t;
 
-    std::string message;
-    string_view message_view;
+    twins<std::string> message;
+    twins<std::string> formatted;
+    twins<attributes_t> attributes;
 
-    std::string formatted;
-    string_view formatted_view;
-
-    attributes_t attributes;
-    attribute_list attributes_view;
-    attribute_pack attributes_pack;
+    attribute_pack pack;
 
     typedef std::aligned_storage<64>::type storage_type;
     storage_type storage;
@@ -67,92 +115,53 @@ private:
 public:
     explicit owned(const record_t& record) :
         message(record.message().to_string()),
-        message_view(message),
         formatted(record.formatted().to_string()),
-        formatted_view(formatted)
+        attributes(flatten(record.attributes()))
     {
+        pack = {{attributes.view}};
+
         auto& inner = this->inner();
-
-        inner.message = message_view;
-        inner.formatted = formatted_view;
-
+        inner.message = message.view;
+        inner.formatted = formatted.view;
         inner.severity = record.severity();
         inner.timestamp = record.timestamp();
-
         inner.tid = record.tid();
-
-        for (auto list : record.attributes()) {
-            for (auto kv : list.get()) {
-                attributes.push_back({
-                    kv.first.to_string(),
-                    boost::apply_visitor(into_owned_t(), kv.second.inner().value)
-                });
-            }
-        }
-
-        for (const auto& attribute : attributes) {
-            attributes_view.emplace_back(attribute);
-        }
-
-        attributes_pack.emplace_back(attributes_view);
-
-        inner.attributes = attributes_pack;
+        inner.attributes = pack;
     }
 
     owned(const owned& other) = delete;
 
     owned(owned&& other) :
         message(std::move(other.message)),
-        message_view(message),
         formatted(std::move(other.formatted)),
-        formatted_view(formatted),
         attributes(std::move(other.attributes)),
         storage(other.storage)
     {
+        pack = {{attributes.view}};
+
         auto& inner = this->inner();
-
-        inner.message = message_view;
-        inner.formatted = formatted_view;
-
-        for (const auto& attribute : attributes) {
-            attributes_view.emplace_back(attribute);
-        }
-
-        attributes_pack.emplace_back(attributes_view);
-
-        inner.attributes = attributes_pack;
+        inner.message = message.view;
+        inner.formatted = formatted.view;
+        inner.attributes = pack;
     }
 
     auto operator=(const owned& other) -> owned& = delete;
 
     auto operator=(owned&& other) -> owned& {
-        if (this == &other) {
-            return *this;
+        if (this != &other) {
+            message = std::move(other.message);
+            formatted = std::move(other.formatted);
+            attributes = std::move(other.attributes);
+
+            storage = other.storage;
+
+            pack = {{attributes.view}};
+
+            auto& inner = this->inner();
+            inner.message = message.view;
+            inner.formatted = formatted.view;
+            inner.attributes = pack;
         }
-
-        message = std::move(other.message);
-        message_view = message;
-
-        formatted = std::move(other.formatted);
-        formatted_view = formatted;
-
-        attributes = std::move(other.attributes);
-
-        storage = other.storage;
-
-        auto& inner = this->inner();
-
-        inner.message = message_view;
-        inner.formatted = formatted_view;
-
-        attributes_view.clear();
-        for (const auto& attribute : attributes) {
-            attributes_view.emplace_back(attribute);
-        }
-
-        attributes_pack = {{attributes_view}};
-
-        inner.attributes = attributes_pack;
 
         return *this;
     }
@@ -168,6 +177,21 @@ private:
 
     auto inner() const noexcept -> const inner_t& {
         return reinterpret_cast<const inner_t&>(storage);
+    }
+
+    static auto flatten(const attribute_pack& pack) -> attributes_t {
+        attributes_t result;
+
+        for (auto list : pack) {
+            for (auto kv : list.get()) {
+                result.emplace_back(
+                    kv.first.to_string(),
+                    boost::apply_visitor(into_owned_t(), kv.second.inner().value)
+                );
+            }
+        }
+
+        return result;
     }
 };
 
