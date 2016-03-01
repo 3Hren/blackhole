@@ -124,7 +124,38 @@ public:
     }
 
     auto operator=(const owned& other) -> owned& = delete;
-    auto operator=(owned&& other) -> owned& = delete;
+
+    auto operator=(owned&& other) -> owned& {
+        if (this == &other) {
+            return *this;
+        }
+
+        message = std::move(other.message);
+        message_view = message;
+
+        formatted = std::move(other.formatted);
+        formatted_view = formatted;
+
+        attributes = std::move(other.attributes);
+
+        storage = other.storage;
+
+        auto& inner = this->inner();
+
+        inner.message = message_view;
+        inner.formatted = formatted_view;
+
+        attributes_view.clear();
+        for (const auto& attribute : attributes) {
+            attributes_view.emplace_back(attribute);
+        }
+
+        attributes_pack = {{attributes_view}};
+
+        inner.attributes = attributes_pack;
+
+        return *this;
+    }
 
     auto into_view() const noexcept -> record_t {
         return {inner()};
