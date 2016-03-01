@@ -42,6 +42,7 @@ struct into_owned_t {
 template<typename T>
 class owned;
 
+// TODO: Consider better naming for both class and file.
 template<>
 class owned<record_t> {
 public:
@@ -98,9 +99,32 @@ public:
         inner.attributes = attributes_pack;
     }
 
-    // TODO: Implement and test move constructor.
-    // TODO: Implement and test move assignment.
-    // TODO: Forbid and test copy constructor and assignment (YAGNI).
+    owned(const owned& other) = delete;
+
+    owned(owned&& other) :
+        message(std::move(other.message)),
+        message_view(message),
+        formatted(std::move(other.formatted)),
+        formatted_view(formatted),
+        attributes(std::move(other.attributes)),
+        storage(other.storage)
+    {
+        auto& inner = this->inner();
+
+        inner.message = message_view;
+        inner.formatted = formatted_view;
+
+        for (const auto& attribute : attributes) {
+            attributes_view.emplace_back(attribute);
+        }
+
+        attributes_pack.emplace_back(attributes_view);
+
+        inner.attributes = attributes_pack;
+    }
+
+    auto operator=(const owned& other) -> owned& = delete;
+    auto operator=(owned&& other) -> owned& = delete;
 
     auto into_view() const noexcept -> record_t {
         return {inner()};
