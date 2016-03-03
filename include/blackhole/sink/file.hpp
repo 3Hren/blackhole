@@ -48,9 +48,12 @@ public:
     /// The path can contain attribute placeholders, meaning that the real destination name will be
     /// deduced at runtime using provided log record. No real file will be opened at construction
     /// time.
+    /// The file is opened by default in append mode meaning seek to the end of stream immediately
+    /// after open.
     ///
     /// \param filename actually a path with final destination file to open. All files are opened
     ///     with append mode.
+    /// \note the associated files will be opened just right after the first write operation.
     explicit file_t(const std::string& filename);
 
     /// Copy construction is explicitly prohibited.
