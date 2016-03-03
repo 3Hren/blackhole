@@ -1,4 +1,4 @@
-blackhole (1.0.0-0alpha8) UNRELEASED; urgency=low
+blackhole (1.0.0-0alpha8) unstable; urgency=low
 
   * Feature: JSON formatter can now mutate severity fields into their string
     representation.
