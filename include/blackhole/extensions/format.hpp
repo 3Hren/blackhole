@@ -61,6 +61,7 @@
 #ifdef _MSC_VER
 # include <intrin.h>  // _BitScanReverse, _BitScanReverse64
 
+namespace blackhole {
 namespace fmt {
 namespace internal {
 # pragma intrinsic(_BitScanReverse)
@@ -90,6 +91,7 @@ inline uint32_t clzll(uint64_t x) {
   return 63 - r;
 }
 # define FMT_BUILTIN_CLZLL(n) fmt::internal::clzll(n)
+}
 }
 }
 #endif
