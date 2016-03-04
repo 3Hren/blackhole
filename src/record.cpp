@@ -2,6 +2,11 @@
 
 #include <thread>
 
+#if defined(_WIN32)
+#include <process.h>
+#include <Windows.h>
+#endif
+
 #include "blackhole/attribute.hpp"
 
 namespace blackhole {
@@ -33,7 +38,14 @@ record_t::record_t(severity_t severity,
     inner.severity = severity;
     inner.timestamp = time_point();
 
+	// TODO: Decompose.
+#if defined(__linux__) || defined(__APPLE__)
     inner.tid = ::pthread_self();
+#elif defined(_WIN32)
+	inner.tid = ::GetCurrentThread();
+#else
+#error "Unsupported platform"
+#endif
 
     inner.attributes = attributes;
 }
@@ -51,7 +63,14 @@ auto record_t::timestamp() const noexcept -> time_point {
 }
 
 auto record_t::pid() const noexcept -> std::uint64_t {
-    return static_cast<std::uint64_t>(::getpid());
+	// TODO: Decompose.
+#if defined(__linux__) || defined(__APPLE__)
+	return static_cast<std::uint64_t>(::getpid());
+#elif defined(_WIN32)
+	return static_cast<std::uint64_t>(::_getpid());
+#else
+#error "Unsupported platform"
+#endif
 }
 
 auto record_t::tid() const noexcept -> std::thread::native_handle_type {
