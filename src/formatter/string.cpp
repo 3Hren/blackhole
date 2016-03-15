@@ -189,7 +189,11 @@ public:
         >(timestamp.time_since_epoch()).count() % 1000000;
 
         std::tm tm;
-        ::gmtime_r(&time, &tm);
+        if (token.gmtime) {
+            ::gmtime_r(&time, &tm);
+        } else {
+            ::localtime_r(&time, &tm);
+        }
 
         fmt::MemoryWriter buffer;
         token.generator(buffer, tm, static_cast<std::uint64_t>(usec));

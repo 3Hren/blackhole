@@ -80,10 +80,11 @@ template<>
 struct timestamp<user> {
     std::string pattern;
     std::string spec;
+    bool gmtime;
     datetime::generator_t generator;
 
     timestamp();
-    timestamp(std::string pattern, std::string spec);
+    timestamp(std::string pattern, std::string spec, bool gmtime);
 };
 
 template<typename T>

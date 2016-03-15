@@ -100,11 +100,15 @@ public:
         switch (type) {
         case 'd':
             return ph::timestamp<num>(std::move(spec));
+        case 'l':
+            spec[spec.size() - 2] = 's';
+            return extract<false>(spec);
         default:
             return extract(spec);
         }
     }
 
+    template<bool gmtime = true>
     auto extract(const std::string& spec) const -> ph::timestamp<user> {
         // Spec always starts with "{:".
         auto pos = spec.begin() + 2;
@@ -130,7 +134,7 @@ public:
 
         spec_.append(std::string(pos, std::end(spec)));
 
-        return ph::timestamp<user>(std::move(pattern), std::move(spec_));
+        return ph::timestamp<user>(std::move(pattern), std::move(spec_), gmtime);
     }
 };
 

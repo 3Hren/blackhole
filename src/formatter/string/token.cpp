@@ -46,12 +46,14 @@ timestamp<num>::timestamp(std::string spec) : spec(std::move(spec)) {}
 timestamp<user>::timestamp() :
     pattern("%Y-%m-%d %H:%M:%S.%f"),
     spec("{}"),
+    gmtime(true),
     generator(datetime::make_generator(pattern))
 {}
 
-timestamp<user>::timestamp(std::string pattern, std::string spec) :
+timestamp<user>::timestamp(std::string pattern, std::string spec, bool gmtime) :
     pattern(pattern.empty() ? "%Y-%m-%d %H:%M:%S.%f" : std::move(pattern)),
     spec(std::move(spec)),
+    gmtime(gmtime),
     generator(datetime::make_generator(this->pattern))
 {}
 
