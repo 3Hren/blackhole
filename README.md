@@ -116,19 +116,20 @@ attributes you can place and format every custom attribute you want, as we just 
 
 The Blackhole supports several predefined attributes, with convenient specifications:
 
-| Placeholder              | Description                                                   |
-|--------------------------|---------------------------------------------------------------|
-|{severity:s}              | User provided severity string representation                  |
-|{severity}, {severity:d}  | Numeric severity value                                        |
-|{timestamp:d}             | Number of microseconds since Unix epoch                       |
-|{timestamp:{spec}s}       | String representation using *strftime* specification          |
-|{timestamp}, {timestamp:s}| The same as *{timestamp:{%Y-%m-%d %H:%M:%S.%f}s}*             |
-|{process:s}               | Process name                                                  |
-|{process}, {process:d}    | PID                                                           |
-|{thread}, {thread::x}     | Thread hex id as an opaque value returned by *pthread_self(3)*|
-|{thread:s}                | Thread name or *unnnamed*                                     |
-|{message}                 | Logging message                                               |
-|{...}                     | All user declared attributes                                  |
+| Placeholder              | Description                                                            |
+|--------------------------|------------------------------------------------------------------------|
+|{severity:s}              | User provided severity string representation                           |
+|{severity}, {severity:d}  | Numeric severity value                                                 |
+|{timestamp:d}             | Number of microseconds since Unix epoch                                |
+|{timestamp:{spec}s}       | String representation using *strftime* specification in UTC            |
+|{timestamp:{spec}l}       | String representation using *strftime* specification in local timezone |
+|{timestamp}, {timestamp:s}| The same as *{timestamp:{%Y-%m-%d %H:%M:%S.%f}s}*                      |
+|{process:s}               | Process name                                                           |
+|{process}, {process:d}    | PID                                                                    |
+|{thread}, {thread::x}     | Thread hex id as an opaque value returned by *pthread_self(3)*         |
+|{thread:s}                | Thread name or *unnnamed*                                              |
+|{message}                 | Logging message                                                        |
+|{...}                     | All user declared attributes                                           |
 
 For more information please read the documentation and visit the following links:
 
