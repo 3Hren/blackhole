@@ -1,3 +1,9 @@
+blackhole (1.0.0-0alpha10) unstable; urgency=low
+
+  * Debian: add more links to migration crate.
+
+ -- Evgeny Safronov <division494@gmail.com>  Thu, 17 Mar 2016 16:03:21 +0300
+
 blackhole (1.0.0-0alpha9) unstable; urgency=low
 
   * Feature: string formatter is now able to optionally represent timestamp
