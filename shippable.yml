@@ -1,0 +1,16 @@
+language: python
+
+build:
+  post_ci:
+    - docker build -t blacklog/blackhole:$BASE_BRANCH .
+  on_success:
+    - docker push blacklog/blackhole:$BASE_BRANCH
+integrations:
+  hub:
+    - integrationName: blacklog
+      type: docker
+      branches:
+        only:
+          - master
+          - develop
+          - v*
