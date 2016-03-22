@@ -170,6 +170,11 @@ struct leftover_t {
 ///
 /// Blackhole also supports the leftover placeholder starting with `...` and meaning to print all
 /// userspace attributes in a reverse order they were provided.
+/// These kind of attributes can be configured using special syntax, similar with the timestamp
+/// attribute with an optional separator.
+/// For example the following placeholder `{...:{{[}{]}{name}={value}}{ }u}` results in whitespace
+/// separated key-value pairs like `id=42` with a special unique-filtered type prefixed with `[` and
+/// suffixed with `]` characters.
 ///
 /// # Performance
 ///
