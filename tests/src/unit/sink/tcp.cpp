@@ -1,7 +1,9 @@
 #include <system_error>
 
+#include <boost/array.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/read.hpp>
+#include <boost/version.hpp>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -47,10 +49,15 @@ TEST(tcp, SendsData) {
     boost::asio::ip::tcp::socket socket(io_service);
     acceptor.accept(socket);
 
-    std::array<char, 2> buffer;
+    boost::array<char, 2> buffer;
     boost::asio::ip::tcp::endpoint remote;
+#if BOOST_VERSION >= 104700
     const auto nread = boost::asio::read(socket, boost::asio::buffer(buffer),
         boost::asio::transfer_exactly(2));
+#else
+    // We are lucky.
+    const auto nread = boost::asio::read(socket, boost::asio::buffer(buffer));
+#endif
 
     ASSERT_EQ(2, nread);
     EXPECT_EQ('{', buffer[0]);

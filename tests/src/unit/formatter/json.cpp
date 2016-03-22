@@ -297,7 +297,7 @@ TEST(json_t, FormatDuplicateAttributesDefault) {
 }
 
 TEST(json_t, UniqueDisabledByDefault) {
-    EXPECT_EQ(false, json_t().unique());
+    EXPECT_FALSE(json_t().unique());
 }
 
 TEST(builder_t, Unique) {
@@ -305,7 +305,7 @@ TEST(builder_t, Unique) {
         .unique()
         .build();
 
-    EXPECT_EQ(true, layout.unique());
+    EXPECT_TRUE(layout.unique());
 }
 
 TEST(json_t, FormatDuplicateAttributesUnique) {
@@ -454,7 +454,7 @@ TEST(json_t, FormatAttributeWithRenaming) {
 }
 
 TEST(json_t, NoNewlineByDefault) {
-    EXPECT_EQ(false, json_t().newline());
+    EXPECT_FALSE(json_t().newline());
 }
 
 TEST(builder_t, Newline) {
@@ -462,7 +462,7 @@ TEST(builder_t, Newline) {
         .newline()
         .build();
 
-    EXPECT_EQ(true, layout.newline());
+    EXPECT_TRUE(layout.newline());
 }
 
 TEST(json_t, FormatMessageWithoutNewlineByDefault) {

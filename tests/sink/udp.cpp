@@ -1,6 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <boost/array.hpp>
 #include <boost/asio/ip/udp.hpp>
 
 #include <blackhole/attribute.hpp>
@@ -38,7 +39,7 @@ TEST(udp_t, SendsData) {
 
     sink.emit(record, "{}");
 
-    std::array<char, 2> buffer;
+    boost::array<char, 2> buffer;
     boost::asio::ip::udp::endpoint remote;
     socket.receive_from(boost::asio::buffer(buffer), remote, 0);
 
