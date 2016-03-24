@@ -314,7 +314,7 @@ struct leftover_visitor {
 
     auto operator()(const ph::leftover_t& token) const -> result_type {
         if (token.name == name) {
-            return result_type(ph::leftover_t(token.name,
+            return result_type(ph::leftover_t(
                 option.filter == leftover_t::filter_t::local,
                 option.prefix, option.suffix, option.pattern, option.separator));
         } else {

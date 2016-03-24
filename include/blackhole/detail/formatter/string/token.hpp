@@ -112,8 +112,8 @@ struct thread<hex> {
 };
 
 struct leftover_t {
+    // TODO: Drop this field.
     std::string name;
-
     bool unique;
     std::string prefix;
     std::string suffix;
@@ -121,9 +121,8 @@ struct leftover_t {
     std::string separator;
 
     leftover_t();
-    leftover_t(std::string name);
-    leftover_t(std::string name, bool unique, std::string prefix, std::string suffix,
-        std::string pattern, std::string separator);
+    leftover_t(bool unique, std::string prefix, std::string suffix, std::string pattern,
+        std::string separator);
 };
 
 }  // namespace placeholder
