@@ -1,6 +1,7 @@
 #include "blackhole/formatter/string.hpp"
 
 #include <array>
+#include <iostream>
 
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/variant/apply_visitor.hpp>
@@ -25,9 +26,6 @@ namespace formatter {
 
 namespace {
 
-using blackhole::formatter::string::optional_t;
-using blackhole::formatter::string::leftover_t;
-
 namespace string = blackhole::detail::formatter::string;
 
 namespace ph = string::ph;
@@ -37,6 +35,7 @@ using string::hex;
 using string::num;
 using string::name;
 using string::user;
+using string::value;
 using string::required;
 using string::optional;
 using string::literal_t;
@@ -85,30 +84,61 @@ public:
     }
 };
 
-template<>
-class view_visitor<unspec> : public boost::static_visitor<> {
-    writer_t& writer;
+class pattern_visitor_t : public boost::static_visitor<> {
+    writer_t& wr;
+    const view_of<attribute_t>::type& attribute;
 
 public:
-    view_visitor(writer_t& writer) noexcept :
-        writer(writer)
+    pattern_visitor_t(writer_t& wr, const view_of<attribute_t>::type& attribute) noexcept :
+        wr(wr),
+        attribute(attribute)
     {}
 
-    auto operator()(std::nullptr_t) const -> void {
-        writer.inner << "none";
+    auto operator()(const literal_t& value) -> void {
+        wr.inner << value.value;
     }
 
-    template<typename T>
-    auto operator()(T value) const -> void {
-        writer.inner << value;
+    auto operator()(const ph::attribute<name>& value) -> void {
+        // TODO: Surround with braces depending on a spec type.
+        wr.write(value.format, string_ref(attribute.first.data(), attribute.first.size()));
     }
 
-    auto operator()(const string_view& value) const -> void {
-        writer.inner << string_ref(value.data(), value.size());
+    auto operator()(const ph::attribute<value>& value) -> void {
+        // TODO: Surround with braces depending on both spec and attribute types.
+        boost::apply_visitor(view_visitor<spec>(wr, value.format), attribute.second.inner().value);
     }
+};
 
-    auto operator()(const attribute::view_t::function_type& value) const -> void {
-        value(writer);
+class evaluator_t {
+    const ph::leftover_t& placeholder;
+
+public:
+    explicit constexpr evaluator_t(const ph::leftover_t& placeholder) noexcept :
+        placeholder(placeholder)
+    {}
+
+    auto eval(writer_t& wr, const attribute_pack& pack) -> void {
+        bool first = true;
+        for (const auto& attributes : pack) {
+            for (const auto& attribute : attributes.get()) {
+                if (first) {
+                    first = false;
+                    wr.inner << placeholder.prefix;
+                } else {
+                    wr.inner << placeholder.separator;
+                }
+
+                pattern_visitor_t visitor(wr, attribute);
+                for (const auto& token : placeholder.tokens) {
+                    boost::apply_visitor(visitor, token);
+                }
+            }
+        }
+
+        // TODO: Resize instead? Measure.
+        if (!first) {
+            wr.inner << placeholder.suffix;
+        }
     }
 };
 
@@ -217,33 +247,14 @@ public:
     }
 
     auto operator()(const ph::leftover_t& token) const -> void {
-        bool first = true;
-        writer_t kv;
-        const view_visitor<unspec> visitor(kv);
+        writer_t wr;
+        evaluator_t(token)
+            .eval(wr, record.attributes());
 
-        for (const auto& attributes : record.attributes()) {
-            for (const auto& attribute : attributes.get()) {
-                if (first) {
-                    first = false;
-                    writer.inner << token.prefix;
-                } else {
-                    writer.inner << token.separator;
-                }
-
-                // TODO: To correctly implement kv patterns we need a visitor with parameters. Or
-                // attribute (pair) type, instead of that `std::pair`.
-                kv.inner << string_ref(attribute.first.data(), attribute.first.size()) << ": ";
-                boost::apply_visitor(visitor, attribute.second.inner().value);
-
-                const auto view = kv.result();
-                writer.inner << string_ref(view.data(), view.size());
-
-                kv.inner.clear();
-            }
-        }
-
-        if (!first) {
-            writer.inner << token.suffix;
+        // Seems like cppformat doesn't initializes the data pointer until required which leads to
+        // conditional jump or move which depends on uninitialised value.
+        if (wr.inner.size() > 0) {
+            writer.write(token.spec, string_ref(wr.inner.data(), wr.inner.size()));
         }
     }
 
@@ -263,12 +274,6 @@ private:
 
 auto tokenize(const std::string& pattern) -> std::vector<token_t> {
     std::vector<token_t> tokens;
-    // for (const auto& reserved : {"process", "thread", "message", "severity", "timestamp"}) {
-    //     if (options.count(reserved) != 0) {
-    //         throw std::logic_error("placeholder '" + std::string(reserved) +
-    //             "' is reserved and can not be configured");
-    //     }
-    // }
 
     parser_t parser(pattern);
     while (auto token = parser.next()) {
@@ -277,56 +282,6 @@ auto tokenize(const std::string& pattern) -> std::vector<token_t> {
 
     return tokens;
 }
-
-struct option_visitor {
-    typedef boost::optional<token_t> result_type;
-
-    const std::string& name;
-    const optional_t& option;
-
-    auto operator()(const ph::generic<required>& token) const -> result_type {
-        if (token.name == name) {
-            return result_type(ph::generic<optional>(token, option.prefix, option.suffix));
-        } else {
-            return boost::none;
-        }
-    }
-
-    auto operator()(const ph::generic<optional>& token) const -> result_type {
-        if (token.name == name) {
-            return result_type(ph::generic<optional>(token, option.prefix, option.suffix));
-        } else {
-            return boost::none;
-        }
-    }
-
-    template<typename T>
-    auto operator()(const T&) const -> result_type {
-        return boost::none;
-    }
-};
-
-struct leftover_visitor {
-    typedef boost::optional<token_t> result_type;
-
-    const std::string& name;
-    const leftover_t& option;
-
-    auto operator()(const ph::leftover_t& token) const -> result_type {
-        if (token.name == name) {
-            return result_type(ph::leftover_t(
-                option.filter == leftover_t::filter_t::local,
-                option.prefix, option.suffix, option.pattern, option.separator));
-        } else {
-            return boost::none;
-        }
-    }
-
-    template<typename T>
-    auto operator()(const T&) const -> result_type {
-        return boost::none;
-    }
-};
 
 }  // namespace
 
@@ -356,32 +311,6 @@ string_t::string_t(const std::string& pattern, severity_map sevmap) :
 // TODO: Decompose `throw std::invalid_argument("token not found");` case.
 // TODO: Check and decompose name is not reserved. Maybe by wrapping `name` with type. Test.
 // TODO: Both algorithms are similar. Decompose.
-auto string_t::set(const std::string& name, const optional_t& option) -> void {
-    const option_visitor visitor{name, option};
-
-    for (auto& token : inner->tokens) {
-        if (auto value = boost::apply_visitor(visitor, token)) {
-            token = value.get();
-            return;
-        }
-    }
-
-    throw std::invalid_argument("token not found");
-
-}
-
-auto string_t::set(const std::string& name, const leftover_t& option) -> void {
-    const leftover_visitor visitor{name, option};
-
-    for (auto& token : inner->tokens) {
-        if (auto value = boost::apply_visitor(visitor, token)) {
-            token = value.get();
-            return;
-        }
-    }
-
-    throw std::invalid_argument("token not found");
-}
 
 auto string_t::format(const record_t& record, writer_t& writer) -> void {
     const visitor_t visitor(writer, record, inner->sevmap);

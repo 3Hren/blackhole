@@ -72,20 +72,22 @@ thread<T>::thread(std::string spec) : spec(std::move(spec)) {}
 thread<hex>::thread() : spec("{:#x}") {}
 thread<hex>::thread(std::string spec) : spec(std::move(spec)) {}
 
-leftover_t::leftover_t() :
-    name("..."),
-    unique(false),
-    separator(", ")
+template<typename T>
+attribute<T>::attribute() :
+    spec(""),
+    format("{:}")
 {}
 
-leftover_t::leftover_t(bool unique, std::string prefix, std::string suffix, std::string pattern,
-    std::string separator) :
-    name("..."),
-    unique(unique),
-    prefix(std::move(prefix)),
-    suffix(std::move(suffix)),
-    pattern(std::move(pattern)),
-    separator(std::move(separator))
+template<typename T>
+attribute<T>::attribute(std::string spec) :
+    spec(std::move(spec)),
+    format("{:" + this->spec + "}")
+{}
+
+leftover_t::leftover_t() :
+    spec("{:}"),
+    separator(", "),
+    tokens({ph::attribute<name>(), literal_t(": "), ph::attribute<value>()})
 {}
 
 template struct severity<num>;
@@ -96,6 +98,9 @@ template struct process<name>;
 
 template struct thread<id>;
 template struct thread<name>;
+
+template struct attribute<name>;
+template struct attribute<value>;
 
 }  // namespace placeholder
 }  // namespace string

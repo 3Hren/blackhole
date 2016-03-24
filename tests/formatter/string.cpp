@@ -38,9 +38,6 @@ namespace testing {
 using ::testing::AnyOf;
 using ::testing::Eq;
 
-using formatter::string::optional_t;
-using formatter::string::leftover_t;
-
 TEST(string_t, Message) {
     formatter::string_t formatter("[{message}]");
 
@@ -224,9 +221,8 @@ TEST(string_t, ThrowsIfGenericAttributeNotFound) {
     EXPECT_THROW(formatter.format(record, writer), std::logic_error);
 }
 
-TEST(string_t, GenericOptional) {
-    formatter::string_t formatter("{protocol}{version:.1f}");
-    formatter.set("version", optional_t{"/", " - REQUIRED"});
+TEST(DISABLED_string_t, GenericOptional) {
+    formatter::string_t formatter("{protocol}{version:{ - REQUIRED:u}.1f}");
 
     const string_view message("-");
     const attribute_list attributes{{"protocol", {"HTTP"}}, {"version", {1.1}}};
@@ -266,12 +262,6 @@ TEST(string_t, GenericLazySpec) {
     formatter.format(record, writer);
 
     EXPECT_EQ("HTTP/1.1 - alpha", writer.result().to_string());
-}
-
-TEST(string_t, ThrowsIfOptionsContainsReservedPlaceholderNames) {
-    formatter::string_t formatter("{protocol}");
-
-    EXPECT_THROW(formatter.set("message", optional_t{"[", "]"}), std::logic_error);
 }
 
 TEST(string_t, Process) {
@@ -636,9 +626,8 @@ TEST(string_t, LeftoverEmpty) {
     EXPECT_EQ("[]", writer.result().to_string());
 }
 
-TEST(string_t, LeftoverWithPrefixAndSuffix) {
-    formatter::string_t formatter("{...}");
-    formatter.set("...", leftover_t{leftover_t::filter_t::none, "[", "]", "{k}: {v}", ", "});
+TEST(DISABLED_string_t, LeftoverWithPrefixAndSuffix) {
+    formatter::string_t formatter("{...:{[:px}{]:sx}s}");
 
     const string_view message("-");
     const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};
@@ -653,9 +642,8 @@ TEST(string_t, LeftoverWithPrefixAndSuffix) {
     ));
 }
 
-TEST(string_t, LeftoverEmptyWithPrefixAndSuffix) {
-    formatter::string_t formatter("{...}");
-    formatter.set("...", leftover_t{leftover_t::filter_t::none, "[", "]", "{k}: {v}", ", "});
+TEST(DISABLED_string_t, LeftoverEmptyWithPrefixAndSuffix) {
+    formatter::string_t formatter("{...:{[:px}{]:sx}s}");
 
     const string_view message("-");
     const attribute_list attributes{};
@@ -667,9 +655,8 @@ TEST(string_t, LeftoverEmptyWithPrefixAndSuffix) {
     EXPECT_EQ("", writer.result().to_string());
 }
 
-TEST(DISABLED_string_t, LeftoverWithPattern) {
-    formatter::string_t formatter("{...}");
-    formatter.set("...", leftover_t{leftover_t::filter_t::none, "", "", "{k}={v}", ", "});
+TEST(string_t, LeftoverWithPattern) {
+    formatter::string_t formatter("{...:{{name}={value}:p}s}");
 
     const string_view message("-");
     const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};
@@ -685,8 +672,7 @@ TEST(DISABLED_string_t, LeftoverWithPattern) {
 }
 
 TEST(string_t, LeftoverWithSeparator) {
-    formatter::string_t formatter("{...}");
-    formatter.set("...", leftover_t{leftover_t::filter_t::none, "", "", "{k}={v}", " | "});
+    formatter::string_t formatter("{...:{ | :x}s}");
 
     const string_view message("-");
     const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};

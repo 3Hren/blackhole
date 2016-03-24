@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include <boost/variant/variant_fwd.hpp>
+#include <boost/variant/variant.hpp>
 
 #include "blackhole/detail/datetime.hpp"
 
@@ -18,12 +18,16 @@ struct hex;
 struct num;
 struct name;
 struct user;
+struct value;
 struct required;
 struct optional;
 
 /// Represents string literal.
 struct literal_t {
     std::string value;
+
+    literal_t() = default;
+    literal_t(std::string value) : value(std::move(value)) {}
 };
 
 namespace placeholder {
@@ -111,18 +115,30 @@ struct thread<hex> {
     thread(std::string spec);
 };
 
+template<typename T>
+struct attribute {
+    std::string spec;
+    std::string format;
+
+    attribute();
+    attribute(std::string spec);
+};
+
 struct leftover_t {
-    // TODO: Drop this field.
-    std::string name;
-    bool unique;
+    typedef boost::variant<
+        literal_t,
+        placeholder::attribute<name>,
+        placeholder::attribute<value>
+    > token_t;
+
     std::string prefix;
     std::string suffix;
-    std::string pattern;
+
+    std::string spec;
     std::string separator;
+    std::vector<token_t> tokens;
 
     leftover_t();
-    leftover_t(bool unique, std::string prefix, std::string suffix, std::string pattern,
-        std::string separator);
 };
 
 }  // namespace placeholder

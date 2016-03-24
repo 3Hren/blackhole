@@ -1,0 +1,124 @@
+#include <boost/fusion/container/vector.hpp>
+#include <boost/fusion/container/generation/vector_tie.hpp>
+#include <boost/spirit/home/qi/auxiliary/eoi.hpp>
+#include <boost/spirit/home/qi/auxiliary/eps.hpp>
+#include <boost/spirit/home/qi/char/char.hpp>
+#include <boost/spirit/home/qi/directive/as.hpp>
+#include <boost/spirit/home/qi/nonterminal/error_handler.hpp>
+#include <boost/spirit/home/qi/operator/alternative.hpp>
+#include <boost/spirit/home/qi/operator/difference.hpp>
+#include <boost/spirit/home/qi/operator/expect.hpp>
+#include <boost/spirit/home/qi/operator/kleene.hpp>
+#include <boost/spirit/home/qi/operator/list.hpp>
+#include <boost/spirit/home/qi/operator/not_predicate.hpp>
+#include <boost/spirit/home/qi/operator/optional.hpp>
+#include <boost/spirit/home/qi/operator/permutation.hpp>
+#include <boost/spirit/home/qi/operator/plus.hpp>
+#include <boost/spirit/home/qi/operator/sequence.hpp>
+#include <boost/spirit/home/qi/string/lit.hpp>
+
+#include <blackhole/detail/formatter/string/error.hpp>
+#include <blackhole/detail/formatter/string/grammar.hpp>
+#include <blackhole/detail/formatter/string/grammar.inl.hpp>
+
+namespace blackhole {
+inline namespace v1 {
+namespace detail {
+namespace formatter {
+namespace string {
+
+namespace qi = boost::spirit::qi;
+
+grammar_t::grammar_t() :
+    grammar_t::base_type(grammar)
+{
+    // See https://docs.python.org/2/library/string.html#format-specification-mini-language for
+    // more information about the spec subset grammar.
+    grammar    %= qi::eps > qi::lit('{') > (
+          '}'
+        | ':' >> -(pattern ^ separator) >> spec >> '}'
+    ) > qi::eoi;
+    pattern    %= qi::lit('{') >> (*(qi::char_ - (qi::lit(":p}") >> !qi::lit('}'))) >> ":p}") % '}';
+    separator  %= qi::lit('{') >> (*(qi::char_ - (qi::lit(":x}") >> !qi::lit('}'))) >> ":x}") % '}';
+    spec       %= -align >> -width >> type;
+    align      %= qi::char_("<^>");
+    width      %= +qi::digit;
+    type       %= qi::char_('s');
+}
+
+pattern_grammar_t::pattern_grammar_t() :
+    pattern_grammar_t::base_type(grammar)
+{
+    grammar    %= *(name | value | lit) >> qi::eoi;
+    name       %= qi::as_string[qi::lit("{name") >> -(qi::lit(':') >> spec) >> '}'];
+    value      %= qi::as_string[qi::lit("{value") >> -(qi::lit(':') >> spec) >> '}'];
+    lit        %= qi::as_string[+(
+          (qi::char_ - "{" - "{{" - "}" - "}}")
+        | lbrace
+        | rbrace
+    ) >> qi::eps];
+    lbrace      = qi::lit('{') >> qi::char_("{");
+    rbrace      = qi::lit('}') >> qi::char_("}");
+    spec       %= -align >> -width >> type;
+    align      %= qi::char_("<^>");
+    width      %= +qi::digit;
+    type       %= qi::char_("sd");
+}
+
+auto parse(std::string pattern) -> grammar_result_t {
+    auto it = pattern.begin();
+    const auto end = pattern.end();
+    grammar_t grammar;
+    grammar_result_t result;
+
+    bool parsed = false;
+    try {
+        parsed = boost::spirit::qi::parse(it, end, grammar, result);
+    } catch (const boost::spirit::qi::expectation_failure<std::string::iterator>& err) {
+        const auto pos = std::distance(pattern.begin(), err.last);
+        throw parser_error_t(static_cast<std::size_t>(pos), pattern, "malformed input pattern");
+    }
+
+    if (parsed && (it == end)) {
+        return result;
+    }
+
+    throw std::runtime_error("NIY");
+}
+
+auto parse_pattern(std::string pattern) -> std::vector<ph::leftover_t::token_t> {
+    auto it = pattern.begin();
+    const auto end = pattern.end();
+    pattern_grammar_t grammar;
+    std::vector<ph::leftover_t::token_t> tokens;
+    const auto rc = boost::spirit::qi::parse(it, end, grammar, tokens);
+
+    if (rc && (it == end)) {
+        return tokens;
+    }
+
+    throw std::invalid_argument("NIY");
+}
+
+auto parse_leftover(const std::string& pattern) -> ph::leftover_t {
+    const auto r = parse(pattern);
+
+    ph::leftover_t result;
+    result.spec = "{:" + r.spec + "}";
+
+    if (auto pattern = r.pattern()) {
+        result.tokens = parse_pattern(*pattern);
+    }
+
+    if (auto separator = r.separator()) {
+        result.separator = *separator;
+    }
+
+    return result;
+}
+
+}  // namespace string
+}  // namespace formatter
+}  // namespace detail
+}  // namespace v1
+}  // namespace blackhole

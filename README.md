@@ -68,6 +68,8 @@ Of course there are disadvantages, such as virtual function call cost and closed
   - [ ] Queue with drop on overload (count dropped message).
 - [x] Formatters.
   - [x] String by pattern.
+    - [ ] Optional placeholders.
+    - [ ] Configurable leftover placeholder.
   - [x] JSON with tree reconstruction.
 - [ ] Sinks.
   - [x] Colored terminal output.

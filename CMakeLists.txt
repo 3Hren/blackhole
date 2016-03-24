@@ -37,6 +37,7 @@ add_library(${LIBRARY_NAME} SHARED
 	src/formatter/mod
 	src/formatter/string.cpp
 	src/formatter/string/error
+	src/formatter/string/grammar
 	src/formatter/string/parser
 	src/formatter/string/token
 	src/handler.cpp
@@ -215,7 +216,9 @@ if (ENABLE_TESTING)
 		tests/src/mocks/handler
 		tests/src/mocks/logger
 		tests/src/mocks/sink
+		tests/src/unit/formatter/grammar
 		tests/src/unit/formatter/json
+		tests/src/unit/formatter/token
 		tests/src/unit/sink/tcp
 		tests/wrapper
 	)

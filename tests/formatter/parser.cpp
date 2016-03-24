@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <boost/algorithm/string.hpp> // TODO: for `starts_with`.
 #include <boost/variant/variant.hpp>
 #include <boost/variant/get.hpp>
 
@@ -21,7 +22,12 @@ using detail::formatter::string::hex;
 using detail::formatter::string::num;
 using detail::formatter::string::name;
 using detail::formatter::string::user;
+using detail::formatter::string::value;
 using detail::formatter::string::required;
+
+namespace ph {
+    using detail::formatter::string::ph::attribute;
+}  // namespace ph
 
 using detail::formatter::string::ph::generic;
 using detail::formatter::string::ph::leftover_t;
@@ -368,20 +374,26 @@ TEST(parser_t, Leftover) {
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-    ASSERT_EQ("...", boost::get<leftover_t>(*token).name);
+    ASSERT_NO_THROW(boost::get<leftover_t>(*token));
 
     EXPECT_FALSE(parser.next());
 }
 
-TEST(parser_t, LeftoverNamed) {
-    parser_t parser("{...last}");
+TEST(parser_t, LeftoverWithPattern) {
+    parser_t parser("{...:{{name}={value}:p}s}");
 
     auto token = parser.next();
     ASSERT_TRUE(!!token);
-
-    ASSERT_EQ("...last", boost::get<leftover_t>(*token).name);
-
     EXPECT_FALSE(parser.next());
+
+    const auto ph = boost::get<leftover_t>(*token);
+
+    ASSERT_EQ(3, ph.tokens.size());
+    EXPECT_EQ("", boost::get<ph::attribute<name>>(ph.tokens.at(0)).spec);
+    EXPECT_EQ("{:}", boost::get<ph::attribute<name>>(ph.tokens.at(0)).format);
+    EXPECT_EQ("=", boost::get<literal_t>(ph.tokens.at(1)).value);
+    EXPECT_EQ("", boost::get<ph::attribute<value>>(ph.tokens.at(2)).spec);
+    EXPECT_EQ("{:}", boost::get<ph::attribute<value>>(ph.tokens.at(2)).format);
 }
 
 TEST(parser_t, RealWorld) {
@@ -439,7 +451,7 @@ TEST(parser_t, RealWorld) {
 
     token = parser.next();
     ASSERT_TRUE(!!token);
-    ASSERT_EQ("...", boost::get<leftover_t>(*token).name);
+    ASSERT_NO_THROW(boost::get<leftover_t>(*token));
 
     EXPECT_FALSE(parser.next());
 }

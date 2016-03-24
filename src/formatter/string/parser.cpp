@@ -3,6 +3,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/variant/variant.hpp>
 
+#include "blackhole/detail/formatter/string/grammar.hpp"
+
 namespace blackhole {
 inline namespace v1 {
 namespace detail {
@@ -138,6 +140,14 @@ public:
     }
 };
 
+template<>
+class spec_factory<ph::leftover_t> : public factory<ph::leftover_t> {
+public:
+    auto match(std::string spec) const -> token_t {
+        return parse_leftover(spec);
+    }
+};
+
 parser_t::parser_t(std::string pattern) :
     state(state_t::unknown),
     pattern(std::move(pattern)),
@@ -148,6 +158,7 @@ parser_t::parser_t(std::string pattern) :
     factories["thread"]    = std::make_shared<spec_factory<ph::thread<hex>>>();
     factories["severity"]  = std::make_shared<spec_factory<ph::severity<user>>>();
     factories["timestamp"] = std::make_shared<spec_factory<ph::timestamp<user>>>();
+    factories["..."]       = std::make_shared<spec_factory<ph::leftover_t>>();
 }
 
 auto
@@ -255,6 +266,7 @@ parser_t::parse_placeholder() -> token_t {
         if (std::isalpha(ch) || std::isdigit(ch) || ch == '_' || ch == '.') {
             name.push_back(ch);
         } else {
+            // We have a spec.
             if (ch == ':') {
                 ++pos;
 
@@ -271,16 +283,16 @@ parser_t::parse_placeholder() -> token_t {
                 ++pos;
                 state = state_t::unknown;
 
-                if (boost::starts_with(name, "...")) {
-                    return ph::leftover_t{std::move(name)};
-                } else {
+                // if (boost::starts_with(name, "...")) {
+                    // return ph::leftover_t{std::move(name)};
+                // } else {
                     const auto it = factories.find(name);
                     if (it == factories.end()) {
                         return ph::generic<required>(std::move(name));
                     } else {
                         return it->second->initialize();
                     }
-                }
+                // }
             } else {
                 throw_<invalid_placeholder_t>();
             }
