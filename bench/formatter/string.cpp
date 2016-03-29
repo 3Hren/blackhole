@@ -109,26 +109,22 @@ static void format_timestamp(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-// TODO: Restore.
-// static void format_leftover(::benchmark::State& state) {
-//     using formatter::string::leftover_t;
-//
-//     formatter::string_t formatter("{...}");
-//     formatter.set("...", leftover_t{{}, "[", "]", "{k}={v}", ", "});
-//
-//     const string_view message("-");
-//     const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};
-//     const attribute_pack pack{attributes};
-//     record_t record(0, message, pack);
-//     writer_t writer;
-//
-//     while (state.KeepRunning()) {
-//         formatter.format(record, writer);
-//         writer.inner.clear();
-//     }
-//
-//     state.SetItemsProcessed(state.iterations());
-// }
+static void format_leftover(::benchmark::State& state) {
+    formatter::string_t formatter("{...:{{name}={value}:p}s}");
+
+    const string_view message("-");
+    const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+
+    while (state.KeepRunning()) {
+        formatter.format(record, writer);
+        writer.inner.clear();
+    }
+
+    state.SetItemsProcessed(state.iterations());
+}
 
 static void format_severity_message(::benchmark::State& state) {
     formatter::string_t formatter("{severity:d}: {message}");
@@ -153,7 +149,7 @@ NBENCHMARK("formatter.string[procname]", format_procname);
 NBENCHMARK("formatter.string[message]", format_message);
 NBENCHMARK("formatter.string[timestamp]", format_timestamp);
 NBENCHMARK("formatter.string[severity + message]", format_severity_message);
-// NBENCHMARK("formatter.string[...]", format_leftover);
+NBENCHMARK("formatter.string[...]", format_leftover);
 
 }  // namespace benchmark
 }  // namespace blackhole

@@ -1,7 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <boost/algorithm/string.hpp> // TODO: for `starts_with`.
-#include <boost/variant/variant.hpp>
 #include <boost/variant/get.hpp>
 
 #include <blackhole/detail/formatter/string/parser.hpp>
