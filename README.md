@@ -69,7 +69,7 @@ Of course there are disadvantages, such as virtual function call cost and closed
 - [x] Formatters.
   - [x] String by pattern.
     - [ ] Optional placeholders.
-    - [ ] Configurable leftover placeholder.
+    - [x] Configurable leftover placeholder.
   - [x] JSON with tree reconstruction.
 - [ ] Sinks.
   - [x] Colored terminal output.
@@ -137,6 +137,28 @@ For more information please read the documentation and visit the following links
 
  - http://cppformat.github.io/latest/syntax.html - general syntax.
  - http://en.cppreference.com/w/cpp/chrono/c/strftime - timestamp spec extension.
+
+There is a special attribute placeholder - **...** - which means to print all non-reserved attributes in a reverse order they were provided in a key-value manner separated by a comma. These kind of attributes can be configured using special syntax, similar with the timestamp attribute with an optional separator. For example the following placeholder `{...:{{name}={value}:p}{\t:x}s}` results in tab separated key-value pairs like `id=42\tmethod=GET`.
+
+The partial grammar in EBNF is:
+```
+Grammar    ::= '{' '...' (':' (Pattern | Separator | (Pattern Separator) | (Separator Pattern))? [>^<]? [0-9]* [su])? '}'
+Extension  ::= '{' (((Any -':')* ':' [ps] '}' ('}' (Any - ':')* ':' [ps] '}')*))
+Pattern    ::= '{' (PatternLiteral | Name | Value)* ':p}'
+Name       ::= '{name' Spec? '}'
+Value      ::= '{value' Spec? '}'
+```
+
+Note, that if you need to include a brace character in the literal text, it can be escaped by doubling: **{{** and **}}**.
+
+Let's describe it more precisely. Given a complex leftover placeholder, let's parse it manually to see what Blackhole see.
+Given: `{...:{{name}={value}:p}{, :s}>50s}`.
+  - Spec: `>50s` - forces the entire result to be right-aligned within the available space.
+  - Extension:
+    - Pattern: `{name}={value}` - format for each attribute. We support only `{name}` and `{value}` placeholders here, but both of them can be configured with spec and type (reserved for further purposes).
+    - Separator: `, `.
+
+Moreover we have plans to configure each pattern spec (not entire result) and prefix with suffix.    
 
 ### JSON.
 JSON formatter provides an ability to format a logging record into a structured JSON tree with attribute handling features, like renaming, routing, mutating and much more.
