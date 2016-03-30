@@ -283,16 +283,12 @@ parser_t::parse_placeholder() -> token_t {
                 ++pos;
                 state = state_t::unknown;
 
-                // if (boost::starts_with(name, "...")) {
-                    // return ph::leftover_t{std::move(name)};
-                // } else {
-                    const auto it = factories.find(name);
-                    if (it == factories.end()) {
-                        return ph::generic<required>(std::move(name));
-                    } else {
-                        return it->second->initialize();
-                    }
-                // }
+                const auto it = factories.find(name);
+                if (it == factories.end()) {
+                    return ph::generic<required>(std::move(name));
+                } else {
+                    return it->second->initialize();
+                }
             } else {
                 throw_<invalid_placeholder_t>();
             }

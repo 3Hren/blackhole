@@ -1,7 +1,6 @@
 #include "blackhole/formatter/string.hpp"
 
 #include <array>
-#include <iostream>
 
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/variant/apply_visitor.hpp>
@@ -20,6 +19,12 @@
 #include "blackhole/detail/formatter/string/token.hpp"
 #include "blackhole/detail/procname.hpp"
 
+// TODO: Optional attributes.
+// Optional placeholders allows to nicely format some patterns where there are non-reserved
+// attributes used and its presents is undetermined. Unlike required placeholders it does not throw
+// an exception if there are no attribute with the given name in the set.
+// Also it provides additional functionality with optional surrounding a present attribute with
+// some prefix and suffix.
 namespace blackhole {
 inline namespace v1 {
 namespace formatter {
