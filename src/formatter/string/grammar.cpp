@@ -5,6 +5,8 @@
 #include <boost/spirit/home/qi/char/char.hpp>
 #include <boost/spirit/home/qi/directive/as.hpp>
 #include <boost/spirit/home/qi/nonterminal/error_handler.hpp>
+#include <boost/spirit/home/qi/nonterminal/grammar.hpp>
+#include <boost/spirit/home/qi/nonterminal/rule.hpp>
 #include <boost/spirit/home/qi/operator/alternative.hpp>
 #include <boost/spirit/home/qi/operator/difference.hpp>
 #include <boost/spirit/home/qi/operator/expect.hpp>
@@ -28,6 +30,51 @@ namespace formatter {
 namespace string {
 
 namespace qi = boost::spirit::qi;
+
+/// EBNF.
+/// Grammar    ::= '{' Prefix? '...' Suffix? (':' Extension* FormatSpec?)? '}'
+/// Extension  ::= '{' (((Any -':')* ':' [ps] '}' ('}' (Any - ':')* ':' [ps] '}')*))
+/// Pattern    ::= '{' (PatternLiteral | Name | Value)* ':p}'
+/// FormatSpec ::= [>^<]? [0-9]* [su]
+struct grammar_t : public boost::spirit::qi::grammar<std::string::iterator, grammar_result_t()> {
+    typedef std::string::iterator iterator_type;
+
+    boost::spirit::qi::rule<iterator_type, grammar_result_t()> grammar;
+    boost::spirit::qi::rule<iterator_type, std::string()> pattern;
+    boost::spirit::qi::rule<iterator_type, std::string()> separator;
+    boost::spirit::qi::rule<iterator_type, std::string()> spec;
+    boost::spirit::qi::rule<iterator_type, char()> align;
+    boost::spirit::qi::rule<iterator_type, std::string()> width;
+    boost::spirit::qi::rule<iterator_type, char()> type;
+
+    grammar_t();
+};
+
+namespace tag {
+
+using string::name;
+using string::value;
+
+}  // namespace tag
+
+struct pattern_grammar_t :
+    public boost::spirit::qi::grammar<std::string::iterator, std::vector<ph::leftover_t::token_t>()>
+{
+    typedef std::string::iterator iterator_type;
+
+    boost::spirit::qi::rule<iterator_type, std::vector<ph::leftover_t::token_t>()> grammar;
+    boost::spirit::qi::rule<iterator_type, ph::attribute<tag::name>()> name;
+    boost::spirit::qi::rule<iterator_type, ph::attribute<tag::value>()> value;
+    boost::spirit::qi::rule<iterator_type, literal_t()> lit;
+    boost::spirit::qi::rule<iterator_type, char()> lbrace;
+    boost::spirit::qi::rule<iterator_type, char()> rbrace;
+    boost::spirit::qi::rule<iterator_type, std::string()> spec;
+    boost::spirit::qi::rule<iterator_type, char()> align;
+    boost::spirit::qi::rule<iterator_type, std::string()> width;
+    boost::spirit::qi::rule<iterator_type, char()> type;
+
+    pattern_grammar_t();
+};
 
 grammar_t::grammar_t() :
     grammar_t::base_type(grammar)
