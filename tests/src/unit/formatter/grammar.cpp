@@ -188,7 +188,7 @@ TEST(pattern_grammar_t, ValueWithSpec) {
 }
 
 TEST(pattern_grammar_t, ThrowsOnUnknownPlaceholder) {
-    EXPECT_THROW(parse_pattern("{unknown}"), std::invalid_argument);
+    EXPECT_THROW(parse_pattern("{unknown}"), std::runtime_error);
 }
 
 // TODO: Check every fucking error.

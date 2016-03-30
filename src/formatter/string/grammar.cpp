@@ -28,6 +28,7 @@ inline namespace v1 {
 namespace detail {
 namespace formatter {
 namespace string {
+namespace {
 
 namespace qi = boost::spirit::qi;
 
@@ -38,6 +39,7 @@ namespace qi = boost::spirit::qi;
 /// FormatSpec ::= [>^<]? [0-9]* [su]
 struct grammar_t : public boost::spirit::qi::grammar<std::string::iterator, grammar_result_t()> {
     typedef std::string::iterator iterator_type;
+    typedef grammar_result_t result_type;
 
     boost::spirit::qi::rule<iterator_type, grammar_result_t()> grammar;
     boost::spirit::qi::rule<iterator_type, std::string()> pattern;
@@ -61,6 +63,7 @@ struct pattern_grammar_t :
     public boost::spirit::qi::grammar<std::string::iterator, std::vector<ph::leftover_t::token_t>()>
 {
     typedef std::string::iterator iterator_type;
+    typedef std::vector<ph::leftover_t::token_t> result_type;
 
     boost::spirit::qi::rule<iterator_type, std::vector<ph::leftover_t::token_t>()> grammar;
     boost::spirit::qi::rule<iterator_type, ph::attribute<tag::name>()> name;
@@ -112,39 +115,38 @@ pattern_grammar_t::pattern_grammar_t() :
     type       %= qi::char_("sd");
 }
 
-auto parse(std::string pattern) -> grammar_result_t {
+template<typename G>
+auto parse(std::string pattern) -> typename G::result_type {
     auto it = pattern.begin();
     const auto end = pattern.end();
-    grammar_t grammar;
-    grammar_result_t result;
+    G grammar;
+    typename G::result_type result;
 
-    bool parsed = false;
-    try {
-        parsed = boost::spirit::qi::parse(it, end, grammar, result);
-    } catch (const boost::spirit::qi::expectation_failure<std::string::iterator>& err) {
-        const auto pos = std::distance(pattern.begin(), err.last);
-        throw parser_error_t(static_cast<std::size_t>(pos), pattern, "malformed input pattern");
-    }
+    const auto parsed = [&]() -> bool {
+        try {
+            return boost::spirit::qi::parse(it, end, grammar, result);
+        } catch (const boost::spirit::qi::expectation_failure<typename G::iterator_type>& err) {
+            const auto pos = std::distance(pattern.begin(), err.last);
+            throw parser_error_t(static_cast<std::size_t>(pos), pattern, "malformed input pattern");
+        }
+    }();
 
     if (parsed && (it == end)) {
         return result;
     }
 
+    // TODO: More verbose message.
     throw std::runtime_error("NIY");
 }
 
+}  // namespace
+
+auto parse(std::string pattern) -> grammar_result_t {
+    return parse<grammar_t>(std::move(pattern));
+}
+
 auto parse_pattern(std::string pattern) -> std::vector<ph::leftover_t::token_t> {
-    auto it = pattern.begin();
-    const auto end = pattern.end();
-    pattern_grammar_t grammar;
-    std::vector<ph::leftover_t::token_t> tokens;
-    const auto rc = boost::spirit::qi::parse(it, end, grammar, tokens);
-
-    if (rc && (it == end)) {
-        return tokens;
-    }
-
-    throw std::invalid_argument("NIY");
+    return parse<pattern_grammar_t>(std::move(pattern));
 }
 
 auto parse_leftover(const std::string& pattern) -> ph::leftover_t {
