@@ -108,7 +108,7 @@ typedef std::function<void(int severity, const std::string& spec, writer_t& writ
 /// respectively: `{process:s}` and `{process:d}`.
 ///
 /// At last the thread attribute can be formatted as either thread id in platform-independent hex
-/// representation by default or explicitly with `:x` type, thread id in platform-dependent way
+/// representation by default or explicitly with `:s` type, thread id in platform-dependent way
 /// using `:d` type or as a thread name if specified, nil otherwise.
 ///
 /// The formatter will throw an exception if an attribute name specified in pattern won't be found
@@ -124,7 +124,7 @@ typedef std::function<void(int severity, const std::string& spec, writer_t& writ
 /// userspace attributes in a reverse order they were provided.
 /// These kind of attributes can be configured using special syntax, similar with the timestamp
 /// attribute with an optional separator.
-/// For example the following placeholder `{...:{{name}={value}:p}{ :x}u}` results in whitespace
+/// For example the following placeholder `{...:{{name}={value}:p}{ :s}u}` results in whitespace
 /// separated key-value pairs like `id=42` with a special unique-filtered type.
 ///
 /// # Performance

@@ -672,7 +672,7 @@ TEST(string_t, LeftoverWithPattern) {
 }
 
 TEST(string_t, LeftoverWithSeparator) {
-    formatter::string_t formatter("{...:{ | :x}s}");
+    formatter::string_t formatter("{...:{ | :s}s}");
 
     const string_view message("-");
     const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};

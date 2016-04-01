@@ -89,7 +89,7 @@ grammar_t::grammar_t() :
         | ':' >> -(pattern ^ separator) >> spec >> '}'
     ) > qi::eoi;
     pattern    %= qi::lit('{') >> (*(qi::char_ - (qi::lit(":p}") >> !qi::lit('}'))) >> ":p}") % '}';
-    separator  %= qi::lit('{') >> (*(qi::char_ - (qi::lit(":x}") >> !qi::lit('}'))) >> ":x}") % '}';
+    separator  %= qi::lit('{') >> (*(qi::char_ - (qi::lit(":s}") >> !qi::lit('}'))) >> ":s}") % '}';
     spec       %= -align >> -width >> type;
     align      %= qi::char_("<^>");
     width      %= +qi::digit;

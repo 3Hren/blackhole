@@ -116,7 +116,7 @@ TEST(grammar_t, ExtractPatternWithTypeMockWithCurlyBraces) {
 }
 
 TEST(grammar_t, ExtractSeparatorOnly) {
-    const auto r = parse("{:{\t:x}s}");
+    const auto r = parse("{:{\t:s}s}");
 
     EXPECT_FALSE(!!r.pattern());
     ASSERT_TRUE(!!r.separator());
@@ -125,7 +125,7 @@ TEST(grammar_t, ExtractSeparatorOnly) {
 }
 
 TEST(grammar_t, ExtractEmptyPatternWithSeparator) {
-    const auto r = parse("{:{:p}{\t:x}s}");
+    const auto r = parse("{:{:p}{\t:s}s}");
 
     ASSERT_TRUE(!!r.pattern());
     EXPECT_EQ("", r.pattern().get());
@@ -135,7 +135,7 @@ TEST(grammar_t, ExtractEmptyPatternWithSeparator) {
 }
 
 TEST(grammar_t, ExtractPatternWithSeparator) {
-    const auto r = parse("{:{{name}={value}:p}{\t:x}s}");
+    const auto r = parse("{:{{name}={value}:p}{\t:s}s}");
 
     ASSERT_TRUE(!!r.pattern());
     EXPECT_EQ("{name}={value}", r.pattern().get());
@@ -145,7 +145,7 @@ TEST(grammar_t, ExtractPatternWithSeparator) {
 }
 
 TEST(grammar_t, ExtractSeparatorEmpty) {
-    const auto r = parse("{:{:x}s}");
+    const auto r = parse("{:{:s}s}");
 
     EXPECT_FALSE(!!r.pattern());
     ASSERT_TRUE(!!r.separator());
@@ -194,7 +194,7 @@ TEST(pattern_grammar_t, ThrowsOnUnknownPlaceholder) {
 // TODO: Check every fucking error.
 
 TEST(parse_leftover, Conversion) {
-    const auto ph = parse_leftover("{:{{name:5s}={value:^10s}:p}{\t:x}<50s}");
+    const auto ph = parse_leftover("{:{{name:5s}={value:^10s}:p}{\t:s}<50s}");
 
     EXPECT_EQ("{:<50s}", ph.spec);
     ASSERT_EQ(3, ph.tokens.size());
