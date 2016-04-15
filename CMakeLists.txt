@@ -216,6 +216,7 @@ if (ENABLE_TESTING)
 		tests/src/mocks/handler
 		tests/src/mocks/logger
 		tests/src/mocks/sink
+		tests/src/unit/cpp17/string_view
 		tests/src/unit/formatter/grammar
 		tests/src/unit/formatter/json
 		tests/src/unit/formatter/token

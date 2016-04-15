@@ -131,10 +131,34 @@ public:
     /// terms of `Traits::compare()`.
     /// Two views are equal if both the size of `this` and `other` are equal and each character in
     /// `this` has an equivalent character in `other` at the same position.
-    constexpr auto operator==(const basic_string_view& other) const noexcept -> bool {
-        return size() == other.size() && traits_type::compare(data(), other.data(), size()) == 0;
-    }
 };
+
+template<typename Char, typename Traits>
+constexpr auto
+operator==(basic_string_view<Char, Traits> this_,
+           basic_string_view<Char, Traits> other) noexcept -> bool
+{
+    return this_.size() == other.size() &&
+        Traits::compare(this_.data(), other.data(), this_.size()) == 0;
+}
+
+template<typename Char, typename Traits>
+constexpr auto
+operator==(basic_string_view<Char, Traits> this_,
+           typename std::common_type<basic_string_view<Char, Traits>>::type other) noexcept -> bool
+{
+    return this_.size() == other.size() &&
+        Traits::compare(this_.data(), other.data(), this_.size()) == 0;
+}
+
+template<typename Char, typename Traits>
+constexpr auto
+operator==(typename std::common_type<basic_string_view<Char, Traits>>::type this_,
+           basic_string_view<Char, Traits> other) noexcept -> bool
+{
+    return this_.size() == other.size() &&
+        Traits::compare(this_.data(), other.data(), this_.size()) == 0;
+}
 
 template<typename Char, typename Traits >
 constexpr auto operator<(basic_string_view<Char, Traits> lhs, basic_string_view<Char, Traits> rhs) ->
