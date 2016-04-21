@@ -55,6 +55,7 @@ add_library(${LIBRARY_NAME} SHARED
 	src/sink/null
 	src/sink/socket/tcp
 	src/sink/socket/udp
+	src/sink/syslog
 	src/wrapper)
 
 # Set the Standard version.
@@ -220,6 +221,7 @@ if (ENABLE_TESTING)
 		tests/src/unit/formatter/grammar
 		tests/src/unit/formatter/json
 		tests/src/unit/formatter/token
+		tests/src/unit/sink/syslog
 		tests/src/unit/sink/tcp
 		tests/wrapper
 	)
