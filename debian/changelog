@@ -1,3 +1,10 @@
+blackhole (1.0.0-0alpha12) unstable; urgency=low
+
+  * Bug fix: string View class now is properly compared with common string
+    types.
+
+ -- Evgeny Safronov <division494@gmail.com>  Thu, 21 Apr 2016 12:08:34 +0300
+
 blackhole (1.0.0-0alpha11) unstable; urgency=low
 
   * Feature: string formatter now supports extensions for leftover placeholder
