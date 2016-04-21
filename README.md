@@ -74,7 +74,7 @@ Of course there are disadvantages, such as virtual function call cost and closed
 - [ ] Sinks.
   - [x] Colored terminal output.
   - [x] Files.
-  - [ ] Syslog.  
+  - [x] Syslog.  
   - [x] Socket UDP.
   - [x] Socket TCP.
     - [x] Blocking.
@@ -191,6 +191,11 @@ This appender emits formatted logging events using connected TCP socket.
 
 #### UDP
 Nuff said.
+
+#### Syslog
+| Option    | Type  | Description                                               |
+|-----------|:-----:|-----------------------------------------------------------|
+|priorities |[i16]  | **Required**.<br/> Priority mapping from severity number. |
 
 ## Runtime Type Information
 
