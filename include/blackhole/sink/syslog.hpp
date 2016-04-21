@@ -2,6 +2,7 @@
 
 #include <syslog.h>
 
+#include <memory>
 #include <vector>
 
 #include "blackhole/forward.hpp"
