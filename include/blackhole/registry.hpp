@@ -95,13 +95,30 @@ public:
 
 private:
     template<typename T>
-    auto select() -> typename std::enable_if<std::is_base_of<sink_t, T>::value>::type {
+    auto select() -> typename std::enable_if<
+        std::is_base_of<sink_t, T>::value &&
+        std::is_same<decltype(factory<T>::from(std::declval<config::node_t>())), T>::value
+    >::type
+    {
         typedef factory<T> factory_type;
 
         const auto type = factory_type::type();
         sinks[type] = [](const config::node_t& config) -> std::unique_ptr<sink_t> {
             return std::unique_ptr<sink_t>(new T(factory_type::from(config)));
         };
+    }
+
+    /// \note new version of factory adapter which returns an owned pointer.
+    template<typename T>
+    auto select() -> typename std::enable_if<
+        std::is_base_of<sink_t, T>::value &&
+        std::is_same<decltype(factory<T>::from(std::declval<config::node_t>())), std::unique_ptr<T>>::value
+    >::type
+    {
+        typedef factory<T> factory_type;
+
+        const auto type = factory_type::type();
+        sinks[type] = &factory_type::from;
     }
 
     template<typename T>

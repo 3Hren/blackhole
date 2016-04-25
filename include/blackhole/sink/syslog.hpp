@@ -12,24 +12,22 @@ namespace blackhole {
 inline namespace v1 {
 namespace sink {
 
+/// parse ident, option, facility.
+/// construct;
+/// connect(...);
+
+
+/// A system logger sink send messages to the system logger.
 class syslog_t : public sink_t {
-    class inner_t;
-    std::unique_ptr<inner_t> inner;
-
 public:
-    syslog_t();
-    syslog_t(const syslog_t& other) = delete;
-    syslog_t(syslog_t&& other);
+    /// Emits the given log record with the corresponding formatted message into the syslog pipe.
+    virtual auto emit(const record_t& record, const string_view& message) -> void;
 
-    ~syslog_t();
-
-    auto option() const noexcept -> int;
-    auto facility() const noexcept -> int;
-    auto identity() const noexcept -> const std::string&;
-
-    auto priorities(std::vector<int> priorities) -> void;
-
-    virtual auto emit(const record_t& record, const string_view& formatted) -> void;
+    /// Transforms the given severity to the corresponding syslog priority value.
+    ///
+    /// The method is called each time the new logging record is emitted by this sink. Override this
+    /// if you want more specific mapping between logger severity and syslog priority.
+    virtual auto priority(severity_t severity) const noexcept -> int = 0;
 };
 
 }  // namespace sink
@@ -37,7 +35,19 @@ public:
 template<>
 struct factory<sink::syslog_t> {
     static auto type() -> const char*;
-    static auto from(const config::node_t& config) -> sink::syslog_t;
+
+    /// The identity is an arbitrary identification string which future syslog invocations will prefix
+    /// to each message. This is intended to identify the source of the message, and people
+    /// conventionally set it to the name of the program that will submit the messages.
+    /// If the ident is  not set, the default identification string will be the program name.
+    ///
+    /// The facility is used to specify what type of program is logging the message. This lets the
+    /// configuration file specify that messages from different facilities will be handled differently.
+    /// The default value is LOG_USER.
+    ///
+    /// The option is a bit string, with the bits as defined in POSIX.1-2001, and POSIX.1-2008. The
+    /// default value is LOG_PID.
+    static auto from(const config::node_t& config) -> std::unique_ptr<sink::syslog_t>;
 };
 
 }  // namespace v1
