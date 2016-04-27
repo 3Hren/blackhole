@@ -91,7 +91,7 @@ auto factory<sink::syslog_t>::from(const config::node_t& config) -> std::unique_
 }
 
 auto factory<sink::syslog_t>::construct(std::unique_ptr<backend_t> backend, priority_t priority) ->
-    std::unique_ptr<syslog_t>
+    std::unique_ptr<sink::syslog_t>
 {
     // return
 }

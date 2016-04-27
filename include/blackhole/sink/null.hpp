@@ -1,15 +1,8 @@
 #pragma once
 
-#include "blackhole/sink.hpp"
+#include "../factory.hpp"
+#include "../sink.hpp"
 
-namespace blackhole {
-inline namespace v1 {
-
-template<typename>
-struct factory;
-
-}  // namespace v1
-}  // namespace blackhole
 
 namespace blackhole {
 inline namespace v1 {
@@ -40,9 +33,17 @@ public:
 }  // namespace sink
 
 template<>
-struct factory<sink::null_t> {
-    static auto type() -> const char*;
-    static auto from(const config::node_t& config) -> sink::null_t;
+class factory<sink::null_t> : public factory<sink_t> {
+public:
+    typedef sink::null_t sink_type;
+
+public:
+    virtual auto type() const noexcept -> const char* override;
+    virtual auto from(const config::node_t& config) const -> std::unique_ptr<sink_t> override;
+
+    // construct -> sink::null_t; // default implementation.
+    // construct(DI) -> Box<null_t> // implementation with DI.
+    // construct(config::node_t) -> Box<null> // implementation from config.
 };
 
 }  // namespace v1

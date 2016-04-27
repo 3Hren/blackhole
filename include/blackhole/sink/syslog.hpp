@@ -38,13 +38,13 @@ public:
 }  // namespace syslog
 
 /// Represents a system logger sink interface, that send messages to the system logger.
-class syslog_t : public sink_t {};
+class syslog_t;
 
 }  // namespace sink
 
 template<>
 struct factory<sink::syslog_t> {
-    typedef sink::syslog_t syslog_t;
+    typedef sink::syslog_t sink_type;
     typedef sink::syslog::backend_t backend_t;
     typedef sink::syslog::priority_t priority_t;
 
@@ -52,11 +52,11 @@ struct factory<sink::syslog_t> {
     static auto type() -> const char*;
 
     /// Constructs and returns a new syslog sink from the specified configuration.
-    static auto from(const config::node_t& config) -> std::unique_ptr<syslog_t>;
+    static auto from(const config::node_t& config) -> std::unique_ptr<sink_type>;
 
     /// Constructs and returns a new syslog sink by injecting the specified dependencies.
     static auto construct(std::unique_ptr<backend_t> backend, priority_t priority) ->
-        std::unique_ptr<syslog_t>;
+        std::unique_ptr<sink_type>;
 
     /// Constructs and returns a new native syslog backend.
     ///

@@ -110,13 +110,13 @@ auto builder_t::formatter(const config::node_t& config) const -> std::unique_ptr
 auto registry_t::configured() -> registry_t {
     registry_t registry;
 
-    registry.add<formatter::string_t>();
+    // registry.add<formatter::string_t>();
 
-    registry.add<sink::console_t>();
+    // registry.add<sink::console_t>();
     registry.add<sink::null_t>();
-    registry.add<sink::syslog_t>();
+    // registry.add<sink::syslog_t>();
 
-    registry.add<handler::blocking_t>();
+    // registry.add<handler::blocking_t>();
 
     return registry;
 }

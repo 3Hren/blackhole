@@ -6,11 +6,10 @@
 #include <string>
 #include <vector>
 
+#include "factory.hpp"
+
 namespace blackhole {
 inline namespace v1 {
-
-template<typename>
-struct factory;
 
 class formatter_t;
 class handler_t;
@@ -82,7 +81,25 @@ public:
     /// After registering the new factory can be used for constructing formatters, sinks or handlers
     /// depending on type using generic configuration object.
     template<typename T>
-    auto add() -> void;
+    auto add(factory<T> f = factory<T>()) ->
+        typename std::enable_if<std::is_same<T, typename factory<T>::sink_type>::value>::type
+    {
+        sinks[f.type()] = std::bind(&factory<T>::from, std::move(f), std::placeholders::_1);
+    }
+
+    template<typename T>
+    auto add(factory<T> f = factory<T>()) ->
+        typename std::enable_if<std::is_same<T, typename factory<T>::handler_type>::value>::type
+    {
+        handlers[f.type()] = std::move(f);
+    }
+
+    template<typename T>
+    auto add(factory<T> f = factory<T>()) ->
+        typename std::enable_if<std::is_same<T, typename factory<T>::formatter_type>::value>::type
+    {
+        formatters[f.type()] = std::move(f);
+    }
 
     /// Returns the sink factory with the given type if registered, throws otherwise.
     auto sink(const std::string& type) const -> sink_factory;
@@ -92,61 +109,7 @@ public:
 
     /// Returns the formatter factory with the given type if registered, throws otherwise.
     auto formatter(const std::string& type) const -> formatter_factory;
-
-private:
-    template<typename T>
-    auto select() -> typename std::enable_if<
-        std::is_base_of<sink_t, T>::value &&
-        std::is_same<decltype(factory<T>::from(std::declval<config::node_t>())), T>::value
-    >::type
-    {
-        typedef factory<T> factory_type;
-
-        const auto type = factory_type::type();
-        sinks[type] = [](const config::node_t& config) -> std::unique_ptr<sink_t> {
-            return std::unique_ptr<sink_t>(new T(factory_type::from(config)));
-        };
-    }
-
-    /// \note new version of factory adapter which returns an owned pointer.
-    template<typename T>
-    auto select() -> typename std::enable_if<
-        std::is_base_of<sink_t, T>::value &&
-        std::is_same<decltype(factory<T>::from(std::declval<config::node_t>())), std::unique_ptr<T>>::value
-    >::type
-    {
-        typedef factory<T> factory_type;
-
-        const auto type = factory_type::type();
-        sinks[type] = &factory_type::from;
-    }
-
-    template<typename T>
-    auto select() -> typename std::enable_if<std::is_base_of<handler_t, T>::value>::type {
-        typedef factory<T> factory_type;
-
-        const auto type = factory_type::type();
-        handlers[type] = [](const config::node_t& config) -> std::unique_ptr<handler_t> {
-            return std::unique_ptr<handler_t>(new T(factory_type::from(config)));
-        };
-    }
-
-    template<typename T>
-    auto select() -> typename std::enable_if<std::is_base_of<formatter_t, T>::value>::type {
-        typedef factory<T> factory_type;
-
-        const auto type = factory_type::type();
-        formatters[type] = [](const config::node_t& config) -> std::unique_ptr<formatter_t> {
-            return std::unique_ptr<formatter_t>(new T(factory_type::from(config)));
-        };
-    }
 };
-
-template<typename T>
-inline auto
-registry_t::add() -> void {
-    select<T>();
-}
 
 template<typename T, typename... Args>
 inline auto

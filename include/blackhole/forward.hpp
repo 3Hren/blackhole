@@ -5,8 +5,10 @@ inline namespace v1 {
 
 class severity_t;
 
-template<typename>
-struct factory;
+class factory_t;
+
+template<typename T>
+class factory;
 
 namespace config {
 
