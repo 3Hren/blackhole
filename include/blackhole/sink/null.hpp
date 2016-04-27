@@ -3,17 +3,6 @@
 #include "../factory.hpp"
 #include "../sink.hpp"
 
-
-namespace blackhole {
-inline namespace v1 {
-namespace config {
-
-class node_t;
-
-}  // namespace config
-}  // namespace v1
-}  // namespace blackhole
-
 namespace blackhole {
 inline namespace v1 {
 namespace sink {
@@ -34,9 +23,6 @@ public:
 
 template<>
 class factory<sink::null_t> : public factory<sink_t> {
-public:
-    typedef sink::null_t sink_type;
-
 public:
     virtual auto type() const noexcept -> const char* override;
     virtual auto from(const config::node_t& config) const -> std::unique_ptr<sink_t> override;
