@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../factory.hpp"
-#include "../sink.hpp"
+#include "blackhole/factory.hpp"
+#include "blackhole/sink.hpp"
 
 namespace blackhole {
 inline namespace v1 {
