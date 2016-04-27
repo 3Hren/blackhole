@@ -40,10 +40,6 @@ public:
 public:
     virtual auto type() const noexcept -> const char* override;
     virtual auto from(const config::node_t& config) const -> std::unique_ptr<sink_t> override;
-
-    // construct -> sink::null_t; // default implementation.
-    // construct(DI) -> Box<null_t> // implementation with DI.
-    // construct(config::node_t) -> Box<null> // implementation from config.
 };
 
 }  // namespace v1

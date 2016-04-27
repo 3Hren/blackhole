@@ -23,22 +23,22 @@ public:
     MOCK_METHOD0(close_, void());
     MOCK_METHOD2(write, void(int, const string_view&));
 };
+//
+// TEST(syslog_t, Type) {
+//     EXPECT_STREQ("syslog", factory<syslog_t>::type());
+// }
 
-TEST(syslog_t, Type) {
-    EXPECT_STREQ("syslog", factory<syslog_t>::type());
-}
-
-TEST(syslog_t, RAII) {
-    std::unique_ptr<mock_backend_t> backend(new mock_backend_t());
-
-    EXPECT_CALL(*backend, open())
-        .Times(1);
-
-    EXPECT_CALL(*backend, close_())
-        .Times(1);
-
-    factory<syslog_t>::construct(std::move(backend), [](severity_t) -> int { return 0; });
-}
+// TEST(syslog_t, RAII) {
+//     std::unique_ptr<mock_backend_t> backend(new mock_backend_t());
+//
+//     EXPECT_CALL(*backend, open())
+//         .Times(1);
+//
+//     EXPECT_CALL(*backend, close_())
+//         .Times(1);
+//
+//     factory<syslog_t>::construct(std::move(backend), [](severity_t) -> int { return 0; });
+// }
 
 }  // namespace
 }  // namespace sink

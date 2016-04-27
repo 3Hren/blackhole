@@ -10,22 +10,24 @@
 #include "mocks/node.hpp"
 
 namespace blackhole {
-namespace testing {
+inline namespace v1 {
+namespace sink {
+namespace {
 
 using ::testing::StrictMock;
 
-using sink::null_t;
-
 TEST(null_t, type) {
-    EXPECT_EQ("null", std::string(factory<sink::null_t>::type()));
+    EXPECT_EQ(std::string("null"), factory<null_t>().type());
 }
 
 TEST(null_t, factory) {
     StrictMock<config::testing::mock::node_t> config;
 
     // NOTE: Actually does nothing, none of mock methods should be called.
-    factory<sink::null_t>::from(config);
+    factory<null_t>().from(config);
 }
 
-}  // namespace testing
+}  // namespace
+}  // namespace sink
+}  // namespace v1
 }  // namespace blackhole

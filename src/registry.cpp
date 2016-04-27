@@ -21,6 +21,8 @@ inline namespace v1 {
 
 namespace {
 
+namespace ph = std::placeholders;
+
 template<typename T>
 class result {
     boost::optional<T> value;
@@ -119,6 +121,10 @@ auto registry_t::configured() -> registry_t {
     // registry.add<handler::blocking_t>();
 
     return registry;
+}
+
+auto registry_t::add(std::shared_ptr<factory<sink_t>> fn) -> void {
+    sinks[fn->type()] = std::bind(&factory<sink_t>::from, fn, ph::_1);
 }
 
 auto registry_t::sink(const std::string& type) const -> sink_factory {

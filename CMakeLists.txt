@@ -211,7 +211,7 @@ if (ENABLE_TESTING)
 		tests/severity
 		tests/sink/console
 		tests/sink/file
-		tests/sink/null
+		tests/src/unit/sink/null
 		tests/sink/udp
 		tests/src/mocks/formatter
 		tests/src/mocks/handler

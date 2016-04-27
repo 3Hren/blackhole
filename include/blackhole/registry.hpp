@@ -57,6 +57,7 @@ private:
     auto formatter(const config::node_t& config) const -> std::unique_ptr<formatter_t>;
 };
 
+// TODO: An interface?
 class registry_t {
 public:
     typedef std::function<std::unique_ptr<sink_t>(const config::node_t&)> sink_factory;
@@ -81,25 +82,13 @@ public:
     /// After registering the new factory can be used for constructing formatters, sinks or handlers
     /// depending on type using generic configuration object.
     template<typename T>
-    auto add(factory<T> f = factory<T>()) ->
-        typename std::enable_if<std::is_same<T, typename factory<T>::sink_type>::value>::type
-    {
-        sinks[f.type()] = std::bind(&factory<T>::from, std::move(f), std::placeholders::_1);
-    }
+    auto add() -> void;
 
-    template<typename T>
-    auto add(factory<T> f = factory<T>()) ->
-        typename std::enable_if<std::is_same<T, typename factory<T>::handler_type>::value>::type
-    {
-        handlers[f.type()] = std::move(f);
-    }
-
-    template<typename T>
-    auto add(factory<T> f = factory<T>()) ->
-        typename std::enable_if<std::is_same<T, typename factory<T>::formatter_type>::value>::type
-    {
-        formatters[f.type()] = std::move(f);
-    }
+    auto add(std::shared_ptr<factory<sink_t>> fn) -> void;
+    // TODO: Not implemented yet.
+    // auto add(std::shared_ptr<factory<filter_t>> fn) -> void;
+    auto add(std::shared_ptr<factory<handler_t>> fn) -> void;
+    auto add(std::shared_ptr<factory<formatter_t>> fn) -> void;
 
     /// Returns the sink factory with the given type if registered, throws otherwise.
     auto sink(const std::string& type) const -> sink_factory;
@@ -110,6 +99,11 @@ public:
     /// Returns the formatter factory with the given type if registered, throws otherwise.
     auto formatter(const std::string& type) const -> formatter_factory;
 };
+
+template<typename T>
+inline auto registry_t::add() -> void {
+    add(std::make_shared<factory<T>>());
+}
 
 template<typename T, typename... Args>
 inline auto
