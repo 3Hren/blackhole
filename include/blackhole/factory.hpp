@@ -15,6 +15,8 @@ public:
 
     virtual ~factory_t() = default;
 
+    /// Returns factory type as a string literal, that is used to identity one factory of a given
+    /// type from another.
     virtual auto type() const noexcept -> const char* = 0;
 };
 

@@ -7,7 +7,10 @@ namespace blackhole {
 inline namespace v1 {
 namespace sink {
 
-auto null_t::emit(const record_t&, const string_view&) -> void {}
+class null_t : public sink_t {
+public:
+   auto emit(const record_t&, const string_view&) -> void {}
+};
 
 }  // namespace sink
 

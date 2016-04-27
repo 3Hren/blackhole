@@ -13,11 +13,7 @@ namespace sink {
 /// pipeline. It never fails and never throws, because it does nothing.
 ///
 /// \remark All methods of this class are thread safe.
-class null_t : public sink_t {
-public:
-    /// Drops any incoming log event.
-    auto emit(const record_t& record, const string_view& formatted) -> void;
-};
+class null_t;
 
 }  // namespace sink
 
