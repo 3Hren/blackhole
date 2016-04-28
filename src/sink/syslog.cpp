@@ -25,27 +25,54 @@ public:
         ::openlog(identity, option, facility);
     }
 
-    ~native_t() {
+    virtual auto open() -> void override {
+        ::openlog(identity, option, facility);
+    }
+
+    virtual auto close() noexcept -> void override {
         ::closelog();
+    }
+};
+
+class default_t : public syslog_t {
+    std::unique_ptr<syslog::backend_t> backend;
+    syslog::priority_map priomap;
+
+public:
+    default_t(std::unique_ptr<syslog::backend_t> backend, syslog::priority_map priomap) :
+        backend(std::move(backend)),
+        priomap(std::move(priomap))
+    {
+        this->backend->open();
+    }
+
+    ~default_t() {
+        backend->close();
+    }
+
+    virtual auto option() const -> int override {
+        return 0; //backend->option();
+    }
+
+    virtual auto facility() const -> int override {
+        return 0; // backend->facility();
+    }
+
+    virtual auto identity() const -> const char* override {
+        return nullptr;
+    }
+
+    virtual auto priority(severity_t severity) const -> int override {
+        return 0;
+    }
+
+    virtual auto emit(const record_t& record, const string_view& message) -> void override {
+        backend->write(priority(record.severity()), message);
     }
 };
 
 }  // namespace
 }  // namespace syslog
-
-class syslog_t : public sink_t {
-    std::unique_ptr<syslog::backend_t> backend;
-    syslog::priority_t priority;
-
-public:
-    syslog_t(std::unique_ptr<syslog::backend_t> backend, syslog::priority_t priority) :
-        backend(std::move(backend)),
-        priority(std::move(priority))
-    {}
-
-    auto emit(const record_t& record, const string_view& message) -> void override {
-    }
-};
 
 // auto priority(severity_t severity) const noexcept -> int {
 //     if (severity < priorities.size()) {
@@ -71,11 +98,11 @@ public:
 
 }  // namespace sink
 
-auto factory<sink::syslog_t>::type() -> const char* {
+auto factory<sink::syslog_t>::type() const noexcept -> const char* {
     return "syslog";
 }
 
-auto factory<sink::syslog_t>::from(const config::node_t& config) -> std::unique_ptr<sink::syslog_t> {
+auto factory<sink::syslog_t>::from(const config::node_t& config) const -> std::unique_ptr<sink_t> {
     // sink::syslog_t syslog;
 
     // if (auto mapping = config["priorities"]) {
@@ -90,8 +117,8 @@ auto factory<sink::syslog_t>::from(const config::node_t& config) -> std::unique_
     // return std::unique_ptr<sink::syslog_t>(new sink::syslog_t(std::move(syslog)));
 }
 
-auto factory<sink::syslog_t>::construct(std::unique_ptr<backend_t> backend, priority_t priority) ->
-    std::unique_ptr<sink::syslog_t>
+auto factory<sink::syslog_t>::construct(std::unique_ptr<backend_t> backend, priority_map priomap) ->
+    std::unique_ptr<syslog_t>
 {
     // return
 }
