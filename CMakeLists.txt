@@ -219,11 +219,12 @@ if (ENABLE_TESTING)
 		tests/src/mocks/logger
 		tests/src/mocks/sink
 		tests/src/unit/cpp17/string_view
-		tests/src/unit/formatter/grammar
 		tests/src/unit/detail/mpsc
 		tests/src/unit/detail/record
+		tests/src/unit/formatter/grammar
 		tests/src/unit/formatter/json
 		tests/src/unit/formatter/token
+		tests/src/unit/sink/asynchronous
 		tests/src/unit/sink/syslog
 		tests/src/unit/sink/tcp
 		tests/wrapper

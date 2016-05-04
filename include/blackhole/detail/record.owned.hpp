@@ -113,6 +113,8 @@ private:
     storage_type storage;
 
 public:
+    owned() : message(""), formatted(""), attributes({}) {}
+
     explicit owned(const record_t& record) :
         message(record.message().to_string()),
         formatted(record.formatted().to_string()),
