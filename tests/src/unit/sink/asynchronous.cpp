@@ -80,15 +80,27 @@ private:
 // src/sink/asynchronous.cpp
 
 #include <unistd.h>
-#include <iostream>
+
+#include <cmath>
 
 namespace blackhole {
 inline namespace v1 {
 namespace experimental {
 namespace sink {
+namespace {
+
+static auto exp2(std::size_t factor) -> std::size_t {
+    if (factor > 20) {
+        throw std::invalid_argument("factor should fit in [0; 20] range");
+    }
+
+    return std::exp2(factor);
+}
+
+}  // namespace
 
 asynchronous_t::asynchronous_t(std::unique_ptr<sink_t> wrapped, std::size_t factor) :
-    queue(2 << factor),
+    queue(exp2(factor)),
     running(true),
     wrapped(std::move(wrapped)),
     thread(std::bind(&asynchronous_t::run, this))
@@ -118,7 +130,7 @@ auto asynchronous_t::run() -> void {
             result = std::move(value);
         });
 
-        std::cout << std::boolalpha << dequeued << ":" << result.message << std::endl;
+        // std::cout << std::boolalpha << dequeued << ":" << result.message << std::endl;
         if (dequeued) {
             // TODO: What to do with exceptions?
             wrapped->emit(result.record.into_view(), result.message);
@@ -127,7 +139,7 @@ auto asynchronous_t::run() -> void {
             ::usleep(1000);
         }
 
-        if (!running && !dequeued) {
+        if (!(running || dequeued)) {
             return;
         }
     }

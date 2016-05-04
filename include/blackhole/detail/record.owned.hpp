@@ -16,6 +16,9 @@
 #include "blackhole/detail/attribute.hpp"
 #include "blackhole/detail/record.hpp"
 
+// TODO: Rename `owned` to ...
+// TODO: Move `into_view` and `from_view` traits.
+
 namespace blackhole {
 inline namespace v1 {
 namespace detail {
@@ -32,6 +35,7 @@ struct into_owned_t {
         return {value.to_string()};
     }
 
+    // TODO: Consider mapping into function.
     auto operator()(const attribute::view_t::function_type& value) const -> result_type {
         writer_t wr;
         value(wr);
@@ -115,12 +119,13 @@ private:
 public:
     owned() : message(""), formatted(""), attributes({}) {}
 
+    /// \throw std::bad_alloc on memory allocation failure.
     explicit owned(const record_t& record) :
         message(record.message().to_string()),
         formatted(record.formatted().to_string()),
         attributes(flatten(record.attributes()))
     {
-        pack = {{attributes.view}};
+        pack.emplace_back(attributes.view);
 
         auto& inner = this->inner();
         inner.message = message.view;
@@ -133,13 +138,15 @@ public:
 
     owned(const owned& other) = delete;
 
-    owned(owned&& other) :
+    owned(owned&& other) noexcept :
         message(std::move(other.message)),
         formatted(std::move(other.formatted)),
         attributes(std::move(other.attributes)),
-        storage(other.storage)
+        storage(other.storage),
+        pack(std::move(other.pack))
     {
-        pack = {{attributes.view}};
+        BOOST_ASSERT(pack.size() == 1);
+        pack.back() = attributes.view;
 
         auto& inner = this->inner();
         inner.message = message.view;
@@ -149,7 +156,7 @@ public:
 
     auto operator=(const owned& other) -> owned& = delete;
 
-    auto operator=(owned&& other) -> owned& {
+    auto operator=(owned&& other) noexcept -> owned& {
         if (this != &other) {
             message = std::move(other.message);
             formatted = std::move(other.formatted);
@@ -157,7 +164,9 @@ public:
 
             storage = other.storage;
 
-            pack = {{attributes.view}};
+            pack = std::move(other.pack);
+            BOOST_ASSERT(pack.size() == 1);
+            pack.back() = attributes.view;
 
             auto& inner = this->inner();
             inner.message = message.view;
