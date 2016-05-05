@@ -25,30 +25,6 @@ class asynchronous_t : public sink_t {
         std::string message;
     };
 
-    // union union_type {
-    //     struct {} uninitialized;
-    //     value_type value;
-    //
-    //     constexpr union_type() noexcept :
-    //         uninitialized({})
-    //     {}
-    //
-    //     union_type(const union_type& other) = delete;
-    //
-    //     union_type(union_type&& other) noexcept :
-    //         value(std::move(other.value))
-    //     {}
-    //
-    //     ~union_type() {}
-    //
-    //     auto operator=(const union_type& other) -> union_type& = delete;
-    //
-    //     auto operator=(union_type&& other) noexcept -> union_type& {
-    //         value = std::move(other.value);
-    //         return *this;
-    //     }
-    // };
-
     typedef cds::container::VyukovMPSCCycleQueue<value_type> queue_type;
 
     queue_type queue;
@@ -62,6 +38,8 @@ public:
     ///     a value of `2 << factor`. Must fit in [0; 20] range (64 MB).
     /// \param queue_type
     /// \param overflow_policy [drop silently, drop with error, block]
+    ///
+    /// \throw std::invalid_argument if the factor is greater than 20.
     asynchronous_t(std::unique_ptr<sink_t> wrapped, std::size_t factor = 10);
 
     ~asynchronous_t();
@@ -107,7 +85,7 @@ asynchronous_t::asynchronous_t(std::unique_ptr<sink_t> wrapped, std::size_t fact
 {}
 
 asynchronous_t::~asynchronous_t() {
-    running = false;
+    running.store(false);
     thread.join();
 }
 
