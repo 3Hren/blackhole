@@ -16,7 +16,6 @@
 #include "blackhole/detail/attribute.hpp"
 #include "blackhole/detail/record.hpp"
 
-// TODO: Rename `owned` to ...
 // TODO: Move `into_view` and `from_view` traits.
 
 namespace blackhole {
@@ -43,84 +42,78 @@ struct into_owned_t {
     }
 };
 
+/// Represents a trait for mapping an owned types to their associated lightweight view types.
+// TODO: Partially copies the same trait from `blackhole::v1` namespace.
 template<typename T>
-struct twin_traits;
+struct view_of;
 
 template<>
-struct twin_traits<std::string> {
-    typedef string_view view_type;
+struct view_of<std::string> {
+    typedef string_view type;
+    typedef std::string buffer_type;
 
-    static auto view_from(const std::string& value) -> view_type {
+    static auto from(const buffer_type& value) -> type {
         return {value};
     }
 };
 
 template<>
-struct twin_traits<attributes_t> {
-    typedef attribute_list view_type;
+struct view_of<attributes_t> {
+    typedef attribute_list type;
+    typedef attributes_t buffer_type;
 
-    static auto view_from(const attributes_t& value) -> view_type {
-        view_type result;
-
-        for (const auto& item : value) {
-            result.emplace_back(item);
-        }
-
+    static auto from(const buffer_type& value) -> type {
+        type result;
+        std::copy(std::begin(value), std::end(value), std::back_inserter(result));
         return result;
     }
 };
 
 template<typename T>
-struct twins {
+struct owned_pair {
     T data;
-    typename twin_traits<T>::view_type view;
+    typename view_of<T>::type view;
 
-    explicit twins(T value) :
+    explicit owned_pair(T value) :
         data(std::move(value)),
-        view(twin_traits<T>::view_from(data))
+        view(view_of<T>::from(data))
     {}
 
-    twins(twins&& other) :
+    owned_pair(const owned_pair& other) = delete;
+    owned_pair(owned_pair&& other) :
         data(std::move(other.data)),
-        view(twin_traits<T>::view_from(data))
+        view(view_of<T>::from(data))
     {}
 
-    auto operator=(twins&& other) -> twins& {
+    auto operator=(const owned_pair& other) -> owned_pair& = delete;
+    auto operator=(owned_pair&& other) -> owned_pair& {
         if (this != &other) {
             data = std::move(other.data);
-            view = twin_traits<T>::view_from(data);
+            view = view_of<T>::from(data);
         }
 
         return *this;
     }
 };
 
-template<typename T>
-class owned;
-
-// TODO: Consider better naming for both class and file.
-template<>
-class owned<record_t> {
-public:
-    typedef record_t view_type;
-
-private:
-    typedef record_t::inner_t inner_t;
-
-    twins<std::string> message;
-    twins<std::string> formatted;
-    twins<attributes_t> attributes;
+/// An owned, mutable record.
+class recordbuf_t {
+    owned_pair<std::string> message;
+    owned_pair<std::string> formatted;
+    owned_pair<attributes_t> attributes;
 
     attribute_pack pack;
 
-    typedef std::aligned_storage<64>::type storage_type;
+    typedef std::aligned_storage<sizeof(record_t::inner_t)>::type storage_type;
     storage_type storage;
 
 public:
-    owned() : message(""), formatted(""), attributes({}) {}
+    recordbuf_t() : message(""), formatted(""), attributes({}) {}
 
+    /// Converts a record to an owned recordbuf.
+    ///
     /// \throw std::bad_alloc on memory allocation failure.
-    explicit owned(const record_t& record) :
+    explicit recordbuf_t(const record_t& record) :
         message(record.message().to_string()),
         formatted(record.formatted().to_string()),
         attributes(flatten(record.attributes()))
@@ -136,9 +129,9 @@ public:
         inner.attributes = pack;
     }
 
-    owned(const owned& other) = delete;
+    recordbuf_t(const recordbuf_t& other) = delete;
 
-    owned(owned&& other) noexcept :
+    recordbuf_t(recordbuf_t&& other) noexcept :
         message(std::move(other.message)),
         formatted(std::move(other.formatted)),
         attributes(std::move(other.attributes)),
@@ -154,17 +147,16 @@ public:
         inner.attributes = pack;
     }
 
-    auto operator=(const owned& other) -> owned& = delete;
+    auto operator=(const recordbuf_t& other) -> recordbuf_t& = delete;
 
-    auto operator=(owned&& other) noexcept -> owned& {
+    auto operator=(recordbuf_t&& other) noexcept -> recordbuf_t& {
         if (this != &other) {
             message = std::move(other.message);
             formatted = std::move(other.formatted);
             attributes = std::move(other.attributes);
-
             storage = other.storage;
-
             pack = std::move(other.pack);
+
             BOOST_ASSERT(pack.size() == 1);
             pack.back() = attributes.view;
 
@@ -182,12 +174,12 @@ public:
     }
 
 private:
-    auto inner() noexcept -> inner_t& {
-        return reinterpret_cast<inner_t&>(storage);
+    auto inner() noexcept -> record_t::inner_t& {
+        return reinterpret_cast<record_t::inner_t&>(storage);
     }
 
-    auto inner() const noexcept -> const inner_t& {
-        return reinterpret_cast<const inner_t&>(storage);
+    auto inner() const noexcept -> const record_t::inner_t& {
+        return reinterpret_cast<const record_t::inner_t&>(storage);
     }
 
     static auto flatten(const attribute_pack& pack) -> attributes_t {
