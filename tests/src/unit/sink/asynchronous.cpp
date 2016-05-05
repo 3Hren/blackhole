@@ -12,16 +12,18 @@
 
 #include "blackhole/sink.hpp"
 
-#include "blackhole/detail/record.owned.hpp"
+#include "blackhole/detail/recordbuf.hpp"
 
 namespace blackhole {
 inline namespace v1 {
 namespace experimental {
 namespace sink {
 
+using detail::recordbuf_t;
+
 class asynchronous_t : public sink_t {
     struct value_type {
-        detail::owned<record_t> record;
+        recordbuf_t record;
         std::string message;
     };
 
@@ -95,7 +97,7 @@ auto asynchronous_t::emit(const record_t& record, const string_view& message) ->
     }
 
     const auto enqueued = queue.enqueue_with([&](value_type& value) {
-        value = {detail::owned<record_t>(record), message.to_string()};
+        value = {recordbuf_t(record), message.to_string()};
     });
 
     // TODO: If failed, some kind of overflow policy is immediately involved.

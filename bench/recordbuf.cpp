@@ -2,7 +2,7 @@
 
 #include <blackhole/attribute.hpp>
 #include <blackhole/record.hpp>
-#include <blackhole/detail/record.owned.hpp>
+#include <blackhole/detail/recordbuf.hpp>
 
 #include "mod.hpp"
 
@@ -17,7 +17,7 @@ static void record(::benchmark::State& state) {
     record_t record(42, message, pack);
 
     while (state.KeepRunning()) {
-        detail::owned<record_t> owned(record);
+        detail::recordbuf_t owned(record);
     }
 
     state.SetItemsProcessed(state.iterations());

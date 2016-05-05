@@ -1,16 +1,16 @@
 #include <memory>
 
-#include <gtest/gtest.h>
+#include <blackhole/detail/recordbuf.hpp>
 
-#include <blackhole/detail/record.owned.hpp>
+#include <gtest/gtest.h>
 
 namespace blackhole {
 inline namespace v1 {
 namespace detail {
 namespace {
 
-TEST(owned, FromRecordMessage) {
-    std::unique_ptr<owned<record_t>> result;
+TEST(recordbuf_t, FromRecordMessage) {
+    std::unique_ptr<recordbuf_t> result;
 
     {
         const string_view message("GET");
@@ -18,14 +18,14 @@ TEST(owned, FromRecordMessage) {
 
         const record_t record(0, message, pack);
 
-        result.reset(new owned<record_t>(record));
+        result.reset(new recordbuf_t(record));
     }
 
     EXPECT_EQ(string_view("GET"), result->into_view().message());
 }
 
 TEST(owned, FromRecordFormattedMessage) {
-    std::unique_ptr<owned<record_t>> result;
+    std::unique_ptr<recordbuf_t> result;
 
     {
         const string_view message("GET: {}");
@@ -33,28 +33,28 @@ TEST(owned, FromRecordFormattedMessage) {
         record_t record(0, message, pack);
         record.activate("GET: 42");
 
-        result.reset(new owned<record_t>(record));
+        result.reset(new recordbuf_t(record));
     }
 
     EXPECT_EQ(string_view("GET: 42"), result->into_view().formatted());
 }
 
 TEST(owned, FromRecordSeverity) {
-    std::unique_ptr<owned<record_t>> result;
+    std::unique_ptr<recordbuf_t> result;
 
     {
         const string_view message("");
         const attribute_pack pack;
         const record_t record(42, message, pack);
 
-        result.reset(new owned<record_t>(record));
+        result.reset(new recordbuf_t(record));
     }
 
     EXPECT_EQ(42, result->into_view().severity());
 }
 
 TEST(owned, FromRecordTimestamp) {
-    std::unique_ptr<owned<record_t>> result;
+    std::unique_ptr<recordbuf_t> result;
 
     record_t::clock_type::time_point min = {};
     record_t::clock_type::time_point max = {};
@@ -67,7 +67,7 @@ TEST(owned, FromRecordTimestamp) {
         record.activate();
         max = record_t::clock_type::now();
 
-        result.reset(new owned<record_t>(record));
+        result.reset(new recordbuf_t(record));
     }
 
     EXPECT_TRUE(min <= result->into_view().timestamp());
@@ -75,21 +75,21 @@ TEST(owned, FromRecordTimestamp) {
 }
 
 TEST(owned, FromRecordThreadId) {
-    std::unique_ptr<owned<record_t>> result;
+    std::unique_ptr<recordbuf_t> result;
 
     {
         const string_view message("");
         const attribute_pack pack;
         const record_t record(0, message, pack);
 
-        result.reset(new owned<record_t>(record));
+        result.reset(new recordbuf_t(record));
     }
 
     EXPECT_EQ(::pthread_self(), result->into_view().tid());
 }
 
 TEST(owned, FromRecordAttributes) {
-    std::unique_ptr<owned<record_t>> result;
+    std::unique_ptr<recordbuf_t> result;
 
     {
         const string_view message("");
@@ -97,7 +97,7 @@ TEST(owned, FromRecordAttributes) {
         const attribute_pack pack{attributes};
         const record_t record(0, message, pack);
 
-        result.reset(new owned<record_t>(record));
+        result.reset(new recordbuf_t(record));
     }
 
     const attribute_list attributes{{"key#1", "value#1"}};
@@ -107,7 +107,7 @@ TEST(owned, FromRecordAttributes) {
 }
 
 TEST(owned, MoveConstructor) {
-    std::unique_ptr<owned<record_t>> result;
+    std::unique_ptr<recordbuf_t> result;
 
     {
         const string_view message("GET");
@@ -115,9 +115,9 @@ TEST(owned, MoveConstructor) {
         const attribute_pack pack{attributes};
         const record_t record(42, message, pack);
 
-        owned<record_t> own(record);
+        recordbuf_t own(record);
 
-        result.reset(new owned<record_t>(std::move(own)));
+        result.reset(new recordbuf_t(std::move(own)));
     }
 
     EXPECT_EQ(string_view("GET"), result->into_view().message());
@@ -129,7 +129,7 @@ TEST(owned, MoveConstructor) {
 }
 
 TEST(owned, MoveAssignment) {
-    std::unique_ptr<owned<record_t>> result;
+    std::unique_ptr<recordbuf_t> result;
 
     {
         const string_view message("GET");
@@ -137,7 +137,7 @@ TEST(owned, MoveAssignment) {
         const attribute_pack pack{attributes};
         const record_t record(42, message, pack);
 
-        result.reset(new owned<record_t>(record));
+        result.reset(new recordbuf_t(record));
     }
 
     {
@@ -146,7 +146,7 @@ TEST(owned, MoveAssignment) {
         const attribute_pack pack{attributes};
         const record_t record(10, message, pack);
 
-        owned<record_t> own(record);
+        recordbuf_t own(record);
 
         *result = std::move(own);
     }
@@ -160,7 +160,7 @@ TEST(owned, MoveAssignment) {
 }
 
 TEST(owned, MoveAssignmentWithDifferentSizes) {
-    std::unique_ptr<owned<record_t>> result;
+    std::unique_ptr<recordbuf_t> result;
 
     {
         const string_view message("GET");
@@ -168,7 +168,7 @@ TEST(owned, MoveAssignmentWithDifferentSizes) {
         const attribute_pack pack{attributes};
         const record_t record(42, message, pack);
 
-        result.reset(new owned<record_t>(record));
+        result.reset(new recordbuf_t(record));
     }
 
     {
@@ -177,7 +177,7 @@ TEST(owned, MoveAssignmentWithDifferentSizes) {
         const attribute_pack pack{attributes};
         const record_t record(10, message, pack);
 
-        owned<record_t> own(record);
+        recordbuf_t own(record);
 
         *result = std::move(own);
     }
