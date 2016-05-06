@@ -30,7 +30,7 @@ class asynchronous_t : public sink_t {
     typedef cds::container::VyukovMPSCCycleQueue<value_type> queue_type;
 
     queue_type queue;
-    std::atomic<bool> running;
+    std::atomic<bool> stopped;
     std::unique_ptr<sink_t> wrapped;
 
     std::thread thread;
@@ -81,18 +81,18 @@ static auto exp2(std::size_t factor) -> std::size_t {
 
 asynchronous_t::asynchronous_t(std::unique_ptr<sink_t> wrapped, std::size_t factor) :
     queue(exp2(factor)),
-    running(true),
+    stopped(false),
     wrapped(std::move(wrapped)),
     thread(std::bind(&asynchronous_t::run, this))
 {}
 
 asynchronous_t::~asynchronous_t() {
-    running.store(false);
+    stopped.store(true);
     thread.join();
 }
 
 auto asynchronous_t::emit(const record_t& record, const string_view& message) -> void {
-    if (!running) {
+    if (stopped) {
         return;
     }
 
@@ -118,7 +118,7 @@ auto asynchronous_t::run() -> void {
             ::usleep(1000);
         }
 
-        if (!(running || dequeued)) {
+        if (stopped && !dequeued) {
             return;
         }
     }
