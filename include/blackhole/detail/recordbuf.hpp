@@ -89,6 +89,7 @@ struct owned_pair {
     auto operator=(owned_pair&& other) -> owned_pair& {
         if (this != &other) {
             data = std::move(other.data);
+            view = std::move(other.view);
             view = view_of<T>::from(data);
         }
 
@@ -108,6 +109,9 @@ class recordbuf_t {
     storage_type storage;
 
 public:
+    /// Constructs an empty invalid record.
+    ///
+    /// Required only by MPSC queue API. All access to such object will likely result in segfault.
     recordbuf_t() : message(""), formatted(""), attributes({}) {}
 
     /// Converts a record to an owned recordbuf.

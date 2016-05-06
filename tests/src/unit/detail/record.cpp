@@ -190,6 +190,19 @@ TEST(owned, MoveAssignmentWithDifferentSizes) {
     EXPECT_EQ(attributes, result->into_view().attributes().at(0).get());
 }
 
+TEST(recordbuf_t, DefaultMove) {
+    recordbuf_t recordbuf;
+
+    const string_view message("POST");
+    const attribute_list attributes{{"key#2", "value#2"}, {"key#3", "value#3"}};
+    const attribute_pack pack{attributes};
+    const record_t record(10, message, pack);
+    recordbuf = recordbuf_t(record);
+
+    recordbuf_t destroyer;
+    destroyer = std::move(recordbuf);
+}
+
 }  // namespace
 }  // namespace detail
 }  // namespace v1
