@@ -21,6 +21,24 @@ namespace sink {
 
 using detail::recordbuf_t;
 
+/// I can imagine: drop, sleep, wait.
+class overflow_policy_t {
+public:
+    enum class action_t {
+        retry,
+        drop
+    };
+
+public:
+    /// Handles record queue overflow.
+    ///
+    /// This method is called when the queue is unable to enqueue more items. It's okay to throw
+    /// exceptions from here, they will be propagated directly to the sink caller.
+    virtual auto overflow() -> action_t = 0;
+
+    virtual auto wakeup() -> void = 0;
+};
+
 class asynchronous_t : public sink_t {
     struct value_type {
         recordbuf_t record;
@@ -33,6 +51,8 @@ class asynchronous_t : public sink_t {
     std::atomic<bool> stopped;
     std::unique_ptr<sink_t> wrapped;
 
+    std::unique_ptr<overflow_policy_t> overflow_policy;
+
     std::thread thread;
 
 public:
@@ -43,6 +63,12 @@ public:
     ///
     /// \throw std::invalid_argument if the factor is greater than 20.
     asynchronous_t(std::unique_ptr<sink_t> wrapped, std::size_t factor = 10);
+
+    // asynchronous_t(std::unique_ptr<sink_t> sink,
+    //                std::unique_ptr<filter_t> filter,
+    //                std::unique_ptr<overflow_policy_t> overflow_policy,
+    //                std::unique_ptr<exception_policy_t> exception_policy,
+    //                std::size_t factor = 10);
 
     ~asynchronous_t();
 
@@ -79,10 +105,42 @@ static auto exp2(std::size_t factor) -> std::size_t {
 
 }  // namespace
 
+class drop_overflow_policy_t : public overflow_policy_t {
+    typedef overflow_policy_t::action_t action_t;
+
+public:
+    /// Drops on overlow.
+    virtual auto overflow() -> action_t {
+        return action_t::drop;
+    }
+
+    /// Does nothing on wakeup.
+    virtual auto wakeup() -> void {}
+};
+
+class wait_overflow_policy_t : public overflow_policy_t {
+    typedef overflow_policy_t::action_t action_t;
+
+    mutable std::mutex mutex;
+    std::condition_variable cv;
+
+public:
+    virtual auto overflow() -> action_t {
+        std::unique_lock<std::mutex> lock(mutex);
+        cv.wait(lock);
+        return action_t::retry;
+    }
+
+    virtual auto wakeup() -> void {
+        cv.notify_one();
+    }
+};
+
 asynchronous_t::asynchronous_t(std::unique_ptr<sink_t> wrapped, std::size_t factor) :
     queue(exp2(factor)),
     stopped(false),
     wrapped(std::move(wrapped)),
+    overflow_policy(new wait_overflow_policy_t),
     thread(std::bind(&asynchronous_t::run, this))
 {}
 
@@ -93,14 +151,28 @@ asynchronous_t::~asynchronous_t() {
 
 auto asynchronous_t::emit(const record_t& record, const string_view& message) -> void {
     if (stopped) {
-        return;
+        throw std::logic_error("queue is sealed");
     }
 
-    const auto enqueued = queue.enqueue_with([&](value_type& value) {
-        value = {recordbuf_t(record), message.to_string()};
-    });
+    while (true) {
+        const auto enqueued = queue.enqueue_with([&](value_type& value) {
+            value = {recordbuf_t(record), message.to_string()};
+        });
 
-    // TODO: If failed, some kind of overflow policy is immediately involved.
+        if (enqueued) {
+            // TODO: underflow_policy->wakeup();
+            return;
+        } else {
+            switch (overflow_policy->overflow()) {
+            case overflow_policy_t::action_t::retry:
+                continue;
+            case overflow_policy_t::action_t::drop:
+                return;
+            default:
+                BOOST_ASSERT(false);
+            }
+        }
+    }
 }
 
 auto asynchronous_t::run() -> void {
@@ -111,11 +183,16 @@ auto asynchronous_t::run() -> void {
         });
 
         if (dequeued) {
-            // TODO: What to do with exceptions?
-            wrapped->emit(result.record.into_view(), result.message);
+            try {
+                wrapped->emit(result.record.into_view(), result.message);
+                overflow_policy->wakeup();
+            } catch (...) {
+                // TODO: exception_policy->process(std::current_exception()); []
+            }
+
         } else {
-            // Sleep or CV.
             ::usleep(1000);
+            // TODO: underflow_policy->underflow(); [wait for enqueue, sleep].
         }
 
         if (stopped && !dequeued) {
