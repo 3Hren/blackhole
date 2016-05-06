@@ -1,0 +1,16 @@
+language: c
+
+build:
+  ci:
+    - sudo apt-get update
+    - sudo apt-get install git
+    - sudo apt-get install cmake
+    - sudo apt-get install g++
+    - sudo apt-get install libboost-dev
+    - sudo apt-get install libboost-thread-dev
+    - sudo apt-get install libboost-system-dev
+    - sudo apt-get install valgrind
+    - mkdir -p build && cd build
+    - cmake -DENABLE_TESTING=ON ..
+    - make
+    - valgrind ./blackhole-tests
