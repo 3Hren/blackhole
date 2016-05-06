@@ -110,7 +110,6 @@ auto asynchronous_t::run() -> void {
             result = std::move(value);
         });
 
-        // std::cout << std::boolalpha << dequeued << ":" << result.message << std::endl;
         if (dequeued) {
             // TODO: What to do with exceptions?
             wrapped->emit(result.record.into_view(), result.message);
