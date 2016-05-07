@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "forward.hpp"
+
 namespace blackhole {
 inline namespace v1 {
 
@@ -58,6 +60,7 @@ private:
     auto formatter(const config::node_t& config) const -> std::unique_ptr<formatter_t>;
 };
 
+// TODO: Replace with interface plus empty/configured factory.
 class registry_t {
 public:
     typedef std::function<std::unique_ptr<sink_t>(const config::node_t&)> sink_factory;
@@ -83,6 +86,8 @@ public:
     /// depending on type using generic configuration object.
     template<typename T>
     auto add() -> void;
+
+    auto add(std::shared_ptr<experimental::factory<sink_t>> factory) -> void;
 
     /// Returns the sink factory with the given type if registered, throws otherwise.
     auto sink(const std::string& type) const -> sink_factory;
