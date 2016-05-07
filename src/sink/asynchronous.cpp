@@ -9,6 +9,8 @@
 #include "blackhole/detail/sink/asynchronous.hpp"
 
 #include <cmath>
+#include <mutex>
+#include <condition_variable>
 
 namespace blackhole {
 inline namespace v1 {
