@@ -8,6 +8,7 @@ inline namespace v1 {
 namespace experimental {
 namespace sink {
 
+// TODO: Add documentation.
 class asynchronous_t;
 
 }  // namespace sink
