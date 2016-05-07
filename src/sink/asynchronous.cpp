@@ -61,7 +61,7 @@ asynchronous_t::asynchronous_t(std::unique_ptr<sink_t> wrapped, std::size_t fact
     queue(exp2(factor)),
     stopped(false),
     wrapped(std::move(wrapped)),
-    overflow_policy(new wait_overflow_policy_t),
+    overflow_policy(new drop_overflow_policy_t),
     thread(std::bind(&asynchronous_t::run, this))
 {}
 
@@ -101,21 +101,22 @@ auto asynchronous_t::run() -> void {
             result = std::move(value);
         });
 
+        if (stopped && !dequeued) {
+            return;
+        }
+
         if (dequeued) {
             try {
                 wrapped->emit(result.record.into_view(), result.message);
                 overflow_policy->wakeup();
             } catch (...) {
+                throw;
                 // TODO: exception_policy->process(std::current_exception()); []
             }
 
         } else {
             ::usleep(1000);
             // TODO: underflow_policy->underflow(); [wait for enqueue, sleep].
-        }
-
-        if (stopped && !dequeued) {
-            return;
         }
     }
 }
