@@ -139,8 +139,8 @@ public:
         message(std::move(other.message)),
         formatted(std::move(other.formatted)),
         attributes(std::move(other.attributes)),
-        storage(other.storage),
-        pack(std::move(other.pack))
+        pack(std::move(other.pack)),
+        storage(other.storage)
     {
         BOOST_ASSERT(pack.size() == 1);
         pack.back() = attributes.view;
