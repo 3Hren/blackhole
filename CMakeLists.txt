@@ -45,12 +45,13 @@ add_library(${LIBRARY_NAME} SHARED
 	src/logger
 	src/procname
 	src/record
-	src/sink/asynchronous
 	src/registry
 	src/root
 	src/scope/holder
 	src/scope/manager
 	src/scope/watcher
+	src/sink/asynchronous
+	src/sink/asynchronous.p
 	src/sink/console
 	src/sink/file
 	src/sink/null
