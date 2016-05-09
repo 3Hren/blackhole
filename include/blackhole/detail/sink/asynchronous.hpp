@@ -51,21 +51,15 @@ class asynchronous_t : public sink_t {
     std::thread thread;
 
 public:
-    /// \param factor queue capacity factor from which the queue capacity will be generated as
-    ///     a value of `2 << factor`. Must fit in [0; 20] range (1048576 items).
-    /// \throw std::invalid_argument if the factor is greater than 20.
     asynchronous_t(std::unique_ptr<sink_t> wrapped, std::size_t factor = 10);
 
-    /// \param factor queue capacity factor from which the queue capacity will be generated as
-    ///     a value of `2 << factor`. Must fit in [0; 20] range (1048576 items).
-    /// \param queue_type
-    /// \param overflow_policy [drop silently, drop with error, block]
-    ///
+    // TODO: Customization.
     // asynchronous_t(std::unique_ptr<sink_t> sink,
+    //                std::size_t factor,
     //                std::unique_ptr<filter_t> filter,
     //                std::unique_ptr<overflow_policy_t> overflow_policy,
-    //                std::unique_ptr<exception_policy_t> exception_policy,
-    //                std::size_t factor = 10);
+    //                std::unique_ptr<underflow_policy_t> underflow_policy,
+    //                std::unique_ptr<exception_policy_t> exception_policy);
 
     ~asynchronous_t();
 
