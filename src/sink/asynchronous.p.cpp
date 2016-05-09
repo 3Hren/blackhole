@@ -66,6 +66,15 @@ asynchronous_t::~asynchronous_t() {
 
 auto asynchronous_t::emit(const record_t& record, const string_view& message) -> void {
     while (true) {
+        // TODO: Uncomment.
+        // switch (filter->filter(record, message)) {
+        // case filter_t::accept:
+        // case filter_t::neutral:
+        //     break;
+        // case filter_t::reject:
+        //     return;
+        // }
+
         const auto enqueued = queue.enqueue_with([&](value_type& value) {
             value = {recordbuf_t(record), message.to_string()};
         });
@@ -101,9 +110,8 @@ auto asynchronous_t::run() -> void {
                 overflow_policy->wakeup();
             } catch (...) {
                 throw;
-                // TODO: exception_policy->process(std::current_exception()); []
+                // TODO: exception_policy->process();
             }
-
         } else {
             ::usleep(1000);
             // TODO: underflow_policy->underflow(); [wait for enqueue, sleep].
