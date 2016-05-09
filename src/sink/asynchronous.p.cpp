@@ -10,7 +10,7 @@ namespace experimental {
 namespace sink {
 namespace {
 
-static auto exp2(std::size_t factor) -> std::size_t {
+auto exp2(std::size_t factor) -> std::size_t {
     if (factor > 20) {
         throw std::invalid_argument("factor should fit in [0; 20] range");
     }
