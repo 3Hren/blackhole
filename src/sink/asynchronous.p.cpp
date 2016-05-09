@@ -65,10 +65,6 @@ asynchronous_t::~asynchronous_t() {
 }
 
 auto asynchronous_t::emit(const record_t& record, const string_view& message) -> void {
-    if (stopped) {
-        throw std::logic_error("queue is sealed");
-    }
-
     while (true) {
         const auto enqueued = queue.enqueue_with([&](value_type& value) {
             value = {recordbuf_t(record), message.to_string()};
