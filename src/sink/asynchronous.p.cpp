@@ -115,7 +115,7 @@ auto asynchronous_t::run() -> void {
                 // TODO: exception_policy->process();
             }
         } else {
-            ::usleep(1000);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
             // TODO: underflow_policy->underflow(); [wait for enqueue, sleep].
         }
     }
