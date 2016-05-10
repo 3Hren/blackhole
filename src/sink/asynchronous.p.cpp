@@ -42,7 +42,7 @@ class wait_overflow_policy_t : public overflow_policy_t {
 public:
     virtual auto overflow() -> action_t {
         std::unique_lock<std::mutex> lock(mutex);
-        cv.wait(lock);
+        cv.wait_for(lock, std::chrono::milliseconds(1));
         return action_t::retry;
     }
 
