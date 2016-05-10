@@ -46,6 +46,10 @@ TEST(asynchronous_t, FactoryType) {
     EXPECT_EQ(std::string("asynchronous"), factory.type());
 }
 
+TEST(overflow_policy_factory_t, ThrowsIfRequestedNonRegisteredType) {
+    EXPECT_THROW(overflow_policy_factory_t().create(""), std::invalid_argument);
+}
+
 }  // namespace
 }  // namespace sink
 }  // namespace experimental

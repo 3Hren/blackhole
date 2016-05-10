@@ -34,6 +34,11 @@ public:
     virtual auto wakeup() -> void = 0;
 };
 
+class overflow_policy_factory_t {
+public:
+    auto create(const std::string& name) const -> std::unique_ptr<overflow_policy_t>;
+};
+
 class asynchronous_t : public sink_t {
     struct value_type {
         recordbuf_t record;
