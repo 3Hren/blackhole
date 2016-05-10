@@ -58,13 +58,13 @@ class asynchronous_t : public sink_t {
 public:
     asynchronous_t(std::unique_ptr<sink_t> wrapped, std::size_t factor = 10);
 
-    // TODO: Customization.
-    // asynchronous_t(std::unique_ptr<sink_t> sink,
-    //                std::size_t factor,
-    //                std::unique_ptr<filter_t> filter,
-    //                std::unique_ptr<overflow_policy_t> overflow_policy,
-    //                std::unique_ptr<underflow_policy_t> underflow_policy,
-    //                std::unique_ptr<exception_policy_t> exception_policy);
+    // TODO: Full customization.
+    asynchronous_t(std::unique_ptr<sink_t> sink,
+                   std::size_t factor,
+                //    std::unique_ptr<filter_t> filter,
+                //    std::unique_ptr<underflow_policy_t> underflow_policy,
+                //    std::unique_ptr<exception_policy_t> exception_policy,
+                   std::unique_ptr<overflow_policy_t> overflow_policy);
 
     ~asynchronous_t();
 

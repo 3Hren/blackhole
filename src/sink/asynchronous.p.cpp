@@ -73,6 +73,16 @@ asynchronous_t::asynchronous_t(std::unique_ptr<sink_t> wrapped, std::size_t fact
     thread(std::bind(&asynchronous_t::run, this))
 {}
 
+asynchronous_t::asynchronous_t(std::unique_ptr<sink_t> sink,
+                               std::size_t factor,
+                               std::unique_ptr<overflow_policy_t> overflow_policy) :
+    queue(exp2(factor)),
+    stopped(false),
+    wrapped(std::move(sink)),
+    overflow_policy(std::move(overflow_policy)),
+    thread(std::bind(&asynchronous_t::run, this))
+{}
+
 asynchronous_t::~asynchronous_t() {
     stopped.store(true);
     thread.join();
