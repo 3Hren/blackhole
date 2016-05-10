@@ -15,6 +15,7 @@
 #include "blackhole/sink/console.hpp"
 #include "blackhole/sink/null.hpp"
 #include "blackhole/sink/syslog.hpp"
+#include "blackhole/factory.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -119,6 +120,12 @@ auto registry_t::configured() -> registry_t {
     registry.add<handler::blocking_t>();
 
     return registry;
+}
+
+auto registry_t::add(std::shared_ptr<experimental::factory<sink_t>> factory) -> void {
+    sinks[factory->type()] = [=](const config::node_t& node) {
+        return factory->from(node);
+    };
 }
 
 auto registry_t::sink(const std::string& type) const -> sink_factory {

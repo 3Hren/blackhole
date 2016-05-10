@@ -4,21 +4,10 @@
 
 #include "blackhole/attribute.hpp"
 
+#include "blackhole/detail/record.hpp"
+
 namespace blackhole {
 inline namespace v1 {
-
-struct record_t::inner_t {
-    std::reference_wrapper<const string_view> message;
-    std::reference_wrapper<const string_view> formatted;
-
-    severity_t severity;
-    time_point timestamp;
-
-    std::thread::native_handle_type tid;
-    char __pad[16];
-
-    std::reference_wrapper<const attribute_pack> attributes;
-};
 
 record_t::record_t(severity_t severity,
     std::reference_wrapper<const string_view> message,
@@ -36,6 +25,10 @@ record_t::record_t(severity_t severity,
     inner.tid = ::pthread_self();
 
     inner.attributes = attributes;
+}
+
+record_t::record_t(inner_t inner) noexcept {
+    this->inner() = std::move(inner);
 }
 
 auto record_t::message() const noexcept -> const string_view& {

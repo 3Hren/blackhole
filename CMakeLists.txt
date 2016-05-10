@@ -50,6 +50,8 @@ add_library(${LIBRARY_NAME} SHARED
 	src/scope/holder
 	src/scope/manager
 	src/scope/watcher
+	src/sink/asynchronous
+	src/sink/asynchronous.p
 	src/sink/console
 	src/sink/file
 	src/sink/null
@@ -149,7 +151,8 @@ if (ENABLE_TESTING)
 	prepare_google_testing()
 
 	include_directories(BEFORE SYSTEM
-		${PROJECT_SOURCE_DIR}/foreign/rapidjson/include)
+		${PROJECT_SOURCE_DIR}/foreign/rapidjson/include
+		${PROJECT_SOURCE_DIR}/foreign/libcds)
 
 	include_directories(
 		${PROJECT_SOURCE_DIR}/tests/include)
@@ -218,9 +221,12 @@ if (ENABLE_TESTING)
 		tests/src/mocks/logger
 		tests/src/mocks/sink
 		tests/src/unit/cpp17/string_view
+		tests/src/unit/detail/mpsc
+		tests/src/unit/detail/record
 		tests/src/unit/formatter/grammar
 		tests/src/unit/formatter/json
 		tests/src/unit/formatter/token
+		tests/src/unit/sink/asynchronous
 		tests/src/unit/sink/syslog
 		tests/src/unit/sink/tcp
 		tests/wrapper
@@ -258,6 +264,7 @@ if (ENABLE_BENCHMARKING)
 		bench/main
 		bench/queue
 		bench/record
+		bench/recordbuf
 		bench/system/thread
 	)
 
