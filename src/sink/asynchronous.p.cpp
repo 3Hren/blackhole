@@ -53,6 +53,18 @@ public:
     }
 };
 
+auto overflow_policy_factory_t::create(const std::string& name) const ->
+    std::unique_ptr<overflow_policy_t>
+{
+    if (name == "drop") {
+        return std::unique_ptr<overflow_policy_t>(new drop_overflow_policy_t);
+    } else if (name == "wait") {
+        return std::unique_ptr<overflow_policy_t>(new wait_overflow_policy_t);
+    }
+
+    throw std::invalid_argument("no overflow policy with name \"" + name + "\" found");
+}
+
 asynchronous_t::asynchronous_t(std::unique_ptr<sink_t> wrapped, std::size_t factor) :
     queue(exp2(factor)),
     stopped(false),
