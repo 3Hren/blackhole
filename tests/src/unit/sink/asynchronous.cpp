@@ -46,7 +46,12 @@ TEST(asynchronous_t, FactoryType) {
     EXPECT_EQ(std::string("asynchronous"), factory.type());
 }
 
-TEST(overflow_policy_factory_t, ThrowsIfRequestedNonRegisteredType) {
+TEST(overflow_policy_factory_t, CreatesRegisteredPolicies) {
+    EXPECT_NO_THROW(overflow_policy_factory_t().create("drop"));
+    EXPECT_NO_THROW(overflow_policy_factory_t().create("wait"));
+}
+
+TEST(overflow_policy_factory_t, ThrowsIfRequestedNonRegisteredPolicy) {
     EXPECT_THROW(overflow_policy_factory_t().create(""), std::invalid_argument);
 }
 
