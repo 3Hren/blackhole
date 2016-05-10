@@ -1,8 +1,9 @@
 blackhole (1.0.0-0beta1) UNRELEASED; urgency=low
 
-  * Feature: introducing a new asynchronous sink.
+  * Break: drop GCC4.6 support.
+  * Feature: introduce asynchronous sink.
     This kind of sink wraps the other sink and causes log events to be written
-    to them on a separate thread.
+    to them on a separate thread providing non-blocking behavior.
 
  -- Evgeny Safronov <division494@gmail.com>  Tue, 10 May 2016 22:16:50 +0300
 
