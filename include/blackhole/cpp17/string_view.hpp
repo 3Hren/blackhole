@@ -184,3 +184,21 @@ using cpp17::string_view;
 
 }  // namespace v1
 }  // namespace blackhole
+
+namespace std {
+
+/// Shamelessly stolen from <string>
+template<typename Char, typename Traits>
+struct hash<blackhole::cpp17::basic_string_view<Char, Traits>> {
+    auto operator()(const blackhole::cpp17::basic_string_view<Char, Traits>& val) const noexcept ->
+        std::size_t;
+};
+
+template<typename Char, typename Traits>
+auto hash<blackhole::cpp17::basic_string_view<Char, Traits>>::operator()(
+    const blackhole::cpp17::basic_string_view<Char, Traits>& val) const noexcept -> std::size_t
+{
+    return __do_string_hash(val.data(), val.data() + val.size());
+}
+
+}  // namespace std

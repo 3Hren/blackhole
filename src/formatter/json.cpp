@@ -234,8 +234,6 @@ public:
     auto attributes() -> void {
         if (inner.unique) {
             // TODO: Small buffer optimization is possible here (see stack allocator with arena).
-            // TODO: Also consider using `unordered_set` instead. But it requires either manually or
-            // indirectly implementing murmur3 hashing to be fully compatible with the Standard.
             std::set<string_view> set;
 
             for (const auto& attributes : record.attributes()) {
