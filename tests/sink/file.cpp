@@ -1,3 +1,5 @@
+#include <system_error>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -7,6 +9,22 @@
 #include <blackhole/detail/sink/file.hpp>
 
 #include "mocks/node.hpp"
+
+namespace blackhole {
+inline namespace v1 {
+namespace sink {
+namespace file {
+namespace {
+
+TEST(backend_t, ThrowsIfUnableToOpenStream) {
+    EXPECT_THROW(backend_t("/__mythic/file.log", 1), std::system_error);
+}
+
+}  // namespace
+}  // namespace file
+}  // namespace sink
+}  // namespace v1
+}  // namespace blackhole
 
 namespace blackhole {
 namespace testing {

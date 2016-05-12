@@ -24,9 +24,18 @@ struct backend_t {
     backend_t(const std::string& filename, std::size_t interval) :
         counter(0),
         interval(interval),
-        stream(new std::ofstream(filename, std::ios::app))
+        stream(new std::ofstream)
     {
         BOOST_ASSERT(interval > 0);
+
+        stream->exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+        try {
+            stream->open(filename, std::ios::app);
+        } catch (const std::system_error& err) {
+            // Transform unspecified ios category into the system one to obtain readable message.
+            throw std::system_error(err.code().value(), std::system_category());
+        }
     }
 
     auto write(const string_view& message) -> void {
