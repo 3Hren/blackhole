@@ -64,21 +64,22 @@ Of course there are disadvantages, such as virtual function call cost and closed
 - [x] Custom verbosity.
 - [x] Custom attributes formatting.
 - [ ] Optional asynchronous pipelining.
-  - [ ] Queue with block on overload.
-  - [ ] Queue with drop on overload (count dropped message).
+  - [x] Queue with block on overload.
+  - [x] Queue with drop on overload (count dropped message).
+  - [ ] The same but for handlers.
 - [x] Formatters.
   - [x] String by pattern.
     - [ ] Optional placeholders.
     - [x] Configurable leftover placeholder.
   - [x] JSON with tree reconstruction.
-- [ ] Sinks.
+- [x] Sinks.
   - [x] Colored terminal output.
   - [x] Files.
   - [x] Syslog.  
   - [x] Socket UDP.
   - [x] Socket TCP.
     - [x] Blocking.
-    - [ ] Non blocking.
+    - [x] Non blocking.
 - [ ] Scatter-gathered IO (?)
 - [x] Logger builder.
 - [ ] Macro with line and filename attributes.
@@ -95,7 +96,7 @@ Formatters in Blackhole are responsible for converting every log record passing 
 String formatter provides an ability to configure your logging output using pattern mechanics with powerful
 customization support.
 
-Unlike previous Blackhole versions now string formatter uses python-like syntax for describing patterns with using *{}*
+Unlike previous Blackhole versions now string formatter uses python-like syntax for describing patterns with using `{}`
 placeholders and format specifications inside. Moreover now you can specify timestamp specification directly inside the
 general pattern or even format it as an microseconds number since epoch.
 
@@ -138,33 +139,63 @@ For more information please read the documentation and visit the following links
  - http://cppformat.github.io/latest/syntax.html - general syntax.
  - http://en.cppreference.com/w/cpp/chrono/c/strftime - timestamp spec extension.
 
-There is a special attribute placeholder - **{...}** - which means to print all non-reserved attributes in a reverse order they were provided in a key-value manner separated by a comma. These kind of attributes can be configured using special syntax, similar with the timestamp attribute with an optional separator.
+Note, that if you need to include a brace character in the literal text, it can be escaped by doubling: `{{` and `}}`.
 
-For example the following placeholder **{...:{{name}={value}:p}{\t:x}s}** results in tab separated key-value pairs like **id=42\tmethod=GET**.
+There is a special attribute placeholder - `{...}` - which means to print all non-reserved attributes in a reverse order they were provided in a key-value manner separated by a comma. These kind of attributes can be configured using special syntax, similar with the timestamp attribute with an optional separator.
 
-Note, that if you need to include a brace character in the literal text, it can be escaped by doubling: **{{** and **}}**.
+For example the following placeholder `{...:{{name}={value}:p}{\t:x}s}` results in tab separated key-value pairs like `id=42\tmethod=GET`.
 
-For pedants there is the partial grammar in EBNF:
+For pedants there is a full placeholder grammar in EBNF:
 ```
-Grammar    ::= '{' '...' (':' (Pattern | Separator | (Pattern Separator) | (Separator Pattern))? [>^<]? [0-9]* [su])? '}'
-Extension  ::= '{' (((Any -':')* ':' [ps] '}' ('}' (Any - ':')* ':' [ps] '}')*))
-Pattern    ::= '{' (PatternLiteral | Name | Value)* ':p}'
-Name       ::= '{name' Spec? '}'
-Value      ::= '{value' Spec? '}'
+Grammar     = Ph
+            | OptPh
+            | VarPh
+Ph          = "{" Name "}"
+OptPh       = "{" Name ":" Spec? "}"
+VarPh       = "{...}"
+            | "{...:" Ext? s "}"
+Ext         = Pat
+            | Sep
+            | Pat Sep
+            | Sep Pat
+Name        = [a-zA-Z0-9_]
+Spec        = Align? Width? Type
+Align       = [>^<]
+Width       = [1-9][0-9]*
+Type        = [su]
+Pat         = "{" PatSpec ":p}"
+Sep         = "{" SepLit* ":s}" ("}" SepLit* ":s}")*
+SepLit      = . ! (":s" | "}" | "}}" | "{" | "{{")
+            | LeBrace
+            | RiBrace
+LeBrace     = "{{" -> "{"
+RiBrace     = "}}" -> "}"
+PatSpec     = (AtName | AtValue | PatLit)*
+AtName      = "{name}"
+            | AtNameSpec
+AtNameSpec  = "{name:" AtSpec "}"
+AtSpec      = Align? Width? AtType
+AtType      = [sd]
+AtValue     = "{value}"
+            | AtValueSpec
+AtValueSpec = "{value:" AtSpec "}"
+PatLit      = . ! ("}" | "}}" | "{" | "{{")
+            | LeBrace
+            | RiBrace
 ```
 
 Let's describe it more precisely. Given a complex leftover placeholder, let's parse it manually to see what Blackhole see.
 Given: `{...:{{name}={value}:p}{\t:s}>50s}`.
 
-| Part                   | Description                                                            |
-|------------------------|------------------------------------------------------------------------|
-| **...**                | Reserved placeholder name indicating for Blackhole that this is a leftover placeholder. |
-| **:**                  | Optional spec marker that is placed after placeholder name where you want to apply one of several extensions. There are pattern, separator, prefix, suffix and format extensions. All of them except format should be surrounded in curly braces. |
-| **{{name}={value}:p}** | Pattern extension that describes how each attribute should be formatted using typical Blackhole notation. The suffix **:p**, that is required for extension identification, means **p**attern. Inside this pattern you can write any pattern you like using two available sub-placeholders for attribute name and value, for each of them a format spec can be applied using cppformat grammar. At last a format spec can be also applied to the entire placeholder, i.e. **:>50p** for example. |
-| **{\t:s}**             | **S**eparator extension for configuring each key-value pair separation. Nuff said. |
-| **{[:r}**              | (Not implemented yet). P**r**efix extension that is prepended before entire result if it is not empty. |
-| **{]:u}**              | (Not implemented yet). S**u**ffix extension that is appended after entire result if it is not empty. |
-| **>50s**               | Entire result format. See cppformat rules for specification. |
+Parameter          | Description                                                            
+-------------------|--------------------------------------------------------------------------------------------------
+...                | Reserved placeholder name indicating for Blackhole that this is a leftover placeholder.
+:                  | Optional spec marker that is placed after placeholder name where you want to apply one of several extensions. There are pattern, separator, prefix, suffix and format extensions. All of them except format should be surrounded in curly braces.
+{{name}={value}:p} | Pattern extension that describes how each attribute should be formatted using typical Blackhole notation. The suffix **:p**, that is required for extension identification, means pattern. Inside this pattern you can write any pattern you like using two available sub-placeholders for attribute name and value, for each of them a format spec can be applied using cppformat grammar. At last a format spec can be also applied to the entire placeholder, i.e. **:>50p** for example.
+{\t:s}             | Separator extension for configuring each key-value pair separation. Nuff said.
+{[:r}              | (Not implemented yet). Prefix extension that is prepended before entire result if it is not empty.
+{]:u}              | (Not implemented yet). Suffix extension that is appended after entire result if it is not empty.
+>50s               | Entire result format. See cppformat rules for specification.
 
 ### JSON.
 JSON formatter provides an ability to format a logging record into a structured JSON tree with attribute handling features, like renaming, routing, mutating and much more.
