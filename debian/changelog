@@ -4,6 +4,7 @@ blackhole (1.0.0-0beta1) UNRELEASED; urgency=low
   * Feature: introduce asynchronous sink.
     This kind of sink wraps the other sink and causes log events to be written
     to them on a separate thread providing non-blocking behavior.
+  * Feature: string view class now satisfies Hash concept.
 
  -- Evgeny Safronov <division494@gmail.com>  Tue, 10 May 2016 22:16:50 +0300
 
