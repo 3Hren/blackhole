@@ -35,6 +35,8 @@ struct backend_t {
         } catch (const std::system_error& err) {
             // Transform unspecified ios category into the system one to obtain readable message.
             throw std::system_error(err.code().value(), std::system_category());
+        } catch (const std::exception&) {
+            throw std::system_error(errno, std::system_category());
         }
     }
 
