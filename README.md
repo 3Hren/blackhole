@@ -200,6 +200,99 @@ Parameter          | Description
 ### JSON.
 JSON formatter provides an ability to format a logging record into a structured JSON tree with attribute handling features, like renaming, routing, mutating and much more.
 
+Briefly using JSON formatter allows to build fully dynamic JSON trees for its further processing with various external tools, like logstash or rsyslog lefting it, however, in a human-readable manner.
+
+Blackhole allows you to control of JSON tree building process using several predefined options.
+
+Without options it will produce just a plain tree with zero level depth. For example for a log record with a severity of 3, message "fatal error, please try again" and a pair of attributes `{"key": 42, "ip": "[::]"}` the result string will look like:
+```json
+{
+    "message": "fatal error, please try again",
+    "severity": 3,
+    "timestamp": 1449859055,
+    "process": 12345,
+    "thread": 57005,
+    "key": 42,
+    "ip": "[::]"
+}
+```
+Using configuration parameters for this formatter you can:
+- Rename parameters.
+- Construct hierarchical tree using a standardized JSON pointer API. For more information please follow \ref https://tools.ietf.org/html/rfc6901.
+
+Attributes renaming acts so much transparently as it appears: it just renames the given attribute name using the specified alternative.
+
+Attributes routing specifies a location where the listed attributes will be placed at the tree construction. Also you can specify a default location for all attributes, which is "/" meaning root otherwise.
+
+For example with routing `{"/fields": ["message", "severity"]}` and "/" as a default pointer the mentioned JSON will look like:
+```json
+{
+    "fields": {
+        "message": "fatal error, please try again",
+        "severity": 3
+    },
+    "timestamp": 1449859055,
+    "process": 12345,
+    "thread": 57005,
+    "key": 42,
+    "ip": "[::]"
+}
+```
+
+Attribute renaming occurs after routing, so mapping "message" => "#message" just replaces the old name with its new alternative.
+
+To gain maximum speed at the tree construction no filtering occurs, so this formatter by default allows duplicated keys, which means invalid JSON tree (but most of parsers are fine with it). If you are really required to deal with unique keys, you can enable `unique` option, but it involves heap allocation and may slow down formatting.
+
+Also formatter allows to automatically append a newline character at the end of the tree, which is strangely required by some consumers, like logstash.
+
+Note, that JSON formatter formats the tree using compact style without excess spaces, tabs etc.
+
+For convenient formatter construction a special builder class is implemented allowing to create and configure instances of this class using streaming API. For example:
+```c++
+auto formatter = blackhole::formatter::json_t::builder_t()
+    .route("/fields", {"message", "severity", "timestamp"})
+    .route("/other")
+    .rename("message", "#message")
+    .rename("timestamp", "#timestamp")
+    .newline()
+    .unique()
+    .build();
+```
+
+This allows to avoid hundreds of constructors and to make a formatter creation to look eye-candy.
+
+The full table of options:
+
+Option      | Type              | Description
+------------|-------------------|---------------
+**/route** | Object of:<br>[string]<br>"\*" | Allows to configure nested tree mapping. Each key must satisfy [JSON Pointer](https://tools.ietf.org/html/rfc6901) specification and sets new attributes location in the tree. Values must be either an array of string, meaning list of attributes that are configured with new place or an "\*" literal, meaning all other attributes.
+**/mapping** | Object of: [string] | Simple attribute names renaming from key to value.
+**/newline** | bool             | If true, a newline will be appended to the end of the result message. The default is _false_.
+**/unique**   | bool             | If true removes all backward consecutive duplicate elements from the attribute list range. For example if there are two attributes with name "name" and values "v1" and "v2" inserted, then after filtering there will be only the last inserted, i.e. "v2". The default is _false_.
+**/mutate/timestamp** | string   | Replaces the timestamp field with new value by transforming it with the given _strftime_ pattern.
+**/mutate/severity**  | [string] | Replaces the severity field with the string value at the current severity value.
+
+For example:
+```json
+"formatter": {
+    "type": "json",
+    "newline": true,
+    "unique": true,
+    "mapping": {
+        "message": "@message",
+        "timestamp": "@timestamp"
+    },
+    "routing": {
+        "": ["message", "timestamp"],
+        "/fields": "*"
+    },
+    "mutate": {
+        "timestamp": "%Y-%m-%dT%H:%M:%S.%fZ",
+        "severity": ["D", "I", "W", "E"]
+    }
+}
+```
+
 ## Sinks
 
 ### Null
