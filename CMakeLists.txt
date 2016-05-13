@@ -20,6 +20,7 @@ find_package(Boost 1.46 REQUIRED COMPONENTS
 	thread)
 
 include_directories(BEFORE SYSTEM
+	${PROJECT_SOURCE_DIR}/foreign/libcds
 	${PROJECT_SOURCE_DIR}/foreign/rapidjson/include)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
