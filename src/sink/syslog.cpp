@@ -1,63 +1,54 @@
 #include "blackhole/sink/syslog.hpp"
 
+#include <syslog.h>
+
 #include "blackhole/config/node.hpp"
 #include "blackhole/config/option.hpp"
 #include "blackhole/cpp17/string_view.hpp"
 #include "blackhole/record.hpp"
 
 #include "blackhole/detail/procname.hpp"
+#include "blackhole/detail/sink/syslog.hpp"
 
 namespace blackhole {
 inline namespace v1 {
 namespace sink {
 
-class syslog_t::inner_t {
-public:
-    int option;
-    int facility;
-    std::string identity;
-    std::vector<int> priorities;
-};
-
-syslog_t::syslog_t() :
-    inner(new inner_t)
-{
-    inner->option = LOG_PID;
-    inner->facility = LOG_USER;
-    inner->identity = detail::procname().to_string();
+syslog_t::syslog_t() {
+   data.option = LOG_PID;
+   data.facility = LOG_USER;
+   data.identity = detail::procname().to_string();
 
 
-    ::openlog(inner->identity.c_str(), inner->option, inner->facility);
+   ::openlog(identity().c_str(), option(), facility());
 }
-
-syslog_t::syslog_t(syslog_t&& other) = default;
 
 syslog_t::~syslog_t() {
     ::closelog();
 }
 
 auto syslog_t::option() const noexcept -> int {
-    return inner->option;
+    return data.option;
 }
 
 auto syslog_t::facility() const noexcept -> int {
-    return inner->facility;
+    return data.facility;
 }
 
 auto syslog_t::identity() const noexcept -> const std::string& {
-    return inner->identity;
+    return data.identity;
 }
 
 auto syslog_t::priorities(std::vector<int> priorities) -> void {
-    inner->priorities = std::move(priorities);
+    data.priorities = std::move(priorities);
 }
 
 auto syslog_t::emit(const record_t& record, const string_view& formatted) -> void {
     const auto severity = static_cast<std::size_t>(record.severity());
 
     int priority;
-    if (severity < inner->priorities.size()) {
-        priority = inner->priorities[severity];
+    if (severity < data.priorities.size()) {
+        priority = data.priorities[severity];
     } else {
         priority = LOG_ERR;
     }
@@ -67,11 +58,13 @@ auto syslog_t::emit(const record_t& record, const string_view& formatted) -> voi
 
 }  // namespace sink
 
-auto factory<sink::syslog_t>::type() -> const char* {
+namespace experimental {
+
+auto factory<sink::syslog_t>::type() const noexcept -> const char* {
     return "syslog";
 }
 
-auto factory<sink::syslog_t>::from(const config::node_t& config) -> sink::syslog_t {
+auto factory<sink::syslog_t>::from(const config::node_t& config) const -> std::unique_ptr<sink_t> {
     sink::syslog_t syslog;
 
     if (auto mapping = config["priorities"]) {
@@ -83,8 +76,9 @@ auto factory<sink::syslog_t>::from(const config::node_t& config) -> sink::syslog
         syslog.priorities(std::move(priorities));
     }
 
-    return syslog;
+    return std::unique_ptr<sink_t>(new sink::syslog_t(std::move(syslog)));
 }
 
+}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "blackhole/factory.hpp"
-#include "blackhole/forward.hpp"
 
 namespace blackhole {
 inline namespace v1 {

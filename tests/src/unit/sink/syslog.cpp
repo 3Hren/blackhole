@@ -1,3 +1,5 @@
+#include <syslog.h>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -5,16 +7,21 @@
 #include <blackhole/sink/syslog.hpp>
 
 #include <blackhole/detail/procname.hpp>
+#include <blackhole/detail/sink/syslog.hpp>
 
 namespace blackhole {
 inline namespace v1 {
 namespace sink {
 namespace {
 
-using sink::syslog_t;
+using experimental::factory;
 
 using ::testing::Return;
 using ::testing::StrictMock;
+
+TEST(syslog_t, Type) {
+    EXPECT_EQ(std::string("syslog"), factory<sink::syslog_t>().type());
+}
 
 TEST(syslog_t, Default) {
     syslog_t syslog;

@@ -8,7 +8,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Integration with CodeCov ([#66]).
 - Keep a changelog ([#67]).
 - Embed libcppformat directly into the Blackhole ([#68]).
+
+### Changed
 - Hide rapidjson symbols entirely ([#78]).
+- All sinks no longer export their symbols and can be constructed only through associated factories as unsized objects.
 
 ## [0.5.0] - The Infinite Corruptor - 2015-04-09
 ### Added
