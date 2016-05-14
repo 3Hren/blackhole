@@ -114,7 +114,7 @@ auto registry_t::configured() -> registry_t {
     registry.add<formatter::string_t>();
 
     registry.add<sink::console_t>();
-    registry.add<sink::null_t>();
+    registry.add_<sink::null_t>();
     registry.add<sink::syslog_t>();
 
     registry.add<handler::blocking_t>();

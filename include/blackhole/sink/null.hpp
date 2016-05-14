@@ -1,25 +1,7 @@
 #pragma once
 
-#include "blackhole/sink.hpp"
-
-namespace blackhole {
-inline namespace v1 {
-
-template<typename>
-struct factory;
-
-}  // namespace v1
-}  // namespace blackhole
-
-namespace blackhole {
-inline namespace v1 {
-namespace config {
-
-class node_t;
-
-}  // namespace config
-}  // namespace v1
-}  // namespace blackhole
+#include "blackhole/factory.hpp"
+#include "blackhole/forward.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -31,19 +13,28 @@ namespace sink {
 /// pipeline. It never fails and never throws, because it does nothing.
 ///
 /// \remark All methods of this class are thread safe.
-class null_t : public sink_t {
-public:
-    /// Drops any incoming log event.
-    auto emit(const record_t& record, const string_view& formatted) -> void;
-};
+class null_t;
 
 }  // namespace sink
 
 template<>
 struct factory<sink::null_t> {
+    [[deprecated]]
     static auto type() -> const char*;
+
+    [[deprecated]]
     static auto from(const config::node_t& config) -> sink::null_t;
 };
 
+namespace experimental {
+
+template<>
+class factory<sink::null_t> : public experimental::factory<sink_t> {
+public:
+    auto type() const noexcept -> const char* override;
+    auto from(const config::node_t& config) const -> std::unique_ptr<sink_t> override;
+};
+
+}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

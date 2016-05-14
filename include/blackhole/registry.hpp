@@ -87,6 +87,11 @@ public:
     template<typename T>
     auto add() -> void;
 
+    template<typename T, typename... Args>
+    auto add_(Args&&... args) -> void {
+        add(std::make_shared<experimental::factory<T>>(std::forward<Args>(args)...));
+    }
+
     auto add(std::shared_ptr<experimental::factory<sink_t>> factory) -> void;
 
     /// Returns the sink factory with the given type if registered, throws otherwise.
