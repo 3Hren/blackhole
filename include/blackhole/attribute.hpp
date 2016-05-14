@@ -14,6 +14,8 @@ namespace blackhole {
 inline namespace v1 {
 
 /// Trait that describes how to format user defined types provided as attributes.
+///
+/// The trait must implement `apply` function that matches attribute function type signature.
 template<typename T>
 struct display_traits;
 
