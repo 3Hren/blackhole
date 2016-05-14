@@ -102,8 +102,6 @@ namespace formatter {
 ///         .build();
 ///
 /// This allow to avoid hundreds of constructors and to make a formatter creation to look eye-candy.
-// TODO: Add severity mapping support.
-// TODO: Add timestamp mapping support.
 // TODO: Idea. Make class private. Export only forward with factory and builder specializations. It
 //      saves from that hundreds of PIMPLS.
 // builder<T>::build() -> std::unique_ptr<formatter_t>;
