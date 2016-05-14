@@ -228,21 +228,21 @@ TEST(Tokenizer, Format) {
         string_view(wr.data(), wr.size()));
 }
 
-// TEST(Pattern, Final) {
-//     constexpr auto count = tokenizer_t("{} - {} [{}] 'GET {} HTTP/1.0' {} {}").count();
-//     constexpr auto token = tokenizer<count.placeholders(), count.total()>("{} - {} [{}] 'GET {} HTTP/1.0' {} {}");
-//
-//     EXPECT_EQ(string_view("{} - {} [{}] 'GET {} HTTP/1.0' {} {}"), token.pattern());
-//
-//     // TODO: EQ literals.
-//     // TODO: EQ placeholders.
-//
-//     fmt::MemoryWriter wr;
-//     token.format(wr, "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326);
-//
-//     EXPECT_EQ(string_view("[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326"),
-//         string_view(wr.data(), wr.size()));
-// }
+TEST(Pattern, Final) {
+    constexpr auto count = tokenizer_t("{} - {} [{}] 'GET {} HTTP/1.0' {} {}").count();
+    constexpr auto token = tokenizer<count.placeholders(), count.tokens()>("{} - {} [{}] 'GET {} HTTP/1.0' {} {}");
+
+    EXPECT_EQ(string_view("{} - {} [{}] 'GET {} HTTP/1.0' {} {}"), token.unparsed());
+
+    // TODO: EQ literals.
+    // TODO: EQ placeholders.
+
+    fmt::MemoryWriter wr;
+    token.format(wr, "[::]", "esafronov", "10/Oct/2000:13:55:36 -0700", "/porn.png", 200, 2326);
+
+    EXPECT_EQ(string_view("[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET /porn.png HTTP/1.0' 200 2326"),
+        string_view(wr.data(), wr.size()));
+}
 
 }  // namespace testing
 }  // namespace blackhole
