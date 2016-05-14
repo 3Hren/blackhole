@@ -15,14 +15,6 @@ public:
 
 }  // namespace sink
 
-auto factory<sink::null_t>::type() -> const char* {
-    return "null";
-}
-
-auto factory<sink::null_t>::from(const config::node_t&) -> sink::null_t {
-    return sink::null_t();
-}
-
 namespace experimental {
 
 auto factory<sink::null_t>::type() const noexcept -> const char* {

@@ -17,15 +17,6 @@ class null_t;
 
 }  // namespace sink
 
-template<>
-struct factory<sink::null_t> {
-    [[deprecated]]
-    static auto type() -> const char*;
-
-    [[deprecated]]
-    static auto from(const config::node_t& config) -> sink::null_t;
-};
-
 namespace experimental {
 
 template<>
