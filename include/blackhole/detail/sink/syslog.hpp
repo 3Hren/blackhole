@@ -29,6 +29,7 @@ public:
     auto option() const noexcept -> int;
     auto facility() const noexcept -> int;
     auto identity() const noexcept -> const std::string&;
+    auto priorities() const -> std::vector<int>;
     auto priorities(std::vector<int> priorities) -> void;
 
     auto emit(const record_t& record, const string_view& formatted) -> void override;

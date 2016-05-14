@@ -9,6 +9,8 @@
 #include <blackhole/detail/procname.hpp>
 #include <blackhole/detail/sink/syslog.hpp>
 
+#include "mocks/node.hpp"
+
 namespace blackhole {
 inline namespace v1 {
 namespace sink {
@@ -16,11 +18,45 @@ namespace {
 
 using experimental::factory;
 
+using ::testing::_;
+using ::testing::Invoke;
 using ::testing::Return;
 using ::testing::StrictMock;
 
 TEST(syslog_t, Type) {
     EXPECT_EQ(std::string("syslog"), factory<sink::syslog_t>().type());
+}
+
+TEST(syslog_t, Factory) {
+    using config::testing::mock::node_t;
+
+    StrictMock<node_t> config;
+
+    auto priorities_node = new node_t;
+    EXPECT_CALL(config, subscript_key("priorities"))
+        .Times(1)
+        .WillOnce(Return(priorities_node));
+
+    node_t priority_item_node;
+    EXPECT_CALL(*priorities_node, each(_))
+        .Times(1)
+        .WillOnce(Invoke([&](const node_t::each_function& fn) {
+            for (int i = 0; i < 4; ++i) {
+                fn(priority_item_node);
+            }
+        }));
+
+    EXPECT_CALL(priority_item_node, to_sint64())
+        .Times(4)
+        .WillOnce(Return(0))
+        .WillOnce(Return(2))
+        .WillOnce(Return(5))
+        .WillOnce(Return(9));
+
+    auto sink = factory<syslog_t>().from(config);
+    const auto& cast = dynamic_cast<const syslog_t&>(*sink);
+
+    EXPECT_EQ((std::vector<int>{0, 2, 5, 9}), cast.priorities());
 }
 
 TEST(syslog_t, Default) {

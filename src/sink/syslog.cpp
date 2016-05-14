@@ -19,7 +19,6 @@ syslog_t::syslog_t() {
    data.facility = LOG_USER;
    data.identity = detail::procname().to_string();
 
-
    ::openlog(identity().c_str(), option(), facility());
 }
 
@@ -37,6 +36,10 @@ auto syslog_t::facility() const noexcept -> int {
 
 auto syslog_t::identity() const noexcept -> const std::string& {
     return data.identity;
+}
+
+auto syslog_t::priorities() const -> std::vector<int> {
+    return data.priorities;
 }
 
 auto syslog_t::priorities(std::vector<int> priorities) -> void {
