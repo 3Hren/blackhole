@@ -8,39 +8,19 @@
 #include "blackhole/record.hpp"
 
 #include "blackhole/detail/sink/file.hpp"
+#include "blackhole/detail/util/deleter.hpp"
 
 namespace blackhole {
 inline namespace v1 {
 namespace sink {
 
-class file_t::properties_t {
-public:
-    properties_t(std::string filename, std::size_t interval) :
-        filename(std::move(filename)),
-        interval(interval)
-    {}
-
-    std::string filename;
-    std::size_t interval;
-};
-
 file_t::file_t(const std::string& filename) :
     inner(new file::inner_t(filename, 0))
 {}
 
-file_t::file_t(std::unique_ptr<file::inner_t> inner) noexcept :
-    inner(std::move(inner))
+file_t::file_t(const file_properties_t& properties) :
+    inner(new file::inner_t(properties.filename, properties.interval))
 {}
-
-file_t::file_t(std::unique_ptr<file_t::properties_t> properties) :
-    inner(new file::inner_t(properties->filename, properties->interval))
-{}
-
-file_t::file_t(file_t&& other) noexcept = default;
-
-file_t::~file_t() = default;
-
-auto file_t::operator=(file_t&& other) noexcept -> file_t& = default;
 
 auto file_t::path() const -> const std::string& {
     return inner->path();
@@ -53,39 +33,35 @@ auto file_t::emit(const record_t& record, const string_view& formatted) -> void 
     inner->backend(filename).write(formatted);
 }
 
-file_t::builder_t::builder_t(const std::string& filename) :
-    properties(new properties_t(filename, 0))
+}  // namespace sink
+
+namespace experimental {
+
+builder<sink::file_t>::builder(const std::string& filename) :
+    properties(new sink::file_properties_t{filename, 0}, deleter_t())
 {}
 
-file_t::builder_t::builder_t(builder_t&& other) noexcept = default;
-
-file_t::builder_t::~builder_t() = default;
-
-auto file_t::builder_t::operator=(builder_t&& other) noexcept -> builder_t& = default;
-
-auto file_t::builder_t::interval(std::size_t count) -> builder_t& {
+auto builder<sink::file_t>::interval(std::size_t count) -> builder& {
     properties->interval = count;
     return *this;
 }
 
-auto file_t::builder_t::build() -> file_t {
-    return file_t(std::move(properties));
+auto builder<sink::file_t>::build() -> std::unique_ptr<sink_t> {
+    return std::unique_ptr<sink_t>(new sink::file_t(*properties));
 }
 
-}  // namespace sink
-
-auto factory<sink::file_t>::type() -> const char* {
+auto factory<sink::file_t>::type() const noexcept -> const char* {
     return "file";
 }
 
-auto factory<sink::file_t>::from(const config::node_t& config) -> sink::file_t {
+auto factory<sink::file_t>::from(const config::node_t& config) const -> std::unique_ptr<sink_t> {
     const auto filename = config["path"].to_string();
 
     if (!filename) {
         throw std::invalid_argument("field 'path' is required");
     }
 
-    sink::file_t::builder_t builder(filename.get());
+    builder<sink::file_t> builder(filename.get());
 
     if (auto flush = config["flush"]) {
         if (auto value = flush.to_uint64()) {
@@ -95,6 +71,10 @@ auto factory<sink::file_t>::from(const config::node_t& config) -> sink::file_t {
 
     return builder.build();
 }
+
+}  // namespace experimental
+
+template auto deleter_t::operator()(sink::file_properties_t* value) -> void;
 
 }  // namespace v1
 }  // namespace blackhole

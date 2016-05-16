@@ -1,7 +1,5 @@
 #pragma once
 
-#include "blackhole/sink/file.hpp"
-
 #include <fstream>
 #include <limits>
 #include <map>
@@ -10,10 +8,34 @@
 #include <boost/assert.hpp>
 
 #include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/sink.hpp"
+#include "blackhole/sink/file.hpp"
 
 namespace blackhole {
 inline namespace v1 {
 namespace sink {
+
+class file_properties_t {
+public:
+    std::string filename;
+    std::size_t interval;
+};
+
+class backend_t;
+class flusher_t;
+
+class backend_factory_t {
+public:
+    virtual ~backend_factory_t() = default;
+    virtual auto create(const std::string& path) const -> std::unique_ptr<backend_t> = 0;
+};
+
+class flusher_factory_t {
+public:
+    virtual ~flusher_factory_t() = default;
+    virtual auto create() const -> std::unique_ptr<flusher_t> = 0;
+};
+
 namespace file {
 
 struct backend_t {
@@ -33,7 +55,8 @@ struct backend_t {
         try {
             stream->open(filename, std::ios::app);
         } catch (const std::system_error& err) {
-            // Transform unspecified ios category into the system one to obtain readable message.
+            // Transform unspecified ios category into the system one to obtain readable message,
+            // otherwise there will be completely weird error reason.
             throw std::system_error(err.code().value(), std::system_category());
         } catch (const std::exception&) {
             throw std::system_error(errno, std::system_category());
@@ -98,6 +121,45 @@ public:
 };
 
 }  // namespace file
+
+class file_t : public sink_t {
+    std::unique_ptr<file::inner_t> inner;
+
+public:
+    /// Constructs a file sink, which will write all incoming events to the file or files located at
+    /// the specified path.
+    ///
+    /// The path can contain attribute placeholders, meaning that the real destination name will be
+    /// deduced at runtime using provided log record. No real file will be opened at construction
+    /// time.
+    /// The file is opened by default in append mode meaning seek to the end of stream immediately
+    /// after open.
+    ///
+    /// \param path a path with final destination file to open. All files are opened with append
+    ///     mode by default.
+    /// \note associated files will be opened on demand during the first write operation.
+    explicit file_t(const std::string& path);
+
+    file_t(const file_properties_t& properties);
+
+    // TODO: DI.
+    // file_t(const std::string& path,
+    //        std::unique_ptr<backend_factory_t> backend_factory,
+    //        std::unique_ptr<flusher_factory_t> flusher_factory);
+
+    /// Returns a const lvalue reference to destination path pattern.
+    ///
+    /// The path can contain attribute placeholders, meaning that the real destination name will be
+    /// deduced at runtime using provided log record. No real file will be opened at construction
+    /// time.
+    auto path() const -> const std::string&;
+
+    /// Outputs the formatted message with its associated record to the file.
+    ///
+    /// Depending on the filename pattern it is possible to write into multiple destinations.
+    auto emit(const record_t& record, const string_view& formatted) -> void;
+};
+
 }  // namespace sink
 }  // namespace v1
 }  // namespace blackhole

@@ -20,17 +20,7 @@ TEST(backend_t, ThrowsIfUnableToOpenStream) {
     EXPECT_THROW(backend_t("/__mythic/file.log", 1), std::system_error);
 }
 
-}  // namespace
-}  // namespace file
-}  // namespace sink
-}  // namespace v1
-}  // namespace blackhole
-
-namespace blackhole {
-namespace testing {
-namespace sink {
-
-using ::blackhole::sink::file_t;
+using experimental::factory;
 
 using ::testing::Return;
 using ::testing::StrictMock;
@@ -63,7 +53,7 @@ TEST(inner_t, IntervalOverflow) {
 }  // namespace file
 
 TEST(file_t, Type) {
-    EXPECT_EQ("file", std::string(blackhole::factory<file_t>::type()));
+    EXPECT_EQ(std::string("file"), factory<file_t>().type());
 }
 
 TEST(file_t, FromRequiresFilename) {
@@ -73,13 +63,13 @@ TEST(file_t, FromRequiresFilename) {
         .Times(1)
         .WillOnce(Return(nullptr));
 
-    EXPECT_THROW(factory<sink::file_t>::from(config), std::invalid_argument);
+    EXPECT_THROW(factory<file_t>().from(config), std::invalid_argument);
 }
 
 TEST(file_t, PatternFromConfig) {
     using config::testing::mock::node_t;
 
-    StrictMock<config::testing::mock::node_t> config;
+    StrictMock<node_t> config;
 
     auto npath = new node_t;
 
@@ -95,13 +85,16 @@ TEST(file_t, PatternFromConfig) {
         .Times(1)
         .WillOnce(Return(nullptr));
 
-    EXPECT_EQ("/tmp/blackhole.log", factory<sink::file_t>::from(config).path());
+    auto sink = factory<file_t>().from(config);
+    const auto& cast = dynamic_cast<const file_t&>(*sink);
+
+    EXPECT_EQ("/tmp/blackhole.log", cast.path());
 }
 
 TEST(file_t, FlushIntervalFromConfig) {
     using config::testing::mock::node_t;
 
-    StrictMock<config::testing::mock::node_t> config;
+    StrictMock<node_t> config;
 
     auto npath = new node_t;
     EXPECT_CALL(config, subscript_key("path"))
@@ -121,9 +114,11 @@ TEST(file_t, FlushIntervalFromConfig) {
         .Times(1)
         .WillOnce(Return(30));
 
-    factory<sink::file_t>::from(config);
+    factory<file_t>().from(config);
 }
 
+}  // namespace
+}  // namespace file
 }  // namespace sink
-}  // namespace testing
+}  // namespace v1
 }  // namespace blackhole

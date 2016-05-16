@@ -214,7 +214,6 @@ if (ENABLE_TESTING)
 		tests/root
 		tests/severity
 		tests/sink/console
-		tests/sink/file
 		tests/sink/udp
 		tests/src/mocks/formatter
 		tests/src/mocks/handler
@@ -227,6 +226,7 @@ if (ENABLE_TESTING)
 		tests/src/unit/formatter/json
 		tests/src/unit/formatter/token
 		tests/src/unit/sink/asynchronous
+		tests/src/unit/sink/file
 		tests/src/unit/sink/null
 		tests/src/unit/sink/syslog
 		tests/src/unit/sink/tcp

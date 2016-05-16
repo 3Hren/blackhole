@@ -3,6 +3,11 @@
 namespace blackhole {
 inline namespace v1 {
 
+struct deleter_t {
+    template<typename T>
+    auto operator()(T* value) -> void;
+};
+
 class severity_t;
 
 class formatter_t;
@@ -16,6 +21,9 @@ struct factory;
 class factory_t;
 
 namespace experimental {
+
+template<typename T>
+class builder;
 
 template<typename T>
 class factory;
