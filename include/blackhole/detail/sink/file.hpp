@@ -91,19 +91,9 @@ class file_t : public sink_t {
     mutable std::mutex mutex;
 
 public:
-    /// Constructs a file sink, which will write all incoming events to the file or files located at
-    /// the specified path.
-    ///
-    /// The path can contain attribute placeholders, meaning that the real destination name will be
-    /// deduced at runtime using provided log record. No real file will be opened at construction
-    /// time.
-    /// The file is opened by default in append mode meaning seek to the end of stream immediately
-    /// after open.
-    ///
     /// \param path a path with final destination file to open. All files are opened with append
     ///     mode by default.
     /// \param interval flush interval in number of write operations.
-    /// \note associated files will be opened on demand during the first write operation.
     explicit file_t(const std::string& path, std::size_t interval = 0);
 
     file_t(const file_properties_t& properties);

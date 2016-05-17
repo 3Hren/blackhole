@@ -8,7 +8,16 @@ namespace blackhole {
 inline namespace v1 {
 namespace sink {
 
-/// Represents a sink that writes formatted log events to one or miltiple files.
+/// Represents a sink that writes formatted log events to the file or files located at the specified
+/// path.
+///
+/// The path can contain attribute placeholders, meaning that the real destination name will be
+/// deduced at runtime using provided log record. No real file will be opened at construction
+/// time.
+/// All files are opened by default in append mode meaning seek to the end of stream immediately
+/// after open.
+///
+/// \note associated files will be opened on demand during the first write operation.
 class file_t;
 class file_properties_t;
 
