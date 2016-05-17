@@ -46,7 +46,7 @@ auto builder<sink::file_t>::interval(std::size_t count) -> builder& {
     return *this;
 }
 
-auto builder<sink::file_t>::build() -> std::unique_ptr<sink_t> {
+auto builder<sink::file_t>::build() && -> std::unique_ptr<sink_t> {
     return std::unique_ptr<sink_t>(new sink::file_t(*properties));
 }
 
@@ -69,7 +69,7 @@ auto factory<sink::file_t>::from(const config::node_t& config) const -> std::uni
         }
     }
 
-    return builder.build();
+    return std::move(builder).build();
 }
 
 }  // namespace experimental

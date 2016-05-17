@@ -34,9 +34,9 @@ public:
     auto interval(std::size_t count) -> builder&;
 
     // TODO: Implement flush after every nsize bytes is written.
-    // auto interval(bytesize_t size) -> builder_t&
+    // auto interval(units::size count) -> builder&
 
-    auto build() -> std::unique_ptr<sink_t>;
+    auto build() && -> std::unique_ptr<sink_t>;
 };
 
 template<>
