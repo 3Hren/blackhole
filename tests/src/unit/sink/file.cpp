@@ -25,18 +25,14 @@ using experimental::factory;
 using ::testing::Return;
 using ::testing::StrictMock;
 
-namespace file {
+TEST(file_t, IntervalSanitizer) {
+    file_t sink("", 0);
 
-using ::blackhole::sink::file::inner_t;
-
-TEST(inner_t, IntervalSanitizer) {
-    inner_t inner("", 0);
-
-    EXPECT_NE(0, inner.interval());
-    EXPECT_EQ(std::numeric_limits<std::size_t>::max(), inner.interval());
+    EXPECT_NE(0, sink.interval());
+    EXPECT_EQ(std::numeric_limits<std::size_t>::max(), sink.interval());
 }
 
-TEST(inner_t, IntervalOverflow) {
+TEST(file_t, IntervalOverflow) {
     std::size_t interval = 3;
     std::size_t counter = 0;
 
@@ -50,13 +46,11 @@ TEST(inner_t, IntervalOverflow) {
     EXPECT_EQ(0, counter);
 }
 
-}  // namespace file
-
-TEST(file_t, Type) {
+TEST(factory, Type) {
     EXPECT_EQ(std::string("file"), factory<file_t>().type());
 }
 
-TEST(file_t, FromRequiresFilename) {
+TEST(factory, FromRequiresFilename) {
     StrictMock<config::testing::mock::node_t> config;
 
     EXPECT_CALL(config, subscript_key("path"))
@@ -66,7 +60,7 @@ TEST(file_t, FromRequiresFilename) {
     EXPECT_THROW(factory<file_t>().from(config), std::invalid_argument);
 }
 
-TEST(file_t, PatternFromConfig) {
+TEST(factory, PatternFromConfig) {
     using config::testing::mock::node_t;
 
     StrictMock<node_t> config;
@@ -91,7 +85,7 @@ TEST(file_t, PatternFromConfig) {
     EXPECT_EQ("/tmp/blackhole.log", cast.path());
 }
 
-TEST(file_t, FlushIntervalFromConfig) {
+TEST(factory, FlushIntervalFromConfig) {
     using config::testing::mock::node_t;
 
     StrictMock<node_t> config;

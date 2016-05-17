@@ -21,22 +21,22 @@ public:
     std::size_t interval;
 };
 
-class backend_t;
-class flusher_t;
-
-class backend_factory_t {
-public:
-    virtual ~backend_factory_t() = default;
-    virtual auto create(const std::string& path) const -> std::unique_ptr<backend_t> = 0;
-};
-
-class flusher_factory_t {
-public:
-    virtual ~flusher_factory_t() = default;
-    virtual auto create() const -> std::unique_ptr<flusher_t> = 0;
-};
-
 namespace file {
+
+// class backend_t;
+// class flusher_t;
+//
+// class backend_factory_t {
+// public:
+//     virtual ~backend_factory_t() = default;
+//     virtual auto create(const std::string& path) const -> std::unique_ptr<backend_t> = 0;
+// };
+//
+// class flusher_factory_t {
+// public:
+//     virtual ~flusher_factory_t() = default;
+//     virtual auto create() const -> std::unique_ptr<flusher_t> = 0;
+// };
 
 struct backend_t {
     std::size_t counter;
@@ -79,51 +79,16 @@ struct backend_t {
     }
 };
 
-class inner_t {
-    struct {
-        std::string filename;
-        std::size_t interval;
-        std::map<std::string, backend_t> backends;
-    } data;
-
-public:
-    std::mutex mutex;
-
-    inner_t(std::string filename, std::size_t interval) {
-        data.filename = std::move(filename);
-        data.interval = interval > 0 ? interval : std::numeric_limits<std::size_t>::max();
-    }
-
-    virtual ~inner_t() {}
-
-    auto path() const noexcept -> const std::string& {
-        return data.filename;
-    }
-
-    auto interval() const noexcept -> std::size_t {
-        return data.interval;
-    }
-
-    virtual auto filename(const record_t&) const -> std::string {
-        // TODO: Generate path from tokens, for now just return static path.
-        return {data.filename};
-    }
-
-    virtual auto backend(const std::string& filename) -> backend_t& {
-        const auto it = data.backends.find(filename);
-
-        if (it == data.backends.end()) {
-            return data.backends.insert(it, std::make_pair(filename, backend_t(filename, interval())))->second;
-        }
-
-        return it->second;
-    }
-};
-
 }  // namespace file
 
 class file_t : public sink_t {
-    std::unique_ptr<file::inner_t> inner;
+    struct {
+        std::string filename;
+        std::size_t interval;
+        std::map<std::string, file::backend_t> backends;
+    } data;
+
+    mutable std::mutex mutex;
 
 public:
     /// Constructs a file sink, which will write all incoming events to the file or files located at
@@ -137,8 +102,9 @@ public:
     ///
     /// \param path a path with final destination file to open. All files are opened with append
     ///     mode by default.
+    /// \param interval flush interval in number of write operations.
     /// \note associated files will be opened on demand during the first write operation.
-    explicit file_t(const std::string& path);
+    explicit file_t(const std::string& path, std::size_t interval = 0);
 
     file_t(const file_properties_t& properties);
 
@@ -154,10 +120,16 @@ public:
     /// time.
     auto path() const -> const std::string&;
 
+    auto interval() const noexcept -> std::size_t;
+
+    auto filename(const record_t&) const -> std::string;
+
+    auto backend(const std::string& filename) -> file::backend_t&;
+
     /// Outputs the formatted message with its associated record to the file.
     ///
     /// Depending on the filename pattern it is possible to write into multiple destinations.
-    auto emit(const record_t& record, const string_view& formatted) -> void;
+    auto emit(const record_t& record, const string_view& formatted) -> void override;
 };
 
 }  // namespace sink

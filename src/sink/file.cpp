@@ -14,23 +14,43 @@ namespace blackhole {
 inline namespace v1 {
 namespace sink {
 
-file_t::file_t(const std::string& filename) :
-    inner(new file::inner_t(filename, 0))
-{}
+file_t::file_t(const std::string& filename, std::size_t interval) {
+    data.filename = filename;
+    data.interval = interval > 0 ? interval : std::numeric_limits<std::size_t>::max();
+}
 
 file_t::file_t(const file_properties_t& properties) :
-    inner(new file::inner_t(properties.filename, properties.interval))
+    file_t(properties.filename, properties.interval)
 {}
 
 auto file_t::path() const -> const std::string& {
-    return inner->path();
+    return data.filename;
+}
+
+auto file_t::interval() const noexcept -> std::size_t {
+    return data.interval;
+}
+
+auto file_t::filename(const record_t&) const -> std::string {
+    // TODO: Generate path from tokens, for now just return static path.
+    return {data.filename};
+}
+
+auto file_t::backend(const std::string& filename) -> file::backend_t& {
+    const auto it = data.backends.find(filename);
+
+    if (it == data.backends.end()) {
+        return data.backends.insert(it, std::make_pair(filename, file::backend_t(filename, interval())))->second;
+    }
+
+    return it->second;
 }
 
 auto file_t::emit(const record_t& record, const string_view& formatted) -> void {
-    const auto filename = inner->filename(record);
+    const auto filename = this->filename(record);
 
-    std::lock_guard<std::mutex> lock(inner->mutex);
-    inner->backend(filename).write(formatted);
+    std::lock_guard<std::mutex> lock(mutex);
+    backend(filename).write(formatted);
 }
 
 }  // namespace sink
