@@ -16,14 +16,122 @@ namespace sink {
 namespace file {
 namespace {
 
-TEST(backend_t, ThrowsIfUnableToOpenStream) {
-    EXPECT_THROW(backend_t("/__mythic/file.log", 1), std::system_error);
-}
-
 using experimental::factory;
 
 using ::testing::Return;
 using ::testing::StrictMock;
+
+TEST(repeat_flusher_t, Default) {
+    repeat_flusher_t flusher(3);
+
+    EXPECT_EQ(0, flusher.count());
+}
+
+TEST(repeat_flusher_t, Update) {
+    repeat_flusher_t flusher(3);
+
+    EXPECT_EQ(flusher_t::idle, flusher.update(1));
+    EXPECT_EQ(flusher_t::idle, flusher.update(1));
+    EXPECT_EQ(flusher_t::flush, flusher.update(1));
+    EXPECT_EQ(flusher_t::idle, flusher.update(1));
+    EXPECT_EQ(flusher_t::idle, flusher.update(1));
+    EXPECT_EQ(flusher_t::flush, flusher.update(1));
+}
+
+TEST(repeat_flusher_t, CounterOverflow) {
+    repeat_flusher_t flusher(3);
+
+    flusher.update(1);
+    EXPECT_EQ(1, flusher.count());
+
+    flusher.update(42);
+    EXPECT_EQ(2, flusher.count());
+
+    flusher.update(1);
+    EXPECT_EQ(0, flusher.count());
+}
+
+TEST(repeat_flusher_t, Reset) {
+    repeat_flusher_t flusher(3);
+
+    flusher.update(1);
+    flusher.update(1);
+    EXPECT_EQ(2, flusher.count());
+
+    flusher.reset();
+    EXPECT_EQ(0, flusher.count());
+}
+
+TEST(repeat_flusher_t, ZeroWrite) {
+    repeat_flusher_t flusher(3);
+
+    flusher.update(0);
+    EXPECT_EQ(0, flusher.count());
+}
+
+TEST(bytecount_flusher_t, Default) {
+    bytecount_flusher_t flusher(1024);
+
+    EXPECT_EQ(0, flusher.count());
+}
+
+TEST(bytecount_flusher_t, Update) {
+    bytecount_flusher_t flusher(1024);
+
+    EXPECT_EQ(flusher_t::idle, flusher.update(10));
+    EXPECT_EQ(flusher_t::idle, flusher.update(1000));
+    EXPECT_EQ(flusher_t::flush, flusher.update(14));
+    EXPECT_EQ(flusher_t::idle, flusher.update(1023));
+    EXPECT_EQ(flusher_t::flush, flusher.update(1));
+    EXPECT_EQ(flusher_t::flush, flusher.update(100500)); // 100500 % 1024 = 148
+    EXPECT_EQ(flusher_t::idle, flusher.update(2));
+    EXPECT_EQ(flusher_t::flush, flusher.update(875));
+}
+
+TEST(bytecount_flusher_t, CounterOverflow) {
+    bytecount_flusher_t flusher(1024);
+
+    flusher.update(10);
+    EXPECT_EQ(10, flusher.count());
+
+    flusher.update(1000);
+    EXPECT_EQ(1010, flusher.count());
+
+    flusher.update(14);
+    EXPECT_EQ(0, flusher.count());
+
+    flusher.update(1023);
+    EXPECT_EQ(1023, flusher.count());
+
+    flusher.update(1);
+    EXPECT_EQ(0, flusher.count());
+
+    flusher.update(100500);
+    EXPECT_EQ(148, flusher.count());
+
+    flusher.update(2);
+    EXPECT_EQ(150, flusher.count());
+
+    flusher.update(875);
+    EXPECT_EQ(1, flusher.count());
+}
+
+TEST(bytecount_flusher_t, Reset) {
+    bytecount_flusher_t flusher(1024);
+
+    flusher.update(10);
+    EXPECT_EQ(10, flusher.count());
+
+    flusher.update(1000);
+    EXPECT_EQ(1010, flusher.count());
+
+    flusher.reset();
+    EXPECT_EQ(0, flusher.count());
+}
+
+TEST(backend_t, ThrowsIfUnableToOpenStream) {
+    EXPECT_THROW(backend_t("/__mythic/file.log", 1), std::system_error);
+}
 
 TEST(file_t, IntervalSanitizer) {
     file_t sink("", 0);

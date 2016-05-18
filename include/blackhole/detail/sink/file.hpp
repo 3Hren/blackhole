@@ -23,13 +23,96 @@ public:
 
 namespace file {
 
-// class backend_t;
-// class flusher_t;
-//
-// class backend_factory_t {
+/// Flush suggest policy.
+class flusher_t {
+public:
+    enum result_t {
+        /// No flush required.
+        idle,
+        /// It's time to flush.
+        flush
+    };
+
+public:
+    virtual ~flusher_t() = default;
+
+    /// Resets the current flusher state.
+    virtual auto reset() -> void = 0;
+
+    /// Updates the flusher, incrementing its counters.
+    ///
+    /// \param nwritten bytes consumed during previous write operation.
+    virtual auto update(std::size_t nwritten) -> result_t = 0;
+};
+
+class repeat_flusher_t : public flusher_t {
+    std::size_t limit;
+    std::size_t counter;
+
+public:
+    constexpr repeat_flusher_t(std::size_t limit) noexcept :
+        limit(limit),
+        counter(0)
+    {}
+
+    auto count() const noexcept -> std::size_t {
+        return counter;
+    }
+
+    auto reset() -> void override {
+        counter = 0;
+    }
+
+    auto update(std::size_t nwritten) -> flusher_t::result_t override {
+        if (nwritten != 0) {
+            counter = (counter + 1) % limit;
+
+            if (counter == 0) {
+                return flusher_t::flush;
+            }
+        }
+
+        return flusher_t::idle;
+    }
+};
+
+class bytecount_flusher_t : public flusher_t {
+    std::uint64_t limit;
+    std::uint64_t counter;
+
+public:
+    constexpr bytecount_flusher_t(std::uint64_t limit) noexcept :
+        limit(limit),
+        counter(0)
+    {}
+
+    auto count() const noexcept -> std::uint64_t {
+        return counter;
+    }
+
+    auto reset() -> void override {
+        counter = 0;
+    }
+
+    auto update(std::size_t nwritten) -> flusher_t::result_t override {
+        auto result = flusher_t::result_t::idle;
+
+        if (nwritten != 0) {
+            if (counter + nwritten >= limit) {
+                result = flusher_t::result_t::flush;
+            }
+
+            counter = (counter + nwritten) % limit;
+        }
+
+        return result;
+    }
+};
+
+// class stream_factory_t {
 // public:
-//     virtual ~backend_factory_t() = default;
-//     virtual auto create(const std::string& path) const -> std::unique_ptr<backend_t> = 0;
+//     virtual ~stream_factory_t() = default;
+//     virtual auto create(const std::string& path) const -> std::unique_ptr<std::ostream> = 0;
 // };
 //
 // class flusher_factory_t {
@@ -64,6 +147,11 @@ struct backend_t {
     }
 
     auto write(const string_view& message) -> void {
+        /// stream->write(message);
+        /// stream->put('\n');
+        /// if (flusher->trigger() == flusher_t::flush) {
+        ///     stream->flush();
+        /// }
         stream->write(message.data(), static_cast<std::streamsize>(message.size()));
         stream->put('\n');
 
