@@ -143,6 +143,22 @@ TEST(repeat_flusher_factory_t, CreatesRepeatFlusher) {
     EXPECT_EQ(42, repeat.limit());
 }
 
+TEST(parse_interval, WithoutUnit) {
+    EXPECT_EQ(1024, parse_interval("1024"));
+}
+
+TEST(parse_interval, B) {
+    EXPECT_EQ(1024, parse_interval("1024B"));
+}
+
+TEST(parse_interval, MB) {
+    EXPECT_EQ(1024 * 1000, parse_interval("1024MB"));
+}
+
+TEST(parse_interval, ThrowsOnUnknownUnit) {
+    EXPECT_THROW(parse_interval("1024Hz"), std::invalid_argument);
+}
+
 TEST(backend_t, ThrowsIfUnableToOpenStream) {
     EXPECT_THROW(backend_t("/__mythic/file.log", 1), std::system_error);
 }

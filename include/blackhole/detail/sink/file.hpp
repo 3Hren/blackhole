@@ -148,6 +148,8 @@ public:
     }
 };
 
+auto parse_interval(const std::string& encoded) -> std::uint64_t;
+
 struct backend_t {
     std::size_t counter;
     std::size_t interval;

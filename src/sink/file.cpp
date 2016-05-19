@@ -1,5 +1,8 @@
 #include "blackhole/sink/file.hpp"
 
+#include <cctype>
+
+#include <boost/lexical_cast.hpp>
 #include <boost/optional/optional.hpp>
 
 #include "blackhole/config/node.hpp"
@@ -13,6 +16,35 @@
 namespace blackhole {
 inline namespace v1 {
 namespace sink {
+namespace file {
+
+auto parse_interval(const std::string& encoded) -> std::uint64_t {
+    const auto ipos = std::find_if(std::begin(encoded), std::end(encoded), [&](char c) -> bool {
+        return !std::isdigit(c);
+    });
+
+    if (ipos == std::end(encoded)) {
+        return boost::lexical_cast<std::uint64_t>(encoded);
+    }
+
+    const auto pos = static_cast<std::size_t>(std::distance(std::begin(encoded), ipos));
+    const auto base = boost::lexical_cast<std::uint64_t>(encoded.substr(0, pos));
+    const auto unit = encoded.substr(pos);
+
+    const std::map<std::string, std::uint64_t> mapping {
+        {"B",  1   },
+        {"MB", 1000},
+    };
+
+    const auto it = mapping.find(unit);
+    if (it == std::end(mapping)) {
+        throw std::invalid_argument("unknown data unit - " + unit);
+    }
+
+    return base * it->second;
+}
+
+}  // namespace file
 
 file_t::file_t(const std::string& filename, std::size_t interval) {
     data.filename = filename;
