@@ -124,7 +124,7 @@ public:
 //     virtual ~stream_factory_t() = default;
 //     virtual auto create(const std::string& path) const -> std::unique_ptr<std::ostream> = 0;
 // };
-//
+
 class flusher_factory_t {
 public:
     virtual ~flusher_factory_t() = default;
