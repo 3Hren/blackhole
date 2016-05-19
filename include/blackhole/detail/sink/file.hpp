@@ -11,6 +11,8 @@
 #include "blackhole/sink.hpp"
 #include "blackhole/sink/file.hpp"
 
+#include "blackhole/detail/memory.hpp"
+
 namespace blackhole {
 inline namespace v1 {
 namespace sink {
@@ -46,14 +48,18 @@ public:
 };
 
 class repeat_flusher_t : public flusher_t {
-    std::size_t limit;
+    std::size_t limit_;
     std::size_t counter;
 
 public:
     constexpr repeat_flusher_t(std::size_t limit) noexcept :
-        limit(limit),
+        limit_(limit),
         counter(0)
     {}
+
+    auto limit() const noexcept -> std::size_t {
+        return limit_;
+    }
 
     auto count() const noexcept -> std::size_t {
         return counter;
@@ -65,7 +71,7 @@ public:
 
     auto update(std::size_t nwritten) -> flusher_t::result_t override {
         if (nwritten != 0) {
-            counter = (counter + 1) % limit;
+            counter = (counter + 1) % limit();
 
             if (counter == 0) {
                 return flusher_t::flush;
@@ -77,14 +83,18 @@ public:
 };
 
 class bytecount_flusher_t : public flusher_t {
-    std::uint64_t limit;
+    std::uint64_t limit_;
     std::uint64_t counter;
 
 public:
     constexpr bytecount_flusher_t(std::uint64_t limit) noexcept :
-        limit(limit),
+        limit_(limit),
         counter(0)
     {}
+
+    auto limit() const noexcept -> std::size_t {
+        return limit_;
+    }
 
     auto count() const noexcept -> std::uint64_t {
         return counter;
@@ -98,11 +108,11 @@ public:
         auto result = flusher_t::result_t::idle;
 
         if (nwritten != 0) {
-            if (counter + nwritten >= limit) {
+            if (counter + nwritten >= limit()) {
                 result = flusher_t::result_t::flush;
             }
 
-            counter = (counter + nwritten) % limit;
+            counter = (counter + nwritten) % limit();
         }
 
         return result;
@@ -115,11 +125,28 @@ public:
 //     virtual auto create(const std::string& path) const -> std::unique_ptr<std::ostream> = 0;
 // };
 //
-// class flusher_factory_t {
-// public:
-//     virtual ~flusher_factory_t() = default;
-//     virtual auto create() const -> std::unique_ptr<flusher_t> = 0;
-// };
+class flusher_factory_t {
+public:
+    virtual ~flusher_factory_t() = default;
+    virtual auto create() const -> std::unique_ptr<flusher_t> = 0;
+};
+
+class repeat_flusher_factory_t : public flusher_factory_t {
+    std::size_t limit_;
+
+public:
+    explicit constexpr repeat_flusher_factory_t(std::size_t limit) :
+        limit_(limit)
+    {}
+
+    auto limit() const noexcept -> std::size_t {
+        return limit_;
+    }
+
+    auto create() const -> std::unique_ptr<flusher_t> override {
+        return blackhole::make_unique<repeat_flusher_t>(limit());
+    }
+};
 
 struct backend_t {
     std::size_t counter;

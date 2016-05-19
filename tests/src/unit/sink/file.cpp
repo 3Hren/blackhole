@@ -24,6 +24,7 @@ using ::testing::StrictMock;
 TEST(repeat_flusher_t, Default) {
     repeat_flusher_t flusher(3);
 
+    EXPECT_EQ(3, flusher.limit());
     EXPECT_EQ(0, flusher.count());
 }
 
@@ -72,6 +73,7 @@ TEST(repeat_flusher_t, ZeroWrite) {
 TEST(bytecount_flusher_t, Default) {
     bytecount_flusher_t flusher(1024);
 
+    EXPECT_EQ(1024, flusher.limit());
     EXPECT_EQ(0, flusher.count());
 }
 
@@ -127,6 +129,18 @@ TEST(bytecount_flusher_t, Reset) {
 
     flusher.reset();
     EXPECT_EQ(0, flusher.count());
+}
+
+TEST(repeat_flusher_factory_t, Init) {
+    EXPECT_EQ(42, repeat_flusher_factory_t(42).limit());
+}
+
+TEST(repeat_flusher_factory_t, CreatesRepeatFlusher) {
+    const repeat_flusher_factory_t factory(42);
+    auto flusher = factory.create();
+    auto repeat = dynamic_cast<const repeat_flusher_t&>(*flusher);
+
+    EXPECT_EQ(42, repeat.limit());
 }
 
 TEST(backend_t, ThrowsIfUnableToOpenStream) {
