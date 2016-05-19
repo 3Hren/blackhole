@@ -149,13 +149,13 @@ TEST(parse_interval, WithoutUnit) {
 
 TEST(parse_interval, KnownUnits) {
     EXPECT_EQ(1024, parse_interval("1024B"));
-    EXPECT_EQ(1024 * 1e3, parse_interval("1024KB"));
+    EXPECT_EQ(1024 * 1e3, parse_interval("1024kB"));
     EXPECT_EQ(1024 * 1e6, parse_interval("1024MB"));
     EXPECT_EQ(1024 * 1e9, parse_interval("1024GB"));
 
-    EXPECT_EQ(1024 * 2ULL << 10, parse_interval("1024KiB"));
-    EXPECT_EQ(1024 * 2ULL << 20, parse_interval("1024MiB"));
-    EXPECT_EQ(1024 * 2ULL << 30, parse_interval("1024GiB"));
+    EXPECT_EQ(1024 * 1ULL << 10, parse_interval("1024KiB"));
+    EXPECT_EQ(1024 * 1ULL << 20, parse_interval("1024MiB"));
+    EXPECT_EQ(1024 * 1ULL << 30, parse_interval("1024GiB"));
 }
 
 TEST(parse_interval, ThrowsOnUnknownUnit) {

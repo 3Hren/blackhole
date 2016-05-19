@@ -32,13 +32,13 @@ auto parse_interval(const std::string& encoded) -> std::uint64_t {
     const auto unit = encoded.substr(pos);
 
     const std::map<std::string, std::uint64_t> mapping {
-        {"B",  1          },
-        {"KB", 1e3        },
-        {"MB", 1e6        },
-        {"GB", 1e9        },
-        {"KiB", 2ULL << 10},
-        {"MiB", 2ULL << 20},
-        {"GiB", 2ULL << 30},
+        {"B",  1},
+        {"kB", 1e3},
+        {"MB", 1e6},
+        {"GB", 1e9},
+        {"KiB", 1ULL << 10},
+        {"MiB", 1ULL << 20},
+        {"GiB", 1ULL << 30},
     };
 
     const auto it = mapping.find(unit);
