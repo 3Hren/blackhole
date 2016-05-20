@@ -21,6 +21,32 @@ using experimental::factory;
 using ::testing::Return;
 using ::testing::StrictMock;
 
+namespace mock {
+
+class flusher_t : public file::flusher_t {
+public:
+    MOCK_METHOD0(reset, void());
+    MOCK_METHOD1(update, file::flusher_t::result_t(std::size_t nwritten));
+};
+
+}  // namespace mock
+
+TEST(backend_t, Write) {
+    std::unique_ptr<std::stringstream> stream(new std::stringstream);
+    std::unique_ptr<mock::flusher_t> flusher(new mock::flusher_t);
+
+    auto& stream_ = *stream;
+
+    EXPECT_CALL(*flusher, update(11))
+        .Times(1)
+        .WillOnce(Return(flusher_t::result_t::idle));
+
+    backend_xt backend(std::move(stream), std::move(flusher));
+    backend.write("le message");
+
+    EXPECT_EQ("le message\n", stream_.str());
+}
+
 TEST(file_t, IntervalSanitizer) {
     file_t sink("", 0);
 

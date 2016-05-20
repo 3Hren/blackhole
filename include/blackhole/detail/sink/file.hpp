@@ -28,15 +28,29 @@ public:
 
 namespace file {
 
+class backend_xt {
+    std::unique_ptr<std::ostream> stream;
+    std::unique_ptr<flusher_t> flusher;
+
+public:
+    backend_xt(std::unique_ptr<std::ostream> stream, std::unique_ptr<flusher_t> flusher) :
+        stream(std::move(stream)),
+        flusher(std::move(flusher))
+    {}
+
+    auto write(const string_view& message) -> void {
+        stream->write(message.data(), static_cast<std::streamsize>(message.size()));
+        stream->put('\n');
+        if (flusher->update(message.size() + 1) == flusher_t::flush) {
+            stream->flush();
+        }
+    }
+};
+
 struct backend_t {
     std::size_t counter;
     std::size_t interval;
     std::unique_ptr<std::ofstream> stream;
-
-    // backend_t(std::unique_ptr<std::ofstream> stream, std::unique_ptr<flusher_t> flusher) :
-    //     stream(std::move(stream)),
-    //     flusher(std::move(flusher))
-    // {}
 
     backend_t(const std::string& filename, std::size_t interval) :
         counter(0),
@@ -59,11 +73,6 @@ struct backend_t {
     }
 
     auto write(const string_view& message) -> void {
-        /// stream->write(message.data(), static_cast<std::streamsize>(message.size()));
-        /// stream->put('\n');
-        /// if (flusher->update(message.size() + 1) == flusher_t::flush) {
-        ///     stream->flush();
-        /// }
         stream->write(message.data(), static_cast<std::streamsize>(message.size()));
         stream->put('\n');
 
