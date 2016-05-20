@@ -1,3 +1,5 @@
+#include <system_error>
+
 #include <gtest/gtest.h>
 
 #include <blackhole/detail/sink/file/stream.hpp>
