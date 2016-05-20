@@ -13,6 +13,9 @@
 
 #include "blackhole/detail/memory.hpp"
 
+#include "file/flusher.hpp"
+#include "file/stream.hpp"
+
 namespace blackhole {
 inline namespace v1 {
 namespace sink {
@@ -25,154 +28,15 @@ public:
 
 namespace file {
 
-/// Flush suggest policy.
-class flusher_t {
-public:
-    enum result_t {
-        /// No flush required.
-        idle,
-        /// It's time to flush.
-        flush
-    };
-
-public:
-    virtual ~flusher_t() = default;
-
-    /// Resets the current flusher state.
-    virtual auto reset() -> void = 0;
-
-    /// Updates the flusher, incrementing its counters.
-    ///
-    /// \param nwritten bytes consumed during previous write operation.
-    virtual auto update(std::size_t nwritten) -> result_t = 0;
-};
-
-class repeat_flusher_t : public flusher_t {
-public:
-    typedef std::size_t threshold_type;
-
-private:
-    threshold_type counter;
-    threshold_type threshold_;
-
-public:
-    constexpr repeat_flusher_t(threshold_type threshold) noexcept :
-        counter(0),
-        threshold_(threshold)
-    {}
-
-    auto threshold() const noexcept -> threshold_type {
-        return threshold_;
-    }
-
-    auto count() const noexcept -> threshold_type {
-        return counter;
-    }
-
-    auto reset() -> void override {
-        counter = 0;
-    }
-
-    auto update(std::size_t nwritten) -> flusher_t::result_t override {
-        if (nwritten != 0) {
-            counter = (counter + 1) % threshold();
-
-            if (counter == 0) {
-                return flusher_t::flush;
-            }
-        }
-
-        return flusher_t::idle;
-    }
-};
-
-class bytecount_flusher_t : public flusher_t {
-public:
-    typedef std::uint64_t threshold_type;
-
-private:
-    threshold_type counter;
-    threshold_type threshold_;
-
-public:
-    constexpr bytecount_flusher_t(threshold_type threshold) noexcept :
-        counter(0),
-        threshold_(threshold)
-    {}
-
-    auto threshold() const noexcept -> threshold_type {
-        return threshold_;
-    }
-
-    auto count() const noexcept -> threshold_type {
-        return counter;
-    }
-
-    auto reset() -> void override {
-        counter = 0;
-    }
-
-    auto update(std::size_t nwritten) -> flusher_t::result_t override {
-        auto result = flusher_t::result_t::idle;
-
-        if (nwritten != 0) {
-            if (counter + nwritten >= threshold()) {
-                result = flusher_t::result_t::flush;
-            }
-
-            counter = (counter + nwritten) % threshold();
-        }
-
-        return result;
-    }
-};
-
-// class stream_factory_t {
-// public:
-//     virtual ~stream_factory_t() = default;
-//     virtual auto create(const std::string& path) const -> std::unique_ptr<std::ostream> = 0;
-// };
-
-class flusher_factory_t {
-public:
-    virtual ~flusher_factory_t() = default;
-    virtual auto create() const -> std::unique_ptr<flusher_t> = 0;
-};
-
-class repeat_flusher_factory_t : public flusher_factory_t {
-public:
-    typedef typename repeat_flusher_t::threshold_type threshold_type;
-
-private:
-    threshold_type value;
-
-public:
-    explicit repeat_flusher_factory_t(threshold_type threshold) noexcept;
-
-    auto threshold() const noexcept -> threshold_type;
-    auto create() const -> std::unique_ptr<flusher_t> override;
-};
-
-class bytecount_flusher_factory_t : public flusher_factory_t {
-public:
-    typedef typename bytecount_flusher_t::threshold_type threshold_type;
-
-private:
-    threshold_type value;
-
-public:
-    explicit bytecount_flusher_factory_t(threshold_type threshold) noexcept;
-
-    auto threshold() const noexcept -> threshold_type;
-    auto create() const -> std::unique_ptr<flusher_t> override;
-};
-
-auto parse_dunit(const std::string& encoded) -> std::uint64_t;
-
 struct backend_t {
     std::size_t counter;
     std::size_t interval;
     std::unique_ptr<std::ofstream> stream;
+
+    // backend_t(std::unique_ptr<std::ofstream> stream, std::unique_ptr<flusher_t> flusher) :
+    //     stream(std::move(stream)),
+    //     flusher(std::move(flusher))
+    // {}
 
     backend_t(const std::string& filename, std::size_t interval) :
         counter(0),
@@ -195,9 +59,9 @@ struct backend_t {
     }
 
     auto write(const string_view& message) -> void {
-        /// stream->write(message);
+        /// stream->write(message.data(), static_cast<std::streamsize>(message.size()));
         /// stream->put('\n');
-        /// if (flusher->trigger() == flusher_t::flush) {
+        /// if (flusher->update(message.size() + 1) == flusher_t::flush) {
         ///     stream->flush();
         /// }
         stream->write(message.data(), static_cast<std::streamsize>(message.size()));

@@ -1,6 +1,8 @@
 #include "blackhole/sink/file.hpp"
 
 #include <cctype>
+#include <fstream>
+#include <ostream>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/optional/optional.hpp>
@@ -11,35 +13,39 @@
 #include "blackhole/record.hpp"
 
 #include "blackhole/detail/sink/file.hpp"
+#include "blackhole/detail/sink/file/flusher/bytecount.hpp"
+#include "blackhole/detail/sink/file/flusher/repeat.hpp"
+#include "blackhole/detail/sink/file/stream.hpp"
 #include "blackhole/detail/util/deleter.hpp"
 
 namespace blackhole {
 inline namespace v1 {
 namespace sink {
 namespace file {
+namespace flusher {
 
-repeat_flusher_factory_t::repeat_flusher_factory_t(threshold_type threshold) noexcept :
+repeat_factory_t::repeat_factory_t(threshold_type threshold) noexcept :
     value(threshold)
 {}
 
-auto repeat_flusher_factory_t::threshold() const noexcept -> threshold_type {
+auto repeat_factory_t::threshold() const noexcept -> threshold_type {
     return value;
 }
 
-auto repeat_flusher_factory_t::create() const -> std::unique_ptr<flusher_t> {
-    return blackhole::make_unique<repeat_flusher_t>(threshold());
+auto repeat_factory_t::create() const -> std::unique_ptr<flusher_t> {
+    return blackhole::make_unique<repeat_t>(threshold());
 }
 
-bytecount_flusher_factory_t::bytecount_flusher_factory_t(threshold_type threshold) noexcept :
+bytecount_factory_t::bytecount_factory_t(threshold_type threshold) noexcept :
     value(threshold)
 {}
 
-auto bytecount_flusher_factory_t::threshold() const noexcept -> threshold_type {
+auto bytecount_factory_t::threshold() const noexcept -> threshold_type {
     return value;
 }
 
-auto bytecount_flusher_factory_t::create() const -> std::unique_ptr<flusher_t> {
-    return blackhole::make_unique<bytecount_flusher_t>(threshold());
+auto bytecount_factory_t::create() const -> std::unique_ptr<flusher_t> {
+    return blackhole::make_unique<bytecount_t>(threshold());
 }
 
 auto parse_dunit(const std::string& encoded) -> std::uint64_t {
@@ -71,6 +77,29 @@ auto parse_dunit(const std::string& encoded) -> std::uint64_t {
     }
 
     return base * it->second;
+}
+
+}  // namespace flusher
+
+auto ofstream_factory_t::create(const std::string& filename, std::ios_base::openmode mode) const ->
+    std::unique_ptr<std::ostream>
+{
+    auto stream = blackhole::make_unique<std::ofstream>();
+    stream->exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+    try {
+        stream->open(filename, mode);
+    } catch (const std::system_error& err) {
+        // Transform unspecified ios category into the system one to be able to obtain readable
+        // error message instead completely weird description.
+        throw std::system_error(err.code().value(), std::system_category());
+    } catch (...) {
+        throw std::system_error(errno, std::system_category());
+    }
+
+    // This hack is needed to trick std::unique_ptr behavior, which is unable to implicitly convert
+    // covariant types because of strongly typed deleter.
+    return std::unique_ptr<std::ostream>(stream.release());
 }
 
 }  // namespace file
