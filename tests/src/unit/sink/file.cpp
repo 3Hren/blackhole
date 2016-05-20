@@ -143,23 +143,23 @@ TEST(repeat_flusher_factory_t, CreatesRepeatFlusher) {
     EXPECT_EQ(42, repeat.limit());
 }
 
-TEST(parse_interval, WithoutUnit) {
-    EXPECT_EQ(1024, parse_interval("1024"));
+TEST(parse_dunit, WithoutUnit) {
+    EXPECT_EQ(1024, parse_dunit("1024"));
 }
 
-TEST(parse_interval, KnownUnits) {
-    EXPECT_EQ(1024, parse_interval("1024B"));
-    EXPECT_EQ(1024 * 1e3, parse_interval("1024kB"));
-    EXPECT_EQ(1024 * 1e6, parse_interval("1024MB"));
-    EXPECT_EQ(1024 * 1e9, parse_interval("1024GB"));
+TEST(parse_dunit, KnownUnits) {
+    EXPECT_EQ(1024, parse_dunit("1024B"));
+    EXPECT_EQ(1024 * 1e3, parse_dunit("1024kB"));
+    EXPECT_EQ(1024 * 1e6, parse_dunit("1024MB"));
+    EXPECT_EQ(1024 * 1e9, parse_dunit("1024GB"));
 
-    EXPECT_EQ(1024 * 1ULL << 10, parse_interval("1024KiB"));
-    EXPECT_EQ(1024 * 1ULL << 20, parse_interval("1024MiB"));
-    EXPECT_EQ(1024 * 1ULL << 30, parse_interval("1024GiB"));
+    EXPECT_EQ(1024 * 1ULL << 10, parse_dunit("1024KiB"));
+    EXPECT_EQ(1024 * 1ULL << 20, parse_dunit("1024MiB"));
+    EXPECT_EQ(1024 * 1ULL << 30, parse_dunit("1024GiB"));
 }
 
-TEST(parse_interval, ThrowsOnUnknownUnit) {
-    EXPECT_THROW(parse_interval("1024Hz"), std::invalid_argument);
+TEST(parse_dunit, ThrowsOnUnknownUnit) {
+    EXPECT_THROW(parse_dunit("1024Hz"), std::invalid_argument);
 }
 
 TEST(backend_t, ThrowsIfUnableToOpenStream) {

@@ -18,7 +18,7 @@ inline namespace v1 {
 namespace sink {
 namespace file {
 
-auto parse_interval(const std::string& encoded) -> std::uint64_t {
+auto parse_dunit(const std::string& encoded) -> std::uint64_t {
     const auto ipos = std::find_if(std::begin(encoded), std::end(encoded), [&](char c) -> bool {
         return !std::isdigit(c);
     });
