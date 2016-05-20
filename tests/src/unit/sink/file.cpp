@@ -28,20 +28,6 @@ TEST(file_t, IntervalSanitizer) {
     EXPECT_EQ(std::numeric_limits<std::size_t>::max(), sink.interval());
 }
 
-TEST(file_t, IntervalOverflow) {
-    std::size_t interval = 3;
-    std::size_t counter = 0;
-
-    counter = (counter + 1) % interval;
-    EXPECT_EQ(1, counter);
-
-    counter = (counter + 1) % interval;
-    EXPECT_EQ(2, counter);
-
-    counter = (counter + 1) % interval;
-    EXPECT_EQ(0, counter);
-}
-
 TEST(factory, Type) {
     EXPECT_EQ(std::string("file"), factory<file_t>().type());
 }

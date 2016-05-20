@@ -16,6 +16,12 @@ TEST(repeat_t, Default) {
     EXPECT_EQ(0, flusher.count());
 }
 
+TEST(repeat_t, Zero) {
+    repeat_t flusher(0);
+
+    EXPECT_EQ(std::numeric_limits<std::size_t>::max(), flusher.threshold());
+}
+
 TEST(repeat_t, Update) {
     repeat_t flusher(3);
 

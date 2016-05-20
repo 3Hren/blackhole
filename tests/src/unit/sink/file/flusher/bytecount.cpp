@@ -16,6 +16,12 @@ TEST(bytecount_t, Default) {
     EXPECT_EQ(0, flusher.count());
 }
 
+TEST(bytecount_t, Zero) {
+    bytecount_t flusher(0);
+
+    EXPECT_EQ(std::numeric_limits<std::uint64_t>::max(), flusher.threshold());
+}
+
 TEST(bytecount_t, Update) {
     bytecount_t flusher(1024);
 

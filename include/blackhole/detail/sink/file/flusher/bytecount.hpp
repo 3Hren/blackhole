@@ -19,7 +19,7 @@ private:
 public:
     constexpr bytecount_t(threshold_type threshold) noexcept :
         counter(0),
-        threshold_(threshold)
+        threshold_(threshold > 0 ? threshold : std::numeric_limits<threshold_type>::max())
     {}
 
     auto threshold() const noexcept -> threshold_type {
