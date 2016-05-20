@@ -48,20 +48,24 @@ public:
 };
 
 class repeat_flusher_t : public flusher_t {
-    std::size_t limit_;
-    std::size_t counter;
+public:
+    typedef std::size_t threshold_type;
+
+private:
+    threshold_type counter;
+    threshold_type threshold_;
 
 public:
-    constexpr repeat_flusher_t(std::size_t limit) noexcept :
-        limit_(limit),
-        counter(0)
+    constexpr repeat_flusher_t(threshold_type threshold) noexcept :
+        counter(0),
+        threshold_(threshold)
     {}
 
-    auto limit() const noexcept -> std::size_t {
-        return limit_;
+    auto threshold() const noexcept -> threshold_type {
+        return threshold_;
     }
 
-    auto count() const noexcept -> std::size_t {
+    auto count() const noexcept -> threshold_type {
         return counter;
     }
 
@@ -71,7 +75,7 @@ public:
 
     auto update(std::size_t nwritten) -> flusher_t::result_t override {
         if (nwritten != 0) {
-            counter = (counter + 1) % limit();
+            counter = (counter + 1) % threshold();
 
             if (counter == 0) {
                 return flusher_t::flush;
@@ -83,20 +87,24 @@ public:
 };
 
 class bytecount_flusher_t : public flusher_t {
-    std::uint64_t limit_;
-    std::uint64_t counter;
+public:
+    typedef std::uint64_t threshold_type;
+
+private:
+    threshold_type counter;
+    threshold_type threshold_;
 
 public:
-    constexpr bytecount_flusher_t(std::uint64_t limit) noexcept :
-        limit_(limit),
-        counter(0)
+    constexpr bytecount_flusher_t(threshold_type threshold) noexcept :
+        counter(0),
+        threshold_(threshold)
     {}
 
-    auto limit() const noexcept -> std::size_t {
-        return limit_;
+    auto threshold() const noexcept -> threshold_type {
+        return threshold_;
     }
 
-    auto count() const noexcept -> std::uint64_t {
+    auto count() const noexcept -> threshold_type {
         return counter;
     }
 
@@ -108,11 +116,11 @@ public:
         auto result = flusher_t::result_t::idle;
 
         if (nwritten != 0) {
-            if (counter + nwritten >= limit()) {
+            if (counter + nwritten >= threshold()) {
                 result = flusher_t::result_t::flush;
             }
 
-            counter = (counter + nwritten) % limit();
+            counter = (counter + nwritten) % threshold();
         }
 
         return result;
@@ -132,20 +140,31 @@ public:
 };
 
 class repeat_flusher_factory_t : public flusher_factory_t {
-    std::size_t limit_;
+public:
+    typedef typename repeat_flusher_t::threshold_type threshold_type;
+
+private:
+    threshold_type value;
 
 public:
-    explicit constexpr repeat_flusher_factory_t(std::size_t limit) :
-        limit_(limit)
-    {}
+    explicit repeat_flusher_factory_t(threshold_type threshold) noexcept;
 
-    auto limit() const noexcept -> std::size_t {
-        return limit_;
-    }
+    auto threshold() const noexcept -> threshold_type;
+    auto create() const -> std::unique_ptr<flusher_t> override;
+};
 
-    auto create() const -> std::unique_ptr<flusher_t> override {
-        return blackhole::make_unique<repeat_flusher_t>(limit());
-    }
+class bytecount_flusher_factory_t : public flusher_factory_t {
+public:
+    typedef typename bytecount_flusher_t::threshold_type threshold_type;
+
+private:
+    threshold_type value;
+
+public:
+    explicit bytecount_flusher_factory_t(threshold_type threshold) noexcept;
+
+    auto threshold() const noexcept -> threshold_type;
+    auto create() const -> std::unique_ptr<flusher_t> override;
 };
 
 auto parse_dunit(const std::string& encoded) -> std::uint64_t;

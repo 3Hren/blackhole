@@ -18,6 +18,30 @@ inline namespace v1 {
 namespace sink {
 namespace file {
 
+repeat_flusher_factory_t::repeat_flusher_factory_t(threshold_type threshold) noexcept :
+    value(threshold)
+{}
+
+auto repeat_flusher_factory_t::threshold() const noexcept -> threshold_type {
+    return value;
+}
+
+auto repeat_flusher_factory_t::create() const -> std::unique_ptr<flusher_t> {
+    return blackhole::make_unique<repeat_flusher_t>(threshold());
+}
+
+bytecount_flusher_factory_t::bytecount_flusher_factory_t(threshold_type threshold) noexcept :
+    value(threshold)
+{}
+
+auto bytecount_flusher_factory_t::threshold() const noexcept -> threshold_type {
+    return value;
+}
+
+auto bytecount_flusher_factory_t::create() const -> std::unique_ptr<flusher_t> {
+    return blackhole::make_unique<bytecount_flusher_t>(threshold());
+}
+
 auto parse_dunit(const std::string& encoded) -> std::uint64_t {
     const auto ipos = std::find_if(std::begin(encoded), std::end(encoded), [&](char c) -> bool {
         return !std::isdigit(c);

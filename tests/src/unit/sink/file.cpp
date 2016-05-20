@@ -24,7 +24,7 @@ using ::testing::StrictMock;
 TEST(repeat_flusher_t, Default) {
     repeat_flusher_t flusher(3);
 
-    EXPECT_EQ(3, flusher.limit());
+    EXPECT_EQ(3, flusher.threshold());
     EXPECT_EQ(0, flusher.count());
 }
 
@@ -73,7 +73,7 @@ TEST(repeat_flusher_t, ZeroWrite) {
 TEST(bytecount_flusher_t, Default) {
     bytecount_flusher_t flusher(1024);
 
-    EXPECT_EQ(1024, flusher.limit());
+    EXPECT_EQ(1024, flusher.threshold());
     EXPECT_EQ(0, flusher.count());
 }
 
@@ -132,15 +132,27 @@ TEST(bytecount_flusher_t, Reset) {
 }
 
 TEST(repeat_flusher_factory_t, Init) {
-    EXPECT_EQ(42, repeat_flusher_factory_t(42).limit());
+    EXPECT_EQ(42, repeat_flusher_factory_t(42).threshold());
 }
 
 TEST(repeat_flusher_factory_t, CreatesRepeatFlusher) {
-    const repeat_flusher_factory_t factory(42);
+    auto factory = repeat_flusher_factory_t(42);
     auto flusher = factory.create();
     auto repeat = dynamic_cast<const repeat_flusher_t&>(*flusher);
 
-    EXPECT_EQ(42, repeat.limit());
+    EXPECT_EQ(42, repeat.threshold());
+}
+
+TEST(bytecount_flusher_factory_t, Init) {
+    EXPECT_EQ(1024, bytecount_flusher_factory_t(1024).threshold());
+}
+
+TEST(bytecount_flusher_factory_t, CreatesByteCountFlusher) {
+    auto factory = bytecount_flusher_factory_t(1024);
+    auto flusher = factory.create();
+    auto repeat = dynamic_cast<const bytecount_flusher_t&>(*flusher);
+
+    EXPECT_EQ(1024, repeat.threshold());
 }
 
 TEST(parse_dunit, WithoutUnit) {
