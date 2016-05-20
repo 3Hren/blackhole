@@ -41,17 +41,10 @@ TEST(backend_t, Write) {
         .Times(1)
         .WillOnce(Return(flusher_t::result_t::idle));
 
-    backend_xt backend(std::move(stream), std::move(flusher));
+    backend_t backend(std::move(stream), std::move(flusher));
     backend.write("le message");
 
     EXPECT_EQ("le message\n", stream_.str());
-}
-
-TEST(file_t, IntervalSanitizer) {
-    file_t sink("", 0);
-
-    EXPECT_NE(0, sink.interval());
-    EXPECT_EQ(std::numeric_limits<std::size_t>::max(), sink.interval());
 }
 
 TEST(factory, Type) {

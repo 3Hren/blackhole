@@ -104,33 +104,33 @@ auto ofstream_factory_t::create(const std::string& filename, std::ios_base::open
 
 }  // namespace file
 
-file_t::file_t(const std::string& filename, std::size_t interval) {
-    data.filename = filename;
-    data.interval = interval > 0 ? interval : std::numeric_limits<std::size_t>::max();
+file_t::file_t(const std::string& path,
+               std::unique_ptr<file::stream_factory_t> stream_factory,
+               std::unique_ptr<file::flusher_factory_t> flusher_factory) :
+    stream_factory(std::move(stream_factory)),
+    flusher_factory(std::move(flusher_factory))
+{
+    data.path = path;
 }
-
-file_t::file_t(const file_properties_t& properties) :
-    file_t(properties.filename, properties.interval)
-{}
 
 auto file_t::path() const -> const std::string& {
-    return data.filename;
-}
-
-auto file_t::interval() const noexcept -> std::size_t {
-    return data.interval;
+    return data.path;
 }
 
 auto file_t::filename(const record_t&) const -> std::string {
     // TODO: Generate path from tokens, for now just return static path.
-    return {data.filename};
+    return {data.path};
 }
 
 auto file_t::backend(const std::string& filename) -> file::backend_t& {
     const auto it = data.backends.find(filename);
 
     if (it == data.backends.end()) {
-        return data.backends.insert(it, std::make_pair(filename, file::backend_t(filename, interval())))->second;
+        auto stream = stream_factory->create(filename, std::ios_base::app);
+        auto flusher = flusher_factory->create();
+
+        return data.backends.insert(it,
+            std::make_pair(filename, file::backend_t(std::move(stream), std::move(flusher))))->second;
     }
 
     return it->second;
@@ -147,17 +147,28 @@ auto file_t::emit(const record_t& record, const string_view& formatted) -> void 
 
 namespace experimental {
 
-builder<sink::file_t>::builder(const std::string& filename) :
-    properties(new sink::file_properties_t{filename, 0}, deleter_t())
-{}
+class builder<sink::file_t>::inner_t {
+public:
+    std::string filename;
+    std::unique_ptr<sink::file::flusher_factory_t> ffactory;
+};
 
-auto builder<sink::file_t>::interval(std::size_t count) -> builder& {
-    properties->interval = count;
+builder<sink::file_t>::builder(const std::string& path) :
+    p(new inner_t{path, nullptr}, deleter_t())
+{
+    p->ffactory = blackhole::make_unique<sink::file::flusher::repeat_factory_t>(std::size_t(0));
+}
+
+auto builder<sink::file_t>::threshold(std::size_t count) -> builder& {
+    p->ffactory = blackhole::make_unique<sink::file::flusher::repeat_factory_t>(count);
     return *this;
 }
 
 auto builder<sink::file_t>::build() && -> std::unique_ptr<sink_t> {
-    return std::unique_ptr<sink_t>(new sink::file_t(*properties));
+    return blackhole::make_unique<sink::file_t>(
+        std::move(p->filename),
+        blackhole::make_unique<sink::file::ofstream_factory_t>(),
+        std::move(p->ffactory));
 }
 
 auto factory<sink::file_t>::type() const noexcept -> const char* {
@@ -175,7 +186,11 @@ auto factory<sink::file_t>::from(const config::node_t& config) const -> std::uni
 
     if (auto flush = config["flush"]) {
         if (auto value = flush.to_uint64()) {
-            builder.interval(value.get());
+            builder.threshold(value.get());
+        }
+
+        if (auto value = flush.to_string()) {
+            // builder.threshold(value.get());
         }
     }
 
@@ -184,7 +199,7 @@ auto factory<sink::file_t>::from(const config::node_t& config) const -> std::uni
 
 }  // namespace experimental
 
-template auto deleter_t::operator()(sink::file_properties_t* value) -> void;
+template auto deleter_t::operator()(experimental::builder<sink::file_t>::inner_t* value) -> void;
 
 }  // namespace v1
 }  // namespace blackhole

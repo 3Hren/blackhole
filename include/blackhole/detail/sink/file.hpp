@@ -19,21 +19,14 @@
 namespace blackhole {
 inline namespace v1 {
 namespace sink {
-
-class file_properties_t {
-public:
-    std::string filename;
-    std::size_t interval;
-};
-
 namespace file {
 
-class backend_xt {
+class backend_t {
     std::unique_ptr<std::ostream> stream;
     std::unique_ptr<flusher_t> flusher;
 
 public:
-    backend_xt(std::unique_ptr<std::ostream> stream, std::unique_ptr<flusher_t> flusher) :
+    backend_t(std::unique_ptr<std::ostream> stream, std::unique_ptr<flusher_t> flusher) :
         stream(std::move(stream)),
         flusher(std::move(flusher))
     {}
@@ -47,53 +40,14 @@ public:
     }
 };
 
-struct backend_t {
-    std::size_t counter;
-    std::size_t interval;
-    std::unique_ptr<std::ofstream> stream;
-
-    backend_t(const std::string& filename, std::size_t interval) :
-        counter(0),
-        interval(interval),
-        stream(new std::ofstream)
-    {
-        BOOST_ASSERT(interval > 0);
-
-        stream->exceptions(std::ifstream::failbit | std::ifstream::badbit);
-
-        try {
-            stream->open(filename, std::ios::app);
-        } catch (const std::system_error& err) {
-            // Transform unspecified ios category into the system one to obtain readable message,
-            // otherwise there will be completely weird error reason.
-            throw std::system_error(err.code().value(), std::system_category());
-        } catch (...) {
-            throw std::system_error(errno, std::system_category());
-        }
-    }
-
-    auto write(const string_view& message) -> void {
-        stream->write(message.data(), static_cast<std::streamsize>(message.size()));
-        stream->put('\n');
-
-        counter = (counter + 1) % interval;
-
-        if (counter == 0) {
-            flush();
-        }
-    }
-
-    auto flush() -> void {
-        stream->flush();
-    }
-};
-
 }  // namespace file
 
 class file_t : public sink_t {
+    std::unique_ptr<file::stream_factory_t> stream_factory;
+    std::unique_ptr<file::flusher_factory_t> flusher_factory;
+
     struct {
-        std::string filename;
-        std::size_t interval;
+        std::string path;
         std::map<std::string, file::backend_t> backends;
     } data;
 
@@ -102,15 +56,9 @@ class file_t : public sink_t {
 public:
     /// \param path a path with final destination file to open. All files are opened with append
     ///     mode by default.
-    /// \param interval flush interval in number of write operations.
-    explicit file_t(const std::string& path, std::size_t interval = 0);
-
-    file_t(const file_properties_t& properties);
-
-    // TODO: DI.
-    // file_t(const std::string& path,
-    //        std::unique_ptr<backend_factory_t> backend_factory,
-    //        std::unique_ptr<flusher_factory_t> flusher_factory);
+    file_t(const std::string& path,
+           std::unique_ptr<file::stream_factory_t> stream_factory,
+           std::unique_ptr<file::flusher_factory_t> flusher_factory);
 
     /// Returns a const lvalue reference to destination path pattern.
     ///
@@ -119,9 +67,7 @@ public:
     /// time.
     auto path() const -> const std::string&;
 
-    auto interval() const noexcept -> std::size_t;
-
-    auto filename(const record_t&) const -> std::string;
+    auto filename(const record_t& record) const -> std::string;
 
     auto backend(const std::string& filename) -> file::backend_t&;
 

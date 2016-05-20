@@ -19,7 +19,6 @@ namespace sink {
 ///
 /// \note associated files will be opened on demand during the first write operation.
 class file_t;
-class file_properties_t;
 
 }  // namespace sink
 
@@ -28,23 +27,37 @@ namespace experimental {
 /// Represents a file sink builder to ease its configuration.
 template<>
 class builder<sink::file_t> {
-    std::unique_ptr<sink::file_properties_t, deleter_t> properties;
+public:
+    struct bytes_t {
+        std::uint64_t value;
+    };
+
+private:
+    class inner_t;
+    std::unique_ptr<inner_t, deleter_t> p;
 
 public:
-    explicit builder(const std::string& filename);
+    explicit builder(const std::string& path);
 
-    /// Specifies a flush interval in terms of write operations.
+    /// Specifies a flush threshold in terms of bytes written.
+    ///
+    /// Logging backend will flush its internal buffers after at least every count bytes written,
+    /// but the underlying implementation can decide to do it more often. Note that 0 value means
+    /// automatic policy.
+    ///
+    /// \param count flush threshold.
+    auto threshold(bytes_t count) -> builder&;
+
+    /// Specifies a flush threshold in terms of write operations.
     ///
     /// Logging backend will flush its internal buffers after at least every count writes, but the
     /// underlying implementation can decide to do it more often. Note that 0 value means automatic
     /// policy.
     ///
-    /// \param count flush interval.
-    auto interval(std::size_t count) -> builder&;
+    /// \param count flush threshold.
+    auto threshold(std::size_t count) -> builder&;
 
-    // TODO: Implement flush after every nsize bytes is written.
-    // auto interval(units::size count) -> builder&
-
+    /// Consumes this builder returning a file sink.
     auto build() && -> std::unique_ptr<sink_t>;
 };
 
