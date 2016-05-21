@@ -198,12 +198,13 @@ auto factory<sink::file_t>::from(const config::node_t& config) const -> std::uni
     builder<sink::file_t> builder(filename.get());
 
     if (auto flush = config["flush"]) {
-        if (auto value = flush.to_uint64()) {
-            builder.flush_every(value.get());
+        if (flush.unwrap()->is_uint64()) {
+            builder.flush_every(flush.unwrap()->to_uint64());
         }
 
-        if (auto value = flush.to_string()) {
-            // builder.threshold(value.get());
+        if (flush.unwrap()->is_string()) {
+            const auto bytes = sink::file::flusher::parse_dunit(flush.unwrap()->to_string());
+            builder.flush_every(bytes_t(bytes));
         }
     }
 

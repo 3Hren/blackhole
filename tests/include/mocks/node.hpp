@@ -15,11 +15,15 @@ class node_t : public ::blackhole::config::node_t {
 public:
     auto is_bool() const noexcept -> bool { return false; }
     auto is_sint64() const noexcept -> bool { return false; }
-    auto is_uint64() const noexcept -> bool { return false; }
+    auto is_uint64() const noexcept -> bool { return is_uint64_(); }
     auto is_double() const noexcept -> bool { return false; }
-    auto is_string() const noexcept -> bool { return false; }
+
+    auto is_string() const noexcept -> bool { return is_string_(); }
     auto is_vector() const noexcept -> bool { return false; }
     auto is_object() const noexcept -> bool { return false; }
+
+    MOCK_CONST_METHOD0(is_uint64_, bool());
+    MOCK_CONST_METHOD0(is_string_, bool());
 
     MOCK_CONST_METHOD0(to_bool, bool());
     MOCK_CONST_METHOD0(to_sint64, std::int64_t());

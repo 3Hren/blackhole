@@ -106,7 +106,7 @@ TEST(factory, FlushIntervalFromConfig) {
 
     StrictMock<node_t> config;
 
-    auto npath = new node_t;
+    auto npath = new StrictMock<node_t>;
     EXPECT_CALL(config, subscript_key("path"))
         .Times(1)
         .WillOnce(Return(npath));
@@ -115,14 +115,56 @@ TEST(factory, FlushIntervalFromConfig) {
         .Times(1)
         .WillOnce(Return("/tmp/blackhole.log"));
 
-    auto nflush = new node_t;
+    auto nflush = new StrictMock<node_t>;
     EXPECT_CALL(config, subscript_key("flush"))
         .Times(1)
         .WillOnce(Return(nflush));
 
+    EXPECT_CALL(*nflush, is_uint64_())
+        .Times(1)
+        .WillOnce(Return(true));
+
     EXPECT_CALL(*nflush, to_uint64())
         .Times(1)
         .WillOnce(Return(30));
+
+    EXPECT_CALL(*nflush, is_string_())
+        .Times(1)
+        .WillOnce(Return(false));
+
+    factory<file_t>().from(config);
+}
+
+TEST(factory, BinaryUnitFlushIntervalFromConfig) {
+    using config::testing::mock::node_t;
+
+    StrictMock<node_t> config;
+
+    auto npath = new StrictMock<node_t>;
+    EXPECT_CALL(config, subscript_key("path"))
+        .Times(1)
+        .WillOnce(Return(npath));
+
+    EXPECT_CALL(*npath, to_string())
+        .Times(1)
+        .WillOnce(Return("/tmp/blackhole.log"));
+
+    auto nflush = new StrictMock<node_t>;
+    EXPECT_CALL(config, subscript_key("flush"))
+        .Times(1)
+        .WillOnce(Return(nflush));
+
+    EXPECT_CALL(*nflush, is_uint64_())
+        .Times(1)
+        .WillOnce(Return(false));
+
+    EXPECT_CALL(*nflush, is_string_())
+        .Times(1)
+        .WillOnce(Return(true));
+
+    EXPECT_CALL(*nflush, to_string())
+        .Times(1)
+        .WillOnce(Return("100MB"));
 
     factory<file_t>().from(config);
 }
