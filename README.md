@@ -41,7 +41,7 @@ you writing them into its final destination. For example, Elasticsearch.
 
 ## Shared library
 
-Despite the header-only dark past now Blackhole is developing as a shared library. Such radical change of distributing
+Despite the header-only dark past now Blackhole is developed as a shared library. Such radical change of distributing
 process was chosen because of many reasons.
 
 Mainly, header-only libraries has one big disadvantage: any code change may (or not) result in recompiling all its dependencies, otherwise having weird runtime errors with symbol loading race.
