@@ -5,6 +5,9 @@ blackhole (1.0.0-0beta1) UNRELEASED; urgency=low
     This kind of sink wraps the other sink and causes log events to be written
     to them on a separate thread providing non-blocking behavior.
   * Feature: string view class now satisfies Hash concept.
+  * Feature: file appender now has a nice builder class.
+  * Feature: flush threshold in file appender configuration now can be specified
+    as a binary unit value, i.e. 1000B, 2MB etc.
   * Bug fix: file appender should no longer silently eat I/O error while trying
     to open a file.
 
