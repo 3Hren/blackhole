@@ -116,7 +116,7 @@ public:
     auto flush_every(std::size_t events) & -> builder&;
     auto flush_every(std::size_t events) && -> builder&&;
 
-    /// Consumes this builder returning a file sink.
+    /// Consumes this builder, returning a newly created file sink with the options configured.
     auto build() && -> std::unique_ptr<sink_t>;
 };
 
