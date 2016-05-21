@@ -25,10 +25,10 @@ namespace config {
 using detail::config::json_t;
 
 /// Represents a JSON based logger configuration factory.
+// TODO: Use make_json_factory(...) instead, interfaces are great! Then drop copy/move defaults.
 template<>
 class factory<json_t> : public factory_t {
     class inner_t;
-    // TODO: Use implementation_ptr<inner_t> instead.
     std::unique_ptr<inner_t> inner;
 
 public:
