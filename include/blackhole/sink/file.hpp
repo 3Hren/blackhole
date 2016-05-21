@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <ratio>
 
 #include "blackhole/factory.hpp"
 
@@ -24,38 +25,96 @@ class file_t;
 
 namespace experimental {
 
+/// Represents a binary unit.
+template<class Rep, class Ratio = std::ratio<1>>
+class binary_unit;
+
+/// Disable all fractional units.
+template<class Rep, std::uintmax_t Denom>
+class binary_unit<Rep, std::ratio<1, Denom>>;
+
+template<class Rep>
+class binary_unit<Rep, std::ratio<1>> {
+public:
+    typedef Rep rep;
+
+private:
+    rep value;
+
+public:
+    constexpr binary_unit(rep value) noexcept :
+        value(value)
+    {}
+
+    constexpr auto count() const noexcept -> rep {
+        return value;
+    }
+};
+
+template<class Rep, class Ratio>
+class binary_unit {
+public:
+    typedef Rep rep;
+
+private:
+    rep value;
+
+public:
+    constexpr binary_unit(rep value) noexcept :
+        value(value)
+    {}
+
+    constexpr auto count() const noexcept -> rep {
+        return value;
+    }
+
+    constexpr operator binary_unit<std::uintmax_t>() noexcept {
+        return binary_unit<std::uintmax_t>(count() * Ratio::num);
+    }
+};
+
+typedef binary_unit<std::uintmax_t> bytes_t;
+typedef binary_unit<std::uintmax_t, std::kilo> kilobytes_t;
+typedef binary_unit<std::uintmax_t, std::mega> megabytes_t;
+typedef binary_unit<std::uintmax_t, std::giga> gigabytes_t;
+typedef binary_unit<std::uintmax_t, std::ratio<1024>> kibibytes_t;
+typedef binary_unit<std::uintmax_t, std::ratio<1024 * 1024>> mibibytes_t;
+typedef binary_unit<std::uintmax_t, std::ratio<1024 * 1024 * 1024>> gibibytes_t;
+
 /// Represents a file sink builder to ease its configuration.
 template<>
 class builder<sink::file_t> {
-public:
-    struct bytes_t {
-        std::uint64_t value;
-    };
-
-private:
     class inner_t;
     std::unique_ptr<inner_t, deleter_t> p;
 
 public:
+    /// Constructs a file sink builder with the given file path pattern.
+    ///
+    /// By default this builder will produce file sinks with automatic flush policy, which can be
+    /// changed using threshold methods.
     explicit builder(const std::string& path);
 
-    /// Specifies a flush threshold in terms of bytes written.
+    /// Specifies flush threshold in terms of bytes written.
     ///
     /// Logging backend will flush its internal buffers after at least every count bytes written,
-    /// but the underlying implementation can decide to do it more often. Note that 0 value means
-    /// automatic policy.
+    /// but the underlying implementation can decide to do it more often.
     ///
-    /// \param count flush threshold.
-    auto threshold(bytes_t count) -> builder&;
+    /// \note setting zero value resets the policy with automatic mode.
+    ///
+    /// \param bytes flush threshold.
+    auto flush_every(bytes_t bytes) & -> builder&;
+    auto flush_every(bytes_t bytes) && -> builder&&;
 
-    /// Specifies a flush threshold in terms of write operations.
+    /// Specifies flush threshold in terms of number of logging events processed.
     ///
     /// Logging backend will flush its internal buffers after at least every count writes, but the
-    /// underlying implementation can decide to do it more often. Note that 0 value means automatic
-    /// policy.
+    /// underlying implementation can decide to do it more often.
     ///
-    /// \param count flush threshold.
-    auto threshold(std::size_t count) -> builder&;
+    /// \note setting zero value resets the policy with automatic mode.
+    ///
+    /// \param events flush threshold.
+    auto flush_every(std::size_t events) & -> builder&;
+    auto flush_every(std::size_t events) && -> builder&&;
 
     /// Consumes this builder returning a file sink.
     auto build() && -> std::unique_ptr<sink_t>;

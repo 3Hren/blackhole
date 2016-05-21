@@ -159,9 +159,22 @@ builder<sink::file_t>::builder(const std::string& path) :
     p->ffactory = blackhole::make_unique<sink::file::flusher::repeat_factory_t>(std::size_t(0));
 }
 
-auto builder<sink::file_t>::threshold(std::size_t count) -> builder& {
-    p->ffactory = blackhole::make_unique<sink::file::flusher::repeat_factory_t>(count);
+auto builder<sink::file_t>::flush_every(bytes_t bytes) & -> builder& {
+    p->ffactory = blackhole::make_unique<sink::file::flusher::bytecount_factory_t>(bytes.count());
     return *this;
+}
+
+auto builder<sink::file_t>::flush_every(bytes_t bytes) && -> builder&& {
+    return std::move(flush_every(bytes));
+}
+
+auto builder<sink::file_t>::flush_every(std::size_t events) & -> builder& {
+    p->ffactory = blackhole::make_unique<sink::file::flusher::repeat_factory_t>(events);
+    return *this;
+}
+
+auto builder<sink::file_t>::flush_every(std::size_t events) && -> builder&& {
+    return std::move(flush_every(events));
 }
 
 auto builder<sink::file_t>::build() && -> std::unique_ptr<sink_t> {
@@ -186,7 +199,7 @@ auto factory<sink::file_t>::from(const config::node_t& config) const -> std::uni
 
     if (auto flush = config["flush"]) {
         if (auto value = flush.to_uint64()) {
-            builder.threshold(value.get());
+            builder.flush_every(value.get());
         }
 
         if (auto value = flush.to_string()) {

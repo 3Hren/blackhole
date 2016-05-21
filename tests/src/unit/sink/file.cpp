@@ -16,7 +16,9 @@ namespace sink {
 namespace file {
 namespace {
 
+using experimental::builder;
 using experimental::factory;
+using experimental::megabytes_t;
 
 using ::testing::Return;
 using ::testing::StrictMock;
@@ -45,6 +47,19 @@ TEST(backend_t, Write) {
     backend.write("le message");
 
     EXPECT_EQ("le message\n", stream_.str());
+}
+
+TEST(builder, Build) {
+    builder<file_t> builder("/tmp/blackhole.log");
+
+    builder.flush_every(100);
+    std::move(builder).build();
+}
+
+TEST(builder, Chained) {
+    auto sink = builder<file_t>("/tmp/blackhole.log")
+        .flush_every(megabytes_t(1))
+        .build();
 }
 
 TEST(factory, Type) {
