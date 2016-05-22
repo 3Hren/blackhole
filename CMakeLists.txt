@@ -213,7 +213,6 @@ if (ENABLE_TESTING)
 		tests/registry
 		tests/root
 		tests/severity
-		tests/sink/console
 		tests/sink/udp
 		tests/src/mocks/formatter
 		tests/src/mocks/handler
@@ -226,6 +225,7 @@ if (ENABLE_TESTING)
 		tests/src/unit/formatter/json
 		tests/src/unit/formatter/token
 		tests/src/unit/sink/asynchronous
+		tests/src/unit/sink/console.cpp
 		tests/src/unit/sink/file.cpp
 		tests/src/unit/sink/file/flusher/bytecount.cpp
 		tests/src/unit/sink/file/flusher/repeat.cpp
@@ -297,13 +297,13 @@ endfunction()
 
 if (ENABLE_EXAMPLES)
 	# Configuration using manual builder.
-    add_executable(2-simple
-		examples/2.simple)
-
-	enable_all_warnings(2-simple)
-
-	target_link_libraries(2-simple
-		blackhole)
+    # add_executable(2-simple
+	# 	examples/2.simple)
+	#
+	# enable_all_warnings(2-simple)
+	#
+	# target_link_libraries(2-simple
+	# 	blackhole)
 
 	# Configuration using JSON config file.
 	add_executable(3-config

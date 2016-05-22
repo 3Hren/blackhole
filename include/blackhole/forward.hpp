@@ -8,6 +8,7 @@ struct deleter_t {
     auto operator()(T* value) -> void;
 };
 
+class record_t;
 class severity_t;
 
 class formatter_t;

@@ -2,35 +2,33 @@
 
 #include <functional>
 
-#include "blackhole/sink.hpp"
-
-namespace blackhole {
-inline namespace v1 {
-
-template<typename>
-struct factory;
-
-}  // namespace v1
-}  // namespace blackhole
-
-namespace blackhole {
-inline namespace v1 {
-namespace config {
-
-class node_t;
-
-}  // namespace config
-}  // namespace v1
-}  // namespace blackhole
+#include "blackhole/factory.hpp"
 
 namespace blackhole {
 inline namespace v1 {
 namespace sink {
 
+/// Represents the console sink which is responsible for writing all incoming log events directly
+/// into one of the selected standard outputs with an ability to optionally colorize result strings.
+///
+/// The sink automatically detects whether the destination stream is a TTY disabling colored output
+/// otherwise, which makes possible to redirect standard output to file without escaping codes
+/// garbage.
+///
+/// Note, that despite of C++ `std::cout` and `std::cerr` thread-safety with no undefined behavior
+/// its guarantees is insufficiently for safe working with them from multiple threads, leading to
+/// result messages intermixing.
+/// To avoid this a global mutex is used internally, which is kinda hack. Any other stdout/stderr
+/// usage outside from logger will probably results in character mixing, but no undefined behavior
+/// will be invoked.
+class console_t;
+
+}  // namespace sink
+
+namespace experimental {
+
 /// Terminal color manipulator.
 class color_t {
-    class scope_t;
-
     int attr;
     int code;
 
@@ -78,89 +76,43 @@ private:
     color_t(int attr, int code);
 };
 
-typedef std::function<auto(const record_t&) -> color_t> termcolor_map;
-
-/// Represents the console sink which is responsible for writing all incoming log events directly
-/// into one of the selected standard outputs with an ability to optionally colorize result strings.
-///
-/// The sink automatically detects whether the destination stream is a TTY disabling colored output
-/// otherwise, which makes possible to redirect standard output to file without escaping codes
-/// garbage.
-///
-/// Note, that despite of C++ `std::cout` and `std::cerr` thread-safety with no undefined behavior
-/// its guarantees is insufficiently for safe working with them from multiple threads, leading to
-/// result messages intermixing.
-/// To avoid this a global mutex is used internally, which is kinda hack. Any other stdout/stderr
-/// usage outside from logger will probably results in character mixing, but no undefined behavior
-/// will be invoked.
-class console_t : public sink_t {
+template<>
+class builder<sink::console_t> {
 public:
-    enum class type_t { stdout, stderr };
-
-private:
-    std::ostream& stream;
-    termcolor_map colormap;
-
-public:
-    class builder_t;
-
-    /// Constructs a default console sink, which will write all incoming events to the standard
-    /// output.
+    /// Constructs a defaultly configured console sink builder.
     ///
-    /// No output coloring occurred in this case.
-    console_t();
+    /// By default the generated sink will write all incoming events to the standard output with no
+    /// coloring.
+    builder();
 
-    /// Constucts a new console sink, which will write all incoming events to the standard output
-    /// using the given terminal color mapping to colorize the output.
-    ///
-    /// \param colormap color mappings from logging level to terminal color.
-    explicit console_t(termcolor_map colormap);
+    /// Sets the destination stream to the standard output pipe.
+    auto stdout() & -> builder&;
+    auto stdout() && -> builder&&;
 
-    /// Constructs a new console sink, which will write all incoming events to the specified
-    /// standard stream (stdout or stderr) using the given terminal color mapping to colorize the
-    /// output.
-    ///
-    /// \param type standard output type.
-    /// \param colormap color mappings from logging level to terminal color.
-    console_t(type_t type, termcolor_map colormap);
+    /// Sets the destination stream to the standard error pipe.
+    auto stderr() & -> builder&;
+    auto stderr() && -> builder&&;
 
-    /// Writes the formatted message into the attached output stream.
-    ///
-    /// Note that the message may be anticipatorily colored using severity information from the
-    /// associated record.
-    auto emit(const record_t& record, const string_view& formatted) -> void;
+    /// TODO(docs): write me.
+    auto colorize(severity_t severity, color_t color) & -> builder&;
+    auto colorize(severity_t severity, color_t color) && -> builder&&;
 
-protected:
-    /// Constructs a new console sink, which will write all incoming events to the specified
-    /// stream using the given terminal color mapping to colorize the output.
-    ///
-    /// This constructor is protected, because it accepts a generic stream instead of predefined
-    /// one making it possible to write into anything that implements stream protocol, which is
-    /// useful for testing reasons for example.
-    console_t(std::ostream& stream, termcolor_map colormap);
+    /// TODO(docs): write me.
+    auto colorize(std::function<auto(const record_t& record) & -> color_t> fn) -> builder&;
+    auto colorize(std::function<auto(const record_t& record) && -> color_t> fn) -> builder&&;
 
-    /// Maps the given log record returning the color that is used for colored formatting the result
-    /// output message.
-    ///
-    /// The implementation uses `colormap` variable provided with construction.
-    virtual auto color(const record_t& record) const -> color_t;
-
-private:
-    static auto output(type_t type) -> std::ostream&;
+    /// TODO(docs): write me.
+    auto build() && -> std::unique_ptr<sink_t>;
 };
-
-class console_t::builder_t {
-public:
-    auto build() const -> console_t;
-};
-
-}  // namespace sink
 
 template<>
-struct factory<sink::console_t> {
-    static auto type() -> const char*;
-    static auto from(const config::node_t& config) -> sink::console_t;
+class factory<sink::console_t> : public factory<sink_t> {
+public:
+    auto type() const noexcept -> const char*;
+    auto from(const config::node_t& config) const -> std::unique_ptr<sink_t>;
 };
+
+}  // namespace experimental
 
 }  // namespace v1
 }  // namespace blackhole

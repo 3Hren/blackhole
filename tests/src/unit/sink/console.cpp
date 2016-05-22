@@ -1,37 +1,23 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <unistd.h>
-
 #include <blackhole/attribute.hpp>
 #include <blackhole/record.hpp>
 #include <blackhole/sink/console.hpp>
 
+#include <blackhole/detail/sink/console.hpp>
+
 namespace blackhole {
-namespace testing {
+inline namespace v1 {
 namespace sink {
+namespace {
 
 using ::testing::StrictMock;
 using ::testing::internal::CaptureStdout;
 using ::testing::internal::GetCapturedStdout;
 
-using ::blackhole::sink::color_t;
-using ::blackhole::sink::console_t;
-
-namespace mock {
-namespace {
-
-class console_t : public ::blackhole::sink::console_t {
-public:
-    std::ostringstream stream;
-
-    explicit console_t(::blackhole::sink::termcolor_map colmap) :
-        ::blackhole::sink::console_t(stream, std::move(colmap))
-    {}
-};
-
-}  // namespace
-}  // namespace mock
+using experimental::color_t;
+using experimental::factory;
 
 TEST(color_t, Default) {
     std::ostringstream stream;
@@ -103,7 +89,7 @@ public:
 };
 
 TEST(console_t, ColoredOutput) {
-    console_t sink([](const record_t&) -> color_t {
+    console_t sink(std::cout, [](const record_t&) -> color_t {
         return color_t::red();
     });
 
@@ -123,7 +109,8 @@ TEST(console_t, ColoredOutput) {
 }
 
 TEST(console_t, NonColoredOutputToNonTTY) {
-    mock::console_t sink([](const record_t&) -> color_t {
+    std::stringstream stream;
+    console_t sink(stream, [](const record_t&) -> color_t {
         return color_t::red();
     });
 
@@ -133,13 +120,14 @@ TEST(console_t, NonColoredOutputToNonTTY) {
 
     sink.emit(record, "expected");
 
-    EXPECT_EQ("expected\n", sink.stream.str());
+    EXPECT_EQ("expected\n", stream.str());
 }
 
-TEST(console_t, Type) {
-    EXPECT_EQ("console", std::string(factory<sink::console_t>::type()));
+TEST(console_t, FactoryType) {
+    EXPECT_EQ(std::string("console"), factory<sink::console_t>().type());
 }
 
+}  // namespace
 }  // namespace sink
-}  // namespace testing
+}  // namespace v1
 }  // namespace blackhole
