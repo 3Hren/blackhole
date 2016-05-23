@@ -1,5 +1,18 @@
 #pragma once
 
+namespace boost {
+namespace asio {
+namespace ip {
+
+struct udp;
+
+template<typename>
+struct basic_endpoint;
+
+}  // namespace ip
+}  // namespace asio
+}  // namespace boost
+
 namespace blackhole {
 inline namespace v1 {
 

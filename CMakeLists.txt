@@ -156,6 +156,7 @@ if (ENABLE_TESTING)
 		${PROJECT_SOURCE_DIR}/foreign/libcds)
 
 	include_directories(
+		${PROJECT_SOURCE_DIR}
 		${PROJECT_SOURCE_DIR}/tests/include)
 
 	if (CMAKE_BUILD_TYPE STREQUAL "Coverage")
@@ -213,7 +214,6 @@ if (ENABLE_TESTING)
 		tests/registry
 		tests/root
 		tests/severity
-		tests/sink/udp
 		tests/src/mocks/formatter
 		tests/src/mocks/handler
 		tests/src/mocks/logger
@@ -233,6 +233,7 @@ if (ENABLE_TESTING)
 		tests/src/unit/sink/null
 		tests/src/unit/sink/syslog
 		tests/src/unit/sink/tcp
+		tests/src/unit/sink/udp.cpp
 		tests/wrapper
 	)
 

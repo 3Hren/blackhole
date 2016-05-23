@@ -2,22 +2,25 @@
 #include <gtest/gtest.h>
 
 #include <boost/array.hpp>
-#include <boost/asio/ip/udp.hpp>
 
 #include <blackhole/attribute.hpp>
 #include <blackhole/record.hpp>
 #include <blackhole/sink/socket/udp.hpp>
 
+#include <src/sink/socket/udp.hpp>
+
 #include "mocks/node.hpp"
 
 namespace blackhole {
-namespace testing {
+inline namespace v1 {
 namespace sink {
+namespace socket {
+namespace {
+
+using experimental::factory;
 
 using ::testing::Return;
 using ::testing::StrictMock;
-
-using blackhole::sink::socket::udp_t;
 
 TEST(udp_t, Endpoint) {
     udp_t sink("0.0.0.0", 20000);
@@ -47,11 +50,11 @@ TEST(udp_t, SendsData) {
     EXPECT_EQ('}', buffer[1]);
 }
 
-TEST(udp_t, type) {
-    EXPECT_EQ("udp", std::string(blackhole::factory<udp_t>::type()));
+TEST(udp_t, FactoryType) {
+    EXPECT_EQ(std::string("udp"), factory<udp_t>().type());
 }
 
-TEST(udp_t, ThrowsIfHostParameterIsMissing) {
+TEST(udp_t, FactoryThrowsIfHostParameterIsMissing) {
     StrictMock<config::testing::mock::node_t> config;
 
     EXPECT_CALL(config, subscript_key("host"))
@@ -59,13 +62,13 @@ TEST(udp_t, ThrowsIfHostParameterIsMissing) {
         .WillOnce(Return(nullptr));
 
     try {
-        factory<udp_t>::from(config);
+        factory<udp_t>().from(config);
     } catch (const std::invalid_argument& err) {
         EXPECT_STREQ(R"(parameter "host" is required)", err.what());
     }
 }
 
-TEST(udp_t, ThrowsIfPortParameterIsMissing) {
+TEST(udp_t, FactoryThrowsIfPortParameterIsMissing) {
     using config::testing::mock::node_t;
 
     StrictMock<node_t> config;
@@ -84,13 +87,13 @@ TEST(udp_t, ThrowsIfPortParameterIsMissing) {
         .WillOnce(Return(nullptr));
 
     try {
-        factory<udp_t>::from(config);
+        factory<udp_t>().from(config);
     } catch (const std::invalid_argument& err) {
         EXPECT_STREQ(R"(parameter "port" is required)", err.what());
     }
 }
 
-TEST(udp_t, Config) {
+TEST(udp_t, FactoryConfig) {
     using config::testing::mock::node_t;
 
     StrictMock<node_t> config;
@@ -113,13 +116,14 @@ TEST(udp_t, Config) {
         .Times(1)
         .WillOnce(Return(20000));
 
-    const auto sink = factory<udp_t>::from(config);
+    const auto sink = factory<udp_t>().from(config);
+    const auto& cast = dynamic_cast<const udp_t&>(*sink);
 
-    EXPECT_EQ(boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 20000), sink.endpoint());
+    EXPECT_EQ(boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 20000), cast.endpoint());
 }
 
-//test config - check endpoint.
-
+}  // namespace
+}  // namespace socket
 }  // namespace sink
-}  // namespace testing
+}  // namespace v1
 }  // namespace blackhole
