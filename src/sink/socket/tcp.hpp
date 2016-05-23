@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 #include <boost/asio/ip/tcp.hpp>
 
 #include "blackhole/sink.hpp"
