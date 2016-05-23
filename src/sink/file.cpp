@@ -1,8 +1,6 @@
 #include "blackhole/sink/file.hpp"
 
 #include <cctype>
-#include <fstream>
-#include <ostream>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/optional/optional.hpp>
