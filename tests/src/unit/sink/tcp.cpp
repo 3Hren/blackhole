@@ -11,18 +11,15 @@
 #include <blackhole/attribute.hpp>
 #include <blackhole/record.hpp>
 #include <blackhole/sink/socket/tcp.hpp>
+#include <src/sink/socket/tcp.hpp>
 
 #include "mocks/node.hpp"
 
 namespace blackhole {
 inline namespace v1 {
 namespace sink {
+namespace socket {
 namespace {
-
-using sink::socket::tcp_t;
-
-using ::testing::Return;
-using ::testing::StrictMock;
 
 TEST(tcp, Host) {
     EXPECT_EQ("localhost", tcp_t("localhost", 20000).host());
@@ -74,11 +71,22 @@ TEST(tcp, ThrowsExceptionOnConnectionRefused) {
     EXPECT_THROW(sink.emit(record, "{}"), std::system_error);
 }
 
-TEST(tcp_t, type) {
-    EXPECT_EQ("tcp", std::string(blackhole::factory<tcp_t>::type()));
+}  // namespace
+}  // namespace socket
+
+namespace {
+
+using ::testing::Return;
+using ::testing::StrictMock;
+
+using experimental::factory;
+using socket::tcp_t;
+
+TEST(tcp_t, FactoryType) {
+    EXPECT_EQ(std::string("tcp"), factory<tcp_t>().type());
 }
 
-TEST(tcp_t, ThrowsIfHostParameterIsMissing) {
+TEST(tcp_t, FactoryThrowsIfHostParameterIsMissing) {
     StrictMock<config::testing::mock::node_t> config;
 
     EXPECT_CALL(config, subscript_key("host"))
@@ -86,13 +94,13 @@ TEST(tcp_t, ThrowsIfHostParameterIsMissing) {
         .WillOnce(Return(nullptr));
 
     try {
-        factory<tcp_t>::from(config);
+        factory<tcp_t>().from(config);
     } catch (const std::invalid_argument& err) {
         EXPECT_STREQ(R"(parameter "host" is required)", err.what());
     }
 }
 
-TEST(tcp_t, ThrowsIfPortParameterIsMissing) {
+TEST(tcp_t, FactoryThrowsIfPortParameterIsMissing) {
     using config::testing::mock::node_t;
 
     StrictMock<node_t> config;
@@ -111,13 +119,13 @@ TEST(tcp_t, ThrowsIfPortParameterIsMissing) {
         .WillOnce(Return(nullptr));
 
     try {
-        factory<tcp_t>::from(config);
+        factory<tcp_t>().from(config);
     } catch (const std::invalid_argument& err) {
         EXPECT_STREQ(R"(parameter "port" is required)", err.what());
     }
 }
 
-TEST(tcp_t, Config) {
+TEST(tcp_t, FactoryConfig) {
     using config::testing::mock::node_t;
 
     StrictMock<node_t> config;
@@ -140,10 +148,11 @@ TEST(tcp_t, Config) {
         .Times(1)
         .WillOnce(Return(20000));
 
-    const auto sink = factory<tcp_t>::from(config);
+    const auto sink = factory<tcp_t>().from(config);
+    const auto& cast = dynamic_cast<const tcp_t&>(*sink);
 
-    EXPECT_EQ("0.0.0.0", sink.host());
-    EXPECT_EQ(20000, sink.port());
+    EXPECT_EQ("0.0.0.0", cast.host());
+    EXPECT_EQ(20000, cast.port());
 }
 
 }  // namespace

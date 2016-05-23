@@ -1,7 +1,5 @@
 #include <mutex>
 
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/optional/optional.hpp>
@@ -10,10 +8,12 @@
 #include "blackhole/config/option.hpp"
 #include "blackhole/cpp17/string_view.hpp"
 #include "blackhole/extensions/format.hpp"
-#include "blackhole/sink.hpp"
 #include "blackhole/sink/socket/tcp.hpp"
 
+#include "blackhole/detail/memory.hpp"
 #include "blackhole/detail/util/optional.hpp"
+
+#include "tcp.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -24,23 +24,13 @@ typedef boost::asio::ip::tcp protocol_type;
 typedef protocol_type::socket socket_type;
 typedef protocol_type::endpoint endpoint_type;
 
-struct tcp_t::data_t {
-    std::string host;
-    std::uint16_t port;
-
-    boost::asio::io_service io_service;
-    std::unique_ptr<socket_type> socket;
-
-    mutable std::mutex mutex;
-};
-
 namespace {
 
 template<typename Protocol, typename SocketService, typename Iterator>
 auto do_connect(boost::asio::basic_socket<Protocol, SocketService>& s,
-             Iterator begin,
-             Iterator end,
-             boost::system::error_code& ec) -> Iterator
+                Iterator begin,
+                Iterator end,
+                boost::system::error_code& ec) -> Iterator
 {
     ec = boost::system::error_code();
 
@@ -107,52 +97,47 @@ auto reconnect(boost::asio::io_service& io_service, const std::string& host, std
 }  // namespace
 
 tcp_t::tcp_t(std::string host, std::uint16_t port) :
-    data(new data_t)
-{
-    data->host = std::move(host);
-    data->port = port;
-}
-
-tcp_t::~tcp_t() = default;
+    host_(std::move(host)),
+    port_(port)
+{}
 
 auto tcp_t::host() const noexcept -> const std::string& {
-    return data->host;
+    return host_;
 }
 
 auto tcp_t::port() const noexcept -> std::uint16_t {
-    return data->port;
+    return port_;
 }
 
 auto tcp_t::emit(const record_t&, const string_view& message) -> void {
-    std::lock_guard<std::mutex> lock(data->mutex);
+    std::lock_guard<std::mutex> lock(mutex);
 
-    if (!data->socket) {
-        data->socket = reconnect(data->io_service, data->host, data->port);
+    if (!socket) {
+        socket = reconnect(io_service, host(), port());
     }
 
     try {
-        boost::asio::write(*data->socket, boost::asio::buffer(message.data(), message.size()));
+        boost::asio::write(*socket, boost::asio::buffer(message.data(), message.size()));
     } catch (const boost::system::system_error&) {
-        data->socket.reset();
+        socket.reset();
         std::rethrow_exception(std::current_exception());
     }
 }
 
 }  // namespace socket
 }  // namespace sink
-}  // namespace v1
-}  // namespace blackhole
 
-namespace blackhole {
-inline namespace v1 {
+namespace experimental {
+
+using sink::socket::tcp_t;
 
 using detail::util::value_or;
 
-auto factory<sink::socket::tcp_t>::type() -> const char* {
+auto factory<tcp_t>::type() const noexcept -> const char* {
     return "tcp";
 }
 
-auto factory<sink::socket::tcp_t>::from(const config::node_t& config) -> sink::socket::tcp_t {
+auto factory<tcp_t>::from(const config::node_t& config) const -> std::unique_ptr<sink_t> {
     const auto host = value_or(config["host"].to_string(), []() -> std::string {
         throw std::invalid_argument(R"(parameter "host" is required)");
     });
@@ -161,8 +146,9 @@ auto factory<sink::socket::tcp_t>::from(const config::node_t& config) -> sink::s
         throw std::invalid_argument(R"(parameter "port" is required)");
     });
 
-    return {host, static_cast<std::uint16_t>(port)};
+    return blackhole::make_unique<tcp_t>(host, static_cast<std::uint16_t>(port));
 }
 
+}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole
