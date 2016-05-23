@@ -10,6 +10,7 @@ blackhole (1.0.0-0beta1) UNRELEASED; urgency=low
     as a binary unit value, i.e. 1000B, 2MB etc.
   * Bug fix: file appender should no longer silently eat I/O error while trying
     to open a file.
+  * TODO: Compare benchmarks before release!
 
  -- Evgeny Safronov <division494@gmail.com>  Tue, 10 May 2016 22:16:50 +0300
 
