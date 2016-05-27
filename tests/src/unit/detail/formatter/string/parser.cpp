@@ -5,23 +5,11 @@
 #include <blackhole/detail/formatter/string/parser.hpp>
 
 namespace blackhole {
-namespace testing {
-
-using detail::formatter::string::broken_t;
-using detail::formatter::string::illformed_t;
-using detail::formatter::string::invalid_placeholder_t;
-
-using detail::formatter::string::parser_t;
-
-using detail::formatter::string::literal_t;
-
-using detail::formatter::string::id;
-using detail::formatter::string::hex;
-using detail::formatter::string::num;
-using detail::formatter::string::name;
-using detail::formatter::string::user;
-using detail::formatter::string::value;
-using detail::formatter::string::required;
+inline namespace v1 {
+namespace detail {
+namespace formatter {
+namespace string {
+namespace {
 
 namespace ph {
     using detail::formatter::string::ph::attribute;
@@ -454,5 +442,9 @@ TEST(parser_t, RealWorld) {
     EXPECT_FALSE(parser.next());
 }
 
-}  // namespace testing
+}  // namespace
+}  // namespace string
+}  // namespace formatter
+}  // namespace detail
+}  // namespace v1
 }  // namespace blackhole

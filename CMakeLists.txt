@@ -207,7 +207,6 @@ if (ENABLE_TESTING)
 		tests/config/option
 		tests/datetime
 		tests/facade
-		tests/formatter/parser
 		tests/handler/blocking
 		tests/record
 		tests/registry
@@ -218,6 +217,7 @@ if (ENABLE_TESTING)
 		tests/src/mocks/logger
 		tests/src/mocks/sink
 		tests/src/unit/cpp17/string_view
+		tests/src/unit/detail/formatter/string/parser.cpp
 		tests/src/unit/detail/mpsc
 		tests/src/unit/detail/record
 		tests/src/unit/formatter/grammar
