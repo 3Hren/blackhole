@@ -111,7 +111,7 @@ auto builder_t::formatter(const config::node_t& config) const -> std::unique_ptr
 auto registry_t::configured() -> registry_t {
     registry_t registry;
 
-    registry.add<formatter::string_t>();
+    registry.add_<formatter::string_t>();
 
     registry.add_<sink::console_t>();
     registry.add_<sink::null_t>();
@@ -124,6 +124,12 @@ auto registry_t::configured() -> registry_t {
 
 auto registry_t::add(std::shared_ptr<experimental::factory<sink_t>> factory) -> void {
     sinks[factory->type()] = [=](const config::node_t& node) {
+        return factory->from(node);
+    };
+}
+
+auto registry_t::add(std::shared_ptr<experimental::factory<formatter_t>> factory) -> void {
+    formatters[factory->type()] = [=](const config::node_t& node) {
         return factory->from(node);
     };
 }

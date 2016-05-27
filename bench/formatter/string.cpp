@@ -4,6 +4,7 @@
 #include <blackhole/attributes.hpp>
 #include <blackhole/cpp17/string_view.hpp>
 #include <blackhole/extensions/writer.hpp>
+#include <blackhole/formatter.hpp>
 #include <blackhole/formatter/string.hpp>
 #include <blackhole/record.hpp>
 
@@ -12,8 +13,12 @@
 namespace blackhole {
 namespace benchmark {
 
+using experimental::builder;
+using formatter::string_t;
+
 static void format_literal(::benchmark::State& state) {
-    formatter::string_t formatter("message: value");
+    auto formatter = builder<string_t>("message: value")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
@@ -21,7 +26,7 @@ static void format_literal(::benchmark::State& state) {
     writer_t writer;
 
     while (state.KeepRunning()) {
-        formatter.format(record, writer);
+        formatter->format(record, writer);
         writer.inner.clear();
     }
 
@@ -29,7 +34,8 @@ static void format_literal(::benchmark::State& state) {
 }
 
 static void format_pid(::benchmark::State& state) {
-    formatter::string_t formatter("{process}");
+    auto formatter = builder<string_t>("{process}")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
@@ -37,7 +43,7 @@ static void format_pid(::benchmark::State& state) {
     writer_t writer;
 
     while (state.KeepRunning()) {
-        formatter.format(record, writer);
+        formatter->format(record, writer);
         writer.inner.clear();
     }
 
@@ -45,7 +51,8 @@ static void format_pid(::benchmark::State& state) {
 }
 
 static void format_procname(::benchmark::State& state) {
-    formatter::string_t formatter("{process:s}");
+    auto formatter = builder<string_t>("{process:s}")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
@@ -53,7 +60,7 @@ static void format_procname(::benchmark::State& state) {
     writer_t writer;
 
     while (state.KeepRunning()) {
-        formatter.format(record, writer);
+        formatter->format(record, writer);
         writer.inner.clear();
     }
 
@@ -61,7 +68,8 @@ static void format_procname(::benchmark::State& state) {
 }
 
 static void format_tid(::benchmark::State& state) {
-    formatter::string_t formatter("{thread}");
+    auto formatter = builder<string_t>("{thread}")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
@@ -69,7 +77,7 @@ static void format_tid(::benchmark::State& state) {
     writer_t writer;
 
     while (state.KeepRunning()) {
-        formatter.format(record, writer);
+        formatter->format(record, writer);
         writer.inner.clear();
     }
 
@@ -77,7 +85,8 @@ static void format_tid(::benchmark::State& state) {
 }
 
 static void format_message(::benchmark::State& state) {
-    formatter::string_t formatter("message: {message}");
+    auto formatter = builder<string_t>("message: {message}")
+        .build();
 
     const string_view message("value");
     const attribute_pack pack;
@@ -85,7 +94,7 @@ static void format_message(::benchmark::State& state) {
     writer_t writer;
 
     while (state.KeepRunning()) {
-        formatter.format(record, writer);
+        formatter->format(record, writer);
         writer.inner.clear();
     }
 
@@ -93,7 +102,8 @@ static void format_message(::benchmark::State& state) {
 }
 
 static void format_timestamp(::benchmark::State& state) {
-    formatter::string_t formatter("{timestamp}");
+    auto formatter = builder<string_t>("{timestamp}")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
@@ -102,7 +112,7 @@ static void format_timestamp(::benchmark::State& state) {
     writer_t writer;
 
     while (state.KeepRunning()) {
-        formatter.format(record, writer);
+        formatter->format(record, writer);
         writer.inner.clear();
     }
 
@@ -110,7 +120,8 @@ static void format_timestamp(::benchmark::State& state) {
 }
 
 static void format_leftover(::benchmark::State& state) {
-    formatter::string_t formatter("{...:{{name}={value}:p}s}");
+    auto formatter = builder<string_t>("{...:{{name}={value}:p}s}")
+        .build();
 
     const string_view message("-");
     const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};
@@ -119,7 +130,7 @@ static void format_leftover(::benchmark::State& state) {
     writer_t writer;
 
     while (state.KeepRunning()) {
-        formatter.format(record, writer);
+        formatter->format(record, writer);
         writer.inner.clear();
     }
 
@@ -127,7 +138,8 @@ static void format_leftover(::benchmark::State& state) {
 }
 
 static void format_severity_message(::benchmark::State& state) {
-    formatter::string_t formatter("{severity:d}: {message}");
+    auto formatter = builder<string_t>("{severity:d}: {message}")
+        .build();
 
     const string_view message("value");
     const attribute_pack pack;
@@ -135,7 +147,7 @@ static void format_severity_message(::benchmark::State& state) {
     writer_t writer;
 
     while (state.KeepRunning()) {
-        formatter.format(record, writer);
+        formatter->format(record, writer);
         writer.inner.clear();
     }
 

@@ -9,6 +9,7 @@ struct deleter_t {
 };
 
 class record_t;
+class writer_t;
 class severity_t;
 
 class formatter_t;

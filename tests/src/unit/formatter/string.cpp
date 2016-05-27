@@ -7,6 +7,7 @@
 #include <blackhole/attributes.hpp>
 #include <blackhole/cpp17/string_view.hpp>
 #include <blackhole/extensions/writer.hpp>
+#include <blackhole/formatter.hpp>
 #include <blackhole/formatter/string.hpp>
 #include <blackhole/record.hpp>
 
@@ -33,169 +34,191 @@ struct display_traits<version_t> {
 }  // namespace blackhole
 
 namespace blackhole {
-namespace testing {
+inline namespace v1 {
+namespace formatter {
+namespace {
+
+using experimental::builder;
+using experimental::factory;
 
 using ::testing::AnyOf;
 using ::testing::Eq;
 
 TEST(string_t, Message) {
-    formatter::string_t formatter("[{message}]");
+    auto formatter = builder<string_t>("[{message}]")
+        .build();
 
     const string_view message("value");
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("[value]", writer.result().to_string());
 }
 
 TEST(string_t, Severity) {
     // NOTE: No severity mapping provided, formatter falls back to the numeric case.
-    formatter::string_t formatter("[{severity}]");
+    auto formatter = builder<string_t>("[{severity}]")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("[0]", writer.result().to_string());
 }
 
 TEST(string_t, SeverityNum) {
-    formatter::string_t formatter("[{severity:d}]");
+    auto formatter = builder<string_t>("[{severity:d}]")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("[0]", writer.result().to_string());
 }
 
 TEST(string_t, SeverityUser) {
-    formatter::string_t formatter("[{severity}]", [](int severity, const std::string&, writer_t& writer) {
-        writer.write("DEBUG");
-    });
+    auto formatter = builder<string_t>("[{severity}]")
+        .mapping([](int, const std::string&, writer_t& writer) {
+            writer.write("DEBUG");
+        })
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("[DEBUG]", writer.result().to_string());
 }
 
 TEST(string_t, SeverityUserExplicit) {
-    formatter::string_t formatter("[{severity:s}]", [](int severity, const std::string&, writer_t& writer) {
-        writer.write("DEBUG");
-    });
+    auto formatter = builder<string_t>("[{severity:s}]")
+        .mapping([](int, const std::string&, writer_t& writer) {
+            writer.write("DEBUG");
+        })
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("[DEBUG]", writer.result().to_string());
 }
 
 TEST(string_t, SeverityNumWithMappingProvided) {
-    formatter::string_t formatter("[{severity:d}]", [](int severity, const std::string&, writer_t& writer) {
-        writer.write("DEBUG");
-    });
+    auto formatter = builder<string_t>("[{severity:d}]")
+        .mapping([](int, const std::string&, writer_t& writer) {
+            writer.write("DEBUG");
+        })
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("[0]", writer.result().to_string());
 }
 
 TEST(string_t, SeverityNumWithSpec) {
-    formatter::string_t formatter("[{severity:*^3d}]");
+    auto formatter = builder<string_t>("[{severity:*^3d}]")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("[*0*]", writer.result().to_string());
 }
 
 TEST(string_t, SeverityUserWithSpec) {
-    formatter::string_t formatter("[{severity:<7}]", [](int severity, const std::string& spec, writer_t& writer) {
-        writer.write(spec, "DEBUG");
-    });
+    auto formatter = builder<string_t>("[{severity:<7}]")
+        .mapping([](int severity, const std::string& spec, writer_t& writer) {
+            writer.write(spec, "DEBUG");
+        })
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("[DEBUG  ]", writer.result().to_string());
 }
 
 TEST(string_t, CombinedSeverityNumWithMessage) {
-    formatter::string_t formatter("[{severity:d}]: {message}");
+    auto formatter = builder<string_t>("[{severity:d}]: {message}")
+        .build();
 
     const string_view message("value");
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("[0]: value", writer.result().to_string());
 }
 
 TEST(string_t, Generic) {
-    formatter::string_t formatter("{protocol}/{version:.1f}");
+    auto formatter = builder<string_t>("{protocol}/{version:.1f}")
+        .build();
 
     const string_view message("-");
     const attribute_list attributes{{"protocol", {"HTTP"}}, {"version", {1.1}}};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("HTTP/1.1", writer.result().to_string());
 }
 
 TEST(string_t, GenericNull) {
-    formatter::string_t formatter("{protocol}");
+    auto formatter = builder<string_t>("{protocol}")
+        .build();
 
     const string_view message("-");
     const attribute_list attributes{{"protocol", {}}};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("none", writer.result().to_string());
 }
 
 TEST(string_t, GenericNullWithSpec) {
-    formatter::string_t formatter("{protocol:>5}");
+    auto formatter = builder<string_t>("{protocol:>5}")
+        .build();
 
     const string_view message("-");
     const attribute_list attributes{{"protocol", {}}};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ(" none", writer.result().to_string());
 }
 
 TEST(string_t, GenericDuplicated) {
-    formatter::string_t formatter("{protocol}/{version}");
+    auto formatter = builder<string_t>("{protocol}/{version}")
+        .build();
 
     const string_view message("-");
     const attribute_list wrapper{{"protocol", {"HTTP"}}, {"version", {1.1}}};
@@ -204,13 +227,14 @@ TEST(string_t, GenericDuplicated) {
     const attribute_pack pack{user, scoped, wrapper};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("TCP/1", writer.result().to_string());
 }
 
 TEST(string_t, ThrowsIfGenericAttributeNotFound) {
-    formatter::string_t formatter("{protocol}/{version:.1f}");
+    auto formatter = builder<string_t>("{protocol}/{version:.1f}")
+        .build();
 
     const string_view message("-");
     const attribute_list attributes{{"protocol", {"HTTP"}}};
@@ -218,24 +242,26 @@ TEST(string_t, ThrowsIfGenericAttributeNotFound) {
     record_t record(0, message, pack);
     writer_t writer;
 
-    EXPECT_THROW(formatter.format(record, writer), std::logic_error);
+    EXPECT_THROW(formatter->format(record, writer), std::logic_error);
 }
 
 TEST(DISABLED_string_t, GenericOptional) {
-    formatter::string_t formatter("{protocol}{version:{ - REQUIRED:u}.1f}");
+    auto formatter = builder<string_t>("{protocol}{version:{ - REQUIRED:u}.1f}")
+        .build();
 
     const string_view message("-");
     const attribute_list attributes{{"protocol", {"HTTP"}}, {"version", {1.1}}};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("HTTP/1.1 - REQUIRED", writer.result().to_string());
 }
 
 TEST(string_t, GenericLazyUnspec) {
-    formatter::string_t formatter("{protocol}/{version}");
+    auto formatter = builder<string_t>("{protocol}/{version}")
+        .build();
 
     version_t version{1, 1};
 
@@ -244,13 +270,14 @@ TEST(string_t, GenericLazyUnspec) {
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("HTTP/1.1", writer.result().to_string());
 }
 
 TEST(string_t, GenericLazySpec) {
-    formatter::string_t formatter("{protocol}/{version:>4s} - alpha");
+    auto formatter = builder<string_t>("{protocol}/{version:>4s} - alpha")
+        .build();
 
     version_t version{1, 1};
 
@@ -259,55 +286,59 @@ TEST(string_t, GenericLazySpec) {
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("HTTP/1.1 - alpha", writer.result().to_string());
 }
 
 TEST(string_t, Process) {
-    formatter::string_t formatter("{process}");
+    auto formatter = builder<string_t>("{process}")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ(std::to_string(::getpid()), writer.result().to_string());
 }
 
 TEST(string_t, ProcessIdExplicitly) {
-    formatter::string_t formatter("{process:d}");
+    auto formatter = builder<string_t>("{process:d}")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ(std::to_string(::getpid()), writer.result().to_string());
 }
 
 TEST(string_t, ProcessName) {
-    formatter::string_t formatter("{process:s}");
+    auto formatter = builder<string_t>("{process:s}")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_TRUE(writer.result().to_string().size() > 0);
 }
 
 TEST(string_t, Thread) {
-    formatter::string_t formatter("{thread}");
+    auto formatter = builder<string_t>("{thread}")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     std::ostringstream stream;
 #ifdef __linux
@@ -319,13 +350,14 @@ TEST(string_t, Thread) {
 }
 
 TEST(string_t, ThreadExplicitly) {
-    formatter::string_t formatter("{thread:#x}");
+    auto formatter = builder<string_t>("{thread:#x}")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     std::ostringstream stream;
 #ifdef __linux
@@ -337,13 +369,14 @@ TEST(string_t, ThreadExplicitly) {
 }
 
 TEST(string_t, ThreadExplicitlySpec) {
-    formatter::string_t formatter("{thread:>#16x}");
+    auto formatter = builder<string_t>("{thread:>#16x}")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     std::ostringstream stream;
 #ifdef __linux__
@@ -378,7 +411,8 @@ struct threadname_guard {
 };
 
 TEST(string_t, ThreadName) {
-    formatter::string_t formatter("{thread:s}");
+    auto formatter = builder<string_t>("{thread:s}")
+        .build();
 
     threadname_guard guard("thread#0");
 
@@ -386,13 +420,14 @@ TEST(string_t, ThreadName) {
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("thread#0", writer.result().to_string());
 }
 
 TEST(string_t, ThreadNameWithSpec) {
-    formatter::string_t formatter("{thread:>10s}");
+    auto formatter = builder<string_t>("{thread:>10s}")
+        .build();
 
     threadname_guard guard("thread#0");
 
@@ -400,14 +435,15 @@ TEST(string_t, ThreadNameWithSpec) {
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("  thread#0", writer.result().to_string());
 }
 
 TEST(string_t, Timestamp) {
     // NOTE: By default %Y-%m-%d %H:%M:%S.%f pattern is used.
-    formatter::string_t formatter("[{timestamp}]");
+    auto formatter = builder<string_t>("[{timestamp}]")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
@@ -426,13 +462,14 @@ TEST(string_t, Timestamp) {
     >(timestamp.time_since_epoch()).count() % 1000000, 6, '0') << "]";
 
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ(wr.str(), writer.result().to_string());
 }
 
 TEST(string_t, TimestampExplicit) {
-    formatter::string_t formatter("[{timestamp:{%Y}}]");
+    auto formatter = builder<string_t>("[{timestamp:{%Y}}]")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
@@ -449,13 +486,14 @@ TEST(string_t, TimestampExplicit) {
     wr << "[" << fmt::StringRef(buffer, len) << "]";
 
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ(wr.str(), writer.result().to_string());
 }
 
 TEST(string_t, TimestampExplicitWithType) {
-    formatter::string_t formatter("[{timestamp:{%H:%M:%S}s}]");
+    auto formatter = builder<string_t>("[{timestamp:{%H:%M:%S}s}]")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
@@ -472,13 +510,14 @@ TEST(string_t, TimestampExplicitWithType) {
     wr << "[" << fmt::StringRef(buffer, len) << "]";
 
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ(wr.str(), writer.result().to_string());
 }
 
 TEST(string_t, TimestampSpec) {
-    formatter::string_t formatter("[{timestamp:>30s}]");
+    auto formatter = builder<string_t>("[{timestamp:>30s}]")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
@@ -497,14 +536,15 @@ TEST(string_t, TimestampSpec) {
     >(timestamp.time_since_epoch()).count() % 1000000, 6, '0') << "]";
 
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ(wr.str(), writer.result().to_string());
 }
 
 TEST(string_t, TimestampLocaltime) {
     // NOTE: By default %Y-%m-%d %H:%M:%S.%f pattern is used.
-    formatter::string_t formatter("[{timestamp:l}]");
+    auto formatter = builder<string_t>("[{timestamp:l}]")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
@@ -523,13 +563,14 @@ TEST(string_t, TimestampLocaltime) {
     >(timestamp.time_since_epoch()).count() % 1000000, 6, '0') << "]";
 
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ(wr.str(), writer.result().to_string());
 }
 
 TEST(string_t, TimestampExplicitWithTypeLocaltime) {
-    formatter::string_t formatter("[{timestamp:{%H:%M:%S}l}]");
+    auto formatter = builder<string_t>("[{timestamp:{%H:%M:%S}l}]")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
@@ -546,13 +587,14 @@ TEST(string_t, TimestampExplicitWithTypeLocaltime) {
     wr << "[" << fmt::StringRef(buffer, len) << "]";
 
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ(wr.str(), writer.result().to_string());
 }
 
 TEST(string_t, TimestampSpecLocaltime) {
-    formatter::string_t formatter("[{timestamp:>30l}]");
+    auto formatter = builder<string_t>("[{timestamp:>30l}]")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
@@ -571,13 +613,14 @@ TEST(string_t, TimestampSpecLocaltime) {
     >(timestamp.time_since_epoch()).count() % 1000000, 6, '0') << "]";
 
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ(wr.str(), writer.result().to_string());
 }
 
 TEST(string_t, TimestampNum) {
-    formatter::string_t formatter("[{timestamp:d}]");
+    auto formatter = builder<string_t>("[{timestamp:d}]")
+        .build();
 
     const string_view message("-");
     const attribute_pack pack;
@@ -592,20 +635,21 @@ TEST(string_t, TimestampNum) {
     wr << "[" << usec << "]";
 
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ(wr.str(), writer.result().to_string());
 }
 
 TEST(string_t, Leftover) {
-    formatter::string_t formatter("{...}");
+    auto formatter = builder<string_t>("{...}")
+        .build();
 
     const string_view message("-");
     const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_THAT(writer.result().to_string(), AnyOf(
         Eq("key#1: 42, key#2: value#2"),
@@ -614,27 +658,29 @@ TEST(string_t, Leftover) {
 }
 
 TEST(string_t, LeftoverEmpty) {
-    formatter::string_t formatter("[{...}]");
+    auto formatter = builder<string_t>("[{...}]")
+        .build();
 
     const string_view message("-");
     const attribute_list attributes{};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("[]", writer.result().to_string());
 }
 
 TEST(DISABLED_string_t, LeftoverWithPrefixAndSuffix) {
-    formatter::string_t formatter("{...:{[:px}{]:sx}s}");
+    auto formatter = builder<string_t>("{...:{[:px}{]:sx}s}")
+        .build();
 
     const string_view message("-");
     const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_THAT(writer.result().to_string(), AnyOf(
         Eq("[key#1: 42, key#2: value#2]"),
@@ -643,27 +689,29 @@ TEST(DISABLED_string_t, LeftoverWithPrefixAndSuffix) {
 }
 
 TEST(DISABLED_string_t, LeftoverEmptyWithPrefixAndSuffix) {
-    formatter::string_t formatter("{...:{[:px}{]:sx}s}");
+    auto formatter = builder<string_t>("{...:{[:px}{]:sx}s}")
+        .build();
 
     const string_view message("-");
     const attribute_list attributes{};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ("", writer.result().to_string());
 }
 
 TEST(string_t, LeftoverWithPattern) {
-    formatter::string_t formatter("{...:{{name}={value}:p}s}");
+    auto formatter = builder<string_t>("{...:{{name}={value}:p}s}")
+        .build();
 
     const string_view message("-");
     const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_THAT(writer.result().to_string(), AnyOf(
         Eq("key#1=42, key#2=value#2"),
@@ -672,14 +720,15 @@ TEST(string_t, LeftoverWithPattern) {
 }
 
 TEST(string_t, LeftoverWithSeparator) {
-    formatter::string_t formatter("{...:{ | :s}s}");
+    auto formatter = builder<string_t>("{...:{ | :s}s}")
+        .build();
 
     const string_view message("-");
     const attribute_list attributes{{"key#1", {42}}, {"key#2", {"value#2"}}};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_THAT(writer.result().to_string(), AnyOf(
         Eq("key#1: 42 | key#2: value#2"),
@@ -687,9 +736,11 @@ TEST(string_t, LeftoverWithSeparator) {
     ));
 }
 
-TEST(string_t, Type) {
-    EXPECT_EQ("string", std::string(factory<formatter::string_t>::type()));
+TEST(string_t, FactoryType) {
+    EXPECT_EQ(std::string("string"), factory<string_t>().type());
 }
 
-}  // namespace testing
+}  // namespace
+}  // namespace formatter
+}  // namespace v1
 }  // namespace blackhole

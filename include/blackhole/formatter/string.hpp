@@ -1,47 +1,8 @@
 #pragma once
 
 #include <functional>
-#include <memory>
-#include <string>
 
-#include "blackhole/formatter.hpp"
-#include "blackhole/severity.hpp"
-
-namespace blackhole {
-inline namespace v1 {
-
-class record_t;
-class writer_t;
-
-template<typename>
-struct factory;
-
-}  // namespace v1
-}  // namespace blackhole
-
-namespace blackhole {
-inline namespace v1 {
-namespace config {
-
-class node_t;
-
-}  // namespace config
-}  // namespace v1
-}  // namespace blackhole
-
-namespace blackhole {
-inline namespace v1 {
-namespace formatter {
-namespace token {
-
-class token_t;
-class option_t;
-
-}  // namespace string
-}  // namespace formatter
-}  // namespace v1
-}  // namespace blackhole
-
+#include "../factory.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -134,26 +95,32 @@ typedef std::function<void(int severity, const std::string& spec, writer_t& writ
 ///
 /// All visited tokens are written directly into the given writer instance with an internal small
 /// stack-allocated buffer, growing using the heap on overflow.
-class string_t : public formatter_t {
-    class inner_t;
-    std::unique_ptr<inner_t, auto(*)(inner_t*) -> void> inner;
-
-public:
-    explicit string_t(const std::string& pattern);
-    explicit string_t(const std::string& pattern, severity_map sevmap);
-
-    /// Formatting.
-
-    auto format(const record_t& record, writer_t& writer) -> void;
-};
+class string_t;
 
 }  // namespace formatter
 
+namespace experimental {
+
 template<>
-struct factory<formatter::string_t> {
-    static auto type() -> const char*;
-    static auto from(const config::node_t& config) -> formatter::string_t;
+class builder<formatter::string_t> {
+    class inner_t;
+    std::unique_ptr<inner_t, deleter_t> p;
+
+public:
+    explicit builder(std::string pattern);
+
+    auto mapping(formatter::severity_map sevmap) && -> builder&&;
+
+    auto build() && -> std::unique_ptr<formatter_t>;
 };
 
+template<>
+class factory<formatter::string_t> : public factory<formatter_t> {
+public:
+    auto type() const noexcept -> const char* override final;
+    auto from(const config::node_t& config) const -> std::unique_ptr<formatter_t> override final;
+};
+
+}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

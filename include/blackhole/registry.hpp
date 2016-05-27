@@ -93,6 +93,7 @@ public:
     }
 
     auto add(std::shared_ptr<experimental::factory<sink_t>> factory) -> void;
+    auto add(std::shared_ptr<experimental::factory<formatter_t>> factory) -> void;
 
     /// Returns the sink factory with the given type if registered, throws otherwise.
     auto sink(const std::string& type) const -> sink_factory;

@@ -12,12 +12,15 @@
 #include "blackhole/config/option.hpp"
 #include "blackhole/extensions/format.hpp"
 #include "blackhole/extensions/writer.hpp"
+#include "blackhole/formatter.hpp"
 #include "blackhole/record.hpp"
 
 #include "blackhole/detail/attribute.hpp"
 #include "blackhole/detail/formatter/string/parser.hpp"
 #include "blackhole/detail/formatter/string/token.hpp"
+#include "blackhole/detail/memory.hpp"
 #include "blackhole/detail/procname.hpp"
+#include "blackhole/detail/util/deleter.hpp"
 
 // TODO: Optional attributes.
 // Optional placeholders allows to nicely format some patterns where there are non-reserved
@@ -290,48 +293,70 @@ auto tokenize(const std::string& pattern) -> std::vector<token_t> {
 
 }  // namespace
 
-class string_t::inner_t {
-public:
+// TODO: Decompose `throw std::invalid_argument("token not found");` case.
+
+class string_t : public formatter_t {
     severity_map sevmap;
     std::vector<token_t> tokens;
-};
 
-string_t::string_t(const std::string& pattern) :
-    inner(new inner_t, [](inner_t* d) { delete d; })
-{
-    inner->sevmap = [](int severity, const std::string& spec, writer_t& writer) {
-        writer.write(spec, severity);
-    };
-
-    inner->tokens = tokenize(pattern);
-}
-
-string_t::string_t(const std::string& pattern, severity_map sevmap) :
-    inner(new inner_t, [](inner_t* d) { delete d; })
-{
-    inner->sevmap = std::move(sevmap);
-    inner->tokens = tokenize(pattern);
-}
-
-// TODO: Decompose `throw std::invalid_argument("token not found");` case.
-// TODO: Check and decompose name is not reserved. Maybe by wrapping `name` with type. Test.
-// TODO: Both algorithms are similar. Decompose.
-
-auto string_t::format(const record_t& record, writer_t& writer) -> void {
-    const visitor_t visitor(writer, record, inner->sevmap);
-
-    for (const auto& token : inner->tokens) {
-        boost::apply_visitor(visitor, token);
+public:
+    explicit string_t(const std::string& pattern) :
+        tokens(tokenize(pattern))
+    {
+        sevmap = [](int severity, const std::string& spec, writer_t& writer) {
+            writer.write(spec, severity);
+        };
     }
-}
+
+    string_t(const std::string& pattern, severity_map sevmap) :
+        sevmap(std::move(sevmap)),
+        tokens(tokenize(pattern))
+    {}
+
+    auto format(const record_t& record, writer_t& writer) -> void override {
+        const visitor_t visitor(writer, record, sevmap);
+
+        for (const auto& token : tokens) {
+            boost::apply_visitor(visitor, token);
+        }
+    }
+};
 
 }  // namespace formatter
 
-auto factory<formatter::string_t>::type() -> const char* {
+namespace experimental {
+
+using formatter::severity_map;
+using formatter::string_t;
+
+class builder<string_t>::inner_t {
+public:
+    std::string pattern;
+    severity_map sevmap;
+};
+
+builder<string_t>::builder(std::string pattern) :
+    p(new inner_t{std::move(pattern), {}}, deleter_t())
+{}
+
+auto builder<string_t>::mapping(formatter::severity_map sevmap) && -> builder&& {
+    p->sevmap = std::move(sevmap);
+    return std::move(*this);
+}
+
+auto builder<string_t>::build() && -> std::unique_ptr<formatter_t> {
+    if (p->sevmap) {
+        return blackhole::make_unique<string_t>(std::move(p->pattern), std::move(p->sevmap));
+    } else {
+        return blackhole::make_unique<string_t>(std::move(p->pattern));
+    }
+}
+
+auto factory<string_t>::type() const noexcept -> const char* {
     return "string";
 }
 
-auto factory<formatter::string_t>::from(const config::node_t& config) -> formatter::string_t {
+auto factory<string_t>::from(const config::node_t& config) const -> std::unique_ptr<formatter_t> {
     auto pattern = config["pattern"].to_string().get();
 
     if (auto mapping = config["sevmap"]) {
@@ -348,11 +373,15 @@ auto factory<formatter::string_t>::from(const config::node_t& config) -> formatt
             }
         };
 
-        return formatter::string_t(std::move(pattern), std::move(fn));
+        return blackhole::make_unique<string_t>(std::move(pattern), std::move(fn));
     }
 
-    return formatter::string_t(std::move(pattern));
+    return blackhole::make_unique<string_t>(std::move(pattern));
 }
+
+}  // namespace experimental
+
+template auto deleter_t::operator()(experimental::builder<formatter::string_t>::inner_t* value) -> void;
 
 }  // namespace v1
 }  // namespace blackhole

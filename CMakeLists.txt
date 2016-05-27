@@ -208,7 +208,6 @@ if (ENABLE_TESTING)
 		tests/datetime
 		tests/facade
 		tests/formatter/parser
-		tests/formatter/string
 		tests/handler/blocking
 		tests/record
 		tests/registry
@@ -223,6 +222,7 @@ if (ENABLE_TESTING)
 		tests/src/unit/detail/record
 		tests/src/unit/formatter/grammar
 		tests/src/unit/formatter/json
+		tests/src/unit/formatter/string.cpp
 		tests/src/unit/formatter/token
 		tests/src/unit/sink/asynchronous
 		tests/src/unit/sink/console.cpp
