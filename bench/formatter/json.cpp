@@ -4,6 +4,7 @@
 #include <blackhole/attributes.hpp>
 #include <blackhole/cpp17/string_view.hpp>
 #include <blackhole/extensions/writer.hpp>
+#include <blackhole/formatter.hpp>
 #include <blackhole/formatter/json.hpp>
 #include <blackhole/record.hpp>
 
@@ -12,10 +13,12 @@
 namespace blackhole {
 namespace benchmark {
 
-using ::blackhole::formatter::json_t;
+using experimental::builder;
+using formatter::json_t;
 
 static void format_json(::benchmark::State& state) {
-    json_t formatter;
+    auto formatter = builder<json_t>()
+        .build();
 
     const string_view message("value");
     const attribute_pack pack;
@@ -23,7 +26,7 @@ static void format_json(::benchmark::State& state) {
     writer_t writer;
 
     while (state.KeepRunning()) {
-        formatter.format(record, writer);
+        formatter->format(record, writer);
         writer.inner.clear();
     }
 
@@ -31,7 +34,7 @@ static void format_json(::benchmark::State& state) {
 }
 
 static void format_json_message_routed(::benchmark::State& state) {
-    auto formatter = json_t::builder_t()
+    auto formatter = builder<json_t>()
         .route("/fields", {"message"})
         .build();
 
@@ -41,7 +44,7 @@ static void format_json_message_routed(::benchmark::State& state) {
     writer_t writer;
 
     while (state.KeepRunning()) {
-        formatter.format(record, writer);
+        formatter->format(record, writer);
         writer.inner.clear();
     }
 
@@ -49,7 +52,7 @@ static void format_json_message_routed(::benchmark::State& state) {
 }
 
 static void format_json_message_routed_attr(::benchmark::State& state) {
-    auto formatter = json_t::builder_t()
+    auto formatter = builder<json_t>()
         .route("/fields", {"endpoint"})
         .build();
 
@@ -60,7 +63,7 @@ static void format_json_message_routed_attr(::benchmark::State& state) {
     writer_t writer;
 
     while (state.KeepRunning()) {
-        formatter.format(record, writer);
+        formatter->format(record, writer);
         writer.inner.clear();
     }
 
@@ -68,7 +71,7 @@ static void format_json_message_routed_attr(::benchmark::State& state) {
 }
 
 static void format_json_message_routed_attr5(::benchmark::State& state) {
-    auto formatter = json_t::builder_t()
+    auto formatter = builder<json_t>()
         .route("/fields", {"endpoint", "severity", "process", "thread"})
         .build();
 
@@ -85,7 +88,7 @@ static void format_json_message_routed_attr5(::benchmark::State& state) {
     writer_t writer;
 
     while (state.KeepRunning()) {
-        formatter.format(record, writer);
+        formatter->format(record, writer);
         writer.inner.clear();
     }
 
@@ -93,7 +96,7 @@ static void format_json_message_routed_attr5(::benchmark::State& state) {
 }
 
 static void format_json_message_routed_attr5_unique(::benchmark::State& state) {
-    auto formatter = json_t::builder_t()
+    auto formatter = builder<json_t>()
         .route("/fields", {"endpoint", "severity", "process", "thread"})
         .unique()
         .build();
@@ -111,7 +114,7 @@ static void format_json_message_routed_attr5_unique(::benchmark::State& state) {
     writer_t writer;
 
     while (state.KeepRunning()) {
-        formatter.format(record, writer);
+        formatter->format(record, writer);
         writer.inner.clear();
     }
 

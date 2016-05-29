@@ -9,8 +9,10 @@
 #include <blackhole/attributes.hpp>
 #include <blackhole/cpp17/string_view.hpp>
 #include <blackhole/extensions/writer.hpp>
+#include <blackhole/formatter.hpp>
 #include <blackhole/formatter/json.hpp>
 #include <blackhole/record.hpp>
+#include <src/formatter/json.hpp>
 
 #include "mocks/node.hpp"
 
@@ -41,19 +43,21 @@ inline namespace v1 {
 namespace formatter {
 namespace {
 
-using ::blackhole::formatter::json_t;
-
 using ::testing::StrictMock;
 using ::testing::Return;
 
+using experimental::builder;
+using experimental::factory;
+
 TEST(json_t, FormatMessage) {
-    json_t formatter;
+    auto formatter = builder<json_t>()
+        .build();
 
     const string_view message("value");
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -63,14 +67,15 @@ TEST(json_t, FormatMessage) {
 }
 
 TEST(json_t, FormatFormattedMessage) {
-    json_t formatter;
+    auto formatter = builder<json_t>()
+        .build();
 
     const string_view message("value {}");
     const attribute_pack pack;
     record_t record(0, message, pack);
     record.activate("value 42");
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -80,13 +85,14 @@ TEST(json_t, FormatFormattedMessage) {
 }
 
 TEST(json_t, FormatSeverity) {
-    json_t formatter;
+    auto formatter = builder<json_t>()
+        .build();
 
     const string_view message("value");
     const attribute_pack pack;
     record_t record(4, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -97,14 +103,15 @@ TEST(json_t, FormatSeverity) {
 }
 
 TEST(json_t, FormatTimestamp) {
-    json_t formatter;
+    auto formatter = builder<json_t>()
+        .build();
 
     const string_view message("value");
     const attribute_pack pack;
     record_t record(4, message, pack);
     record.activate();
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -115,13 +122,14 @@ TEST(json_t, FormatTimestamp) {
 }
 
 TEST(json_t, FormatProcess) {
-    json_t formatter;
+    auto formatter = builder<json_t>()
+        .build();
 
     const string_view message("value");
     const attribute_pack pack;
     record_t record(4, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -132,13 +140,14 @@ TEST(json_t, FormatProcess) {
 }
 
 TEST(json_t, FormatThread) {
-    json_t formatter;
+    auto formatter = builder<json_t>()
+        .build();
 
     const string_view message("value");
     const attribute_pack pack;
     record_t record(4, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -156,14 +165,15 @@ TEST(json_t, FormatThread) {
 }
 
 TEST(json_t, FormatAttribute) {
-    json_t formatter;
+    auto formatter = builder<json_t>()
+        .build();
 
     const string_view message("value");
     const attribute_list attributes{{"counter", 42}};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -177,14 +187,15 @@ TEST(json_t, FormatAttribute) {
 }
 
 TEST(json_t, FormatAttributeNull) {
-    json_t formatter;
+    auto formatter = builder<json_t>()
+        .build();
 
     const string_view message("value");
     const attribute_list attributes{{"endpoint", nullptr}};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -193,14 +204,15 @@ TEST(json_t, FormatAttributeNull) {
 }
 
 TEST(json_t, FormatAttributeBool) {
-    json_t formatter;
+    auto formatter = builder<json_t>()
+        .build();
 
     const string_view message("value");
     const attribute_list attributes{{"available", true}};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -210,14 +222,15 @@ TEST(json_t, FormatAttributeBool) {
 }
 
 TEST(json_t, FormatAttributeDouble) {
-    json_t formatter;
+    auto formatter = builder<json_t>()
+        .build();
 
     const string_view message("value");
     const attribute_list attributes{{"pi", 3.1415}};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -227,14 +240,15 @@ TEST(json_t, FormatAttributeDouble) {
 }
 
 TEST(json_t, FormatAttributeString) {
-    json_t formatter;
+    auto formatter = builder<json_t>()
+        .build();
 
     const string_view message("value");
     const attribute_list attributes{{"endpoint", "127.0.0.1:8080"}};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -250,14 +264,15 @@ TEST(json_t, FormatAttributeString) {
 TEST(json_t, FormatAttributeUser) {
     endpoint_t endpoint{"127.0.0.1", 8080};
 
-    json_t formatter;
+    auto formatter = builder<json_t>()
+        .build();
 
     const string_view message("value");
     const attribute_list attributes{{"endpoint", endpoint}};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -271,7 +286,7 @@ TEST(json_t, FormatAttributeUser) {
 }
 
 TEST(json_t, FormatDuplicateAttributesDefault) {
-    auto formatter = json_t::builder_t()
+    auto formatter = builder<json_t>()
         .build();
 
     const string_view message("value");
@@ -280,7 +295,7 @@ TEST(json_t, FormatDuplicateAttributesDefault) {
     const attribute_pack pack{a1, a2};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -296,20 +311,8 @@ TEST(json_t, FormatDuplicateAttributesDefault) {
     EXPECT_TRUE(writer.result().to_string().find("\"counter\":100") != std::string::npos);
 }
 
-TEST(json_t, UniqueDisabledByDefault) {
-    EXPECT_FALSE(json_t().unique());
-}
-
-TEST(builder_t, Unique) {
-    const auto layout = json_t::builder_t()
-        .unique()
-        .build();
-
-    EXPECT_TRUE(layout.unique());
-}
-
 TEST(json_t, FormatDuplicateAttributesUnique) {
-    auto formatter = json_t::builder_t()
+    auto formatter = builder<json_t>()
         .unique()
         .build();
 
@@ -320,7 +323,7 @@ TEST(json_t, FormatDuplicateAttributesUnique) {
     const attribute_pack pack{a1, a2};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -337,7 +340,7 @@ TEST(json_t, FormatDuplicateAttributesUnique) {
 }
 
 TEST(json_t, FormatMessageWithRouting) {
-    auto formatter = json_t::builder_t()
+    auto formatter = builder<json_t>()
         .route("/fields", {"message"})
         .build();
 
@@ -345,7 +348,7 @@ TEST(json_t, FormatMessageWithRouting) {
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -356,7 +359,7 @@ TEST(json_t, FormatMessageWithRouting) {
 }
 
 TEST(json_t, FormatAttributeStringWithRouting) {
-    auto formatter = json_t::builder_t()
+    auto formatter = builder<json_t>()
         .route("/fields", {"endpoint"})
         .build();
 
@@ -365,7 +368,7 @@ TEST(json_t, FormatAttributeStringWithRouting) {
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -376,7 +379,7 @@ TEST(json_t, FormatAttributeStringWithRouting) {
 }
 
 TEST(json_t, FormatAttributeStringWithNestedRouting) {
-    auto formatter = json_t::builder_t()
+    auto formatter = builder<json_t>()
         .route("/fields/external", {"endpoint"})
         .build();
 
@@ -385,7 +388,7 @@ TEST(json_t, FormatAttributeStringWithNestedRouting) {
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -398,7 +401,7 @@ TEST(json_t, FormatAttributeStringWithNestedRouting) {
 }
 
 TEST(json_t, FormatAttributeStringWithRootRouting) {
-    auto formatter = json_t::builder_t()
+    auto formatter = builder<json_t>()
         .route("", {"endpoint"})
         .build();
 
@@ -407,7 +410,7 @@ TEST(json_t, FormatAttributeStringWithRootRouting) {
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -417,7 +420,7 @@ TEST(json_t, FormatAttributeStringWithRootRouting) {
 }
 
 TEST(json_t, FormatMessageWithRenaming) {
-    auto formatter = json_t::builder_t()
+    auto formatter = builder<json_t>()
         .rename("message", "#message")
         .build();
 
@@ -425,7 +428,7 @@ TEST(json_t, FormatMessageWithRenaming) {
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -435,7 +438,7 @@ TEST(json_t, FormatMessageWithRenaming) {
 }
 
 TEST(json_t, FormatAttributeWithRenaming) {
-    auto formatter = json_t::builder_t()
+    auto formatter = builder<json_t>()
         .rename("source", "#source")
         .build();
 
@@ -444,7 +447,7 @@ TEST(json_t, FormatAttributeWithRenaming) {
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -453,33 +456,21 @@ TEST(json_t, FormatAttributeWithRenaming) {
     EXPECT_STREQ("storage", doc["#source"].GetString());
 }
 
-TEST(json_t, NoNewlineByDefault) {
-    EXPECT_FALSE(json_t().newline());
-}
-
-TEST(builder_t, Newline) {
-    const auto layout = json_t::builder_t()
-        .newline()
-        .build();
-
-    EXPECT_TRUE(layout.newline());
-}
-
 TEST(json_t, FormatMessageWithoutNewlineByDefault) {
-    auto formatter = json_t::builder_t()
+    auto formatter = builder<json_t>()
         .build();
 
     const string_view message("");
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_NE('\n', writer.result().to_string().back());
 }
 
 TEST(json_t, FormatMessageWithNewline) {
-    auto formatter = json_t::builder_t()
+    auto formatter = builder<json_t>()
         .newline()
         .build();
 
@@ -487,21 +478,22 @@ TEST(json_t, FormatMessageWithNewline) {
     const attribute_pack pack;
     record_t record(0, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     EXPECT_EQ('\n', writer.result().to_string().back());
 }
 
 TEST(json_t, MutateTimestamp) {
-    json_t formatter;
-    formatter.timestamp("%Y!");
+    auto formatter = builder<json_t>()
+        .timestamp("%Y!")
+        .build();
 
     const string_view message("value");
     const attribute_pack pack;
     record_t record(4, message, pack);
     record.activate();
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -520,14 +512,15 @@ TEST(json_t, MutateTimestamp) {
 }
 
 TEST(json_t, MutateSeverity) {
-    json_t formatter;
-    formatter.severity({"D", "I", "W", "E"});
+    auto formatter = builder<json_t>()
+        .severity({"D", "I", "W", "E"})
+        .build();
 
     const string_view message("");
     const attribute_pack pack;
     record_t record(2, message, pack);
     writer_t writer;
-    formatter.format(record, writer);
+    formatter->format(record, writer);
 
     rapidjson::Document doc;
     doc.Parse<0>(writer.result().to_string().c_str());
@@ -537,8 +530,32 @@ TEST(json_t, MutateSeverity) {
     EXPECT_EQ("W", std::string(doc["severity"].GetString()));
 }
 
+// TEST(DISABLED_json_t, UniqueDisabledByDefault) {
+//     EXPECT_FALSE(json_t().unique());
+// }
+//
+// TEST(DISABLED_json_t, NoNewlineByDefault) {
+//     EXPECT_FALSE(json_t().newline());
+// }
+//
+// TEST(DISABLED_builder_t, Newline) {
+//     auto layout = builder<json_t>()
+//         .newline()
+//         .build();
+//
+//     EXPECT_TRUE(layout.newline());
+// }
+//
+// TEST(DISABLED_builder_t, Unique) {
+//     auto layout = builder<json_t>()
+//         .unique()
+//         .build();
+//
+//     EXPECT_TRUE(layout.unique());
+// }
+
 TEST(json_t, FactoryType) {
-    EXPECT_EQ("json", std::string(factory<json_t>::type()));
+    EXPECT_EQ(std::string("json"), factory<json_t>().type());
 }
 
 // TODO: Test json factory.

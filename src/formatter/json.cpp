@@ -23,6 +23,10 @@
 
 #include "blackhole/detail/attribute.hpp"
 #include "blackhole/detail/datetime.hpp"
+#include "blackhole/detail/memory.hpp"
+#include "blackhole/detail/util/deleter.hpp"
+
+#include "json.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -291,33 +295,12 @@ json_t::json_t(properties_t properties) :
     inner(new inner_t(std::move(properties)))
 {}
 
-json_t::~json_t() = default;
-
 auto json_t::newline() const noexcept -> bool {
     return inner->newline;
 }
 
 auto json_t::unique() const noexcept -> bool {
     return inner->unique;
-}
-
-auto json_t::severity(std::vector<std::string> sevmap) -> void {
-    inner->severity = std::move(sevmap);
-}
-
-auto json_t::timestamp(const std::string& pattern) -> void {
-    auto generator = detail::datetime::make_generator(pattern);
-    inner->timestamp = [=](const record_t::time_point& timestamp, writer_t& wr) {
-        const auto time = record_t::clock_type::to_time_t(timestamp);
-        const auto usec = std::chrono::duration_cast<
-            std::chrono::microseconds
-        >(timestamp.time_since_epoch()).count() % 1000000;
-
-        std::tm tm;
-        ::gmtime_r(&time, &tm);
-
-        generator(wr.inner, tm, static_cast<std::uint64_t>(usec));
-    };
 }
 
 auto json_t::format(const record_t& record, writer_t& writer) -> void {
@@ -352,46 +335,81 @@ auto json_t::format(const record_t& record, writer_t& writer) -> void {
     }
 }
 
-json_t::builder_t::builder_t() :
-    properties(new properties_t)
+}  // namespace formatter
+
+namespace experimental {
+
+using formatter::json_t;
+
+class builder<json_t>::inner_t : public json_t::properties_t {};
+
+builder<json_t>::builder() :
+    d(new inner_t{}, deleter_t())
 {}
 
-json_t::builder_t::~builder_t() = default;
-
-auto json_t::builder_t::route(std::string route) -> builder_t& {
-    properties->routing.unspecified = std::move(route);
+auto builder<json_t>::route(std::string route) & -> builder& {
+    d->routing.unspecified = std::move(route);
     return *this;
 }
 
-auto json_t::builder_t::route(std::string route, std::vector<std::string> attributes) -> builder_t& {
-    properties->routing.specified[std::move(route)] = std::move(attributes);
+auto builder<json_t>::route(std::string route) && -> builder&& {
+    d->routing.unspecified = std::move(route);
+    return std::move(*this);
+}
+
+auto builder<json_t>::route(std::string route, std::vector<std::string> attributes) & -> builder& {
+    d->routing.specified[std::move(route)] = std::move(attributes);
     return *this;
 }
 
-auto json_t::builder_t::rename(std::string from, std::string to) -> builder_t& {
-    properties->mapping[std::move(from)] = std::move(to);
+auto builder<json_t>::route(std::string route, std::vector<std::string> attributes) && -> builder&& {
+    d->routing.specified[std::move(route)] = std::move(attributes);
+    return std::move(*this);
+}
+
+auto builder<json_t>::rename(std::string from, std::string to) & -> builder& {
+    d->mapping[std::move(from)] = std::move(to);
     return *this;
 }
 
-auto json_t::builder_t::unique() -> builder_t& {
-    properties->unique = true;
+auto builder<json_t>::rename(std::string from, std::string to) && -> builder&& {
+    d->mapping[std::move(from)] = std::move(to);
+    return std::move(*this);
+}
+
+auto builder<json_t>::unique() & -> builder& {
+    d->unique = true;
     return *this;
 }
 
-auto json_t::builder_t::newline() -> builder_t& {
-    properties->newline = true;
+auto builder<json_t>::unique() && -> builder&& {
+    return std::move(unique());
+}
+
+auto builder<json_t>::newline() & -> builder& {
+    d->newline = true;
     return *this;
 }
 
-auto json_t::builder_t::severity(std::vector<std::string> sevmap) -> builder_t& {
-    properties->severity = std::move(sevmap);
+auto builder<json_t>::newline() && -> builder&& {
+    d->newline = true;
+    return std::move(*this);
+}
+
+auto builder<json_t>::severity(std::vector<std::string> sevmap) & -> builder& {
+    d->severity = std::move(sevmap);
     return *this;
 }
 
-auto json_t::builder_t::timestamp(const std::string& pattern) -> builder_t& {
+auto builder<json_t>::severity(std::vector<std::string> sevmap) && -> builder&& {
+    d->severity = std::move(sevmap);
+    return std::move(*this);
+}
+
+auto builder<json_t>::timestamp(const std::string& pattern) & -> builder& {
     auto generator = detail::datetime::make_generator(pattern);
 
-    properties->timestamp = [=](const record_t::time_point& timestamp, writer_t& wr) {
+    d->timestamp = [=](const record_t::time_point& timestamp, writer_t& wr) {
         const auto time = record_t::clock_type::to_time_t(timestamp);
         const auto usec = std::chrono::duration_cast<
             std::chrono::microseconds
@@ -406,18 +424,22 @@ auto json_t::builder_t::timestamp(const std::string& pattern) -> builder_t& {
     return *this;
 }
 
-auto json_t::builder_t::build() const -> json_t {
-    return {std::move(*properties)};
+auto builder<json_t>::timestamp(const std::string& pattern) && -> builder&& {
+    return std::move(timestamp(pattern));
 }
 
-}  // namespace formatter
+auto builder<json_t>::build() const && -> std::unique_ptr<formatter_t> {
+    return blackhole::make_unique<json_t>(std::move(*d));
+}
 
-auto factory<formatter::json_t>::type() noexcept -> const char* {
+auto factory<json_t>::type() const noexcept -> const char* {
     return "json";
 }
 
-auto factory<formatter::json_t>::from(const config::node_t& config) -> formatter::json_t {
-    formatter::json_t::builder_t builder;
+auto factory<json_t>::from(const config::node_t& config) const ->
+    std::unique_ptr<formatter_t>
+{
+    builder<json_t> builder;
 
     if (auto unique = config["unique"].to_bool()) {
         if (unique.get()) {
@@ -472,8 +494,12 @@ auto factory<formatter::json_t>::from(const config::node_t& config) -> formatter
         });
     }
 
-    return builder.build();
+    return std::move(builder).build();
 }
+
+}  // namespace experimental
+
+template auto deleter_t::operator()(experimental::builder<formatter::json_t>::inner_t*) -> void;
 
 }  // namespace v1
 }  // namespace blackhole
