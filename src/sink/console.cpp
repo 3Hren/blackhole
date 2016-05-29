@@ -26,7 +26,7 @@ static std::mutex mutex;
 
 #pragma clang diagnostic pop
 
-typedef std::function<auto(const record_t& record) -> color_t> termcolor_map;
+typedef std::function<color_t(const record_t& record)> termcolor_map;
 
 namespace {
 
@@ -66,7 +66,7 @@ console_t::console_t() :
 /// This constructor is protected, because it accepts a generic stream instead of predefined
 /// one making it possible to write into anything that implements stream protocol, which is
 /// useful for testing reasons for example.
-console_t::console_t(std::ostream& stream, std::function<auto(const record_t& record) -> color_t> colormap) :
+console_t::console_t(std::ostream& stream, std::function<color_t(const record_t& record)> colormap) :
     stream(stream),
     colormap(std::move(colormap))
 {}

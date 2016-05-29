@@ -98,8 +98,8 @@ public:
     auto colorize(severity_t severity, color_t color) && -> builder&&;
 
     /// TODO(docs): write me.
-    auto colorize(std::function<auto(const record_t& record) & -> color_t> fn) -> builder&;
-    auto colorize(std::function<auto(const record_t& record) && -> color_t> fn) -> builder&&;
+    auto colorize(std::function<color_t(const record_t& record)> fn) & -> builder&;
+    auto colorize(std::function<color_t(const record_t& record)> fn) && -> builder&&;
 
     /// TODO(docs): write me.
     auto build() && -> std::unique_ptr<sink_t>;

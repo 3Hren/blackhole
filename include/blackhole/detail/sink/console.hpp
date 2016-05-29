@@ -18,7 +18,7 @@ class console_t : public sink_t {
 
 public:
     console_t();
-    console_t(std::ostream& stream, std::function<auto(const record_t& record) -> color_t> colormap);
+    console_t(std::ostream& stream, std::function<color_t(const record_t& record)> colormap);
 
     auto emit(const record_t& record, const string_view& formatted) -> void override;
 };
