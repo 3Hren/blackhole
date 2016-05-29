@@ -530,6 +530,7 @@ TEST(json_t, MutateSeverity) {
     EXPECT_EQ("W", std::string(doc["severity"].GetString()));
 }
 
+// TODO: Enable.
 // TEST(DISABLED_json_t, UniqueDisabledByDefault) {
 //     EXPECT_FALSE(json_t().unique());
 // }
