@@ -530,30 +530,31 @@ TEST(json_t, MutateSeverity) {
     EXPECT_EQ("W", std::string(doc["severity"].GetString()));
 }
 
-// TODO: Enable.
-// TEST(DISABLED_json_t, UniqueDisabledByDefault) {
-//     EXPECT_FALSE(json_t().unique());
-// }
-//
-// TEST(DISABLED_json_t, NoNewlineByDefault) {
-//     EXPECT_FALSE(json_t().newline());
-// }
-//
-// TEST(DISABLED_builder_t, Newline) {
-//     auto layout = builder<json_t>()
-//         .newline()
-//         .build();
-//
-//     EXPECT_TRUE(layout.newline());
-// }
-//
-// TEST(DISABLED_builder_t, Unique) {
-//     auto layout = builder<json_t>()
-//         .unique()
-//         .build();
-//
-//     EXPECT_TRUE(layout.unique());
-// }
+TEST(json_t, UniqueDisabledByDefault) {
+    EXPECT_FALSE(json_t().unique());
+}
+
+TEST(json_t, NoNewlineByDefault) {
+    EXPECT_FALSE(json_t().newline());
+}
+
+TEST(builder_t, Newline) {
+    const auto layout = builder<json_t>()
+        .newline()
+        .build();
+
+    const auto& cast = dynamic_cast<const json_t&>(*layout);
+    EXPECT_TRUE(cast.newline());
+}
+
+TEST(builder_t, Unique) {
+    auto layout = builder<json_t>()
+        .unique()
+        .build();
+
+    const auto& cast = dynamic_cast<const json_t&>(*layout);
+    EXPECT_TRUE(cast.unique());
+}
 
 TEST(json_t, FactoryType) {
     EXPECT_EQ(std::string("json"), factory<json_t>().type());

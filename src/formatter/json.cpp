@@ -500,6 +500,7 @@ auto factory<json_t>::from(const config::node_t& config) const ->
 }  // namespace experimental
 
 template auto deleter_t::operator()(experimental::builder<formatter::json_t>::inner_t*) -> void;
+template auto deleter_t::operator()(formatter::json_t::inner_t*) -> void;
 
 }  // namespace v1
 }  // namespace blackhole
