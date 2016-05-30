@@ -9,14 +9,16 @@
 #include "mocks/sink.hpp"
 
 namespace blackhole {
-namespace testing {
+inline namespace v1 {
+namespace handler {
+namespace {
 
 using ::testing::Invoke;
 using ::testing::_;
 
-using blackhole::handler::blocking_t;
+using namespace testing;
 
-TEST(Handler, Handle) {
+TEST(blocking_t, Handle) {
     std::unique_ptr<mock::formatter_t> formatter_(new mock::formatter_t);
     mock::formatter_t& formatter = *formatter_;
 
@@ -47,5 +49,7 @@ TEST(Handler, Handle) {
     handler.handle(record);
 }
 
-}  // namespace testing
+}  // namespace
+}  // namespace handler
+}  // namespace v1
 }  // namespace blackhole
