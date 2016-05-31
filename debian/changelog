@@ -1,3 +1,9 @@
+blackhole (1.0.0-0alpha14) unstable; urgency=low
+
+  * Bug fix: fix compilation on clang with boost 1.55.
+
+ -- Evgeny Safronov <division494@gmail.com>  Tue, 31 May 2016 22:50:35 +0300
+
 blackhole (1.0.0-0alpha13) unstable; urgency=low
 
   * Feature: meet the syslog sink.
