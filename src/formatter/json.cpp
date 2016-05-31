@@ -41,14 +41,19 @@ struct visitor_t {
         node.AddMember(rapidjson::StringRef(name.data(), name.size()), rapidjson::kNullType, allocator);
     }
 
-    // For `bool`, `std::int64_t`, `std::uint64_t` and `double` types.
-    template<typename T>
-    auto operator()(T value) -> void {
-        static_assert(
-            std::is_same<T, bool>::value ||
-            std::is_same<T, std::int64_t>::value ||
-            std::is_same<T, std::uint64_t>::value ||
-            std::is_same<T, double>::value, "type mismatch");
+    auto operator()(bool value) -> void {
+        node.AddMember(rapidjson::StringRef(name.data(), name.size()), value, allocator);
+    }
+
+    auto operator()(std::int64_t value) -> void {
+        node.AddMember(rapidjson::StringRef(name.data(), name.size()), value, allocator);
+    }
+
+    auto operator()(std::uint64_t value) -> void {
+        node.AddMember(rapidjson::StringRef(name.data(), name.size()), value, allocator);
+    }
+
+    auto operator()(double value) -> void {
         node.AddMember(rapidjson::StringRef(name.data(), name.size()), value, allocator);
     }
 
@@ -219,9 +224,10 @@ public:
             inner.timestamp(record.timestamp(), wr);
             apply("timestamp", wr.inner.data(), wr.inner.size());
         } else {
-            apply("timestamp", std::chrono::duration_cast<
+            const auto timestamp = std::chrono::duration_cast<
                 std::chrono::microseconds
-            >(record.timestamp().time_since_epoch()).count());
+            >(record.timestamp().time_since_epoch()).count();
+            apply("timestamp", static_cast<std::int64_t>(timestamp));
         }
     }
 
