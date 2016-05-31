@@ -66,32 +66,10 @@ auto builder_t::build(const std::string& name) -> root_logger_t {
 
     // TODO: Check `config.contains(name)`.
     config[name].each([&](const config::node_t& config) {
-        auto formatter = this->formatter(result<const config::node_t&>(config["formatter"].unwrap())
-            .expect("each handler must have a formatter"));
-
-        std::vector<std::unique_ptr<sink_t>> sinks;
-        config["sinks"].each([&](const config::node_t& config) {
-            sinks.emplace_back(this->sink(config));
-        });
-
-        auto handler = this->handler(config);
-        handler->set(std::move(formatter));
-
-        for (auto& sink : sinks) {
-            handler->add(std::move(sink));
-        }
-
-        handlers.emplace_back(std::move(handler));
+        handlers.emplace_back(handler(config));
     });
 
     return root_logger_t(std::move(handlers));
-}
-
-auto builder_t::sink(const config::node_t& config) const -> std::unique_ptr<sink_t> {
-    const auto type = result<std::string>(config["type"].to_string())
-        .expect("sink must have a type");
-
-    return registry.sink(type)(config);
 }
 
 auto builder_t::handler(const config::node_t& config) const -> std::unique_ptr<handler_t> {
@@ -99,13 +77,6 @@ auto builder_t::handler(const config::node_t& config) const -> std::unique_ptr<h
         .get_value_or("blocking");
 
     return registry.handler(type)(config);
-}
-
-auto builder_t::formatter(const config::node_t& config) const -> std::unique_ptr<formatter_t> {
-    const auto type = result<std::string>(config["type"].to_string())
-        .expect("formatter must have a type");
-
-    return registry.formatter(type)(config);
 }
 
 auto registry_t::configured() -> registry_t {
@@ -117,13 +88,19 @@ auto registry_t::configured() -> registry_t {
     registry.add_<sink::null_t>();
     registry.add_<sink::syslog_t>();
 
-    registry.add<handler::blocking_t>();
+    registry.add_<handler::blocking_t>(registry); // TODO: Unsafe, pray for copy elision. Return unique_ptr instead.
 
     return registry;
 }
 
 auto registry_t::add(std::shared_ptr<experimental::factory<sink_t>> factory) -> void {
     sinks[factory->type()] = [=](const config::node_t& node) {
+        return factory->from(node);
+    };
+}
+
+auto registry_t::add(std::shared_ptr<experimental::factory<handler_t>> factory) -> void {
+    handlers[factory->type()] = [=](const config::node_t& node) {
         return factory->from(node);
     };
 }

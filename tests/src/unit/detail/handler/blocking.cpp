@@ -4,6 +4,7 @@
 #include <blackhole/extensions/writer.hpp>
 #include <blackhole/handler/blocking.hpp>
 #include <blackhole/record.hpp>
+#include <src/handler/blocking.hpp>
 
 #include "mocks/formatter.hpp"
 #include "mocks/sink.hpp"
@@ -25,9 +26,10 @@ TEST(blocking_t, Handle) {
     std::unique_ptr<mock::sink_t> sink_(new mock::sink_t);
     mock::sink_t& sink = *sink_;
 
-    blocking_t handler;
-    handler.set(std::move(formatter_));
-    handler.add(std::move(sink_));
+    std::vector<std::unique_ptr<sink_t>> sinks;
+    sinks.emplace_back(std::move(sink_));
+
+    blocking_t handler(std::move(formatter_), std::move(sinks));
 
     EXPECT_CALL(formatter, format(_, _))
         .Times(1)

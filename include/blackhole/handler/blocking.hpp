@@ -1,51 +1,44 @@
 #pragma once
 
-#include <memory>
-#include <vector>
-
-#include "blackhole/handler.hpp"
-
-namespace blackhole {
-inline namespace v1 {
-
-template<typename>
-struct factory;
-
-}  // namespace v1
-}  // namespace blackhole
-
-namespace blackhole {
-inline namespace v1 {
-namespace config {
-
-class node_t;
-
-}  // namespace config
-}  // namespace v1
-}  // namespace blackhole
+#include "../factory.hpp"
 
 namespace blackhole {
 inline namespace v1 {
 namespace handler {
 
-class blocking_t : public handler_t {
-    std::unique_ptr<formatter_t> formatter;
-    std::vector<std::unique_ptr<sink_t>> sinks;
-
-public:
-    auto handle(const record_t& record) -> void;
-
-    auto set(std::unique_ptr<formatter_t> formatter) -> void;
-    auto add(std::unique_ptr<sink_t> sink) -> void;
-};
+class blocking_t;
 
 }  // namespace handler
 
+namespace experimental {
+
 template<>
-struct factory<handler::blocking_t> {
-    static auto type() -> const char*;
-    static auto from(const config::node_t& config) -> handler::blocking_t;
+class builder<handler::blocking_t> {
+    class inner_t;
+    std::unique_ptr<inner_t, deleter_t> d;
+
+public:
+    auto set(std::unique_ptr<formatter_t> formatter) & -> builder&;
+    auto set(std::unique_ptr<formatter_t> formatter) && -> builder&&;
+    auto add(std::unique_ptr<sink_t> sink) & -> builder&;
+    auto add(std::unique_ptr<sink_t> sink) && -> builder&&;
+
+    auto build() && -> std::unique_ptr<handler_t>;
 };
 
+template<>
+class factory<handler::blocking_t> : public factory<handler_t> {
+    registry_t& registry;
+
+public:
+    constexpr explicit factory(registry_t& registry) noexcept :
+        registry(registry)
+    {}
+
+    virtual auto type() const noexcept -> const char* override;
+    virtual auto from(const config::node_t& config) const -> std::unique_ptr<handler_t> override;
+};
+
+}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole
