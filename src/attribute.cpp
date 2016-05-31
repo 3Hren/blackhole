@@ -2,6 +2,8 @@
 
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/variant/apply_visitor.hpp>
+// Must be included strictly before <boost/variant/get.hpp>.
+#include "hack/addressof.hpp"
 #include <boost/variant/get.hpp>
 
 #include "blackhole/detail/attribute.hpp"
