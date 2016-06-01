@@ -89,8 +89,19 @@ public:
         add(std::make_shared<experimental::factory<T>>(std::forward<Args>(args)...));
     }
 
+    /// Registers a new sink factory with this registry.
+    ///
+    /// \overload
     auto add(std::shared_ptr<experimental::factory<sink_t>> factory) -> void;
+
+    /// Registers a new handler factory with this registry.
+    ///
+    /// \overload
     auto add(std::shared_ptr<experimental::factory<handler_t>> factory) -> void;
+
+    /// Registers a new formatter factory with this registry.
+    ///
+    /// \overload
     auto add(std::shared_ptr<experimental::factory<formatter_t>> factory) -> void;
 
     /// Returns the sink factory with the given type if registered, throws otherwise.
