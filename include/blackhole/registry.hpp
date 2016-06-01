@@ -52,9 +52,7 @@ public:
     }
 
 private:
-    auto sink(const config::node_t& config) const -> std::unique_ptr<sink_t>;
     auto handler(const config::node_t& config) const -> std::unique_ptr<handler_t>;
-    auto formatter(const config::node_t& config) const -> std::unique_ptr<formatter_t>;
 };
 
 // TODO: Replace with interface plus empty/configured factory.
