@@ -82,13 +82,13 @@ auto builder_t::handler(const config::node_t& config) const -> std::unique_ptr<h
 auto registry_t::configured() -> registry_t {
     registry_t registry;
 
-    registry.add_<formatter::string_t>();
+    registry.add<formatter::string_t>();
 
-    registry.add_<sink::console_t>();
-    registry.add_<sink::null_t>();
-    registry.add_<sink::syslog_t>();
+    registry.add<sink::console_t>();
+    registry.add<sink::null_t>();
+    registry.add<sink::syslog_t>();
 
-    registry.add_<handler::blocking_t>(registry); // TODO: Unsafe, pray for copy elision. Return unique_ptr instead.
+    registry.add<handler::blocking_t>(registry); // TODO: Unsafe, pray for copy elision. Return unique_ptr instead.
 
     return registry;
 }

@@ -84,11 +84,8 @@ public:
     ///
     /// After registering the new factory can be used for constructing formatters, sinks or handlers
     /// depending on type using generic configuration object.
-    template<typename T>
-    auto add() -> void;
-
     template<typename T, typename... Args>
-    auto add_(Args&&... args) -> void {
+    auto add(Args&&... args) -> void {
         add(std::make_shared<experimental::factory<T>>(std::forward<Args>(args)...));
     }
 
@@ -104,44 +101,7 @@ public:
 
     /// Returns the formatter factory with the given type if registered, throws otherwise.
     auto formatter(const std::string& type) const -> formatter_factory;
-
-private:
-    template<typename T>
-    auto select() -> typename std::enable_if<std::is_base_of<sink_t, T>::value>::type {
-        typedef factory<T> factory_type;
-
-        const auto type = factory_type::type();
-        sinks[type] = [](const config::node_t& config) -> std::unique_ptr<sink_t> {
-            return std::unique_ptr<sink_t>(new T(factory_type::from(config)));
-        };
-    }
-
-    template<typename T>
-    auto select() -> typename std::enable_if<std::is_base_of<handler_t, T>::value>::type {
-        typedef factory<T> factory_type;
-
-        const auto type = factory_type::type();
-        handlers[type] = [](const config::node_t& config) -> std::unique_ptr<handler_t> {
-            return std::unique_ptr<handler_t>(new T(factory_type::from(config)));
-        };
-    }
-
-    template<typename T>
-    auto select() -> typename std::enable_if<std::is_base_of<formatter_t, T>::value>::type {
-        typedef factory<T> factory_type;
-
-        const auto type = factory_type::type();
-        formatters[type] = [](const config::node_t& config) -> std::unique_ptr<formatter_t> {
-            return std::unique_ptr<formatter_t>(new T(factory_type::from(config)));
-        };
-    }
 };
-
-template<typename T>
-inline auto
-registry_t::add() -> void {
-    select<T>();
-}
 
 template<typename T, typename... Args>
 inline auto
