@@ -10,11 +10,7 @@ namespace experimental {
 
 class factory_t {
 public:
-    factory_t() = default;
-    factory_t(const factory_t& other) = default;
-    factory_t(factory_t&& other) = default;
-
-    virtual ~factory_t() {}
+    virtual ~factory_t() = default;
 
     /// Returns factory type as a string literal, that is used to identity one factory of a given
     /// type from another.
