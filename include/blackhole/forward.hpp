@@ -14,13 +14,9 @@ class severity_t;
 
 class formatter_t;
 class handler_t;
-class registry_t;
 class sink_t;
 
-template<typename T>
-struct factory;
-
-class factory_t;
+class registry_t;
 
 namespace experimental {
 

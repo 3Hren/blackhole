@@ -11,9 +11,6 @@
 namespace blackhole {
 inline namespace v1 {
 
-template<typename>
-struct factory;
-
 class formatter_t;
 class handler_t;
 class sink_t;
