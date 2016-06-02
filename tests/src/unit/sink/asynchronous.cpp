@@ -7,6 +7,7 @@
 
 // TODO: Rename directory to just "mock" to be consistent with namespace.
 #include "mocks/sink.hpp"
+#include "mocks/registry.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -40,7 +41,7 @@ TEST(asynchronous_t, DelegatesEmit) {
 }
 
 TEST(asynchronous_t, FactoryType) {
-    registry_t registry;
+    mock_registry_t registry;
     factory<asynchronous_t> factory(registry);
 
     EXPECT_EQ(std::string("asynchronous"), factory.type());

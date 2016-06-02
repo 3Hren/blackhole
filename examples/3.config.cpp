@@ -29,10 +29,10 @@ auto main(int argc, char** argv) -> int {
     /// Here we are going to build the logger using registry. The registry's responsibility is to
     /// track registered handlers, formatter and sinks, but for now we're not going to register
     /// anything else, since there are predefined types.
-    auto log = blackhole::registry_t::configured()
+    auto log = blackhole::registry::configured()
         /// Specify the concrete builder type we want to use. It may be JSON, XML, YAML or whatever
         /// else.
-        .builder<blackhole::config::json_t>(std::ifstream(argv[1]))
+        ->builder<blackhole::config::json_t>(std::ifstream(argv[1]))
             /// Build the logger named "root".
             .build("root");
 

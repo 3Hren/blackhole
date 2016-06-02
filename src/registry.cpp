@@ -17,6 +17,8 @@
 #include "blackhole/sink/syslog.hpp"
 #include "blackhole/factory.hpp"
 
+#include "blackhole/detail/memory.hpp"
+
 namespace blackhole {
 inline namespace v1 {
 
@@ -79,51 +81,76 @@ auto builder_t::handler(const config::node_t& config) const -> std::unique_ptr<h
     return registry.handler(type)(config);
 }
 
-auto registry_t::configured() -> registry_t {
-    registry_t registry;
+class default_registry_t : public registry_t {
+public:
+    typedef registry_t::sink_factory sink_factory;
+    typedef registry_t::handler_factory handler_factory;
+    typedef registry_t::formatter_factory formatter_factory;
 
-    registry.add<formatter::string_t>();
+private:
+    std::map<std::string, sink_factory> sinks;
+    std::map<std::string, handler_factory> handlers;
+    std::map<std::string, formatter_factory> formatters;
 
-    registry.add<sink::console_t>();
-    registry.add<sink::null_t>();
-    registry.add<sink::syslog_t>();
+public:
+    auto sink(const std::string& type) const -> sink_factory override;
+    auto handler(const std::string& type) const -> handler_factory override;
+    auto formatter(const std::string& type) const -> formatter_factory override;
 
-    registry.add<handler::blocking_t>(registry); // TODO: Unsafe, pray for copy elision. Return unique_ptr instead.
+    auto add(std::shared_ptr<experimental::factory<sink_t>> factory) -> void override;
+    auto add(std::shared_ptr<experimental::factory<handler_t>> factory) -> void override;
+    auto add(std::shared_ptr<experimental::factory<formatter_t>> factory) -> void override;
+};
 
-    return registry;
-}
-
-auto registry_t::add(std::shared_ptr<experimental::factory<sink_t>> factory) -> void {
+auto default_registry_t::add(std::shared_ptr<experimental::factory<sink_t>> factory) -> void {
     sinks[factory->type()] = [=](const config::node_t& node) {
         return factory->from(node);
     };
 }
 
-auto registry_t::add(std::shared_ptr<experimental::factory<handler_t>> factory) -> void {
+auto default_registry_t::add(std::shared_ptr<experimental::factory<handler_t>> factory) -> void {
     handlers[factory->type()] = [=](const config::node_t& node) {
         return factory->from(node);
     };
 }
 
-auto registry_t::add(std::shared_ptr<experimental::factory<formatter_t>> factory) -> void {
+auto default_registry_t::add(std::shared_ptr<experimental::factory<formatter_t>> factory) -> void {
     formatters[factory->type()] = [=](const config::node_t& node) {
         return factory->from(node);
     };
 }
 
-auto registry_t::sink(const std::string& type) const -> sink_factory {
+auto default_registry_t::sink(const std::string& type) const -> sink_factory {
     return get(&sinks, type)
         .expect<std::out_of_range>(R"(sink with type "{}" is not registered)", type);
 }
 
-auto registry_t::handler(const std::string& type) const -> handler_factory {
+auto default_registry_t::handler(const std::string& type) const -> handler_factory {
     return get(&handlers, type)
         .expect<std::out_of_range>(R"(handler with type "{}" is not registered)", type);
 }
 
-auto registry_t::formatter(const std::string& type) const -> formatter_factory {
+auto default_registry_t::formatter(const std::string& type) const -> formatter_factory {
     return get(&formatters, type)
         .expect<std::out_of_range>(R"(formatter with type "{}" is not registered)", type);
+}
+
+auto registry::configured() -> std::unique_ptr<registry_t> {
+    std::unique_ptr<registry_t> registry(new default_registry_t);
+
+    registry->add<formatter::string_t>();
+
+    registry->add<sink::console_t>();
+    registry->add<sink::null_t>();
+    registry->add<sink::syslog_t>();
+
+    registry->add<handler::blocking_t>(*registry);
+
+    return registry;
+}
+
+auto registry::empty() -> std::unique_ptr<registry_t> {
+    return blackhole::make_unique<default_registry_t>();
 }
 
 }  // namespace v1

@@ -18,6 +18,8 @@ class sink_t;
 
 class registry_t;
 
+class root_logger_t;
+
 namespace experimental {
 
 template<typename T>
@@ -29,6 +31,10 @@ class factory;
 }  // namespace experimental
 
 namespace config {
+
+template<typename T>
+class factory;
+class factory_t;
 
 class node_t;
 

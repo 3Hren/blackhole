@@ -17,7 +17,7 @@ using ::testing::_;
 TEST(registry_t, ThrowsWhenTryingBuildOnHandlerWithNoType) {
     using config::testing::mock::node_t;
 
-    registry_t registry;
+    auto registry = registry::empty();
 
     node_t n0;
     auto n1 = new node_t;
@@ -26,7 +26,7 @@ TEST(registry_t, ThrowsWhenTryingBuildOnHandlerWithNoType) {
     config::factory<node_t> factory;
 
     try {
-        auto builder = registry.builder<node_t>();
+        auto builder = registry->builder<node_t>();
 
         auto& factory = dynamic_cast<config::factory<node_t>&>(builder.configurator());
         EXPECT_CALL(factory, config())
@@ -57,7 +57,7 @@ TEST(registry_t, ThrowsWhenTryingBuildOnHandlerWithNoType) {
 TEST(registry_t, ThrowsWhenTryingBuildOnUnknownHandler) {
     using config::testing::mock::node_t;
 
-    registry_t registry;
+    auto registry = registry::configured();
 
     node_t n0;
     auto n1 = new node_t;
@@ -67,7 +67,7 @@ TEST(registry_t, ThrowsWhenTryingBuildOnUnknownHandler) {
     config::factory<node_t> factory;
 
     try {
-        auto builder = registry.builder<node_t>();
+        auto builder = registry->builder<node_t>();
 
         auto& factory = dynamic_cast<config::factory<node_t>&>(builder.configurator());
         EXPECT_CALL(factory, config())
