@@ -6,8 +6,8 @@
 #include <gtest/gtest.h>
 
 // TODO: Rename directory to just "mock" to be consistent with namespace.
-#include "mocks/sink.hpp"
 #include "mocks/registry.hpp"
+#include "mocks/sink.hpp"
 
 namespace blackhole {
 inline namespace v1 {
