@@ -95,7 +95,7 @@ typedef std::function<auto(const record_t&) -> color_t> termcolor_map;
 /// will be invoked.
 class console_t : public sink_t {
 public:
-    enum class type_t { stdout, stderr };
+    enum class type_t { stdout_v, stderr_v };
 
 private:
     std::ostream& stream;

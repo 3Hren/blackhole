@@ -1,6 +1,10 @@
 #include "blackhole/sink/console.hpp"
 
+#if defined(__linux__) || defined(__APPLE__)
 #include <unistd.h>
+#elif _WIN32
+#include <io.h>
+#endif
 
 #include <iostream>
 #include <mutex>
@@ -11,15 +15,19 @@ namespace blackhole {
 inline namespace v1 {
 namespace sink {
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wglobal-constructors"
-#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#if defined(__clang__)
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wglobal-constructors"
+	#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif
 
 // Both standard output and error access mutex. Messages written with Blackhole will be
 // synchronized, otherwise an intermixing can occur.
 static std::mutex mutex;
 
-#pragma clang diagnostic pop
+#if defined(__clang__)
+	#pragma clang diagnostic pop
+#endif
 
 class color_t::scope_t {
     std::ostream& stream;
@@ -103,13 +111,19 @@ auto streamfd(const std::ostream& stream) -> FILE* {
     }
 }
 
+auto isatty(FILE* file) -> bool {
+#if defined(__linux__) || defined(__APPLE__)
+	return ::isatty(::fileno(file));
+#elif _WIN32
+	return ::_isatty(::_fileno(file)) != 0;
+#else
+	#error unsupported platform
+#endif
+}
+
 auto isatty(const std::ostream& stream) -> bool {
     if (auto file = streamfd(stream)) {
-#if defined(__linux__) || defined(__APPLE__)
-        return ::isatty(::fileno(file));
-#else
-#error unsupported platform
-#endif
+		return isatty(file);
     } else {
         return false;
     }
@@ -154,7 +168,7 @@ auto console_t::color(const record_t& record) const -> color_t {
 }
 
 auto console_t::output(type_t type) -> std::ostream& {
-    return type == type_t::stdout ? std::cout : std::cerr;
+    return type == type_t::stdout_v ? std::cout : std::cerr;
 }
 
 auto console_t::builder_t::build() const -> console_t {
