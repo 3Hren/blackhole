@@ -1,4 +1,4 @@
-blackhole (1.0.0-0beta1) UNRELEASED; urgency=low
+blackhole (1.0.0-0beta1) unstable; urgency=low
 
   * Break: drop GCC4.6 support.
   * Feature: introduce asynchronous sink.
