@@ -104,7 +104,7 @@ public:
     auto colorize(std::function<color_t(const record_t& record)> fn) & -> builder&;
     auto colorize(std::function<color_t(const record_t& record)> fn) && -> builder&&;
 
-    /// TODO(docs): write me.
+    /// Consumes this builder yielding a newly created console sink with the options configured.
     auto build() && -> std::unique_ptr<sink_t>;
 };
 
