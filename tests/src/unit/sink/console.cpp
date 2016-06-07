@@ -5,7 +5,7 @@
 #include <blackhole/record.hpp>
 #include <blackhole/sink/console.hpp>
 
-#include <blackhole/detail/sink/console.hpp>
+#include <src/sink/console.hpp>
 
 namespace blackhole {
 inline namespace v1 {

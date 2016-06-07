@@ -223,6 +223,7 @@ if (ENABLE_TESTING)
         tests/src/unit/formatter/token
         tests/src/unit/sink/asynchronous
         tests/src/unit/sink/console.cpp
+        tests/src/unit/sink/console/builder.cpp
         tests/src/unit/sink/file.cpp
         tests/src/unit/sink/file/flusher/bytecount.cpp
         tests/src/unit/sink/file/flusher/repeat.cpp

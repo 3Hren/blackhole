@@ -8,8 +8,9 @@
 #include "blackhole/cpp17/string_view.hpp"
 
 #include "blackhole/detail/memory.hpp"
-#include "blackhole/detail/sink/console.hpp"
 #include "blackhole/detail/util/deleter.hpp"
+
+#include "console.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -55,37 +56,30 @@ auto isatty(const std::ostream& stream) -> bool {
 
 }  // namespace
 
-
 console_t::console_t() :
-    stream(std::cout),
+    stream_(std::cout),
     colormap([](const record_t&) -> color_t { return {}; })
 {}
 
-/// Constructs a new console sink, which will write all incoming events to the specified
-/// stream using the given terminal color mapping to colorize the output.
-///
-/// This constructor is protected, because it accepts a generic stream instead of predefined
-/// one making it possible to write into anything that implements stream protocol, which is
-/// useful for testing reasons for example.
 console_t::console_t(std::ostream& stream, std::function<color_t(const record_t& record)> colormap) :
-    stream(stream),
+    stream_(stream),
     colormap(std::move(colormap))
 {}
 
-/// Writes the formatted message into the attached output stream.
-///
-/// Note that the message may be anticipatorily colored using severity information from the
-/// associated record.
+auto console_t::stream() noexcept -> std::ostream& {
+    return stream_;
+}
+
 auto console_t::emit(const record_t& record, const string_view& formatted) -> void {
-    if (isatty(stream)) {
+    if (isatty(stream())) {
         std::lock_guard<std::mutex> lock(mutex);
         colormap(record)
-            .apply(stream, formatted.data(), formatted.size());
-        stream << std::endl;
+            .apply(stream(), formatted.data(), formatted.size());
+        stream() << std::endl;
     } else {
         std::lock_guard<std::mutex> lock(mutex);
-        stream.write(formatted.data(), static_cast<std::streamsize>(formatted.size()));
-        stream << std::endl;
+        stream().write(formatted.data(), static_cast<std::streamsize>(formatted.size()));
+        stream() << std::endl;
     }
 }
 
@@ -168,12 +162,10 @@ auto operator<<(std::ostream& stream, const color_t& color) -> std::ostream& {
 
 class builder<sink::console_t>::inner_t {};
 
-// TODO: TEST!
 builder<sink::console_t>::builder() :
     d(new inner_t)
 {}
 
-// TODO: TEST!
 auto builder<sink::console_t>::build() && -> std::unique_ptr<sink_t> {
     return blackhole::make_unique<sink::console_t>();
 }
