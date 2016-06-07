@@ -339,6 +339,12 @@ builder<string_t>::builder(std::string pattern) :
     p(new inner_t{std::move(pattern), {}}, deleter_t())
 {}
 
+// TODO: TEST!
+auto builder<string_t>::mapping(formatter::severity_map sevmap) & -> builder& {
+    p->sevmap = std::move(sevmap);
+    return *this;
+}
+
 auto builder<string_t>::mapping(formatter::severity_map sevmap) && -> builder&& {
     p->sevmap = std::move(sevmap);
     return std::move(*this);

@@ -109,6 +109,7 @@ class builder<formatter::string_t> {
 public:
     explicit builder(std::string pattern);
 
+    auto mapping(formatter::severity_map sevmap) & -> builder&;
     auto mapping(formatter::severity_map sevmap) && -> builder&&;
 
     auto build() && -> std::unique_ptr<formatter_t>;

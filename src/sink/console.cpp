@@ -9,6 +9,7 @@
 
 #include "blackhole/detail/memory.hpp"
 #include "blackhole/detail/sink/console.hpp"
+#include "blackhole/detail/util/deleter.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -165,6 +166,18 @@ auto operator<<(std::ostream& stream, const color_t& color) -> std::ostream& {
     return stream << "\033[" << color.code << "m";
 }
 
+class builder<sink::console_t>::inner_t {};
+
+// TODO: TEST!
+builder<sink::console_t>::builder() :
+    d(new inner_t)
+{}
+
+// TODO: TEST!
+auto builder<sink::console_t>::build() && -> std::unique_ptr<sink_t> {
+    return blackhole::make_unique<sink::console_t>();
+}
+
 auto factory<sink::console_t>::type() const noexcept -> const char* {
     return "console";
 }
@@ -174,5 +187,8 @@ auto factory<sink::console_t>::from(const config::node_t&) const -> std::unique_
 }
 
 }  // namespace experimental
+
+template auto deleter_t::operator()(experimental::builder<sink::console_t>::inner_t* value) -> void;
+
 }  // namespace v1
 }  // namespace blackhole

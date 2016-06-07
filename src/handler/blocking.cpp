@@ -47,6 +47,11 @@ public:
     std::vector<std::unique_ptr<sink_t>> sinks;
 };
 
+// TODO: TEST!
+builder<blocking_t>::builder() :
+    d(new inner_t)
+{}
+
 auto builder<blocking_t>::set(std::unique_ptr<formatter_t> formatter) & -> builder& {
     d->formatter = std::move(formatter);
     return *this;

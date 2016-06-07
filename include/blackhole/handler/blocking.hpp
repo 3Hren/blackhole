@@ -18,6 +18,8 @@ class builder<handler::blocking_t> {
     std::unique_ptr<inner_t, deleter_t> d;
 
 public:
+    builder();
+
     auto set(std::unique_ptr<formatter_t> formatter) & -> builder&;
     auto set(std::unique_ptr<formatter_t> formatter) && -> builder&&;
     auto add(std::unique_ptr<sink_t> sink) & -> builder&;
@@ -31,7 +33,7 @@ class factory<handler::blocking_t> : public factory<handler_t> {
     registry_t& registry;
 
 public:
-    constexpr explicit factory(registry_t& registry) noexcept :
+    explicit factory(registry_t& registry) noexcept :
         registry(registry)
     {}
 

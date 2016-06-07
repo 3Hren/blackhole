@@ -78,6 +78,9 @@ private:
 
 template<>
 class builder<sink::console_t> {
+    class inner_t;
+    std::unique_ptr<inner_t, deleter_t> d;
+
 public:
     /// Constructs a defaultly configured console sink builder.
     ///

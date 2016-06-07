@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "blackhole/handler.hpp"
+#include "blackhole/forward.hpp"
 
 namespace blackhole {
 inline namespace v1 {
