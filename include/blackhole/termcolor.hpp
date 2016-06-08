@@ -41,8 +41,7 @@ public:
     auto lighter() -> termcolor_t&;
 
     /// Applies the current color to the given stream and writes data specified to it.
-    // TODO: Bad design, subject for change.
-    auto apply(std::ostream& stream, const char* data, std::size_t size) -> void;
+    auto write(std::ostream& stream, const char* data, std::size_t size) -> void;
 
     /// Checks whether this terminal color differs from the default one.
     auto colored() const noexcept -> bool;

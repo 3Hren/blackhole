@@ -71,7 +71,7 @@ auto console_t::emit(const record_t& record, const string_view& formatted) -> vo
     if (isatty(stream())) {
         std::lock_guard<std::mutex> lock(mutex);
         colormap(record)
-            .apply(stream(), formatted.data(), formatted.size());
+            .write(stream(), formatted.data(), formatted.size());
         stream() << std::endl;
     } else {
         std::lock_guard<std::mutex> lock(mutex);

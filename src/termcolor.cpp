@@ -61,7 +61,7 @@ auto termcolor_t::operator!=(const termcolor_t& other) const noexcept -> bool {
     return !operator==(other);
 }
 
-auto termcolor_t::apply(std::ostream& stream, const char* data, std::size_t size) -> void {
+auto termcolor_t::write(std::ostream& stream, const char* data, std::size_t size) -> void {
     if (colored()) {
         scope_t scope(stream, *this);
         stream.write(data, static_cast<std::streamsize>(size));
