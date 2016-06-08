@@ -58,7 +58,7 @@ console_t::console_t() :
     colormap([](const record_t&) -> termcolor_t { return {}; })
 {}
 
-console_t::console_t(std::ostream& stream, termcolor_map colormap) :
+console_t::console_t(std::ostream& stream, termcolor_map_t colormap) :
     stream_(stream),
     colormap(std::move(colormap))
 {}
@@ -87,7 +87,7 @@ namespace experimental {
 class builder<sink::console_t>::inner_t {
 public:
     std::ostream* stream;
-    sink::termcolor_map termcolor;
+    sink::termcolor_map_t termcolor;
 };
 
 builder<sink::console_t>::builder() :
