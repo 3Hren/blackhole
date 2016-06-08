@@ -9,28 +9,16 @@
 namespace blackhole {
 inline namespace v1 {
 
-// TODO: Move to root_logger.hpp.
 class builder_t {
     const registry_t& registry;
-    std::unique_ptr<config::factory_t> factory;
+    std::unique_ptr<config::factory_t, deleter_t> factory;
 
 public:
     builder_t(const registry_t& registry, std::unique_ptr<config::factory_t> factory);
-    builder_t(const builder_t& other) = delete;
-    builder_t(builder_t&& other) = default;
 
-    ~builder_t();
-
-    // TODO: Implement. This requires the signature of formatter factories to be changed to accept
-    // severity_map argument.
-    // auto sevmap(severity_map sevmap) -> void;
+    auto configurator() noexcept -> config::factory_t&;
 
     auto build(const std::string& name) -> root_logger_t;
-
-    // TODO: Hide?
-    auto configurator() -> config::factory_t& {
-        return *factory;
-    }
 
 private:
     auto handler(const config::node_t& config) const -> std::unique_ptr<handler_t>;

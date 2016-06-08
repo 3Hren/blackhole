@@ -56,10 +56,12 @@ auto get(const std::map<std::string, V>* map, const std::string& key) -> result<
 
 builder_t::builder_t(const registry_t& registry, std::unique_ptr<config::factory_t> factory) :
     registry(registry),
-    factory(std::move(factory))
+    factory(factory.release())
 {}
 
-builder_t::~builder_t() = default;
+auto builder_t::configurator() noexcept -> config::factory_t& {
+    return *factory;
+}
 
 auto builder_t::build(const std::string& name) -> root_logger_t {
     const auto& config = factory->config();
