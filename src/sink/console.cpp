@@ -84,14 +84,36 @@ auto console_t::emit(const record_t& record, const string_view& formatted) -> vo
 
 namespace experimental {
 
-class builder<sink::console_t>::inner_t {};
+class builder<sink::console_t>::inner_t {
+public:
+    std::ostream* stream;
+    sink::termcolor_map termcolor;
+};
 
 builder<sink::console_t>::builder() :
-    d(new inner_t)
+    d(new inner_t{&std::cout, [](const record_t&) -> termcolor_t { return {}; }})
 {}
 
+auto builder<sink::console_t>::stdout() & -> builder& {
+    d->stream = &std::cout;
+    return *this;
+}
+
+auto builder<sink::console_t>::stdout() && -> builder&& {
+    return std::move(stdout());
+}
+
+auto builder<sink::console_t>::stderr() & -> builder& {
+    d->stream = &std::cerr;
+    return *this;
+}
+
+auto builder<sink::console_t>::stderr() && -> builder&& {
+    return std::move(stderr());
+}
+
 auto builder<sink::console_t>::build() && -> std::unique_ptr<sink_t> {
-    return blackhole::make_unique<sink::console_t>();
+    return blackhole::make_unique<sink::console_t>(*d->stream, std::move(d->termcolor));
 }
 
 auto factory<sink::console_t>::type() const noexcept -> const char* {
