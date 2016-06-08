@@ -6,6 +6,7 @@
 #include <mutex>
 
 #include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/termcolor.hpp"
 
 #include "blackhole/detail/memory.hpp"
 #include "blackhole/detail/util/deleter.hpp"
@@ -16,8 +17,6 @@ namespace blackhole {
 inline namespace v1 {
 namespace sink {
 
-using experimental::color_t;
-
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
@@ -27,8 +26,6 @@ using experimental::color_t;
 static std::mutex mutex;
 
 #pragma clang diagnostic pop
-
-typedef std::function<color_t(const record_t& record)> termcolor_map;
 
 namespace {
 
@@ -58,10 +55,10 @@ auto isatty(const std::ostream& stream) -> bool {
 
 console_t::console_t() :
     stream_(std::cout),
-    colormap([](const record_t&) -> color_t { return {}; })
+    colormap([](const record_t&) -> termcolor_t { return {}; })
 {}
 
-console_t::console_t(std::ostream& stream, std::function<color_t(const record_t& record)> colormap) :
+console_t::console_t(std::ostream& stream, termcolor_map colormap) :
     stream_(stream),
     colormap(std::move(colormap))
 {}
@@ -86,79 +83,6 @@ auto console_t::emit(const record_t& record, const string_view& formatted) -> vo
 }  // namespace sink
 
 namespace experimental {
-namespace {
-
-class scope_t {
-    std::ostream& stream;
-
-public:
-    scope_t(std::ostream& stream, const color_t& color) :
-        stream(stream)
-    {
-        stream << color;
-    }
-
-    ~scope_t() noexcept(false) {
-        stream << color_t::reset();
-    }
-};
-
-}  // namespace
-
-color_t::color_t() :
-    attr(0),
-    code(39)
-{}
-
-color_t::color_t(int attr, int code) :
-    attr(attr),
-    code(code)
-{}
-
-auto color_t::blue() -> color_t {
-    return color_t(0, 34);
-}
-
-auto color_t::green() -> color_t {
-    return color_t(0, 32);
-}
-
-auto color_t::yellow() -> color_t {
-    return color_t(0, 33);
-}
-
-auto color_t::red() -> color_t {
-    return color_t(0, 31);
-}
-
-auto color_t::reset() -> color_t {
-    return color_t(0, 0);
-}
-
-auto color_t::operator==(const color_t& other) const noexcept -> bool {
-    return code == other.code && attr == other.attr;
-}
-
-auto color_t::operator!=(const color_t& other) const noexcept -> bool {
-    return !operator==(other);
-}
-
-auto color_t::apply(std::ostream& stream, const char* data, std::size_t size) -> void {
-    if (colored()) {
-        scope_t scope(stream, *this);
-        stream.write(data, static_cast<std::streamsize>(size));
-    } else {
-        stream.write(data, static_cast<std::streamsize>(size));
-    }
-}
-
-auto color_t::colored() const noexcept -> bool {
-    return *this != color_t();
-}
-
-auto operator<<(std::ostream& stream, const color_t& color) -> std::ostream& {
-    return stream << "\033[" << color.code << "m";
-}
 
 class builder<sink::console_t>::inner_t {};
 

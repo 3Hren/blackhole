@@ -10,11 +10,11 @@ namespace blackhole {
 inline namespace v1 {
 namespace sink {
 
-using experimental::color_t;
+typedef std::function<termcolor_t(const record_t& record)> termcolor_map;
 
 class console_t : public sink_t {
     std::ostream& stream_;
-    std::function<auto(const record_t& record) -> color_t> colormap;
+    termcolor_map colormap;
 
 public:
     console_t();
@@ -23,7 +23,7 @@ public:
     /// stream using the given terminal color mapping to colorize the output.
     ///
     /// Useful for testing reasons for example.
-    console_t(std::ostream& stream, std::function<color_t(const record_t& record)> colormap);
+    console_t(std::ostream& stream, termcolor_map colormap);
 
     auto stream() noexcept -> std::ostream&;
 

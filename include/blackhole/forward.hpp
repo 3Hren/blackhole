@@ -40,5 +40,8 @@ class factory_t;
 class node_t;
 
 }  // namespace config
+
+class termcolor_t;
+
 }  // namespace v1
 }  // namespace blackhole

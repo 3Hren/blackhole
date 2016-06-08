@@ -4,6 +4,7 @@
 #include <blackhole/attribute.hpp>
 #include <blackhole/record.hpp>
 #include <blackhole/sink/console.hpp>
+#include <blackhole/termcolor.hpp>
 
 #include <src/sink/console.hpp>
 
@@ -16,50 +17,7 @@ using ::testing::StrictMock;
 using ::testing::internal::CaptureStdout;
 using ::testing::internal::GetCapturedStdout;
 
-using experimental::color_t;
 using experimental::factory;
-
-TEST(color_t, Default) {
-    std::ostringstream stream;
-    stream << color_t();
-
-    EXPECT_EQ("\033[39m", stream.str());
-}
-
-TEST(color_t, Red) {
-    std::ostringstream stream;
-    stream << color_t::red();
-
-    EXPECT_EQ("\033[31m", stream.str());
-}
-
-TEST(color_t, Green) {
-    std::ostringstream stream;
-    stream << color_t::green();
-
-    EXPECT_EQ("\033[32m", stream.str());
-}
-
-TEST(color_t, Yellow) {
-    std::ostringstream stream;
-    stream << color_t::yellow();
-
-    EXPECT_EQ("\033[33m", stream.str());
-}
-
-TEST(color_t, Blue) {
-    std::ostringstream stream;
-    stream << color_t::blue();
-
-    EXPECT_EQ("\033[34m", stream.str());
-}
-
-TEST(color_t, Reset) {
-    std::ostringstream stream;
-    stream << color_t::reset();
-
-    EXPECT_EQ("\033[0m", stream.str());
-}
 
 TEST(console_t, WriteIntoStandardOutputByDefault) {
     console_t sink;
@@ -89,8 +47,8 @@ public:
 };
 
 TEST(console_t, ColoredOutput) {
-    console_t sink(std::cout, [](const record_t&) -> color_t {
-        return color_t::red();
+    console_t sink(std::cout, [](const record_t&) -> termcolor_t {
+        return termcolor_t::red();
     });
 
     const string_view message("");
@@ -110,8 +68,8 @@ TEST(console_t, ColoredOutput) {
 
 TEST(console_t, NonColoredOutputToNonTTY) {
     std::stringstream stream;
-    console_t sink(stream, [](const record_t&) -> color_t {
-        return color_t::red();
+    console_t sink(stream, [](const record_t&) -> termcolor_t {
+        return termcolor_t::red();
     });
 
     const string_view message("");

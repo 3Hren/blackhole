@@ -59,6 +59,7 @@ add_library(${LIBRARY_NAME} SHARED
     src/sink/socket/tcp
     src/sink/socket/udp
     src/sink/syslog
+    src/termcolor.cpp
     src/wrapper)
 
 # Set the Standard version.
@@ -232,6 +233,7 @@ if (ENABLE_TESTING)
         tests/src/unit/sink/syslog
         tests/src/unit/sink/tcp
         tests/src/unit/sink/udp.cpp
+        tests/src/unit/termcolor.cpp
         tests/wrapper)
 
     enable_google_testing(${LIBRARY_NAME}-tests)
