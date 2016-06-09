@@ -52,7 +52,7 @@ public:
     auto colorize(severity_t severity, termcolor_t color) & -> builder&;
     auto colorize(severity_t severity, termcolor_t color) && -> builder&&;
 
-    /// Sets the terminal color mapping for this builder.
+    /// Resets the terminal color mapping for this builder with the specified one.
     auto colorize(std::function<termcolor_t(const record_t& record)> fn) & -> builder&;
     auto colorize(std::function<termcolor_t(const record_t& record)> fn) && -> builder&&;
 
@@ -63,8 +63,8 @@ public:
 template<>
 class factory<sink::console_t> : public factory<sink_t> {
 public:
-    auto type() const noexcept -> const char*;
-    auto from(const config::node_t& config) const -> std::unique_ptr<sink_t>;
+    auto type() const noexcept -> const char* override;
+    auto from(const config::node_t& config) const -> std::unique_ptr<sink_t> override;
 };
 
 }  // namespace experimental

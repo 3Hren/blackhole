@@ -3,9 +3,12 @@
 #include <unistd.h>
 
 #include <iostream>
+#include <map>
 #include <mutex>
 
 #include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/record.hpp"
+#include "blackhole/severity.hpp"
 #include "blackhole/termcolor.hpp"
 
 #include "blackhole/detail/memory.hpp"
@@ -55,22 +58,26 @@ auto isatty(const std::ostream& stream) -> bool {
 
 console_t::console_t() :
     stream_(std::cout),
-    colormap([](const record_t&) -> termcolor_t { return {}; })
+    mapping_([](const record_t&) -> termcolor_t { return {}; })
 {}
 
-console_t::console_t(std::ostream& stream, termcolor_map_t colormap) :
+console_t::console_t(std::ostream& stream, std::function<termcolor_t(const record_t& record)> mapping) :
     stream_(stream),
-    colormap(std::move(colormap))
+    mapping_(std::move(mapping))
 {}
 
 auto console_t::stream() noexcept -> std::ostream& {
     return stream_;
 }
 
+auto console_t::mapping(const record_t& record) const -> termcolor_t {
+    return mapping_(record);
+}
+
 auto console_t::emit(const record_t& record, const string_view& formatted) -> void {
     if (isatty(stream())) {
         std::lock_guard<std::mutex> lock(mutex);
-        colormap(record)
+        mapping(record)
             .write(stream(), formatted.data(), formatted.size());
         stream() << std::endl;
     } else {
@@ -87,7 +94,7 @@ namespace experimental {
 class builder<sink::console_t>::inner_t {
 public:
     std::ostream* stream;
-    sink::termcolor_map_t termcolor;
+    std::function<termcolor_t(const record_t& record)> mapping;
 };
 
 builder<sink::console_t>::builder() :
@@ -112,8 +119,25 @@ auto builder<sink::console_t>::stderr() && -> builder&& {
     return std::move(stderr());
 }
 
+auto builder<sink::console_t>::colorize(severity_t severity, termcolor_t color) & -> builder& {
+    const auto fallback = std::move(d->mapping);
+    d->mapping = [=](const record_t& record) -> termcolor_t {
+        if (severity == record.severity()) {
+            return color;
+        } else {
+            return fallback(record);
+        }
+    };
+
+    return *this;
+}
+
+auto builder<sink::console_t>::colorize(severity_t severity, termcolor_t color) && -> builder&& {
+    return std::move(colorize(severity, color));
+}
+
 auto builder<sink::console_t>::build() && -> std::unique_ptr<sink_t> {
-    return blackhole::make_unique<sink::console_t>(*d->stream, std::move(d->termcolor));
+    return blackhole::make_unique<sink::console_t>(*d->stream, std::move(d->mapping));
 }
 
 auto factory<sink::console_t>::type() const noexcept -> const char* {

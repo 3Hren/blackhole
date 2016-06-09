@@ -1,7 +1,10 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <blackhole/attribute.hpp>
+#include <blackhole/record.hpp>
 #include <blackhole/sink/console.hpp>
+#include <blackhole/termcolor.hpp>
 #include <src/sink/console.hpp>
 
 namespace blackhole {
@@ -17,6 +20,12 @@ TEST(builder, Default) {
     auto& cast = static_cast<console_t&>(*sink);
 
     EXPECT_EQ(&std::cout, &cast.stream());
+
+    const string_view message("");
+    const attribute_pack pack;
+
+    record_t record(0, message, pack);
+    EXPECT_EQ(termcolor_t(), cast.mapping(record));
 }
 
 TEST(builder, RedirectToOutputWithLvalue) {
@@ -28,7 +37,7 @@ TEST(builder, RedirectToOutputWithLvalue) {
     EXPECT_EQ(&std::cout, &cast.stream());
 }
 
-TEST(builder, RedirectToOutputWithPRvalue) {
+TEST(builder, RedirectToOutputWithRvalue) {
     auto sink = builder<console_t>()
         .stdout()
         .build();
@@ -46,13 +55,45 @@ TEST(builder, RedirectToErrorWithLvalue) {
     EXPECT_EQ(&std::cerr, &cast.stream());
 }
 
-TEST(builder, RedirectToErrorWithPRvalue) {
+TEST(builder, RedirectToErrorWithRvalue) {
     auto sink = builder<console_t>()
         .stderr()
         .build();
     auto& cast = static_cast<console_t&>(*sink);
 
     EXPECT_EQ(&std::cerr, &cast.stream());
+}
+
+TEST(builder, ColorizeWithLvalue) {
+    builder<console_t> builder;
+    builder.colorize(0, termcolor_t::green());
+    auto sink = std::move(builder).build();
+    auto& cast = static_cast<console_t&>(*sink);
+
+    const string_view message("");
+    const attribute_pack pack;
+
+    record_t record1(0, message, pack);
+    EXPECT_EQ(termcolor_t::green(), cast.mapping(record1));
+
+    record_t record2(1, message, pack);
+    EXPECT_EQ(termcolor_t(), cast.mapping(record2));
+}
+
+TEST(builder, ColorizeWithRvalue) {
+    auto sink = builder<console_t>()
+        .colorize(0, termcolor_t::green())
+        .build();
+    auto& cast = static_cast<console_t&>(*sink);
+
+    const string_view message("");
+    const attribute_pack pack;
+
+    record_t record1(0, message, pack);
+    EXPECT_EQ(termcolor_t::green(), cast.mapping(record1));
+
+    record_t record2(1, message, pack);
+    EXPECT_EQ(termcolor_t(), cast.mapping(record2));
 }
 
 }  // namespace
