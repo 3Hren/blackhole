@@ -1,18 +1,29 @@
-blackhole (1.0.0-0beta1) UNRELEASED; urgency=low
+blackhole (1.0.0-0rc1) UNRELEASED; urgency=low
+
+  * Feature: file appender now has a nice builder class.
+  * Feature: flush threshold in file appender configuration now can be specified
+    as a binary unit value, i.e. 1000B, 2MB etc.
+  * TODO: Compare benchmarks before release!
+
+ -- Evgeny Safronov <division494@gmail.com>  Thu, 09 Jun 2016 21:32:21 +0300
+
+blackhole (1.0.0-0beta1) unstable; urgency=low
 
   * Break: drop GCC4.6 support.
   * Feature: introduce asynchronous sink.
     This kind of sink wraps the other sink and causes log events to be written
     to them on a separate thread providing non-blocking behavior.
   * Feature: string view class now satisfies Hash concept.
-  * Feature: file appender now has a nice builder class.
-  * Feature: flush threshold in file appender configuration now can be specified
-    as a binary unit value, i.e. 1000B, 2MB etc.
   * Bug fix: file appender should no longer silently eat I/O error while trying
     to open a file.
-  * TODO: Compare benchmarks before release!
 
  -- Evgeny Safronov <division494@gmail.com>  Tue, 10 May 2016 22:16:50 +0300
+
+blackhole (1.0.0-0alpha14) unstable; urgency=low
+
+  * Bug fix: fix compilation on clang with boost 1.55.
+
+ -- Evgeny Safronov <division494@gmail.com>  Tue, 31 May 2016 22:50:35 +0300
 
 blackhole (1.0.0-0alpha13) unstable; urgency=low
 
