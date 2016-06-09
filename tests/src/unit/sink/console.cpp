@@ -17,8 +17,6 @@ using ::testing::StrictMock;
 using ::testing::internal::CaptureStdout;
 using ::testing::internal::GetCapturedStdout;
 
-using experimental::factory;
-
 TEST(console_t, WriteIntoStandardOutputByDefault) {
     console_t sink;
 

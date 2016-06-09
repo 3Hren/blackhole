@@ -5,7 +5,6 @@
 
 namespace blackhole {
 inline namespace v1 {
-namespace experimental {
 namespace sink {
 
 /// The asynchronous sink wraps the other sink and causes log events to be written to them on a
@@ -38,7 +37,7 @@ class asynchronous_t;
 /// Register an instance of this class in the registry to be able to construct asynchronous sinks
 /// via config.
 template<>
-class factory<sink::asynchronous_t> : public experimental::factory<sink_t> {
+class factory<sink::asynchronous_t> : public factory<sink_t> {
     const registry_t& registry;
 
 public:
@@ -50,6 +49,5 @@ public:
     virtual auto from(const config::node_t& config) const -> std::unique_ptr<sink_t> override;
 };
 
-}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

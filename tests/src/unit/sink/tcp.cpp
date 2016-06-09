@@ -79,7 +79,6 @@ namespace {
 using ::testing::Return;
 using ::testing::StrictMock;
 
-using experimental::factory;
 using socket::tcp_t;
 
 TEST(tcp_t, FactoryType) {

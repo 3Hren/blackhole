@@ -38,9 +38,6 @@ inline namespace v1 {
 namespace formatter {
 namespace {
 
-using experimental::builder;
-using experimental::factory;
-
 using ::testing::AnyOf;
 using ::testing::Eq;
 

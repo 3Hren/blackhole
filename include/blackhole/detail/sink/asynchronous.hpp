@@ -9,7 +9,6 @@
 
 namespace blackhole {
 inline namespace v1 {
-namespace experimental {
 namespace sink {
 
 using detail::recordbuf_t;
@@ -75,6 +74,5 @@ private:
 };
 
 }  // namespace sink
-}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

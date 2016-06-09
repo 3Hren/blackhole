@@ -21,15 +21,11 @@ class registry_t;
 class logger_t;
 class root_logger_t;
 
-namespace experimental {
-
 template<typename T>
 class builder;
 
 template<typename T>
 class factory;
-
-}  // namespace experimental
 
 namespace config {
 

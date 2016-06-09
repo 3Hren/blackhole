@@ -127,8 +127,6 @@ auto tcp_t::emit(const record_t&, const string_view& message) -> void {
 }  // namespace socket
 }  // namespace sink
 
-namespace experimental {
-
 using sink::socket::tcp_t;
 
 using detail::util::value_or;
@@ -149,6 +147,5 @@ auto factory<tcp_t>::from(const config::node_t& config) const -> std::unique_ptr
     return blackhole::make_unique<tcp_t>(host, static_cast<std::uint16_t>(port));
 }
 
-}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

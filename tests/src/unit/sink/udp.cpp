@@ -20,8 +20,6 @@ namespace {
 using ::testing::Return;
 using ::testing::StrictMock;
 
-using experimental::factory;
-
 TEST(udp_t, Endpoint) {
     udp_t sink("0.0.0.0", 20000);
 

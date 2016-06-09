@@ -23,9 +23,8 @@ class file_t;
 
 }  // namespace sink
 
-namespace experimental {
-
 /// Represents a binary unit.
+// TODO: Should it be here?
 template<class Rep, class Ratio = std::ratio<1>>
 class binary_unit;
 
@@ -127,6 +126,5 @@ public:
     auto from(const config::node_t& config) const -> std::unique_ptr<sink_t>;
 };
 
-}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

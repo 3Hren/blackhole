@@ -12,8 +12,6 @@ inline namespace v1 {
 namespace sink {
 namespace {
 
-using experimental::builder;
-
 TEST(builder, Default) {
     builder<console_t> builder;
     auto sink = std::move(builder).build();

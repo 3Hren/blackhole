@@ -89,8 +89,6 @@ auto console_t::emit(const record_t& record, const string_view& formatted) -> vo
 
 }  // namespace sink
 
-namespace experimental {
-
 class builder<sink::console_t>::inner_t {
 public:
     std::ostream* stream;
@@ -156,9 +154,7 @@ auto factory<sink::console_t>::from(const config::node_t&) const -> std::unique_
     return blackhole::make_unique<sink::console_t>();
 }
 
-}  // namespace experimental
-
-template auto deleter_t::operator()(experimental::builder<sink::console_t>::inner_t* value) -> void;
+template auto deleter_t::operator()(builder<sink::console_t>::inner_t* value) -> void;
 
 }  // namespace v1
 }  // namespace blackhole

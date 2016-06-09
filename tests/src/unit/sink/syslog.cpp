@@ -16,8 +16,6 @@ inline namespace v1 {
 namespace sink {
 namespace {
 
-using experimental::factory;
-
 using ::testing::_;
 using ::testing::Invoke;
 using ::testing::Return;

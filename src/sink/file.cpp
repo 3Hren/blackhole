@@ -143,8 +143,6 @@ auto file_t::emit(const record_t& record, const string_view& formatted) -> void 
 
 }  // namespace sink
 
-namespace experimental {
-
 class builder<sink::file_t>::inner_t {
 public:
     std::string filename;
@@ -209,9 +207,7 @@ auto factory<sink::file_t>::from(const config::node_t& config) const -> std::uni
     return std::move(builder).build();
 }
 
-}  // namespace experimental
-
-template auto deleter_t::operator()(experimental::builder<sink::file_t>::inner_t* value) -> void;
+template auto deleter_t::operator()(builder<sink::file_t>::inner_t* value) -> void;
 
 }  // namespace v1
 }  // namespace blackhole

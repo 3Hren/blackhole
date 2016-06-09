@@ -324,8 +324,6 @@ public:
 
 }  // namespace formatter
 
-namespace experimental {
-
 using formatter::severity_map;
 using formatter::string_t;
 
@@ -385,9 +383,7 @@ auto factory<string_t>::from(const config::node_t& config) const -> std::unique_
     return blackhole::make_unique<string_t>(std::move(pattern));
 }
 
-}  // namespace experimental
-
-template auto deleter_t::operator()(experimental::builder<formatter::string_t>::inner_t* value) -> void;
+template auto deleter_t::operator()(builder<formatter::string_t>::inner_t* value) -> void;
 
 }  // namespace v1
 }  // namespace blackhole

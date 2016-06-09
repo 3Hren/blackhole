@@ -10,7 +10,6 @@
 
 namespace blackhole {
 inline namespace v1 {
-namespace experimental {
 
 auto factory<sink::asynchronous_t>::type() const noexcept -> const char* {
     return "asynchronous";
@@ -37,6 +36,5 @@ auto factory<sink::asynchronous_t>::from(const config::node_t& config) const ->
     return std::unique_ptr<sink_t>(new sink::asynchronous_t(std::move(sink), factor, std::move(overflow)));
 }
 
-}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

@@ -38,8 +38,6 @@ auto udp_t::emit(const record_t&, const string_view& formatted) -> void {
 }  // namespace socket
 }  // namespace sink
 
-namespace experimental {
-
 using sink::socket::udp_t;
 
 using detail::util::value_or;
@@ -60,6 +58,5 @@ auto factory<udp_t>::from(const config::node_t& config) const -> std::unique_ptr
     return blackhole::make_unique<udp_t>(host, static_cast<std::uint16_t>(port));
 }
 
-}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

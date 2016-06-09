@@ -99,24 +99,24 @@ public:
     auto handler(const std::string& type) const -> handler_factory override;
     auto formatter(const std::string& type) const -> formatter_factory override;
 
-    auto add(std::shared_ptr<experimental::factory<sink_t>> factory) -> void override;
-    auto add(std::shared_ptr<experimental::factory<handler_t>> factory) -> void override;
-    auto add(std::shared_ptr<experimental::factory<formatter_t>> factory) -> void override;
+    auto add(std::shared_ptr<factory<sink_t>> factory) -> void override;
+    auto add(std::shared_ptr<factory<handler_t>> factory) -> void override;
+    auto add(std::shared_ptr<factory<formatter_t>> factory) -> void override;
 };
 
-auto default_registry_t::add(std::shared_ptr<experimental::factory<sink_t>> factory) -> void {
+auto default_registry_t::add(std::shared_ptr<factory<sink_t>> factory) -> void {
     sinks[factory->type()] = [=](const config::node_t& node) {
         return factory->from(node);
     };
 }
 
-auto default_registry_t::add(std::shared_ptr<experimental::factory<handler_t>> factory) -> void {
+auto default_registry_t::add(std::shared_ptr<factory<handler_t>> factory) -> void {
     handlers[factory->type()] = [=](const config::node_t& node) {
         return factory->from(node);
     };
 }
 
-auto default_registry_t::add(std::shared_ptr<experimental::factory<formatter_t>> factory) -> void {
+auto default_registry_t::add(std::shared_ptr<factory<formatter_t>> factory) -> void {
     formatters[factory->type()] = [=](const config::node_t& node) {
         return factory->from(node);
     };

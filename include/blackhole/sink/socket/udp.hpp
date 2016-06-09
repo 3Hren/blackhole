@@ -14,8 +14,6 @@ class udp_t;
 }  // namespace socket
 }  // namespace sink
 
-namespace experimental {
-
 template<>
 class factory<sink::socket::udp_t> : public factory<sink_t> {
 public:
@@ -23,6 +21,5 @@ public:
     auto from(const config::node_t& config) const -> std::unique_ptr<sink_t> override;
 };
 
-}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

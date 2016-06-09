@@ -55,18 +55,18 @@ public:
     auto add(Args&&... args) -> void;
 
     /// Registers a new sink factory with this registry.
-    virtual auto add(std::shared_ptr<experimental::factory<sink_t>> factory) -> void = 0;
+    virtual auto add(std::shared_ptr<factory<sink_t>> factory) -> void = 0;
 
     /// Registers a new handler factory with this registry.
-    virtual auto add(std::shared_ptr<experimental::factory<handler_t>> factory) -> void = 0;
+    virtual auto add(std::shared_ptr<factory<handler_t>> factory) -> void = 0;
 
     /// Registers a new formatter factory with this registry.
-    virtual auto add(std::shared_ptr<experimental::factory<formatter_t>> factory) -> void = 0;
+    virtual auto add(std::shared_ptr<factory<formatter_t>> factory) -> void = 0;
 };
 
 template<typename T, typename... Args>
 inline auto registry_t::add(Args&&... args) -> void {
-    add(std::make_shared<experimental::factory<T>>(std::forward<Args>(args)...));
+    add(std::make_shared<factory<T>>(std::forward<Args>(args)...));
 }
 
 template<typename T, typename... Args>

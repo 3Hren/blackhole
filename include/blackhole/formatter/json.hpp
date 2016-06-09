@@ -86,8 +86,6 @@ class json_t;
 
 }  // namespace formatter
 
-namespace experimental {
-
 /// Represents a JSON formatter object builder to ease its configuration.
 ///
 /// Exists mainly for both avoiding hundreds of formatter constructors and keep its semantics
@@ -130,13 +128,11 @@ public:
     /// representation with the corresponding string.
     ///
     /// \note setting an empty array resets the behavior.
-    /// \warning experimental, may be dropped until 1.0.
     ///
     /// \param sevmap severity mapping array.
     auto severity(std::vector<std::string> sevmap) & -> builder&;
     auto severity(std::vector<std::string> sevmap) && -> builder&&;
 
-    /// \warning experimental, may be dropped until 1.0.
     auto timestamp(const std::string& pattern) & -> builder&;
     auto timestamp(const std::string& pattern) && -> builder&&;
 
@@ -150,6 +146,5 @@ public:
     auto from(const config::node_t& config) const -> std::unique_ptr<formatter_t> override;
 };
 
-}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

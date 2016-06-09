@@ -13,8 +13,6 @@ namespace {
 
 using ::testing::StrictMock;
 
-using experimental::factory;
-
 TEST(null_t, type) {
     EXPECT_EQ(std::string("null"), factory<sink::null_t>().type());
 }

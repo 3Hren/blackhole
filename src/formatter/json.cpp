@@ -337,8 +337,6 @@ auto json_t::format(const record_t& record, writer_t& writer) -> void {
 
 }  // namespace formatter
 
-namespace experimental {
-
 using formatter::json_t;
 
 class builder<json_t>::inner_t : public json_t::properties_t {};
@@ -497,9 +495,7 @@ auto factory<json_t>::from(const config::node_t& config) const ->
     return std::move(builder).build();
 }
 
-}  // namespace experimental
-
-template auto deleter_t::operator()(experimental::builder<formatter::json_t>::inner_t*) -> void;
+template auto deleter_t::operator()(builder<formatter::json_t>::inner_t*) -> void;
 template auto deleter_t::operator()(formatter::json_t::inner_t*) -> void;
 
 }  // namespace v1

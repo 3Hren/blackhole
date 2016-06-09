@@ -46,9 +46,6 @@ namespace {
 using ::testing::StrictMock;
 using ::testing::Return;
 
-using experimental::builder;
-using experimental::factory;
-
 TEST(json_t, FormatMessage) {
     auto formatter = builder<json_t>()
         .build();

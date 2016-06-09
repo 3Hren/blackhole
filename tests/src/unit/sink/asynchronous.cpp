@@ -11,7 +11,6 @@
 
 namespace blackhole {
 inline namespace v1 {
-namespace experimental {
 namespace sink {
 namespace {
 
@@ -58,6 +57,5 @@ TEST(overflow_policy_factory_t, ThrowsIfRequestedNonRegisteredPolicy) {
 
 }  // namespace
 }  // namespace sink
-}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

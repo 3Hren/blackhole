@@ -37,8 +37,6 @@ auto blocking_t::handle(const record_t& record) -> void {
 
 }  // namespace handler
 
-namespace experimental {
-
 using handler::blocking_t;
 
 class builder<blocking_t>::inner_t {
@@ -99,9 +97,7 @@ auto factory<blocking_t>::from(const config::node_t& config) const -> std::uniqu
     return std::move(builder).build();
 }
 
-}  // namespace experimental
-
-template auto deleter_t::operator()(experimental::builder<handler::blocking_t>::inner_t*) -> void;
+template auto deleter_t::operator()(builder<handler::blocking_t>::inner_t*) -> void;
 
 }  // namespace v1
 }  // namespace blackhole

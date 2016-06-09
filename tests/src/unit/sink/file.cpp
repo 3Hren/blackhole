@@ -16,10 +16,6 @@ namespace sink {
 namespace file {
 namespace {
 
-using experimental::builder;
-using experimental::factory;
-using experimental::megabytes_t;
-
 using ::testing::Return;
 using ::testing::StrictMock;
 

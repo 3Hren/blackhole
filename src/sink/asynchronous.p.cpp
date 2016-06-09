@@ -6,7 +6,6 @@
 
 namespace blackhole {
 inline namespace v1 {
-namespace experimental {
 namespace sink {
 namespace {
 
@@ -144,6 +143,5 @@ auto asynchronous_t::run() -> void {
 }
 
 }  // namespace sink
-}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

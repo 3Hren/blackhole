@@ -25,8 +25,6 @@ class console_t;
 
 }  // namespace sink
 
-namespace experimental {
-
 template<>
 class builder<sink::console_t> {
     class inner_t;
@@ -67,6 +65,5 @@ public:
     auto from(const config::node_t& config) const -> std::unique_ptr<sink_t> override;
 };
 
-}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

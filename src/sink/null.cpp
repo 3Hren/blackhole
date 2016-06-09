@@ -15,8 +15,6 @@ public:
 
 }  // namespace sink
 
-namespace experimental {
-
 auto factory<sink::null_t>::type() const noexcept -> const char* {
     return "null";
 }
@@ -25,6 +23,5 @@ auto factory<sink::null_t>::from(const config::node_t&) const -> std::unique_ptr
     return std::unique_ptr<sink::null_t>(new sink::null_t);
 }
 
-}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

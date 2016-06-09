@@ -99,8 +99,6 @@ class string_t;
 
 }  // namespace formatter
 
-namespace experimental {
-
 template<>
 class builder<formatter::string_t> {
     class inner_t;
@@ -122,6 +120,5 @@ public:
     auto from(const config::node_t& config) const -> std::unique_ptr<formatter_t> override final;
 };
 
-}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

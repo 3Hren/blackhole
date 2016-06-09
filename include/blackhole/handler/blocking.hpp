@@ -10,8 +10,6 @@ class blocking_t;
 
 }  // namespace handler
 
-namespace experimental {
-
 template<>
 class builder<handler::blocking_t> {
     class inner_t;
@@ -41,6 +39,5 @@ public:
     virtual auto from(const config::node_t& config) const -> std::unique_ptr<handler_t> override;
 };
 
-}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

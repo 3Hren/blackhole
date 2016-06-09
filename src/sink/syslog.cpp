@@ -61,8 +61,6 @@ auto syslog_t::emit(const record_t& record, const string_view& formatted) -> voi
 
 }  // namespace sink
 
-namespace experimental {
-
 auto factory<sink::syslog_t>::type() const noexcept -> const char* {
     return "syslog";
 }
@@ -82,6 +80,5 @@ auto factory<sink::syslog_t>::from(const config::node_t& config) const -> std::u
     return std::unique_ptr<sink_t>(new sink::syslog_t(std::move(syslog)));
 }
 
-}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

@@ -6,7 +6,6 @@
 
 namespace blackhole {
 inline namespace v1 {
-namespace experimental {
 
 class factory_t {
 public:
@@ -23,6 +22,5 @@ public:
     virtual auto from(const config::node_t& config) const -> std::unique_ptr<T> = 0;
 };
 
-}  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole

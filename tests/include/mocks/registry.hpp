@@ -12,9 +12,9 @@ public:
     MOCK_CONST_METHOD1(sink, registry_t::sink_factory(const std::string& type));
     MOCK_CONST_METHOD1(handler, registry_t::handler_factory(const std::string& type));
     MOCK_CONST_METHOD1(formatter, registry_t::formatter_factory(const std::string& type));
-    MOCK_METHOD1(add, void(std::shared_ptr<experimental::factory<sink_t>> factory));
-    MOCK_METHOD1(add, void(std::shared_ptr<experimental::factory<handler_t>> factory));
-    MOCK_METHOD1(add, void(std::shared_ptr<experimental::factory<formatter_t>> factory));
+    MOCK_METHOD1(add, void(std::shared_ptr<factory<sink_t>> factory));
+    MOCK_METHOD1(add, void(std::shared_ptr<factory<handler_t>> factory));
+    MOCK_METHOD1(add, void(std::shared_ptr<factory<formatter_t>> factory));
 };
 
 }  // namespace v1
