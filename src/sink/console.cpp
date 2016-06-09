@@ -121,19 +121,27 @@ auto builder<sink::console_t>::stderr() && -> builder&& {
 
 auto builder<sink::console_t>::colorize(severity_t severity, termcolor_t color) & -> builder& {
     const auto fallback = std::move(d->mapping);
-    d->mapping = [=](const record_t& record) -> termcolor_t {
+
+    return colorize([=](const record_t& record) -> termcolor_t {
         if (severity == record.severity()) {
             return color;
         } else {
             return fallback(record);
         }
-    };
-
-    return *this;
+    });
 }
 
 auto builder<sink::console_t>::colorize(severity_t severity, termcolor_t color) && -> builder&& {
     return std::move(colorize(severity, color));
+}
+
+auto builder<sink::console_t>::colorize(std::function<termcolor_t(const record_t& record)> fn) & -> builder& {
+    d->mapping = std::move(fn);
+    return *this;
+}
+
+auto builder<sink::console_t>::colorize(std::function<termcolor_t(const record_t& record)> fn) && -> builder&& {
+    return std::move(colorize(std::move(fn)));
 }
 
 auto builder<sink::console_t>::build() && -> std::unique_ptr<sink_t> {
