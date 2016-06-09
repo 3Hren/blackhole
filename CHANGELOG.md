@@ -11,7 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Hide rapidjson symbols entirely ([#78]).
-- All sinks no longer export their symbols and can be constructed only through associated factories as unsized objects.
+- All formatters, sinks and handlers no longer export their symbols and can be constructed only through associated factories as unsized objects.
 
 ## [0.5.0] - The Infinite Corruptor - 2015-04-09
 ### Added
