@@ -45,8 +45,8 @@ public:
         registry(registry)
     {}
 
-    virtual auto type() const noexcept -> const char* override;
-    virtual auto from(const config::node_t& config) const -> std::unique_ptr<sink_t> override;
+    auto type() const noexcept -> const char* override;
+    auto from(const config::node_t& config) const -> std::unique_ptr<sink_t> override;
 };
 
 }  // namespace v1
