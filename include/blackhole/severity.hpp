@@ -14,10 +14,6 @@ public:
     constexpr operator int() const noexcept {
         return value;
     }
-
-    constexpr auto operator==(const severity_t& other) const noexcept -> bool {
-        return value == other.value;
-    }
 };
 
 }  // namespace v1
