@@ -13,7 +13,6 @@
 namespace blackhole {
 namespace benchmark {
 
-using experimental::builder;
 using formatter::json_t;
 
 static void format_json(::benchmark::State& state) {

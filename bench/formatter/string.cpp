@@ -13,7 +13,6 @@
 namespace blackhole {
 namespace benchmark {
 
-using experimental::builder;
 using formatter::string_t;
 
 static void format_literal(::benchmark::State& state) {
