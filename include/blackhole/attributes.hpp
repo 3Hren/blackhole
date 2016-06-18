@@ -15,7 +15,7 @@
     #include <vector>
 #endif
 
-#include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/stdext/string_view.hpp"
 
 namespace blackhole {
 inline namespace v1 {

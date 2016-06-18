@@ -7,7 +7,7 @@
 
 namespace blackhole {
 inline namespace v1 {
-namespace cpp17 {
+namespace stdext {
 
 /// The class template `basic_string_view` describes an object that can refer to a constant
 /// contiguous sequence of char-like objects with the first element of the sequence at position
@@ -178,9 +178,9 @@ auto operator<<(std::basic_ostream<Char, Traits>& stream, const basic_string_vie
 /// Several typedefs for common character types are provided:
 typedef basic_string_view<char> string_view;
 
-}  // namespace cpp17
+}  // namespace stdext
 
-using cpp17::string_view;
+using stdext::string_view;
 
 }  // namespace v1
 }  // namespace blackhole
@@ -189,14 +189,14 @@ namespace std {
 
 /// Shamelessly stolen from <string>
 template<typename Char, typename Traits>
-struct hash<blackhole::cpp17::basic_string_view<Char, Traits>> {
-    auto operator()(const blackhole::cpp17::basic_string_view<Char, Traits>& val) const noexcept ->
+struct hash<blackhole::stdext::basic_string_view<Char, Traits>> {
+    auto operator()(const blackhole::stdext::basic_string_view<Char, Traits>& val) const noexcept ->
         std::size_t;
 };
 
 template<typename Char, typename Traits>
-auto hash<blackhole::cpp17::basic_string_view<Char, Traits>>::operator()(
-    const blackhole::cpp17::basic_string_view<Char, Traits>& val) const noexcept -> std::size_t
+auto hash<blackhole::stdext::basic_string_view<Char, Traits>>::operator()(
+    const blackhole::stdext::basic_string_view<Char, Traits>& val) const noexcept -> std::size_t
 {
     return __do_string_hash(val.data(), val.data() + val.size());
 }

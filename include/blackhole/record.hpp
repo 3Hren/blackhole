@@ -5,13 +5,13 @@
 #include <thread>
 
 #include "blackhole/attributes.hpp"
-#include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/stdext/string_view.hpp"
 #include "blackhole/severity.hpp"
 
 namespace blackhole {
 inline namespace v1 {
 
-using cpp17::string_view;
+using stdext::string_view;
 
 class record_t {
 public:

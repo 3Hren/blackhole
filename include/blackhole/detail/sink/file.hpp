@@ -7,7 +7,7 @@
 
 #include <boost/assert.hpp>
 
-#include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/stdext/string_view.hpp"
 #include "blackhole/sink.hpp"
 #include "blackhole/sink/file.hpp"
 

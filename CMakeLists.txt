@@ -213,7 +213,7 @@ if (ENABLE_TESTING)
         tests/src/mocks/handler
         tests/src/mocks/logger
         tests/src/mocks/sink
-        tests/src/unit/cpp17/string_view
+        tests/src/unit/stdext/string_view
         tests/src/unit/detail/formatter/string/parser.cpp
         tests/src/unit/detail/handler/blocking.cpp
         tests/src/unit/detail/mpsc

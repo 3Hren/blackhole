@@ -3,7 +3,7 @@
 
 #include "blackhole/config/node.hpp"
 #include "blackhole/config/option.hpp"
-#include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/stdext/string_view.hpp"
 #include "blackhole/sink/socket/udp.hpp"
 
 #include "blackhole/detail/memory.hpp"

@@ -6,7 +6,7 @@
 #include <map>
 #include <mutex>
 
-#include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/stdext/string_view.hpp"
 #include "blackhole/record.hpp"
 #include "blackhole/severity.hpp"
 #include "blackhole/termcolor.hpp"

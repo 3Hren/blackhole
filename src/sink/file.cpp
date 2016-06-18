@@ -7,7 +7,7 @@
 
 #include "blackhole/config/node.hpp"
 #include "blackhole/config/option.hpp"
-#include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/stdext/string_view.hpp"
 #include "blackhole/record.hpp"
 
 #include "blackhole/detail/sink/file.hpp"

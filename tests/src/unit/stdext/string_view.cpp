@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 
-#include <blackhole/cpp17/string_view.hpp>
+#include <blackhole/stdext/string_view.hpp>
 
 namespace blackhole {
 inline namespace v1 {
-namespace cpp17 {
+namespace stdext {
 namespace {
 
 TEST(string_view, CompareWithString) {
@@ -13,6 +13,6 @@ TEST(string_view, CompareWithString) {
 }
 
 }  // namespace
-}  // namespace cpp17
+}  // namespace stdext
 }  // namespace v1
 }  // namespace blackhole

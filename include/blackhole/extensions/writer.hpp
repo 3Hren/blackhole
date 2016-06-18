@@ -1,12 +1,12 @@
 #pragma once
 
-#include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/stdext/string_view.hpp"
 #include "blackhole/extensions/format.hpp"
 
 namespace blackhole {
 inline namespace v1 {
 
-using cpp17::string_view;
+using stdext::string_view;
 
 /// Represents stream writer backed up by cppformat.
 class writer_t {

@@ -3,7 +3,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <blackhole/cpp17/string_view.hpp>
+#include <blackhole/stdext/string_view.hpp>
 #include <blackhole/sink/syslog.hpp>
 
 #include <blackhole/detail/procname.hpp>

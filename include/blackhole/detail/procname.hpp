@@ -4,16 +4,16 @@
 
 namespace blackhole {
 inline namespace v1 {
-namespace cpp17 {
+namespace stdext {
 
 template<typename Char, typename Traits> class basic_string_view;
 typedef basic_string_view<char, std::char_traits<char>> string_view;
 
-}  // namespace cpp17
+}  // namespace stdext
 
 namespace detail {
 
-auto procname() -> cpp17::string_view;
+auto procname() -> stdext::string_view;
 
 }  // namespace detail
 }  // namespace v1

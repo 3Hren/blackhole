@@ -1,6 +1,6 @@
 #include "mocks/sink.hpp"
 
-#include <blackhole/cpp17/string_view.hpp>
+#include <blackhole/stdext/string_view.hpp>
 #include <blackhole/record.hpp>
 
 namespace blackhole {

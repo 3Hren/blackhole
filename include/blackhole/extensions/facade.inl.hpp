@@ -3,7 +3,7 @@
 #include <functional>
 
 #include "blackhole/attributes.hpp"
-#include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/stdext/string_view.hpp"
 #include "blackhole/extensions/writer.hpp"
 
 namespace blackhole {

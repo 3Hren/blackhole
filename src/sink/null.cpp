@@ -1,6 +1,6 @@
 #include "blackhole/sink/null.hpp"
 
-#include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/stdext/string_view.hpp"
 #include "blackhole/record.hpp"
 #include "blackhole/sink.hpp"
 

@@ -4,10 +4,10 @@
 #include <iostream>
 #include <string>
 
-#include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/stdext/string_view.hpp"
 #include "blackhole/extensions/format.hpp"
 
-using blackhole::cpp17::string_view;
+using blackhole::stdext::string_view;
 
 #if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
 
