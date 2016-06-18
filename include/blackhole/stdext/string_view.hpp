@@ -51,6 +51,7 @@ public:
 
     /// Constructs a view of the null-terminated character string pointed to by `literal`, not
     /// including the terminating null character.
+    // TODO: Consider replace this with char* and dentermining size from Traits::length. Measure.
     template<size_type N>
     constexpr basic_string_view(const Char(&literal)[N]) noexcept :
         data_(literal),
