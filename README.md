@@ -321,6 +321,65 @@ Nuff said.
 |-----------|:-----:|-----------------------------------------------------------|
 |priorities |[i16]  | **Required**.<br/> Priority mapping from severity number. |
 
+## Configuration
+Blackhole can be configured mainly in two ways:
+- Using *experimental* builder.
+- Using abstract factory (GoF, yeah).
+
+### Builder
+The first way involves using _experimental_ yet builder. For each library component (formatter, sink, etc.) there should be appropriate builder specialization that is used to create instances of associated component in a flow-way.
+
+For example:
+```c++
+// Here we are going to configure our string/console handler and to build the logger.
+auto log = blackhole::experimental::partial_builder<blackhole::root_logger_t>()
+   // Add the blocking handler.
+   .handler<blackhole::handler::blocking_t>()
+       // Configure string formatter.
+       //
+       // Pattern syntax behaves like as usual substitution for placeholder. For example if
+       // the attribute named `severity` has value `2`, then pattern `{severity}` will invoke
+       // severity mapping function provided and the result will be `W`.
+       .set<blackhole::formatter::string_t>("{severity}, [{timestamp}]: {message}")
+           .mapping(&sevmap)
+           .build()
+       // Configure console sink to write into stdout (also stderr can be configured).
+       .add<blackhole::sink::console_t>()
+           .build()
+       // And build the handler. Multiple handlers can be added to a single logger, but right
+       // now we confine ourselves with a single handler.
+       .build()
+   // Build the logger.
+   .build();
+```
+
+The result is a `std::unique_ptr<C> where C: Component`, sorry for my Rust.
+
+This is also called *static initialization*, because you must know the configuration of your logging system at compile time. If this isn't suit for you there is another way.
+
+### Factory
+Also called as *dynamic initialization*, and is the recommended way to configure the Blackhole, because it implements some kind of dependency injection through some external source, like JSON file, XML, or `folly::dynamic`.
+
+Blackhole for now implements only initialization from JSON, but it can be easily extended as a plugin, because all you need is just to implement proper interface to allow tree-like traversing through your config object.
+
+Here there is an example how to configure the library from JSON file.
+
+```c++
+// Here we are going to build the logger using registry. The registry's responsibility is to
+// track registered handlers, formatter and sinks, but for now we're not going to register
+// anything else, since there are predefined types.
+auto log = blackhole::registry::configured()
+    // Specify the concrete builder type we want to use. It may be JSON, XML, YAML or whatever
+    // else.
+    ->builder<blackhole::config::json_t>(std::ifstream(argv[1]))
+        // Build the logger named "root".
+        .build("root");
+```
+
+The result is a `std::unique_ptr<logger_t>` object.
+
+For more information see `blackhole::registry_t` class and the `include/blackhole/config` where all magic happens. If you look for an example how to implement your own factory, please see `src/config` directory.
+
 ## Runtime Type Information
 
 The library can be successfully compiled and used without RTTI (with *-fno-rtti* flag).
