@@ -9,6 +9,7 @@
 #include <blackhole/detail/sink/file.hpp>
 
 #include "mocks/node.hpp"
+#include "mocks/registry.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -59,7 +60,7 @@ TEST(builder, Chained) {
 }
 
 TEST(factory, Type) {
-    EXPECT_EQ(std::string("file"), factory<file_t>().type());
+    EXPECT_EQ(std::string("file"), factory<file_t>(mock_registry_t()).type());
 }
 
 TEST(factory, FromRequiresFilename) {
@@ -69,7 +70,7 @@ TEST(factory, FromRequiresFilename) {
         .Times(1)
         .WillOnce(Return(nullptr));
 
-    EXPECT_THROW(factory<file_t>().from(config), std::invalid_argument);
+    EXPECT_THROW(factory<file_t>(mock_registry_t()).from(config), std::invalid_argument);
 }
 
 TEST(factory, PatternFromConfig) {
@@ -91,7 +92,7 @@ TEST(factory, PatternFromConfig) {
         .Times(1)
         .WillOnce(Return(nullptr));
 
-    auto sink = factory<file_t>().from(config);
+    auto sink = factory<file_t>(mock_registry_t()).from(config);
     const auto& cast = dynamic_cast<const file_t&>(*sink);
 
     EXPECT_EQ("/tmp/blackhole.log", cast.path());
@@ -128,7 +129,7 @@ TEST(factory, FlushIntervalFromConfig) {
         .Times(1)
         .WillOnce(Return(false));
 
-    factory<file_t>().from(config);
+    factory<file_t>(mock_registry_t()).from(config);
 }
 
 TEST(factory, BinaryUnitFlushIntervalFromConfig) {
@@ -162,7 +163,7 @@ TEST(factory, BinaryUnitFlushIntervalFromConfig) {
         .Times(1)
         .WillOnce(Return("100MB"));
 
-    factory<file_t>().from(config);
+    factory<file_t>(mock_registry_t()).from(config);
 }
 
 }  // namespace

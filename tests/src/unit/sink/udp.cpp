@@ -10,6 +10,7 @@
 #include <src/sink/socket/udp.hpp>
 
 #include "mocks/node.hpp"
+#include "mocks/registry.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -49,7 +50,7 @@ TEST(udp_t, SendsData) {
 }
 
 TEST(udp_t, FactoryType) {
-    EXPECT_EQ(std::string("udp"), factory<udp_t>().type());
+    EXPECT_EQ(std::string("udp"), factory<udp_t>(mock_registry_t()).type());
 }
 
 TEST(udp_t, FactoryThrowsIfHostParameterIsMissing) {
@@ -60,7 +61,7 @@ TEST(udp_t, FactoryThrowsIfHostParameterIsMissing) {
         .WillOnce(Return(nullptr));
 
     try {
-        factory<udp_t>().from(config);
+        factory<udp_t>(mock_registry_t()).from(config);
     } catch (const std::invalid_argument& err) {
         EXPECT_STREQ(R"(parameter "host" is required)", err.what());
     }
@@ -85,7 +86,7 @@ TEST(udp_t, FactoryThrowsIfPortParameterIsMissing) {
         .WillOnce(Return(nullptr));
 
     try {
-        factory<udp_t>().from(config);
+        factory<udp_t>(mock_registry_t()).from(config);
     } catch (const std::invalid_argument& err) {
         EXPECT_STREQ(R"(parameter "port" is required)", err.what());
     }
@@ -114,7 +115,7 @@ TEST(udp_t, FactoryConfig) {
         .Times(1)
         .WillOnce(Return(20000));
 
-    const auto sink = factory<udp_t>().from(config);
+    const auto sink = factory<udp_t>(mock_registry_t()).from(config);
     const auto& cast = dynamic_cast<const udp_t&>(*sink);
 
     EXPECT_EQ(boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 20000), cast.endpoint());

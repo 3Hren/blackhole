@@ -121,7 +121,13 @@ public:
 
 template<>
 class factory<sink::file_t> : public factory<sink_t> {
+    const registry_t& registry;
+
 public:
+    constexpr explicit factory(const registry_t& registry) noexcept :
+        registry(registry)
+    {}
+
     auto type() const noexcept -> const char*;
     auto from(const config::node_t& config) const -> std::unique_ptr<sink_t>;
 };

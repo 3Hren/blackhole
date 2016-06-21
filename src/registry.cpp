@@ -6,18 +6,15 @@
 #include "blackhole/config/node.hpp"
 #include "blackhole/config/option.hpp"
 #include "blackhole/extensions/format.hpp"
+#include "blackhole/factory.hpp"
 #include "blackhole/formatter.hpp"
-#include "blackhole/formatter/string.hpp"
 #include "blackhole/handler.hpp"
-#include "blackhole/handler/blocking.hpp"
 #include "blackhole/root.hpp"
 #include "blackhole/sink.hpp"
-#include "blackhole/sink/console.hpp"
-#include "blackhole/sink/null.hpp"
-#include "blackhole/sink/syslog.hpp"
-#include "blackhole/factory.hpp"
 
 #include "blackhole/detail/memory.hpp"
+
+#include "essentials.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -139,14 +136,7 @@ auto default_registry_t::formatter(const std::string& type) const -> formatter_f
 
 auto registry::configured() -> std::unique_ptr<registry_t> {
     std::unique_ptr<registry_t> registry(new default_registry_t);
-
-    registry->add<formatter::string_t>();
-
-    registry->add<sink::console_t>();
-    registry->add<sink::null_t>();
-    registry->add<sink::syslog_t>();
-
-    registry->add<handler::blocking_t>(*registry);
+    essentials(*registry);
 
     return registry;
 }

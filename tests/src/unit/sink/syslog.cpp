@@ -10,6 +10,7 @@
 #include <blackhole/detail/sink/syslog.hpp>
 
 #include "mocks/node.hpp"
+#include "mocks/registry.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -22,7 +23,7 @@ using ::testing::Return;
 using ::testing::StrictMock;
 
 TEST(syslog_t, Type) {
-    EXPECT_EQ(std::string("syslog"), factory<sink::syslog_t>().type());
+    EXPECT_EQ(std::string("syslog"), factory<sink::syslog_t>(mock_registry_t()).type());
 }
 
 TEST(syslog_t, Factory) {
@@ -51,7 +52,7 @@ TEST(syslog_t, Factory) {
         .WillOnce(Return(5))
         .WillOnce(Return(9));
 
-    auto sink = factory<syslog_t>().from(config);
+    auto sink = factory<syslog_t>(mock_registry_t()).from(config);
     const auto& cast = dynamic_cast<const syslog_t&>(*sink);
 
     EXPECT_EQ((std::vector<int>{0, 2, 5, 9}), cast.priorities());

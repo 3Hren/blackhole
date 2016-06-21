@@ -33,6 +33,7 @@ add_library(${LIBRARY_NAME} SHARED
     src/config/option
     src/datetime/generator.linux
     src/datetime/generator.other
+    src/essentials.cpp
     src/format
     src/formatter/json
     src/formatter/mod

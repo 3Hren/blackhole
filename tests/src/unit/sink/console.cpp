@@ -8,6 +8,8 @@
 
 #include <src/sink/console.hpp>
 
+#include "mocks/registry.hpp"
+
 namespace blackhole {
 inline namespace v1 {
 namespace sink {
@@ -80,7 +82,7 @@ TEST(console_t, NonColoredOutputToNonTTY) {
 }
 
 TEST(console_t, FactoryType) {
-    EXPECT_EQ(std::string("console"), factory<sink::console_t>().type());
+    EXPECT_EQ(std::string("console"), factory<sink::console_t>(mock_registry_t()).type());
 }
 
 }  // namespace

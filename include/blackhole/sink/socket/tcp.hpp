@@ -15,9 +15,16 @@ class tcp_t;
 }  // namespace sink
 
 template<>
-struct factory<sink::socket::tcp_t> : public factory<sink_t> {
-    auto type() const noexcept -> const char* final override;
-    auto from(const config::node_t& config) const -> std::unique_ptr<sink_t> final override;
+class factory<sink::socket::tcp_t> : public factory<sink_t> {
+    const registry_t& registry;
+
+public:
+    constexpr explicit factory(const registry_t& registry) noexcept :
+        registry(registry)
+    {}
+
+    auto type() const noexcept -> const char* override;
+    auto from(const config::node_t& config) const -> std::unique_ptr<sink_t> override;
 };
 
 }  // namespace v1

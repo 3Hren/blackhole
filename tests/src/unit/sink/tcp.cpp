@@ -14,6 +14,7 @@
 #include <src/sink/socket/tcp.hpp>
 
 #include "mocks/node.hpp"
+#include "mocks/registry.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -82,7 +83,7 @@ using ::testing::StrictMock;
 using socket::tcp_t;
 
 TEST(tcp_t, FactoryType) {
-    EXPECT_EQ(std::string("tcp"), factory<tcp_t>().type());
+    EXPECT_EQ(std::string("tcp"), factory<tcp_t>(mock_registry_t()).type());
 }
 
 TEST(tcp_t, FactoryThrowsIfHostParameterIsMissing) {
@@ -93,7 +94,7 @@ TEST(tcp_t, FactoryThrowsIfHostParameterIsMissing) {
         .WillOnce(Return(nullptr));
 
     try {
-        factory<tcp_t>().from(config);
+        factory<tcp_t>(mock_registry_t()).from(config);
     } catch (const std::invalid_argument& err) {
         EXPECT_STREQ(R"(parameter "host" is required)", err.what());
     }
@@ -118,7 +119,7 @@ TEST(tcp_t, FactoryThrowsIfPortParameterIsMissing) {
         .WillOnce(Return(nullptr));
 
     try {
-        factory<tcp_t>().from(config);
+        factory<tcp_t>(mock_registry_t()).from(config);
     } catch (const std::invalid_argument& err) {
         EXPECT_STREQ(R"(parameter "port" is required)", err.what());
     }
@@ -147,7 +148,7 @@ TEST(tcp_t, FactoryConfig) {
         .Times(1)
         .WillOnce(Return(20000));
 
-    const auto sink = factory<tcp_t>().from(config);
+    const auto sink = factory<tcp_t>(mock_registry_t()).from(config);
     const auto& cast = dynamic_cast<const tcp_t&>(*sink);
 
     EXPECT_EQ("0.0.0.0", cast.host());
