@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "factory.hpp"
 
 namespace blackhole {
