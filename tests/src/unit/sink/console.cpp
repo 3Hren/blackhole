@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 
 #include <blackhole/attribute.hpp>
+#include <blackhole/filter.hpp>
 #include <blackhole/record.hpp>
 #include <blackhole/sink/console.hpp>
 #include <blackhole/termcolor.hpp>

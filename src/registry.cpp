@@ -7,6 +7,7 @@
 #include "blackhole/config/option.hpp"
 #include "blackhole/extensions/format.hpp"
 #include "blackhole/factory.hpp"
+#include "blackhole/filter.hpp"
 #include "blackhole/formatter.hpp"
 #include "blackhole/handler.hpp"
 #include "blackhole/root.hpp"
@@ -83,26 +84,36 @@ auto builder_t::handler(const config::node_t& config) const -> std::unique_ptr<h
 class default_registry_t : public registry_t {
 public:
     typedef registry_t::sink_factory sink_factory;
+    typedef registry_t::filter_factory filter_factory;
     typedef registry_t::handler_factory handler_factory;
     typedef registry_t::formatter_factory formatter_factory;
 
 private:
     std::map<std::string, sink_factory> sinks;
+    std::map<std::string, filter_factory> filters;
     std::map<std::string, handler_factory> handlers;
     std::map<std::string, formatter_factory> formatters;
 
 public:
     auto sink(const std::string& type) const -> sink_factory override;
+    auto filter(const std::string& type) const -> filter_factory override;
     auto handler(const std::string& type) const -> handler_factory override;
     auto formatter(const std::string& type) const -> formatter_factory override;
 
     auto add(std::shared_ptr<factory<sink_t>> factory) -> void override;
+    auto add(std::shared_ptr<factory<filter_t>> factory) -> void override;
     auto add(std::shared_ptr<factory<handler_t>> factory) -> void override;
     auto add(std::shared_ptr<factory<formatter_t>> factory) -> void override;
 };
 
 auto default_registry_t::add(std::shared_ptr<factory<sink_t>> factory) -> void {
     sinks[factory->type()] = [=](const config::node_t& node) {
+        return factory->from(node);
+    };
+}
+
+auto default_registry_t::add(std::shared_ptr<factory<filter_t>> factory) -> void {
+    filters[factory->type()] = [=](const config::node_t& node) {
         return factory->from(node);
     };
 }
@@ -122,6 +133,11 @@ auto default_registry_t::add(std::shared_ptr<factory<formatter_t>> factory) -> v
 auto default_registry_t::sink(const std::string& type) const -> sink_factory {
     return get(&sinks, type)
         .expect<std::out_of_range>(R"(sink with type "{}" is not registered)", type);
+}
+
+auto default_registry_t::filter(const std::string& type) const -> filter_factory {
+    return get(&filters, type)
+        .expect<std::out_of_range>(R"(filter with type "{}" is not registered)", type);
 }
 
 auto default_registry_t::handler(const std::string& type) const -> handler_factory {

@@ -1,5 +1,6 @@
 #include "essentials.hpp"
 
+#include "blackhole/filter/severity.hpp"
 #include "blackhole/formatter/string.hpp"
 #include "blackhole/handler/blocking.hpp"
 #include "blackhole/registry.hpp"
@@ -15,6 +16,8 @@ namespace blackhole {
 inline namespace v1 {
 
 auto essentials(registry_t& registry) -> void {
+    registry.add<filter::severity_t>();
+
     registry.add<formatter::string_t>();
 
     registry.add<sink::asynchronous_t>(registry);

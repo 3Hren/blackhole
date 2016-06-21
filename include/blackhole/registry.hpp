@@ -27,6 +27,7 @@ private:
 class registry_t {
 public:
     typedef std::function<std::unique_ptr<sink_t>(const config::node_t&)> sink_factory;
+    typedef std::function<std::unique_ptr<filter_t>(const config::node_t&)> filter_factory;
     typedef std::function<std::unique_ptr<handler_t>(const config::node_t&)> handler_factory;
     typedef std::function<std::unique_ptr<formatter_t>(const config::node_t&)> formatter_factory;
 
@@ -35,6 +36,9 @@ public:
 
     /// Returns the sink factory with the given type if registered, throws otherwise.
     virtual auto sink(const std::string& type) const -> sink_factory = 0;
+
+    /// Returns the filter factory with the given type if registered, throws otherwise.
+    virtual auto filter(const std::string& type) const -> filter_factory = 0;
 
     /// Returns the handler factory with the given type if registered, throws otherwise.
     virtual auto handler(const std::string& type) const -> handler_factory = 0;
@@ -56,6 +60,9 @@ public:
 
     /// Registers a new sink factory with this registry.
     virtual auto add(std::shared_ptr<factory<sink_t>> factory) -> void = 0;
+
+    /// Registers a new filter factory with this registry.
+    virtual auto add(std::shared_ptr<factory<filter_t>> factory) -> void = 0;
 
     /// Registers a new handler factory with this registry.
     virtual auto add(std::shared_ptr<factory<handler_t>> factory) -> void = 0;

@@ -47,6 +47,7 @@ add_library(${LIBRARY_NAME} SHARED
     src/logger
     src/procname
     src/record
+    src/filter/severity.cpp
     src/registry
     src/root
     src/scope/holder

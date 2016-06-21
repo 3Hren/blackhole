@@ -14,6 +14,7 @@ class severity_t;
 
 class formatter_t;
 class handler_t;
+class filter_t;
 class sink_t;
 
 class registry_t;

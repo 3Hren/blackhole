@@ -6,15 +6,21 @@
 #include <map>
 #include <mutex>
 
-#include "blackhole/stdext/string_view.hpp"
+#include <boost/optional/optional.hpp>
+
+#include "blackhole/config/node.hpp"
+#include "blackhole/config/option.hpp"
 #include "blackhole/record.hpp"
+#include "blackhole/registry.hpp"
 #include "blackhole/severity.hpp"
+#include "blackhole/stdext/string_view.hpp"
 #include "blackhole/termcolor.hpp"
 
 #include "blackhole/detail/memory.hpp"
 #include "blackhole/detail/util/deleter.hpp"
 
 #include "console.hpp"
+#include "../filter/zen.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -58,11 +64,19 @@ auto isatty(const std::ostream& stream) -> bool {
 
 console_t::console_t() :
     stream_(std::cout),
+    filter(new filter::zen_t),
+    mapping_([](const record_t&) -> termcolor_t { return {}; })
+{}
+
+console_t::console_t(std::unique_ptr<filter_t> filter) :
+    stream_(std::cout),
+    filter(std::move(filter)),
     mapping_([](const record_t&) -> termcolor_t { return {}; })
 {}
 
 console_t::console_t(std::ostream& stream, std::function<termcolor_t(const record_t& record)> mapping) :
     stream_(stream),
+    filter(new filter::zen_t),
     mapping_(std::move(mapping))
 {}
 
@@ -75,6 +89,14 @@ auto console_t::mapping(const record_t& record) const -> termcolor_t {
 }
 
 auto console_t::emit(const record_t& record, const string_view& formatted) -> void {
+    switch (filter->filter(record)) {
+    case filter_t::action_t::neutral:
+    case filter_t::action_t::accept:
+        break;
+    case filter_t::action_t::deny:
+        return;
+    }
+
     if (isatty(stream())) {
         std::lock_guard<std::mutex> lock(mutex);
         mapping(record)
@@ -150,7 +172,14 @@ auto factory<sink::console_t>::type() const noexcept -> const char* {
     return "console";
 }
 
-auto factory<sink::console_t>::from(const config::node_t&) const -> std::unique_ptr<sink_t> {
+auto factory<sink::console_t>::from(const config::node_t& config) const -> std::unique_ptr<sink_t> {
+    if (auto type = config["filter"]["type"].to_string()) {
+        auto factory = registry.filter(*type);
+        auto filter = factory(*config["filter"].unwrap());
+
+        return blackhole::make_unique<sink::console_t>(std::move(filter));
+    }
+
     return blackhole::make_unique<sink::console_t>();
 }
 
