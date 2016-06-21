@@ -1,9 +1,22 @@
 blackhole (1.0.0-0rc1) UNRELEASED; urgency=low
 
-  * Feature: file appender now has a nice builder class.
+  * Break: all category factories now have new API, based on abstract factory
+    pattern.
+  * Break: registry class now is an interface. This change is strictly required
+    to be able to add new categories without API breaking in the future.
+  * Break: rename color class to `termcolor_t`.
+  * Break: string view template class is now located in `stdext` namespace.
+  * Break: JSON configuration factory has been completely hidden to prevent
+    sudden ABI breakage.
+  * Feature: introducing new category - filters. Also as a proof of concept
+    a severity filter has been added, which can be used to route logging events
+    by their severity number.
+  * Feature: file appender now has a nice builder class. Strictly speaking, all
+    category classes now have a nice builders, including experimental chained
+    builder.
   * Feature: flush threshold in file appender configuration now can be specified
     as a binary unit value, i.e. 1000B, 2MB etc.
-  * TODO: Compare benchmarks before release!
+  * Feature: attribute value can now be constructed from nullptr.
 
  -- Evgeny Safronov <division494@gmail.com>  Thu, 09 Jun 2016 21:32:21 +0300
 
