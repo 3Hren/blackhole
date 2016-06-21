@@ -71,7 +71,7 @@ inline auto registry_t::add(Args&&... args) -> void {
 
 template<typename T, typename... Args>
 inline auto registry_t::builder(Args&&... args) const -> builder_t {
-    return {*this, std::unique_ptr<config::factory<T>>(new config::factory<T>(std::forward<Args>(args)...))};
+    return {*this, config::factory_traits<T>::construct(std::forward<Args>(args)...)};
 }
 
 namespace registry {

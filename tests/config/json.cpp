@@ -6,7 +6,7 @@
 
 #include <blackhole/config/json.hpp>
 
-#include <blackhole/detail/config/json.hpp>
+#include <src/config/json.hpp>
 
 namespace blackhole {
 namespace testing {
@@ -282,7 +282,7 @@ TEST(json_t, ToBoolActualInt) {
     try {
         config.to_bool();
         FAIL();
-    } catch (const detail::config::type_mismatch& err) {
+    } catch (const config::type_mismatch& err) {
         EXPECT_EQ("/", err.cursor());
         EXPECT_EQ("bool", err.expected());
         EXPECT_EQ("number", err.actual());
@@ -314,7 +314,7 @@ TEST(json_t, ToNumberActualStringWithMultipleIndex) {
     try {
         config["sinks"][0]["rotation"]["pattern"].to_sint64().get();
         FAIL();
-    } catch (const detail::config::type_mismatch& err) {
+    } catch (const config::type_mismatch& err) {
         EXPECT_EQ("/sinks/0/rotation/pattern", err.cursor());
         EXPECT_EQ("int64", err.expected());
         EXPECT_EQ("string", err.actual());

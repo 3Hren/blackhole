@@ -1,17 +1,21 @@
 #pragma once
 
+#include <memory>
+#include <string>
 #include <stdexcept>
 
 #include <boost/lexical_cast.hpp>
-
 #include <rapidjson/document.h>
 
+#include "blackhole/config/factory.hpp"
+#include "blackhole/config/json.hpp"
 #include "blackhole/config/node.hpp"
 #include "blackhole/config/option.hpp"
 
+#include "factory.hpp"
+
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 namespace config {
 
 using blackhole::config::make_option;
@@ -204,7 +208,23 @@ private:
     }
 };
 
+/// Represents a JSON based logger configuration factory.
+template<>
+class factory<json_t> : public factory_t {
+    rapidjson::Document doc;
+    const json_t node;
+
+public:
+    explicit factory(std::istream& stream);
+    explicit factory(std::istream&& stream);
+
+    /// Returns a const lvalue reference to the root configuration.
+    auto config() const noexcept -> const node_t&;
+
+private:
+    auto initialize(std::istream& stream) -> void;
+};
+
 }  // namespace config
-}  // namespace detail
 }  // namespace v1
 }  // namespace blackhole

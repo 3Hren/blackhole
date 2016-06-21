@@ -1,54 +1,48 @@
-#include "blackhole/config/json.hpp"
+#include "json.hpp"
 
 #include <fstream>
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 
-#include "blackhole/detail/config/json.hpp"
+#include "blackhole/detail/memory.hpp"
 
 namespace blackhole {
 inline namespace v1 {
 namespace config {
 
-class factory<json_t>::inner_t {
-public:
-    rapidjson::Document doc;
-    const config::json_t node;
+auto factory_traits<json_t>::construct(std::istream& stream) -> std::unique_ptr<factory_t> {
+    return blackhole::make_unique<factory<json_t>>(stream);
+}
 
-    inner_t() : node(doc) {}
-};
+auto factory_traits<json_t>::construct(std::istream&& stream) -> std::unique_ptr<factory_t> {
+    return blackhole::make_unique<factory<json_t>>(std::move(stream));
+}
 
 factory<json_t>::factory(std::istream& stream) :
-    inner(new inner_t)
+    node(doc)
 {
     initialize(stream);
 }
 
 factory<json_t>::factory(std::istream&& stream) :
-    inner(new inner_t)
+    node(doc)
 {
     initialize(stream);
 }
 
-factory<json_t>::factory(factory&& other) noexcept = default;
-
-factory<json_t>::~factory() = default;
-
-auto factory<json_t>::operator=(factory&& other) noexcept -> factory& = default;
-
 auto factory<json_t>::config() const noexcept -> const node_t& {
-    return inner->node;
+    return node;
 }
 
 auto factory<json_t>::initialize(std::istream& stream) -> void {
     std::string content((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-    inner->doc.Parse<0>(content.c_str());
+    doc.Parse<0>(content.c_str());
 
-    if (inner->doc.HasParseError()) {
+    if (doc.HasParseError()) {
         throw std::invalid_argument("parse error at offset " +
-            boost::lexical_cast<std::string>(inner->doc.GetErrorOffset()) +
-            ": " + rapidjson::GetParseError_En(inner->doc.GetParseError()));
+            boost::lexical_cast<std::string>(doc.GetErrorOffset()) +
+            ": " + rapidjson::GetParseError_En(doc.GetParseError()));
     }
 }
 

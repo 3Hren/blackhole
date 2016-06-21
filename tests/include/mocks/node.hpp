@@ -3,6 +3,10 @@
 #include <blackhole/config/node.hpp>
 #include <blackhole/config/option.hpp>
 
+#include <blackhole/detail/memory.hpp>
+
+#include <src/config/factory.hpp>
+
 namespace blackhole {
 inline namespace v1 {
 namespace config {
@@ -70,6 +74,14 @@ template<>
 class factory<testing::mock::node_t> : public factory_t {
 public:
     MOCK_CONST_METHOD0(config, const node_t&());
+};
+
+template<>
+class factory_traits<testing::mock::node_t> {
+public:
+    static auto construct() -> std::unique_ptr<factory_t> {
+        return blackhole::make_unique<factory<testing::mock::node_t>>();
+    }
 };
 
 }  // namespace config

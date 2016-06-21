@@ -29,11 +29,13 @@ class factory;
 
 namespace config {
 
-template<typename T>
-class factory;
+class node_t;
 class factory_t;
 
-class node_t;
+/// Must implement `construct` method, which accepts anything required for factory construction and
+/// returns an `std::unique_ptr<factory_t>`.
+template<typename T>
+class factory_traits;
 
 }  // namespace config
 
