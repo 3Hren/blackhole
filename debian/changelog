@@ -1,4 +1,4 @@
-blackhole (1.0.0-0rc1) UNRELEASED; urgency=low
+blackhole (1.0.0-0rc1) unstable; urgency=low
 
   * Break: all category factories now have new API, based on abstract factory
     pattern.
