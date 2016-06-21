@@ -28,10 +28,10 @@ public:
 
 template<>
 class factory<handler::blocking_t> : public factory<handler_t> {
-    registry_t& registry;
+    const registry_t& registry;
 
 public:
-    explicit factory(registry_t& registry) noexcept :
+    constexpr explicit factory(const registry_t& registry) noexcept :
         registry(registry)
     {}
 
