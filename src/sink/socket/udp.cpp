@@ -61,6 +61,10 @@ udp_t::udp_t(const std::string& host, std::uint16_t port) :
     inner(new udp::blocking_t(host, port))
 {}
 
+udp_t::udp_t(udp_t&& other) noexcept :
+    inner(std::move(inner))
+{}
+
 udp_t::~udp_t() = default;
 
 auto udp_t::endpoint() const -> const endpoint_type& {

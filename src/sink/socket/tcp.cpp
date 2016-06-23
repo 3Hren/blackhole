@@ -113,6 +113,10 @@ tcp_t::tcp_t(std::string host, std::uint16_t port) :
     data->port = port;
 }
 
+tcp_t::tcp_t(tcp_t&& other) noexcept :
+    data(std::move(other.data))
+{}
+
 tcp_t::~tcp_t() = default;
 
 auto tcp_t::host() const noexcept -> const std::string& {
