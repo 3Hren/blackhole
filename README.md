@@ -378,7 +378,7 @@ auto log = blackhole::registry::configured()
 
 The result is a `std::unique_ptr<logger_t>` object.
 
-For more information see `blackhole::registry_t` class and the `include/blackhole/config` where all magic happens. If you look for an example how to implement your own factory, please see `src/config` directory.
+For more information see [blackhole::registry_t](https://github.com/3Hren/blackhole/blob/master/include/blackhole/registry.hpp#L27) class and the [include/blackhole/config](include/blackhole/config) where all magic happens. If you look for an example how to implement your own factory, please see [src/config](src/config) directory.
 
 ## Runtime Type Information
 
