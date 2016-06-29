@@ -24,6 +24,13 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Blackhole C++ Logger
  Fast C++ logging library with dynamic attributes.
 
+Package: blackhole-dbg
+Section: debug
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libblackhole1 (= ${binary:Version})
+Description: Blackhole - Debug Symbols
+ Blackhole debug files and symbols.
+
 Package: blackhole-migration-dev
 Section: libdevel
 Architecture: any
