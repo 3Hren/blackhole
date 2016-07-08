@@ -100,6 +100,23 @@ static void format_message(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
+static void format_severity(::benchmark::State& state) {
+    auto formatter = builder<string_t>("{severity}")
+        .build();
+
+    const string_view message("value");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    writer_t writer;
+
+    while (state.KeepRunning()) {
+        formatter->format(record, writer);
+        writer.inner.clear();
+    }
+
+    state.SetItemsProcessed(state.iterations());
+}
+
 static void format_timestamp(::benchmark::State& state) {
     auto formatter = builder<string_t>("{timestamp}")
         .build();
@@ -158,6 +175,7 @@ NBENCHMARK("formatter.string[pid]", format_pid);
 NBENCHMARK("formatter.string[tid]", format_tid);
 NBENCHMARK("formatter.string[procname]", format_procname);
 NBENCHMARK("formatter.string[message]", format_message);
+NBENCHMARK("formatter.string[severity]", format_severity);
 NBENCHMARK("formatter.string[timestamp]", format_timestamp);
 NBENCHMARK("formatter.string[severity + message]", format_severity_message);
 NBENCHMARK("formatter.string[...]", format_leftover);
