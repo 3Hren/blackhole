@@ -2,13 +2,7 @@ Blackhole - eating your logs with pleasure
 ==========================================
 [ ![Codeship Status for 3Hren/blackhole](https://codeship.com/projects/8d0e44f0-64ac-0133-20de-4a7e5d8c8004/status?branch=master)](https://codeship.com/projects/113228)
 
-This is pre-release for Blackhole 1.0.0. For clearness I've dropped all the code and started with empty project.
-
-Some parts (almost all formatters and sinks) will be borrowed from v0.5 branch.
-
-Other stuff will be rewritten completely using C++11/14 standard with minimal boost impact.
-
-If you want stable, but deprecated version, please switch to v0.5 branch.
+Blackhole is an attribute-based logger with strong focus on gaining maximum performance as possible for such kind of loggers.
 
 # Features
 
@@ -85,7 +79,11 @@ Of course there are disadvantages, such as virtual function call cost and closed
 - [ ] Macro with line and filename attributes.
 - [x] Initializer from JSON (filename, string).
 - [ ] Inflector.
-- [ ] Filter category for sinks, handlers and loggers.
+- [ ] Filter category.
+  - [x] Category type.
+  - [x] For sinks.
+  - [ ] For handlers.
+  - [ ] For loggers.
 
 ## Formatters
 
@@ -296,10 +294,54 @@ For example:
 ## Sinks
 
 ### Null
-Sometimes we need to just drop all logging events no matter what, for example to benchmarking purposes. For these cases there is null appender, which just ignores all records.
+Sometimes we need to just drop all logging events no matter what, for example to benchmarking purposes. For these cases there is null output (or sink), which just ignores all records.
 
-- Stream.
-- Term.
+The common configuration for this sink looks like:
+
+```json
+"sinks": [
+    {
+        "type": "null"
+    }
+]
+```
+
+### Console
+Represents a console sink which is responsible for writing all incoming log events directly into the terminal using one of the selected standard outputs with an ability to optionally colorize result strings.
+
+The sink automatically detects whether the destination stream is a TTY disabling colored output otherwise, which makes possible to redirect standard output to file without escaping codes garbage.
+
+Note, that despite of C++ `std::cout` and `std::cerr` thread-safety with no undefined behavior its guarantees is insufficiently for safe working with them from multiple threads, leading to result messages intermixing. To avoid this a global mutex is used internally, which is kinda hack. Any other stdout/stderr usage outside from logger will probably results in character mixing, but no undefined behavior will be invoked.
+
+The configuration:
+
+```json
+"sinks": [
+    {
+        "type": "console"
+    }
+]
+```
+
+Note, that currently coloring cannot be configured through dynamic factory (i.e through JSON, YAML etc.), but can be through the builder.
+
+```cpp
+enum severity {
+    debug = 0,
+    info,
+    warn,
+    error
+};
+
+auto console = blackhole::builder<blackhole::sink::console_t>()
+    .colorize(severity::debug, blackhole::termcolor_t())
+    .colorize(severity::info, blackhole::termcolor_t::blue())
+    .colorize(severity::warn, blackhole::termcolor_t::yellow())
+    .colorize(severity::error, blackhole::termcolor_t::red())
+    .stdout()
+    .build();
+```
+
 - File.
 
 ### Socket

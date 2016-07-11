@@ -8,7 +8,7 @@ namespace blackhole {
 inline namespace v1 {
 namespace sink {
 
-/// Represents the console sink which is responsible for writing all incoming log events directly
+/// Represents a console sink which is responsible for writing all incoming log events directly
 /// into one of the selected standard outputs with an ability to optionally colorize result strings.
 ///
 /// The sink automatically detects whether the destination stream is a TTY disabling colored output
