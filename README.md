@@ -342,7 +342,44 @@ auto console = blackhole::builder<blackhole::sink::console_t>()
     .build();
 ```
 
-- File.
+### File
+Represents a sink that writes formatted log events to the file or files located at the specified path.
+
+The path can contain attribute placeholders, meaning that the real destination name will be deduced at runtime using provided log record (not ready yet). No real file will be opened at construction time. All files are opened by default in append mode meaning seek to the end of stream immediately after open.
+
+This sink supports custom flushing policies, allowing to control hardware write load. There are three implemented policies right now:
+
+- Fully automatic (without configuration), meaning that the sink will decide whether to flush or not after each record consumed.
+- Count of records written - this is the simple counter with meaning of "flush at least every N records consumed", but the underlying implementation can decide to do it more often. The value of 1 means that the sink will flush after every logging event, but this results in dramatically performance degradation.
+- By counting of number of bytes written - Blackhole knows about bytes, megabytes, even mibibytes etc.
+
+Note, that it's guaranteed that the sink always flush its buffers at destruction time. This guarantee with conjunction of thread-safe logger reassignment allows to implement common SIGHUP files reopening during log rotation.
+
+Blackhole won't create intermediate directories, because of potential troubles with ACL. Instead an exception will be thrown, which will be anyway caught by the internal logging system notifying through stdout about it.
+
+Note, that associated files will be opened on demand during the first write operation.
+
+```json
+"sinks": [
+    {
+        "type": "file",
+        "flush": "10Mb",
+        "path": "/var/log/blackhole.log"
+    }
+]
+```
+
+Blackhole knows about the following marginal binary units:
+
+- Bytes (B).
+- Kilobytes (kB).
+- Megabytes (MB).
+- Gigabytes (GB).
+- Kibibytes (KiB).
+- Mibibytes (MiB).
+- Gibibytes (GiB).
+
+More you can read at https://en.wikipedia.org/wiki/Binary_prefix.
 
 ### Socket
 The socket sinks category contains sinks that write their output to a remote destination specified by a host and port. Currently the data can be sent over either TCP or UDP.
