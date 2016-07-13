@@ -51,6 +51,13 @@ public:
     auto formatted() const noexcept -> const string_view&;
     auto attributes() const noexcept -> const attribute_pack&;
 
+    /// Check whether the record is active.
+    ///
+    /// Active record is considered as passed filtering stage and should be accepted by any logger
+    /// implementors unconditionally. Note that an event can be anyway filtered out during
+    /// filtering in handlers or sinks.
+    auto is_active() const noexcept -> bool;
+
     /// Activate the record by setting the given formatted message accompanied by obtaining and
     /// setting the current time point.
     auto activate(const string_view& formatted = string_view()) noexcept -> void;

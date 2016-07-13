@@ -95,5 +95,16 @@ TEST(Record, Formatted) {
     EXPECT_EQ("GET /porn.png HTTP/1.1 - SUCCESS", record.formatted().to_string());
 }
 
+TEST(Record, IsActive) {
+    const string_view message("GET /porn.png HTTP/1.1");
+    const attribute_pack pack;
+
+    record_t record(42, message, pack);
+    EXPECT_FALSE(record.is_active());
+
+    record.activate();
+    EXPECT_TRUE(record.is_active());
+}
+
 }  // namespace testing
 }  // namespace blackhole

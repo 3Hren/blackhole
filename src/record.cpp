@@ -59,6 +59,10 @@ auto record_t::attributes() const noexcept -> const attribute_pack& {
     return inner().attributes.get();
 }
 
+auto record_t::is_active() const noexcept -> bool {
+    return inner().timestamp != time_point();
+}
+
 auto record_t::activate(const string_view& formatted) noexcept -> void {
     if (formatted.data() != nullptr) {
         inner().formatted = formatted;
