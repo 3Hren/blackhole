@@ -136,6 +136,7 @@ auto factory<tcp_t>::type() const noexcept -> const char* {
 }
 
 auto factory<tcp_t>::from(const config::node_t& config) const -> std::unique_ptr<sink_t> {
+    (void)registry;
     const auto host = value_or(config["host"].to_string(), []() -> std::string {
         throw std::invalid_argument(R"(parameter "host" is required)");
     });

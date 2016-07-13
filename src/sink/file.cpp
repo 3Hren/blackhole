@@ -185,6 +185,7 @@ auto factory<sink::file_t>::type() const noexcept -> const char* {
 }
 
 auto factory<sink::file_t>::from(const config::node_t& config) const -> std::unique_ptr<sink_t> {
+    (void)registry;
     const auto filename = config["path"].to_string();
 
     if (!filename) {

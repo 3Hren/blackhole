@@ -66,6 +66,7 @@ auto factory<sink::syslog_t>::type() const noexcept -> const char* {
 }
 
 auto factory<sink::syslog_t>::from(const config::node_t& config) const -> std::unique_ptr<sink_t> {
+    (void)registry;
     sink::syslog_t syslog;
 
     if (auto mapping = config["priorities"]) {

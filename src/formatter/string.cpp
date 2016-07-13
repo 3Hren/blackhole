@@ -179,7 +179,8 @@ public:
         writer.write(token.spec, detail::procname().data());
     }
 
-    auto operator()(const ph::thread<id>& token) const -> void {
+    __attribute__((noreturn))
+    auto operator()(const ph::thread<id>&) const -> void {
         throw std::runtime_error("{thread:d} placeholder is not implemented yet");
     }
 
