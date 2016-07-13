@@ -314,6 +314,15 @@ if (ENABLE_EXAMPLES)
     target_link_libraries(3-config
         blackhole)
 
+    # Configuration using JSON config file with facade.
+    add_executable(4-config_facade
+        examples/4.config_facade)
+
+    enable_all_warnings(4-config_facade)
+
+    target_link_libraries(4-config_facade
+        blackhole)
+
     file(COPY examples/3.config.json DESTINATION .)
 endif (ENABLE_EXAMPLES)
 
