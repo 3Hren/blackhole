@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] - The Lich King - YYYY-MM-DD
+## [1.0.0] - The Lich King - 2016-07-13
 ### Added
 - The Blackhole is completely rewritten from the scratch, there is no need to duplicate README here.
 - Integration with CodeCov ([#66]).

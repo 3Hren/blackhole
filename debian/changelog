@@ -1,3 +1,9 @@
+blackhole (1.0.0-1) unstable; urgency=low
+
+  * Feature: records can now provide an information whether they were activated.
+
+ -- Evgeny Safronov <division494@gmail.com>  Wed, 13 Jul 2016 15:16:53 +0300
+
 blackhole (1.0.0-0rc1) unstable; urgency=low
 
   * Break: all category factories now have new API, based on abstract factory
