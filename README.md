@@ -459,6 +459,57 @@ The result is a `std::unique_ptr<logger_t>` object.
 
 For more information see [blackhole::registry_t](https://github.com/3Hren/blackhole/blob/master/include/blackhole/registry.hpp#L27) class and the [include/blackhole/config](include/blackhole/config) where all magic happens. If you look for an example how to implement your own factory, please see [src/config](src/config) directory.
 
+## Facade
+One can say that the raw logger interface is inconvenient, and this is true, unfortunately, because it must work both in simple cases, where intermediate message formatting is not required, without attributes; and in complex cases, where lazy message formatting occurs, with attributes provided, remaining at the same time as fast as possible, giving a high-performance solution.
+
+Let's take a look on the interface:
+
+```cpp
+class logger_t {
+public:
+    virtual ~logger_t() = 0;
+    virtual auto log(severity_t severity, const message_t& message) -> void = 0;
+    virtual auto log(severity_t severity, const message_t& message, attribute_pack& pack) -> void = 0;
+    virtual auto log(severity_t severity, const lazy_message_t& message, attribute_pack& pack) -> void = 0;
+
+    virtual auto manager() -> scope::manager_t& = 0;
+};
+```
+
+To avoid manually creating all these structures a special extension is provided: facade. In two words it is a thin template adapter over any given logger which extends its interface, providing methods that makes logging convenient again. We describe all these methods by abusing a random HTTP logging event of success file serve.
+
+For simple cases there is a thin wrapper that transforms a string into string view and passes it further.
+
+```cpp
+logger.log(0, "GET /static/image.png HTTP/1.1 436 200");
+```
+
+Sometimes we want to provide additional attributes. In these cases they can be passed using initializer list.
+
+```cpp
+logger.log(0, "GET /static/image.png HTTP/1.1 436 200", {
+    {"cache", true},
+    {"elapsed", 435.72},
+    {"user-agent", "Mozilla Firefox"}
+});
+```
+
+Often we want to format a message using predefined pattern, but with arguments obtained at runtime.
+
+```cpp
+logger.log(0, "{} {} HTTP/1.1 {} {}", "GET", "/static/image.png", 436, 200);
+```
+
+At last, we can combine two previous examples to obtain something really useful. Note that attribute list argument must be the last.
+
+```cpp
+logger.log(0, "{} {} HTTP/1.1 {} {}", "GET", "/static/image.png", 436, 200, attribute_list{
+    {"cache", true},
+    {"elapsed", 435.72},
+    {"user-agent", "Mozilla Firefox"}
+});
+```
+
 ## Runtime Type Information
 
 The library can be successfully compiled and used without RTTI (with *-fno-rtti* flag).
@@ -472,7 +523,7 @@ The library can be successfully compiled and used without RTTI (with *-fno-rtti*
 
 # Why another logging library?
 
-That's the first question I ask myself when see *yet another silver-buller library*.
+That's the first question I ask myself when see *yet another silver-bullet library*.
 
 First of all, we required a logger with attributes support. Here `boost::log` was fine, but it didn't compile in our compilers. Sad. After that we've realized that one of our bottlenecks is located in logging part, that's why `boost::log` and `log4cxx` weren't fit in our requirements. Thirdly we are developing for stable, but old linux distributives with relatively old compilers that supports only basic part of C++11.
 
