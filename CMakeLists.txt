@@ -43,7 +43,8 @@ add_library(${LIBRARY_NAME} SHARED
     src/formatter/string/parser
     src/formatter/string/token
     src/handler.cpp
-    src/handler/blocking
+    src/handler/blocking.cpp
+    src/handler/dev.cpp
     src/logger
     src/procname
     src/record
@@ -296,6 +297,15 @@ function(enable_all_warnings TARGET)
 endfunction()
 
 if (ENABLE_EXAMPLES)
+    # Hello World example.
+    add_executable(1-hello
+        examples/1.hello)
+
+    enable_all_warnings(1-hello)
+
+    target_link_libraries(1-hello
+            blackhole)
+
     # Configuration using manual builder.
     add_executable(2-simple
         examples/2.simple)

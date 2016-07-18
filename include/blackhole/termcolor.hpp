@@ -14,6 +14,8 @@ public:
     /// Constructs a default terminal color.
     termcolor_t() noexcept;
 
+    static auto gray() -> termcolor_t;
+
     /// Creates a terminal color stream manipulator, which equals the blue color.
     ///
     /// Usually useful for marking information or debug events.
