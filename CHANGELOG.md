@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.1] - Ori - 2016-07-18
+### Fixed
+- Experimental builders will no longer change meaning of AST tokens ([#134]).
+
 ## [1.0.0] - The Lich King - 2016-07-13
 ### Added
 - The Blackhole is completely rewritten from the scratch, there is no need to duplicate README here.
@@ -259,6 +263,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [#67]: (https://github.com/3Hren/blackhole/issues/67)
 [#68]: (https://github.com/3Hren/blackhole/issues/68)
 [#78]: (https://github.com/3Hren/blackhole/issues/78)
+[#134]: (https://github.com/3Hren/blackhole/issues/134)
 
 [#38]: (https://github.com/3Hren/blackhole/pull/38)
 [#40]: (https://github.com/3Hren/blackhole/pull/40)
