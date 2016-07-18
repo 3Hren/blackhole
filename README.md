@@ -1,6 +1,6 @@
 Blackhole - eating your logs with pleasure
 ==========================================
-[ ![Codeship Status for 3Hren/blackhole](https://codeship.com/projects/8d0e44f0-64ac-0133-20de-4a7e5d8c8004/status?branch=master)](https://codeship.com/projects/113228)
+[![Build Status](https://travis-ci.org/3Hren/blackhole.svg?branch=master)][CI]
 
 Blackhole is an attribute-based logger with strong focus on gaining maximum performance as possible for such kind of loggers.
 
@@ -664,3 +664,5 @@ Each feature and fix is developed in a separate branch. Bugs which are discovere
 - `master`: master branch - contains stable, working version of VM code.
 - `develop`: development branch - all fixes and features are first merged here.
 - `issue/<number>/<slug>` or `issue/<slug>`: for issues (both enhancement and bug fixes).
+
+[CI]: https://travis-ci.org/3Hren/blackhole
