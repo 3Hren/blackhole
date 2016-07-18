@@ -65,7 +65,7 @@ private:
     template<typename, typename> friend class partial_builder;
 
     Parent parent;
-    builder<handler::blocking_t> builder;
+    builder<handler::blocking_t> builder_;
 
 public:
     partial_builder(Parent parent) noexcept :
@@ -83,7 +83,7 @@ public:
     }
 
     auto build() && -> Parent&& {
-        parent.handlers.emplace_back(std::move(builder).build());
+        parent.handlers.emplace_back(std::move(builder_).build());
         return std::move(*this).parent;
     }
 };
@@ -97,21 +97,21 @@ public:
 
 private:
     parent_type parent;
-    builder<internal_type> builder;
+    builder<internal_type> builder_;
 
 public:
     partial_builder(parent_type parent, std::string pattern) noexcept :
         parent(std::move(parent)),
-        builder(std::move(pattern))
+        builder_(std::move(pattern))
     {}
 
     auto mapping(formatter::severity_map sevmap) && -> this_type&& {
-        builder.mapping(std::move(sevmap));
+        builder_.mapping(std::move(sevmap));
         return std::move(*this);
     }
 
     auto build() && -> parent_type&& {
-        parent.builder.set(std::move(builder).build());
+        parent.builder_.set(std::move(builder_).build());
         return std::move(*this).parent;
     }
 };
@@ -125,7 +125,7 @@ public:
 
 private:
     parent_type parent;
-    builder<internal_type> builder;
+    builder<internal_type> builder_;
 
 public:
     partial_builder(parent_type parent) noexcept :
@@ -133,7 +133,7 @@ public:
     {}
 
     auto build() && -> parent_type&& {
-        parent.builder.add(std::move(builder).build());
+        parent.builder_.add(std::move(builder_).build());
         return std::move(*this).parent;
     }
 };
