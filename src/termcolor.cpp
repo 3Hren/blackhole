@@ -33,6 +33,10 @@ termcolor_t::termcolor_t(int attr, int code) noexcept :
     code(code)
 {}
 
+auto termcolor_t::gray() -> termcolor_t {
+    return {0, 2};
+}
+
 auto termcolor_t::blue() -> termcolor_t {
     return termcolor_t(0, 34);
 }

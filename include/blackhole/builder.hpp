@@ -12,6 +12,7 @@
 #include "formatter/string.hpp"
 #include "sink/console.hpp"
 #include "handler/blocking.hpp"
+#include "handler/dev.hpp"
 #include "sink.hpp"
 #include "root.hpp"
 
@@ -81,6 +82,28 @@ public:
     auto add(Args&&... args) && -> partial_builder<T, this_type> {
         return {std::move(*this), std::forward<Args>(args)...};
     }
+
+    auto build() && -> Parent&& {
+        parent.handlers.emplace_back(std::move(builder_).build());
+        return std::move(*this).parent;
+    }
+};
+
+template<typename Parent>
+class partial_builder<handler::dev_t, Parent> {
+public:
+    typedef partial_builder<handler::dev_t, Parent> this_type;
+
+private:
+    template<typename, typename> friend class partial_builder;
+
+    Parent parent;
+    builder<handler::dev_t> builder_;
+
+public:
+    partial_builder(Parent parent) noexcept :
+        parent(std::move(parent))
+    {}
 
     auto build() && -> Parent&& {
         parent.handlers.emplace_back(std::move(builder_).build());
