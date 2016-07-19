@@ -6,10 +6,12 @@
 #include <tuple>
 #include <utility>
 
-#include "blackhole/cpp17/string_view.hpp"
+#include "blackhole/stdext/string_view.hpp"
 
-/// \warning this module is experimental and doesn't adhers Semantic Versioning and you shouldn't
-///     depend on it no matter what. Everything may change, including sudden death.
+#if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
+
+//! \warning this module is experimental and doesn't adhers Semantic Versioning and you shouldn't
+//!     depend on it no matter what. Everything may change, including sudden death.
 
 namespace blackhole {
 inline namespace v1 {
@@ -378,3 +380,5 @@ private:
 }  // namespace experimental
 }  // namespace v1
 }  // namespace blackhole
+
+#endif

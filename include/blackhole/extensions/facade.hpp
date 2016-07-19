@@ -158,5 +158,17 @@ logger_facade<Logger>::select(int severity, const string_view& pattern, const Ar
     detail::without_tail<detail::select_t, Args...>::type::apply(inner(), severity, pattern, args...);
 }
 
-}  // namespace blackhole
+template<class T> inline auto deref_logger(T& log) -> T& { return log; }
+template<class T> inline auto deref_logger(T* const log) -> T& { return *log; }
+template<class T> inline auto deref_logger(std::unique_ptr<T>& log) -> T& { return *log; }
+template<class T> inline auto deref_logger(std::shared_ptr<T>& log) -> T& { return *log; }
+template<class T> inline auto deref_logger(const std::unique_ptr<T>& log) -> T& { return *log; }
+template<class T> inline auto deref_logger(const std::shared_ptr<T>& log) -> T& { return *log; }
+
+template<class T>
+inline auto make_facade(T&& log) -> logger_facade<T> {
+    return logger_facade<T>(deref_logger(log));
+}
+
+}  // namespace v1
 }  // namespace blackhole

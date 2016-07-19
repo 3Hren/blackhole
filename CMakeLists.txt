@@ -216,7 +216,6 @@ if (ENABLE_TESTING)
         tests/src/mocks/handler
         tests/src/mocks/logger
         tests/src/mocks/sink
-        tests/src/unit/stdext/string_view
         tests/src/unit/detail/formatter/string/parser.cpp
         tests/src/unit/detail/handler/blocking.cpp
         tests/src/unit/detail/mpsc
@@ -225,6 +224,7 @@ if (ENABLE_TESTING)
         tests/src/unit/formatter/json
         tests/src/unit/formatter/string.cpp
         tests/src/unit/formatter/token
+        tests/src/unit/metaformat.cpp
         tests/src/unit/sink/asynchronous
         tests/src/unit/sink/console.cpp
         tests/src/unit/sink/console/builder.cpp
@@ -236,6 +236,7 @@ if (ENABLE_TESTING)
         tests/src/unit/sink/syslog
         tests/src/unit/sink/tcp
         tests/src/unit/sink/udp.cpp
+        tests/src/unit/stdext/string_view
         tests/src/unit/termcolor.cpp
         tests/wrapper)
 
