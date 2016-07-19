@@ -118,23 +118,23 @@ public:
             switch (record.severity()) {
             case 0:
                 colorize(stream, termcolor_t::gray());
-                stream << "T";
-                break;
-            case 1:
-                colorize(stream, termcolor_t::gray());
                 stream << "D";
                 break;
-            case 2:
+            case 1:
                 colorize(stream, termcolor_t::green());
                 stream << "I";
                 break;
-            case 3:
+            case 2:
                 colorize(stream, termcolor_t::yellow());
                 stream << "W";
                 break;
-            case 4:
+            case 3:
                 colorize(stream, termcolor_t::red());
                 stream << "E";
+                break;
+            default:
+                colorize(stream, termcolor_t::gray());
+                stream << "T";
                 break;
             }
         });
