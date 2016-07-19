@@ -32,17 +32,12 @@ auto main() -> int {
         }
     );
 
-    log.log(1, "stopping engine", {
-        {"engine", 4},
-        {"source", "core/asio"},
-    });
-
-    log.log(2, "core has been terminated");
-    log.log(3, "client stopped connection before send body completed", {
+    log.log(1, "core has been terminated");
+    log.log(2, "client stopped connection before send body completed", {
         {"uuid",     "a7c345fa-2034-439e-b941-44321419725e"},
         {"endpoint", "[::]:59010"}
     });
-    log.log(4, "file does not exist: {}", "/var/www/favicon.ico");
+    log.log(3, "file does not exist: {}", "/var/www/favicon.ico");
 
     return 0;
 }
