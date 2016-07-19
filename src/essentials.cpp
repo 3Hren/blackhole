@@ -3,6 +3,7 @@
 #include "blackhole/filter/severity.hpp"
 #include "blackhole/formatter/string.hpp"
 #include "blackhole/handler/blocking.hpp"
+#include "blackhole/handler/dev.hpp"
 #include "blackhole/registry.hpp"
 #include "blackhole/sink/asynchronous.hpp"
 #include "blackhole/sink/console.hpp"
@@ -29,6 +30,7 @@ auto essentials(registry_t& registry) -> void {
     registry.add<sink::syslog_t>(registry);
 
     registry.add<handler::blocking_t>(registry);
+    registry.add<handler::dev_t>(registry);
 }
 
 }  // namespace v1
