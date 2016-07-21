@@ -85,6 +85,9 @@ Of course there are disadvantages, such as virtual function call cost and closed
   - [ ] For handlers.
   - [ ] For loggers.
 
+## Experimental
+Note, that there are some symbols, that are wrapped into `experimental` namespace. These symbols don't adhere semantic versioning and, well... experimental. Use them with caution and only, where you want to try super-unstable features, which can be changed or even dropped.
+
 ## Formatters
 
 Formatters in Blackhole are responsible for converting every log record passing into some byte array representation. It can be either human-readable string, JSON tree or even [protobuf](https://github.com/google/protobuf) packed frame.
