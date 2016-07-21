@@ -30,7 +30,7 @@ auto essentials(registry_t& registry) -> void {
     registry.add<sink::syslog_t>(registry);
 
     registry.add<handler::blocking_t>(registry);
-    registry.add<handler::dev_t>(registry);
+    // registry.add<handler::dev_t>(registry);
 }
 
 }  // namespace v1
