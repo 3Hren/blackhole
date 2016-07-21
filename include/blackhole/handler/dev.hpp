@@ -4,14 +4,16 @@
 
 namespace blackhole {
 inline namespace v1 {
+namespace experimental {
 namespace handler {
 
 class dev_t;
 
 }  // namespace handler
+}  // namespace experimental
 
 template<>
-class builder<handler::dev_t> {
+class builder<experimental::handler::dev_t> {
     class inner_t;
     std::unique_ptr<inner_t, deleter_t> d;
 
@@ -22,7 +24,7 @@ public:
 };
 
 template<>
-class factory<handler::dev_t> : public factory<handler_t> {
+class factory<experimental::handler::dev_t> : public factory<handler_t> {
     const registry_t& registry;
 
 public:

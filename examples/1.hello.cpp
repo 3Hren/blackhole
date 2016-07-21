@@ -17,7 +17,7 @@ auto main() -> int {
     // Here we are going to configure our development handler and to build the logger.
     auto lg = blackhole::experimental::partial_builder<blackhole::root_logger_t>()
         // Add the development handler.
-        .handler<blackhole::handler::dev_t>()
+        .handler<blackhole::experimental::handler::dev_t>()
             .build()
         // Build the logger.
         .build();

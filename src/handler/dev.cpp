@@ -19,6 +19,7 @@
 
 namespace blackhole {
 inline namespace v1 {
+namespace experimental {
 namespace handler {
 
 namespace datetime = detail::datetime;
@@ -202,8 +203,9 @@ private:
 };
 
 }  // namespace handler
+}  // namespace experimental
 
-using handler::dev_t;
+using experimental::handler::dev_t;
 
 class builder<dev_t>::inner_t {};
 
@@ -224,7 +226,7 @@ auto factory<dev_t>::from(const config::node_t&) const -> std::unique_ptr<handle
     return builder<dev_t>().build();
 }
 
-template auto deleter_t::operator()(builder<handler::dev_t>::inner_t*) -> void;
+template auto deleter_t::operator()(builder<experimental::handler::dev_t>::inner_t*) -> void;
 
 }  // namespace v1
 }  // namespace blackhole

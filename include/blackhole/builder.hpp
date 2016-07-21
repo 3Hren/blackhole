@@ -58,15 +58,15 @@ public:
 };
 
 template<typename Parent>
-class partial_builder<handler::blocking_t, Parent> {
+class partial_builder<blackhole::handler::blocking_t, Parent> {
 public:
-    typedef partial_builder<handler::blocking_t, Parent> this_type;
+    typedef partial_builder<blackhole::handler::blocking_t, Parent> this_type;
 
 private:
     template<typename, typename> friend class partial_builder;
 
     Parent parent;
-    builder<handler::blocking_t> builder_;
+    builder<blackhole::handler::blocking_t> builder_;
 
 public:
     partial_builder(Parent parent) noexcept :
@@ -90,9 +90,9 @@ public:
 };
 
 template<typename Parent>
-class partial_builder<handler::dev_t, Parent> {
+class partial_builder<experimental::handler::dev_t, Parent> {
 public:
-    typedef partial_builder<handler::dev_t, Parent> this_type;
+    typedef partial_builder<experimental::handler::dev_t, Parent> this_type;
 
 private:
     template<typename, typename> friend class partial_builder;
