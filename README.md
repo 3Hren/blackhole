@@ -157,7 +157,8 @@ Ext         = Pat
             | Pat Sep
             | Sep Pat
 Name        = [a-zA-Z0-9_]
-Spec        = Align? Width? Type
+Spec        = Fill? Align? Width? Type
+Fill        = [a character other than '{' or '}']
 Align       = [>^<]
 Width       = [1-9][0-9]*
 Type        = [su]
