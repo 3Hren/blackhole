@@ -1,3 +1,9 @@
+blackhole (1.0.2-1) unstable; urgency=low
+
+  * Bug fix: the library should properly build on GCC 5 (#143).
+
+ -- Evgeny Safronov <division494@gmail.com>  Fri, 29 Jul 2016 15:45:14 +0300
+
 blackhole (1.0.1-1) unstable; urgency=low
 
   * Bug fix: experimental builders will no longer change meaning of AST

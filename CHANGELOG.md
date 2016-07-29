@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.2] - Grove Warden - 2016-07-29
+### Fixed
+- Bug fix: the library should properly build on GCC 5 (#143).
+
 ## [1.0.1] - Ori - 2016-07-18
 ### Fixed
 - Experimental builders will no longer change meaning of AST tokens ([#134]).
@@ -268,3 +272,4 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 [#38]: (https://github.com/3Hren/blackhole/pull/38)
 [#40]: (https://github.com/3Hren/blackhole/pull/40)
 [#45]: (https://github.com/3Hren/blackhole/pull/45)
+[#143]: (https://github.com/3Hren/blackhole/pull/143)
