@@ -89,7 +89,7 @@ literal_with_args(::benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
 }
 
-#if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
+#if (__GNUC__ >= 6 || defined(__clang__)) && defined(__cpp_constexpr) && __cpp_constexpr >= 201304
 static
 void
 literal_with_args_using_cpp14_formatter(::benchmark::State& state) {
@@ -282,7 +282,7 @@ NBENCHMARK("log.lit[args: 1]", literal_with_arg);
 NBENCHMARK("log.lit[args: 6]", literal_with_args);
 
 
-#if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
+#if (__GNUC__ >= 6 || defined(__clang__)) && defined(__cpp_constexpr) && __cpp_constexpr >= 201304
 NBENCHMARK("log.lit[args: 6 + c++14::fmt]", literal_with_args_using_cpp14_formatter);
 #endif
 

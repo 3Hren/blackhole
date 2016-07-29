@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <boost/type_traits/remove_cv.hpp> 
 #include <boost/variant/get.hpp>
 
 #include <blackhole/detail/formatter/string/parser.hpp>

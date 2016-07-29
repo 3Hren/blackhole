@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
+#if (__GNUC__ >= 6 || defined(__clang__)) && defined(__cpp_constexpr) && __cpp_constexpr >= 201304
 #include "blackhole/extensions/metaformat.hpp"
 #endif
 
@@ -60,7 +60,7 @@ public:
     template<typename T, typename... Args>
     auto log(int severity, const string_view& pattern, const T& arg, const Args&... args) -> void;
 
-#if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
+#if (__GNUC__ >= 6 || defined(__clang__)) && defined(__cpp_constexpr) && __cpp_constexpr >= 201304
     /// Log a message with the given severity level and further formatting using the given pattern
     /// and arguments.
     ///
@@ -114,7 +114,7 @@ logger_facade<Logger>::log(int severity, const string_view& pattern, const attri
     inner().log(severity, pattern, pack);
 }
 
-#if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
+#if (__GNUC__ >= 6 || defined(__clang__)) && defined(__cpp_constexpr) && __cpp_constexpr >= 201304
 
 template<typename Logger>
 template<std::size_t N, typename T, typename... Args>
