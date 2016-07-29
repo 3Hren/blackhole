@@ -1,4 +1,4 @@
-#if defined(__cpp_constexpr) && __cpp_constexpr >= 201304
+#if (__GNUC__ >= 6 || defined(__clang__)) && defined(__cpp_constexpr) && __cpp_constexpr >= 201304
 
 #include <benchmark/benchmark.h>
 
