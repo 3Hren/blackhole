@@ -1,4 +1,7 @@
 {
-    global: *;
-    local: *rapidjson*;
+    global:
+        *;
+    local:
+        *rapidjson*;
+        *boost4asio6detail*;
 };
