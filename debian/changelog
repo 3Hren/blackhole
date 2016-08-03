@@ -1,3 +1,18 @@
+blackhole (1.1.0-1) unstable; urgency=low
+
+  * Added: introducing a new development handler with eye-candy colored
+    output.
+  * Changed: changed meaning of experimental symbols. Those symbols that are
+    wrapped into `experimental` namespace don't adhere semantic versioning and,
+    well... experimental.
+    Use them with caution and only, where you want to try super-unstable
+    features, which can be changed or even dropped.
+  * Changed: explicitly hide all symbols from `boost::asio::detail` namespace,
+    which are supposed to be hidden by default, but the ancient GNU linker
+    exports them anyway.
+
+ -- Evgeny Safronov <division494@gmail.com>  Wed, 03 Aug 2016 17:00:22 +0300
+
 blackhole (1.0.2-1) unstable; urgency=low
 
   * Bug fix: the library should properly build on GCC 5 (#143).

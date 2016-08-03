@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.0] - Bleeding Hollow - 2016-08-03
+### Added
+- Introduce new development handler with eye-candy colored output.
+
+### Changed
+- Note, that there are some symbols, that are wrapped into `experimental` namespace. These symbols don't adhere semantic versioning and, well... experimental. Use them with caution and only, where you want to try super-unstable features, which can be changed or even dropped.
+- Hide `boost::asio::detail` namespace, which are supposed to be hidden by default, but the ancient GNU linker exports them anyway.
+
 ## [1.0.2] - Grove Warden - 2016-07-29
 ### Fixed
 - Bug fix: the library should properly build on GCC 5 (#143).
