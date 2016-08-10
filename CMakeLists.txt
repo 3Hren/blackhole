@@ -315,6 +315,15 @@ if (ENABLE_EXAMPLES)
     target_link_libraries(2-simple
             blackhole)
 
+    # Configuration using manual chained builder.
+    add_executable(2-0-builder
+        examples/2.0.builder)
+
+    enable_all_warnings(2-0-builder)
+
+    target_link_libraries(2-0-builder
+        blackhole)
+
     # Configuration using JSON config file.
     add_executable(3-config
         examples/3.config)
