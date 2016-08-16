@@ -10,8 +10,8 @@ namespace sink {
 namespace {
 
 auto exp2(std::size_t factor) -> std::size_t {
-    if (factor > 20) {
-        throw std::invalid_argument("factor should fit in [0; 20] range");
+    if (factor < 2 || factor > 20) {
+        throw std::invalid_argument("factor should fit in [2; 20] range");
     }
 
     return static_cast<std::size_t>(std::exp2(factor));
