@@ -1,3 +1,9 @@
+blackhole (1.1.0-2) unstable; urgency=low
+
+  * Fix empty debuginfo package
+
+ -- Vitaly Isaev <vitalyisaev2@gmail.com>  Thu, 18 Aug 2016 12:41:51 +0300
+
 blackhole (1.1.0-1) unstable; urgency=low
 
   * Added: introducing a new development handler with eye-candy colored
