@@ -522,6 +522,12 @@ auto factory<json_t>::from(const config::node_t& config) const ->
         });
     }
 
+    if (auto formatting = config["formatting"]) {
+        formatting.each_map([&](const std::string& key, const config::node_t& value) {
+            builder.format(key, value.to_string());
+        });
+    }
+
     if (auto routing = config["routing"]) {
         routing.each_map([&](const std::string& key, const config::node_t& value) {
             try {
