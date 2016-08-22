@@ -61,7 +61,7 @@ struct visitor_t {
             rapidjson::StringRef(value.data(), value.size()), allocator);
     }
 
-    // For non-owning buffers.
+    // For temporary buffers, rapidjson will copy the data.
     auto operator()(const char* data, std::size_t size) -> void {
         node.AddMember(rapidjson::StringRef(name.data(), name.size()),
             rapidjson::Value(data, static_cast<unsigned int>(size), allocator), allocator);
@@ -73,6 +73,35 @@ struct visitor_t {
 
         node.AddMember(rapidjson::StringRef(name.data(), name.size()),
             wr.result().to_string(), allocator);
+    }
+};
+
+// TODO: Decompose. Almost the same class is in `string.cpp`.
+class view_visitor : public boost::static_visitor<> {
+    writer_t& writer;
+    const std::string& spec;
+
+public:
+    view_visitor(writer_t& writer, const std::string& spec) noexcept :
+        writer(writer),
+        spec(spec)
+    {}
+
+    auto operator()(std::nullptr_t) const -> void {
+        writer.write(spec, "none");
+    }
+
+    template<typename T>
+    auto operator()(T value) const -> void {
+        writer.write(spec, value);
+    }
+
+    auto operator()(const string_view& value) const -> void {
+        writer.write(spec, value.data());
+    }
+
+    auto operator()(const attribute::view_t::function_type& value) const -> void {
+        value(writer);
     }
 };
 
@@ -109,6 +138,7 @@ public:
     } routing;
 
     std::unordered_map<std::string, std::string> mapping;
+    std::unordered_map<std::string, std::string> formatting;
 
     properties_t() :
         unique(false),
@@ -126,6 +156,7 @@ public:
     std::map<std::string, rapidjson::Pointer> routing;
 
     std::unordered_map<std::string, std::string> mapping;
+    std::unordered_map<std::string, std::string> formatting;
 
     bool unique;
     bool newline;
@@ -136,6 +167,7 @@ public:
     inner_t(json_t::properties_t properties) :
         rest(properties.routing.unspecified),
         mapping(std::move(properties.mapping)),
+        formatting(std::move(properties.formatting)),
         unique(properties.unique),
         newline(properties.newline),
         timestamp(properties.timestamp),
@@ -264,19 +296,43 @@ private:
     auto apply(const string_view& name, const T& value) -> void {
         const auto renamed = inner.renamed(name);
         visitor_t visitor{inner.get(name, root), root.GetAllocator(), renamed};
-        visitor(value);
+
+        const auto it = inner.formatting.find(std::string(name.data(), name.size()));
+        if (it != std::end(inner.formatting)) {
+            writer_t wr;
+            wr.write(it->second, value);
+            visitor(wr.inner.data(), wr.inner.size());
+        } else {
+            visitor(value);
+        }
     }
 
     auto apply(const string_view& name, const char* data, std::size_t size) -> void {
         const auto renamed = inner.renamed(name);
         visitor_t visitor{inner.get(name, root), root.GetAllocator(), renamed};
-        visitor(data, size);
+
+        const auto it = inner.formatting.find(std::string(name.data(), name.size()));
+        if (it != std::end(inner.formatting)) {
+            writer_t wr;
+            wr.write(it->second, fmt::StringRef(data, size));
+            visitor(wr.inner.data(), wr.inner.size());
+        } else {
+            visitor(data, size);
+        }
     }
 
     auto apply(const string_view& name, const attribute::view_t& value) -> void {
         const auto renamed = inner.renamed(name);
         visitor_t visitor{inner.get(name, root), root.GetAllocator(), renamed};
-        boost::apply_visitor(visitor, value.inner().value);
+
+        const auto it = inner.formatting.find(std::string(name.data(), name.size()));
+        if (it != std::end(inner.formatting)) {
+            writer_t wr;
+            boost::apply_visitor(view_visitor(wr, it->second), value.inner().value);
+            visitor(wr.inner.data(), wr.inner.size());
+        } else {
+            boost::apply_visitor(visitor, value.inner().value);
+        }
     }
 };
 
@@ -424,6 +480,15 @@ auto builder<json_t>::timestamp(const std::string& pattern) & -> builder& {
 
 auto builder<json_t>::timestamp(const std::string& pattern) && -> builder&& {
     return std::move(timestamp(pattern));
+}
+
+auto builder<json_t>::format(std::string name, std::string spec) & -> builder& {
+    d->formatting[name] = spec;
+    return *this;
+}
+
+auto builder<json_t>::format(std::string name, std::string spec) && -> builder&& {
+    return std::move(format(std::move(name), std::move(spec)));
 }
 
 auto builder<json_t>::build() const && -> std::unique_ptr<formatter_t> {
