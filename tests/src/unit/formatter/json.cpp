@@ -535,6 +535,63 @@ TEST(json_t, NoNewlineByDefault) {
     EXPECT_FALSE(json_t().newline());
 }
 
+TEST(json_t, MutateSeverityFormat) {
+    auto formatter = builder<json_t>()
+        .format("severity", "{:>4}")
+        .build();
+
+    const string_view message("");
+    const attribute_pack pack;
+    record_t record(2, message, pack);
+    writer_t writer;
+    formatter->format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+
+    ASSERT_TRUE(doc.HasMember("severity"));
+    ASSERT_TRUE(doc["severity"].IsString());
+    EXPECT_EQ("   2", std::string(doc["severity"].GetString()));
+}
+
+TEST(json_t, MutateThreadFormat) {
+    auto formatter = builder<json_t>()
+        .format("thread", "0x123456")
+        .build();
+
+    const string_view message("value");
+    const attribute_list attributes{{"source", "storage"}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter->format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+    ASSERT_TRUE(doc.HasMember("thread"));
+    ASSERT_TRUE(doc["thread"].IsString());
+    EXPECT_STREQ("0x123456", doc["thread"].GetString());
+}
+
+TEST(json_t, MutateAttributeFormat) {
+    auto formatter = builder<json_t>()
+        .format("source", "[{:.>6.4}]")
+        .build();
+
+    const string_view message("value");
+    const attribute_list attributes{{"source", "storage"}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter->format(record, writer);
+
+    rapidjson::Document doc;
+    doc.Parse<0>(writer.result().to_string().c_str());
+    ASSERT_TRUE(doc.HasMember("source"));
+    ASSERT_TRUE(doc["source"].IsString());
+    EXPECT_STREQ("[..stor]", doc["source"].GetString());
+}
+
 TEST(builder_t, Newline) {
     const auto layout = builder<json_t>()
         .newline()

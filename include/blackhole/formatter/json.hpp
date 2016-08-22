@@ -136,6 +136,18 @@ public:
     auto timestamp(const std::string& pattern) & -> builder&;
     auto timestamp(const std::string& pattern) && -> builder&&;
 
+    /// Sets the given formatting specification to an attribute with the specified name.
+    ///
+    /// Custom formatting is useful when it's required to build a JSON tree with preformatted
+    /// values using a spec, for example, to write a number using HEX representation. Note, that
+    /// after formatting a value will be written as a string.
+    ///
+    /// \param name attribute name.
+    /// \param spec string representation of a spec. The spec should match with libfmt formatting
+    ///     specification.
+    auto format(std::string name, std::string spec) & -> builder&;
+    auto format(std::string name, std::string spec) && -> builder&&;
+
     auto build() const && -> std::unique_ptr<formatter_t>;
 };
 
