@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- JSON formatter can now apply custom attributes formatting. This feature can be also configured using "formatting" key in the config.
 ### Fixed
 - Limit min queue factor value to 2. Otherwise an assertion inside MPSC queue is triggered.
 
