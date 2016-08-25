@@ -48,6 +48,7 @@ template<>
 struct generic<optional> : public generic<required> {
     std::string prefix;
     std::string suffix;
+    boost::variant<std::int64_t, double, std::string> otherwise;
 
     generic(std::string name);
     generic(std::string name, std::string spec);

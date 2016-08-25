@@ -2,6 +2,7 @@
 
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
 #include <boost/optional/optional.hpp>
+#include <boost/variant/variant.hpp>
 
 namespace blackhole {
 inline namespace v1 {
@@ -33,6 +34,15 @@ struct grammar_result_t {
     }
 };
 
+struct optional_result_t {
+    struct extension_t {
+        boost::optional<boost::variant<double, std::string>> otherwise;
+    };
+
+    extension_t extension;
+    std::string spec;
+};
+
 auto parse(std::string pattern) -> grammar_result_t;
 auto parse_pattern(std::string pattern) -> std::vector<ph::leftover_t::token_t>;
 
@@ -44,6 +54,17 @@ auto parse_pattern(std::string pattern) -> std::vector<ph::leftover_t::token_t>;
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
+
+typedef boost::optional<boost::variant<double, std::string>> adapt1_type;
+
+BOOST_FUSION_ADAPT_STRUCT(blackhole::detail::formatter::string::optional_result_t::extension_t,
+    (adapt1_type, otherwise)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(blackhole::detail::formatter::string::optional_result_t,
+    (blackhole::detail::formatter::string::optional_result_t::extension_t, extension)
+    (std::string, spec)
+)
 
 BOOST_FUSION_ADAPT_STRUCT(blackhole::detail::formatter::string::grammar_result_t::extension_t,
     (boost::optional<std::string>, pattern)

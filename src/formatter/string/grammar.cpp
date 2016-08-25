@@ -1,3 +1,4 @@
+#include <boost/lexical_cast.hpp>
 #include <boost/fusion/container/vector.hpp>
 #include <boost/fusion/container/generation/vector_tie.hpp>
 #include <boost/spirit/home/qi/auxiliary/eoi.hpp>
@@ -51,6 +52,42 @@ struct grammar_t : public boost::spirit::qi::grammar<std::string::iterator, gram
 
     grammar_t();
 };
+
+struct optional_grammar_t : public boost::spirit::qi::grammar<std::string::iterator, optional_result_t()> {
+    typedef std::string::iterator iterator_type;
+    typedef optional_result_t result_type;
+
+    boost::spirit::qi::rule<iterator_type, optional_result_t()> grammar;
+    boost::spirit::qi::rule<iterator_type, std::string()> otherwise;
+    boost::spirit::qi::rule<iterator_type, std::string()> spec;
+    boost::spirit::qi::rule<iterator_type, std::string()> fill;
+    boost::spirit::qi::rule<iterator_type, char()> align;
+    boost::spirit::qi::rule<iterator_type, char()> alt;
+    boost::spirit::qi::rule<iterator_type, char()> zero;
+    boost::spirit::qi::rule<iterator_type, std::string()> width;
+    boost::spirit::qi::rule<iterator_type, std::string()> precision;
+    boost::spirit::qi::rule<iterator_type, char()> type;
+
+    optional_grammar_t();
+};
+
+optional_grammar_t::optional_grammar_t() :
+    optional_grammar_t::base_type(grammar)
+{
+    grammar %= qi::eps > qi::lit('{') > (
+          '}'
+        | ':' >> otherwise >> spec >> '}'
+    ) > qi::eoi;
+    otherwise %= qi::lit('{') >> (*(qi::char_ - (qi::lit(":default}") >> !qi::lit('}'))) >> ":default}") % '}';
+    spec  %= -alt >> -zero >> -width >> type;
+    // fill  %= +qi::char_;
+    // align %= qi::char_("<^>");
+    alt   %= qi::char_('#');
+    zero  %= qi::char_('0');
+    width %= +qi::digit;
+    // precision %= '.' >> +qi::digit;
+    type  %= qi::char_("sdfx");
+}
 
 namespace tag {
 
@@ -127,6 +164,7 @@ auto parse(std::string pattern) -> typename G::result_type {
             return boost::spirit::qi::parse(it, end, grammar, result);
         } catch (const boost::spirit::qi::expectation_failure<typename G::iterator_type>& err) {
             const auto pos = std::distance(pattern.begin(), err.last);
+            std::cout << std::string(pattern.begin(), pattern.begin() + pos) << std::endl;
             throw parser_error_t(static_cast<std::size_t>(pos), pattern, "malformed input pattern");
         }
     }();
@@ -147,6 +185,26 @@ auto parse(std::string pattern) -> grammar_result_t {
 
 auto parse_pattern(std::string pattern) -> std::vector<ph::leftover_t::token_t> {
     return parse<pattern_grammar_t>(std::move(pattern));
+}
+
+auto parse_optional(const std::string& pattern) -> ph::generic<optional> {
+    ph::generic<optional> token("");
+
+    const auto result = parse<optional_grammar_t>(pattern);
+    token.spec = "{:" + result.spec + "}";
+
+    try {
+        token.otherwise = boost::lexical_cast<std::int64_t>(result.extension.otherwise.get());
+        return token;
+    } catch (const boost::bad_lexical_cast&) {}
+
+    try {
+        token.otherwise = boost::lexical_cast<double>(result.extension.otherwise.get());
+        return token;
+    } catch (const boost::bad_lexical_cast&) {}
+
+    token.otherwise = result.extension.otherwise.get();
+    return token;
 }
 
 auto parse_leftover(const std::string& pattern) -> ph::leftover_t {

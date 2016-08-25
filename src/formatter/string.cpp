@@ -92,6 +92,22 @@ public:
     }
 };
 
+class otherwise_visitor : public boost::static_visitor<> {
+    writer_t& writer;
+    const std::string& spec;
+
+public:
+    otherwise_visitor(writer_t& writer, const std::string& spec) noexcept :
+        writer(writer),
+        spec(spec)
+    {}
+
+    template<typename T>
+    auto operator()(T value) const -> void {
+        writer.write(spec, value);
+    }
+};
+
 class pattern_visitor_t : public boost::static_visitor<> {
     writer_t& wr;
     const view_of<attribute_t>::type& attribute;
@@ -252,6 +268,8 @@ public:
             writer.write(token.prefix);
             boost::apply_visitor(view_visitor<spec>(writer, token.spec), value->inner().value);
             writer.write(token.suffix);
+        } else {
+            boost::apply_visitor(otherwise_visitor(writer, token.spec), token.otherwise);
         }
     }
 
