@@ -187,8 +187,8 @@ auto parse_pattern(std::string pattern) -> std::vector<ph::leftover_t::token_t> 
     return parse<pattern_grammar_t>(std::move(pattern));
 }
 
-auto parse_optional(const std::string& pattern) -> ph::generic<optional> {
-    ph::generic<optional> token("");
+auto parse_optional(const std::string& name, const std::string& pattern) -> ph::generic<optional> {
+    ph::generic<optional> token(name);
 
     const auto result = parse<optional_grammar_t>(pattern);
     token.spec = "{:" + result.spec + "}";

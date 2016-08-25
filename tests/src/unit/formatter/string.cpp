@@ -256,6 +256,20 @@ TEST(string_t, GenericOptionalWhenNotFound) {
     EXPECT_EQ("0x002a/0x0000", writer.result().to_string());
 }
 
+TEST(string_t, GenericOptionalWhenFound) {
+    auto formatter = builder<string_t>("{trace:{42:default}#06x}/{span:#06x}")
+        .build();
+
+    const string_view message("-");
+    const attribute_list attributes{{"trace", 10}, {"span", 50}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter->format(record, writer);
+
+    EXPECT_EQ("0x000a/0x0032", writer.result().to_string());
+}
+
 TEST(string_t, GenericLazyUnspec) {
     auto formatter = builder<string_t>("{protocol}/{version}")
         .build();
