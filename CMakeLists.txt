@@ -148,10 +148,11 @@ endif (ENABLE_TESTING_THREADSAFETY)
 
 if (ENABLE_TESTING)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/foreign/modules")
-    include(DownloadGoogleTesting)
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/tests/cmake")
 
     find_package(Threads)
 
+    include(PrepareGoogleTesting)
     prepare_google_testing()
 
     include_directories(BEFORE SYSTEM
@@ -239,7 +240,7 @@ if (ENABLE_TESTING)
         tests/src/unit/termcolor.cpp
         tests/wrapper)
 
-    enable_google_testing(${LIBRARY_NAME}-tests)
+    add_dependencies(${LIBRARY_NAME}-tests googlemock)
 
     target_link_libraries(${LIBRARY_NAME}-tests
         ${LIBRARY_NAME}
