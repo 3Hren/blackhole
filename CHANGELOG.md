@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Extend optional placeholders grammar.
+This change allows to specify fill, align and precision specification for optional placeholders when configuring the pattern formatter. Also the type specifier is now optional, allowing to specify no type, making `libfmt` to select the proper formatting itself. This change should fix a bug, where it’s impossible to specify the default integral value for string-formatted placeholder.
+
 ## [1.2.0] - Flamegor - 2016-08-29
 ### Added
 - JSON formatter can now apply custom attributes formatting. This feature can be also configured using "formatting" key in the config.

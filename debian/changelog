@@ -1,3 +1,15 @@
+blackhole (1.2.1-1) UNRELEASED; urgency=low
+
+  * Fixed: extend optional placeholders grammar.
+    This change allows to specify fill, align and precision specification for
+    optional placeholders when configuring the pattern formatter.
+    Also the type specifier is now optional, allowing to specify no type,
+    making `libfmt` to select the proper formatting itself.
+    This change should fix a bug, where it’s impossible to specify the default
+    integral value for string-formatted placeholder.
+
+ -- Evgeny Safronov <division494@gmail.com>  Mon, 29 Aug 2016 19:01:15 +0300
+
 blackhole (1.2.0-1) unstable; urgency=low
 
   * Added: JSON formatter can now apply custom attributes formatting. This
