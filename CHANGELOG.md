@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [1.2.0] - Flamegor - 2016-08-29
 ### Added
 - JSON formatter can now apply custom attributes formatting. This feature can be also configured using "formatting" key in the config.
 - String formatter now supports optional placeholders with default value (#150).

@@ -1,4 +1,4 @@
-blackhole (1.2.0-1) UNRELEASED; urgency=low
+blackhole (1.2.0-1) unstable; urgency=low
 
   * Added: JSON formatter can now apply custom attributes formatting. This
     feature can be also configured using "formatting" key in the config.
