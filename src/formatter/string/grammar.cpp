@@ -164,7 +164,6 @@ auto parse(std::string pattern) -> typename G::result_type {
             return boost::spirit::qi::parse(it, end, grammar, result);
         } catch (const boost::spirit::qi::expectation_failure<typename G::iterator_type>& err) {
             const auto pos = std::distance(pattern.begin(), err.last);
-            std::cout << std::string(pattern.begin(), pattern.begin() + pos) << std::endl;
             throw parser_error_t(static_cast<std::size_t>(pos), pattern, "malformed input pattern");
         }
     }();
