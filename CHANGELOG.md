@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [1.2.1] - Firemaw - 2016-08-29
 ### Fixed
 - Extend optional placeholders grammar.
 This change allows to specify fill, align and precision specification for optional placeholders when configuring the pattern formatter. Also the type specifier is now optional, allowing to specify no type, making `libfmt` to select the proper formatting itself. This change should fix a bug, where it’s impossible to specify the default integral value for string-formatted placeholder.

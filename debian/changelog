@@ -1,4 +1,4 @@
-blackhole (1.2.1-1) UNRELEASED; urgency=low
+blackhole (1.2.1-1) unstable; urgency=low
 
   * Fixed: extend optional placeholders grammar.
     This change allows to specify fill, align and precision specification for
