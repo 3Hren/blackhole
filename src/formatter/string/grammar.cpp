@@ -13,6 +13,7 @@
 #include <boost/spirit/home/qi/operator/expect.hpp>
 #include <boost/spirit/home/qi/operator/kleene.hpp>
 #include <boost/spirit/home/qi/operator/list.hpp>
+#include <boost/spirit/home/qi/operator/and_predicate.hpp>
 #include <boost/spirit/home/qi/operator/not_predicate.hpp>
 #include <boost/spirit/home/qi/operator/optional.hpp>
 #include <boost/spirit/home/qi/operator/permutation.hpp>
@@ -60,7 +61,7 @@ struct optional_grammar_t : public boost::spirit::qi::grammar<std::string::itera
     boost::spirit::qi::rule<iterator_type, optional_result_t()> grammar;
     boost::spirit::qi::rule<iterator_type, std::string()> otherwise;
     boost::spirit::qi::rule<iterator_type, std::string()> spec;
-    boost::spirit::qi::rule<iterator_type, std::string()> fill;
+    boost::spirit::qi::rule<iterator_type, char()> fill;
     boost::spirit::qi::rule<iterator_type, char()> align;
     boost::spirit::qi::rule<iterator_type, char()> alt;
     boost::spirit::qi::rule<iterator_type, char()> zero;
@@ -79,13 +80,13 @@ optional_grammar_t::optional_grammar_t() :
         | ':' >> otherwise >> spec >> '}'
     ) > qi::eoi;
     otherwise %= qi::lit('{') >> (*(qi::char_ - (qi::lit(":default}") >> !qi::lit('}'))) >> ":default}") % '}';
-    spec  %= -alt >> -zero >> -width >> type;
-    // fill  %= +qi::char_;
-    // align %= qi::char_("<^>");
+    spec  %= -fill >> -align >> -alt >> -zero >> -width >> -precision >> -type;
+    fill  %= qi::char_ >> &align;
+    align %= qi::char_("<^>");
     alt   %= qi::char_('#');
     zero  %= qi::char_('0');
     width %= +qi::digit;
-    // precision %= '.' >> +qi::digit;
+    precision %= qi::char_('.') >> +qi::digit;
     type  %= qi::char_("sdfx");
 }
 

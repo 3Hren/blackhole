@@ -270,6 +270,34 @@ TEST(string_t, GenericOptionalWhenFound) {
     EXPECT_EQ("0x000a/0x0032", writer.result().to_string());
 }
 
+TEST(string_t, GenericOptionalWithDefaultIntegerAndRealIntegerFormattedAsUnknown) {
+    auto formatter = builder<string_t>("{trace:{0000:default}04}/{span:{0000:default}04}")
+        .build();
+
+    const string_view message("-");
+    const attribute_list attributes{{"span", 50}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter->format(record, writer);
+
+    EXPECT_EQ("0000/0050", writer.result().to_string());
+}
+
+TEST(string_t, GenericOptionalWithDefaultIntegerAndRealStringFormattedAsUnknown) {
+    auto formatter = builder<string_t>("{trace:{0000:default}0>4}/{span:{0000:default}0>4}")
+        .build();
+
+    const string_view message("-");
+    const attribute_list attributes{{"span", "50"}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter->format(record, writer);
+
+    EXPECT_EQ("0000/0050", writer.result().to_string());
+}
+
 TEST(string_t, GenericLazyUnspec) {
     auto formatter = builder<string_t>("{protocol}/{version}")
         .build();
