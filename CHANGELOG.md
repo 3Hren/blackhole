@@ -5,8 +5,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 - JSON formatter can now apply custom attributes formatting. This feature can be also configured using "formatting" key in the config.
+- String formatter now supports optional placeholders with default value (#150).
 ### Fixed
 - Limit min queue factor value to 2. Otherwise an assertion inside MPSC queue is triggered.
+- Repair suddenly broken Google Mocking Library link.
 
 ## [1.1.0] - Bleeding Hollow - 2016-08-03
 ### Added
