@@ -242,18 +242,32 @@ TEST(string_t, ThrowsIfGenericAttributeNotFound) {
     EXPECT_THROW(formatter->format(record, writer), std::logic_error);
 }
 
-TEST(DISABLED_string_t, GenericOptional) {
-    auto formatter = builder<string_t>("{protocol}{version:{ - REQUIRED:u}.1f}")
+TEST(string_t, GenericOptionalWhenNotFound) {
+    auto formatter = builder<string_t>("{trace:{42:default}#06x}/{span:#06x}")
         .build();
 
     const string_view message("-");
-    const attribute_list attributes{{"protocol", {"HTTP"}}, {"version", {1.1}}};
+    const attribute_list attributes{{"span", 0}};
     const attribute_pack pack{attributes};
     record_t record(0, message, pack);
     writer_t writer;
     formatter->format(record, writer);
 
-    EXPECT_EQ("HTTP/1.1 - REQUIRED", writer.result().to_string());
+    EXPECT_EQ("0x002a/0x0000", writer.result().to_string());
+}
+
+TEST(string_t, GenericOptionalWhenFound) {
+    auto formatter = builder<string_t>("{trace:{42:default}#06x}/{span:#06x}")
+        .build();
+
+    const string_view message("-");
+    const attribute_list attributes{{"trace", 10}, {"span", 50}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+    writer_t writer;
+    formatter->format(record, writer);
+
+    EXPECT_EQ("0x000a/0x0032", writer.result().to_string());
 }
 
 TEST(string_t, GenericLazyUnspec) {
