@@ -12,8 +12,9 @@ struct record_t::inner_t {
     severity_t severity;
     time_point timestamp;
 
+    std::uint64_t lwp;
     std::thread::native_handle_type tid;
-    char __pad[16];
+    char __pad[8];
 
     std::reference_wrapper<const attribute_pack> attributes;
 };

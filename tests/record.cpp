@@ -1,5 +1,11 @@
 #include <gtest/gtest.h>
 
+#if defined(__linux__)
+    #include <sys/syscall.h>
+    #include <sys/types.h>
+    #include <unistd.h>
+#endif
+
 #include <blackhole/attribute.hpp>
 #include <blackhole/record.hpp>
 
@@ -42,6 +48,20 @@ TEST(Record, Pid) {
     record_t record(42, message, pack);
 
     EXPECT_EQ(::getpid(), record.pid());
+}
+
+TEST(Record, Lwp) {
+    const string_view message("GET /porn.png HTTP/1.1");
+    const attribute_pack pack;
+
+    record_t record(42, message, pack);
+
+#if defined(__linux__)
+    EXPECT_TRUE(record.lwp() > 0);
+    EXPECT_EQ(syscall(SYS_gettid), record.lwp());
+#else
+    EXPECT_EQ(0, record.lwp());
+#endif
 }
 
 TEST(Record, Tid) {

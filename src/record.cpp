@@ -1,5 +1,11 @@
 #include "blackhole/record.hpp"
 
+#if defined(__linux__)
+    #include <sys/syscall.h>
+    #include <sys/types.h>
+    #include <unistd.h>
+#endif
+
 #include <thread>
 
 #include "blackhole/attribute.hpp"
@@ -45,6 +51,14 @@ auto record_t::timestamp() const noexcept -> time_point {
 
 auto record_t::pid() const noexcept -> std::uint64_t {
     return static_cast<std::uint64_t>(::getpid());
+}
+
+auto record_t::lwp() const noexcept -> std::uint64_t {
+#if defined(__linux__)
+    return ::syscall(SYS_gettid);
+#else
+    return 0;
+#endif
 }
 
 auto record_t::tid() const noexcept -> std::thread::native_handle_type {
