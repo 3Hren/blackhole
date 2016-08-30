@@ -228,6 +228,12 @@ public:
         apply("process", record.pid());
     }
 
+    auto lwp() -> void {
+        #ifdef __linux__
+                apply("lwp", record.lwp());
+        #endif
+    }
+
     auto thread() -> void {
         writer_t wr;
         // TODO: Encapsulate.
@@ -237,10 +243,6 @@ public:
             wr.write("{:#x}", reinterpret_cast<unsigned long>(record.tid()));
 #endif
         apply("thread", wr.inner.data(), wr.inner.size());
-
-#ifdef __linux__
-        apply("lwp", record.lwp());
-#endif
     }
 
     auto severity() -> void {
@@ -382,6 +384,7 @@ auto json_t::format(const record_t& record, writer_t& writer) -> void {
 
     auto builder = inner->create(root, record);
     builder.message();
+    builder.lwp();
     builder.thread();
     builder.process();
     builder.severity();
