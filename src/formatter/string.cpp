@@ -22,7 +22,6 @@
 #include "blackhole/detail/procname.hpp"
 #include "blackhole/detail/util/deleter.hpp"
 
-// TODO: Optional attributes.
 // Optional placeholders allows to nicely format some patterns where there are non-reserved
 // attributes used and its presents is undetermined. Unlike required placeholders it does not throw
 // an exception if there are no attribute with the given name in the set.
