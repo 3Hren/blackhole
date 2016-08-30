@@ -237,6 +237,10 @@ public:
             wr.write("{:#x}", reinterpret_cast<unsigned long>(record.tid()));
 #endif
         apply("thread", wr.inner.data(), wr.inner.size());
+
+#ifdef __linux__
+        apply("lwp", record.lwp());
+#endif
     }
 
     auto severity() -> void {
