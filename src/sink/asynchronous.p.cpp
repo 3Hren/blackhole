@@ -1,4 +1,4 @@
-#include "blackhole/detail/sink/asynchronous.hpp"
+#include "asynchronous.hpp"
 
 #include <cmath>
 #include <condition_variable>

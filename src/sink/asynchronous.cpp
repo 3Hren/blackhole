@@ -6,7 +6,7 @@
 #include "blackhole/config/option.hpp"
 #include "blackhole/registry.hpp"
 
-#include "blackhole/detail/sink/asynchronous.hpp"
+#include "asynchronous.hpp"
 
 namespace blackhole {
 inline namespace v1 {

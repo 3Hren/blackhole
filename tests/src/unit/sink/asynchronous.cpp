@@ -1,6 +1,7 @@
 #include <blackhole/registry.hpp>
 #include <blackhole/sink/asynchronous.hpp>
-#include <blackhole/detail/sink/asynchronous.hpp>
+
+#include <src/sink/asynchronous.hpp>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

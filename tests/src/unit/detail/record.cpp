@@ -1,6 +1,6 @@
 #include <memory>
 
-#include <blackhole/detail/recordbuf.hpp>
+#include <src/recordbuf.hpp>
 
 #include <gtest/gtest.h>
 

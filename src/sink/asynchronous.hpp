@@ -5,7 +5,7 @@
 
 #include "blackhole/sink.hpp"
 
-#include "blackhole/detail/recordbuf.hpp"
+#include "../recordbuf.hpp"
 
 namespace blackhole {
 inline namespace v1 {

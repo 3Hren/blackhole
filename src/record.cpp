@@ -4,7 +4,7 @@
 
 #include "blackhole/attribute.hpp"
 
-#include "blackhole/detail/record.hpp"
+#include "record.hpp"
 
 namespace blackhole {
 inline namespace v1 {

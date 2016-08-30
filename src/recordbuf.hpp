@@ -14,7 +14,8 @@
 #include "blackhole/severity.hpp"
 
 #include "blackhole/detail/attribute.hpp"
-#include "blackhole/detail/record.hpp"
+
+#include "record.hpp"
 
 // TODO: Move `into_view` and `from_view` traits.
 
