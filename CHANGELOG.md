@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Records are now aware of lightweight process id - LWP (or SPID).
+
+  On Linux an LWP is a process created to facilitate a user-space thread. Each user-thread has a 1x1 mapping to an LWP. An LWP is associated with its own unique positive number, that we store in the record at the construction time. For other platforms there is always 0 stored in the record instead.
+
 ## [1.2.1] - Firemaw - 2016-08-29
 ### Fixed
 - Extend optional placeholders grammar.
