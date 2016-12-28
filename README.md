@@ -367,7 +367,7 @@ Note, that associated files will be opened on demand during the first write oper
 "sinks": [
     {
         "type": "file",
-        "flush": "10Mb",
+        "flush": "10MB",
         "path": "/var/log/blackhole.log"
     }
 ]
