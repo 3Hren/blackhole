@@ -1,10 +1,10 @@
 #pragma once
 
 #if defined(__clang__) || defined(GCC47) || __GNUC__ >= 5
-# if __GNUC__ >= 5
-// it is needed to resolve <cmath> header which requires std::double_t
+#if __GNUC__ >= 5
+// It is needed to resolve `<cmath>` header which requires `std::double_t`.
 #include <math.h>
-# endif
+#endif
 
 #else
 namespace std {
