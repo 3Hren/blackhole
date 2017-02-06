@@ -20,6 +20,38 @@ namespace blackhole {
 inline namespace v1 {
 namespace formatter {
 
+namespace {
+
+class view_visitor : public boost::static_visitor<> {
+    writer_t& writer;
+    const std::string& spec;
+
+public:
+    view_visitor(writer_t& writer, const std::string& spec) noexcept :
+        writer(writer),
+        spec(spec)
+    {}
+
+    auto operator()(std::nullptr_t) const -> void {
+        writer.write(spec, "none");
+    }
+
+    template<typename T>
+    auto operator()(T value) const -> void {
+        writer.write(spec, value);
+    }
+
+    auto operator()(const string_view& value) const -> void {
+        writer.write(spec, value.data());
+    }
+
+    auto operator()(const attribute::view_t::function_type& value) const -> void {
+        value(writer);
+    }
+};
+
+}  // namespace
+
 using detail::formatter::string::placeholder::timestamp;
 using detail::formatter::string::user;
 
@@ -72,6 +104,14 @@ public:
 
         for (const auto& kv : attributes) {
             writer.write("\t{}={}", kv.first, kv.second);
+        }
+
+        for (const auto& attributes : record.attributes()) {
+            for (const auto& attribute : attributes.get()) {
+                writer_t wr;
+                boost::apply_visitor(view_visitor(wr, "{}"), attribute.second.inner().value);
+                writer.write("\t{}={}", attribute.first, fmt::StringRef(wr.inner.data(), wr.inner.size()));
+            }
         }
 
         writer.write("\n");
