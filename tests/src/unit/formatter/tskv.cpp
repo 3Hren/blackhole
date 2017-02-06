@@ -29,17 +29,19 @@ TEST(tskv_t, Format) {
     const auto time = record_t::clock_type::to_time_t(timestamp);
     std::tm tm;
     ::gmtime_r(&time, &tm);
+    char buffer[128];
+    const auto len = std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S %z", &tm);
     std::ostringstream stream;
     // Timestamp are formatted using default value.
     stream << "tskv"
-        << "\ttimestamp=" << std::put_time(&tm, "%Y-%m-%d %H:%M:%S %z")
+        << "\ttimestamp=" << std::string(buffer, len)
         << "\tseverity=" << 0
         << "\tpid=" << ::getpid()
+        << "\ttid="
 #ifdef __linux__
-        << "\ttid=" << std::hex << std::internal << std::showbase << std::setw(2) << std::setfill('0')
-#else
-        << "\ttid=" << std::this_thread::get_id()
+        << std::hex << std::internal << std::showbase << std::setw(2) << std::setfill('0')
 #endif
+        << std::this_thread::get_id()
         << "\tmessage=value\n";
 
     writer_t writer;
@@ -68,9 +70,9 @@ TEST(tskv_t, FormatWithAttributes) {
     EXPECT_TRUE(boost::ends_with(writer.result().to_string(), suffix.str()));
 }
 
-TEST(tskv_t, FormatWithInsert) {
+TEST(tskv_t, FormatWithCreate) {
     auto formatter = builder<tskv_t>()
-        .insert("tskv_format", "cocaine")
+        .create("tskv_format", "cocaine")
         .build();
 
     const string_view message("value");
@@ -82,19 +84,22 @@ TEST(tskv_t, FormatWithInsert) {
     const auto time = record_t::clock_type::to_time_t(timestamp);
     std::tm tm;
     ::gmtime_r(&time, &tm);
+    char buffer[128];
+    const auto len = std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S %z", &tm);
     std::ostringstream stream;
     // Timestamp are formatted using default value.
     stream << "tskv"
-        << "\ttimestamp=" << std::put_time(&tm, "%Y-%m-%d %H:%M:%S %z")
+        << "\ttskv_format=cocaine"
+        << "\ttimestamp=" << std::string(buffer, len)
         << "\tseverity=" << 0
         << "\tpid=" << ::getpid()
+        << "\ttid="
 #ifdef __linux__
-        << "\ttid=" << std::hex << std::internal << std::showbase << std::setw(2) << std::setfill('0')
-#else
-        << "\ttid=" << std::this_thread::get_id()
+        << std::hex << std::internal << std::showbase << std::setw(2) << std::setfill('0')
 #endif
+        << std::this_thread::get_id()
         << "\tmessage=value"
-        << "\ttskv_format=cocaine\n";
+        << "\n";
 
     writer_t writer;
     formatter->format(record, writer);
@@ -102,29 +107,111 @@ TEST(tskv_t, FormatWithInsert) {
     EXPECT_EQ(stream.str(), writer.result().to_string());
 }
 
-// TODO: Escape attribute values.
-// TODO: Rename fields.
-// TODO: Mutate fields by format.
-// TODO: Remove fields by name.
+TEST(tskv_t, Escape) {
+    auto formatter = builder<tskv_t>()
+        .build();
 
-// {
-//     "insert": {
-//         "tskv_format": "YT",
-//         ...
-//     },
-//     "rename": {
-//         "message": "@message",
-//         ...
-//     },
-//     "mutate": {
-//         "timestamp": {},
-//         "timezone": {
-//             "strftime": "%z"
-//         },
-//         ...
-//     },
-//     "remove": ["severity"]
-// }
+    const string_view message(
+        "\x07""bell"
+        "\x08""backspace"
+        "\x09""tab"
+        "\x0a""line feed"
+        "\x0b""vtab"
+        "\x0c""form feed"
+        "\x0d""carriage return"
+        "\x1b""escape"
+    );
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+
+    writer_t writer;
+    formatter->format(record, writer);
+
+    std::ostringstream suffix;
+    suffix << "message=\\abell\\bbackspace\\ttab\\nline feed\\vvtab\\fform feed\\rcarriage return\\eescape\n";
+
+    EXPECT_TRUE(boost::ends_with(writer.result().to_string(), suffix.str()));
+}
+
+TEST(tskv_t, EscapeKey) {
+    auto formatter = builder<tskv_t>()
+        .build();
+
+    const string_view message("value");
+    const attribute_list attributes{{"with=eq", 42}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+
+    writer_t writer;
+    formatter->format(record, writer);
+
+    std::ostringstream suffix;
+    suffix << "message=value\twith\\=eq=42\n";
+
+    EXPECT_TRUE(boost::ends_with(writer.result().to_string(), suffix.str()));
+}
+
+TEST(tskv_t, FormatTimestampWithTimezone) {
+    auto formatter = builder<tskv_t>()
+        .timestamp("timestamp", "%Y-%m-%d %H:%M:%S")
+        .timestamp("timezone", "%z")
+        .build();
+
+    const string_view message("value");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    record.activate();
+
+    const auto timestamp = record.timestamp();
+    const auto time = record_t::clock_type::to_time_t(timestamp);
+    std::tm tm;
+    ::gmtime_r(&time, &tm);
+    char buffer[128];
+    auto len = std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &tm);
+    std::ostringstream stream;
+    stream << "\ttimestamp=" << std::string(buffer, len);
+    len = std::strftime(buffer, sizeof(buffer), "%z", &tm);
+    stream << "\ttimezone=" << std::string(buffer, len);
+
+    writer_t writer;
+    formatter->format(record, writer);
+
+    EXPECT_TRUE(boost::contains(writer.result().to_string(), stream.str()));
+}
+
+TEST(tskv_t, Rename) {
+    auto formatter = builder<tskv_t>()
+        .rename("message", "@message")
+        .build();
+
+    const string_view message("value");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+
+    writer_t writer;
+    formatter->format(record, writer);
+
+    std::ostringstream suffix;
+    suffix << "@message=value\n";
+
+    EXPECT_TRUE(boost::ends_with(writer.result().to_string(), suffix.str()));
+}
+
+TEST(tskv_t, Remove) {
+    auto formatter = builder<tskv_t>()
+        .remove("message")
+        .build();
+
+    const string_view message("value");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+
+    writer_t writer;
+    formatter->format(record, writer);
+
+    EXPECT_FALSE(boost::contains(writer.result().to_string(), "message"));
+    EXPECT_FALSE(boost::contains(writer.result().to_string(), "message=value"));
+}
 
 } // namespace
 } // namespace formatter
