@@ -254,58 +254,6 @@ public:
 
         builder.finish();
     }
-
-private:
-    auto write_escaped_key(writer_t& writer, string_view data) -> void {
-        for (auto it = data.data(); it != data.data() + data.size(); ++it) {
-            switch (*it) {
-            case '=':
-                writer.inner << "\\=";
-                break;
-            default:
-                writer.inner << *it;
-            };
-        }
-    }
-
-    auto write_escaped_val(writer_t& writer, string_view data) -> void {
-        for (auto it = data.data(); it != data.data() + data.size(); ++it) {
-            switch (*it) {
-            case '\a':
-                writer.inner << "\\a";
-                break;
-            case '\b':
-                writer.inner << "\\b";
-                break;
-            case '\t':
-                writer.inner << "\\t";
-                break;
-            case '\n':
-                writer.inner << "\\n";
-                break;
-            case '\v':
-                writer.inner << "\\v";
-                break;
-            case '\f':
-                writer.inner << "\\f";
-                break;
-            case '\r':
-                writer.inner << "\\r";
-                break;
-            case '\x1B':
-                writer.inner << "\\e";
-                break;
-            case '\0':
-                writer.inner << "\\0";
-                break;
-            case '\\':
-                writer.inner << "\\\\";
-                break;
-            default:
-                writer.inner << *it;
-            };
-        }
-    }
 };
 
 }  // namespace formatter
