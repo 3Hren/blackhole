@@ -18,8 +18,17 @@ class builder<formatter::tskv_t> {
 public:
     explicit builder();
 
-    auto insert(const std::string& name, const std::string& value) & -> builder&;
-    auto insert(const std::string& name, const std::string& value) && -> builder&&;
+    auto create(const std::string& name, const std::string& value) & -> builder&;
+    auto create(const std::string& name, const std::string& value) && -> builder&&;
+
+    auto rename(const std::string& from, const std::string& to) & -> builder&;
+    auto rename(const std::string& from, const std::string& to) && -> builder&&;
+
+    auto remove(const std::string& name) & -> builder&;
+    auto remove(const std::string& name) && -> builder&&;
+
+    auto timestamp(const std::string& name, const std::string& pattern) & -> builder&;
+    auto timestamp(const std::string& name, const std::string& pattern) && -> builder&&;
 
     auto build() && -> std::unique_ptr<formatter_t>;
 };

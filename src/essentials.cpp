@@ -3,6 +3,7 @@
 #include "blackhole/filter/severity.hpp"
 #include "blackhole/formatter/json.hpp"
 #include "blackhole/formatter/string.hpp"
+#include "blackhole/formatter/tskv.hpp"
 #include "blackhole/handler/blocking.hpp"
 #include "blackhole/handler/dev.hpp"
 #include "blackhole/registry.hpp"
@@ -22,6 +23,7 @@ auto essentials(registry_t& registry) -> void {
 
     registry.add<formatter::json_t>();
     registry.add<formatter::string_t>();
+    registry.add<formatter::tskv_t>();
 
     registry.add<sink::asynchronous_t>(registry);
     registry.add<sink::console_t>(registry);
