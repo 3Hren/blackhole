@@ -15,10 +15,11 @@ struct literal_t {
     std::string value;
 };
 
+struct epoch_t {};
 struct usecond_t {};
 
 class generator_t {
-    typedef boost::variant<literal_t, usecond_t> token_t;
+    typedef boost::variant<literal_t, epoch_t, usecond_t> token_t;
 
     std::vector<token_t> tokens;
 

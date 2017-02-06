@@ -172,6 +172,10 @@ inline void normal(context_t& context) {
     fill<2>(context.wr, context.tm.tm_sec);
 }
 
+inline void epoch(context_t& context) {
+    context.wr << std::mktime(&context.tm);
+}
+
 } // namespace second
 
 namespace usecond {
@@ -361,6 +365,11 @@ public:
         tokens.push_back(&visit::time::second::normal);
     }
 
+    virtual void epoch() {
+        end_partial_literal();
+        tokens.push_back(&visit::time::second::epoch);
+    }
+
     virtual void usecond() {
         end_partial_literal();
         tokens.push_back(&visit::time::usecond::normal);
@@ -453,6 +462,9 @@ public:
             break;
         case 'S':
             handler.second();
+            break;
+        case 's':
+            handler.epoch();
             break;
         case 'f':
             handler.usecond();
