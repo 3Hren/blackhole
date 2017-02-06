@@ -23,7 +23,7 @@ namespace {
 
 struct visitor_t : public boost::static_visitor<> {
     fmt::MemoryWriter& stream;
-    const std::tm& tm;
+    std::tm tm;
     std::uint64_t usec;
     char buffer[1024];
 
@@ -36,6 +36,10 @@ struct visitor_t : public boost::static_visitor<> {
     auto operator()(const literal_t& value) -> void {
         std::size_t ret = std::strftime(buffer, sizeof(buffer), value.value.c_str(), &tm);
         stream << fmt::StringRef(buffer, ret);
+    }
+
+    auto operator()(epoch_t) -> void {
+        stream.write("{}", std::mktime(&tm));
     }
 
     auto operator()(usecond_t) -> void {
@@ -53,6 +57,12 @@ generator_t::generator_t(std::string pattern) {
         if (boost::starts_with(boost::make_iterator_range(pos, std::end(pattern)), "%f")) {
             tokens.emplace_back(literal_t{std::move(literal)});
             tokens.emplace_back(usecond_t{});
+            literal.clear();
+            ++pos;
+            ++pos;
+        } else if (boost::starts_with(boost::make_iterator_range(pos, std::end(pattern)), "%s")) {
+            tokens.emplace_back(literal_t{std::move(literal)});
+            tokens.emplace_back(epoch_t{});
             literal.clear();
             ++pos;
             ++pos;
