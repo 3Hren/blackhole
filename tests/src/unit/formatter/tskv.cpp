@@ -48,6 +48,26 @@ TEST(tskv_t, Format) {
     EXPECT_EQ(stream.str(), writer.result().to_string());
 }
 
+TEST(tskv_t, FormatWithAttributes) {
+    auto formatter = builder<tskv_t>()
+        .build();
+
+    const string_view message("value");
+    const attribute_list attributes{{"id", 42}, {"key", "value"}};
+    const attribute_pack pack{attributes};
+    record_t record(0, message, pack);
+
+    writer_t writer;
+    formatter->format(record, writer);
+
+    std::ostringstream suffix;
+    suffix << "\tmessage=value"
+        << "\tid=42"
+        << "\tkey=value\n";
+
+    EXPECT_TRUE(boost::ends_with(writer.result().to_string(), suffix.str()));
+}
+
 TEST(tskv_t, FormatWithInsert) {
     auto formatter = builder<tskv_t>()
         .insert("tskv_format", "cocaine")
@@ -82,7 +102,6 @@ TEST(tskv_t, FormatWithInsert) {
     EXPECT_EQ(stream.str(), writer.result().to_string());
 }
 
-// TODO: Insert constant fields.
 // TODO: Escape attribute values.
 // TODO: Rename fields.
 // TODO: Mutate fields by format.
