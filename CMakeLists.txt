@@ -34,6 +34,7 @@ add_library(${LIBRARY_NAME} SHARED
     src/datetime/generator.linux
     src/datetime/generator.other
     src/essentials.cpp
+    src/filter/severity.cpp
     src/format
     src/formatter/json
     src/formatter/mod
@@ -42,13 +43,13 @@ add_library(${LIBRARY_NAME} SHARED
     src/formatter/string/grammar
     src/formatter/string/parser
     src/formatter/string/token
+    src/formatter/tskv.cpp
     src/handler.cpp
     src/handler/blocking.cpp
     src/handler/dev.cpp
     src/logger
     src/procname
     src/record
-    src/filter/severity.cpp
     src/registry
     src/root
     src/scope/holder
@@ -217,13 +218,13 @@ if (ENABLE_TESTING)
         tests/src/mocks/handler
         tests/src/mocks/logger
         tests/src/mocks/sink
-        tests/src/unit/stdext/string_view
         tests/src/unit/detail/formatter/string/parser.cpp
         tests/src/unit/detail/handler/blocking.cpp
         tests/src/unit/detail/mpsc
         tests/src/unit/detail/record
         tests/src/unit/formatter/grammar
         tests/src/unit/formatter/json
+        tests/src/unit/formatter/tskv.cpp
         tests/src/unit/formatter/string.cpp
         tests/src/unit/formatter/token
         tests/src/unit/sink/asynchronous
@@ -237,6 +238,7 @@ if (ENABLE_TESTING)
         tests/src/unit/sink/syslog
         tests/src/unit/sink/tcp
         tests/src/unit/sink/udp.cpp
+        tests/src/unit/stdext/string_view
         tests/src/unit/termcolor.cpp
         tests/wrapper)
 
