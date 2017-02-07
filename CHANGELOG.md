@@ -2,7 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [1.4.0] - Helya - 2017-02-07
+### Added
+- TSKV (tab-separated key-value) formatter.
+
 ## [1.3.0] - Xavius - 2016-10-25
 ### Added
 - Records are now aware of lightweight process id - LWP (or SPID).
