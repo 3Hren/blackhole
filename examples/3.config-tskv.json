@@ -1,0 +1,27 @@
+{
+    "root": [
+        {
+            "type": "blocking",
+            "formatter": {
+                "type": "tskv",
+                "create": {
+                    "tskv_format": "YT"
+                },
+                "rename": {
+                    "severity": "verbosity"
+                },
+                "mutate": {
+                    "unixtime": {
+                        "strftime": "%s.%f"
+                    }
+                },
+                "remove": ["timestamp"]
+            },
+            "sinks": [
+                {
+                    "type": "console"
+                }
+            ]
+        }
+    ]
+}
