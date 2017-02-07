@@ -42,7 +42,7 @@ TEST(tskv_t, Format) {
         << std::hex << std::internal << std::showbase << std::setw(2) << std::setfill('0')
 #endif
         << std::this_thread::get_id()
-        << "\tmessage=value\n";
+        << "\tmessage=value";
 
     writer_t writer;
     formatter->format(record, writer);
@@ -65,7 +65,7 @@ TEST(tskv_t, FormatWithAttributes) {
     std::ostringstream suffix;
     suffix << "\tmessage=value"
         << "\tid=42"
-        << "\tkey=value\n";
+        << "\tkey=value";
 
     EXPECT_TRUE(boost::ends_with(writer.result().to_string(), suffix.str()));
 }
@@ -98,8 +98,7 @@ TEST(tskv_t, FormatWithCreate) {
         << std::hex << std::internal << std::showbase << std::setw(2) << std::setfill('0')
 #endif
         << std::this_thread::get_id()
-        << "\tmessage=value"
-        << "\n";
+        << "\tmessage=value";
 
     writer_t writer;
     formatter->format(record, writer);
@@ -128,7 +127,7 @@ TEST(tskv_t, Escape) {
     formatter->format(record, writer);
 
     std::ostringstream suffix;
-    suffix << "message=\\abell\\bbackspace\\ttab\\nline feed\\vvtab\\fform feed\\rcarriage return\\eescape\n";
+    suffix << "message=\\abell\\bbackspace\\ttab\\nline feed\\vvtab\\fform feed\\rcarriage return\\eescape";
 
     EXPECT_TRUE(boost::ends_with(writer.result().to_string(), suffix.str()));
 }
@@ -146,7 +145,7 @@ TEST(tskv_t, EscapeKey) {
     formatter->format(record, writer);
 
     std::ostringstream suffix;
-    suffix << "message=value\twith\\=eq=42\n";
+    suffix << "message=value\twith\\=eq=42";
 
     EXPECT_TRUE(boost::ends_with(writer.result().to_string(), suffix.str()));
 }
@@ -192,7 +191,7 @@ TEST(tskv_t, Rename) {
     formatter->format(record, writer);
 
     std::ostringstream suffix;
-    suffix << "@message=value\n";
+    suffix << "@message=value";
 
     EXPECT_TRUE(boost::ends_with(writer.result().to_string(), suffix.str()));
 }

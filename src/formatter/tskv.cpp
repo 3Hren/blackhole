@@ -124,9 +124,7 @@ public:
         }
     }
 
-    auto finish() -> void {
-        wr.write("\n");
-    }
+    auto finish() -> void {}
 
 private:
     auto add(const std::string& name, string_view value) -> void {
