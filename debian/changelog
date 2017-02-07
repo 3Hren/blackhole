@@ -1,3 +1,9 @@
+blackhole (1.4.0-0alpha1) unstable; urgency=low
+
+  * Added: TSKV (tab-separated key-value) formatter.
+
+ -- Evgeny Safronov <division494@gmail.com>  Tue, 07 Feb 2017 11:23:52 +0300
+
 blackhole (1.3.0-1) unstable; urgency=low
 
   * Added: records are now aware of lightweight process id - LWP (or SPID).
