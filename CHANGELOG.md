@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased] - Chronomatic Anomaly - 2017-02-13
+### Added
+- Lambda expressions with capture-list can now be used as formatting arguments. This allows to log arguments that require heavyweight transformation before the result can be used.
+
+For example:
+```c++
+logger.log(0, "[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET {} HTTP/1.0' 200 2326",
+    [&](std::ostream& stream) -> std::ostream& {
+        return stream << boost::join(paths, "/");
+    }
+);
+```
+
 ## [1.4.0] - Helya - 2017-02-07
 ### Added
 - TSKV (tab-separated key-value) formatter.
