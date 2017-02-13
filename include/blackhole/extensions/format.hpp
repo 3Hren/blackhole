@@ -2638,11 +2638,33 @@ class BasicArrayWriter : public BasicWriter<Char> {
 typedef BasicArrayWriter<char> ArrayWriter;
 typedef BasicArrayWriter<wchar_t> WArrayWriter;
 
+template<typename T, typename Char>
+typename std::enable_if<
+    std::is_convertible<
+        T,
+        std::function<std::ostream&(std::ostream&)>
+    >::value
+>::type
+invoke_helper(std::basic_ostringstream<Char> &os, const T &v) {
+    v(os);
+}
+
+template<typename T, typename U, typename Char>
+typename std::enable_if<
+    !std::is_convertible<
+        T,
+        std::function<std::ostream&(std::ostream&)>
+    >::value
+>::type
+invoke_helper(std::basic_ostringstream<Char> &os, const U &v) {
+    os << v;
+}
+
 // Formats a value.
 template <typename Char, typename T>
 void format(BasicFormatter<Char> &f, const Char *&format_str, const T &value) {
   std::basic_ostringstream<Char> os;
-  os << value;
+  invoke_helper<T>(os, value);
   std::basic_string<Char> str = os.str();
   internal::Arg arg = internal::MakeValue<Char>(str);
   arg.type = static_cast<internal::Arg::Type>(
