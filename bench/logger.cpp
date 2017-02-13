@@ -77,6 +77,24 @@ literal_with_arg(::benchmark::State& state) {
 
 static
 void
+literal_with_lazy_arg(::benchmark::State& state) {
+    root_logger_t root({});
+    logger_facade<root_logger_t> logger(root);
+
+    const auto path = "/porn.png";
+    while (state.KeepRunning()) {
+        logger.log(0, "[::] - esafronov [10/Oct/2000:13:55:36 -0700] 'GET {} HTTP/1.0' 200 2326",
+            [&](std::ostream& stream) -> std::ostream& {
+                return stream << path;
+            }
+        );
+    }
+
+    state.SetItemsProcessed(state.iterations());
+}
+
+static
+void
 literal_with_args(::benchmark::State& state) {
     root_logger_t root({});
     logger_facade<root_logger_t> logger(root);
@@ -279,6 +297,7 @@ NBENCHMARK("log.string", string);
 NBENCHMARK("log.lit", literal);
 NBENCHMARK("log.lit[reject]", literal_reject);
 NBENCHMARK("log.lit[args: 1]", literal_with_arg);
+NBENCHMARK("log.lit[args: 1 (lazy)]", literal_with_lazy_arg);
 NBENCHMARK("log.lit[args: 6]", literal_with_args);
 
 
