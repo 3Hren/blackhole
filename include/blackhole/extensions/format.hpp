@@ -39,6 +39,7 @@
 #include <stdexcept>
 #include <string>
 #include <map>
+#include <functional> // for functional objects formatting.
 
 #ifndef FMT_USE_IOSTREAMS
 # define FMT_USE_IOSTREAMS 1
