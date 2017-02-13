@@ -2,7 +2,7 @@
 
 #include <blackhole/attribute.hpp>
 #include <blackhole/record.hpp>
-#include <blackhole/detail/recordbuf.hpp>
+#include <src/recordbuf.hpp>
 
 #include "mod.hpp"
 

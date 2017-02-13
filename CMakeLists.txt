@@ -271,6 +271,7 @@ if (ENABLE_BENCHMARKING)
         bench/datetime
         bench/formatter/json
         bench/formatter/string
+        bench/formatter/tskv.cpp
         bench/logger
         bench/main
         bench/queue
