@@ -5,6 +5,7 @@ language: cpp
 matrix:
   include:
     - compiler: gcc
+    - compiler: gcc
       addons:
         apt:
           sources:
@@ -12,7 +13,6 @@ matrix:
           packages:
             - lcov
       env:
-        - BUILD_TYPE=Debug
         - BUILD_TYPE=Coverage
     - compiler: gcc
       addons:
@@ -35,5 +35,5 @@ script:
       bash <(curl -s https://codecov.io/bash);
     else
       make;
-      - ./blackhole-tests;
+      ./blackhole-tests;
     fi
