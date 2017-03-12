@@ -11,13 +11,29 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - lcov
+      env:
+        - BUILD_TYPE=Coverage
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
             - g++-4.9
       env: COMPILER=g++-4.9
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y libboost-dev libboost-thread-dev libboost-system-dev
 script:
-  - mkdir build
+  - mkdir -p build
   - cd build
-  - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DENABLE_TESTING=ON .. && make
-  - ./blackhole-tests
+  - cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DENABLE_TESTING=ON ..
+  - |
+    if [[ "${BUILD_TYPE}" == "Coverage" ]]; then
+      make coverage;
+      bash <(curl -s https://codecov.io/bash);
+    else
+      make;
+      ./blackhole-tests;
+    fi
