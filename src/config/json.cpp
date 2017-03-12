@@ -4,6 +4,7 @@
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
+#include <rapidjson/istreamwrapper.h>
 
 #include "blackhole/detail/memory.hpp"
 
@@ -36,8 +37,8 @@ auto factory<json_t>::config() const noexcept -> const node_t& {
 }
 
 auto factory<json_t>::initialize(std::istream& stream) -> void {
-    std::string content((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
-    doc.Parse<0>(content.c_str());
+    rapidjson::IStreamWrapper wrapper(stream);
+    doc.ParseStream<rapidjson::kParseCommentsFlag | rapidjson::kParseTrailingCommasFlag>(wrapper);
 
     if (doc.HasParseError()) {
         throw std::invalid_argument("parse error at offset " +

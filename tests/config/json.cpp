@@ -330,8 +330,22 @@ TEST(factory, FromInvalidJson) {
         config::factory<json_t> factory(stream);
         FAIL();
     } catch (const std::invalid_argument& err) {
-        EXPECT_STREQ("parse error at offset 13: Missing a closing quotation mark in string.", err.what());
+        EXPECT_STREQ("parse error at offset 14: Missing a closing quotation mark in string.", err.what());
     }
+}
+
+TEST(factory, CommentsIsOk) {
+    std::stringstream stream;
+    stream << R"({"key": /* Some comment. */ "value"})";
+
+    EXPECT_NO_THROW((config::factory<json_t>(stream)));
+}
+
+TEST(factory, TrailingCommaIsOk) {
+    std::stringstream stream;
+    stream << R"({"key": "value",})";
+
+    EXPECT_NO_THROW((config::factory<json_t>(stream)));
 }
 
 }  // namespace testing
