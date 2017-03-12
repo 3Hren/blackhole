@@ -1,5 +1,12 @@
 language: c
 
+env:
+  global:
+    - secure: Fx8+n0sd25Tb5Z51ESIM5n0yrcyvfbqne3DIKqf2a+TH4SiVHyKjD67r8/CaMnGj7FWN061zsI7b7mJvZUU9uq874x6QYO1ClubbnpMAaF54Fy8xeqh/r54nzws+Gjx+WOwZ6cK+qlwiwSWPqaroWlcwgz2Ex6foYba8ilmyE3ETlR/uNGOa3/3YrxCo9v8x/wZBxrBUlgeqvCjsuLoZMEc5+uPK8vOmGHptoRTpAOhsa69ZX79WphhllDSddflOsmF79cN75ZIpZveTx/WWvwvOn0FIJxkmUhLgrSH/FpMVvfjvzo55+lWrwSxgUnk3lzdG/CYb6zBJBiWBxwELgw==
+  matrix:
+    - BUILD_TYPE=Release
+    - BUILD_TYPE=Coverage
+
 build:
   ci:
     - sudo apt-get update
@@ -9,8 +16,21 @@ build:
     - sudo apt-get install libboost-dev
     - sudo apt-get install libboost-thread-dev
     - sudo apt-get install libboost-system-dev
-    - sudo apt-get install valgrind
+    - |
+      if [[ "${BUILD_TYPE}" == "Coverage" ]]; then
+        sudo apt-get install lcov;
+      else
+        sudo apt-get install valgrind;
+      fi
     - mkdir -p build && cd build
-    - cmake -DENABLE_TESTING=ON ..
+    - cmake -DENABLE_TESTING=ON -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
     - make
-    - valgrind ./blackhole-tests
+    - |
+      if [[ "${BUILD_TYPE}" == "Coverage" ]]; then
+        make coverage;
+        bash <(curl -s https://codecov.io/bash);
+      else
+        valgrind ./blackhole-tests;
+      fi
+
+  on_success:
