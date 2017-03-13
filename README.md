@@ -1,6 +1,8 @@
 Blackhole - eating your logs with pleasure
 ==========================================
 [![Build Status](https://travis-ci.org/3Hren/blackhole.svg?branch=master)][CI]
+[![codecov](https://codecov.io/gh/3hren/blackhole/branch/master/graph/badge.svg)][Coverage]
+
 
 Blackhole is an attribute-based logger with strong focus on gaining maximum performance as possible for such kind of loggers.
 
@@ -670,3 +672,4 @@ Each feature and fix is developed in a separate branch. Bugs which are discovere
 - `issue/<number>/<slug>` or `issue/<slug>`: for issues (both enhancement and bug fixes).
 
 [CI]: https://travis-ci.org/3Hren/blackhole
+[Coverage]: https://codecov.io/gh/3hren/blackhole
