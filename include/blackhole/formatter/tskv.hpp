@@ -30,6 +30,9 @@ public:
     auto timestamp(const std::string& name, const std::string& pattern) & -> builder&;
     auto timestamp(const std::string& name, const std::string& pattern) && -> builder&&;
 
+    auto timestamp(const std::string& name, const std::string& pattern, bool gmtime) & -> builder&;
+    auto timestamp(const std::string& name, const std::string& pattern, bool gmtime) && -> builder&&;
+
     auto build() && -> std::unique_ptr<formatter_t>;
 };
 

@@ -301,12 +301,20 @@ auto builder<tskv_t>::remove(const std::string& name) && -> builder&& {
 }
 
 auto builder<tskv_t>::timestamp(const std::string& name, const std::string& value) & -> builder& {
-    p->data.timestamps[name] = formatter::timestamp<formatter::user>(value, "{}", true);
-    return *this;
+    return this->timestamp(name, value, true);
 }
 
 auto builder<tskv_t>::timestamp(const std::string& name, const std::string& value) && -> builder&& {
-    p->data.timestamps[name] = formatter::timestamp<formatter::user>(value, "{}", true);
+    return std::move(*this).timestamp(name, value, true);
+}
+
+auto builder<tskv_t>::timestamp(const std::string& name, const std::string& value, bool gmtime) & -> builder& {
+    p->data.timestamps[name] = formatter::timestamp<formatter::user>(value, "{}", gmtime);
+    return *this;
+}
+
+auto builder<tskv_t>::timestamp(const std::string& name, const std::string& value, bool gmtime) && -> builder&& {
+    p->data.timestamps[name] = formatter::timestamp<formatter::user>(value, "{}", gmtime);
     return std::move(*this);
 }
 
@@ -342,7 +350,12 @@ auto factory<tskv_t>::from(const config::node_t& config) const -> std::unique_pt
     if (auto cfg = config["mutate"]) {
         cfg.each_map([&](const std::string& key, const config::node_t& how) {
             if (auto strftime = how["strftime"]) {
-                builder.timestamp(key, strftime.to_string().get());
+                bool gmtime = true;
+                if (auto value = how["gmtime"]) {
+                    gmtime = value.to_bool().get();
+                }
+
+                builder.timestamp(key, strftime.to_string().get(), gmtime);
                 return;
             }
         });
