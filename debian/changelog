@@ -1,7 +1,17 @@
+blackhole (1.6.0-1) unstable; urgency=low
+
+  * Added: allow comments and trailing commas in the JSON config.
+  * Added: allow to specify how to pick time in TSKV formatter (#168).
+    This change allows to specify how Blackhole should pick the time during
+    formatting timestamps using TSKV formatter.
+  * Changed: replace deprecated OS X stuff with modern one.
+
+ -- Evgeny Safronov <division494@gmail.com>  Thu, 13 Apr 2017 17:35:32 +0300
+
 blackhole (1.5.0-1) unstable; urgency=low
 
-  * Added: lambda expressions with capture-list can now be used as formatting 
-    arguments. This allows to log arguments that require heavyweight 
+  * Added: lambda expressions with capture-list can now be used as formatting
+    arguments. This allows to log arguments that require heavyweight
     transformation before the result can be used.
 
  -- Evgeny Safronov <division494@gmail.com>  Tue, 14 Feb 2017 17:01:17 +0300
