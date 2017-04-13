@@ -212,6 +212,34 @@ TEST(tskv_t, Remove) {
     EXPECT_FALSE(boost::contains(writer.result().to_string(), "message=value"));
 }
 
+TEST(tskv_t, FormatTimestampWithTimezoneUsingLocaltime) {
+    auto formatter = builder<tskv_t>()
+        .timestamp("timestamp", "%Y-%m-%d %H:%M:%S", false)
+        .timestamp("timezone", "%z", false)
+        .build();
+
+    const string_view message("value");
+    const attribute_pack pack;
+    record_t record(0, message, pack);
+    record.activate();
+
+    const auto timestamp = record.timestamp();
+    const auto time = record_t::clock_type::to_time_t(timestamp);
+    std::tm tm;
+    ::localtime_r(&time, &tm);
+    char buffer[128];
+    auto len = std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &tm);
+    std::ostringstream stream;
+    stream << "\ttimestamp=" << std::string(buffer, len);
+    len = std::strftime(buffer, sizeof(buffer), "%z", &tm);
+    stream << "\ttimezone=" << std::string(buffer, len);
+
+    writer_t writer;
+    formatter->format(record, writer);
+
+    EXPECT_TRUE(boost::contains(writer.result().to_string(), stream.str()));
+}
+
 } // namespace
 } // namespace formatter
 } // namespace v1
