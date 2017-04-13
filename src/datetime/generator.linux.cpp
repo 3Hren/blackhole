@@ -25,12 +25,16 @@ struct visitor_t : public boost::static_visitor<> {
     fmt::MemoryWriter& stream;
     std::tm tm;
     std::uint64_t usec;
+    bool gmtime;
+    long tz_offset;
     char buffer[1024];
 
-    visitor_t(fmt::MemoryWriter& stream, const std::tm& tm, std::uint64_t usec) :
+    visitor_t(fmt::MemoryWriter& stream, const std::tm& tm, std::uint64_t usec, bool gmtime, long tz_offset) :
         stream(stream),
         tm(tm),
-        usec(usec)
+        usec(usec),
+        gmtime(gmtime),
+        tz_offset(tz_offset)
     {}
 
     auto operator()(const literal_t& value) -> void {
@@ -40,6 +44,14 @@ struct visitor_t : public boost::static_visitor<> {
 
     auto operator()(epoch_t) -> void {
         stream.write("{}", std::mktime(&tm));
+    }
+
+    auto operator()(epoch_alternative_t) -> void {
+        long offset = 0;
+        if (gmtime) {
+            offset += tz_offset;
+        }
+        stream.write("{}", std::mktime(&tm) - offset);
     }
 
     auto operator()(usecond_t) -> void {
@@ -66,6 +78,13 @@ generator_t::generator_t(std::string pattern) {
             literal.clear();
             ++pos;
             ++pos;
+        } else if (boost::starts_with(boost::make_iterator_range(pos, std::end(pattern)), "%Es")) {
+            tokens.emplace_back(literal_t{std::move(literal)});
+            tokens.emplace_back(epoch_alternative_t{});
+            literal.clear();
+            ++pos;
+            ++pos;
+            ++pos;
         } else {
             literal.push_back(*pos);
             ++pos;
@@ -79,8 +98,8 @@ generator_t::generator_t(std::string pattern) {
 
 template<typename Stream>
 auto
-generator_t::operator()(Stream& stream, const std::tm& tm, std::uint64_t usec) const -> void {
-    visitor_t visitor(stream, tm, usec);
+generator_t::operator()(Stream& stream, const std::tm& tm, std::uint64_t usec, bool gmtime, long tz_offset) const -> void {
+    visitor_t visitor(stream, tm, usec, gmtime, tz_offset);
 
     for (const auto& token : tokens) {
         boost::apply_visitor(visitor, token);
@@ -92,7 +111,7 @@ auto make_generator(const std::string& pattern) -> generator_t {
 }
 
 template
-auto generator_t::operator()<writer_type>(writer_type&, const std::tm&, std::uint64_t) const -> void;
+auto generator_t::operator()<writer_type>(writer_type&, const std::tm&, std::uint64_t, bool, long) const -> void;
 
 }  // namespace datetime
 }  // namespace detail

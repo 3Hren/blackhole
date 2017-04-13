@@ -249,7 +249,7 @@ public:
         }
 
         fmt::MemoryWriter buffer;
-        token.generator(buffer, tm, static_cast<std::uint64_t>(usec));
+        token.generator(buffer, tm, static_cast<std::uint64_t>(usec), token.gmtime, timezone);
         writer.write(token.spec, string_ref(buffer.data(), buffer.size()));
     }
 

@@ -10,6 +10,7 @@
 
 namespace blackhole {
 namespace testing {
+namespace {
 
 using blackhole::detail::datetime::make_generator;
 
@@ -17,17 +18,21 @@ class datetime_t : public ::testing::Test {
 protected:
     std::tm tm;
     std::uint64_t usec;
+    bool gmtime;
+    long tz_offset;
 
     void SetUp() {
         tm = std::tm();
         usec = 0;
+        gmtime = true;
+        tz_offset = 0;
     }
 
     auto generate(const std::string& pattern) const -> std::string {
         fmt::MemoryWriter wr;
 
         const auto generator = make_generator(pattern);
-        generator(wr, tm, usec);
+        generator(wr, tm, usec, gmtime, tz_offset);
         return {wr.data(), wr.size()};
     }
 };
@@ -264,12 +269,12 @@ TEST_F(datetime_t, Microsecond) {
     EXPECT_EQ("100500", generate("%f"));
 }
 
-TEST_F(datetime_t, MicrosecondLowerBould) {
+TEST_F(datetime_t, MicrosecondLowerBound) {
     usec = 0;
     EXPECT_EQ("000000", generate("%f"));
 }
 
-TEST_F(datetime_t, MicrosecondUpperBould) {
+TEST_F(datetime_t, MicrosecondUpperBound) {
     usec = 999999;
     EXPECT_EQ("999999", generate("%f"));
 }
@@ -371,5 +376,20 @@ TEST_F(datetime_t, Large) {
     EXPECT_EQ(expected, generate(pattern));
 }
 
+TEST_F(datetime_t, epoch) {
+    tm.tm_year = 100;
+    tm.tm_mon = 0;
+    tm.tm_mday = 1;
+    tm.tm_hour = 10;
+    tm.tm_min = 00;
+    tm.tm_sec = 00;
+    // According to the man strftime treats `%s` as number of seconds since epoch and assumes
+    // that we got `tm` using `localtime` function. So the result timestamp is shifted
+    // at `extern timezone` seconds: 946720800 + timezone.
+    EXPECT_EQ(std::to_string(946720800 + timezone), generate("%s"));
+    EXPECT_EQ(using_strftime("%s", tm), generate("%s"));
+}
+
+}  // namespace
 }  // namespace testing
 }  // namespace blackhole

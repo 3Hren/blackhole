@@ -32,13 +32,18 @@ struct context_t {
     stream_type wr;
     std::tm tm;
     std::uint64_t usec;
+    bool gmtime;
+    long tz_offset;
+
     const std::vector<std::string>& literals;
     std::vector<std::string>::const_iterator it;
 
-    context_t(writer_type& wr, std::tm tm, std::uint64_t usec, const std::vector<std::string>& literals):
+    context_t(writer_type& wr, std::tm tm, std::uint64_t usec, bool gmtime, long tz_offset, const std::vector<std::string>& literals):
         wr(wr),
         tm(tm),
         usec(usec),
+        gmtime(gmtime),
+        tz_offset(tz_offset),
         literals(literals),
         it(std::begin(this->literals))
     {}
@@ -174,6 +179,14 @@ inline void normal(context_t& context) {
 
 inline void epoch(context_t& context) {
     context.wr << std::mktime(&context.tm);
+}
+
+inline void epoch_alternative(context_t& context) {
+    long offset = 0;
+    if (context.gmtime) {
+        offset += context.tz_offset;
+    }
+    context.wr << std::mktime(&context.tm) - offset;
 }
 
 } // namespace second
@@ -370,6 +383,11 @@ public:
         tokens.push_back(&visit::time::second::epoch);
     }
 
+    virtual void epoch_alternative() {
+        end_partial_literal();
+        tokens.push_back(&visit::time::second::epoch_alternative);
+    }
+
     virtual void usecond() {
         end_partial_literal();
         tokens.push_back(&visit::time::usecond::normal);
@@ -466,6 +484,11 @@ public:
         case 's':
             handler.epoch();
             break;
+        case 'E':
+            if (std::next(it, 2) != end && *std::next(it, 2) == 's') {
+                handler.epoch_alternative();
+            }
+            return it + 3;
         case 'f':
             handler.usecond();
             break;
@@ -600,8 +623,8 @@ generator_t::generator_t(std::vector<token_t> tokens, std::vector<std::string> l
 
 template<typename Stream>
 auto
-generator_t::operator()(Stream& stream, const std::tm& tm, std::uint64_t usec) const -> void {
-    context_t context{stream, tm, usec, literals};
+generator_t::operator()(Stream& stream, const std::tm& tm, std::uint64_t usec, bool gmtime, long tz_offset) const -> void {
+    context_t context{stream, tm, usec, gmtime, tz_offset, literals};
 
     for (const auto& token : tokens) {
         token(context);
@@ -620,7 +643,7 @@ auto make_generator(const std::string& pattern) -> generator_t {
 }
 
 template
-auto generator_t::operator()<writer_type>(writer_type&, const std::tm&, std::uint64_t) const -> void;
+auto generator_t::operator()<writer_type>(writer_type&, const std::tm&, std::uint64_t, bool gmtime, long tz_offset) const -> void;
 
 }  // namespace datetime
 }  // namespace detail
