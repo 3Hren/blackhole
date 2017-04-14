@@ -238,6 +238,10 @@ public:
         d(std::move(data))
     {}
 
+    auto data() const -> const tskv_data& {
+        return d;
+    }
+
     auto format(const record_t& record, writer_t& writer) -> void override {
         builder_t builder{writer, record, d};
         builder.add_header();

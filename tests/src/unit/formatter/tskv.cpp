@@ -5,16 +5,24 @@
 
 #include <blackhole/attribute.hpp>
 #include <blackhole/attributes.hpp>
-#include <blackhole/stdext/string_view.hpp>
 #include <blackhole/extensions/writer.hpp>
 #include <blackhole/formatter.hpp>
 #include <blackhole/formatter/tskv.hpp>
 #include <blackhole/record.hpp>
+#include <blackhole/stdext/string_view.hpp>
+
+#include "src/formatter/tskv.cpp"
+
+#include "mocks/node.hpp"
+#include "mocks/registry.hpp"
 
 namespace blackhole {
 inline namespace v1 {
 namespace formatter {
 namespace {
+
+using ::testing::Return;
+using ::testing::StrictMock;
 
 TEST(tskv_t, Format) {
     auto formatter = builder<tskv_t>()
@@ -238,6 +246,10 @@ TEST(tskv_t, FormatTimestampWithTimezoneUsingLocaltime) {
     formatter->format(record, writer);
 
     EXPECT_TRUE(boost::contains(writer.result().to_string(), stream.str()));
+}
+
+TEST(factory, Type) {
+    EXPECT_EQ("tskv", factory<tskv_t>().type());
 }
 
 } // namespace
