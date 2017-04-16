@@ -524,16 +524,16 @@ To use it all you need is to create a logger, import the facade definition and w
 /// In this case the entire logging pipeline is initialized from file including severity mapping.
 /// The logging facade is used to allow runtime formatting and attributes provisioning.
 
-#include <fstream>
-#include <iostream>
+# include <fstream>
+# include <iostream>
 
-#include <blackhole/attribute.hpp>
-#include <blackhole/attributes.hpp>
-#include <blackhole/config/json.hpp>
-#include <blackhole/extensions/facade.hpp>
-#include <blackhole/extensions/writer.hpp>
-#include <blackhole/registry.hpp>
-#include <blackhole/root.hpp>
+# include <blackhole/attribute.hpp>
+# include <blackhole/attributes.hpp>
+# include <blackhole/config/json.hpp>
+# include <blackhole/extensions/facade.hpp>
+# include <blackhole/extensions/writer.hpp>
+# include <blackhole/registry.hpp>
+# include <blackhole/root.hpp>
 
 using namespace blackhole;
 
