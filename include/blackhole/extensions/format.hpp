@@ -124,6 +124,8 @@ inline uint32_t clzll(uint64_t x) {
 # pragma clang diagnostic ignored "-Wmissing-noreturn"
 # pragma clang diagnostic ignored "-Wimplicit-fallthrough"
 # pragma clang diagnostic ignored "-Wunused-member-function"
+# pragma clang diagnostic ignored "-Wundefined-var-template"
+# pragma clang diagnostic ignored "-Wundefined-func-template"
 #endif
 
 #ifdef __GNUC_LIBSTD__
