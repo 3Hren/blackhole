@@ -158,5 +158,5 @@ logger_facade<Logger>::select(int severity, const string_view& pattern, const Ar
     detail::without_tail<detail::select_t, Args...>::type::apply(inner(), severity, pattern, args...);
 }
 
-}  // namespace blackhole
-}  // namespace blackhole
+} // namespace v1
+} // namespace blackhole
