@@ -15,13 +15,13 @@
 
 auto main() -> int {
     // Here we are going to configure our development handler and to build the logger.
-    auto lg = blackhole::experimental::partial_builder<blackhole::root_logger_t>()
+    auto lg = blackhole::builder<blackhole::root_logger_t>()
         // Add the development handler.
-        .handler<blackhole::experimental::handler::dev_t>()
-            .build()
+        .add(blackhole::builder<blackhole::experimental::handler::dev_t>()
+            .build())
         // Build the logger.
         .build();
-    auto log = blackhole::logger_facade<blackhole::root_logger_t>(lg);
+    auto log = blackhole::logger_facade<blackhole::root_logger_t>(*lg);
 
     log.log(0, "add {} quads for {}, weight: {:.2f}%, {}/{}", 64, "nginx", 34.375, 22, 64,
         blackhole::attribute_list {

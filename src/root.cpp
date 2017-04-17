@@ -13,6 +13,7 @@
 #include "blackhole/scope/watcher.hpp"
 
 #include "blackhole/detail/spinlock.hpp"
+#include "blackhole/detail/util/deleter.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -205,6 +206,34 @@ auto root_logger_t::consume(severity_t severity, const string_view& pattern, att
 auto root_logger_t::manager() -> scope::manager_t& {
     return sync->manager;
 }
+
+class builder<root_logger_t>::inner_t {
+public:
+    root_logger_t::filter_t filter;
+    std::vector<std::unique_ptr<handler_t>> handlers;
+};
+
+builder<root_logger_t>::builder() :
+    d(new inner_t)
+{
+    d->filter = [](const record_t&) -> bool { return true; };
+}
+
+auto builder<root_logger_t>::add(std::unique_ptr<handler_t> handler) & -> builder& {
+    d->handlers.push_back(std::move(handler));
+    return *this;
+}
+
+auto builder<root_logger_t>::add(std::unique_ptr<handler_t> handler) && -> builder&& {
+    return std::move(add(std::move(handler)));
+}
+
+auto builder<root_logger_t>::build() && -> std::unique_ptr<result_type> {
+    std::unique_ptr<root_logger_t> log(new root_logger_t(std::move(d->filter), std::move(d->handlers)));
+    return log;
+}
+
+template auto deleter_t::operator()(builder<root_logger_t>::inner_t*) -> void;
 
 }  // namespace v1
 }  // namespace blackhole

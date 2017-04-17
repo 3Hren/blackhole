@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 
+#include "blackhole/forward.hpp"
 #include "blackhole/logger.hpp"
 
 namespace blackhole {
@@ -67,6 +68,24 @@ public:
 private:
     template<typename F>
     auto consume(severity_t severity, const string_view& pattern, attribute_pack& pack, const F& fn) -> void;
+};
+
+template<>
+class builder<root_logger_t> {
+public:
+    typedef root_logger_t result_type;
+
+private:
+    class inner_t;
+    std::unique_ptr<inner_t, deleter_t> d;
+
+public:
+    builder();
+
+    auto add(std::unique_ptr<handler_t> handler) & -> builder&;
+    auto add(std::unique_ptr<handler_t> handler) && -> builder&&;
+
+    auto build() && -> std::unique_ptr<result_type>;
 };
 
 }  // namespace v1
