@@ -172,7 +172,7 @@ private:
         }
 
         fmt::MemoryWriter buffer;
-        token.generator(buffer, tm, static_cast<std::uint64_t>(usec));
+        token.generator(buffer, tm, static_cast<std::uint64_t>(usec), token.gmtime, timezone);
 
         add(name, string_view(buffer.data(), buffer.size()));
     }
