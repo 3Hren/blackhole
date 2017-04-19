@@ -25,6 +25,10 @@ include_directories(BEFORE SYSTEM
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
+IF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+	include_directories(/usr/local/include)
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+
 add_library(${LIBRARY_NAME} SHARED
     src/attribute
     src/config/factory
