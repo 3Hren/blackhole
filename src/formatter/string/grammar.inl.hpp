@@ -6,7 +6,6 @@
 
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 namespace formatter {
 namespace string {
 
@@ -48,7 +47,6 @@ auto parse_pattern(std::string pattern) -> std::vector<ph::leftover_t::token_t>;
 
 }  // namespace string
 }  // namespace formatter
-}  // namespace detail
 }  // namespace v1
 }  // namespace blackhole
 
@@ -57,22 +55,22 @@ auto parse_pattern(std::string pattern) -> std::vector<ph::leftover_t::token_t>;
 
 typedef boost::optional<boost::variant<double, std::string>> adapt1_type;
 
-BOOST_FUSION_ADAPT_STRUCT(blackhole::detail::formatter::string::optional_result_t::extension_t,
+BOOST_FUSION_ADAPT_STRUCT(blackhole::formatter::string::optional_result_t::extension_t,
     (adapt1_type, otherwise)
 )
 
-BOOST_FUSION_ADAPT_STRUCT(blackhole::detail::formatter::string::optional_result_t,
-    (blackhole::detail::formatter::string::optional_result_t::extension_t, extension)
+BOOST_FUSION_ADAPT_STRUCT(blackhole::formatter::string::optional_result_t,
+    (blackhole::formatter::string::optional_result_t::extension_t, extension)
     (std::string, spec)
 )
 
-BOOST_FUSION_ADAPT_STRUCT(blackhole::detail::formatter::string::grammar_result_t::extension_t,
+BOOST_FUSION_ADAPT_STRUCT(blackhole::formatter::string::grammar_result_t::extension_t,
     (boost::optional<std::string>, pattern)
     (boost::optional<std::string>, separator)
 )
 
-BOOST_FUSION_ADAPT_STRUCT(blackhole::detail::formatter::string::grammar_result_t,
-    (blackhole::detail::formatter::string::grammar_result_t::extension_t, extension)
+BOOST_FUSION_ADAPT_STRUCT(blackhole::formatter::string::grammar_result_t,
+    (blackhole::formatter::string::grammar_result_t::extension_t, extension)
     (std::string, spec)
 )
 

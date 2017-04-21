@@ -2,13 +2,12 @@
 
 #include <boost/spirit/home/qi/operator/expect.hpp>
 
-#include <blackhole/detail/formatter/string/error.hpp>
-#include <blackhole/detail/formatter/string/grammar.hpp>
-#include <blackhole/detail/formatter/string/grammar.inl.hpp>
+#include <src/formatter/string/error.hpp>
+#include <src/formatter/string/grammar.hpp>
+#include <src/formatter/string/grammar.inl.hpp>
 
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 namespace formatter {
 namespace string {
 namespace {
@@ -209,6 +208,5 @@ TEST(parse_leftover, Conversion) {
 }  // namespace
 }  // namespace string
 }  // namespace formatter
-}  // namespace detail
 }  // namespace v1
 }  // namespace blackhole

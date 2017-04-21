@@ -1,8 +1,7 @@
-#include "blackhole/detail/formatter/string/token.hpp"
+#include "token.hpp"
 
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 namespace formatter {
 namespace string {
 namespace placeholder {
@@ -102,9 +101,8 @@ template struct thread<name>;
 template struct attribute<name>;
 template struct attribute<value>;
 
-}  // namespace placeholder
-}  // namespace string
-}  // namespace formatter
-}  // namespace detail
-}  // namespace v1
-}  // namespace blackhole
+} // namespace placeholder
+} // namespace string
+} // namespace formatter
+} // namespace v1
+} // namespace blackhole

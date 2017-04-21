@@ -13,16 +13,15 @@
 #include "blackhole/termcolor.hpp"
 
 #include "blackhole/detail/attribute.hpp"
-#include "blackhole/detail/datetime.hpp"
 #include "blackhole/detail/memory.hpp"
 #include "blackhole/detail/util/deleter.hpp"
+
+#include "../datetime.hpp"
 
 namespace blackhole {
 inline namespace v1 {
 namespace experimental {
 namespace handler {
-
-namespace datetime = detail::datetime;
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wglobal-constructors"
@@ -91,7 +90,7 @@ class dev_t : public handler_t {
 
 public:
     dev_t() :
-        timestamp(detail::datetime::make_generator("%Y-%m-%d %H:%M:%S.%f"))
+        timestamp(datetime::make_generator("%Y-%m-%d %H:%M:%S.%f"))
     {
         tokens.emplace_back([](std::ostream& stream, const record_t&) {
             colorize(stream, termcolor_t::gray());

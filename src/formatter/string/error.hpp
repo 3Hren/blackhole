@@ -6,7 +6,6 @@
 
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 namespace formatter {
 namespace string {
 
@@ -39,8 +38,7 @@ public:
     invalid_placeholder_t(std::size_t pos, const std::string& pattern);
 };
 
-}  // namespace string
-}  // namespace formatter
-}  // namespace detail
-}  // namespace v1
-}  // namespace blackhole
+} // namespace string
+} // namespace formatter
+} // namespace v1
+} // namespace blackhole

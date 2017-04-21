@@ -4,11 +4,10 @@
 
 #include <boost/variant/variant.hpp>
 
-#include "blackhole/detail/datetime.hpp"
+#include "src/datetime.hpp"
 
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 namespace formatter {
 namespace string {
 
@@ -147,6 +146,15 @@ struct leftover_t {
     leftover_t();
 };
 
+extern template struct severity<num>;
+extern template struct severity<user>;
+extern template struct process<id>;
+extern template struct process<name>;
+extern template struct thread<id>;
+extern template struct thread<name>;
+extern template struct attribute<name>;
+extern template struct attribute<value>;
+
 }  // namespace placeholder
 
 namespace ph = placeholder;
@@ -170,6 +178,5 @@ typedef boost::variant<
 
 }  // namespace string
 }  // namespace formatter
-}  // namespace detail
 }  // namespace v1
 }  // namespace blackhole

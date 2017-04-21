@@ -13,10 +13,11 @@
 #include "blackhole/record.hpp"
 
 #include "blackhole/detail/attribute.hpp"
-#include "blackhole/detail/datetime.hpp"
-#include "blackhole/detail/formatter/string/token.hpp"
 #include "blackhole/detail/memory.hpp"
 #include "blackhole/detail/util/deleter.hpp"
+
+#include "../datetime.hpp"
+#include "string/token.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -54,8 +55,8 @@ public:
 
 }  // namespace
 
-using detail::formatter::string::placeholder::timestamp;
-using detail::formatter::string::user;
+using string::placeholder::timestamp;
+using string::user;
 
 struct tskv_data {
     std::set<std::string> removed;

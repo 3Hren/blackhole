@@ -4,7 +4,6 @@
 
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 namespace datetime {
 
 template<typename Stream, typename Char, class Traits = std::char_traits<Char>>
@@ -61,6 +60,5 @@ public:
 };
 
 }  // namespace datetime
-}  // namespace detail
 }  // namespace v1
 }  // namespace blackhole

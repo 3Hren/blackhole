@@ -16,11 +16,12 @@
 #include "blackhole/record.hpp"
 
 #include "blackhole/detail/attribute.hpp"
-#include "blackhole/detail/formatter/string/parser.hpp"
-#include "blackhole/detail/formatter/string/token.hpp"
 #include "blackhole/detail/memory.hpp"
 #include "blackhole/detail/procname.hpp"
 #include "blackhole/detail/util/deleter.hpp"
+
+#include "string/parser.hpp"
+#include "string/token.hpp"
 
 // Optional placeholders allows to nicely format some patterns where there are non-reserved
 // attributes used and its presents is undetermined. Unlike required placeholders it does not throw
@@ -32,8 +33,6 @@ inline namespace v1 {
 namespace formatter {
 
 namespace {
-
-namespace string = blackhole::detail::formatter::string;
 
 namespace ph = string::ph;
 
