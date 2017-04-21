@@ -26,45 +26,46 @@ include_directories(BEFORE SYSTEM
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_library(${LIBRARY_NAME} SHARED
-    src/attribute
-    src/config/factory
-    src/config/json
-    src/config/node
-    src/config/option
-    src/datetime/generator.linux
-    src/datetime/generator.other
+    src/attribute.cpp
+    src/config/factory.cpp
+    src/config/json.cpp
+    src/config/node.cpp
+    src/config/option.cpp
+    src/datetime/generator.linux.cpp
+    src/datetime/generator.other.cpp
     src/essentials.cpp
     src/filter/severity.cpp
-    src/format
-    src/formatter/json
-    src/formatter/mod
+    src/format.cpp
+    src/formatter/json.cpp
+    src/formatter/mod.cpp
     src/formatter/string.cpp
-    src/formatter/string/error
-    src/formatter/string/grammar
-    src/formatter/string/parser
-    src/formatter/string/token
+    src/formatter/string/error.cpp
+    src/formatter/string/grammar.cpp
+    src/formatter/string/parser.cpp
+    src/formatter/string/token.cpp
     src/formatter/tskv.cpp
     src/handler.cpp
     src/handler/blocking.cpp
     src/handler/dev.cpp
-    src/logger
-    src/procname
-    src/record
-    src/registry
-    src/root
-    src/scope/holder
-    src/scope/manager
-    src/scope/watcher
-    src/sink/asynchronous
-    src/sink/asynchronous.p
-    src/sink/console
-    src/sink/file
-    src/sink/null
-    src/sink/socket/tcp
-    src/sink/socket/udp
-    src/sink/syslog
+    src/logger.cpp
+    src/procname.cpp
+    src/record.cpp
+    src/registry.cpp
+    src/root.cpp
+    src/scope/holder.cpp
+    src/scope/manager.cpp
+    src/scope/watcher.cpp
+    src/sink/asynchronous.cpp
+    src/sink/asynchronous.p.cpp
+    src/sink/console.cpp
+    src/sink/file.cpp
+    src/sink/null.cpp
+    src/sink/socket/tcp.cpp
+    src/sink/socket/udp.cpp
+    src/sink/syslog.cpp
     src/termcolor.cpp
-    src/wrapper)
+    src/wrapper.cpp
+)
 
 # Set the Standard version.
 include(CheckCXXCompilerFlag)
