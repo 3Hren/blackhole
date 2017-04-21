@@ -6,7 +6,7 @@
 #include <blackhole/attribute.hpp>
 #include <blackhole/record.hpp>
 #include <blackhole/sink/file.hpp>
-#include <blackhole/detail/sink/file.hpp>
+#include <src/sink/file.hpp>
 
 #include "mocks/node.hpp"
 #include "mocks/registry.hpp"

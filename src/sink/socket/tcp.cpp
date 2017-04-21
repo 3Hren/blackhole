@@ -10,9 +10,8 @@
 #include "blackhole/extensions/format.hpp"
 #include "blackhole/sink/socket/tcp.hpp"
 
-#include "blackhole/detail/memory.hpp"
-#include "blackhole/detail/util/optional.hpp"
-
+#include "../../memory.hpp"
+#include "../../util/optional.hpp"
 #include "tcp.hpp"
 
 namespace blackhole {
@@ -129,7 +128,7 @@ auto tcp_t::emit(const record_t&, const string_view& message) -> void {
 
 using sink::socket::tcp_t;
 
-using detail::util::value_or;
+using util::value_or;
 
 auto factory<tcp_t>::type() const noexcept -> const char* {
     return "tcp";

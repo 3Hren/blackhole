@@ -7,7 +7,7 @@
 #include "blackhole/filter.hpp"
 #include "blackhole/record.hpp"
 
-#include "blackhole/detail/memory.hpp"
+#include "../memory.hpp"
 
 namespace blackhole {
 inline namespace v1 {

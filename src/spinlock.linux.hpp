@@ -4,7 +4,6 @@
 
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 
 class spinlock_t {
     pthread_spinlock_t mutex;
@@ -32,6 +31,5 @@ public:
     }
 };
 
-}  // namespace detail
-}  // namespace v1
-}  // namespace blackhole
+} // namespace v1
+} // namespace blackhole

@@ -6,9 +6,8 @@
 #include "blackhole/stdext/string_view.hpp"
 #include "blackhole/sink/socket/udp.hpp"
 
-#include "blackhole/detail/memory.hpp"
-#include "blackhole/detail/util/optional.hpp"
-
+#include "../../memory.hpp"
+#include "../../util/optional.hpp"
 #include "udp.hpp"
 
 namespace blackhole {
@@ -40,7 +39,7 @@ auto udp_t::emit(const record_t&, const string_view& formatted) -> void {
 
 using sink::socket::udp_t;
 
-using detail::util::value_or;
+using util::value_or;
 
 auto factory<udp_t>::type() const noexcept -> const char* {
     return "udp";

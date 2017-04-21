@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <blackhole/detail/sink/file/flusher/repeat.hpp>
+#include <src/sink/file/flusher/repeat.hpp>
 
 namespace blackhole {
 inline namespace v1 {

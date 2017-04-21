@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <blackhole/detail/sink/file/flusher/bytecount.hpp>
+#include <src/sink/file/flusher/bytecount.hpp>
 
 namespace blackhole {
 inline namespace v1 {

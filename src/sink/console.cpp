@@ -16,11 +16,10 @@
 #include "blackhole/stdext/string_view.hpp"
 #include "blackhole/termcolor.hpp"
 
-#include "blackhole/detail/memory.hpp"
-#include "blackhole/detail/util/deleter.hpp"
-
-#include "console.hpp"
 #include "../filter/zen.hpp"
+#include "../memory.hpp"
+#include "../util/deleter.hpp"
+#include "console.hpp"
 
 namespace blackhole {
 inline namespace v1 {

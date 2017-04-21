@@ -3,9 +3,8 @@
 #include <blackhole/config/node.hpp>
 #include <blackhole/config/option.hpp>
 
-#include <blackhole/detail/memory.hpp>
-
 #include <src/config/factory.hpp>
+#include <src/memory.hpp>
 
 namespace blackhole {
 inline namespace v1 {

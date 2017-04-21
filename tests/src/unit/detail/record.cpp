@@ -6,7 +6,6 @@
 
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 namespace {
 
 TEST(recordbuf_t, FromRecordMessage) {
@@ -204,6 +203,5 @@ TEST(recordbuf_t, DefaultMove) {
 }
 
 }  // namespace
-}  // namespace detail
 }  // namespace v1
 }  // namespace blackhole
