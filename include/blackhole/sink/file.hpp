@@ -128,8 +128,8 @@ public:
         registry(registry)
     {}
 
-    auto type() const noexcept -> const char*;
-    auto from(const config::node_t& config) const -> std::unique_ptr<sink_t>;
+    auto type() const noexcept -> const char* override;
+    auto from(const config::node_t& config) const -> std::unique_ptr<sink_t> override;
 };
 
 }  // namespace v1
