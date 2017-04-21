@@ -6,9 +6,13 @@
 
 #include <boost/variant/variant.hpp>
 
+#include "blackhole/extensions/format.hpp"
+
 namespace blackhole {
 inline namespace v1 {
 namespace datetime {
+
+typedef fmt::MemoryWriter writer_type;
 
 struct literal_t {
     std::string value;
@@ -25,8 +29,7 @@ class generator_t {
 public:
     explicit generator_t(std::string pattern);
 
-    template<typename Stream>
-    void operator()(Stream& stream, const std::tm& tm, std::uint64_t usec = 0) const;
+    void operator()(writer_type& stream, const std::tm& tm, std::uint64_t usec = 0) const;
 };
 
 auto make_generator(const std::string& pattern) -> generator_t;

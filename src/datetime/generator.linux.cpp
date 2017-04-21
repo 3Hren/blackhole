@@ -11,13 +11,6 @@
 namespace blackhole {
 inline namespace v1 {
 namespace datetime {
-
-namespace {
-
-typedef fmt::MemoryWriter writer_type;
-
-}  // namespace
-
 namespace {
 
 struct visitor_t : public boost::static_visitor<> {
@@ -76,12 +69,10 @@ generator_t::generator_t(std::string pattern) {
     }
 }
 
-template<typename Stream>
-auto
-generator_t::operator()(Stream& stream, const std::tm& tm, std::uint64_t usec) const -> void {
+auto generator_t::operator()(writer_type& stream, const std::tm& tm, std::uint64_t usec) const -> void {
     visitor_t visitor(stream, tm, usec);
 
-    for (const auto& token : tokens) {
+    for (auto& token : tokens) {
         boost::apply_visitor(visitor, token);
     }
 }
@@ -90,11 +81,8 @@ auto make_generator(const std::string& pattern) -> generator_t {
     return generator_t(pattern);
 }
 
-template
-auto generator_t::operator()<writer_type>(writer_type&, const std::tm&, std::uint64_t) const -> void;
-
-}  // namespace datetime
-}  // namespace v1
-}  // namespace blackhole
+} // namespace datetime
+} // namespace v1
+} // namespace blackhole
 
 #endif
