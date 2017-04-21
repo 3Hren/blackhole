@@ -11,7 +11,9 @@
 #include "mocks/handler.hpp"
 
 namespace blackhole {
-namespace testing {
+namespace {
+
+using namespace testing;
 
 using ::testing::Invoke;
 using ::testing::Throw;
@@ -462,5 +464,49 @@ TEST(RootLogger, IgnoresMarginalExceptionsFromHandlers) {
     EXPECT_EQ("logging core error occurred: unknown\n", actual);
 }
 
-}  // namespace testing
-}  // namespace blackhole
+TEST(RootLogger, BuilderAddHandler) {
+    std::unique_ptr<mock::handler_t> d(new mock::handler_t);
+
+    mock::handler_t* handler_view = d.get();
+    std::unique_ptr<handler_t> handler(std::move(d));
+
+    EXPECT_CALL(*handler_view, handle(_))
+        .Times(1)
+        .WillOnce(Invoke([](const record_t& record) {
+            EXPECT_EQ("GET /porn.png HTTP/1.1", record.message().to_string());
+            EXPECT_EQ("GET /porn.png HTTP/1.1", record.formatted().to_string());
+            EXPECT_EQ(0, record.severity());
+            EXPECT_EQ(0, record.attributes().size());
+        }));
+
+    builder<root_logger_t> builder;
+    builder.add(std::move(handler));
+    auto logger = std::move(builder).build();
+
+    logger->log(0, "GET /porn.png HTTP/1.1");
+}
+
+TEST(RootLogger, BuilderChainedAddHandler) {
+    std::unique_ptr<mock::handler_t> d(new mock::handler_t);
+
+    mock::handler_t* handler_view = d.get();
+    std::unique_ptr<handler_t> handler(std::move(d));
+
+    EXPECT_CALL(*handler_view, handle(_))
+        .Times(1)
+        .WillOnce(Invoke([](const record_t& record) {
+            EXPECT_EQ("GET /porn.png HTTP/1.1", record.message().to_string());
+            EXPECT_EQ("GET /porn.png HTTP/1.1", record.formatted().to_string());
+            EXPECT_EQ(0, record.severity());
+            EXPECT_EQ(0, record.attributes().size());
+        }));
+
+    auto logger = builder<root_logger_t>()
+        .add(std::move(handler))
+        .build();
+
+    logger->log(0, "GET /porn.png HTTP/1.1");
+}
+
+} // namespace
+} // namespace blackhole
