@@ -5,7 +5,7 @@
 #include <blackhole/attribute.hpp>
 #include "blackhole/extensions/writer.hpp"
 
-#include <blackhole/detail/attribute.hpp>
+#include <src/attribute.hpp>
 
 namespace {
 
@@ -13,7 +13,7 @@ struct user_t {
     std::string name;
 };
 
-}  // namespace
+} // namespace
 
 namespace blackhole {
 inline namespace v1 {
@@ -25,15 +25,12 @@ struct display_traits<user_t> {
     }
 };
 
-}  // namespace v1
-}  // namespace blackhole
+} // namespace v1
+} // namespace blackhole
 
 namespace blackhole {
-namespace testing {
 namespace attribute {
-
-using ::blackhole::attribute::value_t;
-using ::blackhole::attribute::view_t;
+namespace {
 
 TEST(view_t, Default) {
     view_t v;
@@ -181,8 +178,6 @@ TEST(view_t, DefaultVisit) {
     EXPECT_TRUE(boost::apply_visitor(visitor_t(), v.inner().value));
 }
 
-namespace {
-
 struct view_visitor : public view_t::visitor_t {
     int value;
 
@@ -198,8 +193,6 @@ struct view_visitor : public view_t::visitor_t {
     auto operator()(const view_t::string_type&) -> void {}
     auto operator()(const view_t::function_type&) -> void {}
 };
-
-}  // namespace
 
 TEST(view_t, Visitor) {
     view_t v(42);
@@ -302,8 +295,6 @@ TEST(value_t, FromString) {
     EXPECT_EQ("le message", blackhole::attribute::get<std::string>(v));
 }
 
-namespace {
-
 struct value_visitor : public value_t::visitor_t {
     int value;
 
@@ -320,8 +311,6 @@ struct value_visitor : public value_t::visitor_t {
     auto operator()(const value_t::function_type&) -> void {}
 };
 
-}  // namespace
-
 TEST(value_t, Visitor) {
     value_t v(42);
 
@@ -334,6 +323,6 @@ TEST(value_t, Visitor) {
     EXPECT_EQ(42, visitor.value);
 }
 
-}  // namespace attribute
-}  // namespace testing
-}  // namespace blackhole
+} // namespace
+} // namespace attribute
+} // namespace blackhole

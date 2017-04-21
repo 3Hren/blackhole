@@ -15,11 +15,11 @@
 #include "blackhole/formatter.hpp"
 #include "blackhole/record.hpp"
 
-#include "blackhole/detail/attribute.hpp"
 #include "blackhole/detail/memory.hpp"
 #include "blackhole/detail/procname.hpp"
 #include "blackhole/detail/util/deleter.hpp"
 
+#include "../attribute.hpp"
 #include "string/parser.hpp"
 #include "string/token.hpp"
 
