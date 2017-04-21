@@ -6,24 +6,27 @@
 
 #include <blackhole/extensions/format.hpp>
 
-#include <blackhole/detail/datetime.hpp>
+#include <src/datetime.hpp>
 
 namespace blackhole {
 namespace testing {
+namespace {
 
-using blackhole::detail::datetime::make_generator;
+using blackhole::datetime::make_generator;
 
 class datetime_t : public ::testing::Test {
 protected:
     std::tm tm;
     std::uint64_t usec;
 
-    void SetUp() {
+    void
+    SetUp() {
         tm = std::tm();
         usec = 0;
     }
 
-    auto generate(const std::string& pattern) const -> std::string {
+    auto
+    generate(const std::string& pattern) const -> std::string {
         fmt::MemoryWriter wr;
 
         const auto generator = make_generator(pattern);
@@ -35,7 +38,8 @@ protected:
 namespace {
 
 template<std::size_t N>
-inline std::string using_strftime(const char(&format)[N], const std::tm& tm) {
+std::string
+using_strftime(const char (&format)[N], const std::tm& tm) {
     char buffer[128];
     std::size_t ret = std::strftime(buffer, sizeof(buffer), format, &tm);
     BOOST_ASSERT(ret > 0);
@@ -43,7 +47,7 @@ inline std::string using_strftime(const char(&format)[N], const std::tm& tm) {
     return std::string(buffer, ret);
 }
 
-}  // namespace
+} // namespace
 
 TEST_F(datetime_t, DayOfMonthNum) {
     tm.tm_mday = 23;
@@ -364,12 +368,13 @@ TEST_F(datetime_t, Large) {
     std::string pattern("%Y-%m-%d %H:%M:%S");
     std::string expected("2014-02-23 12:20:30");
     for (int i = 0; i < 40; ++i) {
-        pattern  += " || %Y-%m-%d %H:%M:%S";
+        pattern += " || %Y-%m-%d %H:%M:%S";
         expected += " || 2014-02-23 12:20:30";
     }
 
     EXPECT_EQ(expected, generate(pattern));
 }
 
-}  // namespace testing
-}  // namespace blackhole
+} // namespace
+} // namespace testing
+} // namespace blackhole

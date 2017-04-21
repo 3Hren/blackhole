@@ -1,6 +1,6 @@
 #ifdef __APPLE__
 
-#include "blackhole/detail/datetime/other/generator.hpp"
+#include "generator.other.hpp"
 
 #include <ctime>
 #include <functional>
@@ -12,11 +12,10 @@
 
 #include "blackhole/extensions/format.hpp"
 
-#include "blackhole/detail/datetime/other/stream.hpp"
+#include "stream.hpp"
 
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 namespace datetime {
 
 namespace {
@@ -623,7 +622,6 @@ template
 auto generator_t::operator()<writer_type>(writer_type&, const std::tm&, std::uint64_t) const -> void;
 
 }  // namespace datetime
-}  // namespace detail
 }  // namespace v1
 }  // namespace blackhole
 

@@ -22,11 +22,11 @@
 #include "blackhole/extensions/writer.hpp"
 
 #include "blackhole/detail/attribute.hpp"
-#include "blackhole/detail/datetime.hpp"
 #include "blackhole/detail/memory.hpp"
 #include "blackhole/detail/util/deleter.hpp"
 
 #include "json.hpp"
+#include "src/datetime.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -468,7 +468,7 @@ auto builder<json_t>::severity(std::vector<std::string> sevmap) && -> builder&& 
 }
 
 auto builder<json_t>::timestamp(const std::string& pattern) & -> builder& {
-    auto generator = detail::datetime::make_generator(pattern);
+    auto generator = datetime::make_generator(pattern);
 
     d->timestamp = [=](const record_t::time_point& timestamp, writer_t& wr) {
         const auto time = record_t::clock_type::to_time_t(timestamp);

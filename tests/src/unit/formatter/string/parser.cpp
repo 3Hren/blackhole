@@ -3,26 +3,27 @@
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/variant/get.hpp>
 
-#include <blackhole/detail/formatter/string/parser.hpp>
+#include <src/formatter/string/parser.hpp>
 
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 namespace formatter {
 namespace string {
 namespace {
 
 namespace ph {
-    using detail::formatter::string::ph::attribute;
-}  // namespace ph
 
-using detail::formatter::string::ph::generic;
-using detail::formatter::string::ph::leftover_t;
-using detail::formatter::string::ph::message_t;
-using detail::formatter::string::ph::process;
-using detail::formatter::string::ph::severity;
-using detail::formatter::string::ph::thread;
-using detail::formatter::string::ph::timestamp;
+using string::ph::attribute;
+
+} // namespace ph
+
+using string::ph::generic;
+using string::ph::leftover_t;
+using string::ph::message_t;
+using string::ph::process;
+using string::ph::severity;
+using string::ph::thread;
+using string::ph::timestamp;
 
 TEST(parser_t, Empty) {
     parser_t parser("");
@@ -446,6 +447,5 @@ TEST(parser_t, RealWorld) {
 }  // namespace
 }  // namespace string
 }  // namespace formatter
-}  // namespace detail
 }  // namespace v1
 }  // namespace blackhole

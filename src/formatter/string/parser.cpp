@@ -1,13 +1,12 @@
-#include "blackhole/detail/formatter/string/parser.hpp"
+#include "parser.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/variant/variant.hpp>
 
-#include "blackhole/detail/formatter/string/grammar.hpp"
+#include "grammar.hpp"
 
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 namespace formatter {
 namespace string {
 
@@ -325,8 +324,7 @@ parser_t::throw_(Args&&... args) -> void {
         std::forward<Args>(args)...);
 }
 
-}  // namespace string
-}  // namespace formatter
-}  // namespace detail
-}  // namespace v1
-}  // namespace blackhole
+} // namespace string
+} // namespace formatter
+} // namespace v1
+} // namespace blackhole

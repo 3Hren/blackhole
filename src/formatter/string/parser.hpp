@@ -6,12 +6,11 @@
 
 #include <boost/optional/optional.hpp>
 
-#include "blackhole/detail/formatter/string/error.hpp"
-#include "blackhole/detail/formatter/string/token.hpp"
+#include "error.hpp"
+#include "token.hpp"
 
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 namespace formatter {
 namespace string {
 
@@ -75,6 +74,5 @@ private:
 
 }  // namespace string
 }  // namespace formatter
-}  // namespace detail
 }  // namespace v1
 }  // namespace blackhole

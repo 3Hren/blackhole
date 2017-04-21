@@ -5,11 +5,10 @@
 
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 namespace datetime {
 
 struct context_t;
-typedef void(*token_t)(context_t&);
+typedef void (*token_t)(context_t&);
 
 class generator_t {
     std::vector<token_t> tokens;
@@ -24,7 +23,6 @@ public:
 
 auto make_generator(const std::string& pattern) -> generator_t;
 
-}  // namespace datetime
-}  // namespace detail
-}  // namespace v1
-}  // namespace blackhole
+} // namespace datetime
+} // namespace v1
+} // namespace blackhole

@@ -218,15 +218,15 @@ if (ENABLE_TESTING)
         tests/src/mocks/handler
         tests/src/mocks/logger
         tests/src/mocks/sink
-        tests/src/unit/detail/formatter/string/parser.cpp
         tests/src/unit/detail/handler/blocking.cpp
         tests/src/unit/detail/mpsc
         tests/src/unit/detail/record
-        tests/src/unit/formatter/grammar
         tests/src/unit/formatter/json
-        tests/src/unit/formatter/tskv.cpp
         tests/src/unit/formatter/string.cpp
-        tests/src/unit/formatter/token
+        tests/src/unit/formatter/string/grammar.cpp
+        tests/src/unit/formatter/string/parser.cpp
+        tests/src/unit/formatter/string/token.cpp
+        tests/src/unit/formatter/tskv.cpp
         tests/src/unit/sink/asynchronous
         tests/src/unit/sink/console.cpp
         tests/src/unit/sink/console/builder.cpp

@@ -1,8 +1,7 @@
-#include "blackhole/detail/formatter/string/error.hpp"
+#include "error.hpp"
 
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 namespace formatter {
 namespace string {
 
@@ -41,6 +40,5 @@ invalid_placeholder_t::invalid_placeholder_t(std::size_t pos, const std::string&
 
 }  // namespace string
 }  // namespace formatter
-}  // namespace detail
 }  // namespace v1
 }  // namespace blackhole

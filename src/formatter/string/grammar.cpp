@@ -21,13 +21,12 @@
 #include <boost/spirit/home/qi/operator/sequence.hpp>
 #include <boost/spirit/home/qi/string/lit.hpp>
 
-#include <blackhole/detail/formatter/string/error.hpp>
-#include <blackhole/detail/formatter/string/grammar.hpp>
-#include <blackhole/detail/formatter/string/grammar.inl.hpp>
+#include "error.hpp"
+#include "grammar.hpp"
+#include "grammar.inl.hpp"
 
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 namespace formatter {
 namespace string {
 namespace {
@@ -224,8 +223,7 @@ auto parse_leftover(const std::string& pattern) -> ph::leftover_t {
     return result;
 }
 
-}  // namespace string
-}  // namespace formatter
-}  // namespace detail
-}  // namespace v1
-}  // namespace blackhole
+} // namespace string
+} // namespace formatter
+} // namespace v1
+} // namespace blackhole
