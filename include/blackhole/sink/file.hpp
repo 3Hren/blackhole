@@ -132,5 +132,5 @@ public:
     auto from(const config::node_t& config) const -> std::unique_ptr<sink_t> override;
 };
 
-}  // namespace v1
-}  // namespace blackhole
+} // namespace v1
+} // namespace blackhole

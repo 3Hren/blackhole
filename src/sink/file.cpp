@@ -210,5 +210,5 @@ auto factory<sink::file_t>::from(const config::node_t& config) const -> std::uni
 
 template auto deleter_t::operator()(builder<sink::file_t>::inner_t* value) -> void;
 
-}  // namespace v1
-}  // namespace blackhole
+} // namespace v1
+} // namespace blackhole
