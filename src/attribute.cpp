@@ -6,7 +6,7 @@
 #include "hack/addressof.hpp"
 #include <boost/variant/get.hpp>
 
-#include "blackhole/detail/attribute.hpp"
+#include "attribute.hpp"
 
 namespace blackhole {
 inline namespace v1 {
