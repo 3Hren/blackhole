@@ -29,6 +29,7 @@ struct display_traits<user_t> {
 } // namespace blackhole
 
 namespace blackhole {
+inline namespace v1 {
 namespace attribute {
 namespace {
 
@@ -325,4 +326,5 @@ TEST(value_t, Visitor) {
 
 } // namespace
 } // namespace attribute
+} // namespace v1
 } // namespace blackhole
