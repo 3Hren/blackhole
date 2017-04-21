@@ -10,8 +10,6 @@
 
 #include <boost/assert.hpp>
 
-#include "blackhole/extensions/format.hpp"
-
 #include "stream.hpp"
 
 namespace blackhole {
@@ -20,10 +18,9 @@ namespace datetime {
 
 namespace {
 
-typedef fmt::MemoryWriter writer_type;
 typedef ostream_adapter<writer_type> stream_type;
 
-}  // namespace
+} // namespace
 
 struct context_t {
     // TODO: Get rid of intermediate stream for facets. Its construction consumes ~70ns, which is
@@ -597,12 +594,10 @@ generator_t::generator_t(std::vector<token_t> tokens, std::vector<std::string> l
     literals(std::move(literals))
 {}
 
-template<typename Stream>
-auto
-generator_t::operator()(Stream& stream, const std::tm& tm, std::uint64_t usec) const -> void {
+auto generator_t::operator()(writer_type& stream, const std::tm& tm, std::uint64_t usec) const -> void {
     context_t context{stream, tm, usec, literals};
 
-    for (const auto& token : tokens) {
+    for (auto& token : tokens) {
         token(context);
     }
 }
@@ -618,11 +613,8 @@ auto make_generator(const std::string& pattern) -> generator_t {
     return generator_t(std::move(tokens), std::move(literals));
 }
 
-template
-auto generator_t::operator()<writer_type>(writer_type&, const std::tm&, std::uint64_t) const -> void;
-
-}  // namespace datetime
-}  // namespace v1
-}  // namespace blackhole
+} // namespace datetime
+} // namespace v1
+} // namespace blackhole
 
 #endif

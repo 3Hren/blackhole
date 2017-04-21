@@ -162,6 +162,8 @@ private:
     auto construct(T&& value) -> void;
 };
 
+extern template auto value_t::construct<value_t::string_type>(value_t::string_type&&) -> void;
+
 /// Represents an attribute value holder view, containing only lightweight views of the actual
 /// values.
 ///
@@ -309,6 +311,9 @@ private:
         display_traits<T>::apply(*static_cast<const T*>(value), wr);
     }
 };
+
+extern template auto view_t::construct<string_view>(string_view&& value) -> void;
+extern template auto view_t::construct<view_t::function_type>(view_t::function_type&& value) -> void;
 
 /// Retrieves a value of a specified, but yet restricted type, from a given attribute value.
 ///
