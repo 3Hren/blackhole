@@ -4,7 +4,6 @@
 
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 namespace util {
 
 /// This hack is required because of `boost::optional` 1.46, which I have to support and which
@@ -18,7 +17,6 @@ auto value_or(const boost::optional<T>& optional, F fn) -> T {
     }
 }
 
-}  // namespace util
-}  // namespace detail
-}  // namespace v1
-}  // namespace blackhole
+} // namespace util
+} // namespace v1
+} // namespace blackhole

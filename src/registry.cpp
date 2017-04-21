@@ -13,9 +13,8 @@
 #include "blackhole/root.hpp"
 #include "blackhole/sink.hpp"
 
-#include "blackhole/detail/memory.hpp"
-
 #include "essentials.hpp"
+#include "memory.hpp"
 
 namespace blackhole {
 inline namespace v1 {

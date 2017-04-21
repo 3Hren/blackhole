@@ -6,8 +6,8 @@
 #include <blackhole/stdext/string_view.hpp>
 #include <blackhole/sink/syslog.hpp>
 
-#include <blackhole/detail/procname.hpp>
-#include <blackhole/detail/sink/syslog.hpp>
+#include <src/procname.hpp>
+#include <src/sink/syslog.hpp>
 
 #include "mocks/node.hpp"
 #include "mocks/registry.hpp"
@@ -61,7 +61,7 @@ TEST(syslog_t, Factory) {
 TEST(syslog_t, Default) {
     syslog_t syslog;
 
-    EXPECT_EQ(detail::procname().to_string(), syslog.identity());
+    EXPECT_EQ(procname().to_string(), syslog.identity());
     EXPECT_EQ(LOG_PID, syslog.option());
     EXPECT_EQ(LOG_USER, syslog.facility());
 }

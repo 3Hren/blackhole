@@ -10,11 +10,11 @@
 #include "blackhole/stdext/string_view.hpp"
 #include "blackhole/record.hpp"
 
-#include "blackhole/detail/sink/file.hpp"
-#include "blackhole/detail/sink/file/flusher/bytecount.hpp"
-#include "blackhole/detail/sink/file/flusher/repeat.hpp"
-#include "blackhole/detail/sink/file/stream.hpp"
-#include "blackhole/detail/util/deleter.hpp"
+#include "../util/deleter.hpp"
+#include "file.hpp"
+#include "file/flusher/bytecount.hpp"
+#include "file/flusher/repeat.hpp"
+#include "file/stream.hpp"
 
 namespace blackhole {
 inline namespace v1 {

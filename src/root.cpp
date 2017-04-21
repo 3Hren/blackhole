@@ -12,14 +12,11 @@
 #include "blackhole/scope/manager.hpp"
 #include "blackhole/scope/watcher.hpp"
 
-#include "blackhole/detail/spinlock.hpp"
-#include "blackhole/detail/util/deleter.hpp"
+#include "spinlock.hpp"
+#include "util/deleter.hpp"
 
 namespace blackhole {
 inline namespace v1 {
-
-using detail::spinlock_t;
-
 namespace {
 
 using scope::watcher_t;

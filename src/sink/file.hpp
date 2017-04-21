@@ -11,8 +11,7 @@
 #include "blackhole/sink.hpp"
 #include "blackhole/sink/file.hpp"
 
-#include "blackhole/detail/memory.hpp"
-
+#include "../memory.hpp"
 #include "file/flusher.hpp"
 #include "file/stream.hpp"
 

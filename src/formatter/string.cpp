@@ -15,11 +15,10 @@
 #include "blackhole/formatter.hpp"
 #include "blackhole/record.hpp"
 
-#include "blackhole/detail/memory.hpp"
-#include "blackhole/detail/procname.hpp"
-#include "blackhole/detail/util/deleter.hpp"
-
 #include "../attribute.hpp"
+#include "../memory.hpp"
+#include "../procname.hpp"
+#include "../util/deleter.hpp"
 #include "string/parser.hpp"
 #include "string/token.hpp"
 
@@ -190,7 +189,7 @@ public:
     }
 
     auto operator()(const ph::process<name>& token) const -> void {
-        writer.write(token.spec, detail::procname().data());
+        writer.write(token.spec, procname().data());
     }
 
     auto operator()(const ph::thread<id>& token) const -> void {

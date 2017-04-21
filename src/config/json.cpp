@@ -6,7 +6,7 @@
 #include <rapidjson/error/en.h>
 #include <rapidjson/istreamwrapper.h>
 
-#include "blackhole/detail/memory.hpp"
+#include "../memory.hpp"
 
 namespace blackhole {
 inline namespace v1 {

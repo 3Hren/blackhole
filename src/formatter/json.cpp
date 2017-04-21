@@ -21,11 +21,10 @@
 #include "blackhole/record.hpp"
 #include "blackhole/extensions/writer.hpp"
 
-#include "blackhole/detail/memory.hpp"
-#include "blackhole/detail/util/deleter.hpp"
-
 #include "../attribute.hpp"
 #include "../datetime.hpp"
+#include "../memory.hpp"
+#include "../util/deleter.hpp"
 #include "json.hpp"
 
 namespace blackhole {

@@ -11,8 +11,6 @@ namespace blackhole {
 inline namespace v1 {
 namespace sink {
 
-using detail::recordbuf_t;
-
 /// I can imagine: drop, sleep, wait.
 class overflow_policy_t {
 public:

@@ -1,4 +1,4 @@
-#include "blackhole/detail/procname.hpp"
+#include "procname.hpp"
 
 #ifdef __linux__
 #   include <sys/types.h>
@@ -14,7 +14,6 @@
 
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 
 namespace {
 
@@ -34,13 +33,12 @@ auto procname(pid_t pid) -> stdext::string_view {
 #endif
 }
 
-}  // namespace
+} // namespace
 
 auto procname() -> stdext::string_view {
     static const stdext::string_view name = procname(::getpid());
     return name;
 }
 
-}  // namespace detail
-}  // namespace v1
-}  // namespace blackhole
+} // namespace v1
+} // namespace blackhole

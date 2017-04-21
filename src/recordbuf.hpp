@@ -20,7 +20,6 @@
 
 namespace blackhole {
 inline namespace v1 {
-namespace detail {
 
 struct into_owned_t {
     typedef attribute::value_t result_type;
@@ -44,6 +43,9 @@ struct into_owned_t {
 
 /// Represents a trait for mapping an owned types to their associated lightweight view types.
 // TODO: Partially copies the same trait from `blackhole::v1` namespace.
+
+namespace detail {
+
 template<typename T>
 struct view_of;
 
@@ -69,20 +71,22 @@ struct view_of<attributes_t> {
     }
 };
 
+} // namespace detail
+
 template<typename T>
 struct owned_pair {
     T data;
-    typename view_of<T>::type view;
+    typename detail::view_of<T>::type view;
 
     explicit owned_pair(T value) :
         data(std::move(value)),
-        view(view_of<T>::from(data))
+        view(detail::view_of<T>::from(data))
     {}
 
     owned_pair(const owned_pair& other) = delete;
     owned_pair(owned_pair&& other) :
         data(std::move(other.data)),
-        view(view_of<T>::from(data))
+        view(detail::view_of<T>::from(data))
     {}
 
     auto operator=(const owned_pair& other) -> owned_pair& = delete;
@@ -90,7 +94,7 @@ struct owned_pair {
         if (this != &other) {
             data = std::move(other.data);
             view = std::move(other.view);
-            view = view_of<T>::from(data);
+            view = detail::view_of<T>::from(data);
         }
 
         return *this;
@@ -202,6 +206,5 @@ private:
     }
 };
 
-}  // namespace detail
-}  // namespace v1
-}  // namespace blackhole
+} // namespace v1
+} // namespace blackhole

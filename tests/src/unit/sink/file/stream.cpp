@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <blackhole/detail/sink/file/stream.hpp>
+#include <src/sink/file/stream.hpp>
 
 namespace blackhole {
 inline namespace v1 {

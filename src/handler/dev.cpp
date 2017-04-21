@@ -12,11 +12,10 @@
 #include "blackhole/record.hpp"
 #include "blackhole/termcolor.hpp"
 
-#include "blackhole/detail/memory.hpp"
-#include "blackhole/detail/util/deleter.hpp"
-
 #include "../attribute.hpp"
 #include "../datetime.hpp"
+#include "../memory.hpp"
+#include "../util/deleter.hpp"
 
 namespace blackhole {
 inline namespace v1 {

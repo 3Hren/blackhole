@@ -7,8 +7,8 @@
 #include "blackhole/stdext/string_view.hpp"
 #include "blackhole/record.hpp"
 
-#include "blackhole/detail/procname.hpp"
-#include "blackhole/detail/sink/syslog.hpp"
+#include "../procname.hpp"
+#include "syslog.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -17,7 +17,7 @@ namespace sink {
 syslog_t::syslog_t() {
    data.option = LOG_PID;
    data.facility = LOG_USER;
-   data.identity = detail::procname().to_string();
+   data.identity = procname().to_string();
 
    ::openlog(identity().c_str(), option(), facility());
 }

@@ -9,9 +9,8 @@
 #include "blackhole/registry.hpp"
 #include "blackhole/sink.hpp"
 
-#include "blackhole/detail/memory.hpp"
-#include "blackhole/detail/util/deleter.hpp"
-
+#include "../memory.hpp"
+#include "../util/deleter.hpp"
 #include "blocking.hpp"
 
 namespace blackhole {
