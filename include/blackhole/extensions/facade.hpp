@@ -7,6 +7,7 @@
 #endif
 
 #include "blackhole/extensions/facade.inl.hpp"
+#include "blackhole/stdext/source_location.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -21,11 +22,17 @@ public:
 
 private:
     std::reference_wrapper<wrapped_type> wrapped;
+    stdext::source_location loc;
 
 public:
     /// Creates a logger facade by wrapping the given logger.
-    constexpr explicit logger_facade(wrapped_type& wrapped) noexcept:
+    constexpr explicit logger_facade(wrapped_type& wrapped) noexcept :
         wrapped(wrapped)
+    {}
+
+    constexpr explicit logger_facade(wrapped_type& wrapped, stdext::source_location loc) noexcept :
+        wrapped(wrapped),
+        loc(loc)
     {}
 
     /// Returns an lvalue reference to the the underlying logger.
@@ -95,7 +102,16 @@ template<typename Logger>
 inline
 auto
 logger_facade<Logger>::log(int severity, const string_view& pattern) -> void {
-    inner().log(severity, pattern);
+    if (loc.is_valid()) {
+        attribute_list loc_attributes{
+            {"line", loc.line()},
+            {"file", string_view(loc.file_name())},
+        };
+        attribute_pack pack{loc_attributes};
+        inner().log(severity, pattern, pack);
+    } else {
+        inner().log(severity, pattern);
+    }
 }
 
 template<typename Logger>
@@ -110,8 +126,17 @@ template<typename Logger>
 inline
 auto
 logger_facade<Logger>::log(int severity, const string_view& pattern, const attribute_list& attributes) -> void {
-    attribute_pack pack{attributes};
-    inner().log(severity, pattern, pack);
+    if (loc.is_valid()) {
+        attribute_list loc_attributes{
+            {"line", loc.line()},
+            {"file", string_view(loc.file_name())},
+        };
+        attribute_pack pack{attributes, loc_attributes};
+        inner().log(severity, pattern, pack);
+    } else {
+        attribute_pack pack{attributes};
+        inner().log(severity, pattern, pack);
+    }
 }
 
 #if (__GNUC__ >= 6 || defined(__clang__)) && defined(__cpp_constexpr) && __cpp_constexpr >= 201304
@@ -127,9 +152,18 @@ logger_facade<Logger>::log(int severity, const detail::formatter<N>& pattern, co
         return {wr.data(), wr.size()};
     };
 
-    attribute_pack pack;
-    // TODO: Pass non-empty pattern.
-    inner().log(severity, {"", std::cref(fn)}, pack);
+    if (loc.is_valid()) {
+        attribute_list loc_attributes{
+            {"line", loc.line()},
+            {"file", string_view(loc.file_name())},
+        };
+        attribute_pack pack{loc_attributes};
+        inner().log(severity, {"", std::cref(fn)}, pack);
+    } else {
+        attribute_pack pack;
+        // TODO: Pass non-empty pattern.
+        inner().log(severity, {"", std::cref(fn)}, pack);
+    }
 }
 
 #endif
@@ -144,8 +178,17 @@ logger_facade<Logger>::select(int severity, const string_view& pattern, const Ar
     fmt::MemoryWriter wr;
     const auto fn = std::bind(&detail::gcc::write_all<Args...>, std::ref(wr), pattern.data(), std::cref(args)...);
 
-    attribute_pack pack;
-    inner().log(severity, {pattern, std::cref(fn)}, pack);
+    if (loc.is_valid()) {
+        attribute_list loc_attributes{
+            {"line", loc.line()},
+            {"file", string_view(loc.file_name())},
+        };
+        attribute_pack pack{ loc_attributes};
+        inner().log(severity, {pattern, std::cref(fn)}, pack);
+    } else {
+        attribute_pack pack;
+        inner().log(severity, {pattern, std::cref(fn)}, pack);
+    }
 }
 
 template<typename Logger>
@@ -155,7 +198,14 @@ auto
 logger_facade<Logger>::select(int severity, const string_view& pattern, const Args&... args) ->
     typename std::enable_if<detail::with_attributes<Args...>::value>::type
 {
-    detail::without_tail<detail::select_t, Args...>::type::apply(inner(), severity, pattern, args...);
+    detail::without_tail<detail::select_t, Args...>::type::apply(inner(), severity, pattern, loc, args...);
+}
+
+template<typename T>
+constexpr auto make_facade(T& log, stdext::source_location loc = stdext::source_location::current())
+    -> logger_facade<T>
+{
+    return logger_facade<T>(log, loc);
 }
 
 } // namespace v1

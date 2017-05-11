@@ -3,8 +3,9 @@
 #include <functional>
 
 #include "blackhole/attributes.hpp"
-#include "blackhole/stdext/string_view.hpp"
 #include "blackhole/extensions/writer.hpp"
+#include "blackhole/stdext/source_location.hpp"
+#include "blackhole/stdext/string_view.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -83,14 +84,25 @@ template<typename... Args>
 struct select_t {
     template<typename Logger>
     static
-    auto apply(Logger& log, int severity, const string_view& pattern, const Args&... args,
+    auto apply(Logger& log, int severity, const string_view& pattern,
+        const stdext::source_location& loc,
+        const Args&... args,
         const attribute_list& attributes) -> void
     {
         fmt::MemoryWriter wr;
         const auto fn = std::bind(&gcc::write_all<Args...>, std::ref(wr), pattern.data(), std::cref(args)...);
 
-        attribute_pack pack{attributes};
-        log.log(severity, {pattern, std::cref(fn)}, pack);
+        if (loc.is_valid()) {
+            attribute_list loc_attributes{
+                {"line", loc.line()},
+                {"file", string_view(loc.file_name())},
+            };
+            attribute_pack pack{attributes, loc_attributes};
+            log.log(severity, {pattern, std::cref(fn)}, pack);
+        } else {
+            attribute_pack pack{attributes};
+            log.log(severity, {pattern, std::cref(fn)}, pack);
+        }
     }
 };
 

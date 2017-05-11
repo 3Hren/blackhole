@@ -58,6 +58,11 @@ public:
         size_(N - 1)
     {}
 
+    constexpr basic_string_view(const Char* s) :
+        data_(s),
+        size_(Traits::length(s))
+    {}
+
     /// Constructs a view of the first `size` characters of the character array starting with the
     /// element pointed by `literal`.
     ///
