@@ -56,6 +56,35 @@ TEST(overflow_policy_factory_t, ThrowsIfRequestedNonRegisteredPolicy) {
     EXPECT_THROW(overflow_policy_factory_t().create(""), std::invalid_argument);
 }
 
+TEST(asynchronous_t, Builder) {
+    std::unique_ptr<mock::sink_t> wrapped(new mock::sink_t);
+
+    builder<asynchronous_t> builder(std::move(wrapped));
+    auto sink = std::move(builder).build();
+
+    EXPECT_EQ(1024, dynamic_cast<asynchronous_t&>(*sink).capacity());
+}
+
+TEST(asynchronous_t, BuilderSetFactor) {
+    std::unique_ptr<mock::sink_t> wrapped(new mock::sink_t);
+
+    builder<asynchronous_t> builder(std::move(wrapped));
+    builder.factor(5);
+    auto sink = std::move(builder).build();
+
+    EXPECT_EQ(32, dynamic_cast<asynchronous_t&>(*sink).capacity());
+}
+
+TEST(asynchronous_t, BuilderSetFactorFlow) {
+    std::unique_ptr<mock::sink_t> wrapped(new mock::sink_t);
+
+    auto sink = builder<asynchronous_t>(std::move(wrapped))
+        .factor(5)
+        .build();
+
+    EXPECT_EQ(32, dynamic_cast<asynchronous_t&>(*sink).capacity());
+}
+
 }  // namespace
 }  // namespace sink
 }  // namespace v1

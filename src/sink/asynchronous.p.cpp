@@ -87,6 +87,10 @@ asynchronous_t::~asynchronous_t() {
     thread.join();
 }
 
+auto asynchronous_t::capacity() const -> std::size_t {
+    return queue.capacity();
+}
+
 auto asynchronous_t::emit(const record_t& record, const string_view& message) -> void {
     while (true) {
         // TODO: Uncomment.

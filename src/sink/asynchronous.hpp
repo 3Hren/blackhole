@@ -65,6 +65,9 @@ public:
 
     ~asynchronous_t();
 
+    /// Returns the message queue capacity in number of events.
+    auto capacity() const -> std::size_t;
+
     auto emit(const record_t& record, const string_view& message) -> void;
 
 private:

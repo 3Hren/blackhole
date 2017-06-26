@@ -31,6 +31,28 @@ class asynchronous_t;
 
 }  // namespace sink
 
+template<>
+class builder<sink::asynchronous_t> {
+    class inner_t;
+    std::unique_ptr<inner_t, deleter_t> d;
+
+public:
+    /// Constructs a sink builder from some other sink.
+    ///
+    /// The ownership of the specified sink is transferred to the builder.
+    ///
+    /// \param wrapped The target sink (usually the blocking one) that is need to make asynchronous.
+    explicit builder(std::unique_ptr<sink_t> wrapped);
+
+    /// Sets the queue size factor.
+    auto factor(std::size_t value) & -> builder&;
+    auto factor(std::size_t value) && -> builder&&;
+
+    /// Consumes this builder yielding a newly created asynchronous sink with the options
+    /// configured.
+    auto build() && -> std::unique_ptr<sink_t>;
+};
+
 /// Represents asynchronous sink factory.
 ///
 /// Register an instance of this class in the registry to be able to construct asynchronous sinks
