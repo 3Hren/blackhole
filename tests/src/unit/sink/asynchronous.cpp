@@ -85,6 +85,38 @@ TEST(asynchronous_t, BuilderSetFactorFlow) {
     EXPECT_EQ(32, dynamic_cast<asynchronous_t&>(*sink).capacity());
 }
 
+TEST(asynchronous_t, BuilderSetDropOverflowPolicy) {
+    std::unique_ptr<mock::sink_t> wrapped(new mock::sink_t);
+
+    builder<asynchronous_t> builder(std::move(wrapped));
+    builder.drop();
+    std::move(builder).build();
+}
+
+TEST(asynchronous_t, BuilderSetDropOverflowPolicyFlow) {
+    std::unique_ptr<mock::sink_t> wrapped(new mock::sink_t);
+
+    builder<asynchronous_t>(std::move(wrapped))
+        .drop()
+        .build();
+}
+
+TEST(asynchronous_t, BuilderSetWaitOverflowPolicy) {
+    std::unique_ptr<mock::sink_t> wrapped(new mock::sink_t);
+
+    builder<asynchronous_t> builder(std::move(wrapped));
+    builder.wait();
+    std::move(builder).build();
+}
+
+TEST(asynchronous_t, BuilderSetWaitOverflowPolicyFlow) {
+    std::unique_ptr<mock::sink_t> wrapped(new mock::sink_t);
+
+    builder<asynchronous_t>(std::move(wrapped))
+        .wait()
+        .build();
+}
+
 }  // namespace
 }  // namespace sink
 }  // namespace v1

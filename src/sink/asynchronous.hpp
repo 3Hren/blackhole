@@ -20,7 +20,7 @@ public:
     };
 
 public:
-    virtual ~overflow_policy_t() {}
+    virtual ~overflow_policy_t() = default;
 
     /// Handles record queue overflow.
     ///
