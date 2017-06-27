@@ -16,11 +16,12 @@ inline namespace v1 {
 class builder<sink::asynchronous_t>::inner_t {
 public:
     std::unique_ptr<sink_t> wrapped;
+    std::unique_ptr<sink::overflow_policy_t> overflow_policy;
     std::size_t factor;
 };
 
 builder<sink::asynchronous_t>::builder(std::unique_ptr<sink_t> wrapped) :
-    d(new inner_t{std::move(wrapped), 10})
+    d(new inner_t{std::move(wrapped), sink::overflow_policy_factory_t().create("wait"), 10})
 {}
 
 auto builder<sink::asynchronous_t>::factor(std::size_t value) & -> builder& {
@@ -30,6 +31,24 @@ auto builder<sink::asynchronous_t>::factor(std::size_t value) & -> builder& {
 
 auto builder<sink::asynchronous_t>::factor(std::size_t value) && -> builder&& {
     return std::move(factor(value));
+}
+
+auto builder<sink::asynchronous_t>::wait() & -> builder& {
+    d->overflow_policy = sink::overflow_policy_factory_t().create("wait");
+    return *this;
+}
+
+auto builder<sink::asynchronous_t>::drop() && -> builder&& {
+    return std::move(wait());
+}
+
+auto builder<sink::asynchronous_t>::drop() & -> builder& {
+    d->overflow_policy = sink::overflow_policy_factory_t().create("drop");
+    return *this;
+}
+
+auto builder<sink::asynchronous_t>::wait() && -> builder&& {
+    return std::move(wait());
 }
 
 auto builder<sink::asynchronous_t>::build() && -> std::unique_ptr<sink_t> {

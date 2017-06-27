@@ -39,7 +39,8 @@ class builder<sink::asynchronous_t> {
 public:
     /// Constructs a sink builder from some other sink.
     ///
-    /// The ownership of the specified sink is transferred to the builder.
+    /// The ownership of the specified sink is transferred to the builder. The default overflow
+    /// policy will block the calling thread while the internal message queue is full.
     ///
     /// \param wrapped The target sink (usually the blocking one) that is need to make asynchronous.
     explicit builder(std::unique_ptr<sink_t> wrapped);
@@ -47,6 +48,14 @@ public:
     /// Sets the queue size factor.
     auto factor(std::size_t value) & -> builder&;
     auto factor(std::size_t value) && -> builder&&;
+
+    /// Sets the drop overflow policy.
+    auto drop() & -> builder&;
+    auto drop() && -> builder&&;
+
+    /// Sets the wait overflow policy.
+    auto wait() & -> builder&;
+    auto wait() && -> builder&&;
 
     /// Consumes this builder yielding a newly created asynchronous sink with the options
     /// configured.
