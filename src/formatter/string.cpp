@@ -19,6 +19,7 @@
 #include "../memory.hpp"
 #include "../procname.hpp"
 #include "../util/deleter.hpp"
+#include "../util/time.hpp"
 #include "string/parser.hpp"
 #include "string/token.hpp"
 
@@ -241,9 +242,9 @@ public:
 
         std::tm tm;
         if (token.gmtime) {
-            ::gmtime_r(&time, &tm);
+            gmtime(&time, &tm);
         } else {
-            ::localtime_r(&time, &tm);
+            localtime(&time, &tm);
         }
 
         fmt::MemoryWriter buffer;

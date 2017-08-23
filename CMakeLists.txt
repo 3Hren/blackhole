@@ -241,6 +241,7 @@ if (ENABLE_TESTING)
         tests/src/unit/sink/udp.cpp
         tests/src/unit/stdext/string_view
         tests/src/unit/termcolor.cpp
+        tests/src/unit/time.cpp
         tests/wrapper
     )
 
