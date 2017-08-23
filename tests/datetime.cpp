@@ -42,7 +42,7 @@ std::string
 using_strftime(const char (&format)[N], const std::tm& tm) {
     char buffer[128];
     std::size_t ret = std::strftime(buffer, sizeof(buffer), format, &tm);
-    BOOST_ASSERT(ret > 0);
+    // BOOST_ASSERT(ret > 0);
 
     return std::string(buffer, ret);
 }
