@@ -115,6 +115,10 @@ public:
     auto flush_every(std::size_t events) & -> builder&;
     auto flush_every(std::size_t events) && -> builder&&;
 
+    /// Speficies whether a sink should check file exists before attempt writing.
+    auto should_stat(bool flag) & -> builder&;
+    auto should_stat(bool flag) && -> builder&&;
+
     /// Consumes this builder, returning a newly created file sink with the options configured.
     auto build() && -> std::unique_ptr<sink_t>;
 };

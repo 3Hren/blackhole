@@ -1,5 +1,7 @@
 #include "blackhole/sink/file.hpp"
 
+#include <sys/stat.h>
+
 #include <cctype>
 
 #include <boost/lexical_cast.hpp>
@@ -104,9 +106,11 @@ auto ofstream_factory_t::create(const std::string& filename, std::ios_base::open
 
 file_t::file_t(const std::string& path,
                std::unique_ptr<file::stream_factory_t> stream_factory,
-               std::unique_ptr<file::flusher_factory_t> flusher_factory) :
+               std::unique_ptr<file::flusher_factory_t> flusher_factory,
+               bool should_stat) :
     stream_factory(std::move(stream_factory)),
-    flusher_factory(std::move(flusher_factory))
+    flusher_factory(std::move(flusher_factory)),
+    should_stat(should_stat)
 {
     data.path = path;
 }
@@ -120,18 +124,40 @@ auto file_t::filename(const record_t&) const -> std::string {
     return {data.path};
 }
 
+auto file_t::exists(const std::string& filename) const -> bool {
+    struct stat buf = {};
+    return ::stat(filename.c_str(), &buf) == 0;
+}
+
 auto file_t::backend(const std::string& filename) -> file::backend_t& {
     const auto it = data.backends.find(filename);
 
     if (it == data.backends.end()) {
-        auto stream = stream_factory->create(filename, std::ios_base::app);
-        auto flusher = flusher_factory->create();
+        return create_backend(filename);
+    }
 
-        return data.backends.insert(it,
-            std::make_pair(filename, file::backend_t(std::move(stream), std::move(flusher))))->second;
+    if (should_stat && !exists(filename)) {
+        data.backends.erase(filename);
+        return create_backend(filename);
     }
 
     return it->second;
+}
+
+auto file_t::create_backend(const std::string& filename) -> file::backend_t& {
+    auto stream = stream_factory->create(filename, std::ios_base::app);
+    auto flusher = flusher_factory->create();
+    return data.backends.insert(
+        std::make_pair(filename, file::backend_t(std::move(stream), std::move(flusher)))).first->second;
+}
+
+template<typename T>
+auto file_t::create_backend(const std::string& filename, T it) -> file::backend_t& {
+    auto stream = stream_factory->create(filename, std::ios_base::app);
+    auto flusher = flusher_factory->create();
+
+    return data.backends.insert(it,
+        std::make_pair(filename, file::backend_t(std::move(stream), std::move(flusher))))->second;
 }
 
 auto file_t::emit(const record_t& record, const string_view& formatted) -> void {
@@ -147,10 +173,11 @@ class builder<sink::file_t>::inner_t {
 public:
     std::string filename;
     std::unique_ptr<sink::file::flusher_factory_t> ffactory;
+    bool should_stat;
 };
 
 builder<sink::file_t>::builder(const std::string& path) :
-    p(new inner_t{path, nullptr}, deleter_t())
+    p(new inner_t{path, nullptr, false}, deleter_t())
 {
     p->ffactory = blackhole::make_unique<sink::file::flusher::repeat_factory_t>(std::size_t(0));
 }
@@ -173,11 +200,22 @@ auto builder<sink::file_t>::flush_every(std::size_t events) && -> builder&& {
     return std::move(flush_every(events));
 }
 
+auto builder<sink::file_t>::should_stat(bool flag) & -> builder& {
+    p->should_stat = flag;
+    return *this;
+}
+
+auto builder<sink::file_t>::should_stat(bool flag) && -> builder&& {
+    return std::move(should_stat(flag));
+}
+
 auto builder<sink::file_t>::build() && -> std::unique_ptr<sink_t> {
     return blackhole::make_unique<sink::file_t>(
         std::move(p->filename),
         blackhole::make_unique<sink::file::ofstream_factory_t>(),
-        std::move(p->ffactory));
+        std::move(p->ffactory),
+        p->should_stat
+    );
 }
 
 auto factory<sink::file_t>::type() const noexcept -> const char* {
@@ -202,6 +240,12 @@ auto factory<sink::file_t>::from(const config::node_t& config) const -> std::uni
         if (flush.unwrap()->is_string()) {
             const auto bytes = sink::file::flusher::parse_dunit(flush.unwrap()->to_string());
             builder.flush_every(bytes_t(bytes));
+        }
+    }
+
+    if (auto should_stat = config["should_stat"]) {
+        if (should_stat.unwrap()->is_bool()) {
+            builder.should_stat(should_stat.unwrap()->to_bool());
         }
     }
 

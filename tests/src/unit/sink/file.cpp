@@ -92,6 +92,10 @@ TEST(factory, PatternFromConfig) {
         .Times(1)
         .WillOnce(Return(nullptr));
 
+    EXPECT_CALL(config, subscript_key("should_stat"))
+        .Times(1)
+        .WillOnce(Return(nullptr));
+
     auto sink = factory<file_t>(mock_registry_t()).from(config);
     const auto& cast = dynamic_cast<const file_t&>(*sink);
 
@@ -129,6 +133,10 @@ TEST(factory, FlushIntervalFromConfig) {
         .Times(1)
         .WillOnce(Return(false));
 
+    EXPECT_CALL(config, subscript_key("should_stat"))
+        .Times(1)
+        .WillOnce(Return(nullptr));
+
     factory<file_t>(mock_registry_t()).from(config);
 }
 
@@ -162,6 +170,10 @@ TEST(factory, BinaryUnitFlushIntervalFromConfig) {
     EXPECT_CALL(*nflush, to_string())
         .Times(1)
         .WillOnce(Return("100MB"));
+
+    EXPECT_CALL(config, subscript_key("should_stat"))
+        .Times(1)
+        .WillOnce(Return(nullptr));
 
     factory<file_t>(mock_registry_t()).from(config);
 }
