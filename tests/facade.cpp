@@ -120,6 +120,36 @@ TEST(Facade, LazyFormattedLogCaptured) {
     });
 }
 
+namespace {
+
+struct int_wrapper_t {
+    int v;
+};
+
+auto operator<<(std::ostream& stream, const int_wrapper_t& v) -> std::ostream& {
+    return stream << v.v;
+}
+
+} // namespace
+
+TEST(Facade, LazyFormattedLogStream) {
+    logger_type inner;
+    logger_facade<logger_type> logger(inner);
+
+    attribute_pack expected;
+    writer_t writer;
+
+    EXPECT_CALL(inner, log(severity_t(0), An<const lazy_message_t&>(), expected))
+        .Times(1)
+        .WillOnce(WithArg<1>(Invoke([](const lazy_message_t& message) {
+            EXPECT_EQ("GET /porn.png HTTP/1.0 - {}", message.pattern.to_string());
+            EXPECT_EQ("GET /porn.png HTTP/1.0 - 42", message.supplier().to_string());
+        })));
+
+
+    logger.log(0, "GET /porn.png HTTP/1.0 - {}", int_wrapper_t{42});
+}
+
 TEST(Facade, FormattedAttributeLog) {
     logger_type inner;
     logger_facade<logger_type> logger(inner);
