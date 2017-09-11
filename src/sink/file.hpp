@@ -50,6 +50,8 @@ class file_t : public sink_t {
         std::map<std::string, file::backend_t> backends;
     } data;
 
+    bool should_stat;
+
     mutable std::mutex mutex;
 
 public:
@@ -57,7 +59,8 @@ public:
     ///     mode by default.
     file_t(const std::string& path,
            std::unique_ptr<file::stream_factory_t> stream_factory,
-           std::unique_ptr<file::flusher_factory_t> flusher_factory);
+           std::unique_ptr<file::flusher_factory_t> flusher_factory,
+           bool should_stat);
 
     /// Returns a const lvalue reference to destination path pattern.
     ///
@@ -68,7 +71,14 @@ public:
 
     auto filename(const record_t& record) const -> std::string;
 
+    auto exists(const std::string& filename) const -> bool;
+
     auto backend(const std::string& filename) -> file::backend_t&;
+
+    auto create_backend(const std::string& filename) -> file::backend_t&;
+
+    template<typename T>
+    auto create_backend(const std::string& filename, T it) -> file::backend_t&;
 
     /// Outputs the formatted message with its associated record to the file.
     ///
