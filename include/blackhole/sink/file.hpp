@@ -116,8 +116,13 @@ public:
     auto flush_every(std::size_t events) && -> builder&&;
 
     /// Speficies whether a sink should check file exists before attempt writing.
-    auto should_stat(bool flag) & -> builder&;
-    auto should_stat(bool flag) && -> builder&&;
+    ///
+    /// In case the file doesn't exist the sink will create it. If it exists, but its inode differs
+    /// from its initial value the sink changes the target to that file automatically.
+    ///
+    /// Note, that this check significantly slows down sink's performance.
+    auto rotate_checking_stat() & -> builder&;
+    auto rotate_checking_stat() && -> builder&&;
 
     /// Consumes this builder, returning a newly created file sink with the options configured.
     auto build() && -> std::unique_ptr<sink_t>;

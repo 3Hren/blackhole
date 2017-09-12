@@ -13,6 +13,7 @@
 
 #include "../memory.hpp"
 #include "file/flusher.hpp"
+#include "file/rotate.hpp"
 #include "file/stream.hpp"
 
 namespace blackhole {
@@ -21,14 +22,21 @@ namespace sink {
 namespace file {
 
 class backend_t {
+    std::string name;
     std::unique_ptr<std::ostream> stream;
+    std::unique_ptr<rotate_t> rotate;
     std::unique_ptr<flusher_t> flusher;
 
 public:
-    backend_t(std::unique_ptr<std::ostream> stream, std::unique_ptr<flusher_t> flusher) :
+    backend_t(std::unique_ptr<std::ostream> stream, std::unique_ptr<rotate_t> rotate, std::unique_ptr<flusher_t> flusher) :
         stream(std::move(stream)),
+        rotate(std::move(rotate)),
         flusher(std::move(flusher))
     {}
+
+    auto should_rotate() const -> bool {
+        return rotate->should_rotate();
+    }
 
     auto write(const string_view& message) -> void {
         stream->write(message.data(), static_cast<std::streamsize>(message.size()));
@@ -43,14 +51,13 @@ public:
 
 class file_t : public sink_t {
     std::unique_ptr<file::stream_factory_t> stream_factory;
+    std::unique_ptr<file::rotate_factory_t> rotate_factory;
     std::unique_ptr<file::flusher_factory_t> flusher_factory;
 
     struct {
         std::string path;
         std::map<std::string, file::backend_t> backends;
     } data;
-
-    bool should_stat;
 
     mutable std::mutex mutex;
 
@@ -59,8 +66,8 @@ public:
     ///     mode by default.
     file_t(const std::string& path,
            std::unique_ptr<file::stream_factory_t> stream_factory,
-           std::unique_ptr<file::flusher_factory_t> flusher_factory,
-           bool should_stat);
+           std::unique_ptr<file::rotate_factory_t> rotate_factory,
+           std::unique_ptr<file::flusher_factory_t> flusher_factory);
 
     /// Returns a const lvalue reference to destination path pattern.
     ///
@@ -71,14 +78,9 @@ public:
 
     auto filename(const record_t& record) const -> std::string;
 
-    auto exists(const std::string& filename) const -> bool;
-
     auto backend(const std::string& filename) -> file::backend_t&;
 
     auto create_backend(const std::string& filename) -> file::backend_t&;
-
-    template<typename T>
-    auto create_backend(const std::string& filename, T it) -> file::backend_t&;
 
     /// Outputs the formatted message with its associated record to the file.
     ///

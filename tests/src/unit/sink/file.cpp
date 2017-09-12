@@ -28,10 +28,16 @@ public:
     MOCK_METHOD1(update, file::flusher_t::result_t(std::size_t nwritten));
 };
 
+class rotate_t : public file::rotate_t {
+public:
+    MOCK_METHOD0(should_rotate, bool());
+};
+
 }  // namespace mock
 
 TEST(backend_t, Write) {
     std::unique_ptr<std::stringstream> stream(new std::stringstream);
+    std::unique_ptr<mock::rotate_t> rotate(new mock::rotate_t);
     std::unique_ptr<mock::flusher_t> flusher(new mock::flusher_t);
 
     auto& stream_ = *stream;
@@ -40,7 +46,7 @@ TEST(backend_t, Write) {
         .Times(1)
         .WillOnce(Return(flusher_t::result_t::idle));
 
-    backend_t backend(std::move(stream), std::move(flusher));
+    backend_t backend(std::move(stream), std::move(rotate), std::move(flusher));
     backend.write("le message");
 
     EXPECT_EQ("le message\n", stream_.str());
@@ -92,7 +98,7 @@ TEST(factory, PatternFromConfig) {
         .Times(1)
         .WillOnce(Return(nullptr));
 
-    EXPECT_CALL(config, subscript_key("should_stat"))
+    EXPECT_CALL(config, subscript_key("rotate"))
         .Times(1)
         .WillOnce(Return(nullptr));
 
@@ -133,7 +139,7 @@ TEST(factory, FlushIntervalFromConfig) {
         .Times(1)
         .WillOnce(Return(false));
 
-    EXPECT_CALL(config, subscript_key("should_stat"))
+    EXPECT_CALL(config, subscript_key("rotate"))
         .Times(1)
         .WillOnce(Return(nullptr));
 
@@ -171,7 +177,7 @@ TEST(factory, BinaryUnitFlushIntervalFromConfig) {
         .Times(1)
         .WillOnce(Return("100MB"));
 
-    EXPECT_CALL(config, subscript_key("should_stat"))
+    EXPECT_CALL(config, subscript_key("rotate"))
         .Times(1)
         .WillOnce(Return(nullptr));
 
