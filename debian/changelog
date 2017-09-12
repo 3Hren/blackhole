@@ -1,3 +1,10 @@
+blackhole (1.9.0-1) unstable; urgency=low
+
+  * Added: rotate section for file sink, which describes how (and if) files
+    should be rotated.
+
+ -- Evgeny Safronov <division494@gmail.com>  Mon, 11 Sep 2017 17:43:52 +0300
+
 blackhole (1.8.0-1) unstable; urgency=low
 
   * Fixed: add missing overflow policies.
