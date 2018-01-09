@@ -28,10 +28,6 @@ class file_t;
 template<class Rep, class Ratio = std::ratio<1>>
 class binary_unit;
 
-/// Disable all fractional units.
-template<class Rep, std::uintmax_t Denom>
-class binary_unit<Rep, std::ratio<1, Denom>>;
-
 template<class Rep>
 class binary_unit<Rep, std::ratio<1>> {
 public:
@@ -52,6 +48,8 @@ public:
 
 template<class Rep, class Ratio>
 class binary_unit {
+    static_assert(Ratio::den == 1, "fractional units are permitted");
+
 public:
     typedef Rep rep;
 
