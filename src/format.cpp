@@ -457,20 +457,20 @@ class BasicArgFormatter : public ArgVisitor<Impl, void> {
     typedef typename BasicWriter<Char>::CharPtr CharPtr;
     Char fill = internal::CharTraits<Char>::cast(spec_.fill());
     CharPtr out = CharPtr();
-    const unsigned CHAR_WIDTH = 1;
-    if (spec_.width_ > CHAR_WIDTH) {
+    const unsigned CHAR_SIZE = 1;
+    if (spec_.width_ > CHAR_SIZE) {
       out = writer_.grow_buffer(spec_.width_);
       if (spec_.align_ == ALIGN_RIGHT) {
-        std::fill_n(out, spec_.width_ - CHAR_WIDTH, fill);
-        out += spec_.width_ - CHAR_WIDTH;
+        std::fill_n(out, spec_.width_ - CHAR_SIZE, fill);
+        out += spec_.width_ - CHAR_SIZE;
       } else if (spec_.align_ == ALIGN_CENTER) {
         out = writer_.fill_padding(out, spec_.width_,
-                                   internal::check(CHAR_WIDTH), fill);
+                                   internal::check(CHAR_SIZE), fill);
       } else {
-        std::fill_n(out + CHAR_WIDTH, spec_.width_ - CHAR_WIDTH, fill);
+        std::fill_n(out + CHAR_SIZE, spec_.width_ - CHAR_SIZE, fill);
       }
     } else {
-      out = writer_.grow_buffer(CHAR_WIDTH);
+      out = writer_.grow_buffer(CHAR_SIZE);
     }
     *out = internal::CharTraits<Char>::cast(value);
   }
