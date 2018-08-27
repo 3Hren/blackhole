@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\attribute.cpp" />
+    <ClCompile Include="..\src\config\factory.cpp" />
+    <ClCompile Include="..\src\config\json.cpp" />
+    <ClCompile Include="..\src\config\node.cpp" />
+    <ClCompile Include="..\src\config\option.cpp" />
+    <ClCompile Include="..\src\datetime\generator.linux.cpp" />
+    <ClCompile Include="..\src\datetime\generator.other.cpp" />
+    <ClCompile Include="..\src\essentials.cpp" />
+    <ClCompile Include="..\src\filter\severity.cpp" />
+    <ClCompile Include="..\src\format.cpp" />
+    <ClCompile Include="..\src\formatter\json.cpp" />
+    <ClCompile Include="..\src\formatter\mod.cpp" />
+    <ClCompile Include="..\src\formatter\string.cpp" />
+    <ClCompile Include="..\src\formatter\string\error.cpp" />
+    <ClCompile Include="..\src\formatter\string\grammar.cpp" />
+    <ClCompile Include="..\src\formatter\string\parser.cpp" />
+    <ClCompile Include="..\src\formatter\string\token.cpp" />
+    <ClCompile Include="..\src\formatter\tskv.cpp" />
+    <ClCompile Include="..\src\handler.cpp" />
+    <ClCompile Include="..\src\handler\blocking.cpp" />
+    <ClCompile Include="..\src\handler\dev.cpp" />
+    <ClCompile Include="..\src\logger.cpp" />
+    <ClCompile Include="..\src\procname.cpp" />
+    <ClCompile Include="..\src\record.cpp" />
+    <ClCompile Include="..\src\registry.cpp" />
+    <ClCompile Include="..\src\root.cpp" />
+    <ClCompile Include="..\src\scope\holder.cpp" />
+    <ClCompile Include="..\src\scope\manager.cpp" />
+    <ClCompile Include="..\src\scope\watcher.cpp" />
+    <ClCompile Include="..\src\sink\asynchronous.cpp" />
+    <ClCompile Include="..\src\sink\asynchronous.p.cpp" />
+    <ClCompile Include="..\src\sink\console.cpp" />
+    <ClCompile Include="..\src\sink\file.cpp" />
+    <ClCompile Include="..\src\sink\null.cpp" />
+    <ClCompile Include="..\src\sink\socket\tcp.cpp" />
+    <ClCompile Include="..\src\sink\socket\udp.cpp" />
+    <ClCompile Include="..\src\sink\syslog.cpp" />
+    <ClCompile Include="..\src\termcolor.cpp" />
+    <ClCompile Include="..\src\wrapper.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\attribute.hpp" />
+    <ClInclude Include="..\src\config\factory.hpp" />
+    <ClInclude Include="..\src\config\json.hpp" />
+    <ClInclude Include="..\src\datetime.hpp" />
+    <ClInclude Include="..\src\datetime\generator.linux.hpp" />
+    <ClInclude Include="..\src\datetime\generator.other.hpp" />
+    <ClInclude Include="..\src\datetime\stream.hpp" />
+    <ClInclude Include="..\src\essentials.hpp" />
+    <ClInclude Include="..\src\filter\zen.hpp" />
+    <ClInclude Include="..\src\formatter\json.hpp" />
+    <ClInclude Include="..\src\formatter\string\error.hpp" />
+    <ClInclude Include="..\src\formatter\string\grammar.hpp" />
+    <ClInclude Include="..\src\formatter\string\grammar.inl.hpp" />
+    <ClInclude Include="..\src\formatter\string\parser.hpp" />
+    <ClInclude Include="..\src\formatter\string\token.hpp" />
+    <ClInclude Include="..\src\hack\addressof.hpp" />
+    <ClInclude Include="..\src\handler\blocking.hpp" />
+    <ClInclude Include="..\src\handler\dev.hpp" />
+    <ClInclude Include="..\src\memory.hpp" />
+    <ClInclude Include="..\src\procname.hpp" />
+    <ClInclude Include="..\src\record.hpp" />
+    <ClInclude Include="..\src\recordbuf.hpp" />
+    <ClInclude Include="..\src\sink\asynchronous.hpp" />
+    <ClInclude Include="..\src\sink\console.hpp" />
+    <ClInclude Include="..\src\sink\file.hpp" />
+    <ClInclude Include="..\src\sink\file\flusher.hpp" />
+    <ClInclude Include="..\src\sink\file\flusher\bytecount.hpp" />
+    <ClInclude Include="..\src\sink\file\flusher\repeat.hpp" />
+    <ClInclude Include="..\src\sink\file\rotate.hpp" />
+    <ClInclude Include="..\src\sink\file\rotate\null.hpp" />
+    <ClInclude Include="..\src\sink\file\rotate\stat.hpp" />
+    <ClInclude Include="..\src\sink\file\stream.hpp" />
+    <ClInclude Include="..\src\sink\socket\tcp.hpp" />
+    <ClInclude Include="..\src\sink\socket\udp.hpp" />
+    <ClInclude Include="..\src\sink\syslog.hpp" />
+    <ClInclude Include="..\src\spinlock.hpp" />
+    <ClInclude Include="..\src\spinlock.linux.hpp" />
+    <ClInclude Include="..\src\spinlock.osx.hpp" />
+    <ClInclude Include="..\src\util\deleter.hpp" />
+    <ClInclude Include="..\src\util\optional.hpp" />
+    <ClInclude Include="..\src\util\time.hpp" />
+    <ClInclude Include="..\src\util\unimplemented.hpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{A14AD286-C080-4190-B39C-09A1571D28B9}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>blackholestatic</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)lib\</OutDir>
+    <IntDir>$(SolutionDir)tmp\$(Platform).$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)-$(Platform)-$(Configuration)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)lib\</OutDir>
+    <IntDir>$(SolutionDir)tmp\$(Platform).$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)-$(Platform)-$(Configuration)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)lib\</OutDir>
+    <IntDir>$(SolutionDir)tmp\$(Platform).$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)-$(Platform)-$(Configuration)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)lib\</OutDir>
+    <IntDir>$(SolutionDir)tmp\$(Platform).$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)-$(Platform)-$(Configuration)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;BOOST_ASIO_ENABLE_OLD_SERVICES;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\include;..\foreign;..\foreign\rapidjson\include;..\foreign\libcds;..\foreign\syslog-on-event-log;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)$(Platform).$(Configuration)\%(RelativeDir)</ObjectFileName>
+      <AdditionalOptions>-D_WIN32_WINNT=0x0A00 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;BOOST_ASIO_ENABLE_OLD_SERVICES;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\include;..\foreign;..\foreign\rapidjson\include;..\foreign\libcds;..\foreign\syslog-on-event-log;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)$(Platform).$(Configuration)\%(RelativeDir)</ObjectFileName>
+      <AdditionalOptions>-D_WIN32_WINNT=0x0A00 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;BOOST_ASIO_ENABLE_OLD_SERVICES;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\include;..\foreign;..\foreign\rapidjson\include;..\foreign\libcds;..\foreign\syslog-on-event-log;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)$(Platform).$(Configuration)\%(RelativeDir)</ObjectFileName>
+      <AdditionalOptions>-D_WIN32_WINNT=0x0A00 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;BOOST_ASIO_ENABLE_OLD_SERVICES;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>..\include;..\foreign;..\foreign\rapidjson\include;..\foreign\libcds;..\foreign\syslog-on-event-log;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ObjectFileName>$(IntDir)$(Platform).$(Configuration)\%(RelativeDir)</ObjectFileName>
+      <AdditionalOptions>-D_WIN32_WINNT=0x0A00 %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
