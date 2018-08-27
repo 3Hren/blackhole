@@ -1,5 +1,8 @@
 build
 bench/*.py
 docs
+bin
+lib
+tmp
 
 .clang_complete

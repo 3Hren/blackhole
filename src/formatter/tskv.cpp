@@ -4,6 +4,7 @@
 
 #include <boost/optional/optional.hpp>
 
+#include "blackhole/compat.hpp"
 #include "blackhole/attribute.hpp"
 #include "blackhole/config/node.hpp"
 #include "blackhole/config/option.hpp"
@@ -96,9 +97,9 @@ public:
 
     auto add_tid() -> void {
         wr.write("\ttid={:#x}",
-#ifdef __linux__
+#ifndef __APPLE__
             record.tid()
-#elif __APPLE__
+#else
             reinterpret_cast<unsigned long>(record.tid())
 #endif
         );

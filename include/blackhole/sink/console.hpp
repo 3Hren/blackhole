@@ -27,7 +27,10 @@ class console_t;
 
 template<>
 class builder<sink::console_t> {
+public:
     class inner_t;
+
+private:
     std::unique_ptr<inner_t, deleter_t> d;
 
 public:
@@ -38,12 +41,22 @@ public:
     builder();
 
     /// Sets the destination stream to the standard output pipe.
-    auto stdout() & -> builder&;
-    auto stdout() && -> builder&&;
+    auto to_stdout() & -> builder&;
+    auto to_stdout() && -> builder&&;
+
+# if !defined( _MSC_VER )
+    auto stdout() & -> builder& {  return to_stdout();  }
+    auto stdout() && -> builder&&  {  return std::move( to_stdout() );  }
+# endif
 
     /// Sets the destination stream to the standard error pipe.
-    auto stderr() & -> builder&;
-    auto stderr() && -> builder&&;
+    auto to_stderr() & -> builder&;
+    auto to_stderr() && -> builder&&;
+
+# if !defined( _MSC_VER )
+    auto stderr() & -> builder& {  return to_stderr();  }
+    auto stderr() && -> builder&& {  return std::move( to_stderr() );  }
+# endif
 
     /// Sets terminal color mapping for a given severity making all log events to be colored with
     /// specified color.

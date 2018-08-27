@@ -8,6 +8,8 @@
 
 #include <thread>
 
+#include "blackhole/compat.hpp"
+
 #include "blackhole/attribute.hpp"
 
 #include "record.hpp"

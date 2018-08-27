@@ -5,6 +5,7 @@
 
 #include <boost/variant/variant.hpp>
 
+#include "blackhole/compat.hpp"
 #include "blackhole/attribute.hpp"
 #include "blackhole/attributes.hpp"
 #include "blackhole/extensions/writer.hpp"
@@ -46,7 +47,7 @@ auto streamfd(const std::ostream& stream) noexcept -> FILE* {
 
 auto isatty(const std::ostream& stream) -> bool {
     if (auto file = streamfd(stream)) {
-#if defined(__linux__) || defined(__APPLE__)
+#if defined(__linux__) || defined(__APPLE__) || defined( _WIN32 )
         return ::isatty(::fileno(file));
 #else
 #error unsupported platform

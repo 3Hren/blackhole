@@ -1,13 +1,12 @@
 #include "blackhole/sink/console.hpp"
 
-#include <unistd.h>
-
 #include <iostream>
 #include <map>
 #include <mutex>
 
 #include <boost/optional/optional.hpp>
 
+#include "blackhole/compat.hpp"
 #include "blackhole/config/node.hpp"
 #include "blackhole/config/option.hpp"
 #include "blackhole/record.hpp"
@@ -49,7 +48,7 @@ auto streamfd(const std::ostream& stream) noexcept -> FILE* {
 
 auto isatty(const std::ostream& stream) -> bool {
     if (auto file = streamfd(stream)) {
-#if defined(__linux__) || defined(__APPLE__)
+#if defined(__linux__) || defined(__APPLE__) || defined( _WIN32 )
         return ::isatty(::fileno(file));
 #else
 #error unsupported platform
@@ -120,22 +119,22 @@ builder<sink::console_t>::builder() :
     d(new inner_t{&std::cout, [](const record_t&) -> termcolor_t { return {}; }})
 {}
 
-auto builder<sink::console_t>::stdout() & -> builder& {
+auto builder<sink::console_t>::to_stdout() & -> builder& {
     d->stream = &std::cout;
     return *this;
 }
 
-auto builder<sink::console_t>::stdout() && -> builder&& {
-    return std::move(stdout());
+auto builder<sink::console_t>::to_stdout() && -> builder&& {
+    return std::move(to_stdout());
 }
 
-auto builder<sink::console_t>::stderr() & -> builder& {
+auto builder<sink::console_t>::to_stderr() & -> builder& {
     d->stream = &std::cerr;
     return *this;
 }
 
-auto builder<sink::console_t>::stderr() && -> builder&& {
-    return std::move(stderr());
+auto builder<sink::console_t>::to_stderr() && -> builder&& {
+    return std::move(to_stderr());
 }
 
 auto builder<sink::console_t>::colorize(severity_t severity, termcolor_t color) & -> builder& {

@@ -15,7 +15,7 @@ class tcp_t : public sink_t {
     std::string host_;
     std::uint16_t port_;
 
-    boost::asio::io_service io_service;
+    boost::asio::io_context io_service;
     std::unique_ptr<boost::asio::ip::tcp::socket> socket;
 
     mutable std::mutex mutex;

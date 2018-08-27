@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ctime>
+#include "blackhole/compat.hpp"
 
 namespace blackhole {
 inline namespace v1 {
@@ -75,19 +76,24 @@ public:
     tzinit_t() { tzset(); }
 };
 
+#ifndef _MSC_VER     // suppress warnings
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wglobal-constructors"
+#endif
 
 static const tzinit_t tz;
 
+#ifndef _MSC_VER    //  suppress warnings
 #pragma clang diagnostic pop
+#endif
 
 static auto localtime(const time_t* t, struct tm* tp) noexcept -> struct tm* {
     time_t time = *t - timezone;
     gmtime_r(&time, tp);
+# if defined( __GNUC__ )  // GNU extension
     tp->tm_gmtoff = timezone;
     tp->tm_zone = *tzname;
-
+# endif
     return tp;
 }
 

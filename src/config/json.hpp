@@ -7,6 +7,8 @@
 #include <boost/lexical_cast.hpp>
 #include <rapidjson/document.h>
 
+#include "blackhole/compat.hpp"
+
 #include "blackhole/config/factory.hpp"
 #include "blackhole/config/json.hpp"
 #include "blackhole/config/node.hpp"
@@ -185,7 +187,7 @@ private:
         return cursor + "/" + key;
     }
 
-    __attribute((noreturn)) auto type_mismatch(const std::string& expected) const -> void {
+    NORETURN auto type_mismatch(const std::string& expected) const -> void {
         throw config::type_mismatch(cursor.empty() ? "/" : cursor, expected, type());
     }
 

@@ -75,8 +75,9 @@ class builder<root_logger_t> {
 public:
     typedef root_logger_t result_type;
 
-private:
     class inner_t;
+
+private:
     std::unique_ptr<inner_t, deleter_t> d;
 
 public:

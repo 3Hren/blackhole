@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 
+#include "compat.hpp"
+
 #include "forward.hpp"
 
 #include "handler.hpp"

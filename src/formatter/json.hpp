@@ -9,10 +9,9 @@ namespace formatter {
 class json_t : public formatter_t {
 public:
     class properties_t;
-
-private:
     class inner_t;
 
+private:
     std::unique_ptr<inner_t, deleter_t> inner;
 
 public:

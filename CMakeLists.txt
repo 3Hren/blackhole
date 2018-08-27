@@ -84,6 +84,8 @@ else ()
     message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif ()
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_ASIO_ENABLE_OLD_SERVICES")
+
 # Set maximum warnings level depending on compiler.
 # TODO: target_maximum_warnings(${LIBRARY_NAME})
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

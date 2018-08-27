@@ -101,8 +101,8 @@ class string_t;
 
 template<>
 class builder<formatter::string_t> {
+public:
     class inner_t;
-    std::unique_ptr<inner_t, deleter_t> p;
 
 public:
     explicit builder(std::string pattern);
@@ -111,6 +111,9 @@ public:
     auto mapping(formatter::severity_map sevmap) && -> builder&&;
 
     auto build() && -> std::unique_ptr<formatter_t>;
+
+private:
+    std::unique_ptr<inner_t, deleter_t> p;
 };
 
 template<>
