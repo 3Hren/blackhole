@@ -46,7 +46,7 @@ public:
 
 # if !defined( _MSC_VER )
     auto stdout() & -> builder& {  return to_stdout();  }
-    auto stdout() && -> builder&&  {  return to_stdout();  }
+    auto stdout() && -> builder&&  {  return std::move( to_stdout() );  }
 # endif
 
     /// Sets the destination stream to the standard error pipe.
@@ -55,7 +55,7 @@ public:
 
 # if !defined( _MSC_VER )
     auto stderr() & -> builder& {  return to_stderr();  }
-    auto stderr() && -> builder&& {  return to_stderr();  }
+    auto stderr() && -> builder&& {  return std::move( to_stderr() );  }
 # endif
 
     /// Sets terminal color mapping for a given severity making all log events to be colored with
