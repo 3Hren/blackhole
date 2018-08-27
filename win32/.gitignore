@@ -1,1 +1,5 @@
 *.vcxproj.user
+*.vcxproj.filters
+bin
+lib
+tmp
