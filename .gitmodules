@@ -7,3 +7,6 @@
 [submodule "foreign/libcds"]
 	path = foreign/libcds
 	url = https://github.com/khizmax/libcds.git
+[submodule "foreign/syslog-on-event-log"]
+	path = foreign/syslog-on-event-log
+	url = https://github.com/big-keva/syslog-on-event-log
