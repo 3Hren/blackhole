@@ -116,7 +116,7 @@ static inline fmt::internal::Null<> strerror_s(char *, std::size_t, ...) {
 }
 
 namespace fmt {
-namespace {
+//namespace {
 
 #ifndef _MSC_VER
 # define FMT_SNPRINTF snprintf
@@ -410,7 +410,7 @@ class CharConverter : public fmt::internal::ArgVisitor<CharConverter, void> {
     arg_.int_value = static_cast<char>(value);
   }
 };
-}  // namespace
+//}  // namespace
 
 namespace internal {
 

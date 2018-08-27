@@ -15,7 +15,7 @@ public:
     typedef boost::asio::ip::basic_endpoint<boost::asio::ip::udp> endpoint_type;
 
 private:
-    boost::asio::io_service io_service;
+    boost::asio::io_context io_service;
     boost::asio::ip::udp::socket socket;
     boost::asio::ip::udp::endpoint endpoint_;
 

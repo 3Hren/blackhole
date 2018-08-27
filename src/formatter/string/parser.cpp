@@ -5,6 +5,8 @@
 
 #include "grammar.hpp"
 
+#include <cctype>
+
 namespace blackhole {
 inline namespace v1 {
 namespace formatter {
@@ -316,7 +318,7 @@ parser_t::exact(const_iterator pos, const Range& range) const -> bool {
 }
 
 template<class Exception, class... Args>
-__attribute__((noreturn))
+NORETURN
 auto
 parser_t::throw_(Args&&... args) -> void {
     state = state_t::broken;

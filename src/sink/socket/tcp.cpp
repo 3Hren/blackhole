@@ -61,7 +61,7 @@ auto do_connect(boost::asio::basic_socket<Protocol, SocketService>& s, Iterator 
 
 /// Resolves specified host and tries to connect to the socket.
 template<typename Protocol>
-auto connect(boost::asio::io_service& ev, typename Protocol::socket& socket,
+auto connect(boost::asio::io_context& ev, typename Protocol::socket& socket,
     const std::string& host, std::uint16_t port) -> void
 {
     typename Protocol::resolver::iterator endpoint;
@@ -84,7 +84,7 @@ auto connect(boost::asio::io_service& ev, typename Protocol::socket& socket,
     }
 }
 
-auto reconnect(boost::asio::io_service& io_service, const std::string& host, std::uint16_t port) ->
+auto reconnect(boost::asio::io_context& io_service, const std::string& host, std::uint16_t port) ->
     std::unique_ptr<socket_type>
 {
     auto socket = std::unique_ptr<socket_type>(new socket_type(io_service));

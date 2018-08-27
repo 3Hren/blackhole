@@ -15,6 +15,8 @@
 #include <rapidjson/writer.h>
 #include <rapidjson/pointer.h>
 
+#include "blackhole/compat.hpp"
+
 #include "blackhole/attribute.hpp"
 #include "blackhole/config/node.hpp"
 #include "blackhole/config/option.hpp"

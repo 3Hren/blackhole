@@ -9,6 +9,8 @@
 #include "error.hpp"
 #include "token.hpp"
 
+#include "blackhole/compat.hpp"
+
 namespace blackhole {
 inline namespace v1 {
 namespace formatter {
@@ -69,7 +71,7 @@ private:
 
     /// Marks the parser as broken and throws an exception
     template<class Exception, class... Args>
-    __attribute__((noreturn)) auto throw_(Args&&... args) -> void;
+    NORETURN auto throw_(Args&&... args) -> void;
 };
 
 }  // namespace string

@@ -12,7 +12,10 @@ class blocking_t;
 
 template<>
 class builder<handler::blocking_t> {
+public:
     class inner_t;
+
+private:
     std::unique_ptr<inner_t, deleter_t> d;
 
 public:

@@ -44,7 +44,11 @@ struct root_logger_t::sync_t {
     // The given solution works both on OS X with clang compiler and on linux with GCC and clang.
     // Feel free to hack and send a PR with better solution.
 #ifndef __APPLE__
+#  ifdef _MSC_VER
+    typedef std::mutex mutex_type;
+#  else
     typedef spinlock_t mutex_type;
+#  endif
     mutable mutex_type mutex;
 #endif
 
@@ -70,7 +74,11 @@ struct root_logger_t::sync_t {
 };
 
 struct root_logger_t::inner_t {
+#  ifdef _MSC_VER
+    typedef std::mutex mutex_type;
+#  else
     typedef spinlock_t mutex_type;
+#  endif
 
     filter_t filter;
     const std::vector<std::unique_ptr<handler_t>> handlers;

@@ -33,7 +33,10 @@ class asynchronous_t;
 
 template<>
 class builder<sink::asynchronous_t> {
+public:
     class inner_t;
+
+private:
     std::unique_ptr<inner_t, deleter_t> d;
 
 public:

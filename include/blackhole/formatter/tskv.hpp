@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../factory.hpp"
+#include <string>
 
 namespace blackhole {
 inline namespace v1 {
@@ -12,7 +13,10 @@ class tskv_t;
 
 template<>
 class builder<formatter::tskv_t> {
+public:
     class inner_t;
+
+private:
     std::unique_ptr<inner_t, deleter_t> p;
 
 public:

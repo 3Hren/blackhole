@@ -93,7 +93,10 @@ class json_t;
 /// different "setters" – no need for default parameters, dealing with constructor bloat etc.
 template<>
 class builder<formatter::json_t> {
+public:
     class inner_t;
+
+private:
     std::unique_ptr<inner_t, deleter_t> d;
 
 public:

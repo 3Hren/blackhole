@@ -70,7 +70,7 @@ inline uint32_t clz(uint32_t x) {
   _BitScanReverse(&r, x);
   return 31 - r;
 }
-# define FMT_BUILTIN_CLZ(n) fmt::internal::clz(n)
+# define FMT_BUILTIN_CLZ(n) ::fmt::internal::clz(n)
 
 # ifdef _WIN64
 #  pragma intrinsic(_BitScanReverse64)
@@ -90,7 +90,7 @@ inline uint32_t clzll(uint64_t x) {
 # endif
   return 63 - r;
 }
-# define FMT_BUILTIN_CLZLL(n) fmt::internal::clzll(n)
+# define FMT_BUILTIN_CLZLL(n) ::fmt::internal::clzll(n)
 }
 }
 #endif
@@ -415,8 +415,8 @@ enum { INLINE_BUFFER_SIZE = 500 };
 #if FMT_SECURE_SCL
 // Use checked iterator to avoid warnings on MSVC.
 template <typename T>
-inline stdext::checked_array_iterator<T*> make_ptr(T *ptr, std::size_t size) {
-  return stdext::checked_array_iterator<T*>(ptr, size);
+inline ::stdext::checked_array_iterator<T*> make_ptr(T *ptr, std::size_t size) {
+  return ::stdext::checked_array_iterator<T*>(ptr, size);
 }
 #else
 template <typename T>
@@ -644,7 +644,7 @@ template <typename Char>
 class BasicCharTraits {
  public:
 #if FMT_SECURE_SCL
-  typedef stdext::checked_array_iterator<Char*> CharPtr;
+  typedef ::stdext::checked_array_iterator<Char*> CharPtr;
 #else
   typedef Char *CharPtr;
 #endif

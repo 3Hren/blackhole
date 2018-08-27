@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <ratio>
+#include <string>
 
 #include "blackhole/factory.hpp"
 
@@ -83,7 +84,10 @@ typedef binary_unit<std::uintmax_t, std::ratio<1024 * 1024 * 1024>> gibibytes_t;
 /// Represents a file sink builder to ease its configuration.
 template<>
 class builder<sink::file_t> {
+public:
     class inner_t;
+
+private:
     std::unique_ptr<inner_t, deleter_t> p;
 
 public:

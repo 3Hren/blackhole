@@ -1,4 +1,4 @@
-#ifdef __APPLE__
+#if defined( __APPLE__ ) || defined( _WIN32 )
 
 #include "generator.other.hpp"
 
