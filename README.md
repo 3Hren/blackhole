@@ -37,14 +37,14 @@ you writing them into its final destination. For example, Elasticsearch.
 
 ## Shared library
 
-Despite the header-only dark past now Blackhole is developed as a shared library. Such radical change of distributing
+Despite the header-only dark past now Blackhole is developed as a shared library. Such a radical change of distributing
 process was chosen because of many reasons.
 
-Mainly, header-only libraries has one big disadvantage: any code change may (or not) result in recompiling all its dependencies, otherwise having weird runtime errors with symbol loading race.
+Mainly, header-only libraries have one big disadvantage: any code change may (or not) result in recompiling all its dependencies, otherwise having weird runtime errors with symbol loading race.
 
 The other reason was the personal aim to reduce compile time, because it was fucking huge!
 
-Of course there are disadvantages, such as virtual function call cost and closed doors for inlining, but here my personal benchmark-driven development helped to avoid performance degradation.
+Of course, there are disadvantages, such as virtual function call cost and closed doors for inlining, but here my personal benchmark-driven development helped to avoid performance degradation.
 
 ## Planning
 
@@ -101,7 +101,7 @@ customization support.
 
 Unlike previous Blackhole versions now string formatter uses python-like syntax for describing patterns with using `{}`
 placeholders and format specifications inside. Moreover now you can specify timestamp specification directly inside the
-general pattern or even format it as an microseconds number since epoch.
+general pattern or even format it as a microseconds number since epoch.
 
 For example we have the given pattern:
 ```
@@ -133,7 +133,7 @@ The Blackhole supports several predefined attributes, with convenient specificat
 |{process:s}               | Process name                                                           |
 |{process}, {process:d}    | PID                                                                    |
 |{thread}, {thread::x}     | Thread hex id as an opaque value returned by *pthread_self(3)*         |
-|{thread:s}                | Thread name or *unnnamed*                                              |
+|{thread:s}                | Thread name or *unnamed*                                              |
 |{message}                 | Logging message                                                        |
 |{...}                     | All user declared attributes                                           |
 
@@ -226,7 +226,7 @@ Using configuration parameters for this formatter you can:
 
 Attributes renaming acts so much transparently as it appears: it just renames the given attribute name using the specified alternative.
 
-Attributes routing specifies a location where the listed attributes will be placed at the tree construction. Also you can specify a default location for all attributes, which is "/" meaning root otherwise.
+Attributes routing specifies a location where the listed attributes will be placed at the tree construction. Also, you can specify a default location for all attributes, which is "/" meaning root otherwise.
 
 For example with routing `{"/fields": ["message", "severity"]}` and "/" as a default pointer the mentioned JSON will look like:
 ```json
@@ -247,7 +247,7 @@ Attribute renaming occurs after routing, so mapping "message" => "#message" just
 
 To gain maximum speed at the tree construction no filtering occurs, so this formatter by default allows duplicated keys, which means invalid JSON tree (but most of parsers are fine with it). If you are really required to deal with unique keys, you can enable `unique` option, but it involves heap allocation and may slow down formatting.
 
-Also formatter allows to automatically append a newline character at the end of the tree, which is strangely required by some consumers, like logstash.
+Also, formatter allows to automatically append a newline character at the end of the tree, which is strangely required by some consumers, like logstash.
 
 Note, that JSON formatter formats the tree using compact style without excess spaces, tabs etc.
 
@@ -272,7 +272,7 @@ Option      | Type              | Description
 **/route** | Object of:<br>[string]<br>"\*" | Allows to configure nested tree mapping. Each key must satisfy [JSON Pointer](https://tools.ietf.org/html/rfc6901) specification and sets new attributes location in the tree. Values must be either an array of string, meaning list of attributes that are configured with new place or an "\*" literal, meaning all other attributes.
 **/mapping** | Object of: [string] | Simple attribute names renaming from key to value.
 **/newline** | bool             | If true, a newline will be appended to the end of the result message. The default is _false_.
-**/unique**   | bool             | If true removes all backward consecutive duplicate elements from the attribute list range. For example if there are two attributes with name "name" and values "v1" and "v2" inserted, then after filtering there will be only the last inserted, i.e. "v2". The default is _false_.
+**/unique**   | bool             | If true removes all backward consecutive duplicate elements from the attribute list range. For example, if there are two attributes with name "name" and values "v1" and "v2" inserted, then after filtering there will be only the last inserted, i.e. "v2". The default is _false_.
 **/mutate/timestamp** | string   | Replaces the timestamp field with new value by transforming it with the given _strftime_ pattern.
 **/mutate/severity**  | [string] | Replaces the severity field with the string value at the current severity value.
 
@@ -300,7 +300,7 @@ For example:
 ## Sinks
 
 ### Null
-Sometimes we need to just drop all logging events no matter what, for example to benchmarking purposes. For these cases there is null output (or sink), which just ignores all records.
+Sometimes we need to just drop all logging events no matter what, for example to benchmarking purposes. For these cases, there is null output (or sink), which just ignores all records.
 
 The common configuration for this sink looks like:
 
@@ -484,13 +484,13 @@ public:
 
 To avoid manually creating all these structures a special extension is provided: facade. In two words it is a thin template adapter over any given logger which extends its interface, providing methods that makes logging convenient again. We describe all these methods by abusing a random HTTP logging event of success file serve.
 
-For simple cases there is a thin wrapper that transforms a string into string view and passes it further.
+For simple cases, there is a thin wrapper that transforms a string into string view and passes it further.
 
 ```cpp
 logger.log(0, "GET /static/image.png HTTP/1.1 436 200");
 ```
 
-Sometimes we want to provide additional attributes. In these cases they can be passed using initializer list.
+Sometimes we want to provide additional attributes. In these cases, they can be passed using initializer list.
 
 ```cpp
 logger.log(0, "GET /static/image.png HTTP/1.1 436 200", {
@@ -592,11 +592,11 @@ The library can be successfully compiled and used without RTTI (with *-fno-rtti*
 
 # Why another logging library?
 
-That's the first question I ask myself when see *yet another silver-bullet library*.
+That's the first question I ask myself when seeing *yet another silver-bullet library*.
 
 First of all, we required a logger with attributes support. Here `boost::log` was fine, but it didn't compile in our compilers. Sad. After that we've realized that one of our bottlenecks is located in logging part, that's why `boost::log` and `log4cxx` weren't fit in our requirements. Thirdly we are developing for stable, but old linux distributives with relatively old compilers that supports only basic part of C++11.
 
-At last, but not least, all that libraries has one fatal disadvantage - [NIH](https://en.wikipedia.org/wiki/Not_invented_here).
+At last, but not least, all that libraries have one fatal disadvantage - [NIH](https://en.wikipedia.org/wiki/Not_invented_here).
 
 So here we are.
 
@@ -606,9 +606,9 @@ To be honest, let's describe some popular logging libraries, its advantages and 
 Developed by another crazy Russian programmer using dark template magic and Vodka (not sure what was first). It's a perfect and powerful library, seriously.
 
 **Pros:**
-- It's a fucking **boost**! Many people don't want to depend on another library, wishing to just `apt get install` instead.
+- It's a fucking **boost**! Many people don't want to depend on another library, wishing to just `apt-get install` instead.
 - Have attributes too.
-- Large community, less bugs.
+- Large community, fewer bugs.
 - Highly configurable.
 - Good documentation.
 
@@ -644,13 +644,13 @@ But everyone knows that even the light is unable to leave from blackhole.
 - Nice kitty in author's avatar.
 
 **Cons:**
-- Again no attributes, no custom filtering, no custom verbosity levels. You are restricted to functionality provided by this library, nothing more.
+- Again no attributes, no custom filtering, no custom verbosity levels. You are restricted to the functionality provided by this library, nothing more.
 
 # Notable changes
 First of all, the entire library was completely rewritten for performance reasons.
 
 - No more attribute copying unless it's really required (for asynchronous logging for example). Nested attributes are now organized in flattened range.
-- Dropped `boost::format` into the Hell. It's hard to find more slower library for formatting both in compilation stage and runtime. Instead, the perfect [cppformat](https://github.com/cppformat/cppformat) library with an own compile-time constexpr extensions is used.
+- Dropped `boost::format` into the Hell. It's hard to find a slower library for formatting both in compilation stage and runtime. Instead, the perfect [cppformat](https://github.com/cppformat/cppformat) library with an own compile-time constexpr extensions is used.
 - There are predefined attributes with fast read access, like `message`, `severity`, `timestmap` etc.
 - With **cppformat** participation there is new Python-like format syntax using placeholder replacement.
 - Severity mapping from its numeric representation to strings can now be configured from generic configuration source (from file for example).
@@ -667,7 +667,7 @@ First of all, the entire library was completely rewritten for performance reason
 Each feature and fix is developed in a separate branch. Bugs which are discovered during development of a certain feature, may be fixed in the same branch as their parent issue. This is also true for small features.
 
 ### Branch structure:
-- `master`: master branch - contains stable, working version of VM code.
+- `master`: master branch - contains a stable, working version of VM code.
 - `develop`: development branch - all fixes and features are first merged here.
 - `issue/<number>/<slug>` or `issue/<slug>`: for issues (both enhancement and bug fixes).
 
