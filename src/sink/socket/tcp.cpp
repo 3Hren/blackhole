@@ -25,8 +25,13 @@ typedef protocol_type::endpoint endpoint_type;
 
 namespace {
 
+#if BOOST_VERSION >= 106600
+template<typename Protocol, typename Iterator>
+auto do_connect(boost::asio::basic_socket<Protocol>& s,
+#else
 template<typename Protocol, typename SocketService, typename Iterator>
 auto do_connect(boost::asio::basic_socket<Protocol, SocketService>& s,
+#endif
                 Iterator begin,
                 Iterator end,
                 boost::system::error_code& ec) -> Iterator
@@ -50,8 +55,13 @@ auto do_connect(boost::asio::basic_socket<Protocol, SocketService>& s,
     return end;
 }
 
+#if BOOST_VERSION >= 106600
+template <typename Protocol, typename Iterator>
+auto do_connect(boost::asio::basic_socket<Protocol>& s, Iterator begin) -> Iterator {
+#else
 template <typename Protocol, typename SocketService, typename Iterator>
 auto do_connect(boost::asio::basic_socket<Protocol, SocketService>& s, Iterator begin) -> Iterator {
+#endif
     boost::system::error_code ec;
     Iterator end = typename Protocol::resolver::iterator();
     Iterator result = do_connect(s, begin, end, ec);
