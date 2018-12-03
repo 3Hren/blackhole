@@ -1,5 +1,6 @@
 #pragma once
 
+#include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/udp.hpp>
 
 #include "blackhole/sink.hpp"

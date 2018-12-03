@@ -2,6 +2,7 @@
 
 #include <mutex>
 
+#include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
 #include "blackhole/sink.hpp"
