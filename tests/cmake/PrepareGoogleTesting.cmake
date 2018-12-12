@@ -1,25 +1,41 @@
 include(Compiler)
 include(ExternalProject)
 
-# Builds at least on GCC 4.8 and Apple clang-703.0.31.
+# Builds at least on GCC 4.8 and Apple clang-703.0.31.                                                                                
 function(download_google_testing)
-    set(GOOGLEMOCK_URL "https://github.com/google/googletest/archive/release-1.8.0.zip")
-    set(GOOGLEMOCK_URL_MD5 adfafc8512ab65fd3cf7955ef0100ff5)
+    set(GOOGLETEST_GIT_REPO "https://github.com/abseil/googletest.git")
+
+    if(${CMAKE_VERSION} VERSION_LESS "3.0.0") 
+        set(GOOGLETEST_GIT_TAG release-1.8.0)
+    else()
+        set(GOOGLETEST_GIT_TAG "")
+    endif()
+
+    # Using a specific git tag violates the Abseil/Google Test Live At Head philosophy.                                               
+    # https://abseil.io/about/philosophy                                                                                              
+    # But in case the blackhole tests fail to build, uncommenting the GIT_TAG line will                                               
+    # use a Google Test version, which was working.                                                                                   
 
     set_directory_properties(properties EP_PREFIX "${CMAKE_BINARY_DIR}/foreign")
     ExternalProject_ADD(googlemock
-        URL ${GOOGLEMOCK_URL}
-        URL_MD5 ${GOOGLEMOCK_URL_MD5}
+        GIT_REPOSITORY ${GOOGLETEST_GIT_REPO}
+        GIT_TAG  ${GOOGLETEST_GIT_TAG}
         SOURCE_DIR "${CMAKE_BINARY_DIR}/foreign/googlemock"
         CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}" "-DCMAKE_CXX_FLAGS=-fPIC"
         INSTALL_COMMAND "")
     ExternalProject_GET_PROPERTY(googlemock SOURCE_DIR)
     ExternalProject_GET_PROPERTY(googlemock BINARY_DIR)
 
-    set(GOOGLETEST_INCLUDE_DIR ${SOURCE_DIR}/googletest/include PARENT_SCOPE)
+    set(GOOGLETEST_INCLUDE_DIR ${SOURCE_DIR}/googletest/include PARENT_SCOPE)                                                    
     set(GOOGLEMOCK_INCLUDE_DIR ${SOURCE_DIR}/googlemock/include PARENT_SCOPE)
-    set(GOOGLETEST_BINARY_DIR ${BINARY_DIR}/googlemock/gtest PARENT_SCOPE)
-    set(GOOGLEMOCK_BINARY_DIR ${BINARY_DIR}/googlemock PARENT_SCOPE)
+
+    if(${CMAKE_VERSION} VERSION_LESS "3.0.0") 
+        set(GOOGLETEST_BINARY_DIR ${BINARY_DIR}/googlemock/gtest PARENT_SCOPE)
+        set(GOOGLEMOCK_BINARY_DIR ${BINARY_DIR}/googlemock PARENT_SCOPE)
+	  else()
+        set(GOOGLETEST_BINARY_DIR "")
+        set(GOOGLEMOCK_BINARY_DIR ${BINARY_DIR}/lib PARENT_SCOPE)
+		endif()
 endfunction()
 
 function(prepare_google_testing)
